@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/hex/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "hex",
+    version = """1.4.0""",
+## _filedeps_path: 'hex'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@hex//:hex.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@hex//:hex.cmxa",
+            "@hex//:hex.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@cstruct//:cstruct",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'hex'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@hex//:hex.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@hex//:hex.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@cstruct//:cstruct",
+    ],
+    visibility = ["//visibility:public"]
+)

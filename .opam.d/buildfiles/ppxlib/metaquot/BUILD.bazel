@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/ppxlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "metaquot",
+    version = """0.15.0""",
+## _filedeps_path: 'ppxlib/metaquot'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//metaquot:ppxlib_metaquot.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//metaquot:ppxlib_metaquot.cmxa",
+            "@ppxlib//metaquot:ppxlib_metaquot.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ppxlib//:ppxlib",
+        "@ppxlib//metaquot_lifters",
+        "@ppxlib//traverse_builtins",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppxlib/metaquot'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//metaquot:ppxlib_metaquot.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//metaquot:ppxlib_metaquot.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ppxlib//:ppxlib",
+        "@ppxlib//metaquot_lifters",
+        "@ppxlib//traverse_builtins",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/cstruct/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "cstruct",
+    version = """5.2.0""",
+## _filedeps_path: 'cstruct'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@cstruct//:cstruct.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cstruct//:cstruct.cmxa",
+            "@cstruct//:cstruct.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'cstruct'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@cstruct//:cstruct.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cstruct//:cstruct.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+    ],
+    visibility = ["//visibility:public"]
+)

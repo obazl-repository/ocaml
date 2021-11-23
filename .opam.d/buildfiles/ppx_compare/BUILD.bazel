@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_compare/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_compare",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_compare'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_compare//:ppx_compare.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_compare//:ppx_compare.cmxa",
+            "@ppx_compare//:ppx_compare.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ppx_compare//expander",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_compare'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_compare//:ppx_compare.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_compare//:ppx_compare.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ppx_compare//expander",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

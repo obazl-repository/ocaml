@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/decompress/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "de",
+    version = """1.4.2""",
+## _filedeps_path: 'decompress/de'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@decompress//de:de.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@decompress//de:de.cmxa",
+            "@decompress//de:de.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@checkseum//:checkseum",
+        "@optint//:optint",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'decompress/de'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@decompress//de:de.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@decompress//de:de.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@checkseum//:checkseum",
+        "@optint//:optint",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,6 @@
+## original: /Users/gar/.opam/4.10/lib/odoc/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)

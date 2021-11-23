@@ -1,0 +1,68 @@
+## original: /Users/gar/.opam/4.10/lib/cohttp-lwt-unix/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "cohttp-lwt-unix",
+    version = """4.0.0""",
+    doc = """Lwt/Unix backend for Cohttp""",
+## _filedeps_path: 'cohttp-lwt-unix'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@cohttp-lwt-unix//:cohttp_lwt_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cohttp-lwt-unix//:cohttp_lwt_unix.cmxa",
+            "@cohttp-lwt-unix//:cohttp_lwt_unix.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@cohttp//:cohttp",
+        "@cohttp-lwt//:cohttp-lwt",
+        "@conduit-lwt//:conduit-lwt",
+        "@conduit-lwt-unix//:conduit-lwt-unix",
+        "@fmt//:fmt",
+        "@logs//:logs",
+        "@logs//fmt",
+        "@logs//lwt",
+        "@lwt//unix",
+        "@magic-mime//:magic-mime",
+        "@ppx_sexp_conv//runtime-lib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'cohttp-lwt-unix'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@cohttp-lwt-unix//:cohttp_lwt_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cohttp-lwt-unix//:cohttp_lwt_unix.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@cohttp//:cohttp",
+        "@cohttp-lwt//:cohttp-lwt",
+        "@conduit-lwt//:conduit-lwt",
+        "@conduit-lwt-unix//:conduit-lwt-unix",
+        "@fmt//:fmt",
+        "@logs//:logs",
+        "@logs//fmt",
+        "@logs//lwt",
+        "@lwt//unix",
+        "@magic-mime//:magic-mime",
+        "@ppx_sexp_conv//runtime-lib",
+    ],
+    visibility = ["//visibility:public"]
+)

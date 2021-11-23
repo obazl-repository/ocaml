@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/crowbar/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "crowbar",
+## _filedeps_path: 'crowbar'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@crowbar//:crowbar.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@crowbar//:crowbar.cmxa",
+            "@crowbar//:crowbar.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@afl-persistent//:afl-persistent",
+        "@cmdliner//:cmdliner",
+        "@ocplib-endian//:ocplib-endian",
+        "@str//:str",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'crowbar'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@crowbar//:crowbar.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@crowbar//:crowbar.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@afl-persistent//:afl-persistent",
+        "@cmdliner//:cmdliner",
+        "@ocplib-endian//:ocplib-endian",
+        "@str//:str",
+    ],
+    visibility = ["//visibility:public"]
+)

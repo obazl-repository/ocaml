@@ -1,0 +1,26 @@
+## original: /Users/gar/.opam/4.10/lib/findlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "findlib",
+    version = """1.9.1""",
+    doc = """Package manager""",
+    deps = select({
+        "X//conditions:default": [ ## predicates: 
+            "@FIXME: findlib/internal//lib",
+        ],
+        "X": [ ## predicates: toploop, 
+            "@FIXME: findlib/top//lib",
+            "@FIXME: findlib/internal//lib",
+        ],
+        "X": [ ## predicates: create_toploop, 
+            "@FIXME: findlib/top//lib",
+            "@FIXME: findlib/internal//lib",
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

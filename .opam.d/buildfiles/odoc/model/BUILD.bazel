@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/odoc/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "model",
+    version = """1.5.3""",
+## _filedeps_path: 'odoc/model'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@odoc//model:odoc_model.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@odoc//model:odoc_model.cmxa",
+            "@odoc//model:odoc_model.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@result//:result",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'odoc/model'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@odoc//model:odoc_model.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@odoc//model:odoc_model.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@result//:result",
+    ],
+    visibility = ["//visibility:public"]
+)

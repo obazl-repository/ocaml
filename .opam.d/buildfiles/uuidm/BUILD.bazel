@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/uuidm/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "uuidm",
+    version = """v0.9.7""",
+    doc = """Universally unique identifiers (UUIDs)""",
+## _filedeps_path: 'uuidm'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@uuidm//:uuidm.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@uuidm//:uuidm.cmxa",
+            "@uuidm//:uuidm.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bytes//:bytes",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'uuidm'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@uuidm//:uuidm.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@uuidm//:uuidm.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bytes//:bytes",
+    ],
+    visibility = ["//visibility:public"]
+)

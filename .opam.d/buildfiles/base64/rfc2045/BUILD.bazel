@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/base64/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "rfc2045",
+    version = """3.5.0""",
+## _filedeps_path: 'base64/rfc2045'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@base64//rfc2045:base64_rfc2045.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@base64//rfc2045:base64_rfc2045.cmxa",
+            "@base64//rfc2045:base64_rfc2045.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bytes//:bytes",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'base64/rfc2045'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@base64//rfc2045:base64_rfc2045.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@base64//rfc2045:base64_rfc2045.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bytes//:bytes",
+    ],
+    visibility = ["//visibility:public"]
+)

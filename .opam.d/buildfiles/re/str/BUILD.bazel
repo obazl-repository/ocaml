@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/re/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "str",
+    version = """1.9.0""",
+    doc = """Deprecated. Use Re.Str""",
+## _filedeps_path: 're/str'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@re//str:re_str.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@re//str:re_str.cmxa",
+            "@re//str:re_str.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@re//:re",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 're/str'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@re//str:re_str.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@re//str:re_str.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@re//:re",
+    ],
+    visibility = ["//visibility:public"]
+)

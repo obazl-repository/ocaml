@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/resto-cohttp/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "resto-cohttp",
+## _filedeps_path: 'resto-cohttp'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@resto-cohttp//:resto_cohttp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@resto-cohttp//:resto_cohttp.cmxa",
+            "@resto-cohttp//:resto_cohttp.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@cohttp-lwt//:cohttp-lwt",
+        "@resto//:resto",
+        "@resto-directory//:resto-directory",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'resto-cohttp'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@resto-cohttp//:resto_cohttp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@resto-cohttp//:resto_cohttp.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@cohttp-lwt//:cohttp-lwt",
+        "@resto//:resto",
+        "@resto-directory//:resto-directory",
+    ],
+    visibility = ["//visibility:public"]
+)

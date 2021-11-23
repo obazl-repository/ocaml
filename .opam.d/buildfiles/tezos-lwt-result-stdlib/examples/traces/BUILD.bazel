@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/tezos-lwt-result-stdlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "traces",
+## _filedeps_path: 'tezos-lwt-result-stdlib/examples/traces'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@tezos-lwt-result-stdlib//examples/traces:traces.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@tezos-lwt-result-stdlib//examples/traces:traces.cmxa",
+            "@tezos-lwt-result-stdlib//examples/traces:traces.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@lwt//:lwt",
+        "@tezos-lwt-result-stdlib//bare/structs",
+        "@tezos-lwt-result-stdlib//traced/sigs",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'tezos-lwt-result-stdlib/examples/traces'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@tezos-lwt-result-stdlib//examples/traces:traces.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@tezos-lwt-result-stdlib//examples/traces:traces.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@lwt//:lwt",
+        "@tezos-lwt-result-stdlib//bare/structs",
+        "@tezos-lwt-result-stdlib//traced/sigs",
+    ],
+    visibility = ["//visibility:public"]
+)

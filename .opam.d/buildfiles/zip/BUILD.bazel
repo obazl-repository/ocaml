@@ -1,0 +1,28 @@
+## original: /Users/gar/.opam/4.10/lib/zip/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "zip",
+    version = """1.09""",
+## _filedeps_path: 'zip'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@zip//:zip.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@zip//:zip.cmxa",
+            "@zip//:zip.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

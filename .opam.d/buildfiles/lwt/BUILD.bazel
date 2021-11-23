@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/lwt/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "lwt",
+    version = """5.4.1""",
+    doc = """Monadic promises and concurrent I/O""",
+## _filedeps_path: 'lwt'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt//:lwt.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt//:lwt.cmxa",
+            "@lwt//:lwt.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bytes//:bytes",
+        "@result//:result",
+        "@seq//:seq",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'lwt'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt//:lwt.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt//:lwt.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bytes//:bytes",
+        "@result//:result",
+        "@seq//:seq",
+    ],
+    visibility = ["//visibility:public"]
+)

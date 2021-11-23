@@ -1,0 +1,63 @@
+## original: /Users/gar/.opam/4.10/lib/ppxlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppxlib",
+    version = """0.15.0""",
+## _filedeps_path: 'ppxlib'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//:ppxlib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//:ppxlib.cmxa",
+            "@ppxlib//:ppxlib.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ocaml-compiler-libs//common",
+        "@ocaml-compiler-libs//shadow",
+        "@ocaml-migrate-parsetree//:ocaml-migrate-parsetree",
+        "@ppx_derivers//:ppx_derivers",
+        "@ppxlib//ast",
+        "@ppxlib//print_diff",
+        "@ppxlib//stdppx",
+        "@ppxlib//traverse_builtins",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppxlib'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//:ppxlib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//:ppxlib.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ocaml-compiler-libs//common",
+        "@ocaml-compiler-libs//shadow",
+        "@ocaml-migrate-parsetree//:ocaml-migrate-parsetree",
+        "@ppx_derivers//:ppx_derivers",
+        "@ppxlib//ast",
+        "@ppxlib//print_diff",
+        "@ppxlib//stdppx",
+        "@ppxlib//traverse_builtins",
+    ],
+    visibility = ["//visibility:public"]
+)

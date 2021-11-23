@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/mtime/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "jsoo",
+    version = """1.2.0""",
+    doc = """Mtime_clock for js_of_ocaml""",
+## _filedeps_path: 'mtime/jsoo'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@mtime//clock/jsoo:mtime_clock.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@mtime//clock/jsoo:mtime_clock.cmxa",
+            "@mtime//clock/jsoo:mtime_clock.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@js_of_ocaml//:js_of_ocaml",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'mtime/jsoo'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@mtime//clock/jsoo:mtime_clock.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@mtime//clock/jsoo:mtime_clock.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@js_of_ocaml//:js_of_ocaml",
+    ],
+    visibility = ["//visibility:public"]
+)

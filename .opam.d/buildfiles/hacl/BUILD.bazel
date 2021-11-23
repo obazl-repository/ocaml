@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/hacl/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "hacl",
+## _filedeps_path: 'hacl'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@hacl//:hacl.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@hacl//:hacl.cmxa",
+            "@hacl//:hacl.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigstring//:bigstring",
+        "@ocplib-endian//bigstring",
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'hacl'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@hacl//:hacl.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@hacl//:hacl.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigstring//:bigstring",
+        "@ocplib-endian//bigstring",
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)

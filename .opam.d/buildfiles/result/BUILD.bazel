@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/result/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "result",
+    version = """1.5""",
+## _filedeps_path: 'result'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@result//:result.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@result//:result.cmxa",
+            "@result//:result.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'result'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@result//:result.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@result//:result.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

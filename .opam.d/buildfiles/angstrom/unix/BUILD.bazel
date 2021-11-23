@@ -1,0 +1,15 @@
+## original: /Users/gar/.opam/4.10/lib/angstrom/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "unix",
+    doc = """Deprecated. Use angstrom-unix directly""",
+    deps = [
+        "@angstrom-unix//:angstrom-unix",
+    ],
+    visibility = ["//visibility:public"]
+)

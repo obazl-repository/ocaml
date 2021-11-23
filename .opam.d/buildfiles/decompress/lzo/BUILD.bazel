@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/decompress/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "lzo",
+    version = """1.4.2""",
+## _filedeps_path: 'decompress/lzo'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@decompress//lzo:lzo.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@decompress//lzo:lzo.cmxa",
+            "@decompress//lzo:lzo.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'decompress/lzo'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@decompress//lzo:lzo.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@decompress//lzo:lzo.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+    ],
+    visibility = ["//visibility:public"]
+)

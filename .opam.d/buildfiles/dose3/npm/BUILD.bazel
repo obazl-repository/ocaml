@@ -1,0 +1,25 @@
+## original: /Users/gar/.opam/4.10/lib/dose3/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "npm",
+    version = """5.0.1""",
+## _filedeps_path: 'dose3'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@dose3//npm:npm.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@dose3//npm:npm.cmxa",
+            "@dose3//npm:npm.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)

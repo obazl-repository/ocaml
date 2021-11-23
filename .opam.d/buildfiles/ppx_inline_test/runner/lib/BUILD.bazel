@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_inline_test/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "lib",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_inline_test/runner/lib'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_inline_test//runner/lib:ppx_inline_test_runner_lib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_inline_test//runner/lib:ppx_inline_test_runner_lib.cmxa",
+            "@ppx_inline_test//runner/lib:ppx_inline_test_runner_lib.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_inline_test/runner/lib'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_inline_test//runner/lib:ppx_inline_test_runner_lib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_inline_test//runner/lib:ppx_inline_test_runner_lib.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+    ],
+    visibility = ["//visibility:public"]
+)

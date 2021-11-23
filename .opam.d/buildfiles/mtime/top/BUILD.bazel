@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/mtime/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "top",
+    version = """1.2.0""",
+    doc = """Mtime toplevel support""",
+## _filedeps_path: 'mtime'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@mtime//top:mtime_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@mtime//top:mtime_top.cmxa",
+            "@mtime//top:mtime_top.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@mtime//:mtime",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'mtime'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@mtime//top:mtime_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@mtime//top:mtime_top.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@mtime//:mtime",
+    ],
+    visibility = ["//visibility:public"]
+)

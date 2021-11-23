@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/uucp/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "uucp",
+    version = """13.0.0""",
+    doc = """Unicode character properties""",
+## _filedeps_path: 'uucp'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@uucp//:uucp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@uucp//:uucp.cmxa",
+            "@uucp//:uucp.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'uucp'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@uucp//:uucp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@uucp//:uucp.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

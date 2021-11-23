@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/tyxml/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "tyxml",
+    version = """4.5.0""",
+## _filedeps_path: 'tyxml'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@tyxml//:tyxml.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@tyxml//:tyxml.cmxa",
+            "@tyxml//:tyxml.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@re//:re",
+        "@tyxml//functor",
+        "@uutf//:uutf",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'tyxml'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@tyxml//:tyxml.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@tyxml//:tyxml.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@re//:re",
+        "@tyxml//functor",
+        "@uutf//:uutf",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_repr/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_repr",
+    version = """0.3.0""",
+## _filedeps_path: 'ppx_repr'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_repr//:ppx_repr.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_repr//:ppx_repr.cmxa",
+            "@ppx_repr//:ppx_repr.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ppx_repr//lib",
+        "@ppxlib//:ppxlib",
+    ],
+    ppx_codeps = [
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_repr'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_repr//:ppx_repr.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_repr//:ppx_repr.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ppx_repr//lib",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

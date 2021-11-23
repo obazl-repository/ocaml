@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/b0/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "std",
+    version = """0.0.2""",
+    doc = """B00 stdlib extensions""",
+## _filedeps_path: 'b0/b00/std'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@b0//b00/std:b0_b00_std.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@b0//b00/std:b0_b00_std.cmxa",
+            "@b0//b00/std:b0_b00_std.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'b0/b00/std'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@b0//b00/std:b0_b00_std.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@b0//b00/std:b0_b00_std.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

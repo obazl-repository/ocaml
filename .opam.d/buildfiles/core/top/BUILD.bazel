@@ -1,0 +1,46 @@
+## original: /Users/gar/.opam/4.10/lib/core/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "top",
+    version = """v0.14.0""",
+## _filedeps_path: 'core/top'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@core//top:core_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:toplevel",
+        "@core//:core",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'core/top'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@core//top:core_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:toplevel",
+        "@core//:core",
+    ],
+    visibility = ["//visibility:public"]
+)

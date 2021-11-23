@@ -1,0 +1,25 @@
+## original: /Users/gar/.opam/4.10/lib/hashcons/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "hashcons",
+    version = """1.2""",
+    doc = """Hash-consing library""",
+## _filedeps_path: 'hashcons'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@hashcons//:hashcons.cmo",
+
+        ],
+        "@ocaml//mode:native": [
+            "@hashcons//:hashcons.cmx",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)

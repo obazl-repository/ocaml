@@ -1,0 +1,16 @@
+## original: /Users/gar/.opam/4.10/lib/ocamldoc/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ocamldoc",
+    version = """[distributed with Ocaml]""",
+    doc = """ocamldoc plugin interface""",
+    deps = [
+        "@ocaml//compiler-libs",
+    ],
+    visibility = ["//visibility:public"]
+)

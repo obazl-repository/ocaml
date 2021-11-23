@@ -1,0 +1,54 @@
+## original: /Users/gar/.opam/4.10/lib/dose3/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "dose3",
+    version = """5.0.1""",
+    doc = """Dose3 libraries""",
+## _filedeps_path: 'dose3'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@dose3//:common.cma",
+            "@dose3//:algo.cma",
+            "@dose3//:versioning.cma",
+            "@dose3//:pef.cma",
+            "@dose3//:debian.cma",
+            "@dose3//:csw.cma",
+            "@dose3//:opam.cma",
+            "@dose3//:npm.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@dose3//:common.cmxa",
+            "@dose3//:common.a",
+            "@dose3//:algo.cmxa",
+            "@dose3//:algo.a",
+            "@dose3//:versioning.cmxa",
+            "@dose3//:versioning.a",
+            "@dose3//:pef.cmxa",
+            "@dose3//:pef.a",
+            "@dose3//:debian.cmxa",
+            "@dose3//:debian.a",
+            "@dose3//:csw.cmxa",
+            "@dose3//:csw.a",
+            "@dose3//:opam.cmxa",
+            "@dose3//:opam.a",
+            "@dose3//:npm.cmxa",
+            "@dose3//:npm.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@extlib//:extlib",
+        "@re//pcre",
+        "@cudf//:cudf",
+        "@ocamlgraph//:ocamlgraph",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

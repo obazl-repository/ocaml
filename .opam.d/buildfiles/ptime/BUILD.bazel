@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/ptime/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ptime",
+    version = """0.8.5""",
+    doc = """POSIX time for OCaml""",
+## _filedeps_path: 'ptime'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ptime//:ptime.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ptime//:ptime.cmxa",
+            "@ptime//:ptime.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@result//:result",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ptime'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ptime//:ptime.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ptime//:ptime.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@result//:result",
+    ],
+    visibility = ["//visibility:public"]
+)

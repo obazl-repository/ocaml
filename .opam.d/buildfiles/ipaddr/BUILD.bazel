@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/ipaddr/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ipaddr",
+    version = """5.2.0""",
+## _filedeps_path: 'ipaddr'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ipaddr//:ipaddr.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ipaddr//:ipaddr.cmxa",
+            "@ipaddr//:ipaddr.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@domain-name//:domain-name",
+        "@macaddr//:macaddr",
+        "@stdlib-shims//:stdlib-shims",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ipaddr'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ipaddr//:ipaddr.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ipaddr//:ipaddr.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@domain-name//:domain-name",
+        "@macaddr//:macaddr",
+        "@stdlib-shims//:stdlib-shims",
+    ],
+    visibility = ["//visibility:public"]
+)

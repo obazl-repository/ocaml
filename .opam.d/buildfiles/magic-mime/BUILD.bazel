@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/magic-mime/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "magic-mime",
+    version = """1.2.0""",
+## _filedeps_path: 'magic-mime'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@magic-mime//:magic_mime_library.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@magic-mime//:magic_mime_library.cmxa",
+            "@magic-mime//:magic_mime_library.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'magic-mime'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@magic-mime//:magic_mime_library.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@magic-mime//:magic_mime_library.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

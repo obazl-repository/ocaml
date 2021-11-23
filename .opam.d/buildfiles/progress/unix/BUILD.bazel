@@ -1,0 +1,55 @@
+## original: /Users/gar/.opam/4.10/lib/progress/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "unix",
+    version = """0.1.1""",
+## _filedeps_path: 'progress/unix'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@progress//unix:progress_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@progress//unix:progress_unix.cmxa",
+            "@progress//unix:progress_unix.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@mtime//clock",
+        "@mtime//clock/os",
+        "@progress//:progress",
+        "@terminal_size//:terminal_size",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'progress/unix'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@progress//unix:progress_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@progress//unix:progress_unix.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@mtime//clock",
+        "@mtime//clock/os",
+        "@progress//:progress",
+        "@terminal_size//:terminal_size",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

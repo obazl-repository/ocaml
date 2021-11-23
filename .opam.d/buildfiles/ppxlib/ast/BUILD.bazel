@@ -1,0 +1,53 @@
+## original: /Users/gar/.opam/4.10/lib/ppxlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ast",
+    version = """0.15.0""",
+## _filedeps_path: 'ppxlib/ast'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//ast:ppxlib_ast.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//ast:ppxlib_ast.cmxa",
+            "@ppxlib//ast:ppxlib_ast.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ocaml-compiler-libs//common",
+        "@ocaml-compiler-libs//shadow",
+        "@ocaml-migrate-parsetree//:ocaml-migrate-parsetree",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppxlib/ast'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//ast:ppxlib_ast.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//ast:ppxlib_ast.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ocaml-compiler-libs//common",
+        "@ocaml-compiler-libs//shadow",
+        "@ocaml-migrate-parsetree//:ocaml-migrate-parsetree",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/json-data-encoding/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "json-data-encoding",
+    doc = """Type-safe encoding to and decoding from JSON""",
+## _filedeps_path: 'json-data-encoding'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@json-data-encoding//:json_data_encoding.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@json-data-encoding//:json_data_encoding.cmxa",
+            "@json-data-encoding//:json_data_encoding.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'json-data-encoding'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@json-data-encoding//:json_data_encoding.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@json-data-encoding//:json_data_encoding.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)

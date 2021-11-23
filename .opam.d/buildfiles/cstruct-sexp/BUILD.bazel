@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/cstruct-sexp/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "cstruct-sexp",
+    version = """5.2.0""",
+## _filedeps_path: 'cstruct-sexp'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@cstruct-sexp//:cstruct_sexp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cstruct-sexp//:cstruct_sexp.cmxa",
+            "@cstruct-sexp//:cstruct_sexp.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@cstruct//:cstruct",
+        "@sexplib//:sexplib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'cstruct-sexp'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@cstruct-sexp//:cstruct_sexp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cstruct-sexp//:cstruct_sexp.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@cstruct//:cstruct",
+        "@sexplib//:sexplib",
+    ],
+    visibility = ["//visibility:public"]
+)

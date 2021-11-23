@@ -1,0 +1,29 @@
+## original: /Users/gar/.opam/4.10/lib/dum/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "dum",
+    version = """1.0.1""",
+    doc = """Dump OCaml values""",
+## _filedeps_path: 'dum'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@dum//:dum.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@dum//:dum.cmxa",
+            "@dum//:dum.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@easy-format//:easy-format",
+    ],
+    visibility = ["//visibility:public"]
+)

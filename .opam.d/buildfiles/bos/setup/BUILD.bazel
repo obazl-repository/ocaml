@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/bos/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "setup",
+    version = """0.2.1""",
+    doc = """Bos quick setup for simple programs""",
+## _filedeps_path: 'bos'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@bos//setup:bos_setup.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bos//setup:bos_setup.cmxa",
+            "@bos//setup:bos_setup.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@fmt//tty",
+        "@logs//fmt",
+        "@bos//:bos",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'bos'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@bos//setup:bos_setup.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bos//setup:bos_setup.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@fmt//tty",
+        "@logs//fmt",
+        "@bos//:bos",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/re/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "pcre",
+    version = """1.9.0""",
+    doc = """Deprecated. Use Re.Pcre""",
+## _filedeps_path: 're/pcre'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@re//pcre:re_pcre.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@re//pcre:re_pcre.cmxa",
+            "@re//pcre:re_pcre.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@re//:re",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 're/pcre'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@re//pcre:re_pcre.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@re//pcre:re_pcre.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@re//:re",
+    ],
+    visibility = ["//visibility:public"]
+)

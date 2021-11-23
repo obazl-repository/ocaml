@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/eqaf/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "eqaf",
+    version = """0.8""",
+## _filedeps_path: 'eqaf'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@eqaf//:eqaf.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@eqaf//:eqaf.cmxa",
+            "@eqaf//:eqaf.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'eqaf'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@eqaf//:eqaf.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@eqaf//:eqaf.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

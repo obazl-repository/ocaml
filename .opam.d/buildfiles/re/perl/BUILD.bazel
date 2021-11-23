@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/re/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "perl",
+    version = """1.9.0""",
+    doc = """Deprecated. Use Re.Perl""",
+## _filedeps_path: 're/perl'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@re//perl:re_perl.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@re//perl:re_perl.cmxa",
+            "@re//perl:re_perl.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@re//:re",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 're/perl'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@re//perl:re_perl.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@re//perl:re_perl.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@re//:re",
+    ],
+    visibility = ["//visibility:public"]
+)

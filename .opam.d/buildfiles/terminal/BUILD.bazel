@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/terminal/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "terminal",
+    version = """0.2.1""",
+## _filedeps_path: 'terminal'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@terminal//:terminal.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@terminal//:terminal.cmxa",
+            "@terminal//:terminal.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@stdlib-shims//:stdlib-shims",
+        "@uucp//:uucp",
+        "@uutf//:uutf",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'terminal'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@terminal//:terminal.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@terminal//:terminal.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@stdlib-shims//:stdlib-shims",
+        "@uucp//:uucp",
+        "@uutf//:uutf",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/logs/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "cli",
+    version = """0.7.0""",
+    doc = """Cmdliner support for Logs""",
+## _filedeps_path: 'logs'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@logs//cli:logs_cli.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@logs//cli:logs_cli.cmxa",
+            "@logs//cli:logs_cli.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@logs//:logs",
+        "@cmdliner//:cmdliner",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'logs'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@logs//cli:logs_cli.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@logs//cli:logs_cli.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@logs//:logs",
+        "@cmdliner//:cmdliner",
+    ],
+    visibility = ["//visibility:public"]
+)

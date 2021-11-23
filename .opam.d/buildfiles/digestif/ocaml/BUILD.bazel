@@ -1,0 +1,53 @@
+## original: /Users/gar/.opam/4.10/lib/digestif/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ocaml",
+    version = """0.9.0""",
+## _filedeps_path: 'digestif/ocaml'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@digestif//ocaml:digestif_ocaml.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@digestif//ocaml:digestif_ocaml.cmxa",
+            "@digestif//ocaml:digestif_ocaml.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@digestif//:digestif",
+        "@eqaf//:eqaf",
+        "@stdlib-shims//:stdlib-shims",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'digestif/ocaml'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@digestif//ocaml:digestif_ocaml.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@digestif//ocaml:digestif_ocaml.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@digestif//:digestif",
+        "@eqaf//:eqaf",
+        "@stdlib-shims//:stdlib-shims",
+    ],
+    visibility = ["//visibility:public"]
+)

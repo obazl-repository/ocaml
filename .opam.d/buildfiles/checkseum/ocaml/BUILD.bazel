@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/checkseum/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ocaml",
+    version = """0.3.2""",
+## _filedeps_path: 'checkseum/ocaml'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@checkseum//ocaml:checkseum_ocaml.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@checkseum//ocaml:checkseum_ocaml.cmxa",
+            "@checkseum//ocaml:checkseum_ocaml.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@checkseum//:checkseum",
+        "@optint//:optint",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'checkseum/ocaml'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@checkseum//ocaml:checkseum_ocaml.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@checkseum//ocaml:checkseum_ocaml.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@checkseum//:checkseum",
+        "@optint//:optint",
+    ],
+    visibility = ["//visibility:public"]
+)

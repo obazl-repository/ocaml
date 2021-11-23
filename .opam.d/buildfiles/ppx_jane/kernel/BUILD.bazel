@@ -1,0 +1,83 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_jane/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "kernel",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_jane/kernel'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_jane//kernel:ppx_jane_kernel.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_jane//kernel:ppx_jane_kernel.cmxa",
+            "@ppx_jane//kernel:ppx_jane_kernel.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ppx_assert//:ppx_assert",
+        "@ppx_base//:ppx_base",
+        "@ppx_bench//:ppx_bench",
+        "@ppx_bin_prot//:ppx_bin_prot",
+        "@ppx_custom_printf//:ppx_custom_printf",
+        "@ppx_fields_conv//:ppx_fields_conv",
+        "@ppx_fixed_literal//:ppx_fixed_literal",
+        "@ppx_here//:ppx_here",
+        "@ppx_inline_test//:ppx_inline_test",
+        "@ppx_let//:ppx_let",
+        "@ppx_module_timer//:ppx_module_timer",
+        "@ppx_optcomp//:ppx_optcomp",
+        "@ppx_optional//:ppx_optional",
+        "@ppx_pipebang//:ppx_pipebang",
+        "@ppx_sexp_message//:ppx_sexp_message",
+        "@ppx_sexp_value//:ppx_sexp_value",
+        "@ppx_string//:ppx_string",
+        "@ppx_typerep_conv//:ppx_typerep_conv",
+        "@ppx_variants_conv//:ppx_variants_conv",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_jane/kernel'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_jane//kernel:ppx_jane_kernel.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_jane//kernel:ppx_jane_kernel.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ppx_assert//:ppx_assert",
+        "@ppx_base//:ppx_base",
+        "@ppx_bench//:ppx_bench",
+        "@ppx_bin_prot//:ppx_bin_prot",
+        "@ppx_custom_printf//:ppx_custom_printf",
+        "@ppx_fields_conv//:ppx_fields_conv",
+        "@ppx_fixed_literal//:ppx_fixed_literal",
+        "@ppx_here//:ppx_here",
+        "@ppx_inline_test//:ppx_inline_test",
+        "@ppx_let//:ppx_let",
+        "@ppx_module_timer//:ppx_module_timer",
+        "@ppx_optcomp//:ppx_optcomp",
+        "@ppx_optional//:ppx_optional",
+        "@ppx_pipebang//:ppx_pipebang",
+        "@ppx_sexp_message//:ppx_sexp_message",
+        "@ppx_sexp_value//:ppx_sexp_value",
+        "@ppx_string//:ppx_string",
+        "@ppx_typerep_conv//:ppx_typerep_conv",
+        "@ppx_variants_conv//:ppx_variants_conv",
+    ],
+    visibility = ["//visibility:public"]
+)

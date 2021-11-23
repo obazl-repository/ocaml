@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/stdlib-shims/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "stdlib-shims",
+    version = """0.3.0""",
+## _filedeps_path: 'stdlib-shims'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@stdlib-shims//:stdlib_shims.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@stdlib-shims//:stdlib_shims.cmxa",
+            "@stdlib-shims//:stdlib_shims.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'stdlib-shims'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@stdlib-shims//:stdlib_shims.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@stdlib-shims//:stdlib_shims.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

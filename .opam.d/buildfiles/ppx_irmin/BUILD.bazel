@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_irmin/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_irmin",
+    version = """2.5.4""",
+## _filedeps_path: 'ppx_irmin'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_irmin//:ppx_irmin.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_irmin//:ppx_irmin.cmxa",
+            "@ppx_irmin//:ppx_irmin.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ppx_repr//lib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_irmin'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_irmin//:ppx_irmin.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_irmin//:ppx_irmin.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ppx_repr//lib",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/odig/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "support",
+    version = """0.0.6""",
+    doc = """Odig support library""",
+## _filedeps_path: 'odig'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@odig//support:odig_support.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@odig//support:odig_support.cmxa",
+            "@odig//support:odig_support.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@b0//b00/std",
+        "@b0//b00",
+        "@b0//b00/kit",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'odig'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@odig//support:odig_support.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@odig//support:odig_support.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@b0//b00/std",
+        "@b0//b00",
+        "@b0//b00/kit",
+    ],
+    visibility = ["//visibility:public"]
+)

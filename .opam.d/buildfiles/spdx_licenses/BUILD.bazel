@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/spdx_licenses/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "spdx_licenses",
+    version = """1.0.0""",
+## _filedeps_path: 'spdx_licenses'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@spdx_licenses//:spdx_licenses.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@spdx_licenses//:spdx_licenses.cmxa",
+            "@spdx_licenses//:spdx_licenses.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'spdx_licenses'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@spdx_licenses//:spdx_licenses.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@spdx_licenses//:spdx_licenses.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

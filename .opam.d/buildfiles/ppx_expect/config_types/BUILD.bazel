@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_expect/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "config_types",
+    version = """v0.14.0""",
+    doc = """Runtime configuration options for ppx_expect""",
+## _filedeps_path: 'ppx_expect/config_types'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_expect//config_types:expect_test_config_types.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_expect//config_types:expect_test_config_types.cmxa",
+            "@ppx_expect//config_types:expect_test_config_types.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_expect/config_types'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_expect//config_types:expect_test_config_types.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_expect//config_types:expect_test_config_types.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

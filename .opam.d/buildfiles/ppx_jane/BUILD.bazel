@@ -1,0 +1,53 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_jane/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_jane",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_jane'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_jane//:ppx_jane.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_jane//:ppx_jane.cmxa",
+            "@ppx_jane//:ppx_jane.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base_quickcheck//ppx_quickcheck",
+        "@ppx_expect//:ppx_expect",
+        "@ppx_jane//kernel",
+        "@ppx_stable//:ppx_stable",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_jane'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_jane//:ppx_jane.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_jane//:ppx_jane.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base_quickcheck//ppx_quickcheck",
+        "@ppx_expect//:ppx_expect",
+        "@ppx_jane//kernel",
+        "@ppx_stable//:ppx_stable",
+    ],
+    visibility = ["//visibility:public"]
+)

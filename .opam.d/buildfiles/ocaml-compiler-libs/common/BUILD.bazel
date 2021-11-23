@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/ocaml-compiler-libs/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "common",
+    version = """v0.12.3""",
+## _filedeps_path: 'ocaml-compiler-libs/common'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml-compiler-libs//common:ocaml_common.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml-compiler-libs//common:ocaml_common.cmxa",
+            "@ocaml-compiler-libs//common:ocaml_common.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ocaml-compiler-libs/common'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml-compiler-libs//common:ocaml_common.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml-compiler-libs//common:ocaml_common.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+    ],
+    visibility = ["//visibility:public"]
+)

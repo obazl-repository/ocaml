@@ -1,0 +1,99 @@
+## original: /Users/gar/.opam/4.10/lib/core/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "core",
+    version = """v0.14.0""",
+## _filedeps_path: 'core'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@core//:core.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@core//:core.cmxa",
+            "@core//:core.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@base_quickcheck//:base_quickcheck",
+        "@bin_prot//:bin_prot",
+        "@core//error_checking_mutex",
+        "@core_kernel//:core_kernel",
+        "@core_kernel//base_for_tests",
+        "@core_kernel//caml_unix",
+        "@core_kernel//flags",
+        "@core_kernel//version_util",
+        "@fieldslib//:fieldslib",
+        "@ppx_assert//runtime-lib",
+        "@ppx_bench//runtime-lib",
+        "@ppx_compare//runtime-lib",
+        "@ppx_enumerate//runtime-lib",
+        "@ppx_expect//collector",
+        "@ppx_expect//config",
+        "@ppx_hash//runtime-lib",
+        "@ppx_here//runtime-lib",
+        "@ppx_inline_test//runtime-lib",
+        "@ppx_module_timer//runtime",
+        "@ppx_sexp_conv//runtime-lib",
+        "@sexplib//unix",
+        "@spawn//:spawn",
+        "@ocaml//threads",
+        "@timezone//:timezone",
+        "@typerep//:typerep",
+        "@variantslib//:variantslib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'core'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@core//:core.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@core//:core.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@base_quickcheck//:base_quickcheck",
+        "@bin_prot//:bin_prot",
+        "@core//error_checking_mutex",
+        "@core_kernel//:core_kernel",
+        "@core_kernel//base_for_tests",
+        "@core_kernel//caml_unix",
+        "@core_kernel//flags",
+        "@core_kernel//version_util",
+        "@fieldslib//:fieldslib",
+        "@ppx_assert//runtime-lib",
+        "@ppx_bench//runtime-lib",
+        "@ppx_compare//runtime-lib",
+        "@ppx_enumerate//runtime-lib",
+        "@ppx_expect//collector",
+        "@ppx_expect//config",
+        "@ppx_hash//runtime-lib",
+        "@ppx_here//runtime-lib",
+        "@ppx_inline_test//runtime-lib",
+        "@ppx_module_timer//runtime",
+        "@ppx_sexp_conv//runtime-lib",
+        "@sexplib//unix",
+        "@spawn//:spawn",
+        "@ocaml//threads",
+        "@timezone//:timezone",
+        "@typerep//:typerep",
+        "@variantslib//:variantslib",
+    ],
+    visibility = ["//visibility:public"]
+)

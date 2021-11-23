@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/irmin-pack/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "layered",
+    version = """2.5.4""",
+## _filedeps_path: 'irmin-pack/layered'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@irmin-pack//layered:irmin_pack_layered.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@irmin-pack//layered:irmin_pack_layered.cmxa",
+            "@irmin-pack//layered:irmin_pack_layered.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@irmin-layers//:irmin-layers",
+        "@irmin-pack//:irmin-pack",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'irmin-pack/layered'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@irmin-pack//layered:irmin_pack_layered.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@irmin-pack//layered:irmin_pack_layered.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@irmin-layers//:irmin-layers",
+        "@irmin-pack//:irmin-pack",
+    ],
+    visibility = ["//visibility:public"]
+)

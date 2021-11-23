@@ -1,0 +1,64 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_deriving/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "std",
+    version = """5.1""",
+    doc = """Meta-package for all built-in derivers""",
+## _filedeps_path: 'ppx_deriving/std'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//std:ppx_deriving_std.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//std:ppx_deriving_std.cmxa",
+            "@ppx_deriving//std:ppx_deriving_std.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ppx_deriving//create",
+        "@ppx_deriving//enum",
+        "@ppx_deriving//eq",
+        "@ppx_deriving//fold",
+        "@ppx_deriving//iter",
+        "@ppx_deriving//make",
+        "@ppx_deriving//map",
+        "@ppx_deriving//ord",
+        "@ppx_deriving//show",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_deriving/std'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//std:ppx_deriving_std.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//std:ppx_deriving_std.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ppx_deriving//create",
+        "@ppx_deriving//enum",
+        "@ppx_deriving//eq",
+        "@ppx_deriving//fold",
+        "@ppx_deriving//iter",
+        "@ppx_deriving//make",
+        "@ppx_deriving//map",
+        "@ppx_deriving//ord",
+        "@ppx_deriving//show",
+    ],
+    visibility = ["//visibility:public"]
+)

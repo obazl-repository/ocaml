@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_module_timer/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_module_timer",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_module_timer'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_module_timer//:ppx_module_timer.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_module_timer//:ppx_module_timer.cmxa",
+            "@ppx_module_timer//:ppx_module_timer.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ppxlib//:ppxlib",
+    ],
+    ppx_codeps = [
+        "@ppx_module_timer//runtime",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_module_timer'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_module_timer//:ppx_module_timer.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_module_timer//:ppx_module_timer.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

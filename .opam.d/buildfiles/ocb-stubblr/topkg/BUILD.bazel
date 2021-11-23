@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/ocb-stubblr/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "topkg",
+    version = """0.1.1""",
+    doc = """OCamlbuild plugin for C stubs""",
+## _filedeps_path: 'ocb-stubblr'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ocb-stubblr//topkg:ocb-stubblr-topkg.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocb-stubblr//topkg:ocb-stubblr-topkg.cmxa",
+            "@ocb-stubblr//topkg:ocb-stubblr-topkg.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@topkg//:topkg",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ocb-stubblr'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ocb-stubblr//topkg:ocb-stubblr-topkg.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocb-stubblr//topkg:ocb-stubblr-topkg.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@topkg//:topkg",
+    ],
+    visibility = ["//visibility:public"]
+)

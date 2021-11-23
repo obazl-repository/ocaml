@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/logs/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "logs",
+    version = """0.7.0""",
+    doc = """Logging infrastructure for OCaml""",
+## _filedeps_path: 'logs'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@logs//:logs.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@logs//:logs.cmxa",
+            "@logs//:logs.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'logs'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@logs//:logs.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@logs//:logs.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

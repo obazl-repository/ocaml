@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_fixed_literal/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_fixed_literal",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_fixed_literal'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_fixed_literal//:ppx_fixed_literal.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_fixed_literal//:ppx_fixed_literal.cmxa",
+            "@ppx_fixed_literal//:ppx_fixed_literal.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_fixed_literal'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_fixed_literal//:ppx_fixed_literal.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_fixed_literal//:ppx_fixed_literal.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

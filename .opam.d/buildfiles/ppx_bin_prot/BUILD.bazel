@@ -1,0 +1,55 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_bin_prot/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_bin_prot",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_bin_prot'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_bin_prot//:ppx_bin_prot.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_bin_prot//:ppx_bin_prot.cmxa",
+            "@ppx_bin_prot//:ppx_bin_prot.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ocaml//compiler-libs:common",
+        "@ppx_bin_prot//shape-expander",
+        "@ppxlib//:ppxlib",
+    ],
+    ppx_codeps = [
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_bin_prot'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_bin_prot//:ppx_bin_prot.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_bin_prot//:ppx_bin_prot.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ocaml//compiler-libs:common",
+        "@ppx_bin_prot//shape-expander",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

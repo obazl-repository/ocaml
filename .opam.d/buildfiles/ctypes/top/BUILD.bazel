@@ -1,0 +1,29 @@
+## original: /Users/gar/.opam/4.10/lib/ctypes/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "top",
+    version = """0.18.0""",
+    doc = """Toplevel printers for C types""",
+## _filedeps_path: 'ctypes'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ctypes//top:ctypes-top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ctypes//top:ctypes-top.cmxa",
+            "@ctypes//top:ctypes-top.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ctypes//:ctypes",
+    ],
+    visibility = ["//visibility:public"]
+)

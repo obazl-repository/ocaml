@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/macaddr/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "macaddr",
+    version = """5.2.0""",
+## _filedeps_path: 'macaddr'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@macaddr//:macaddr.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@macaddr//:macaddr.cmxa",
+            "@macaddr//:macaddr.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'macaddr'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@macaddr//:macaddr.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@macaddr//:macaddr.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

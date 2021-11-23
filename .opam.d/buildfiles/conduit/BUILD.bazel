@@ -1,0 +1,57 @@
+## original: /Users/gar/.opam/4.10/lib/conduit/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "conduit",
+    version = """2.1.0""",
+## _filedeps_path: 'conduit'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@conduit//:conduit.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@conduit//:conduit.cmxa",
+            "@conduit//:conduit.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@astring//:astring",
+        "@ipaddr//:ipaddr",
+        "@ipaddr-sexp//:ipaddr-sexp",
+        "@ppx_sexp_conv//runtime-lib",
+        "@sexplib//:sexplib",
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'conduit'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@conduit//:conduit.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@conduit//:conduit.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@astring//:astring",
+        "@ipaddr//:ipaddr",
+        "@ipaddr-sexp//:ipaddr-sexp",
+        "@ppx_sexp_conv//runtime-lib",
+        "@sexplib//:sexplib",
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,55 @@
+## original: /Users/gar/.opam/4.10/lib/repr/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "repr",
+    version = """0.3.0""",
+## _filedeps_path: 'repr'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@repr//:repr.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@repr//:repr.cmxa",
+            "@repr//:repr.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base64//:base64",
+        "@either//:either",
+        "@fmt//:fmt",
+        "@jsonm//:jsonm",
+        "@uutf//:uutf",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'repr'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@repr//:repr.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@repr//:repr.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base64//:base64",
+        "@either//:either",
+        "@fmt//:fmt",
+        "@jsonm//:jsonm",
+        "@uutf//:uutf",
+    ],
+    visibility = ["//visibility:public"]
+)

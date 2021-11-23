@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/angstrom/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "angstrom",
+    version = """0.15.0""",
+## _filedeps_path: 'angstrom'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@angstrom//:angstrom.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@angstrom//:angstrom.cmxa",
+            "@angstrom//:angstrom.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigstringaf//:bigstringaf",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'angstrom'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@angstrom//:angstrom.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@angstrom//:angstrom.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigstringaf//:bigstringaf",
+    ],
+    visibility = ["//visibility:public"]
+)

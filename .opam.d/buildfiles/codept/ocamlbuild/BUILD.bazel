@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/codept/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ocamlbuild",
+    version = """0.11.0""",
+## _filedeps_path: 'codept/ocamlbuild'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@codept//ocamlbuild:ocamlbuild_plugin.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@codept//ocamlbuild:ocamlbuild_plugin.cmxa",
+            "@codept//ocamlbuild:ocamlbuild_plugin.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocamlbuild//:ocamlbuild",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'codept/ocamlbuild'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@codept//ocamlbuild:ocamlbuild_plugin.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@codept//ocamlbuild:ocamlbuild_plugin.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocamlbuild//:ocamlbuild",
+    ],
+    visibility = ["//visibility:public"]
+)

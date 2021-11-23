@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/topkg/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "topkg",
+    version = """1.0.3""",
+    doc = """The transitory OCaml software packager""",
+## _filedeps_path: 'topkg'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@topkg//:topkg.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@topkg//:topkg.cmxa",
+            "@topkg//:topkg.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'topkg'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@topkg//:topkg.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@topkg//:topkg.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

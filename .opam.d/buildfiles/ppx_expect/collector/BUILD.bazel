@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_expect/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "collector",
+    version = """v0.14.0""",
+    doc = """Runtime library for ppx_expect""",
+## _filedeps_path: 'ppx_expect/collector'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_expect//collector:expect_test_collector.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_expect//collector:expect_test_collector.cmxa",
+            "@ppx_expect//collector:expect_test_collector.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ppx_expect//common",
+        "@ppx_expect//config_types",
+        "@ppx_inline_test//runtime-lib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_expect/collector'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_expect//collector:expect_test_collector.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_expect//collector:expect_test_collector.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ppx_expect//common",
+        "@ppx_expect//config_types",
+        "@ppx_inline_test//runtime-lib",
+    ],
+    visibility = ["//visibility:public"]
+)

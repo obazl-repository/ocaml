@@ -1,0 +1,62 @@
+## original: /Users/gar/.opam/4.10/lib/cohttp/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "cohttp",
+    version = """4.0.0""",
+    doc = """Co-operative Client/Server HTTP library.""",
+## _filedeps_path: 'cohttp'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@cohttp//:cohttp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cohttp//:cohttp.cmxa",
+            "@cohttp//:cohttp.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base64//:base64",
+        "@bytes//:bytes",
+        "@ppx_sexp_conv//runtime-lib",
+        "@re//:re",
+        "@sexplib0//:sexplib0",
+        "@stringext//:stringext",
+        "@uri//:uri",
+        "@uri-sexp//:uri-sexp",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'cohttp'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@cohttp//:cohttp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cohttp//:cohttp.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base64//:base64",
+        "@bytes//:bytes",
+        "@ppx_sexp_conv//runtime-lib",
+        "@re//:re",
+        "@sexplib0//:sexplib0",
+        "@stringext//:stringext",
+        "@uri//:uri",
+        "@uri-sexp//:uri-sexp",
+    ],
+    visibility = ["//visibility:public"]
+)

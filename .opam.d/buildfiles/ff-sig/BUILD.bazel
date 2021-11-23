@@ -1,0 +1,46 @@
+## original: /Users/gar/.opam/4.10/lib/ff-sig/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ff-sig",
+## _filedeps_path: 'ff-sig'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ff-sig//:ff_sig.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ff-sig//:ff_sig.cmxa",
+            "@ff-sig//:ff_sig.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ff-sig'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ff-sig//:ff_sig.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ff-sig//:ff_sig.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)

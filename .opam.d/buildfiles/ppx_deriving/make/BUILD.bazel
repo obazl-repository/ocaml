@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_deriving/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "make",
+    version = """5.1""",
+    doc = """[@@deriving make]""",
+## _filedeps_path: 'ppx_deriving/make'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//make:ppx_deriving_make.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//make:ppx_deriving_make.cmxa",
+            "@ppx_deriving//make:ppx_deriving_make.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ppx_deriving//api",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_deriving/make'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//make:ppx_deriving_make.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//make:ppx_deriving_make.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ppx_deriving//api",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

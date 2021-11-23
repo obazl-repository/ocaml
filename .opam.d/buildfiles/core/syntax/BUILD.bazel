@@ -1,0 +1,13 @@
+## original: /Users/gar/.opam/4.10/lib/core/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import( # error
+    name = "syntax",
+    version = """[deprecated]""",
+    error = """core.syntax is deprecated, use ppx_jane instead""",
+    visibility = ["//visibility:public"]
+)

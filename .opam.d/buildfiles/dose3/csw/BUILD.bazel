@@ -1,0 +1,29 @@
+## original: /Users/gar/.opam/4.10/lib/dose3/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "csw",
+    version = """5.0.1""",
+## _filedeps_path: 'dose3'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@dose3//csw:csw.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@dose3//csw:csw.cmxa",
+            "@dose3//csw:csw.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@dose3//common",
+        "@dose3//debian",
+    ],
+    visibility = ["//visibility:public"]
+)

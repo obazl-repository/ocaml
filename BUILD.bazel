@@ -1,0 +1,409 @@
+load("@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_archive",
+     "ocaml_executable",
+     "ocaml_module",
+)
+
+exports_files(["Makefile.config", "VERSION"])
+
+##############################
+####  Executable Targets  ####
+MAIN_OPTS = [
+    "-principal",
+    "-nostdlib",
+]
+
+MAIN_DEPS = [
+    ##"#UNRESOLVED 3: #f: runtime",
+    # "//./stdlib:stdlib",
+    # "//.:ocamlbytecomp",
+    # "//.:ocamlcommon",
+]
+
+#################
+ocaml_executable(
+    name    = "main.exe",
+    visibility = ["//visibility:public"],
+    exe     = "main",
+    main    = ":Main",
+    deps = MAIN_DEPS + [
+        ":Main",
+    ],
+)
+
+OPTMAIN_OPTS = [
+    "-principal",
+    "-nostdlib",
+]
+
+OPTMAIN_DEPS = [
+    ##"#UNRESOLVED 3: #f: runtime",
+    # "//./stdlib:stdlib",
+    # "//.:ocamlcommon",
+    # "//.:ocamlmiddleend",
+    # "//.:ocamloptcomp",
+]
+
+#################
+ocaml_executable(
+    name    = "optmain.exe",
+    visibility = ["//visibility:public"],
+    exe     = "optmain",
+    main    = ":Optmain",
+    deps = OPTMAIN_DEPS + [
+        ":Optmain",
+    ],
+)
+
+###############################################
+########### Archive/Library Targets ###########
+
+######## ocamlcommon ########
+OCAMLCOMMON_OPTS = [
+    "-principal",
+    "-nostdlib",
+]
+
+OCAMLCOMMON_DEPS = [
+    # "//./stdlib:stdlib",
+]
+
+##############
+ocaml_archive(
+    name    = "ocamlcommon",
+    visibility = ["//visibility:public"],
+    modules = [
+        ":Annot",
+        ":Arg_helper",
+        ":Ast_helper",
+        ":Ast_invariants",
+        ":Ast_iterator",
+        ":Ast_mapper",
+        ":Asttypes",
+        ":Attr_helper",
+        ":Binutils",
+        ":Btype",
+        ":Build_path_prefix_map",
+        ":Builtin_attributes",
+        ":Bytesections",
+        ":CamlinternalMenhirLib",
+        ":Ccomp",
+        ":Clflags",
+        ":Cmi_format",
+        ":Cmo_format",
+        ":Cmt2annot",
+        ":Cmt_format",
+        ":Compenv",
+        ":Compile_common",
+        ":Compmisc",
+        ":Config",
+        ":Consistbl",
+        ":Ctype",
+        ":Datarepr",
+        ":Debuginfo",
+        ":Depend",
+        ":Diffing",
+        ":Diffing_with_keys",
+        ":Dll",
+        ":Docstrings",
+        ":Env",
+        ":Envaux",
+        ":Errortrace",
+        ":Ident",
+        ":Identifiable",
+        ":Includeclass",
+        ":Includecore",
+        ":Includemod",
+        ":Includemod_errorprinter",
+        ":Instruct",
+        ":Int_replace_polymorphic_compare",
+        ":Lambda",
+        ":Lazy_backtrack",
+        ":Lexer",
+        ":Load_path",
+        ":Local_store",
+        ":Location",
+        ":Longident",
+        ":Main_args",
+        ":Makedepend",
+        ":Matching",
+        ":Meta",
+        ":Misc",
+        ":Mtype",
+        ":Numbers",
+        ":Opcodes",
+        ":Oprint",
+        ":Outcometree",
+        ":Parmatch",
+        ":Parse",
+        ":Parser",
+        ":Parsetree",
+        ":Path",
+        ":Patterns",
+        ":Persistent_env",
+        ":Pparse",
+        ":Pprintast",
+        ":Predef",
+        ":Primitive",
+        ":Printast",
+        ":Printlambda",
+        ":Printpat",
+        ":Printtyp",
+        ":Printtyped",
+        ":Profile",
+        ":Rec_check",
+        ":Runtimedef",
+        ":Signature_group",
+        ":Simplif",
+        ":Strongly_connected_components",
+        ":Stypes",
+        ":Subst",
+        ":Switch",
+        ":Symtable",
+        ":Syntaxerr",
+        ":Targetint",
+        ":Tast_iterator",
+        ":Tast_mapper",
+        ":Terminfo",
+        ":Translattribute",
+        ":Translclass",
+        ":Translcore",
+        ":Translmod",
+        ":Translobj",
+        ":Translprim",
+        ":Type_immediacy",
+        ":Typeclass",
+        ":Typecore",
+        ":Typedecl",
+        ":Typedecl_immediacy",
+        ":Typedecl_properties",
+        ":Typedecl_separability",
+        ":Typedecl_unboxed",
+        ":Typedecl_variance",
+        ":Typedtree",
+        ":Typemod",
+        ":Typeopt",
+        ":Types",
+        ":Typetexp",
+        ":Untypeast",
+        ":Warnings",
+    ],
+)
+
+######## ocamlbytecomp ########
+OCAMLBYTECOMP_OPTS = [
+    "-principal",
+    "-nostdlib",
+]
+
+OCAMLBYTECOMP_DEPS = [
+    # "//./stdlib:stdlib",
+    # "//.:ocamlcommon",
+]
+
+##############
+ocaml_archive(
+    name    = "ocamlbytecomp",
+    visibility = ["//visibility:public"],
+    modules = [
+        ":Bytegen",
+        ":Bytelibrarian",
+        ":Bytelink",
+        ":Bytepackager",
+        ":Compile",
+        ":Emitcode",
+        ":Errors",
+        ":Maindriver",
+        ":Printinstr",
+    ],
+)
+
+######## ocamlmiddleend ########
+OCAMLMIDDLEEND_OPTS = [
+    "-principal",
+    "-nostdlib",
+]
+
+OCAMLMIDDLEEND_DEPS = [
+    # "//./stdlib:stdlib",
+    # "//.:ocamlcommon",
+]
+
+##############
+ocaml_archive(
+    name    = "ocamlmiddleend",
+    visibility = ["//visibility:public"],
+    modules = [
+        ":Alias_analysis",
+        ":Allocated_const",
+        ":Augment_specialised_args",
+        ":Backend_intf",
+        ":Backend_var",
+        ":Build_export_info",
+        ":Clambda",
+        ":Clambda_primitives",
+        ":Closure",
+        ":Closure_conversion",
+        ":Closure_conversion_aux",
+        ":Closure_element",
+        ":Closure_id",
+        ":Closure_middle_end",
+        ":Closure_offsets",
+        ":Closure_origin",
+        ":Cmx_format",
+        ":Cmxs_format",
+        ":Compilation_unit",
+        ":Compilenv",
+        ":Convert_primitives",
+        ":Effect_analysis",
+        ":Export_id",
+        ":Export_info",
+        ":Export_info_for_pack",
+        ":Extract_projections",
+        ":Find_recursive_functions",
+        ":Flambda",
+        ":Flambda_invariants",
+        ":Flambda_iterators",
+        ":Flambda_middle_end",
+        ":Flambda_to_clambda",
+        ":Flambda_utils",
+        ":Freshening",
+        ":Id_types",
+        ":Import_approx",
+        ":Inconstant_idents",
+        ":Initialize_symbol_to_let_symbol",
+        ":Inline_and_simplify",
+        ":Inline_and_simplify_aux",
+        ":Inlining_cost",
+        ":Inlining_decision",
+        ":Inlining_decision_intf",
+        ":Inlining_stats",
+        ":Inlining_stats_types",
+        ":Inlining_transforms",
+        ":Internal_variable_names",
+        ":Invariant_params",
+        ":Lift_code",
+        ":Lift_constants",
+        ":Lift_let_to_initialize_symbol",
+        ":Linkage_name",
+        ":Mutable_variable",
+        ":Parameter",
+        ":Pass_wrapper",
+        ":Printclambda",
+        ":Printclambda_primitives",
+        ":Projection",
+        ":Ref_to_variables",
+        ":Remove_free_vars_equal_to_args",
+        ":Remove_unused_arguments",
+        ":Remove_unused_closure_vars",
+        ":Remove_unused_program_constructs",
+        ":Semantics_of_primitives",
+        ":Set_of_closures_id",
+        ":Set_of_closures_origin",
+        ":Share_constants",
+        ":Simple_value_approx",
+        ":Simplify_boxed_integer_ops",
+        ":Simplify_boxed_integer_ops_intf",
+        ":Simplify_common",
+        ":Simplify_primitives",
+        ":Static_exception",
+        ":Symbol",
+        ":Tag",
+        ":Traverse_for_exported_symbols",
+        ":Un_anf",
+        ":Unbox_closures",
+        ":Unbox_free_vars_of_closures",
+        ":Unbox_specialised_args",
+        ":Var_within_closure",
+        ":Variable",
+    ],
+)
+
+######## ocamloptcomp ########
+OCAMLOPTCOMP_OPTS = [
+    "-principal",
+    "-nostdlib",
+]
+
+OCAMLOPTCOMP_DEPS = [
+    # "//./stdlib:stdlib",
+    # "//.:ocamlcommon",
+    # "//.:ocamlmiddleend",
+]
+
+##############
+ocaml_archive(
+    name    = "ocamloptcomp",
+    visibility = ["//visibility:public"],
+    modules = [
+        ":CSE",
+        ":CSEgen",
+        ":Afl_instrument",
+        ":Arch",
+        ":Asmgen",
+        ":Asmlibrarian",
+        ":Asmlink",
+        ":Asmpackager",
+        ":Branch_relaxation",
+        ":Branch_relaxation_intf",
+        ":Cmm",
+        ":Cmm_helpers",
+        ":Cmm_invariants",
+        ":Cmmgen",
+        ":Cmmgen_state",
+        ":Coloring",
+        ":Comballoc",
+        ":Dataflow",
+        ":Deadcode",
+        ":Domainstate",
+        ":Emit",
+        ":Emitaux",
+        ":Emitenv",
+        ":Interf",
+        ":Interval",
+        ":Linear",
+        ":Linear_format",
+        ":Linearize",
+        ":Linscan",
+        ":Liveness",
+        ":Mach",
+        ":Optcompile",
+        ":Opterrors",
+        ":Optmaindriver",
+        ":Polling",
+        ":Printcmm",
+        ":Printlinear",
+        ":Printmach",
+        ":Proc",
+        ":Reg",
+        ":Reload",
+        ":Reloadgen",
+        ":Schedgen",
+        ":Scheduling",
+        ":Selectgen",
+        ":Selection",
+        ":Spill",
+        ":Split",
+        ":Strmatch",
+        ":X86_ast",
+        ":X86_dsl",
+        ":X86_gas",
+        ":X86_masm",
+        ":X86_proc",
+    ],
+)
+
+#############################
+####  Singleton Targets  ####
+
+########################
+####  Rule Targets  ####
+
+################  rule  ################
+## (
+##   (copy main.exe ocamlc.byte)
+## )
+################  rule  ################
+## (
+##   (copy optmain.exe ocamlopt.byte)
+## )

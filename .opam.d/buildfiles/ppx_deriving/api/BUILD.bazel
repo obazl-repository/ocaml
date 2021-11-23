@@ -1,0 +1,59 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_deriving/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "api",
+    version = """5.1""",
+    doc = """Plugin API for ppx_deriving""",
+## _filedeps_path: 'ppx_deriving/api'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//api:ppx_deriving_api.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//api:ppx_deriving_api.cmxa",
+            "@ppx_deriving//api:ppx_deriving_api.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ocaml-migrate-parsetree//:ocaml-migrate-parsetree",
+        "@ppx_derivers//:ppx_derivers",
+        "@ppxlib//:ppxlib",
+        "@result//:result",
+    ],
+    ppx_codeps = [
+        "@ppx_deriving//runtime",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_deriving/api'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//api:ppx_deriving_api.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//api:ppx_deriving_api.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ocaml-migrate-parsetree//:ocaml-migrate-parsetree",
+        "@ppx_derivers//:ppx_derivers",
+        "@ppxlib//:ppxlib",
+        "@result//:result",
+    ],
+    visibility = ["//visibility:public"]
+)

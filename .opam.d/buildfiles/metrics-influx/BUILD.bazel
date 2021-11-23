@@ -1,0 +1,55 @@
+## original: /Users/gar/.opam/4.10/lib/metrics-influx/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "metrics-influx",
+    version = """0.3.0""",
+## _filedeps_path: 'metrics-influx'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@metrics-influx//:metrics_influx.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@metrics-influx//:metrics_influx.cmxa",
+            "@metrics-influx//:metrics_influx.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@astring//:astring",
+        "@duration//:duration",
+        "@fmt//:fmt",
+        "@lwt//:lwt",
+        "@metrics//:metrics",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'metrics-influx'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@metrics-influx//:metrics_influx.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@metrics-influx//:metrics_influx.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@astring//:astring",
+        "@duration//:duration",
+        "@fmt//:fmt",
+        "@lwt//:lwt",
+        "@metrics//:metrics",
+    ],
+    visibility = ["//visibility:public"]
+)

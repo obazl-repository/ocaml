@@ -1,0 +1,20 @@
+## original: /Users/gar/.opam/4.10/lib/num-top/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "num-top",
+    version = """1.4""",
+    doc = """Add-on for num inside toploops""",
+## _filedeps_path: 'num-top'
+    archive = [
+    ],
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@num//core",
+    ],
+    visibility = ["//visibility:public"]
+)

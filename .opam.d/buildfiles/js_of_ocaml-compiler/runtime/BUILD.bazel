@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/js_of_ocaml-compiler/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "runtime",
+    version = """3.10.0""",
+## _filedeps_path: 'js_of_ocaml-compiler/runtime'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@js_of_ocaml-compiler//runtime:jsoo_runtime.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@js_of_ocaml-compiler//runtime:jsoo_runtime.cmxa",
+            "@js_of_ocaml-compiler//runtime:jsoo_runtime.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@js_of_ocaml-compiler//:js_of_ocaml-compiler",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'js_of_ocaml-compiler/runtime'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@js_of_ocaml-compiler//runtime:jsoo_runtime.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@js_of_ocaml-compiler//runtime:jsoo_runtime.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@js_of_ocaml-compiler//:js_of_ocaml-compiler",
+    ],
+    visibility = ["//visibility:public"]
+)

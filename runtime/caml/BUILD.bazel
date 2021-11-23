@@ -1,0 +1,56 @@
+# GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h build_config.h
+
+genrule(
+    name = "opnames_h",
+    outs = ["opnames.h"],
+    srcs = ["//runtime/caml:instruct.h"],
+    cmd  = " ".join([
+	    # tr is for window only?
+        # 	tr -d '\r' < $< | \
+        "cat $(location //runtime/caml:instruct.h) | ",
+	    "sed -e '/\\/\\*/d' ",
+	    "-e '/^#/d'",
+	    "-e 's/enum /static char * names_of_/' ",
+	    "-e 's/{$$/[] = {/' ",
+	    "-e 's/\\([[:upper:]][[:upper:]_0-9]*\\)/\"\\1\"/g' > $@"
+    ])
+)
+
+genrule(
+    name = "version_h",
+    outs  = ["version.h"],
+    tools = ["//tools:make-version-header.sh"],
+    srcs  = ["//:VERSION"],
+    cmd   = " ".join([
+        "$(location //tools:make-version-header.sh)",
+        "$(location //:VERSION)",
+        "> $@"
+    ]),
+)
+
+genrule(
+    name = "jumptbl_h",
+    outs = ["jumptbl.h"],
+    srcs = ["//runtime/caml:instruct.h"],
+    cmd  = " ".join([
+	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
+	    "sed -n -e '/^  /s/ \\([A-Z]\\)/ \\&\\&lbl_\\1/gp' ",
+	    "-e '/^}/q' > $@"
+    ])
+)
+
+cc_library(
+    name = "hdrs",
+    hdrs = [
+        "domain_state.tbl",
+        # ## generated files:
+              ":opnames.h",
+        ":jumptbl.h",
+        ":version.h"
+    ] + glob(["*.h"]),
+    include_prefix = "caml",
+    # hdrs = ["domain_state.tbl"],
+    # static_library = ...,
+          visibility = ["//runtime:__pkg__"],
+)
+

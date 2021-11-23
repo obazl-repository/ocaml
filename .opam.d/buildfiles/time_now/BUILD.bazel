@@ -1,0 +1,57 @@
+## original: /Users/gar/.opam/4.10/lib/time_now/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "time_now",
+    version = """v0.14.0""",
+## _filedeps_path: 'time_now'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@time_now//:time_now.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@time_now//:time_now.cmxa",
+            "@time_now//:time_now.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@jane-street-headers//:jane-street-headers",
+        "@ppx_compare//runtime-lib",
+        "@ppx_enumerate//runtime-lib",
+        "@ppx_hash//runtime-lib",
+        "@ppx_sexp_conv//runtime-lib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'time_now'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@time_now//:time_now.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@time_now//:time_now.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@jane-street-headers//:jane-street-headers",
+        "@ppx_compare//runtime-lib",
+        "@ppx_enumerate//runtime-lib",
+        "@ppx_hash//runtime-lib",
+        "@ppx_sexp_conv//runtime-lib",
+    ],
+    visibility = ["//visibility:public"]
+)

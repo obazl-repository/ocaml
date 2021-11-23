@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/integers/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "integers",
+    doc = """Signed and unsigned integers of various sizes""",
+## _filedeps_path: 'integers'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@integers//:integers.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@integers//:integers.cmxa",
+            "@integers//:integers.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'integers'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@integers//:integers.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@integers//:integers.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

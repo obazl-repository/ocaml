@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/dune-configurator/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "dune-configurator",
+    version = """2.9.0""",
+## _filedeps_path: 'dune-configurator'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@dune-configurator//:configurator.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@dune-configurator//:configurator.cmxa",
+            "@dune-configurator//:configurator.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@csexp//:csexp",
+        "@result//:result",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'dune-configurator'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@dune-configurator//:configurator.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@dune-configurator//:configurator.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@csexp//:csexp",
+        "@result//:result",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

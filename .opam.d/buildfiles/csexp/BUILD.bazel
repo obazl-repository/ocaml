@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/csexp/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "csexp",
+    version = """1.5.1""",
+## _filedeps_path: 'csexp'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@csexp//:csexp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@csexp//:csexp.cmxa",
+            "@csexp//:csexp.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'csexp'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@csexp//:csexp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@csexp//:csexp.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

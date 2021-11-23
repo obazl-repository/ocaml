@@ -1,0 +1,57 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_sexp_message/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "expander",
+    version = """v0.14.0""",
+    doc = """Expander for ppx_sexp_message""",
+## _filedeps_path: 'ppx_sexp_message/expander'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_sexp_message//expander:ppx_sexp_message_expander.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_sexp_message//expander:ppx_sexp_message_expander.cmxa",
+            "@ppx_sexp_message//expander:ppx_sexp_message_expander.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ppx_here//expander",
+        "@ppx_sexp_conv//expander",
+        "@ppxlib//:ppxlib",
+    ],
+    ppx_codeps = [
+        "@ppx_sexp_conv//runtime-lib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_sexp_message/expander'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_sexp_message//expander:ppx_sexp_message_expander.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_sexp_message//expander:ppx_sexp_message_expander.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ppx_here//expander",
+        "@ppx_sexp_conv//expander",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

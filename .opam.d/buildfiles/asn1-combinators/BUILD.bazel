@@ -1,0 +1,56 @@
+## original: /Users/gar/.opam/4.10/lib/asn1-combinators/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "asn1-combinators",
+    version = """0.2.5""",
+    doc = """Embed typed ASN.1 grammars in OCaml""",
+## _filedeps_path: 'asn1-combinators'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@asn1-combinators//:asn1_combinators.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@asn1-combinators//:asn1_combinators.cmxa",
+            "@asn1-combinators//:asn1_combinators.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@cstruct//:cstruct",
+        "@ptime//:ptime",
+        "@stdlib-shims//:stdlib-shims",
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'asn1-combinators'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@asn1-combinators//:asn1_combinators.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@asn1-combinators//:asn1_combinators.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+        "@cstruct//:cstruct",
+        "@ptime//:ptime",
+        "@stdlib-shims//:stdlib-shims",
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)

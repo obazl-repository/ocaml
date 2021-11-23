@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/ppxlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "traverse_builtins",
+    version = """0.15.0""",
+## _filedeps_path: 'ppxlib/traverse_builtins'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//traverse_builtins:ppxlib_traverse_builtins.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//traverse_builtins:ppxlib_traverse_builtins.cmxa",
+            "@ppxlib//traverse_builtins:ppxlib_traverse_builtins.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppxlib/traverse_builtins'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//traverse_builtins:ppxlib_traverse_builtins.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//traverse_builtins:ppxlib_traverse_builtins.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

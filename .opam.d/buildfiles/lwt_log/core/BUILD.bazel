@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/lwt_log/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "core",
+    version = """1.1.1""",
+    doc = """Logger for Lwt (deprecated; pure-OCaml core)""",
+## _filedeps_path: 'lwt_log/core'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt_log//core:lwt_log_core.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt_log//core:lwt_log_core.cmxa",
+            "@lwt_log//core:lwt_log_core.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@lwt//:lwt",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'lwt_log/core'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt_log//core:lwt_log_core.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt_log//core:lwt_log_core.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@lwt//:lwt",
+    ],
+    visibility = ["//visibility:public"]
+)

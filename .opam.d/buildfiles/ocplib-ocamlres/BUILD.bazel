@@ -1,0 +1,32 @@
+## original: /Users/gar/.opam/4.10/lib/ocplib-ocamlres/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ocplib-ocamlres",
+    version = """0.4""",
+    doc = """Manipulation, injection and extraction of embedded resources""",
+## _filedeps_path: 'ocplib-ocamlres'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ocplib-ocamlres//:ocplib-ocamlres.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocplib-ocamlres//:ocplib-ocamlres.cmxa",
+            "@ocplib-ocamlres//:ocplib-ocamlres.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@pprint//:pprint",
+        "@str//:str",
+        "@ocplib-ocamlres//runtime",
+        "@astring//:astring",
+    ],
+    visibility = ["//visibility:public"]
+)

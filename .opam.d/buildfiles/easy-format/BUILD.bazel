@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/easy-format/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "easy-format",
+    version = """1.3.2""",
+    doc = """Indentation made easy(ier)""",
+## _filedeps_path: 'easy-format'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@easy-format//:easy_format.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@easy-format//:easy_format.cmxa",
+            "@easy-format//:easy_format.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'easy-format'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@easy-format//:easy_format.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@easy-format//:easy_format.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

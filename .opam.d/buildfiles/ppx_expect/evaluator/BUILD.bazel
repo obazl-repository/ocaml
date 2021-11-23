@@ -1,0 +1,57 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_expect/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "evaluator",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_expect/evaluator'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_expect//evaluator:ppx_expect_evaluator.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_expect//evaluator:ppx_expect_evaluator.cmxa",
+            "@ppx_expect//evaluator:ppx_expect_evaluator.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ppx_expect//collector",
+        "@ppx_expect//common",
+        "@ppx_expect//matcher",
+        "@ppxlib//print_diff",
+        "@stdio//:stdio",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_expect/evaluator'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_expect//evaluator:ppx_expect_evaluator.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_expect//evaluator:ppx_expect_evaluator.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ppx_expect//collector",
+        "@ppx_expect//common",
+        "@ppx_expect//matcher",
+        "@ppxlib//print_diff",
+        "@stdio//:stdio",
+    ],
+    visibility = ["//visibility:public"]
+)

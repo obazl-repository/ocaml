@@ -1,0 +1,26 @@
+## original: /Users/gar/.opam/4.10/lib/zarith/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "zarith",
+    version = """1.11""",
+    doc = """Arbitrary precision integers""",
+## _filedeps_path: 'zarith'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@zarith//:zarith.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@zarith//:zarith.cmxa",
+            "@zarith//:zarith.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)

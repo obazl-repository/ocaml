@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_pipebang/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_pipebang",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_pipebang'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_pipebang//:ppx_pipebang.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_pipebang//:ppx_pipebang.cmxa",
+            "@ppx_pipebang//:ppx_pipebang.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_pipebang'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_pipebang//:ppx_pipebang.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_pipebang//:ppx_pipebang.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

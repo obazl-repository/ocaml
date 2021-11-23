@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/jst-config/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "jst-config",
+    version = """v0.14.0""",
+## _filedeps_path: 'jst-config'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@jst-config//:config_h.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@jst-config//:config_h.cmxa",
+            "@jst-config//:config_h.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'jst-config'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@jst-config//:config_h.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@jst-config//:config_h.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

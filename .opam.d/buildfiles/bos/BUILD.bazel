@@ -1,0 +1,58 @@
+## original: /Users/gar/.opam/4.10/lib/bos/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "bos",
+    version = """0.2.1""",
+    doc = """Basic OS interaction for OCaml""",
+## _filedeps_path: 'bos'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@bos//:bos.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bos//:bos.cmxa",
+            "@bos//:bos.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@rresult//:rresult",
+        "@astring//:astring",
+        "@fpath//:fpath",
+        "@fmt//:fmt",
+        "@unix//:unix",
+        "@logs//:logs",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'bos'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@bos//:bos.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bos//:bos.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@rresult//:rresult",
+        "@astring//:astring",
+        "@fpath//:fpath",
+        "@fmt//:fmt",
+        "@unix//:unix",
+        "@logs//:logs",
+    ],
+    visibility = ["//visibility:public"]
+)

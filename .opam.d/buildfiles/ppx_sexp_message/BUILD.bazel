@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_sexp_message/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_sexp_message",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_sexp_message'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_sexp_message//:ppx_sexp_message.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_sexp_message//:ppx_sexp_message.cmxa",
+            "@ppx_sexp_message//:ppx_sexp_message.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ppx_sexp_message//expander",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_sexp_message'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_sexp_message//:ppx_sexp_message.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_sexp_message//:ppx_sexp_message.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ppx_sexp_message//expander",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

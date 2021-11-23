@@ -1,0 +1,30 @@
+## original: /Users/gar/.opam/4.10/lib/ctypes/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "foreign",
+    version = """0.18.0""",
+    doc = """Dynamic linking of C functions""",
+## _filedeps_path: 'ctypes'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ctypes//foreign:ctypes-foreign.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ctypes//foreign:ctypes-foreign.cmxa",
+            "@ctypes//foreign:ctypes-foreign.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//threads",
+        "@ctypes//:ctypes",
+    ],
+    visibility = ["//visibility:public"]
+)

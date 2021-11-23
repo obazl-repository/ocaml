@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/cmdliner/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "cmdliner",
+    version = """v1.0.4""",
+    doc = """Declarative definition of command line interfaces""",
+## _filedeps_path: 'cmdliner'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@cmdliner//:cmdliner.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cmdliner//:cmdliner.cmxa",
+            "@cmdliner//:cmdliner.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'cmdliner'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@cmdliner//:cmdliner.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cmdliner//:cmdliner.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

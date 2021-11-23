@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/mtime/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "mtime",
+    version = """1.2.0""",
+    doc = """Monotonic wall-clock time for OCaml""",
+## _filedeps_path: 'mtime'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@mtime//:mtime.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@mtime//:mtime.cmxa",
+            "@mtime//:mtime.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'mtime'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@mtime//:mtime.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@mtime//:mtime.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

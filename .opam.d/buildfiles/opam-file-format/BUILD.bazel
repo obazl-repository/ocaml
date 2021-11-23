@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/opam-file-format/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "opam-file-format",
+    version = """2.1.3""",
+    doc = """Parser and printer for the opam file syntax""",
+## _filedeps_path: 'opam-file-format'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@opam-file-format//:opam_file_format.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@opam-file-format//:opam_file_format.cmxa",
+            "@opam-file-format//:opam_file_format.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'opam-file-format'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@opam-file-format//:opam_file_format.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@opam-file-format//:opam_file_format.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

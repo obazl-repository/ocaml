@@ -1,0 +1,59 @@
+## original: /Users/gar/.opam/4.10/lib/mirage-crypto-rng/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "lwt",
+    version = """0.10.3""",
+## _filedeps_path: 'mirage-crypto-rng/lwt'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@mirage-crypto-rng//lwt:mirage_crypto_rng_lwt.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@mirage-crypto-rng//lwt:mirage_crypto_rng_lwt.cmxa",
+            "@mirage-crypto-rng//lwt:mirage_crypto_rng_lwt.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@duration//:duration",
+        "@logs//:logs",
+        "@lwt//:lwt",
+        "@lwt//unix",
+        "@mirage-crypto-rng//:mirage-crypto-rng",
+        "@mirage-crypto-rng//unix",
+        "@mtime//clock/os",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'mirage-crypto-rng/lwt'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@mirage-crypto-rng//lwt:mirage_crypto_rng_lwt.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@mirage-crypto-rng//lwt:mirage_crypto_rng_lwt.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@duration//:duration",
+        "@logs//:logs",
+        "@lwt//:lwt",
+        "@lwt//unix",
+        "@mirage-crypto-rng//:mirage-crypto-rng",
+        "@mirage-crypto-rng//unix",
+        "@mtime//clock/os",
+    ],
+    visibility = ["//visibility:public"]
+)

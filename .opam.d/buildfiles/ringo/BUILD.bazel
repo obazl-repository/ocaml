@@ -1,0 +1,40 @@
+## original: /Users/gar/.opam/4.10/lib/ringo/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ringo",
+## _filedeps_path: 'ringo'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ringo//:ringo.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ringo//:ringo.cmxa",
+            "@ringo//:ringo.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ringo'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ringo//:ringo.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ringo//:ringo.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

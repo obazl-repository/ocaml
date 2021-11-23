@@ -1,0 +1,46 @@
+## original: /Users/gar/.opam/4.10/lib/lwt-canceler/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "lwt-canceler",
+## _filedeps_path: 'lwt-canceler'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt-canceler//:lwt_canceler.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt-canceler//:lwt_canceler.cmxa",
+            "@lwt-canceler//:lwt_canceler.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@lwt//:lwt",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'lwt-canceler'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt-canceler//:lwt_canceler.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt-canceler//:lwt_canceler.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@lwt//:lwt",
+    ],
+    visibility = ["//visibility:public"]
+)

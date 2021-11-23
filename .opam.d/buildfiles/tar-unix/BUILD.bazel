@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/tar-unix/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "tar-unix",
+    version = """1.1.0""",
+## _filedeps_path: 'tar-unix'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@tar-unix//:tar_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@tar-unix//:tar_unix.cmxa",
+            "@tar-unix//:tar_unix.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@cstruct-lwt//:cstruct-lwt",
+        "@lwt//:lwt",
+        "@tar//:tar",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'tar-unix'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@tar-unix//:tar_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@tar-unix//:tar_unix.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@cstruct-lwt//:cstruct-lwt",
+        "@lwt//:lwt",
+        "@tar//:tar",
+    ],
+    visibility = ["//visibility:public"]
+)

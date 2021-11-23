@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/ppxlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "print_diff",
+    version = """0.15.0""",
+## _filedeps_path: 'ppxlib/print_diff'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//print_diff:ppxlib_print_diff.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//print_diff:ppxlib_print_diff.cmxa",
+            "@ppxlib//print_diff:ppxlib_print_diff.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppxlib/print_diff'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppxlib//print_diff:ppxlib_print_diff.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppxlib//print_diff:ppxlib_print_diff.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

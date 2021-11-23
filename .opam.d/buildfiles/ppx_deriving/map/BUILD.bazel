@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_deriving/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "map",
+    version = """5.1""",
+    doc = """[@@deriving map]""",
+## _filedeps_path: 'ppx_deriving/map'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//map:ppx_deriving_map.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//map:ppx_deriving_map.cmxa",
+            "@ppx_deriving//map:ppx_deriving_map.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ppx_deriving//api",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_deriving/map'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//map:ppx_deriving_map.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//map:ppx_deriving_map.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ppx_deriving//api",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

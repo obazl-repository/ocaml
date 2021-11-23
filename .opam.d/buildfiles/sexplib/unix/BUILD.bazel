@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/sexplib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "unix",
+    version = """v0.14.0""",
+## _filedeps_path: 'sexplib/unix'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@sexplib//unix:sexplib_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@sexplib//unix:sexplib_unix.cmxa",
+            "@sexplib//unix:sexplib_unix.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@sexplib//:sexplib",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'sexplib/unix'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@sexplib//unix:sexplib_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@sexplib//unix:sexplib_unix.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@sexplib//:sexplib",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

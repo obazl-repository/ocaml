@@ -1,0 +1,46 @@
+## original: /Users/gar/.opam/4.10/lib/lwt-watcher/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "lwt-watcher",
+## _filedeps_path: 'lwt-watcher'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt-watcher//:lwt_watcher.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt-watcher//:lwt_watcher.cmxa",
+            "@lwt-watcher//:lwt_watcher.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@lwt//:lwt",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'lwt-watcher'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt-watcher//:lwt_watcher.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt-watcher//:lwt_watcher.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@lwt//:lwt",
+    ],
+    visibility = ["//visibility:public"]
+)

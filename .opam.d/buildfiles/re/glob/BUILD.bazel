@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/re/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "glob",
+    version = """1.9.0""",
+    doc = """Deprecated. Use Re.Glob""",
+## _filedeps_path: 're/glob'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@re//glob:re_glob.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@re//glob:re_glob.cmxa",
+            "@re//glob:re_glob.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@re//:re",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 're/glob'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@re//glob:re_glob.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@re//glob:re_glob.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@re//:re",
+    ],
+    visibility = ["//visibility:public"]
+)

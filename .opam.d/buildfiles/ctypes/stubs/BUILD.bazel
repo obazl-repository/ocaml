@@ -1,0 +1,30 @@
+## original: /Users/gar/.opam/4.10/lib/ctypes/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "stubs",
+    version = """0.18.0""",
+    doc = """Stub generation from C types""",
+## _filedeps_path: 'ctypes'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ctypes//stubs:cstubs.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ctypes//stubs:cstubs.cmxa",
+            "@ctypes//stubs:cstubs.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ctypes//:ctypes",
+        "@str//:str",
+    ],
+    visibility = ["//visibility:public"]
+)

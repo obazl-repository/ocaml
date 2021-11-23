@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/terminal_size/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "terminal_size",
+    version = """0.1.4""",
+## _filedeps_path: 'terminal_size'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@terminal_size//:terminal_size.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@terminal_size//:terminal_size.cmxa",
+            "@terminal_size//:terminal_size.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'terminal_size'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@terminal_size//:terminal_size.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@terminal_size//:terminal_size.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

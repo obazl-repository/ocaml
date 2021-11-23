@@ -1,0 +1,58 @@
+## original: /Users/gar/.opam/4.10/lib/lwt/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "unix",
+    version = """5.4.1""",
+    doc = """Unix support for Lwt""",
+## _filedeps_path: 'lwt/unix'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt//unix:lwt_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt//unix:lwt_unix.cmxa",
+            "@lwt//unix:lwt_unix.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray//:bigarray",
+        "@lwt//:lwt",
+        "@mmap//:mmap",
+        "@ocplib-endian//bigstring",
+        "@ocaml//threads",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'lwt/unix'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@lwt//unix:lwt_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@lwt//unix:lwt_unix.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray//:bigarray",
+        "@lwt//:lwt",
+        "@mmap//:mmap",
+        "@ocplib-endian//bigstring",
+        "@ocaml//threads",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

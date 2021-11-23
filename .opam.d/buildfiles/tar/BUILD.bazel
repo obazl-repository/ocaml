@@ -1,0 +1,51 @@
+## original: /Users/gar/.opam/4.10/lib/tar/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "tar",
+    version = """1.1.0""",
+## _filedeps_path: 'tar'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@tar//:tar.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@tar//:tar.cmxa",
+            "@tar//:tar.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@cstruct//:cstruct",
+        "@re//str",
+        "@stdlib-shims//:stdlib-shims",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'tar'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@tar//:tar.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@tar//:tar.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@cstruct//:cstruct",
+        "@re//str",
+        "@stdlib-shims//:stdlib-shims",
+    ],
+    visibility = ["//visibility:public"]
+)

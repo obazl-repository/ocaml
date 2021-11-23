@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/ptime/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "top",
+    version = """0.8.5""",
+    doc = """Ptime_clock native OS toplevel support""",
+## _filedeps_path: 'ptime/os'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ptime//clock/os/top:ptime_clock_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ptime//clock/os/top:ptime_clock_top.cmxa",
+            "@ptime//clock/os/top:ptime_clock_top.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ptime//top",
+        "@ptime//clock/os",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ptime/os'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ptime//clock/os/top:ptime_clock_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ptime//clock/os/top:ptime_clock_top.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ptime//top",
+        "@ptime//clock/os",
+    ],
+    visibility = ["//visibility:public"]
+)

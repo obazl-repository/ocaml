@@ -1,0 +1,15 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_deriving/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_deriving",
+    doc = """Type-driven code generation""",
+    deps = [
+        "@ppx_deriving//runtime",
+    ],
+    visibility = ["//visibility:public"]
+)

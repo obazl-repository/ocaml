@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/ocplib-endian/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ocplib-endian",
+    doc = """Optimised functions to read and write int16/32/64 from strings and bytes""",
+## _filedeps_path: 'ocplib-endian'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ocplib-endian//:ocplib_endian.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocplib-endian//:ocplib_endian.cmxa",
+            "@ocplib-endian//:ocplib_endian.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bytes//:bytes",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ocplib-endian'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ocplib-endian//:ocplib_endian.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocplib-endian//:ocplib_endian.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bytes//:bytes",
+    ],
+    visibility = ["//visibility:public"]
+)

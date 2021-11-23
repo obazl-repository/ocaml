@@ -1,0 +1,60 @@
+## original: /Users/gar/.opam/4.10/lib/b0/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "b0",
+    version = """0.0.2""",
+    doc = """b0 tool driver""",
+## _filedeps_path: 'b0/b0'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@b0//b0:b0_b0.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@b0//b0:b0_b0.cmxa",
+            "@b0//b0:b0_b0.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@unix//:unix",
+        "@cmdliner//:cmdliner",
+        "@b0//b00/std",
+        "@b0//b00",
+        "@b0//b00/kit",
+        "@b0//:b0",
+        "@b0//kit",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'b0/b0'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@b0//b0:b0_b0.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@b0//b0:b0_b0.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@unix//:unix",
+        "@cmdliner//:cmdliner",
+        "@b0//b00/std",
+        "@b0//b00",
+        "@b0//b00/kit",
+        "@b0//:b0",
+        "@b0//kit",
+    ],
+    visibility = ["//visibility:public"]
+)

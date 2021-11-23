@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/uri/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "services",
+    version = """4.2.0""",
+## _filedeps_path: 'uri/services'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@uri//services:uri_services.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@uri//services:uri_services.cmxa",
+            "@uri//services:uri_services.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'uri/services'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@uri//services:uri_services.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@uri//services:uri_services.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)

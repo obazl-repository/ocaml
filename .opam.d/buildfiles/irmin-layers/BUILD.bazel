@@ -1,0 +1,55 @@
+## original: /Users/gar/.opam/4.10/lib/irmin-layers/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "irmin-layers",
+    version = """2.5.4""",
+## _filedeps_path: 'irmin-layers'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@irmin-layers//:irmin_layers.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@irmin-layers//:irmin_layers.cmxa",
+            "@irmin-layers//:irmin_layers.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@irmin//:irmin",
+        "@logs//:logs",
+        "@lwt//:lwt",
+        "@mtime//:mtime",
+        "@mtime//clock/os",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'irmin-layers'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@irmin-layers//:irmin_layers.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@irmin-layers//:irmin_layers.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@irmin//:irmin",
+        "@logs//:logs",
+        "@lwt//:lwt",
+        "@mtime//:mtime",
+        "@mtime//clock/os",
+    ],
+    visibility = ["//visibility:public"]
+)

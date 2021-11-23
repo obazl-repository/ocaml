@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_let/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "expander",
+    version = """v0.14.0""",
+    doc = """Expander for ppx_let""",
+## _filedeps_path: 'ppx_let/expander'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_let//expander:ppx_let_expander.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_let//expander:ppx_let_expander.cmxa",
+            "@ppx_let//expander:ppx_let_expander.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_let/expander'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_let//expander:ppx_let_expander.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_let//expander:ppx_let_expander.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

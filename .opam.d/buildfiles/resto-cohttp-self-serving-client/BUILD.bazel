@@ -1,0 +1,60 @@
+## original: /Users/gar/.opam/4.10/lib/resto-cohttp-self-serving-client/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "resto-cohttp-self-serving-client",
+## _filedeps_path: 'resto-cohttp-self-serving-client'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@resto-cohttp-self-serving-client//:resto_cohttp_self_serving_client.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@resto-cohttp-self-serving-client//:resto_cohttp_self_serving_client.cmxa",
+            "@resto-cohttp-self-serving-client//:resto_cohttp_self_serving_client.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@lwt//:lwt",
+        "@resto//:resto",
+        "@resto-acl//:resto-acl",
+        "@resto-cohttp//:resto-cohttp",
+        "@resto-cohttp-client//:resto-cohttp-client",
+        "@resto-cohttp-server//:resto-cohttp-server",
+        "@resto-directory//:resto-directory",
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'resto-cohttp-self-serving-client'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@resto-cohttp-self-serving-client//:resto_cohttp_self_serving_client.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@resto-cohttp-self-serving-client//:resto_cohttp_self_serving_client.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@lwt//:lwt",
+        "@resto//:resto",
+        "@resto-acl//:resto-acl",
+        "@resto-cohttp//:resto-cohttp",
+        "@resto-cohttp-client//:resto-cohttp-client",
+        "@resto-cohttp-server//:resto-cohttp-server",
+        "@resto-directory//:resto-directory",
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)

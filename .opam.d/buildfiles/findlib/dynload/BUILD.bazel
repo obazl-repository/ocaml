@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/findlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "dynload",
+    version = """1.9.1""",
+    doc = """Package manager dynamic loader""",
+## _filedeps_path: 'findlib'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@findlib//dynload:findlib_dynload.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@findlib//dynload:findlib_dynload.cmxa",
+            "@findlib//dynload:findlib_dynload.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@findlib//:findlib",
+        "@dynlink//:dynlink",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'findlib'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@findlib//dynload:findlib_dynload.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@findlib//dynload:findlib_dynload.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@findlib//:findlib",
+        "@dynlink//:dynlink",
+    ],
+    visibility = ["//visibility:public"]
+)

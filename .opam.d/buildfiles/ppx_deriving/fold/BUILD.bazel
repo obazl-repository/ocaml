@@ -1,0 +1,52 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_deriving/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "fold",
+    version = """5.1""",
+    doc = """[@@deriving fold]""",
+## _filedeps_path: 'ppx_deriving/fold'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//fold:ppx_deriving_fold.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//fold:ppx_deriving_fold.cmxa",
+            "@ppx_deriving//fold:ppx_deriving_fold.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ppx_deriving//api",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_deriving/fold'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_deriving//fold:ppx_deriving_fold.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_deriving//fold:ppx_deriving_fold.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ppx_deriving//api",
+        "@ppxlib//:ppxlib",
+    ],
+    visibility = ["//visibility:public"]
+)

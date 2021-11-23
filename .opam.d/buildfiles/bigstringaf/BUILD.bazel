@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/bigstringaf/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "bigstringaf",
+    version = """0.8.0""",
+## _filedeps_path: 'bigstringaf'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@bigstringaf//:bigstringaf.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bigstringaf//:bigstringaf.cmxa",
+            "@bigstringaf//:bigstringaf.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'bigstringaf'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@bigstringaf//:bigstringaf.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bigstringaf//:bigstringaf.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigarray-compat//:bigarray-compat",
+    ],
+    visibility = ["//visibility:public"]
+)

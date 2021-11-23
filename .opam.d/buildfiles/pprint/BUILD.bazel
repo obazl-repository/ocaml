@@ -1,0 +1,40 @@
+## original: /Users/gar/.opam/4.10/lib/pprint/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "pprint",
+## _filedeps_path: 'pprint'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@pprint//:pprint.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@pprint//:pprint.cmxa",
+            "@pprint//:pprint.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'pprint'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@pprint//:pprint.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@pprint//:pprint.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

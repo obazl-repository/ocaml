@@ -1,0 +1,127 @@
+load("//config:BUILD.bzl",
+     "ARCH", "MODEL", "SYSTEM",
+     "HOST", "ROOTDIR", "LIBDIR",
+     "OC_CFLAGS", "CFLAGS",
+     "OC_CPPFLAGS", "CPPFLAGS",
+     "OC_LDFLAGS", "LDFLAGS",
+
+     "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+     "OUTPUTEXE"
+     )
+
+COMMON_C_SOURCES = [
+    "misc.c",
+    "startup_aux.c",
+    "freelist.c",
+    "major_gc.c",
+    "minor_gc.c",
+    "memory.c",
+    "alloc.c",
+    "globroots.c",
+    "signals.c",
+    "printexc.c",
+    "backtrace.c",
+    "compare.c",
+    "ints.c",
+    "floats.c",
+    "str.c",
+    "eventlog.c",
+    "array.c", "io.c", "extern.c", "intern.c", "hash.c", "sys.c",
+    "meta.c",
+    "parsing.c",
+    "gc_ctrl.c",
+    "md5.c", "obj.c",
+    "lexing.c",
+    "callback.c",
+    "debugger.c",
+    "weak.c", "compact.c", "finalise.c", "custom.c",
+    "dynlink.c",
+    "afl.c",
+    "bigarray.c", "memprof.c", "domain.c", "skiplist.c", "codefrag.c"
+] + select({
+    "//config/host:linux": ["unix.c"],
+    "//config/host:macos": ["unix.c"],
+    # "//config/host:win32": ["win32.c"],
+    "//conditions:default": []
+})
+
+BYTECODE_C_SOURCES = [
+    "interp.c", "stacks.c", "fix_code.c", "startup_byt.c", "roots_byt.c",
+    "fail_byt.c", "signals_byt.c", "backtrace_byt.c", "main.c",
+]
+
+NATIVE_C_SOURCES = [
+    "startup_nat.c", "main.c", "fail_nat.c", "roots_nat.c", "signals_nat.c",
+    "backtrace_nat.c", "dynlink_nat.c", "clambda_checks.c",
+]
+
+cc_library(
+    name = "camlrun",
+    srcs = [
+        ":build_config.h",
+        # "//runtime/caml:version.h"
+    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    # + glob(["caml/*.h"]),
+    copts = [
+        "-I$(GENDIR)/runtime" # to pick up build_config.h
+    ] + OC_CPPFLAGS + select({
+        "//config/host:linux": [],
+        "//config/host:macos": [],
+        "//conditions:default": []
+    # }) + select({
+    #     "//config:debug": OC_DEBUG_CPPFLAGS,
+    #     "//config:instrumented": OC_INSTR_CPPFLAGS,
+    #     "//config:pic": OC_CFLAGS + SHAREDLIB_CFLAGS,
+    #     "//conditions:default": []
+    # }) + select({
+    #     "//config/mode:native": OC_NATIVE_CPPFLAGS,
+    #     "//conditions:default": []
+    }),
+    defines = OC_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"]
+)
+
+cc_library(
+    name = "libasmrun",
+    srcs = COMMON_C_SOURCES + NATIVE_C_SOURCES + glob(["caml/*.h"]),
+    # hdrs = ["//runtime/caml:hdrs"]
+)
+
+################################################################
+# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g  -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -DCAMLDLLIMPORT= -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_macosx  -o sak.o sak.c
+
+# gcc -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g    -o sak sak.o
+
+cc_binary(
+    name = "sak.exe",
+    srcs = ["sak.c"],
+    copts = OC_CFLAGS + CFLAGS + CPPFLAGS,
+    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
+    linkopts = OC_LDFLAGS + LDFLAGS,
+    deps= ["//runtime/caml:hdrs"],
+    visibility = ["//runtime/caml:__pkg__"]
+)
+
+# build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
+# 	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
+# 	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
+# 	echo '#define HOST "$(HOST)"' >> $@
+
+# C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
+### Where to install the standard library
+## LIBDIR=${exec_prefix}/lib/ocaml
+
+genrule(
+    name = "build_config_h",
+    tools = ["//runtime:sak.exe"],
+    outs = ["build_config.h"],
+    srcs = ["//:Makefile.config"],
+    cmd  = " ".join([
+        "OSD=`$(location //runtime:sak.exe) encode-C-literal {libdir}`;".format(
+            libdir = LIBDIR),
+        "echo OSD: $$OSD;",
+	    "echo '/* This file is generated from {ROOTDIR}/Makefile.config */' > $@;".format(ROOTDIR = ROOTDIR),
+	    "echo \"#define OCAML_STDLIB_DIR $$OSD\" >> $@;",
+	    "echo '#define HOST \"{HOST}\"' >> $@".format(HOST=HOST)
+    ])
+)

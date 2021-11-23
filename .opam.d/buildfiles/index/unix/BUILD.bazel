@@ -1,0 +1,63 @@
+## original: /Users/gar/.opam/4.10/lib/index/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "unix",
+    version = """1.3.3""",
+## _filedeps_path: 'index/unix'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@index//unix:index_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@index//unix:index_unix.cmxa",
+            "@index//unix:index_unix.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@fmt//:fmt",
+        "@index//:index",
+        "@logs//:logs",
+        "@logs//threaded",
+        "@mtime//:mtime",
+        "@mtime//clock/os",
+        "@semaphore-compat//:semaphore-compat",
+        "@ocaml//threads",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'index/unix'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@index//unix:index_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@index//unix:index_unix.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@fmt//:fmt",
+        "@index//:index",
+        "@logs//:logs",
+        "@logs//threaded",
+        "@mtime//:mtime",
+        "@mtime//clock/os",
+        "@semaphore-compat//:semaphore-compat",
+        "@ocaml//threads",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

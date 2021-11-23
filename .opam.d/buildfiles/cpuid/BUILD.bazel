@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/cpuid/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "cpuid",
+    version = """0.1.2""",
+    doc = """Detect CPU features""",
+## _filedeps_path: 'cpuid'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@cpuid//:cpuid.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cpuid//:cpuid.cmxa",
+            "@cpuid//:cpuid.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'cpuid'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@cpuid//:cpuid.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@cpuid//:cpuid.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

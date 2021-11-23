@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/typerep/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "typerep",
+    version = """v0.14.0""",
+## _filedeps_path: 'typerep'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@typerep//:typerep_lib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@typerep//:typerep_lib.cmxa",
+            "@typerep//:typerep_lib.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'typerep'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@typerep//:typerep_lib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@typerep//:typerep_lib.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+    ],
+    visibility = ["//visibility:public"]
+)

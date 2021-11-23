@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/metrics/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "metrics",
+    version = """0.3.0""",
+## _filedeps_path: 'metrics'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@metrics//:metrics.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@metrics//:metrics.cmxa",
+            "@metrics//:metrics.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@fmt//:fmt",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'metrics'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@metrics//:metrics.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@metrics//:metrics.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@fmt//:fmt",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/genspio/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "genspio",
+    version = """0.0.2""",
+## _filedeps_path: 'genspio'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@genspio//:genspio.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@genspio//:genspio.cmxa",
+            "@genspio//:genspio.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@nonstd//:nonstd",
+        "@sosa//:sosa",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'genspio'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@genspio//:genspio.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@genspio//:genspio.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@nonstd//:nonstd",
+        "@sosa//:sosa",
+    ],
+    visibility = ["//visibility:public"]
+)

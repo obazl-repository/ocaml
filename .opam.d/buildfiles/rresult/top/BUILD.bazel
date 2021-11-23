@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/rresult/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "top",
+    version = """0.7.0""",
+    doc = """Rresult toplevel support""",
+## _filedeps_path: 'rresult'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@rresult//top:rresult_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@rresult//top:rresult_top.cmxa",
+            "@rresult//top:rresult_top.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@rresult//:rresult",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'rresult'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@rresult//top:rresult_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@rresult//top:rresult_top.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@rresult//:rresult",
+    ],
+    visibility = ["//visibility:public"]
+)

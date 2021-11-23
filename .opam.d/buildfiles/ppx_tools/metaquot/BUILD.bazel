@@ -1,0 +1,54 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_tools/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "metaquot",
+    version = """6.4""",
+    doc = """Meta-quotation: Parsetree manipulation using concrete syntax""",
+## _filedeps_path: 'ppx_tools/metaquot'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_tools//metaquot:ppx_metaquot.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_tools//metaquot:ppx_metaquot.cmxa",
+            "@ppx_tools//metaquot:ppx_metaquot.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ppx_tools//:ppx_tools",
+        "@ppx_tools//ast_lifter",
+    ],
+    ppx_codeps = [
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_tools/metaquot'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_tools//metaquot:ppx_metaquot.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_tools//metaquot:ppx_metaquot.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:common",
+        "@ppx_tools//:ppx_tools",
+        "@ppx_tools//ast_lifter",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,26 @@
+## original: /Users/gar/.opam/4.10/lib/sosa/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "sosa",
+    version = """0.0.1""",
+    doc = """Sane OCaml String API""",
+## _filedeps_path: 'sosa'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@sosa//:sosa.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@sosa//:sosa.cmxa",
+            "@sosa//:sosa.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)

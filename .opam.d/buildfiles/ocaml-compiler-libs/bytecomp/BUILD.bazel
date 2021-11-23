@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/ocaml-compiler-libs/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "bytecomp",
+    version = """v0.12.3""",
+## _filedeps_path: 'ocaml-compiler-libs/bytecomp'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml-compiler-libs//bytecomp:ocaml_bytecomp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml-compiler-libs//bytecomp:ocaml_bytecomp.cmxa",
+            "@ocaml-compiler-libs//bytecomp:ocaml_bytecomp.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:bytecomp",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ocaml-compiler-libs/bytecomp'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml-compiler-libs//bytecomp:ocaml_bytecomp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml-compiler-libs//bytecomp:ocaml_bytecomp.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:bytecomp",
+    ],
+    visibility = ["//visibility:public"]
+)

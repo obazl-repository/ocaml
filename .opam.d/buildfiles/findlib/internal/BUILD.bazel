@@ -1,0 +1,42 @@
+## original: /Users/gar/.opam/4.10/lib/findlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "internal",
+    version = """1.9.1""",
+    doc = """Package manager""",
+## _filedeps_path: 'findlib'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@findlib//internal:findlib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@findlib//internal:findlib.cmxa",
+            "@findlib//internal:findlib.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'findlib'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@findlib//internal:findlib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@findlib//internal:findlib.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

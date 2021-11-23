@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/eqaf/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "cstruct",
+    version = """0.8""",
+## _filedeps_path: 'eqaf/cstruct'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@eqaf//cstruct:eqaf_cstruct.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@eqaf//cstruct:eqaf_cstruct.cmxa",
+            "@eqaf//cstruct:eqaf_cstruct.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@cstruct//:cstruct",
+        "@eqaf//bigstring",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'eqaf/cstruct'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@eqaf//cstruct:eqaf_cstruct.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@eqaf//cstruct:eqaf_cstruct.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@cstruct//:cstruct",
+        "@eqaf//bigstring",
+    ],
+    visibility = ["//visibility:public"]
+)

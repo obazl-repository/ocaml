@@ -1,0 +1,55 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_custom_printf/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ppx_custom_printf",
+    version = """v0.14.0""",
+## _filedeps_path: 'ppx_custom_printf'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_custom_printf//:ppx_custom_printf.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_custom_printf//:ppx_custom_printf.cmxa",
+            "@ppx_custom_printf//:ppx_custom_printf.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+        "@ocaml//compiler-libs:common",
+        "@ppx_sexp_conv//expander",
+        "@ppxlib//:ppxlib",
+        "@ppxlib//metaquot_lifters",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_custom_printf'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_custom_printf//:ppx_custom_printf.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_custom_printf//:ppx_custom_printf.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+        "@ocaml//compiler-libs:common",
+        "@ppx_sexp_conv//expander",
+        "@ppxlib//:ppxlib",
+        "@ppxlib//metaquot_lifters",
+    ],
+    visibility = ["//visibility:public"]
+)

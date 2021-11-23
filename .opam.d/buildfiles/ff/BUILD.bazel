@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/ff/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ff",
+    version = """0.4.0""",
+## _filedeps_path: 'ff'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ff//:ff.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ff//:ff.cmxa",
+            "@ff//:ff.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ff'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ff//:ff.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ff//:ff.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)

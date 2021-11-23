@@ -1,0 +1,46 @@
+## original: /Users/gar/.opam/4.10/lib/integers/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "top",
+    doc = """toplevel pretty printers""",
+## _filedeps_path: 'integers/top'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@integers//top:integers_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs",
+        "@integers//:integers",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'integers/top'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@integers//top:integers_top.cma",
+
+        ],
+        "@ocaml//mode:native": [
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs",
+        "@integers//:integers",
+    ],
+    visibility = ["//visibility:public"]
+)

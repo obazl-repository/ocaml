@@ -1,0 +1,49 @@
+## original: /Users/gar/.opam/4.10/lib/ounit2/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "ounit2",
+    version = """2.2.4""",
+## _filedeps_path: 'ounit2'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ounit2//:oUnit.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ounit2//:oUnit.cmxa",
+            "@ounit2//:oUnit.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ounit2//advanced",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ounit2'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ounit2//:oUnit.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ounit2//:oUnit.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ounit2//advanced",
+        "@unix//:unix",
+    ],
+    visibility = ["//visibility:public"]
+)

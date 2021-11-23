@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/logs/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "threaded",
+    version = """0.7.0""",
+    doc = """Thread safe logging""",
+## _filedeps_path: 'logs'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@logs//threaded:logs_threaded.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@logs//threaded:logs_threaded.cmxa",
+            "@logs//threaded:logs_threaded.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@logs//:logs",
+        "@ocaml//threads",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'logs'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@logs//threaded:logs_threaded.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@logs//threaded:logs_threaded.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@logs//:logs",
+        "@ocaml//threads",
+    ],
+    visibility = ["//visibility:public"]
+)

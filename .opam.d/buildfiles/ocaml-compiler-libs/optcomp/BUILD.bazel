@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/ocaml-compiler-libs/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "optcomp",
+    version = """v0.12.3""",
+## _filedeps_path: 'ocaml-compiler-libs/optcomp'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml-compiler-libs//optcomp:ocaml_optcomp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml-compiler-libs//optcomp:ocaml_optcomp.cmxa",
+            "@ocaml-compiler-libs//optcomp:ocaml_optcomp.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//compiler-libs:optcomp",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ocaml-compiler-libs/optcomp'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml-compiler-libs//optcomp:ocaml_optcomp.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml-compiler-libs//optcomp:ocaml_optcomp.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//compiler-libs:optcomp",
+    ],
+    visibility = ["//visibility:public"]
+)

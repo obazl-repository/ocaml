@@ -1,0 +1,50 @@
+## original: /Users/gar/.opam/4.10/lib/logs/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "fmt",
+    version = """0.7.0""",
+    doc = """Format reporter for Logs""",
+## _filedeps_path: 'logs'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@logs//fmt:logs_fmt.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@logs//fmt:logs_fmt.cmxa",
+            "@logs//fmt:logs_fmt.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@logs//:logs",
+        "@fmt//:fmt",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'logs'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@logs//fmt:logs_fmt.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@logs//fmt:logs_fmt.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@logs//:logs",
+        "@fmt//:fmt",
+    ],
+    visibility = ["//visibility:public"]
+)

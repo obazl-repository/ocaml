@@ -1,0 +1,46 @@
+## original: /Users/gar/.opam/4.10/lib/resto/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "resto",
+## _filedeps_path: 'resto'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@resto//:resto.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@resto//:resto.cmxa",
+            "@resto//:resto.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'resto'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@resto//:resto.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@resto//:resto.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@uri//:uri",
+    ],
+    visibility = ["//visibility:public"]
+)

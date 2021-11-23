@@ -1,0 +1,58 @@
+## original: /Users/gar/.opam/4.10/lib/resto-cohttp-server/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "resto-cohttp-server",
+## _filedeps_path: 'resto-cohttp-server'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@resto-cohttp-server//:resto_cohttp_server.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@resto-cohttp-server//:resto_cohttp_server.cmxa",
+            "@resto-cohttp-server//:resto_cohttp_server.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@cohttp-lwt-unix//:cohttp-lwt-unix",
+        "@conduit-lwt-unix//:conduit-lwt-unix",
+        "@lwt//:lwt",
+        "@resto//:resto",
+        "@resto-acl//:resto-acl",
+        "@resto-cohttp//:resto-cohttp",
+        "@resto-directory//:resto-directory",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'resto-cohttp-server'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@resto-cohttp-server//:resto_cohttp_server.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@resto-cohttp-server//:resto_cohttp_server.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@cohttp-lwt-unix//:cohttp-lwt-unix",
+        "@conduit-lwt-unix//:conduit-lwt-unix",
+        "@lwt//:lwt",
+        "@resto//:resto",
+        "@resto-acl//:resto-acl",
+        "@resto-cohttp//:resto-cohttp",
+        "@resto-directory//:resto-directory",
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,48 @@
+## original: /Users/gar/.opam/4.10/lib/ppx_compare/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "runtime-lib",
+    version = """v0.14.0""",
+    doc = """Runtime library for ppx_compare""",
+## _filedeps_path: 'ppx_compare/runtime-lib'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_compare//runtime-lib:ppx_compare_lib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_compare//runtime-lib:ppx_compare_lib.cmxa",
+            "@ppx_compare//runtime-lib:ppx_compare_lib.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@base//:base",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ppx_compare/runtime-lib'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ppx_compare//runtime-lib:ppx_compare_lib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ppx_compare//runtime-lib:ppx_compare_lib.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@base//:base",
+    ],
+    visibility = ["//visibility:public"]
+)

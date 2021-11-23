@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/uecc/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "uecc",
+    doc = """ECDH and ECDSA for 8-bit, 32-bit, and 64-bit processors.""",
+## _filedeps_path: 'uecc'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@uecc//:uecc.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@uecc//:uecc.cmxa",
+            "@uecc//:uecc.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bigstring//:bigstring",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'uecc'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@uecc//:uecc.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@uecc//:uecc.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bigstring//:bigstring",
+    ],
+    visibility = ["//visibility:public"]
+)

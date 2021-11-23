@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/ocaml-compiler-libs/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "shadow",
+    version = """v0.12.3""",
+## _filedeps_path: 'ocaml-compiler-libs/shadow'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml-compiler-libs//shadow:ocaml_shadow.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml-compiler-libs//shadow:ocaml_shadow.cmxa",
+            "@ocaml-compiler-libs//shadow:ocaml_shadow.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ocaml-compiler-libs/shadow'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml-compiler-libs//shadow:ocaml_shadow.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml-compiler-libs//shadow:ocaml_shadow.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

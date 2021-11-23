@@ -1,0 +1,55 @@
+## original: /Users/gar/.opam/4.10/lib/pyml/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "pyml",
+    version = """20200220""",
+    doc = """py.ml: OCaml bindings for Python""",
+## _filedeps_path: 'pyml'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@pyml//:pyml.cma",
+            "@pyml//:numpy.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@pyml//:pyml.cmxa",
+            "@pyml//:pyml.a",
+            "@pyml//:numpy.cmxa",
+            "@pyml//:numpy.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@unix//:unix",
+        "@stdcompat//:stdcompat",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'pyml'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@pyml//:pyml.cma",
+            "@pyml//:numpy.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@pyml//:pyml.cmxs",
+            "@pyml//:numpy.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@unix//:unix",
+        "@stdcompat//:stdcompat",
+    ],
+    visibility = ["//visibility:public"]
+)

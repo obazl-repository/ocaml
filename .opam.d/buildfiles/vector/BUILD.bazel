@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/vector/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "vector",
+    version = """1.0.0""",
+## _filedeps_path: 'vector'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@vector//:vector.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@vector//:vector.cmxa",
+            "@vector//:vector.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'vector'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@vector//:vector.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@vector//:vector.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

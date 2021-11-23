@@ -1,0 +1,54 @@
+## original: /Users/gar/.opam/4.10/lib/bls12-381-unix/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "bls12-381-unix",
+## _filedeps_path: 'bls12-381-unix'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@bls12-381-unix//:bls12_381_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bls12-381-unix//:bls12_381_unix.cmxa",
+            "@bls12-381-unix//:bls12_381_unix.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bls12-381//:bls12-381",
+        "@bls12-381-gen//:bls12-381-gen",
+        "@ctypes//:ctypes",
+        "@ctypes//foreign",
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'bls12-381-unix'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@bls12-381-unix//:bls12_381_unix.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bls12-381-unix//:bls12_381_unix.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@bls12-381//:bls12-381",
+        "@bls12-381-gen//:bls12-381-gen",
+        "@ctypes//:ctypes",
+        "@ctypes//foreign",
+        "@zarith//:zarith",
+    ],
+    visibility = ["//visibility:public"]
+)

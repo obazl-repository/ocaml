@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/num/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "core",
+    version = """1.4""",
+## _filedeps_path: 'ocaml'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml//lib:nums.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml//lib:nums.cmxa",
+            "@ocaml//lib:nums.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'ocaml'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@ocaml//lib:nums.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@ocaml//lib:nums.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)

@@ -1,0 +1,47 @@
+## original: /Users/gar/.opam/4.10/lib/semaphore-compat/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "semaphore-compat",
+    version = """1.0.1""",
+## _filedeps_path: 'semaphore-compat'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@semaphore-compat//:semaphore_compat.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@semaphore-compat//:semaphore_compat.cmxa",
+            "@semaphore-compat//:semaphore_compat.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@ocaml//threads",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'semaphore-compat'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@semaphore-compat//:semaphore_compat.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@semaphore-compat//:semaphore_compat.cmxs",
+
+        ],
+    }),
+    deps = [
+        "@ocaml//threads",
+    ],
+    visibility = ["//visibility:public"]
+)

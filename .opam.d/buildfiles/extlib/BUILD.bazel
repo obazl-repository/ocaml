@@ -1,0 +1,29 @@
+## original: /Users/gar/.opam/4.10/lib/extlib/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "extlib",
+    version = """1.7.7""",
+    doc = """Extended standard library""",
+## _filedeps_path: 'extlib'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@extlib//:extLib.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@extlib//:extLib.cmxa",
+            "@extlib//:extLib.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    deps = [
+        "@bytes//:bytes",
+    ],
+    visibility = ["//visibility:public"]
+)

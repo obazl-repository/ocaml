@@ -1,0 +1,41 @@
+## original: /Users/gar/.opam/4.10/lib/bheap/META
+
+load(
+     "@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_import"
+)
+
+ocaml_import(
+    name = "bheap",
+    version = """2.0.0""",
+## _filedeps_path: 'bheap'
+    archive = select({
+        "@ocaml//mode:bytecode": [
+            "@bheap//:binary_heap.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bheap//:binary_heap.cmxa",
+            "@bheap//:binary_heap.a",
+
+        ],
+    }),
+    all = glob(["*.cmx", "*.cmi", "*.a", "*.so"]),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_import(
+    name = "plugin",
+## _filedeps_path: 'bheap'
+    plugin = select({
+        "@ocaml//mode:bytecode": [
+            "@bheap//:binary_heap.cma",
+
+        ],
+        "@ocaml//mode:native": [
+            "@bheap//:binary_heap.cmxs",
+
+        ],
+    }),
+    visibility = ["//visibility:public"]
+)
