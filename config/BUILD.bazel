@@ -1,1 +1,30 @@
-# do not remove
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "bool_setting")
+
+package(default_visibility = ["//visibility:public"])
+
+bool_flag( name = "instrument", build_setting_default = False)
+
+config_setting(
+    name = "instrumented",
+    flag_values = {":instrument": "True"}
+    # constraint_values = [
+    #     "@platforms//os:linux",
+    # ]
+)
+
+config_setting(
+    name = "debug",
+    constraint_values = [
+        # "//config/debug" blah blah
+        "@platforms//os:linux",
+    ]
+)
+
+config_setting(
+    name = "pic",
+    constraint_values = [
+        # "//config/pic" blah blah
+        "@platforms//os:linux",
+    ]
+)

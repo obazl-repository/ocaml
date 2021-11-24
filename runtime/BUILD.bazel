@@ -1,3 +1,8 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+
+load("@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_module")
+
 load("//config:BUILD.bzl",
      "ARCH", "MODEL", "SYSTEM",
      "HOST", "ROOTDIR", "LIBDIR",
@@ -6,8 +11,22 @@ load("//config:BUILD.bzl",
      "OC_LDFLAGS", "LDFLAGS",
 
      "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
-     "OUTPUTEXE"
+     "OUTPUTEXE", "MKEXE_FLAGS",
+     "BYTE_CCLIB_LDFLAGS"
      )
+
+# ifeq "$(TOOLCHAIN)" "msvc"
+# ASM_EXT := asm
+# ASM_SOURCES := $(ARCH)nt.$(ASM_EXT)
+# else
+# ASM_EXT := S
+# ASM_SOURCES := $(ARCH).$(ASM_EXT)
+# endif
+
+ASM_SOURCES = select({
+    # "//config/host:win": [$(ARCH)nt.$(ASM_EXT)]
+    "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
+})
 
 COMMON_C_SOURCES = [
     "misc.c",
@@ -55,62 +74,7 @@ NATIVE_C_SOURCES = [
     "backtrace_nat.c", "dynlink_nat.c", "clambda_checks.c",
 ]
 
-cc_library(
-    name = "camlrun",
-    srcs = [
-        ":build_config.h",
-        # "//runtime/caml:version.h"
-    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
-    # + glob(["caml/*.h"]),
-    copts = [
-        "-I$(GENDIR)/runtime" # to pick up build_config.h
-    ] + OC_CPPFLAGS + select({
-        "//config/host:linux": [],
-        "//config/host:macos": [],
-        "//conditions:default": []
-    # }) + select({
-    #     "//config:debug": OC_DEBUG_CPPFLAGS,
-    #     "//config:instrumented": OC_INSTR_CPPFLAGS,
-    #     "//config:pic": OC_CFLAGS + SHAREDLIB_CFLAGS,
-    #     "//conditions:default": []
-    # }) + select({
-    #     "//config/mode:native": OC_NATIVE_CPPFLAGS,
-    #     "//conditions:default": []
-    }),
-    defines = OC_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"]
-)
-
-cc_library(
-    name = "libasmrun",
-    srcs = COMMON_C_SOURCES + NATIVE_C_SOURCES + glob(["caml/*.h"]),
-    # hdrs = ["//runtime/caml:hdrs"]
-)
-
-################################################################
-# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g  -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -DCAMLDLLIMPORT= -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_macosx  -o sak.o sak.c
-
-# gcc -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g    -o sak sak.o
-
-cc_binary(
-    name = "sak.exe",
-    srcs = ["sak.c"],
-    copts = OC_CFLAGS + CFLAGS + CPPFLAGS,
-    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
-    linkopts = OC_LDFLAGS + LDFLAGS,
-    deps= ["//runtime/caml:hdrs"],
-    visibility = ["//runtime/caml:__pkg__"]
-)
-
-# build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
-# 	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
-# 	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
-# 	echo '#define HOST "$(HOST)"' >> $@
-
-# C_LITERAL = $(shell ./sak$(EXE) encode-C-literal '$(1)')
-### Where to install the standard library
-## LIBDIR=${exec_prefix}/lib/ocaml
-
+########
 genrule(
     name = "build_config_h",
     tools = ["//runtime:sak.exe"],
@@ -124,4 +88,141 @@ genrule(
 	    "echo \"#define OCAML_STDLIB_DIR $$OSD\" >> $@;",
 	    "echo '#define HOST \"{HOST}\"' >> $@".format(HOST=HOST)
     ])
+)
+
+# primitives: $(shell ./gen_primitives.sh > primitives.new; \
+#                     cmp -s primitives primitives.new || echo primitives.new)
+# 	cp $^ $@
+## FIXME: do the cmp
+genrule(
+    name  = "primitives_dat",
+    tools = [":gen_primitives.sh"],
+    outs  = ["primitives"],
+    ## cwd is proj root, but the script assumes it is runtime
+    cmd   = " ".join([
+        "echo PWD: $$(PWD);",
+        "cd runtime && ",
+        "../$(location :gen_primitives.sh) > ../$@;"
+    ]),
+    ## script depends on these:
+    srcs  = [
+        "alloc.c", "array.c", "compare.c", "extern.c", "floats.c",
+        "gc_ctrl.c", "hash.c", "intern.c", "interp.c", "ints.c", "io.c",
+        "lexing.c", "md5.c", "meta.c", "memprof.c", "obj.c", "parsing.c",
+        "signals.c", "str.c", "sys.c", "callback.c", "weak.c",
+        "finalise.c", "stacks.c", "dynlink.c", "backtrace_byt.c",
+        "backtrace.c", "afl.c", "bigarray.c", "eventlog.c",
+    ]
+)
+
+## TODO: obazl_rules_mustache
+# mustache_lines(
+#     name = "prims_c",
+#     out  = "prims.c",
+#     template = "prims.mustache",
+#     data     = "prims.c",
+# )
+
+# prims.c : primitives
+genrule(
+    name  = "prims_c",
+    outs  = ["prims.c"],
+    srcs  = [":primitives"],
+    cmd   = "\n".join([
+        "PRIMS=`cat $(location primitives)`;",
+        # "echo PRIMS: $$PRIMS;",
+	    "echo '#define CAML_INTERNALS' > $@;",
+        "echo '#include \"caml/mlvalues.h\"' >> $@;",
+	    "echo '#include \"caml/prims.h\"' >> $@;",
+        "sed -e 's/.*/extern value &();/' $(location :primitives) >> $@;",
+        "echo 'c_primitive caml_builtin_cprim[] = {' >> $@;",
+        "sed -e 's/.*/  &,/' $(location :primitives) >> $@;",
+        "echo '  0 };' >> $@;",
+        "echo 'char * caml_names_of_builtin_cprim[] = {' >> $@;",
+        "sed -e 's/.*/  \"&\",/' $(location :primitives) >> $@;",
+        "echo '  0 };' >> $@"
+    ])
+)
+
+################  Libraries and Programs  ################
+###########
+cc_library(
+    name = "camlrun",
+    srcs = [
+        ":build_config.h",
+    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    copts = [
+        "-I$(GENDIR)/runtime" # to pick up build_config.h
+    ] + OC_CPPFLAGS,
+    defines = OC_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"]
+)
+
+cc_binary(
+    name = "ocamlrun",
+    srcs = ["prims.c", "instrtrace.c"],
+    copts = OC_CFLAGS + CFLAGS,
+    linkopts = OC_LDFLAGS + LDFLAGS + BYTE_CCLIB_LDFLAGS + MKEXE_FLAGS,
+    deps= [":camlrun"],
+    visibility = ["//runtime/caml:__pkg__"]
+)
+
+################ instrumented
+cc_library(
+    name = "camlruni",
+    srcs = [
+        ":build_config.h",
+    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    copts = [
+        "-I$(GENDIR)/runtime" # to pick up build_config.h
+    ] + OC_CPPFLAGS,
+    defines = OC_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"]
+)
+
+###########
+cc_library(
+    name = "asmrun",
+    srcs = [
+        ":build_config.h",
+        "signals_osdep.h"
+    ] + COMMON_C_SOURCES + NATIVE_C_SOURCES + ASM_SOURCES,
+    copts = [
+        "-I$(GENDIR)/runtime" # to pick up build_config.h
+    ] + OC_CPPFLAGS,
+    linkopts = LDFLAGS + OC_LDFLAGS,
+    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"]
+)
+
+##########
+cc_binary(
+    name = "sak.exe",
+    srcs = ["sak.c"],
+    copts = OC_CFLAGS + CFLAGS + CPPFLAGS,
+    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
+    linkopts = OC_LDFLAGS + LDFLAGS,
+    deps= ["//runtime/caml:hdrs"],
+    visibility = ["//runtime/caml:__pkg__"]
+)
+
+###########
+write_file( ## from dune file
+    name     = "runtime_ml",
+    out      = "runtime.ml",
+    content  = ["let linkme = ()"]
+)
+
+ocaml_module(  ## from dune file
+    name   = "Runtime",
+    mode   = "bytecode",
+    struct = "runtime.ml",
+    opts   = [
+        "-nostdlib", "-nopervasives",
+        "-cclib", "-I runtime"
+    ],
+    deps = [":camlrun"]
+    # cc_deps = {
+    #     ":camlrun": "static",
+    # },
 )
