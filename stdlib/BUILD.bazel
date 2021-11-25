@@ -1,0 +1,1637 @@
+## GENERATED FILE ##
+
+load("@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_ns_archive",
+     "ocaml_ns_library",
+     "ocaml_signature",
+)
+
+COMPFLAGS = [
+    "-strict-sequence", "-absname",
+    "-w", "+a-4-9-41-42-44-45-48-70",
+    "-g", "-warn-error", "+A",
+    "-bin-annot",
+    "-nostdlib", "-principal",
+    "-safe-string", "-strict-formats"
+]
+
+MODULE_OPTS = COMPFLAGS # ["-nostdlib"]
+SIG_OPTS = COMPFLAGS  # ["-nostdlib"]
+
+ocaml_library(
+    name = "stdlib_lib",
+    modules  = [
+        ":Arg",
+        ":Array",
+        ":ArrayLabels",
+        ":Atomic",
+        ":Bigarray",
+        ":Bool",
+        ":Buffer",
+        ":Bytes",
+        ":BytesLabels",
+        ":Callback",
+        ":CamlinternalAtomic",
+        ":CamlinternalFormat",
+        ":CamlinternalFormatBasics",
+        ":CamlinternalLazy",
+        ":CamlinternalMod",
+        ":CamlinternalOO",
+        ":Char",
+        ":Complex",
+        ":Digest",
+        ":Either",
+        ":Ephemeron",
+        ":Filename",
+        ":Float",
+        ":Format",
+        ":Fun",
+        ":Gc",
+        ":Genlex",
+        ":Hashtbl",
+        ":In_channel",
+        ":Int",
+        ":Int32",
+        ":Int64",
+        ":Lazy",
+        ":Lexing",
+        ":List",
+        ":ListLabels",
+        ":Map",
+        ":Marshal",
+        ":MoreLabels",
+        ":Nativeint",
+        ":Obj",
+        ":Oo",
+        ":Option",
+        ":Out_channel",
+        ":Parsing",
+        ":Pervasives",
+        ":Printexc",
+        ":Printf",
+        ":Queue",
+        ":Random",
+        ":Result",
+        ":Scanf",
+        ":Seq",
+        ":Set",
+        ":Stack",
+        ":StdLabels",
+        ":Std_exit",
+        ":Stdlib",
+        ":Stream",
+        ":String",
+        ":StringLabels",
+        ":Sys",
+        ":Uchar",
+        ":Unit",
+        ":Weak",
+    ],
+)
+
+ocaml_module(
+    name   = "Arg",
+    struct = "arg.ml",
+    sig    = "Arg_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Printf", ## (Stdlib Printf)
+        ":List", ## (Stdlib List)
+        ":Int", ## (Stdlib Int)
+        ":Buffer", ## (Stdlib Buffer)
+        ":Array", ## (Stdlib Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Arg_cmi",
+    src  = "arg.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Array",
+    struct = "array.ml",
+    sig    = "Array_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_signature(
+    name = "Array_cmi",
+    src  = "array.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "ArrayLabels",
+    struct = "arrayLabels.ml",
+    sig    = "ArrayLabels_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Array", ## (Stdlib Array)
+    ]
+)
+
+ocaml_signature(
+    name = "ArrayLabels_cmi",
+    src  = "arrayLabels.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "Atomic",
+    struct = "atomic.ml",
+    sig    = "Atomic_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":CamlinternalAtomic"
+    ]
+)
+
+ocaml_signature(
+    name = "Atomic_cmi",
+    src  = "atomic.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Bigarray",
+    struct = "bigarray.ml",
+    sig    = "Bigarray_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":Complex", ## (Stdlib Complex)
+        ":Array", ## (Stdlib Array)
+        ## (Genarray)
+        ## (Array3)
+        ## (Array2)
+        ## (Array1)
+        ## (Array0)
+    ]
+)
+
+ocaml_signature(
+    name = "Bigarray_cmi",
+    src  = "bigarray.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Complex", ## (Stdlib Complex)
+        ## (Genarray)
+        ## (Array3)
+        ## (Array2)
+        ## (Array1)
+        ## (Array0)
+    ]
+)
+
+ocaml_module(
+    name   = "Bool",
+    struct = "bool.ml",
+    sig    = "Bool_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+    ]
+)
+
+ocaml_signature(
+    name = "Bool_cmi",
+    src  = "bool.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Buffer",
+    struct = "buffer.ml",
+    sig    = "Buffer_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Uchar", ## (Stdlib Uchar)
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Seq", ## (Stdlib Seq)
+        ":Char", ## (Stdlib Char)
+        ":Bytes", ## (Stdlib Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "Buffer_cmi",
+    src  = "buffer.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Uchar", ## (Stdlib Uchar)
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "Bytes",
+    struct = "bytes.ml",
+    sig    = "Bytes_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":Seq", ## (Stdlib Seq)
+        ":Int", ## (Stdlib Int)
+        ":Char", ## (Stdlib Char)
+    ]
+)
+
+ocaml_signature(
+    name = "Bytes_cmi",
+    src  = "bytes.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "BytesLabels",
+    struct = "bytesLabels.ml",
+    sig    = "BytesLabels_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Bytes", ## (Stdlib Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "BytesLabels_cmi",
+    src  = "bytesLabels.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "Callback",
+    struct = "callback.ml",
+    sig    = "Callback_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Obj", ## (Stdlib Obj)
+    ]
+)
+
+ocaml_signature(
+    name = "Callback_cmi",
+    src  = "callback.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+# ../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 -g -warn-error +A -bin-annot -nostdlib -principal -safe-string -strict-formats  -nopervasives -c camlinternalAtomic.mli
+
+ocaml_module(
+    name   = "CamlinternalAtomic",
+    struct = "camlinternalAtomic.ml",
+    sig    = "CamlinternalAtomic_cmi",
+    opts = MODULE_OPTS + ["-nopervasives"],
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "CamlinternalAtomic_cmi",
+    src  = "camlinternalAtomic.mli",
+    opts = SIG_OPTS + ["-nopervasives"],
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "CamlinternalFormat",
+    struct = "camlinternalFormat.ml",
+    sig    = "CamlinternalFormat_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Int", ## (Stdlib Int)
+        ":Char", ## (Stdlib Char)
+        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        ":Bytes", ## (Stdlib Bytes)
+        ":Buffer", ## (Stdlib Buffer)
+    ]
+)
+
+ocaml_signature(
+    name = "CamlinternalFormat_cmi",
+    src  = "camlinternalFormat.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        ":Buffer", ## (Stdlib Buffer)
+    ]
+)
+
+ocaml_module(
+    name   = "CamlinternalFormatBasics",
+    struct = "camlinternalFormatBasics.ml",
+    sig    = "CamlinternalFormatBasics_cmi",
+    opts = MODULE_OPTS + ["-nopervasives"],
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "CamlinternalFormatBasics_cmi",
+    src  = "camlinternalFormatBasics.mli",
+    opts = SIG_OPTS + ["-nopervasives"],
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "CamlinternalLazy",
+    struct = "camlinternalLazy.ml",
+    sig    = "CamlinternalLazy_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":Obj", ## (Stdlib Obj)
+    ]
+)
+
+ocaml_signature(
+    name = "CamlinternalLazy_cmi",
+    src  = "camlinternalLazy.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "CamlinternalMod",
+    struct = "camlinternalMod.ml",
+    sig    = "CamlinternalMod_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Obj", ## (Stdlib Obj)
+        ":Lazy", ## (Stdlib Lazy)
+        ":CamlinternalOO", ## (Stdlib CamlinternalOO)
+        ":Array", ## (Stdlib Array)
+    ]
+)
+
+ocaml_signature(
+    name = "CamlinternalMod_cmi",
+    src  = "camlinternalMod.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Obj", ## (Stdlib Obj)
+    ]
+)
+
+ocaml_module(
+    name   = "CamlinternalOO",
+    struct = "camlinternalOO.ml",
+    sig    = "CamlinternalOO_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Obj", ## (Stdlib Obj)
+        ":List", ## (Stdlib List)
+        ":Char", ## (Stdlib Char)
+        ":Array", ## (Stdlib Array)
+        ## (Map)
+    ]
+)
+
+ocaml_signature(
+    name = "CamlinternalOO_cmi",
+    src  = "camlinternalOO.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Obj", ## (Stdlib Obj)
+    ]
+)
+
+ocaml_module(
+    name   = "Char",
+    struct = "char.ml",
+    sig    = "Char_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Char_cmi",
+    src  = "char.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Complex",
+    struct = "complex.ml",
+    sig    = "Complex_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Complex_cmi",
+    src  = "complex.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Digest",
+    struct = "digest.ml",
+    sig    = "Digest_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":String", ## (Stdlib String)
+        ":Char", ## (Stdlib Char)
+        ":Bytes", ## (Stdlib Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "Digest_cmi",
+    src  = "digest.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Either",
+    struct = "either.ml",
+    sig    = "Either_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Either_cmi",
+    src  = "either.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ephemeron",
+    struct = "ephemeron.ml",
+    sig    = "Ephemeron_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":Seq", ## (Stdlib Seq)
+        ":Random", ## (Stdlib Random)
+        ":Obj", ## (Stdlib Obj)
+        ":Lazy", ## (Stdlib Lazy)
+        ":Int", ## (Stdlib Int)
+        ":Array", ## (Stdlib Array)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "Ephemeron_cmi",
+    src  = "ephemeron.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_module(
+    name   = "Filename",
+    struct = "filename.ml",
+    sig    = "Filename_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Random", ## (Stdlib Random)
+        ":Printf", ## (Stdlib Printf)
+        ":List", ## (Stdlib List)
+        ":Lazy", ## (Stdlib Lazy)
+        ":Buffer", ## (Stdlib Buffer)
+    ]
+)
+
+ocaml_signature(
+    name = "Filename_cmi",
+    src  = "filename.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Float",
+    struct = "float.ml",
+    sig    = "Float_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":Seq", ## (Stdlib Seq)
+        ":List", ## (Stdlib List)
+        ":Array", ## (Stdlib Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Float_cmi",
+    src  = "float.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ## (Stdlib)
+    ]
+)
+
+ocaml_module(
+    name   = "Format",
+    struct = "format.ml",
+    sig    = "Format_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":String", ## (Stdlib String)
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":Seq", ## (Stdlib Seq)
+        ":List", ## (Stdlib List)
+        ":Int", ## (Stdlib Int)
+        ":Either", ## (Stdlib Either)
+        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        ":CamlinternalFormat", ## (Stdlib CamlinternalFormat)
+        ":Bytes", ## (Stdlib Bytes)
+        ":Buffer", ## (Stdlib Buffer)
+        ## (Stack)
+        ## (Queue)
+    ]
+)
+
+ocaml_signature(
+    name = "Format_cmi",
+    src  = "format.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ":Either", ## (Stdlib Either)
+        ":Buffer", ## (Stdlib Buffer)
+        ## (Stdlib)
+    ]
+)
+
+ocaml_module(
+    name   = "Fun",
+    struct = "fun.ml",
+    sig    = "Fun_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Printexc", ## (Stdlib Printexc)
+    ]
+)
+
+ocaml_signature(
+    name = "Fun_cmi",
+    src  = "fun.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gc",
+    struct = "gc.ml",
+    sig    = "Gc_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Printf", ## (Stdlib Printf)
+        ":Printexc", ## (Stdlib Printexc)
+    ]
+)
+
+ocaml_signature(
+    name = "Gc_cmi",
+    src  = "gc.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Printexc", ## (Stdlib Printexc)
+    ]
+)
+
+ocaml_module(
+    name   = "Genlex",
+    struct = "genlex.ml",
+    sig    = "Genlex_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":String", ## (Stdlib String)
+        ":List", ## (Stdlib List)
+        ":Char", ## (Stdlib Char)
+        ":Bytes", ## (Stdlib Bytes)
+        ## (Stream)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "Genlex_cmi",
+    src  = "genlex.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Stream)
+    ]
+)
+
+ocaml_module(
+    name   = "Hashtbl",
+    struct = "hashtbl.ml",
+    sig    = "Hashtbl_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Seq", ## (Stdlib Seq)
+        ":Random", ## (Stdlib Random)
+        ":Obj", ## (Stdlib Obj)
+        ":Lazy", ## (Stdlib Lazy)
+        ":Int", ## (Stdlib Int)
+        ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
+        ":Array", ## (Stdlib Array)
+        ## (MakeSeeded)
+        ## (H)
+    ]
+)
+
+ocaml_signature(
+    name = "Hashtbl_cmi",
+    src  = "hashtbl.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ## (H)
+    ]
+)
+
+ocaml_module(
+    name   = "In_channel",
+    struct = "in_channel.ml",
+    sig    = "In_channel_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+    ]
+)
+
+ocaml_signature(
+    name = "In_channel_cmi",
+    src  = "in_channel.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Stdlib)
+    ]
+)
+
+ocaml_module(
+    name   = "Int",
+    struct = "int.ml",
+    sig    = "Int_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+    ]
+)
+
+ocaml_signature(
+    name = "Int_cmi",
+    src  = "int.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Int32",
+    struct = "int32.ml",
+    sig    = "Int32_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ## ":Stdlib", ## (Stdlib Stdlib)
+    ]
+)
+
+ocaml_signature(
+    name = "Int32_cmi",
+    src  = "int32.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Int64",
+    struct = "int64.ml",
+    sig    = "Int64_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+    ]
+)
+
+ocaml_signature(
+    name = "Int64_cmi",
+    src  = "int64.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lazy",
+    struct = "lazy.ml",
+    sig    = "Lazy_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Obj", ## (Stdlib Obj)
+        ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
+    ]
+)
+
+ocaml_signature(
+    name = "Lazy_cmi",
+    src  = "lazy.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
+    ]
+)
+
+ocaml_module(
+    name   = "Lexing",
+    struct = "lexing.ml",
+    sig    = "Lexing_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Int", ## (Stdlib Int)
+        ":Bytes", ## (Stdlib Bytes)
+        ":Array", ## (Stdlib Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Lexing_cmi",
+    src  = "lexing.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "List",
+    struct = "list.ml",
+    sig    = "List_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":Seq", ## (Stdlib Seq)
+        ":Either", ## (Stdlib Either)
+    ]
+)
+
+ocaml_signature(
+    name = "List_cmi",
+    src  = "list.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ":Either", ## (Stdlib Either)
+    ]
+)
+
+ocaml_module(
+    name   = "ListLabels",
+    struct = "listLabels.ml",
+    sig    = "ListLabels_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":List", ## (Stdlib List)
+    ]
+)
+
+ocaml_signature(
+    name = "ListLabels_cmi",
+    src  = "listLabels.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ":Either", ## (Stdlib Either)
+    ]
+)
+
+ocaml_module(
+    name   = "Map",
+    struct = "map.ml",
+    sig    = "Map_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ## (Ord)
+    ]
+)
+
+ocaml_signature(
+    name = "Map_cmi",
+    src  = "map.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ## (Ord)
+    ]
+)
+
+ocaml_module(
+    name   = "Marshal",
+    struct = "marshal.ml",
+    sig    = "Marshal_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Bytes", ## (Stdlib Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "Marshal_cmi",
+    src  = "marshal.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "MoreLabels",
+    struct = "moreLabels.ml",
+    sig    = "MoreLabels_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Set", ## (Stdlib Set)
+        ## (Map)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "MoreLabels_cmi",
+    src  = "moreLabels.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Set", ## (Stdlib Set)
+        ":Seq", ## (Stdlib Seq)
+        ## (Ord)
+        ## (Map)
+        ## (Hashtbl)
+        ## (H)
+    ]
+)
+
+ocaml_module(
+    name   = "Nativeint",
+    struct = "nativeint.ml",
+    sig    = "Nativeint_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        # ":Stdlib", ## (Stdlib Stdlib)
+    ]
+)
+
+ocaml_signature(
+    name = "Nativeint_cmi",
+    src  = "nativeint.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Obj",
+    struct = "obj.ml",
+    sig    = "Obj_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":Nativeint", ## (Stdlib Nativeint)
+        ":Int32", ## (Stdlib Int32)
+    ]
+)
+
+ocaml_signature(
+    name = "Obj_cmi",
+    src  = "obj.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Int32", ## (Stdlib Int32)
+    ]
+)
+
+ocaml_module(
+    name   = "Oo",
+    struct = "oo.ml",
+    sig    = "Oo_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":CamlinternalOO", ## (Stdlib CamlinternalOO)
+    ]
+)
+
+ocaml_signature(
+    name = "Oo_cmi",
+    src  = "oo.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":CamlinternalOO", ## (Stdlib CamlinternalOO)
+    ]
+)
+
+ocaml_module(
+    name   = "Option",
+    struct = "option.ml",
+    sig    = "Option_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_signature(
+    name = "Option_cmi",
+    src  = "option.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "Out_channel",
+    struct = "out_channel.ml",
+    sig    = "Out_channel_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+    ]
+)
+
+ocaml_signature(
+    name = "Out_channel_cmi",
+    src  = "out_channel.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Stdlib)
+    ]
+)
+
+ocaml_module(
+    name   = "Parsing",
+    struct = "parsing.ml",
+    sig    = "Parsing_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Obj", ## (Stdlib Obj)
+        ":Lexing", ## (Stdlib Lexing)
+        ":Array", ## (Stdlib Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Parsing_cmi",
+    src  = "parsing.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Obj", ## (Stdlib Obj)
+        ":Lexing", ## (Stdlib Lexing)
+    ]
+)
+
+ocaml_module(
+    name   = "Pervasives",
+    struct = "pervasives.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        ## (LargeFile)
+    ]
+)
+
+ocaml_module(
+    name   = "Printexc",
+    struct = "printexc.ml",
+    sig    = "Printexc_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":Printf", ## (Stdlib Printf)
+        ":Obj", ## (Stdlib Obj)
+        ":Buffer", ## (Stdlib Buffer)
+        ":Atomic", ## (Stdlib Atomic)
+        ":Array", ## (Stdlib Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Printexc_cmi",
+    src  = "printexc.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Printf",
+    struct = "printf.ml",
+    sig    = "Printf_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        ":CamlinternalFormat", ## (Stdlib CamlinternalFormat)
+        ":Buffer", ## (Stdlib Buffer)
+    ]
+)
+
+ocaml_signature(
+    name = "Printf_cmi",
+    src  = "printf.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Buffer", ## (Stdlib Buffer)
+    ]
+)
+
+ocaml_module(
+    name   = "Queue",
+    struct = "queue.ml",
+    sig    = "Queue_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_signature(
+    name = "Queue_cmi",
+    src  = "queue.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "Random",
+    struct = "random.ml",
+    sig    = "Random_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":String", ## (Stdlib String)
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":Nativeint", ## (Stdlib Nativeint)
+        ":Int64", ## (Stdlib Int64)
+        ":Int32", ## (Stdlib Int32)
+        ":Int", ## (Stdlib Int)
+        ":Digest", ## (Stdlib Digest)
+        ":Char", ## (Stdlib Char)
+        ":Array", ## (Stdlib Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Random_cmi",
+    src  = "random.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Nativeint", ## (Stdlib Nativeint)
+        ":Int64", ## (Stdlib Int64)
+        ":Int32", ## (Stdlib Int32)
+    ]
+)
+
+ocaml_module(
+    name   = "Result",
+    struct = "result.ml",
+    sig    = "Result_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_signature(
+    name = "Result_cmi",
+    src  = "result.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "Scanf",
+    struct = "scanf.ml",
+    sig    = "Scanf_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":String", ## (Stdlib String)
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":Printf", ## (Stdlib Printf)
+        ":List", ## (Stdlib List)
+        ":Int", ## (Stdlib Int)
+        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        ":CamlinternalFormat", ## (Stdlib CamlinternalFormat)
+        ":Bytes", ## (Stdlib Bytes)
+        ":Buffer", ## (Stdlib Buffer)
+    ]
+)
+
+ocaml_signature(
+    name = "Scanf_cmi",
+    src  = "scanf.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        ## (Stdlib)
+    ]
+)
+
+ocaml_module(
+    name   = "Seq",
+    struct = "seq.ml",
+    sig    = "Seq_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Seq_cmi",
+    src  = "seq.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Set",
+    struct = "set.ml",
+    sig    = "Set_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ":List", ## (Stdlib List)
+    ]
+)
+
+ocaml_signature(
+    name = "Set_cmi",
+    src  = "set.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "Stack",
+    struct = "stack.ml",
+    sig    = "Stack_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+        ":List", ## (Stdlib List)
+    ]
+)
+
+ocaml_signature(
+    name = "Stack_cmi",
+    src  = "stack.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "StdLabels",
+    struct = "stdLabels.ml",
+    sig    = "StdLabels_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":StringLabels", ## (Stdlib StringLabels)
+        ":ListLabels", ## (Stdlib ListLabels)
+        ":BytesLabels", ## (Stdlib BytesLabels)
+        ":ArrayLabels", ## (Stdlib ArrayLabels)
+    ]
+)
+
+ocaml_signature(
+    name = "StdLabels_cmi",
+    src  = "stdLabels.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":StringLabels", ## (Stdlib StringLabels)
+        ":ListLabels", ## (Stdlib ListLabels)
+        ":BytesLabels", ## (Stdlib BytesLabels)
+        ":ArrayLabels", ## (Stdlib ArrayLabels)
+    ]
+)
+
+ocaml_module(
+    name   = "Std_exit",
+    struct = "std_exit.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Stdlib",
+    struct = "stdlib.ml",
+    sig    = "Stdlib_cmi",
+    opts = MODULE_OPTS + ["-no-alias-deps"],
+    deps = [
+        # ":Unit", ## (Stdlib Unit)
+        # ":Uchar", ## (Stdlib Uchar)
+        # ":Sys", ## (Stdlib Sys)
+        # ":StringLabels", ## (Stdlib StringLabels)
+        # ":String", ## (Stdlib String)
+        # ":Stdlib", ## (Stdlib Stdlib)
+        # ":StdLabels", ## (Stdlib StdLabels)
+        # ":Stack", ## (Stdlib Stack)
+        # ":Set", ## (Stdlib Set)
+        # ":Seq", ## (Stdlib Seq)
+        # ":Scanf", ## (Stdlib Scanf)
+        # ":Result", ## (Stdlib Result)
+        # ":Random", ## (Stdlib Random)
+        # ":Queue", ## (Stdlib Queue)
+        # ":Printf", ## (Stdlib Printf)
+        # ":Printexc", ## (Stdlib Printexc)
+        # ":Pervasives", ## (Stdlib Pervasives)
+        # ":Parsing", ## (Stdlib Parsing)
+        # ":Out_channel", ## (Stdlib Out_channel)
+        # ":Option", ## (Stdlib Option)
+        # ":Oo", ## (Stdlib Oo)
+        # ":Obj", ## (Stdlib Obj)
+        # ":Nativeint", ## (Stdlib Nativeint)
+        # ":MoreLabels", ## (Stdlib MoreLabels)
+        # ":Marshal", ## (Stdlib Marshal)
+        # ":ListLabels", ## (Stdlib ListLabels)
+        # ":List", ## (Stdlib List)
+        # ":Lexing", ## (Stdlib Lexing)
+        # ":Lazy", ## (Stdlib Lazy)
+        # ":Int64", ## (Stdlib Int64)
+        # ":Int32", ## (Stdlib Int32)
+        # ":Int", ## (Stdlib Int)
+        # ":In_channel", ## (Stdlib In_channel)
+        # ":Genlex", ## (Stdlib Genlex)
+        # ":Gc", ## (Stdlib Gc)
+        # ":Fun", ## (Stdlib Fun)
+        # ":Format", ## (Stdlib Format)
+        # ":Float", ## (Stdlib Float)
+        # ":Filename", ## (Stdlib Filename)
+        # ":Ephemeron", ## (Stdlib Ephemeron)
+        # ":Either", ## (Stdlib Either)
+        # ":Digest", ## (Stdlib Digest)
+        # ":Complex", ## (Stdlib Complex)
+        # ":Char", ## (Stdlib Char)
+        # ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
+        # ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        # ":CamlinternalAtomic", ## (Stdlib CamlinternalAtomic)
+        # ":Callback", ## (Stdlib Callback)
+        # ":BytesLabels", ## (Stdlib BytesLabels)
+        # ":Bytes", ## (Stdlib Bytes)
+        # ":Buffer", ## (Stdlib Buffer)
+        # ":Bool", ## (Stdlib Bool)
+        # ":Atomic", ## (Stdlib Atomic)
+        # ":ArrayLabels", ## (Stdlib ArrayLabels)
+        # ":Array", ## (Stdlib Array)
+        # ":Arg", ## (Stdlib Arg)
+        # ## (Weak)
+        # ## (Stream)
+        # ## (Queue)
+        # ## (Map)
+        # ## (Hashtbl)
+        # ## (Bigarray)
+    ]
+)
+
+ocaml_ns_library(
+    name   = "ocaml-stdlib",
+    ns = "Stdlib",
+    # struct = "stdlib.ml",
+    # sig    = "Stdlib_cmi",
+    opts = MODULE_OPTS + ["-no-alias-deps"],
+    submodules   = [
+        ":Unit", ## (Stdlib Unit)
+        ":Uchar", ## (Stdlib Uchar)
+        ":Sys", ## (Stdlib Sys)
+        ":StringLabels", ## (Stdlib StringLabels)
+        ":String", ## (Stdlib String)
+        ":Stdlib", ## (Stdlib Stdlib)
+        ":StdLabels", ## (Stdlib StdLabels)
+        ":Stack", ## (Stdlib Stack)
+        ":Set", ## (Stdlib Set)
+        ":Seq", ## (Stdlib Seq)
+        ":Scanf", ## (Stdlib Scanf)
+        ":Result", ## (Stdlib Result)
+        ":Random", ## (Stdlib Random)
+        ":Queue", ## (Stdlib Queue)
+        ":Printf", ## (Stdlib Printf)
+        ":Printexc", ## (Stdlib Printexc)
+        ":Pervasives", ## (Stdlib Pervasives)
+        ":Parsing", ## (Stdlib Parsing)
+        ":Out_channel", ## (Stdlib Out_channel)
+        ":Option", ## (Stdlib Option)
+        ":Oo", ## (Stdlib Oo)
+        ":Obj", ## (Stdlib Obj)
+        ":Nativeint", ## (Stdlib Nativeint)
+        ":MoreLabels", ## (Stdlib MoreLabels)
+        ":Marshal", ## (Stdlib Marshal)
+        ":ListLabels", ## (Stdlib ListLabels)
+        ":List", ## (Stdlib List)
+        ":Lexing", ## (Stdlib Lexing)
+        ":Lazy", ## (Stdlib Lazy)
+        ":Int64", ## (Stdlib Int64)
+        ":Int32", ## (Stdlib Int32)
+        ":Int", ## (Stdlib Int)
+        ":In_channel", ## (Stdlib In_channel)
+        ":Genlex", ## (Stdlib Genlex)
+        ":Gc", ## (Stdlib Gc)
+        ":Fun", ## (Stdlib Fun)
+        ":Format", ## (Stdlib Format)
+        ":Float", ## (Stdlib Float)
+        ":Filename", ## (Stdlib Filename)
+        ":Ephemeron", ## (Stdlib Ephemeron)
+        ":Either", ## (Stdlib Either)
+        ":Digest", ## (Stdlib Digest)
+        ":Complex", ## (Stdlib Complex)
+        ":Char", ## (Stdlib Char)
+        # ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
+        # ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        # ":CamlinternalAtomic", ## (Stdlib CamlinternalAtomic)
+        ":Callback", ## (Stdlib Callback)
+        ":BytesLabels", ## (Stdlib BytesLabels)
+        ":Bytes", ## (Stdlib Bytes)
+        ":Buffer", ## (Stdlib Buffer)
+        ":Bool", ## (Stdlib Bool)
+        ":Atomic", ## (Stdlib Atomic)
+        ":ArrayLabels", ## (Stdlib ArrayLabels)
+        ":Array", ## (Stdlib Array)
+        ":Arg", ## (Stdlib Arg)
+        ## (Weak)
+        ## (Stream)
+        ## (Queue)
+        ## (Map)
+        ## (Hashtbl)
+        ## (Bigarray)
+    ]
+)
+
+ocaml_signature(
+    name = "Stdlib_cmi",
+    src  = "stdlib.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Unit", ## (Stdlib Unit)
+        ":Uchar", ## (Stdlib Uchar)
+        ":Sys", ## (Stdlib Sys)
+        ":StringLabels", ## (Stdlib StringLabels)
+        ":String", ## (Stdlib String)
+        ":StdLabels", ## (Stdlib StdLabels)
+        ":Set", ## (Stdlib Set)
+        ":Seq", ## (Stdlib Seq)
+        ":Result", ## (Stdlib Result)
+        ":Random", ## (Stdlib Random)
+        ":Printf", ## (Stdlib Printf)
+        ":Printexc", ## (Stdlib Printexc)
+        ":Pervasives", ## (Stdlib Pervasives)
+        ":Parsing", ## (Stdlib Parsing)
+        ":Option", ## (Stdlib Option)
+        ":Oo", ## (Stdlib Oo)
+        ":Obj", ## (Stdlib Obj)
+        ":Nativeint", ## (Stdlib Nativeint)
+        ":Marshal", ## (Stdlib Marshal)
+        ":ListLabels", ## (Stdlib ListLabels)
+        ":List", ## (Stdlib List)
+        ":Lexing", ## (Stdlib Lexing)
+        ":Lazy", ## (Stdlib Lazy)
+        ":Int64", ## (Stdlib Int64)
+        ":Int32", ## (Stdlib Int32)
+        ":Int", ## (Stdlib Int)
+        ":Genlex", ## (Stdlib Genlex)
+        ":Gc", ## (Stdlib Gc)
+        ":Fun", ## (Stdlib Fun)
+        ":Filename", ## (Stdlib Filename)
+        ":Ephemeron", ## (Stdlib Ephemeron)
+        ":Either", ## (Stdlib Either)
+        ":Digest", ## (Stdlib Digest)
+        ":Complex", ## (Stdlib Complex)
+        ":Char", ## (Stdlib Char)
+        # ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
+        # ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+        ":Callback", ## (Stdlib Callback)
+        ":BytesLabels", ## (Stdlib BytesLabels)
+        ":Bytes", ## (Stdlib Bytes)
+        ":Buffer", ## (Stdlib Buffer)
+        ":Bool", ## (Stdlib Bool)
+        ":ArrayLabels", ## (Stdlib ArrayLabels)
+        ":Array", ## (Stdlib Array)
+        ":Arg", ## (Stdlib Arg)
+        ## (Weak)
+        ## (Stream)
+        ## (Stack)
+        ## (Scanf)
+        ## (Queue)
+        ## (Out_channel)
+        ## (MoreLabels)
+        ## (Map)
+        ## (In_channel)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Float)
+        ## (Bigarray)
+        ## (Atomic)
+    ]
+)
+
+ocaml_module(
+    name   = "Stream",
+    struct = "stream.ml",
+    sig    = "Stream_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":String", ## (Stdlib String)
+        ":List", ## (Stdlib List)
+        ":Lazy", ## (Stdlib Lazy)
+        ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
+        ":Bytes", ## (Stdlib Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "Stream_cmi",
+    src  = "stream.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "String",
+    struct = "string.ml",
+    sig    = "String_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":Bytes", ## (Stdlib Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "String_cmi",
+    src  = "string.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "StringLabels",
+    struct = "stringLabels.ml",
+    sig    = "StringLabels_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":String", ## (Stdlib String)
+    ]
+)
+
+ocaml_signature(
+    name = "StringLabels_cmi",
+    src  = "stringLabels.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Seq", ## (Stdlib Seq)
+    ]
+)
+
+ocaml_module(
+    name   = "Sys",
+    struct = "sys.ml",
+    sig    = "Sys_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Sys_cmi",
+    src  = "sys.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Uchar",
+    struct = "uchar.ml",
+    sig    = "Uchar_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## ":Stdlib", ## (Stdlib Stdlib)
+        ":Char", ## (Stdlib Char)
+    ]
+)
+
+ocaml_signature(
+    name = "Uchar_cmi",
+    src  = "uchar.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unit",
+    struct = "unit.ml",
+    sig    = "Unit_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Unit_cmi",
+    src  = "unit.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Weak",
+    struct = "weak.ml",
+    sig    = "Weak_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Sys", ## (Stdlib Sys)
+        ":Obj", ## (Stdlib Obj)
+        ":Int", ## (Stdlib Int)
+        ":Array", ## (Stdlib Array)
+        ## (Hashtbl)
+        ## (H)
+    ]
+)
+
+ocaml_signature(
+    name = "Weak_cmi",
+    src  = "weak.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Hashtbl)
+        ## (H)
+    ]
+)
+
