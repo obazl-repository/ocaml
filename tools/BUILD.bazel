@@ -1,0 +1,352 @@
+## GENERATED FILE ##
+
+load("@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+exports_files(["make-version-header.sh"])
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "tools_lib",
+    modules  = [
+        ":Caml_tex",
+        ":Cmpbyt",
+        ":Dumpobj",
+        ":Eqparsetree",
+        ":Lintapidiff",
+        ":Objinfo",
+        ":Ocamlcmt",
+        ":Ocamlcp",
+        ":Ocamldep",
+        ":Ocamlmklib",
+        ":Ocamlmktop",
+        ":Ocamloptp",
+        ":Ocamlprof",
+        ":Primreq",
+        ":Profiling",
+        ":Stripdebug",
+    ],
+)
+
+ocaml_module(
+    name   = "Caml_tex",
+    struct = "caml_tex.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Unix)
+        ## (Toploop)
+        ## (Sys)
+        ## (Syntaxerr)
+        ## (String)
+        ## (Str)
+        ## (StdLabels)
+        ## (Printexc)
+        ## (Parsetree)
+        ## (Parse)
+        ## (Mty)
+        ## (Mtd)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Lexer)
+        ## (Format)
+        ## (Filename)
+        ## (Compmisc)
+        ## (Compenv)
+        ## (Clflags)
+        ## (Bytes)
+        ## (Buffer)
+        ## (Ast_iterator)
+        ## (Ast_helper)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Cmpbyt",
+    struct = "cmpbyt.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (Printf)
+        ## (Bytesections)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Dumpobj",
+    struct = "dumpobj.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (Symtable)
+        ## (String)
+        ## (Printf)
+        ## (Opnames)
+        ## (Opcodes)
+        ## (Obj)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Instruct)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Config)
+        ## (Cmo_format)
+        ## (Bytesections)
+        ## (Asttypes)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Eqparsetree",
+    struct = "eqparsetree.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Lintapidiff",
+    struct = "lintapidiff.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (String)
+        ## (Str)
+        ## (Scanf)
+        ## (Printtyp)
+        ## (Printf)
+        ## (Pparse)
+        ## (Path)
+        ## (Parsetree)
+        ## (Parse)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Ident)
+        ## (Format)
+        ## (Filename)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Objinfo",
+    struct = "objinfo.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (Symtable)
+        ## (Symbol)
+        ## (String)
+        ## (Printf)
+        ## (Printclambda)
+        ## (Misc)
+        ## (List)
+        ## (Linkage_name)
+        ## (LargeFile)
+        ## (Ident)
+        ## (Format)
+        ## (Filename)
+        ## (Export_info)
+        ## (Digest)
+        ## (Compilation_unit)
+        ## (Cmxs_format)
+        ## (Cmx_format)
+        ## (Cmt_format)
+        ## (Cmo_format)
+        ## (Cmi_format)
+        ## (Bytesections)
+        ## (Binutils)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamlcmt",
+    struct = "ocamlcmt.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Untypeast)
+        ## (Stypes)
+        ## (String)
+        ## (Printf)
+        ## (Pprintast)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Lexing)
+        ## (Format)
+        ## (Filename)
+        ## (Envaux)
+        ## (Digest)
+        ## (Compmisc)
+        ## (Cmt_format)
+        ## (Cmt2annot)
+        ## (Clflags)
+        ## (Array)
+        ## (Arg)
+        ## (Annot)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamlcp",
+    struct = "ocamlcp.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Main_args)
+        ## (List)
+        ## (Filename)
+        ## (Compenv)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamldep",
+    struct = "ocamldep.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Makedepend)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamlmklib",
+    struct = "ocamlmklib.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (String)
+        ## (Stack)
+        ## (Printf)
+        ## (Misc)
+        ## (List)
+        ## (Filename)
+        ## (Config)
+        ## (Bytes)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamlmktop",
+    struct = "ocamlmktop.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (List)
+        ## (Filename)
+        ## (Config)
+        ## (Ccomp)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamloptp",
+    struct = "ocamloptp.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Main_args)
+        ## (List)
+        ## (Filename)
+        ## (Compenv)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamlprof",
+    struct = "ocamlprof.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Warnings)
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Parsetree)
+        ## (Parse)
+        ## (Option)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Int)
+        ## (Format)
+        ## (Filename)
+        ## (Bytes)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Primreq",
+    struct = "primreq.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Misc)
+        ## (List)
+        ## (Config)
+        ## (Cmo_format)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Profiling",
+    struct = "profiling.ml",
+    sig    = "Profiling_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (List)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Profiling_cmi",
+    src  = "profiling.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Stripdebug",
+    struct = "stripdebug.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (Printf)
+        ## (Misc)
+        ## (List)
+        ## (Bytesections)
+        ## (Array)
+    ]
+)
+
