@@ -1,0 +1,34 @@
+load("//config:BUILD.bzl", "OC_CFLAGS", "CFLAGS", "OC_LDFLAGS", "LDFLAGS")
+
+# gcc -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common    -Wl,-no_compact_unwind -o ocamlyacc closure.o error.o lalr.o lr0.o main.o mkpar.o output.o reader.o skeleton.o symtab.o verbose.o warshall.o
+
+## WARNING: there's a bug in closure.c, if -DDEBUG then print_closure
+## is defined twice.
+
+cc_binary(
+    name = "ocamlyacc",
+    srcs = [
+        "closure.c", "error.c", "lalr.c", "lr0.c",
+        "main.c", "mkpar.c", "output.c", "reader.c",
+        "skeleton.c", "symtab.c", "verbose.c", "warshall.c",
+        "version.h", "defs.h",
+    ],
+    copts = [
+        "-I", "$(GENDIR)/yacc",
+    ] + select({
+        ## On macos Bazel passes -DDEBUG in fastbuild mode
+        ## this breaks closure.c due to the bug mentioned above.
+        "//config/host:macos": ["-UDEBUG"],
+        "//conditions:default": []
+    }),
+    deps = ["//runtime/caml:hdrs"],
+)
+
+genrule(
+    name = "version_h",
+    outs = ["version.h"],
+    srcs = ["//:VERSION"],
+    cmd  =  "echo \"#define OCAML_VERSION \\\"\"" +
+            "`sed -e 1q $(location //:VERSION) | tr -d '\r'`\\\" > $@;"
+)
+
