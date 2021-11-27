@@ -1,3 +1,5 @@
+exports_files(["domain_state.tbl"])
+
 # GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h build_config.h
 
 genrule(
@@ -39,6 +41,9 @@ genrule(
     ])
 )
 
+## WARNING: if you build with make, these generated files will be
+## generated and placed in the source tree, so when you then build
+## with Bazel you'll get an error about file already existing.
 cc_library(
     name = "hdrs",
     hdrs = [

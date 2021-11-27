@@ -12,7 +12,7 @@ load("//config:BUILD.bzl",
 
      "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
      "OUTPUTEXE", "MKEXE_FLAGS",
-     "BYTE_CCLIB_LDFLAGS"
+     "BYTECCLIBS"
      )
 
 # ifeq "$(TOOLCHAIN)" "msvc"
@@ -163,7 +163,7 @@ cc_binary(
     name = "ocamlrun",
     srcs = ["prims.c", "instrtrace.c"],
     copts = OC_CFLAGS + CFLAGS,
-    linkopts = OC_LDFLAGS + LDFLAGS + BYTE_CCLIB_LDFLAGS + MKEXE_FLAGS,
+    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS,
     deps= [":camlrun"],
     visibility = ["//visibility:public"]
 )

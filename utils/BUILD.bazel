@@ -15,76 +15,50 @@ MODULE_OPTS = COMPFLAGS + ["-I", "boot"]
 
 SIG_OPTS = MODULE_OPTS
 
+STDLIB = ["//stdlib"]
+
 
 # COMMON_CMI = $(UTILS_CMI) $(PARSING_CMI) $(TYPING_CMI) $(LAMBDA_CMI) $(COMP_CMI)
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 # compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(COMMON)
 # 	$(CAMLC) -a -linkall -o $@ $(COMMON)
 
-# ocaml_library(
-#     name = "utils",
-#     modules  = [
-# ## compilerlibs/Makefile.compilerlibs
-# # UTILS = \
-# #   utils/config.cmo \
-# ##   utils/build_path_prefix_map.cmo \
-# #   utils/misc.cmo \
-# #   utils/identifiable.cmo \
-# #   utils/numbers.cmo \
-# ##   utils/arg_helper.cmo \ 
-# #   utils/clflags.cmo \
-# #   utils/profile.cmo \
-# #   utils/local_store.cmo \
-# #   utils/load_path.cmo \
-# #   utils/terminfo.cmo \
-# #   utils/ccomp.cmo \
-# #   utils/warnings.cmo \
-# #   utils/consistbl.cmo \
-# #   utils/strongly_connected_components.cmo \
-# #   utils/targetint.cmo \
-# #   utils/int_replace_polymorphic_compare.cmo \
-# #   utils/domainstate.cmo \
-# ##   utils/binutils.cmo \
-# #   utils/lazy_backtrack.cmo \
-# #   utils/diffing.cmo \
-# #   utils/diffing_with_keys.cmo
-# # UTILS_CMI =
+ocaml_library(
+    name = "utils",
+    modules  = [
+        ## list from compilerlibs/Makefile.compilerlibs UTILS
+        "Config",
+        "Build_path_prefix_map",
+        "Misc",
+        "Identifiable",
+        "Numbers",
+        "Arg_helper",
+        "Clflags",
+        "Profile",
+        "Local_store",
+        "Load_path",
+        "Terminfo",
+        "Ccomp",
+        "Warnings",
+        "Consistbl",
+        "Strongly_connected_components",
+        "Targetint",
+        "Int_replace_polymorphic_compare",
+        "Domainstate",
+        "Binutils",
+        "Lazy_backtrack",
+        "Diffing",
+        "Diffing_with_keys"
+    ]
+)
 
-
-#         ":Arg_helper", #
-#         ":Binutils",  #
-#         ":Build_path_prefix_map", #
-#         ":Ccomp",
-#         ":Clflags",
-#         ":Consistbl",
-#         ":Diffing",
-#         ":Diffing_with_keys",
-#         ":Identifiable",
-#         ":Int_replace_polymorphic_compare",
-#         ":Lazy_backtrack",
-#         ":Load_path",
-#         ":Local_store",
-#         ":Misc",
-#         ":Numbers",
-#         ":Profile",
-#         ":Strongly_connected_components",
-#         ":Targetint",
-#         ":Terminfo",
-#         ":Warnings",
-#     ],
-#     # signatures  = [
-#     #     ":Config_cmi",
-#     # ],
-# )
-
-# ./boot/ocamlrun ./boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66-70 -warn-error +a -bin-annot -safe-string -strict-formats -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c utils/arg_helper.mli
 
 bootstrap_module(
     name   = "Arg_helper",
     struct = "arg_helper.ml",
     sig    = "Arg_helper_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (String)
         ## (Printf)
         ## (Printexc)
@@ -97,7 +71,7 @@ bootstrap_signature(
     name = "Arg_helper_cmi",
     src  = "arg_helper.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Map)
     ]
 )
@@ -107,22 +81,26 @@ bootstrap_module(
     struct = "binutils.ml",
     sig    = "Binutils_cmi",
     opts = MODULE_OPTS,
+    ## DEMO: we can depend on individual submodules instead of the entire lib
     deps   = [
-        ## (Sys)
-        ## (String)
-        ## (Result)
-        ## (Printf)
-        ## (Option)
-        ## (List)
-        ## (Lazy)
-        ## (LargeFile)
-        ## (Int64)
-        ## (Int32)
-        ## (Int)
-        ## (Fun)
-        ## (Char)
-        ## (Bytes)
-        ## (Array)
+        ## "//stdlib" ## depend on entire Stdlib
+
+        ## depend on individual Stdlib submodules:
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Result",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lazy",
+        # "//stdlib:Stdlib.LargeFile",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Array"
     ]
 )
 
@@ -130,7 +108,7 @@ bootstrap_signature(
     name = "Binutils_cmi",
     src  = "binutils.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Result)
     ]
 )
@@ -140,7 +118,7 @@ bootstrap_module(
     struct = "build_path_prefix_map.ml",
     sig    = "Build_path_prefix_map_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (String)
         ## (Printf)
         ## (List)
@@ -152,7 +130,7 @@ bootstrap_signature(
     name = "Build_path_prefix_map_cmi",
     src  = "build_path_prefix_map.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
@@ -161,7 +139,7 @@ bootstrap_module(
     struct = "ccomp.ml",
     sig    = "Ccomp_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Profile", ## (Utils Profile)
         ":Misc", ## (Utils Misc)
         ":Load_path", ## (Utils Load_path)
@@ -179,7 +157,7 @@ bootstrap_signature(
     name = "Ccomp_cmi",
     src  = "ccomp.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
@@ -188,7 +166,7 @@ bootstrap_module(
     struct = "clflags.ml",
     sig    = "Clflags_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Profile", ## (Utils Profile)
         ":Numbers", ## (Utils Numbers)
         ":Misc", ## (Utils Misc)
@@ -206,7 +184,7 @@ bootstrap_signature(
     name = "Clflags_cmi",
     src  = "clflags.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Profile", ## (Utils Profile)
         ":Misc", ## (Utils Misc)
         ## (Digest)
@@ -219,89 +197,15 @@ bootstrap_module(
     struct = "config.ml",
     sig    = "Config_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
-
-# config.ml: config.mlp $(ROOTDIR)/Makefile.config Makefile
-# 	sed $(call SUBST,AFL_INSTRUMENT) \
-# 	    $(call SUBST,ARCH) \
-#       ...
-#       	    $< > $@
-## Makefile.common:
-## SED_ESCAPE=$(subst ','\'',$(subst !,\!,$(subst &,\&,$(subst \,\\,$1))))
-## SUBST generates the sed substitution for the variable *named* in $1
-# SUBST=-e 's!%%$1%%!$(call SED_ESCAPE,$($1))!'
-
-# genrule(
-#     name = "config_gen",
-#     outs = ["config.ml"],
-#     srcs = [
-#         "config.mlp"
-#         "//:Makefile.config",
-#         ":Makefile"
-#     ],
-#     cmd  = "\n".join([
-# 	sed $(call SUBST,AFL_INSTRUMENT) \
-# 	    $(call SUBST,ARCH) \
-# 	    $(call SUBST_STRING,ARCMD) \
-# 	    $(call SUBST_STRING,ASM) \
-# 	    $(call SUBST,ASM_CFI_SUPPORTED) \
-# 	    $(call SUBST_STRING,BYTECCLIBS) \
-# 	    $(call SUBST_STRING,CC) \
-# 	    $(call SUBST_STRING,CCOMPTYPE) \
-# 	    $(call SUBST_STRING,OUTPUTOBJ) \
-# 	    $(call SUBST_STRING,EXT_ASM) \
-# 	    $(call SUBST_STRING,EXT_DLL) \
-# 	    $(call SUBST_STRING,EXE) \
-# 	    $(call SUBST_STRING,EXT_LIB) \
-# 	    $(call SUBST_STRING,EXT_OBJ) \
-# 	    $(call SUBST,FLAMBDA) \
-# 	    $(call SUBST,WITH_FLAMBDA_INVARIANTS) \
-# 	    $(call SUBST,WITH_CMM_INVARIANTS) \
-# 	    $(call SUBST_STRING,FLEXLINK_FLAGS) \
-# 	    $(call SUBST_QUOTE,FLEXDLL_DIR) \
-# 	    $(call SUBST,HOST) \
-# 	    $(call SUBST_STRING,BINDIR) \
-# 	    $(call SUBST_STRING,LIBDIR) \
-# 	    $(call SUBST_STRING,MKDLL) \
-# 	    $(call SUBST_STRING,MKEXE) \
-# 	    $(call SUBST_STRING,FLEXLINK_LDFLAGS) \
-# 	    $(call SUBST_STRING,FLEXLINK_DLL_LDFLAGS) \
-# 	    $(call SUBST_STRING,MKMAINDLL) \
-# 	    $(call SUBST,MODEL) \
-# 	    $(call SUBST_STRING,NATIVECCLIBS) \
-# 	    $(call SUBST_STRING,OCAMLC_CFLAGS) \
-# 	    $(call SUBST_STRING,OCAMLC_CPPFLAGS) \
-# 	    $(call SUBST_STRING,OCAMLOPT_CFLAGS) \
-# 	    $(call SUBST_STRING,OCAMLOPT_CPPFLAGS) \
-# 	    $(call SUBST_STRING,PACKLD) \
-# 	    $(call SUBST,PROFINFO_WIDTH) \
-# 	    $(call SUBST_STRING,RANLIBCMD) \
-# 	    $(call SUBST_STRING,RPATH) \
-# 	    $(call SUBST_STRING,MKSHAREDLIBRPATH) \
-# 	    $(call SUBST,FORCE_SAFE_STRING) \
-# 	    $(call SUBST,DEFAULT_SAFE_STRING) \
-# 	    $(call SUBST,WINDOWS_UNICODE) \
-# 	    $(call SUBST,NAKED_POINTERS) \
-# 	    $(call SUBST,SUPPORTS_SHARED_LIBRARIES) \
-# 	    $(call SUBST,SYSTEM) \
-# 	    $(call SUBST,SYSTHREAD_SUPPORT) \
-# 	    $(call SUBST,TARGET) \
-# 	    $(call SUBST,WITH_FRAME_POINTERS) \
-# 	    $(call SUBST,WITH_PROFINFO) \
-# 	    $(call SUBST,FLAT_FLOAT_ARRAY) \
-# 	    $(call SUBST,FUNCTION_SECTIONS) \
-# 	    $(call SUBST,CC_HAS_DEBUG_PREFIX_MAP) \
-# 	    $(call SUBST,AS_HAS_DEBUG_PREFIX_MAP) \
-#     ])
-# )
 
 bootstrap_signature(
     name = "Config_cmi",
     src  = "config.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
@@ -310,7 +214,7 @@ bootstrap_module(
     struct = "consistbl.ml",
     sig    = "Consistbl_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ## (Set)
         ## (Map)
@@ -324,7 +228,7 @@ bootstrap_signature(
     name = "Consistbl_cmi",
     src  = "consistbl.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ## (Set)
         ## (Map)
@@ -338,7 +242,7 @@ bootstrap_module(
     struct = "diffing.ml",
     sig    = "Diffing_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ## (Option)
         ## (List)
@@ -351,7 +255,7 @@ bootstrap_signature(
     name = "Diffing_cmi",
     src  = "diffing.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ## (Format)
         ## (Digest)
@@ -363,7 +267,7 @@ bootstrap_module(
     struct = "diffing_with_keys.ml",
     sig    = "Diffing_with_keys_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ":Diffing", ## (Utils Diffing)
         ## (Map)
@@ -378,18 +282,92 @@ bootstrap_signature(
     name = "Diffing_with_keys_cmi",
     src  = "diffing_with_keys.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Diffing", ## (Utils Diffing)
         ## (Format)
     ]
 )
+
+## NB: module name made to match sig, so input may be symlinked.
+## there's a but, for now we use a tmp name for the genfile.
+bootstrap_module(
+    name   = "Domainstate",
+    struct = "Xdomainstate.ml",
+    sig    = "Domainstate_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+    ]
+)
+
+genrule(
+    name = "domainstate_ml",
+    outs = ["Xdomainstate.ml"],
+    srcs = ["//runtime/caml:domain_state.tbl"],
+    cmd  = "\n".join([
+
+        ## FIXME: next to last entry 'checking_pointer_pc is conditional
+
+        "echo \"type t =\" > domain_state.ml.tmp;",
+        "sed -n -e 's/DOMAIN_STATE[^,]*, *\\([^)]*\\)).*/| Domain_\\1/p' $(location //runtime/caml:domain_state.tbl) >> domain_state.ml.tmp;",
+        "echo >> domain_state.ml.tmp",
+
+        "echo \"let idx_of_field =\" >> domain_state.ml.tmp;",
+        "echo \"  let curr = 0 in\" >> domain_state.ml.tmp;",
+        "sed -n -e 's/DOMAIN_STATE[^,]*, *\\([^)]*\\)).*/" +
+        "let idx__\\1 = curr in let curr = curr + 1 in/p' $(location //runtime/caml:domain_state.tbl) >> domain_state.ml.tmp;",
+        "echo >> domain_state.ml.tmp;",
+
+        "echo \"let _ = curr in\" >> domain_state.ml.tmp;",
+        "echo \"function\" >> domain_state.ml.tmp;",
+
+        "sed -n -e 's/DOMAIN_STATE[^,]*, *\\([^)]*\\)).*/" +
+        "| Domain_\\1 -> idx__\\1/p' $(location //runtime/caml:domain_state.tbl) >> domain_state.ml.tmp;",
+
+        # if NAKED_POINTERS_CHECKER config option set && !defined(_WIN32)
+        # "cp domain_state.ml.tmp $@;",
+        # else remove
+        "sed -n -e '/checking_pointer_pc/!p' domain_state.ml.tmp > $@;"
+        # "rm domain_state.ml.tmp"
+    ])
+)
+
+bootstrap_signature(
+    name = "Domainstate_cmi",
+    src  = "domainstate.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ]
+)
+
+genrule(
+    name = "domainstate_mli",
+    outs = ["domainstate.mli"],
+    srcs = ["//runtime/caml:domain_state.tbl"],
+    cmd  = "\n".join([
+
+        ## FIXME: next to last entry 'checking_pointer_pc is conditional
+
+        "echo \"type t =\" > domain_state.mli.tmp;",
+        "sed -n -e 's/DOMAIN_STATE[^,]*, *\\([^)]*\\)).*/" +
+        "| Domain_\\1/p' $(location //runtime/caml:domain_state.tbl) >> domain_state.mli.tmp;",
+        "echo >> domain_state.mli.tmp",
+
+        "echo \"val idx_of_field : t -> int\" >> domain_state.mli.tmp;",
+
+        # if NAKED_POINTERS_CHECKER config option set && !defined(_WIN32)
+        ## "mv domain_state.tmp $@;"
+        # else remove
+        "sed -n -e '/checking_pointer_pc/!p' domain_state.mli.tmp >> $@;"
+    ])
+)
+
 
 bootstrap_module(
     name   = "Identifiable",
     struct = "identifiable.ml",
     sig    = "Identifiable_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ## (Set)
         ## (Printf)
@@ -404,7 +382,7 @@ bootstrap_signature(
     name = "Identifiable_cmi",
     src  = "identifiable.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Set)
         ## (Map)
         ## (Hashtbl)
@@ -417,7 +395,7 @@ bootstrap_module(
     struct = "int_replace_polymorphic_compare.ml",
     sig    = "Int_replace_polymorphic_compare_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
@@ -425,7 +403,7 @@ bootstrap_signature(
     name = "Int_replace_polymorphic_compare_cmi",
     src  = "int_replace_polymorphic_compare.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
@@ -434,7 +412,7 @@ bootstrap_module(
     struct = "lazy_backtrack.ml",
     sig    = "Lazy_backtrack_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Either)
     ]
 )
@@ -443,7 +421,7 @@ bootstrap_signature(
     name = "Lazy_backtrack_cmi",
     src  = "lazy_backtrack.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Either)
     ]
 )
@@ -453,7 +431,7 @@ bootstrap_module(
     struct = "load_path.ml",
     sig    = "Load_path_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ":Local_store", ## (Utils Local_store)
         ":Config", ## (Utils Config)
@@ -469,7 +447,7 @@ bootstrap_signature(
     name = "Load_path_cmi",
     src  = "load_path.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
@@ -478,7 +456,7 @@ bootstrap_module(
     struct = "local_store.ml",
     sig    = "Local_store_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (List)
         ## (Fun)
     ]
@@ -488,7 +466,7 @@ bootstrap_signature(
     name = "Local_store_cmi",
     src  = "local_store.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
@@ -497,7 +475,7 @@ bootstrap_module(
     struct = "misc.ml",
     sig    = "Misc_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Config", ## (Utils Config)
         ":Build_path_prefix_map", ## (Utils Build_path_prefix_map)
         ## (Sys)
@@ -527,7 +505,7 @@ bootstrap_signature(
     name = "Misc_cmi",
     src  = "misc.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Build_path_prefix_map", ## (Utils Build_path_prefix_map)
         ## (String)
         ## (Set)
@@ -543,7 +521,7 @@ bootstrap_module(
     struct = "numbers.ml",
     sig    = "Numbers_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ":Identifiable", ## (Utils Identifiable)
         ## (Set)
@@ -561,7 +539,7 @@ bootstrap_signature(
     name = "Numbers_cmi",
     src  = "numbers.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Identifiable", ## (Utils Identifiable)
         ## (Set)
         ## (Map)
@@ -575,7 +553,7 @@ bootstrap_module(
     struct = "profile.ml",
     sig    = "Profile_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ## (Sys)
         ## (String)
@@ -595,7 +573,7 @@ bootstrap_signature(
     name = "Profile_cmi",
     src  = "profile.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
     ]
 )
@@ -605,7 +583,7 @@ bootstrap_module(
     struct = "strongly_connected_components.ml",
     sig    = "Strongly_connected_components_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Numbers", ## (Utils Numbers)
         ":Misc", ## (Utils Misc)
         ":Identifiable", ## (Utils Identifiable)
@@ -622,7 +600,7 @@ bootstrap_signature(
     name = "Strongly_connected_components_cmi",
     src  = "strongly_connected_components.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Identifiable", ## (Utils Identifiable)
         ## (Set)
         ## (Map)
@@ -635,7 +613,7 @@ bootstrap_module(
     struct = "targetint.ml",
     sig    = "Targetint_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ## (Sys)
         ## (Int64)
@@ -649,7 +627,7 @@ bootstrap_signature(
     name = "Targetint_cmi",
     src  = "targetint.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
     ]
 )
@@ -659,7 +637,7 @@ bootstrap_module(
     struct = "terminfo.ml",
     sig    = "Terminfo_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (Printf)
     ]
@@ -669,7 +647,7 @@ bootstrap_signature(
     name = "Terminfo_cmi",
     src  = "terminfo.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
@@ -678,8 +656,7 @@ bootstrap_module(
     struct = "warnings.ml",
     sig    = "Warnings_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        "//stdlib:ocaml-stdlib",
+    deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ## (String)
         ## (Printf)
@@ -699,8 +676,7 @@ bootstrap_signature(
     name = "Warnings_cmi",
     src  = "warnings.mli",
     opts = SIG_OPTS,
-    deps   = [
-        "//stdlib:ocaml-stdlib",
+    deps   = STDLIB + [
         ## (Lexing)
         ## (Lazy)
     ]
@@ -713,3 +689,5 @@ write_config(
     template = "config.mlp",
     data     = CONFIG_MAP
 )
+
+################################################################
