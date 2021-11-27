@@ -1,14 +1,40 @@
-## GENERATED FILE ##
-
 load("@obazl_rules_ocaml//ocaml:rules.bzl",
+     "bootstrap_module",
+     "bootstrap_ns_library",
+     "bootstrap_ns_resolver",
+     "bootstrap_signature",
      "ocaml_library",
-     "ocaml_module",
-     "ocaml_ns_archive",
-     "ocaml_ns_library",
-     "ocaml_signature",
+     # "ocaml_module",
+     # "ocaml_ns_archive",
+     # "ocaml_ns_library",
+     # "ocaml_signature",
 )
 
+## NB: "Error: Unbound module Stdlib".
+# When bootstrapping there is no std lib yet; we pass -nostdlib to
+# avoid putting its path in the search path. But the (bootstrap)
+# compiler opens Stdlib by default, so we will always get the
+# above-noted error. Pass -nopervasives to prevent this.
+# This applies to:
+# * camlinternalAtomic.ml[i],
+# * camlinternalFormatBasics.ml[i]
+# * stdlib.ml[i]
+
+# Special cases: camlinternal* are not namespaced:
+#   * camlinternaAtomic and camlinternalFormatBasics are deps of Stdlib.
+#     they themselve have no deps, so -nopervasives
+#   * the other camlinternal* depend on Stdlib, and may depend on
+#     submodules in Stdlib ns
+
+#   * when obazl builds submodules, it passes -open Stdlib. That's
+#     enough to resolve symbols in the ns, but not their bindings. We
+#     get errors like "Error: Unbound type constructor ref" and
+#     "Error: Unbound value >=". I *think* that means the sym was
+#     resolved in an interface the impl is missing.
+
+
 COMPFLAGS = [
+    "-use-prims", "runtime/primitives",
     "-strict-sequence", "-absname",
     "-w", "+a-4-9-41-42-44-45-48-70",
     "-g", "-warn-error", "+A",
@@ -20,10 +46,37 @@ COMPFLAGS = [
 MODULE_OPTS = COMPFLAGS # ["-nostdlib"]
 SIG_OPTS = COMPFLAGS  # ["-nostdlib"]
 
+# camlinternal: Atomic, Format, FormatBasics, Lazy, Mod, OO
+CAMLINTERNAL_OPTS = [
+    # "-use-prims", "../runtime/primitives",
+    # "-nopervasives"
+    # "-open", "Stdlib"
+] + COMPFLAGS
+# Atomic, FormatBasics:  ["-nopervasives"]
+#Format: ["-w", "+A", "-w", "-fragile-match"]
+
+# stdlib__%.cmo:
+# 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
+# 	         -o $@ -c $(filter %.ml, $^)
+
+# %.cmx: %.ml
+# 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
+
+# %.cmx: %.ml
+# 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
+
+## NB: we do not need to define an ocaml_ns_resolver (or rather
+## bootstrap_ns_resolver), since Stdlib serves as our ns_resolver
+## module. Each submodule includes itself by attribution ns=":Stdlib".
+## This library target just aggregates the resolver and submodules.
+## They can be listed in any order.
 ocaml_library(
-    name = "stdlib_lib",
-    modules  = [
-        ":Arg",
+    name   = "ocaml-stdlib",
+    modules   = [
+        ":Stdlib", ## functions as the ns_resolver module
+
+        ## Namespace submodules:
+        ":Arg",     ## renamed:  Stdlib__Arg
         ":Array",
         ":ArrayLabels",
         ":Atomic",
@@ -33,12 +86,6 @@ ocaml_library(
         ":Bytes",
         ":BytesLabels",
         ":Callback",
-        ":CamlinternalAtomic",
-        ":CamlinternalFormat",
-        ":CamlinternalFormatBasics",
-        ":CamlinternalLazy",
-        ":CamlinternalMod",
-        ":CamlinternalOO",
         ":Char",
         ":Complex",
         ":Digest",
@@ -80,7 +127,6 @@ ocaml_library(
         ":Stack",
         ":StdLabels",
         ":Std_exit",
-        ":Stdlib",
         ":Stream",
         ":String",
         ":StringLabels",
@@ -88,10 +134,268 @@ ocaml_library(
         ":Uchar",
         ":Unit",
         ":Weak",
+
+        ## Non-namespaced modules. Some of these depend on namespaced
+        ## modules.
+        ":CamlinternalAtomic",
+        ":CamlinternalFormat",
+        ":CamlinternalFormatBasics",
+        ":CamlinternalLazy",
+        ":CamlinternalMod",
+        ":CamlinternalOO",
     ],
+    visibility = ["//visibility:public"],
 )
 
-ocaml_module(
+##################################################################
+##############  Main Resolver Module: Stdlib  ####################
+
+# ../runtime/ocamlrun ../boot/ocamlc
+# -use-prims ../runtime/primitives
+# -strict-sequence -absname -w +a-4-9-41-42-44-45-48-70
+# -g -warn-error +A -bin-annot -nostdlib -principal
+# -safe-string -strict-formats
+
+## added to stdlib.cm[iox] only, by $(shell Comflags $@):
+# -nopervasives -no-alias-deps -w -49
+# -pp "$AWK -f ./expand_module_aliases.awk" -c stdlib.mli
+
+## the awk script inserts the stdlib__ prefix in the module aliasing
+## equations in stdlib.ml[i]
+
+genrule(
+    name = "stdlib_ml_awk",
+    outs = ["x/stdlib.ml"],
+    srcs = ["stdlib.ml", "//stdlib:expand_module_aliases.awk"],
+    cmd_bash  = " ".join([
+        "awk -f $(location //stdlib:expand_module_aliases.awk) $(location :stdlib.ml)",
+        "> $@"
+    ]),
+)
+
+bootstrap_module(
+    name   = "Stdlib",
+    visibility = ["//visibility:public"],
+    struct = "x/stdlib.ml",
+    sig    = "Stdlib_cmi",
+    opts = MODULE_OPTS + [
+        "-nopervasives",
+        "-no-alias-deps", "-w", "-49",
+    ],
+    deps = [
+        ":CamlinternalFormatBasics",
+        ":CamlinternalAtomic",
+    ],
+    data = ["//runtime:primitives"]
+)
+
+genrule(
+    name = "stdlib_mli_awk",
+    outs = ["x/stdlib.mli"],
+    srcs = ["stdlib.mli", "//stdlib:expand_module_aliases.awk"],
+    cmd_bash  = " ".join([
+        "awk -f $(location //stdlib:expand_module_aliases.awk) $(location :stdlib.mli)",
+        "> $@"
+    ]),
+)
+
+bootstrap_signature(
+    name = "Stdlib_cmi",
+    src  = "x/stdlib.mli",
+    opts = SIG_OPTS + [
+        "-nopervasives",
+        "-no-alias-deps", "-w", "-49",
+    ],
+    deps   = [
+        ":CamlinternalFormatBasics",
+    ],
+    data = ["//runtime:primitives"]
+)
+
+################################################################
+############  Non-namespaced Components of Stdlib ##############
+
+## camlinternal* modules:
+# All are in the Stdlib archive but none are in the Stdlib ns.
+# Atomic and FormatBasic are deps of the nslib but do not depend on
+# any other modules.
+# The other camlinternal* are submodules but they are not renamed.
+# They depend on other subcomponents, but since they are not renamed
+# such deps must not be listed; instead just list :Stdlib.
+
+bootstrap_module(
+    name   = "CamlinternalAtomic",
+    struct = "camlinternalAtomic.ml",
+    sig    = "CamlinternalAtomic_cmi",
+    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    # deps   = []
+)
+
+bootstrap_signature(
+    name = "CamlinternalAtomic_cmi",
+    src  = "camlinternalAtomic.mli",
+    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    # deps   = []
+)
+
+bootstrap_module(
+    name   = "CamlinternalFormat",
+    struct = "camlinternalFormat.ml",
+    sig    = "CamlinternalFormat_cmi",
+    opts = CAMLINTERNAL_OPTS + ["-w", "+A", "-w", "-fragile-match"],
+    deps   = [
+        ":CamlinternalFormatBasics",
+        ":Stdlib",
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Int", ## (Stdlib Int)
+        ":Char", ## (Stdlib Char)
+        ":Bytes", ## (Stdlib Bytes)
+        ":Buffer", ## (Stdlib Buffer)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "CamlinternalFormat_cmi",
+    src  = "camlinternalFormat.mli",
+    opts = CAMLINTERNAL_OPTS + [
+        "-open", "Stdlib",
+        "-w", "+A", "-w", "-fragile-match"
+    ],
+    deps   = [
+        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
+
+        # Depends on Buffer, but we need to go through the ns Stdlib.
+        # The problem is we cannot express a dependency on an ns
+        # submodule using a namespaced symbol like ":Stdlib.Buffer";
+        # we can only depend on build targets.
+
+        # Depending directly on :Buffer cause it (and its deps) to be
+        # built w/o namespacing, so we'll have the same stuff built
+        # with and without namespacing. Which is bad.
+        ":Buffer",
+
+        # :Stdlib (the resolver) itself is not renamed, but it
+        # contains the alias for Buffer => Stdlib__Buffer. We get:
+        ## "Error: The module Buffer is an alias for module
+        ##  Stdlib__Buffer, which is missing."
+        # ":Stdlib",
+
+        # That's because the Stdlib (resolver) module, unlike the NS
+        # lib, does not depend on the submodules, because it is
+        # compiled with '-no-alias-deps'. So they do not get built
+        # unless the NS target is built. But we cannot depend on
+        # :ocaml-stdlib on pain of circularity.
+
+        # What we need is to make CamlinternalFormat a component but
+        # not a submodule of the namespace, without renaming. Then we
+        # could list sibling deps directly.
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "CamlinternalFormatBasics",
+    struct = "camlinternalFormatBasics.ml",
+    sig    = "CamlinternalFormatBasics_cmi",
+    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    # deps   = []
+)
+
+bootstrap_signature(
+    name = "CamlinternalFormatBasics_cmi",
+    src  = "camlinternalFormatBasics.mli",
+    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    # deps   = []
+)
+
+bootstrap_module(
+    name   = "CamlinternalLazy",
+    struct = "camlinternalLazy.ml",
+    sig    = "CamlinternalLazy_cmi",
+    opts = CAMLINTERNAL_OPTS,
+    deps   = [
+        ":Stdlib",
+        ":Sys",
+        ":Obj"
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "CamlinternalLazy_cmi",
+    src  = "camlinternalLazy.mli",
+    # does not refer to any modules, but Stdlib is opened
+    # automatically, leading to "Error: Unbound module Stdlib".
+    # -nopervasives prevents this.
+    opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],
+    deps   = [
+        ":Stdlib",
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "CamlinternalMod",
+    struct = "camlinternalMod.ml",
+    sig    = "CamlinternalMod_cmi",
+    opts = CAMLINTERNAL_OPTS,
+    deps   = [
+        ":CamlinternalOO", ## (Stdlib CamlinternalOO)
+        # ":Stdlib",
+        ":Obj", ## (Stdlib Obj)
+        ":Lazy", ## (Stdlib Lazy)
+        ":Array", ## (Stdlib Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "CamlinternalMod_cmi",
+    src  = "camlinternalMod.mli",
+    opts = CAMLINTERNAL_OPTS,
+    deps   = [
+        # ":Stdlib",
+        ":Obj",
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "CamlinternalOO",
+    struct = "camlinternalOO.ml",
+    sig    = "CamlinternalOO_cmi",
+    opts = CAMLINTERNAL_OPTS + ["-no-alias-deps"],
+    deps   = [
+        # ":Stdlib",
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Obj", ## (Stdlib Obj)
+        ":List", ## (Stdlib List)
+        ":Char", ## (Stdlib Char)
+        ":Array", ## (Stdlib Array)
+        ":Map"
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "CamlinternalOO_cmi",
+    src  = "camlinternalOO.mli",
+    opts = CAMLINTERNAL_OPTS + ["-no-alias-deps"],
+    deps   = [
+        # ":Stdlib",
+        ":Obj"
+    ],
+    data = ["//runtime:primitives"]
+)
+
+#########################################################
+################  Namespaced Submodules  ################
+
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Arg",
     struct = "arg.ml",
     sig    = "Arg_cmi",
@@ -104,74 +408,111 @@ ocaml_module(
         ":Int", ## (Stdlib Int)
         ":Buffer", ## (Stdlib Buffer)
         ":Array", ## (Stdlib Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Arg_cmi",
     src  = "arg.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":Sys", ## (Stdlib Sys)
+        ":String", ## (Stdlib String)
+        ":Printf", ## (Stdlib Printf)
+        ":List", ## (Stdlib List)
+        ":Int", ## (Stdlib Int)
+        ":Buffer", ## (Stdlib Buffer)
+        ":Array", ## (Stdlib Array)
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Array",
     struct = "array.ml",
     sig    = "Array_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
-    ]
+        ":Seq",
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Array_cmi",
     src  = "array.mli",
     opts = SIG_OPTS,
     deps   = [
+        ":Stdlib",
         ":Seq", ## (Stdlib Seq)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "ArrayLabels",
     struct = "arrayLabels.ml",
     sig    = "ArrayLabels_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
     deps   = [
-        ":Array", ## (Stdlib Array)
-    ]
+        ":Array"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+genrule(
+    name = "array_labels_mli_awk",
+    outs = ["x/arrayLabels.mli"],
+    srcs = ["arrayLabels.mli", "//stdlib:expand_module_aliases.awk"],
+    cmd_bash  = " ".join([
+        "awk -f $(location //stdlib:expand_module_aliases.awk)",
+        "$(location :arrayLabels.mli)",
+        "> $@"
+    ]),
+)
+
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "ArrayLabels_cmi",
     src  = "arrayLabels.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Atomic",
     struct = "atomic.ml",
     sig    = "Atomic_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":CamlinternalAtomic"
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Atomic_cmi",
     src  = "atomic.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib_cmi"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Bigarray",
     struct = "bigarray.ml",
     sig    = "Bigarray_cmi",
@@ -185,10 +526,12 @@ ocaml_module(
         ## (Array2)
         ## (Array1)
         ## (Array0)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Bigarray_cmi",
     src  = "bigarray.mli",
     opts = SIG_OPTS,
@@ -199,32 +542,43 @@ ocaml_signature(
         ## (Array2)
         ## (Array1)
         ## (Array0)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Bool",
     struct = "bool.ml",
     sig    = "Bool_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ## ":Stdlib", ## (Stdlib Stdlib)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Bool_cmi",
     src  = "bool.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Buffer",
     struct = "buffer.ml",
     sig    = "Buffer_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "+A"],
+    # + select({
+    #     mode:native :-inline 3
+    #     mode:bc: ["-w" "+A"]
+    # }),
     deps   = [
         ":Uchar", ## (Stdlib Uchar)
         ":Sys", ## (Stdlib Sys)
@@ -232,242 +586,142 @@ ocaml_module(
         ":Seq", ## (Stdlib Seq)
         ":Char", ## (Stdlib Char)
         ":Bytes", ## (Stdlib Bytes)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Buffer_cmi",
     src  = "buffer.mli",
     opts = SIG_OPTS,
     deps   = [
+        # ":Stdlib_cmi",
         ":Uchar", ## (Stdlib Uchar)
         ":Seq", ## (Stdlib Seq)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Bytes",
     struct = "bytes.ml",
     sig    = "Bytes_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":Sys", ## (Stdlib Sys)
-        ## ":Stdlib", ## (Stdlib Stdlib)
         ":Seq", ## (Stdlib Seq)
         ":Int", ## (Stdlib Int)
         ":Char", ## (Stdlib Char)
-    ]
+        # ":Stdlib_cmi", ## (Stdlib Stdlib)
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Bytes_cmi",
     src  = "bytes.mli",
     opts = SIG_OPTS,
     deps   = [
+        ":Int", ## (Stdlib Int)
         ":Seq", ## (Stdlib Seq)
-    ]
+        # ":Stdlib_cmi", ## (Stdlib Stdlib)
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "BytesLabels",
     struct = "bytesLabels.ml",
     sig    = "BytesLabels_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
     deps   = [
         ":Bytes", ## (Stdlib Bytes)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "BytesLabels_cmi",
     src  = "bytesLabels.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Callback",
     struct = "callback.ml",
     sig    = "Callback_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Obj", ## (Stdlib Obj)
-    ]
+        ":Obj"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Callback_cmi",
     src  = "callback.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":In_channel"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-# ../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 -g -warn-error +A -bin-annot -nostdlib -principal -safe-string -strict-formats  -nopervasives -c camlinternalAtomic.mli
-
-ocaml_module(
-    name   = "CamlinternalAtomic",
-    struct = "camlinternalAtomic.ml",
-    sig    = "CamlinternalAtomic_cmi",
-    opts = MODULE_OPTS + ["-nopervasives"],
-    deps   = [
-    ]
-)
-
-ocaml_signature(
-    name = "CamlinternalAtomic_cmi",
-    src  = "camlinternalAtomic.mli",
-    opts = SIG_OPTS + ["-nopervasives"],
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "CamlinternalFormat",
-    struct = "camlinternalFormat.ml",
-    sig    = "CamlinternalFormat_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Sys", ## (Stdlib Sys)
-        ":String", ## (Stdlib String)
-        ":Int", ## (Stdlib Int)
-        ":Char", ## (Stdlib Char)
-        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
-        ":Bytes", ## (Stdlib Bytes)
-        ":Buffer", ## (Stdlib Buffer)
-    ]
-)
-
-ocaml_signature(
-    name = "CamlinternalFormat_cmi",
-    src  = "camlinternalFormat.mli",
-    opts = SIG_OPTS,
-    deps   = [
-        ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
-        ":Buffer", ## (Stdlib Buffer)
-    ]
-)
-
-ocaml_module(
-    name   = "CamlinternalFormatBasics",
-    struct = "camlinternalFormatBasics.ml",
-    sig    = "CamlinternalFormatBasics_cmi",
-    opts = MODULE_OPTS + ["-nopervasives"],
-    deps   = [
-    ]
-)
-
-ocaml_signature(
-    name = "CamlinternalFormatBasics_cmi",
-    src  = "camlinternalFormatBasics.mli",
-    opts = SIG_OPTS + ["-nopervasives"],
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "CamlinternalLazy",
-    struct = "camlinternalLazy.ml",
-    sig    = "CamlinternalLazy_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Sys", ## (Stdlib Sys)
-        ":Obj", ## (Stdlib Obj)
-    ]
-)
-
-ocaml_signature(
-    name = "CamlinternalLazy_cmi",
-    src  = "camlinternalLazy.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "CamlinternalMod",
-    struct = "camlinternalMod.ml",
-    sig    = "CamlinternalMod_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Obj", ## (Stdlib Obj)
-        ":Lazy", ## (Stdlib Lazy)
-        ":CamlinternalOO", ## (Stdlib CamlinternalOO)
-        ":Array", ## (Stdlib Array)
-    ]
-)
-
-ocaml_signature(
-    name = "CamlinternalMod_cmi",
-    src  = "camlinternalMod.mli",
-    opts = SIG_OPTS,
-    deps   = [
-        ":Obj", ## (Stdlib Obj)
-    ]
-)
-
-ocaml_module(
-    name   = "CamlinternalOO",
-    struct = "camlinternalOO.ml",
-    sig    = "CamlinternalOO_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Sys", ## (Stdlib Sys)
-        ":String", ## (Stdlib String)
-        ":Obj", ## (Stdlib Obj)
-        ":List", ## (Stdlib List)
-        ":Char", ## (Stdlib Char)
-        ":Array", ## (Stdlib Array)
-        ## (Map)
-    ]
-)
-
-ocaml_signature(
-    name = "CamlinternalOO_cmi",
-    src  = "camlinternalOO.mli",
-    opts = SIG_OPTS,
-    deps   = [
-        ":Obj", ## (Stdlib Obj)
-    ]
-)
-
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Char",
     struct = "char.ml",
     sig    = "Char_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps   = [":Stdlib"],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Char_cmi",
     src  = "char.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib_cmi"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Complex",
     struct = "complex.ml",
     sig    = "Complex_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps   = [":Stdlib"],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Complex_cmi",
     src  = "complex.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Digest",
     struct = "digest.ml",
     sig    = "Digest_cmi",
@@ -476,35 +730,46 @@ ocaml_module(
         ":String", ## (Stdlib String)
         ":Char", ## (Stdlib Char)
         ":Bytes", ## (Stdlib Bytes)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Digest_cmi",
     src  = "digest.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":In_channel"
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Either",
     struct = "either.ml",
     sig    = "Either_cmi",
     opts = MODULE_OPTS,
     deps   = [
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Either_cmi",
     src  = "either.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Ephemeron",
     struct = "ephemeron.ml",
     sig    = "Ephemeron_cmi",
@@ -518,19 +783,24 @@ ocaml_module(
         ":Int", ## (Stdlib Int)
         ":Array", ## (Stdlib Array)
         ## (Hashtbl)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Ephemeron_cmi",
     src  = "ephemeron.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Hashtbl)
-    ]
+        ":Hashtbl",
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Filename",
     struct = "filename.ml",
     sig    = "Filename_cmi",
@@ -543,45 +813,54 @@ ocaml_module(
         ":List", ## (Stdlib List)
         ":Lazy", ## (Stdlib Lazy)
         ":Buffer", ## (Stdlib Buffer)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Filename_cmi",
     src  = "filename.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Float",
     struct = "float.ml",
     sig    = "Float_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
     deps   = [
         ## ":Stdlib", ## (Stdlib Stdlib)
         ":Seq", ## (Stdlib Seq)
         ":List", ## (Stdlib List)
         ":Array", ## (Stdlib Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Float_cmi",
     src  = "float.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
-        ## (Stdlib)
-    ]
+        ":Seq",
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Format",
     struct = "format.ml",
     sig    = "Format_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "+A", "-w", "-fragile-match"],
     deps   = [
         ":String", ## (Stdlib String)
         ## ":Stdlib", ## (Stdlib Stdlib)
@@ -593,42 +872,51 @@ ocaml_module(
         ":CamlinternalFormat", ## (Stdlib CamlinternalFormat)
         ":Bytes", ## (Stdlib Bytes)
         ":Buffer", ## (Stdlib Buffer)
-        ## (Stack)
-        ## (Queue)
-    ]
+        ":Stack",
+        ":Queue"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Format_cmi",
     src  = "format.mli",
-    opts = SIG_OPTS,
+    opts = SIG_OPTS + ["-w", "+A", "-w", "-fragile-match"],
     deps   = [
         ":Seq", ## (Stdlib Seq)
         ":Either", ## (Stdlib Either)
         ":Buffer", ## (Stdlib Buffer)
         ## (Stdlib)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Fun",
     struct = "fun.ml",
     sig    = "Fun_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":Printexc", ## (Stdlib Printexc)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Fun_cmi",
     src  = "fun.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Gc",
     struct = "gc.ml",
     sig    = "Gc_cmi",
@@ -638,19 +926,23 @@ ocaml_module(
         ":String", ## (Stdlib String)
         ":Printf", ## (Stdlib Printf)
         ":Printexc", ## (Stdlib Printexc)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Gc_cmi",
     src  = "gc.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Printexc", ## (Stdlib Printexc)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Genlex",
     struct = "genlex.ml",
     sig    = "Genlex_cmi",
@@ -661,20 +953,25 @@ ocaml_module(
         ":Char", ## (Stdlib Char)
         ":Bytes", ## (Stdlib Bytes)
         ## (Stream)
-        ## (Hashtbl)
-    ]
+        ":Hashtbl"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Genlex_cmi",
     src  = "genlex.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Stream)
-    ]
+        # ":Stdlib",
+        ":Stream"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Hashtbl",
     struct = "hashtbl.ml",
     sig    = "Hashtbl_cmi",
@@ -691,114 +988,145 @@ ocaml_module(
         ":Array", ## (Stdlib Array)
         ## (MakeSeeded)
         ## (H)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Hashtbl_cmi",
     src  = "hashtbl.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
         ## (H)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "In_channel",
     struct = "in_channel.ml",
     sig    = "In_channel_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ## ":Stdlib", ## (Stdlib Stdlib)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "In_channel_cmi",
     src  = "in_channel.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Stdlib)
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Int",
     struct = "int.ml",
     sig    = "Int_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## ":Stdlib", ## (Stdlib Stdlib)
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Int_cmi",
     src  = "int.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Int32",
     struct = "int32.ml",
     sig    = "Int32_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-no-alias-deps"],
     deps   = [
-        ":Sys", ## (Stdlib Sys)
-        ## ":Stdlib", ## (Stdlib Stdlib)
-    ]
+        # ":Stdlib_cmi",
+        ":Sys",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Int32_cmi",
     src  = "int32.mli",
-    opts = SIG_OPTS,
+    opts = SIG_OPTS + ["-no-alias-deps"],
     deps   = [
-    ]
+        # ":Stdlib_cmi",
+        ":Sys",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Int64",
     struct = "int64.ml",
     sig    = "Int64_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## ":Stdlib", ## (Stdlib Stdlib)
-    ]
+        ":Stdlib",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Int64_cmi",
     src  = "int64.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Lazy",
     struct = "lazy.ml",
     sig    = "Lazy_cmi",
     opts = MODULE_OPTS,
+    # + select({
+    #     mode:native : ["-afl-inst-ratio 0"]
+    # })
     deps   = [
         ":Obj", ## (Stdlib Obj)
         ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Lazy_cmi",
     src  = "lazy.mli",
     opts = SIG_OPTS,
     deps   = [
         ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Lexing",
     struct = "lexing.ml",
     sig    = "Lexing_cmi",
@@ -809,18 +1137,23 @@ ocaml_module(
         ":Int", ## (Stdlib Int)
         ":Bytes", ## (Stdlib Bytes)
         ":Array", ## (Stdlib Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Lexing_cmi",
     src  = "lexing.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "List",
     struct = "list.ml",
     sig    = "List_cmi",
@@ -829,124 +1162,153 @@ ocaml_module(
         ":Sys", ## (Stdlib Sys)
         ":Seq", ## (Stdlib Seq)
         ":Either", ## (Stdlib Either)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "List_cmi",
     src  = "list.mli",
     opts = SIG_OPTS,
     deps   = [
+        # ":Stdlib_cmi",
         ":Seq", ## (Stdlib Seq)
         ":Either", ## (Stdlib Either)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "ListLabels",
     struct = "listLabels.ml",
     sig    = "ListLabels_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
     deps   = [
         ":List", ## (Stdlib List)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "ListLabels_cmi",
     src  = "listLabels.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
         ":Either", ## (Stdlib Either)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Map",
     struct = "map.ml",
     sig    = "Map_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
+        ":Seq",
+        ":Stdlib"
         ## (Ord)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Map_cmi",
     src  = "map.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
         ## (Ord)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Marshal",
     struct = "marshal.ml",
     sig    = "Marshal_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":Bytes", ## (Stdlib Bytes)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Marshal_cmi",
     src  = "marshal.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "MoreLabels",
     struct = "moreLabels.ml",
     sig    = "MoreLabels_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
     deps   = [
-        ":Set", ## (Stdlib Set)
-        ## (Map)
-        ## (Hashtbl)
-    ]
+        ":Set",
+        ":Map",
+        ":Hashtbl"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "MoreLabels_cmi",
     src  = "moreLabels.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Set", ## (Stdlib Set)
         ":Seq", ## (Stdlib Seq)
-        ## (Ord)
-        ## (Map)
-        ## (Hashtbl)
-        ## (H)
-    ]
+        # ":Ord",
+        ":Map",
+        ":Hashtbl"
+        # H
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Nativeint",
     struct = "nativeint.ml",
     sig    = "Nativeint_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Sys", ## (Stdlib Sys)
-        # ":Stdlib", ## (Stdlib Stdlib)
-    ]
+        # ":Stdlib_cmi",
+        ":Sys",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Nativeint_cmi",
     src  = "nativeint.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib_cmi",
+        ":Sys",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Obj",
     struct = "obj.ml",
     sig    = "Obj_cmi",
@@ -955,76 +1317,95 @@ ocaml_module(
         ":Sys", ## (Stdlib Sys)
         ":Nativeint", ## (Stdlib Nativeint)
         ":Int32", ## (Stdlib Int32)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Obj_cmi",
     src  = "obj.mli",
     opts = SIG_OPTS,
     deps   = [
+        # ":Stdlib_cmi",
         ":Int32", ## (Stdlib Int32)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Oo",
     struct = "oo.ml",
     sig    = "Oo_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":CamlinternalOO", ## (Stdlib CamlinternalOO)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Oo_cmi",
     src  = "oo.mli",
-    opts = SIG_OPTS,
+    opts = SIG_OPTS + ["-no-principal"],
     deps   = [
         ":CamlinternalOO", ## (Stdlib CamlinternalOO)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Option",
     struct = "option.ml",
     sig    = "Option_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
-    ]
+        ":Seq",
+        # ":Stdlib",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Option_cmi",
     src  = "option.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
-    ]
+        ":Seq",
+        ":Stdlib",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Out_channel",
     struct = "out_channel.ml",
     sig    = "Out_channel_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## ":Stdlib", ## (Stdlib Stdlib)
-    ]
+        ":Stdlib", ## (Stdlib Stdlib)
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Out_channel_cmi",
     src  = "out_channel.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Stdlib)
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Parsing",
     struct = "parsing.ml",
     sig    = "Parsing_cmi",
@@ -1033,93 +1414,115 @@ ocaml_module(
         ":Obj", ## (Stdlib Obj)
         ":Lexing", ## (Stdlib Lexing)
         ":Array", ## (Stdlib Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Parsing_cmi",
     src  = "parsing.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Obj", ## (Stdlib Obj)
         ":Lexing", ## (Stdlib Lexing)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Pervasives",
     struct = "pervasives.ml",
     opts = MODULE_OPTS,
     deps   = [
         ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
         ## (LargeFile)
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Printexc",
     struct = "printexc.ml",
     sig    = "Printexc_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## ":Stdlib", ## (Stdlib Stdlib)
+        # ":Stdlib", ## (Stdlib Stdlib)
         ":Printf", ## (Stdlib Printf)
         ":Obj", ## (Stdlib Obj)
         ":Buffer", ## (Stdlib Buffer)
         ":Atomic", ## (Stdlib Atomic)
         ":Array", ## (Stdlib Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Printexc_cmi",
     src  = "printexc.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Printf",
     struct = "printf.ml",
     sig    = "Printf_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "+A", "-w", "-fragile-match"],
     deps   = [
         ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
         ":CamlinternalFormat", ## (Stdlib CamlinternalFormat)
         ":Buffer", ## (Stdlib Buffer)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Printf_cmi",
     src  = "printf.mli",
-    opts = SIG_OPTS,
+    opts = SIG_OPTS + ["-w", "+A", "-w", "-fragile-match"],
     deps   = [
         ":Buffer", ## (Stdlib Buffer)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Queue",
     struct = "queue.ml",
     sig    = "Queue_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
-    ]
+        ":Stdlib",
+        ":Seq",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Queue_cmi",
     src  = "queue.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
-    ]
+        ":Seq",
+        # ":Stdlib",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Random",
     struct = "random.ml",
     sig    = "Random_cmi",
@@ -1134,10 +1537,12 @@ ocaml_module(
         ":Digest", ## (Stdlib Digest)
         ":Char", ## (Stdlib Char)
         ":Array", ## (Stdlib Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Random_cmi",
     src  = "random.mli",
     opts = SIG_OPTS,
@@ -1145,33 +1550,44 @@ ocaml_signature(
         ":Nativeint", ## (Stdlib Nativeint)
         ":Int64", ## (Stdlib Int64)
         ":Int32", ## (Stdlib Int32)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Result",
     struct = "result.ml",
     sig    = "Result_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
-    ]
+        ":Seq",
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Result_cmi",
     src  = "result.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Seq", ## (Stdlib Seq)
-    ]
+        ":Stdlib",
+        ":Seq"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Scanf",
     struct = "scanf.ml",
     sig    = "Scanf_cmi",
-    opts = MODULE_OPTS,
+    opts   = MODULE_OPTS + ["-w", "+A", "-w", "-fragile-match"],
+    # + select({
+    #     mode:native  ["-inline", 9]
+    # })
     deps   = [
         ":String", ## (Stdlib String)
         ## ":Stdlib", ## (Stdlib Stdlib)
@@ -1182,38 +1598,44 @@ ocaml_module(
         ":CamlinternalFormat", ## (Stdlib CamlinternalFormat)
         ":Bytes", ## (Stdlib Bytes)
         ":Buffer", ## (Stdlib Buffer)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
-    name = "Scanf_cmi",
-    src  = "scanf.mli",
-    opts = SIG_OPTS,
-    deps   = [
-        ## ":Stdlib", ## (Stdlib Stdlib)
+bootstrap_signature(
+    ns   = ":Stdlib",
+    name  = "Scanf_cmi",
+    src   = "scanf.mli",
+    opts  = SIG_OPTS + [
+        "-w", "+A", "-w", "-fragile-match"
+    ],
+    deps  = [
+        ":Stdlib",
         ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
         ## (Stdlib)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Seq",
     struct = "seq.ml",
     sig    = "Seq_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    # deps   = []
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Seq_cmi",
     src  = "seq.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ]
+    # deps   = []
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Set",
     struct = "set.ml",
     sig    = "Set_cmi",
@@ -1221,19 +1643,23 @@ ocaml_module(
     deps   = [
         ":Seq", ## (Stdlib Seq)
         ":List", ## (Stdlib List)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Set_cmi",
     src  = "set.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Stack",
     struct = "stack.ml",
     sig    = "Stack_cmi",
@@ -1241,32 +1667,38 @@ ocaml_module(
     deps   = [
         ":Seq", ## (Stdlib Seq)
         ":List", ## (Stdlib List)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Stack_cmi",
     src  = "stack.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "StdLabels",
     struct = "stdLabels.ml",
     sig    = "StdLabels_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
     deps   = [
         ":StringLabels", ## (Stdlib StringLabels)
         ":ListLabels", ## (Stdlib ListLabels)
         ":BytesLabels", ## (Stdlib BytesLabels)
         ":ArrayLabels", ## (Stdlib ArrayLabels)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "StdLabels_cmi",
     src  = "stdLabels.mli",
     opts = SIG_OPTS,
@@ -1275,228 +1707,24 @@ ocaml_signature(
         ":ListLabels", ## (Stdlib ListLabels)
         ":BytesLabels", ## (Stdlib BytesLabels)
         ":ArrayLabels", ## (Stdlib ArrayLabels)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Std_exit",
     struct = "std_exit.ml",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + [
+        "-use-prims", "../runtime/primitives",
+    ],
     deps   = [
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
-    name   = "Stdlib",
-    struct = "stdlib.ml",
-    sig    = "Stdlib_cmi",
-    opts = MODULE_OPTS + ["-no-alias-deps"],
-    deps = [
-        # ":Unit", ## (Stdlib Unit)
-        # ":Uchar", ## (Stdlib Uchar)
-        # ":Sys", ## (Stdlib Sys)
-        # ":StringLabels", ## (Stdlib StringLabels)
-        # ":String", ## (Stdlib String)
-        # ":Stdlib", ## (Stdlib Stdlib)
-        # ":StdLabels", ## (Stdlib StdLabels)
-        # ":Stack", ## (Stdlib Stack)
-        # ":Set", ## (Stdlib Set)
-        # ":Seq", ## (Stdlib Seq)
-        # ":Scanf", ## (Stdlib Scanf)
-        # ":Result", ## (Stdlib Result)
-        # ":Random", ## (Stdlib Random)
-        # ":Queue", ## (Stdlib Queue)
-        # ":Printf", ## (Stdlib Printf)
-        # ":Printexc", ## (Stdlib Printexc)
-        # ":Pervasives", ## (Stdlib Pervasives)
-        # ":Parsing", ## (Stdlib Parsing)
-        # ":Out_channel", ## (Stdlib Out_channel)
-        # ":Option", ## (Stdlib Option)
-        # ":Oo", ## (Stdlib Oo)
-        # ":Obj", ## (Stdlib Obj)
-        # ":Nativeint", ## (Stdlib Nativeint)
-        # ":MoreLabels", ## (Stdlib MoreLabels)
-        # ":Marshal", ## (Stdlib Marshal)
-        # ":ListLabels", ## (Stdlib ListLabels)
-        # ":List", ## (Stdlib List)
-        # ":Lexing", ## (Stdlib Lexing)
-        # ":Lazy", ## (Stdlib Lazy)
-        # ":Int64", ## (Stdlib Int64)
-        # ":Int32", ## (Stdlib Int32)
-        # ":Int", ## (Stdlib Int)
-        # ":In_channel", ## (Stdlib In_channel)
-        # ":Genlex", ## (Stdlib Genlex)
-        # ":Gc", ## (Stdlib Gc)
-        # ":Fun", ## (Stdlib Fun)
-        # ":Format", ## (Stdlib Format)
-        # ":Float", ## (Stdlib Float)
-        # ":Filename", ## (Stdlib Filename)
-        # ":Ephemeron", ## (Stdlib Ephemeron)
-        # ":Either", ## (Stdlib Either)
-        # ":Digest", ## (Stdlib Digest)
-        # ":Complex", ## (Stdlib Complex)
-        # ":Char", ## (Stdlib Char)
-        # ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
-        # ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
-        # ":CamlinternalAtomic", ## (Stdlib CamlinternalAtomic)
-        # ":Callback", ## (Stdlib Callback)
-        # ":BytesLabels", ## (Stdlib BytesLabels)
-        # ":Bytes", ## (Stdlib Bytes)
-        # ":Buffer", ## (Stdlib Buffer)
-        # ":Bool", ## (Stdlib Bool)
-        # ":Atomic", ## (Stdlib Atomic)
-        # ":ArrayLabels", ## (Stdlib ArrayLabels)
-        # ":Array", ## (Stdlib Array)
-        # ":Arg", ## (Stdlib Arg)
-        # ## (Weak)
-        # ## (Stream)
-        # ## (Queue)
-        # ## (Map)
-        # ## (Hashtbl)
-        # ## (Bigarray)
-    ]
-)
-
-ocaml_ns_library(
-    name   = "ocaml-stdlib",
-    ns = "Stdlib",
-    # struct = "stdlib.ml",
-    # sig    = "Stdlib_cmi",
-    opts = MODULE_OPTS + ["-no-alias-deps"],
-    submodules   = [
-        ":Unit", ## (Stdlib Unit)
-        ":Uchar", ## (Stdlib Uchar)
-        ":Sys", ## (Stdlib Sys)
-        ":StringLabels", ## (Stdlib StringLabels)
-        ":String", ## (Stdlib String)
-        ":Stdlib", ## (Stdlib Stdlib)
-        ":StdLabels", ## (Stdlib StdLabels)
-        ":Stack", ## (Stdlib Stack)
-        ":Set", ## (Stdlib Set)
-        ":Seq", ## (Stdlib Seq)
-        ":Scanf", ## (Stdlib Scanf)
-        ":Result", ## (Stdlib Result)
-        ":Random", ## (Stdlib Random)
-        ":Queue", ## (Stdlib Queue)
-        ":Printf", ## (Stdlib Printf)
-        ":Printexc", ## (Stdlib Printexc)
-        ":Pervasives", ## (Stdlib Pervasives)
-        ":Parsing", ## (Stdlib Parsing)
-        ":Out_channel", ## (Stdlib Out_channel)
-        ":Option", ## (Stdlib Option)
-        ":Oo", ## (Stdlib Oo)
-        ":Obj", ## (Stdlib Obj)
-        ":Nativeint", ## (Stdlib Nativeint)
-        ":MoreLabels", ## (Stdlib MoreLabels)
-        ":Marshal", ## (Stdlib Marshal)
-        ":ListLabels", ## (Stdlib ListLabels)
-        ":List", ## (Stdlib List)
-        ":Lexing", ## (Stdlib Lexing)
-        ":Lazy", ## (Stdlib Lazy)
-        ":Int64", ## (Stdlib Int64)
-        ":Int32", ## (Stdlib Int32)
-        ":Int", ## (Stdlib Int)
-        ":In_channel", ## (Stdlib In_channel)
-        ":Genlex", ## (Stdlib Genlex)
-        ":Gc", ## (Stdlib Gc)
-        ":Fun", ## (Stdlib Fun)
-        ":Format", ## (Stdlib Format)
-        ":Float", ## (Stdlib Float)
-        ":Filename", ## (Stdlib Filename)
-        ":Ephemeron", ## (Stdlib Ephemeron)
-        ":Either", ## (Stdlib Either)
-        ":Digest", ## (Stdlib Digest)
-        ":Complex", ## (Stdlib Complex)
-        ":Char", ## (Stdlib Char)
-        # ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
-        # ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
-        # ":CamlinternalAtomic", ## (Stdlib CamlinternalAtomic)
-        ":Callback", ## (Stdlib Callback)
-        ":BytesLabels", ## (Stdlib BytesLabels)
-        ":Bytes", ## (Stdlib Bytes)
-        ":Buffer", ## (Stdlib Buffer)
-        ":Bool", ## (Stdlib Bool)
-        ":Atomic", ## (Stdlib Atomic)
-        ":ArrayLabels", ## (Stdlib ArrayLabels)
-        ":Array", ## (Stdlib Array)
-        ":Arg", ## (Stdlib Arg)
-        ## (Weak)
-        ## (Stream)
-        ## (Queue)
-        ## (Map)
-        ## (Hashtbl)
-        ## (Bigarray)
-    ]
-)
-
-ocaml_signature(
-    name = "Stdlib_cmi",
-    src  = "stdlib.mli",
-    opts = SIG_OPTS,
-    deps   = [
-        ":Unit", ## (Stdlib Unit)
-        ":Uchar", ## (Stdlib Uchar)
-        ":Sys", ## (Stdlib Sys)
-        ":StringLabels", ## (Stdlib StringLabels)
-        ":String", ## (Stdlib String)
-        ":StdLabels", ## (Stdlib StdLabels)
-        ":Set", ## (Stdlib Set)
-        ":Seq", ## (Stdlib Seq)
-        ":Result", ## (Stdlib Result)
-        ":Random", ## (Stdlib Random)
-        ":Printf", ## (Stdlib Printf)
-        ":Printexc", ## (Stdlib Printexc)
-        ":Pervasives", ## (Stdlib Pervasives)
-        ":Parsing", ## (Stdlib Parsing)
-        ":Option", ## (Stdlib Option)
-        ":Oo", ## (Stdlib Oo)
-        ":Obj", ## (Stdlib Obj)
-        ":Nativeint", ## (Stdlib Nativeint)
-        ":Marshal", ## (Stdlib Marshal)
-        ":ListLabels", ## (Stdlib ListLabels)
-        ":List", ## (Stdlib List)
-        ":Lexing", ## (Stdlib Lexing)
-        ":Lazy", ## (Stdlib Lazy)
-        ":Int64", ## (Stdlib Int64)
-        ":Int32", ## (Stdlib Int32)
-        ":Int", ## (Stdlib Int)
-        ":Genlex", ## (Stdlib Genlex)
-        ":Gc", ## (Stdlib Gc)
-        ":Fun", ## (Stdlib Fun)
-        ":Filename", ## (Stdlib Filename)
-        ":Ephemeron", ## (Stdlib Ephemeron)
-        ":Either", ## (Stdlib Either)
-        ":Digest", ## (Stdlib Digest)
-        ":Complex", ## (Stdlib Complex)
-        ":Char", ## (Stdlib Char)
-        # ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
-        # ":CamlinternalFormatBasics", ## (Stdlib CamlinternalFormatBasics)
-        ":Callback", ## (Stdlib Callback)
-        ":BytesLabels", ## (Stdlib BytesLabels)
-        ":Bytes", ## (Stdlib Bytes)
-        ":Buffer", ## (Stdlib Buffer)
-        ":Bool", ## (Stdlib Bool)
-        ":ArrayLabels", ## (Stdlib ArrayLabels)
-        ":Array", ## (Stdlib Array)
-        ":Arg", ## (Stdlib Arg)
-        ## (Weak)
-        ## (Stream)
-        ## (Stack)
-        ## (Scanf)
-        ## (Queue)
-        ## (Out_channel)
-        ## (MoreLabels)
-        ## (Map)
-        ## (In_channel)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Float)
-        ## (Bigarray)
-        ## (Atomic)
-    ]
-)
-
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Stream",
     struct = "stream.ml",
     sig    = "Stream_cmi",
@@ -1507,18 +1735,23 @@ ocaml_module(
         ":Lazy", ## (Stdlib Lazy)
         ":CamlinternalLazy", ## (Stdlib CamlinternalLazy)
         ":Bytes", ## (Stdlib Bytes)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Stream_cmi",
     src  = "stream.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "String",
     struct = "string.ml",
     sig    = "String_cmi",
@@ -1526,91 +1759,116 @@ ocaml_module(
     deps   = [
         ## ":Stdlib", ## (Stdlib Stdlib)
         ":Bytes", ## (Stdlib Bytes)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "String_cmi",
     src  = "string.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "StringLabels",
     struct = "stringLabels.ml",
     sig    = "StringLabels_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
     deps   = [
         ":String", ## (Stdlib String)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "StringLabels_cmi",
     src  = "stringLabels.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Seq", ## (Stdlib Seq)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Sys",
     struct = "sys.ml",
     sig    = "Sys_cmi",
     opts = MODULE_OPTS,
     deps   = [
-    ]
+        # ":Stdlib_cmi"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Sys_cmi",
     src  = "sys.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Uchar",
     struct = "uchar.ml",
     sig    = "Uchar_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## ":Stdlib", ## (Stdlib Stdlib)
-        ":Char", ## (Stdlib Char)
-    ]
+        # ":Stdlib_cmi",
+        ":Char",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Uchar_cmi",
     src  = "uchar.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib_cmi",
+        ":Char",
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Unit",
     struct = "unit.ml",
     sig    = "Unit_cmi",
     opts = MODULE_OPTS,
     deps   = [
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Unit_cmi",
     src  = "unit.mli",
     opts = SIG_OPTS,
     deps   = [
-    ]
+        # ":Stdlib"
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
+    ns    = ":Stdlib",
     name   = "Weak",
     struct = "weak.ml",
     sig    = "Weak_cmi",
@@ -1622,16 +1880,20 @@ ocaml_module(
         ":Array", ## (Stdlib Array)
         ## (Hashtbl)
         ## (H)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
+    ns   = ":Stdlib",
     name = "Weak_cmi",
     src  = "weak.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Hashtbl)
+        # ":Stdlib",
+        ":Hashtbl",
         ## (H)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 

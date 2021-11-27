@@ -96,6 +96,7 @@ genrule(
 ## FIXME: do the cmp
 genrule(
     name  = "primitives_dat",
+    visibility = ["//visibility:public"],
     tools = [":gen_primitives.sh"],
     outs  = ["primitives"],
     ## cwd is proj root, but the script assumes it is runtime
@@ -164,7 +165,7 @@ cc_binary(
     copts = OC_CFLAGS + CFLAGS,
     linkopts = OC_LDFLAGS + LDFLAGS + BYTE_CCLIB_LDFLAGS + MKEXE_FLAGS,
     deps= [":camlrun"],
-    visibility = ["//runtime/caml:__pkg__"]
+    visibility = ["//visibility:public"]
 )
 
 ################ instrumented
