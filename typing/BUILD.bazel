@@ -1,0 +1,1932 @@
+load("@obazl_rules_ocaml//ocaml:rules.bzl",
+     "ocaml_library",
+     "bootstrap_module",
+     "bootstrap_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+STDLIB = ["//stdlib"]
+
+ocaml_library(
+    name = "typing",
+    modules  = [
+        ":Btype",
+        ":Cmt2annot",
+        ":Ctype",
+        ":Datarepr",
+        ":Env",
+        ":Envaux",
+        ":Errortrace",
+        ":Ident",
+        ":Includeclass",
+        ":Includecore",
+        ":Includemod",
+        ":Includemod_errorprinter",
+        ":Mtype",
+        ":Oprint",
+        ":Parmatch",
+        ":Path",
+        ":Patterns",
+        ":Persistent_env",
+        ":Predef",
+        ":Primitive",
+        ":Printpat",
+        ":Printtyp",
+        ":Printtyped",
+        ":Rec_check",
+        ":Signature_group",
+        ":Stypes",
+        ":Subst",
+        ":Tast_iterator",
+        ":Tast_mapper",
+        ":Type_immediacy",
+        ":Typeclass",
+        ":Typecore",
+        ":Typedecl",
+        ":Typedecl_immediacy",
+        ":Typedecl_properties",
+        ":Typedecl_separability",
+        ":Typedecl_unboxed",
+        ":Typedecl_variance",
+        ":Typedtree",
+        ":Typemod",
+        ":Typeopt",
+        ":Types",
+        ":Typetexp",
+        ":Untypeast",
+    ],
+    # signatures  = [
+    #     ":Annot_cmi",
+    #     ":Outcometree_cmi",
+    # ],
+)
+
+bootstrap_signature(
+    name = "Annot_cmi",
+    src  = "annot.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        "//parsing:Location"
+    ]
+)
+
+bootstrap_module(
+    name   = "Btype",
+    struct = "btype.ml",
+    sig    = "Btype_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ## (Vars)
+        ## (VarSet)
+        ## (Transient_expr)
+        ## (TransientTypeOps)
+        ## (String)
+        ## (Set)
+        ## (Option)
+        ## (Meths)
+        ## (MethSet)
+        ## (Map)
+        ## (Local_store)
+        ## (List)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Char)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Btype_cmi",
+    src  = "btype.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ## (Set)
+        ## (Map)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Cmt2annot",
+    struct = "cmt2annot.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Tast_iterator", ## (Typing Tast_iterator)
+        ":Stypes", ## (Typing Stypes)
+        ":Path", ## (Typing Path)
+        ":Oprint", ## (Typing Oprint)
+        ":Ident", ## (Typing Ident)
+        ":Envaux", ## (Typing Envaux)
+        ":Env", ## (Typing Env)
+        ":Annot_cmi", ## (Typing Annot)
+        ## (Parsetree)
+        ## (Option)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        "//file_formats:Cmt_format"
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+bootstrap_module(
+    name   = "Ctype",
+    struct = "ctype.ml",
+    sig    = "Ctype_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Subst", ## (Typing Subst)
+        ":Predef", ## (Typing Predef)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Btype", ## (Typing Btype)
+        ## (Vars)
+        ## (Variance)
+        ## (Uid)
+        ## (TypeSet)
+        ## (TypePairs)
+        ## (TypeMap)
+        ## (TypeHash)
+        ## (Transient_expr)
+        ## (Subtype)
+        ## (String)
+        ## (Printf)
+        ## (Option)
+        ## (Misc)
+        ## (Meths)
+        ## (Longident)
+        ## (Location)
+        ## (Local_store)
+        ## (List)
+        ## (Lazy)
+        ## (Int)
+        ## (Hashtbl)
+        ## (For_copy)
+        ## (Clflags)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Ctype_cmi",
+    src  = "ctype.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Btype", ## (Typing Btype)
+        ## (Longident)
+        ## (Location)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Datarepr",
+    struct = "datarepr.ml",
+    sig    = "Datarepr_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Btype", ## (Typing Btype)
+        ## (Variance)
+        ## (Uid)
+        ## (TypeSet)
+        ## (Location)
+        ## (List)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Datarepr_cmi",
+    src  = "datarepr.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+    ]
+)
+
+bootstrap_module(
+    name   = "Env",
+    struct = "env.ml",
+    sig    = "Env_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Subst", ## (Typing Subst)
+        ":Predef", ## (Typing Predef)
+        ":Persistent_env", ## (Typing Persistent_env)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Datarepr", ## (Typing Datarepr)
+        ":Btype", ## (Typing Btype)
+        ## (Warnings)
+        ## (Uid)
+        ## (Seq)
+        ## (Printf)
+        ## (Option)
+        ## (Misc)
+        ## (Longident)
+        ## (Location)
+        ## (Local_store)
+        ## (Load_path)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Lazy)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Filename)
+        ## (Cmi_format)
+        ## (Clflags)
+        ## (Builtin_attributes)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Env_cmi",
+    src  = "env.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Subst", ## (Typing Subst)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        "//stdlib:Stdlib.String", ## (Stdlib String)
+        ## (Warnings)
+        ## (Misc)
+        ## (Longident)
+        ## (Location)
+        ## (Load_path)
+        ## (Format)
+        ## (Digest)
+        "//file_formats:Cmi_format_cmi",
+        ## (Asttypes)
+    ],
+    visibility = ["//lambda:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Envaux",
+    struct = "envaux.ml",
+    sig    = "Envaux_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Subst", ## (Typing Subst)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Location)
+        ## (Lazy_backtrack)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Envaux_cmi",
+    src  = "envaux.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Subst", ## (Typing Subst)
+        ":Path", ## (Typing Path)
+        ":Env", ## (Typing Env)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Errortrace",
+    struct = "errortrace.ml",
+    sig    = "Errortrace_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ## (List)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Errortrace_cmi",
+    src  = "errortrace.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Ident",
+    struct = "ident.ml",
+    sig    = "Ident_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (String)
+        ## (Misc)
+        "//utils:Local_store",
+        ## (Int)
+        ## (Identifiable)
+        ## (Format)
+        "//utils:Clflags"
+        ## (Char)
+    ]
+)
+
+bootstrap_signature(
+    name = "Ident_cmi",
+    src  = "ident.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        "//utils:Identifiable"
+        ## (Format)
+    ],
+    visibility = ["//lambda:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Includeclass",
+    struct = "includeclass.ml",
+    sig    = "Includeclass_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Path", ## (Typing Path)
+        ":Ctype", ## (Typing Ctype)
+        ## (List)
+        ## (Format)
+        ## (Builtin_attributes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Includeclass_cmi",
+    src  = "includeclass.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ## (Location)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Includecore",
+    struct = "includecore.ml",
+    sig    = "Includecore_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Subst", ## (Typing Subst)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Primitive", ## (Typing Primitive)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Variance)
+        ## (StringLabels)
+        ## (String)
+        ## (Option)
+        ## (Misc)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Int)
+        ## (Format)
+        ## (Diffing_with_keys)
+        ## (Builtin_attributes)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Includecore_cmi",
+    src  = "includecore.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Format)
+        "//utils:Diffing_with_keys_cmi"
+    ]
+)
+
+bootstrap_module(
+    name   = "Includemod",
+    struct = "includemod.ml",
+    sig    = "Includemod_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Subst", ## (Typing Subst)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Primitive", ## (Typing Primitive)
+        ":Predef", ## (Typing Predef)
+        ":Path", ## (Typing Path)
+        ":Mtype", ## (Typing Mtype)
+        ":Includecore", ## (Typing Includecore)
+        ":Includeclass", ## (Typing Includeclass)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (String)
+        ## (Result)
+        ## (Option)
+        ## (Misc)
+        ## (Map)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Format)
+        ## (Diffing_with_keys)
+        ## (Diffing)
+        "//file_formats:Cmt_format"
+        ## (Builtin_attributes)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Includemod_cmi",
+    src  = "includemod.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Includecore", ## (Typing Includecore)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ## (Parsetree)
+        ## (Map)
+        ## (Longident)
+        ## (Location)
+        ## (Format)
+        ## (Diffing_with_keys)
+        ## (Diffing)
+    ]
+)
+
+bootstrap_module(
+    name   = "Includemod_errorprinter",
+    struct = "includemod_errorprinter.ml",
+    sig    = "Includemod_errorprinter_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Subst", ## (Typing Subst)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Path", ## (Typing Path)
+        ":Oprint", ## (Typing Oprint)
+        ":Includemod", ## (Typing Includemod)
+        ":Includecore", ## (Typing Includecore)
+        ":Includeclass", ## (Typing Includeclass)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Misc)
+        ## (Marshal)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Lazy_backtrack)
+        ## (Format)
+        ## (Diffing_with_keys)
+        ## (Diffing)
+        ## (Clflags)
+        ## (Bytes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Includemod_errorprinter_cmi",
+    src  = "includemod_errorprinter.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Includemod", ## (Typing Includemod)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Mtype",
+    struct = "mtype.ml",
+    sig    = "Mtype_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Subst", ## (Typing Subst)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Option)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Clflags)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Mtype_cmi",
+    src  = "mtype.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+    ]
+)
+
+bootstrap_module(
+    name   = "Oprint",
+    struct = "oprint.ml",
+    sig    = "Oprint_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Outcometree_cmi", ## (Typing Outcometree)
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Printexc)
+        "//parsing:Pprintast"
+        ## (Option)
+        ## (List)
+        ## (Format)
+        ## (Char)
+        ## (Bytes)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Oprint_cmi",
+    src  = "oprint.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Outcometree_cmi", ## (Typing Outcometree)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+# ./boot/ocamlrun ./boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66-70 -warn-error +a -bin-annot -safe-string -strict-formats -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c typing/outcometree.mli
+
+bootstrap_signature(
+    name = "Outcometree_cmi",
+    src  = "outcometree.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Parmatch",
+    struct = "parmatch.ml",
+    sig    = "Parmatch_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Untypeast", ## (Typing Untypeast)
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Tast_iterator", ## (Typing Tast_iterator)
+        ":Subst", ## (Typing Subst)
+        ":Printpat", ## (Typing Printpat)
+        ":Predef", ## (Typing Predef)
+        ":Patterns", ## (Typing Patterns)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Warnings)
+        ## (String)
+        ## (Set)
+        ## (Seq)
+        ## (Parsetree)
+        ## (Option)
+        ## (Nativeint)
+        ## (Misc)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Int64)
+        ## (Int32)
+        ## (Int)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Config)
+        ## (Char)
+        ## (Buffer)
+        ## (Asttypes)
+        ## (Ast_helper)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Parmatch_cmi",
+    src  = "parmatch.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Hashtbl)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Path",
+    struct = "path.ml",
+    sig    = "Path_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Ident", ## (Typing Ident)
+        ## (String)
+        ## (Set)
+        ## (Map)
+        ## (List)
+        ## (Int)
+        ## (Format)
+    ]
+)
+
+bootstrap_signature(
+    name = "Path_cmi",
+    src  = "path.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Ident", ## (Typing Ident)
+        ## (Set)
+        ## (Map)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Patterns",
+    struct = "patterns.ml",
+    sig    = "Patterns_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Subst", ## (Typing Subst)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Patterns_cmi",
+    src  = "patterns.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Persistent_env",
+    struct = "persistent_env.ml",
+    sig    = "Persistent_env_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Warnings)
+        ## (Printf)
+        ## (Misc)
+        ## (Location)
+        "//utils:Load_path",
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Digest)
+        # "//utils:Consistbl"
+        ## (Config)
+        ## (Cmi_format)
+        ## (Clflags)
+    ]
+)
+
+bootstrap_signature(
+    name = "Persistent_env_cmi",
+    src  = "persistent_env.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types",
+        ## (Misc)
+        ## (Location)
+        "//utils:Lazy_backtrack_cmi",
+        ## (Format)
+        ## (Digest)
+        "//utils:Consistbl",
+        "//file_formats:Cmi_format_cmi"
+    ]
+)
+
+bootstrap_module(
+    name   = "Predef",
+    struct = "predef.ml",
+    sig    = "Predef_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Btype", ## (Typing Btype)
+        ## (Parsetree)
+        ## (Location)
+        ## (List)
+        ## (Asttypes)
+        "//parsing:Ast_helper" ## or Ast_helper_cmi?
+    ]
+)
+
+bootstrap_signature(
+    name = "Predef_cmi",
+    src  = "predef.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+    ]
+)
+
+bootstrap_module(
+    name   = "Primitive",
+    struct = "primitive.ml",
+    sig    = "Primitive_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Outcometree_cmi", ## (Typing Outcometree)
+        ## (String)
+        ## (Parsetree)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Format)
+        "//parsing:Attr_helper"
+    ]
+)
+
+bootstrap_signature(
+    name = "Primitive_cmi",
+    src  = "primitive.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Outcometree_cmi", ## (Typing Outcometree)
+        ## (Parsetree)
+        ## (Location)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Printpat",
+    struct = "printpat.ml",
+    sig    = "Printpat_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Ident", ## (Typing Ident)
+        ## (String)
+        ## (Printf)
+        ## (List)
+        ## (Format)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Printpat_cmi",
+    src  = "printpat.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Printtyp",
+    struct = "printtyp.ml",
+    sig    = "Printtyp_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Subst", ## (Typing Subst)
+        ":Signature_group", ## (Typing Signature_group)
+        ":Primitive", ## (Typing Primitive)
+        ":Predef", ## (Typing Predef)
+        ":Path", ## (Typing Path)
+        ":Outcometree_cmi", ## (Typing Outcometree)
+        ":Oprint", ## (Typing Oprint)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Warnings)
+        ## (Vars)
+        ## (Variance)
+        ## (Uid)
+        ## (TypeMap)
+        ## (Transient_expr)
+        ## (TransientTypeMap)
+        ## (Printf)
+        ## (Parsetree)
+        ## (Option)
+        ## (Misc)
+        ## (Meths)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Lazy_backtrack)
+        ## (Int)
+        ## (Format)
+        ## (Clflags)
+        ## (Char)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Printtyp_cmi",
+    src  = "printtyp.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ":Outcometree_cmi", ## (Typing Outcometree)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ## (Longident)
+        ## (Location)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Printtyped",
+    struct = "printtyped.ml",
+    sig    = "Printtyped_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ## (String)
+        "//parsing:Printast",
+        "//parsing:Pprintast",
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Format)
+        ## (Clflags)
+        ## (Char)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Printtyped_cmi",
+    src  = "printtyped.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Rec_check",
+    struct = "rec_check.ml",
+    sig    = "Rec_check_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typeopt", ## (Typing Typeopt)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Primitive", ## (Typing Primitive)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ## (Map)
+        ## (List)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Rec_check_cmi",
+    src  = "rec_check.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ## (Parsetree)
+        ## (Longident)
+    ]
+)
+
+bootstrap_module(
+    name   = "Signature_group",
+    struct = "signature_group.ml",
+    sig    = "Signature_group_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Ident", ## (Typing Ident)
+        ":Btype", ## (Typing Btype)
+        ## (Seq)
+        ## (List)
+    ]
+)
+
+bootstrap_signature(
+    name = "Signature_group_cmi",
+    src  = "signature_group.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ## (Seq)
+    ]
+)
+
+bootstrap_module(
+    name   = "Stypes",
+    struct = "stypes.ml",
+    sig    = "Stypes_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Typedtree", ## (Typing Typedtree)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Annot_cmi", ## (Typing Annot)
+        ## (String)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Int)
+        ## (Format)
+        ## (Clflags)
+    ]
+)
+
+bootstrap_signature(
+    name = "Stypes_cmi",
+    src  = "stypes.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Annot_cmi", ## (Typing Annot)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+    ]
+)
+
+bootstrap_module(
+    name   = "Subst",
+    struct = "subst.ml",
+    sig    = "Subst_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Btype", ## (Typing Btype)
+        ## (Vars)
+        ## (Uid)
+        ## (Transient_expr)
+        ## (String)
+        ## (Parsetree)
+        ## (Option)
+        ## (Misc)
+        ## (Meths)
+        ## (Location)
+        ## (Local_store)
+        ## (List)
+        "//utils:Lazy_backtrack",
+        ## (For_copy)
+        ## (Clflags)
+        "//parsing:Ast_mapper"
+    ]
+)
+
+bootstrap_signature(
+    name = "Subst_cmi",
+    src  = "subst.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ## (Parsetree)
+        ## (Location)
+    ]
+)
+
+bootstrap_module(
+    name   = "Tast_iterator",
+    struct = "tast_iterator.ml",
+    sig    = "Tast_iterator_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Subst", ## (Typing Subst)
+        ":Env", ## (Typing Env)
+        ## (Option)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Tast_iterator_cmi",
+    src  = "tast_iterator.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Tast_mapper",
+    struct = "tast_mapper.ml",
+    sig    = "Tast_mapper_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Subst", ## (Typing Subst)
+        ":Env", ## (Typing Env)
+        ## (Option)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Asttypes)
+        ## (Array)
+    ],
+    visibility = ["//file_formats:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Tast_mapper_cmi",
+    src  = "tast_mapper.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Type_immediacy",
+    struct = "type_immediacy.ml",
+    sig    = "Type_immediacy_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        "//parsing:Builtin_attributes"
+    ]
+)
+
+bootstrap_signature(
+    name = "Type_immediacy_cmi",
+    src  = "type_immediacy.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        "//parsing:Parsetree_cmi"
+    ]
+)
+
+bootstrap_module(
+    name   = "Typeclass",
+    struct = "typeclass.ml",
+    sig    = "Typeclass_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Typetexp", ## (Typing Typetexp)
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl_variance", ## (Typing Typedecl_variance)
+        ":Typedecl", ## (Typing Typedecl)
+        ":Typecore", ## (Typing Typecore)
+        ":Subst", ## (Typing Subst)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Predef", ## (Typing Predef)
+        ":Path", ## (Typing Path)
+        ":Oprint", ## (Typing Oprint)
+        ":Includeclass", ## (Typing Includeclass)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Warnings)
+        ## (Vb)
+        ## (Vars)
+        ## (Variance)
+        ## (VarSet)
+        ## (Uid)
+        ## (Typ)
+        ## (Pat)
+        ## (Parsetree)
+        ## (Option)
+        ## (Meths)
+        ## (MethSet)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Lazy)
+        ## (Int)
+        ## (Format)
+        ## (Exp)
+        ## (Cty)
+        ## (Csig)
+        ## (Cmt_format)
+        ## (Clflags)
+        ## (Cl)
+        ## (Builtin_attributes)
+        ## (Asttypes)
+        ## (Ast_helper)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typeclass_cmi",
+    src  = "typeclass.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typecore",
+    struct = "typecore.ml",
+    sig    = "Typecore_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Typetexp", ## (Typing Typetexp)
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl", ## (Typing Typedecl)
+        ":Subst", ## (Typing Subst)
+        ":Rec_check", ## (Typing Rec_check)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Printpat", ## (Typing Printpat)
+        ":Primitive", ## (Typing Primitive)
+        ":Predef", ## (Typing Predef)
+        ":Persistent_env", ## (Typing Persistent_env)
+        ":Path", ## (Typing Path)
+        ":Parmatch", ## (Typing Parmatch)
+        ":Mtype", ## (Typing Mtype)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Warnings)
+        ## (Vb)
+        ## (Vars)
+        ## (Uid)
+        ## (TypeSet)
+        ## (TypePairs)
+        ## (String)
+        ## (Result)
+        ## (Pat)
+        ## (Parsetree)
+        ## (Option)
+        ## (Nativeint)
+        ## (Mod)
+        ## (Misc)
+        ## (Meths)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Int64)
+        ## (Int32)
+        ## (Int)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Exp)
+        "//file_formats:Cmt_format"
+        ## (Clflags)
+        ## (Char)
+        ## (CamlinternalFormatBasics)
+        ## (CamlinternalFormat)
+        ## (Builtin_attributes)
+        ## (Attr)
+        ## (Asttypes)
+        ## (Ast_helper)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typecore_cmi",
+    src  = "typecore.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typedecl",
+    struct = "typedecl.ml",
+    sig    = "Typedecl_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Typetexp", ## (Typing Typetexp)
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl_variance", ## (Typing Typedecl_variance)
+        ":Typedecl_unboxed", ## (Typing Typedecl_unboxed)
+        ":Typedecl_separability", ## (Typing Typedecl_separability)
+        ":Typedecl_immediacy", ## (Typing Typedecl_immediacy)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Subst", ## (Typing Subst)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Primitive", ## (Typing Primitive)
+        ":Predef", ## (Typing Predef)
+        ":Path", ## (Typing Path)
+        ":Oprint", ## (Typing Oprint)
+        ":Includecore", ## (Typing Includecore)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Warnings)
+        ## (Variance)
+        ## (Uid)
+        ## (Pprintast)
+        ## (Parsetree)
+        ## (Option)
+        ## (Misc)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Diffing_with_keys)
+        ## (Config)
+        ## (Clflags)
+        ## (Builtin_attributes)
+        ## (Attr_helper)
+        ## (Asttypes)
+        "//parsing:Ast_iterator"
+        ## (Ast_helper)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typedecl_cmi",
+    src  = "typedecl.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl_variance", ## (Typing Typedecl_variance)
+        ":Typedecl_separability", ## (Typing Typedecl_separability)
+        ":Typedecl_immediacy", ## (Typing Typedecl_immediacy)
+        ":Path", ## (Typing Path)
+        ":Includecore", ## (Typing Includecore)
+        ":Ident", ## (Typing Ident)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Format)
+        ## (Diffing_with_keys)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typedecl_immediacy",
+    struct = "typedecl_immediacy.ml",
+    sig    = "Typedecl_immediacy_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedecl_unboxed", ## (Typing Typedecl_unboxed)
+        ":Typedecl_properties", ## (Typing Typedecl_properties)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Ctype", ## (Typing Ctype)
+        ## (Location)
+        ## (List)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typedecl_immediacy_cmi",
+    src  = "typedecl_immediacy.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedecl_properties", ## (Typing Typedecl_properties)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Location)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typedecl_properties",
+    struct = "typedecl_properties.ml",
+    sig    = "Typedecl_properties_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Subst", ## (Typing Subst)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Builtin_attributes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typedecl_properties_cmi",
+    src  = "typedecl_properties.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typedecl_separability",
+    struct = "typedecl_separability.ml",
+    sig    = "Typedecl_separability_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedecl_properties", ## (Typing Typedecl_properties)
+        ":Subst", ## (Typing Subst)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Set)
+        ## (Map)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Config)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typedecl_separability_cmi",
+    src  = "typedecl_separability.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedecl_properties", ## (Typing Typedecl_properties)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Location)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typedecl_unboxed",
+    struct = "typedecl_unboxed.ml",
+    sig    = "Typedecl_unboxed_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Subst", ## (Typing Subst)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ## (Lazy_backtrack)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typedecl_unboxed_cmi",
+    src  = "typedecl_unboxed.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Env", ## (Typing Env)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typedecl_variance",
+    struct = "typedecl_variance.ml",
+    sig    = "Typedecl_variance_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl_properties", ## (Typing Typedecl_properties)
+        ":Subst", ## (Typing Subst)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (Variance)
+        ## (String)
+        ## (Parsetree)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typedecl_variance_cmi",
+    src  = "typedecl_variance.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl_properties", ## (Typing Typedecl_properties)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typedtree",
+    struct = "typedtree.ml",
+    sig    = "Typedtree_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Subst", ## (Typing Subst)
+        ":Primitive", ## (Typing Primitive)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Option)
+        ## (Meths)
+        ## (MethSet)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typedtree_cmi",
+    src  = "typedtree.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Primitive", ## (Typing Primitive)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Asttypes)
+    ],
+    visibility = ["//file_formats:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Typemod",
+    struct = "typemod.ml",
+    sig    = "Typemod_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Typetexp", ## (Typing Typetexp)
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl", ## (Typing Typedecl)
+        ":Typecore", ## (Typing Typecore)
+        ":Typeclass", ## (Typing Typeclass)
+        ":Subst", ## (Typing Subst)
+        ":Signature_group", ## (Typing Signature_group)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Path", ## (Typing Path)
+        ":Mtype", ## (Typing Mtype)
+        ":Includemod_errorprinter", ## (Typing Includemod_errorprinter)
+        ":Includemod", ## (Typing Includemod)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Cmt2annot", ## (Typing Cmt2annot)
+        ":Btype", ## (Typing Btype)
+        ## (Warnings)
+        ## (Variance)
+        ## (Uid)
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Parsetree)
+        "//parsing:Parse",
+        ## (Option)
+        ## (Misc)
+        ## (Longident)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Lexing)
+        ## (Lazy_backtrack)
+        ## (Lazy)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Filename)
+        ## (Config)
+        ## (Cmt_format)
+        ## (Cmi_format)
+        ## (Clflags)
+        ## (Builtin_attributes)
+        ## (Attr_helper)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typemod_cmi",
+    src  = "typemod.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl", ## (Typing Typedecl)
+        ":Path", ## (Typing Path)
+        ":Includemod", ## (Typing Includemod)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Cmi_format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Typeopt",
+    struct = "typeopt.ml",
+    sig    = "Typeopt_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Typedecl_unboxed", ## (Typing Typedecl_unboxed)
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Subst", ## (Typing Subst)
+        ":Predef", ## (Typing Predef)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ## (Sys)
+        ## (Parsetree)
+        ## (Longident)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Config)
+        ## (Clflags)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typeopt_cmi",
+    src  = "typeopt.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Env", ## (Typing Env)
+        "//lambda:Lambda_cmi"
+        ## (Parsetree)
+        ## (Longident)
+    ]
+)
+
+bootstrap_module(
+    name   = "Types",
+    struct = "types.ml",
+    sig    = "Types_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Primitive", ## (Typing Primitive)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ## (Parsetree)
+        ## (Misc)
+        ## (Longident)
+        ## (Location)
+        ## (Local_store)
+        ## (List)
+        ## (Identifiable)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Config)
+        ## (Asttypes)
+    ],
+    visibility = ["//file_formats:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Types_cmi",
+    src  = "types.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Type_immediacy", ## (Typing Type_immediacy)
+        ":Primitive", ## (Typing Primitive)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ## (Set)
+        ## (Parsetree)
+        ## (Map)
+        ## (Longident)
+        ## (Location)
+        ## (Identifiable)
+        ## (Format)
+        ## (Asttypes)
+    ],
+    visibility = ["//lambda:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Typetexp",
+    struct = "typetexp.ml",
+    sig    = "Typetexp_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Subst", ## (Typing Subst)
+        ":Printtyp", ## (Typing Printtyp)
+        ":Predef", ## (Typing Predef)
+        ":Path", ## (Typing Path)
+        ":Oprint", ## (Typing Oprint)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ":Ctype", ## (Typing Ctype)
+        ":Btype", ## (Typing Btype)
+        ## (String)
+        ## (Pprintast)
+        ## (Parsetree)
+        ## (Misc)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Clflags)
+        ## (Builtin_attributes)
+        ## (Asttypes)
+        ## (Ast_helper)
+    ]
+)
+
+bootstrap_signature(
+    name = "Typetexp_cmi",
+    src  = "typetexp.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ":Errortrace", ## (Typing Errortrace)
+        ":Env", ## (Typing Env)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+bootstrap_module(
+    name   = "Untypeast",
+    struct = "untypeast.ml",
+    sig    = "Untypeast_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Types", ## (Typing Types)
+        ":Typedtree", ## (Typing Typedtree)
+        ":Subst", ## (Typing Subst)
+        ":Path", ## (Typing Path)
+        ":Ident", ## (Typing Ident)
+        ":Env", ## (Typing Env)
+        ## (Vb)
+        ## (Val)
+        ## (Type)
+        ## (Typ)
+        ## (Te)
+        ## (String)
+        ## (Str)
+        ## (Sig)
+        ## (Rf)
+        ## (Pat)
+        ## (Parsetree)
+        ## (Option)
+        ## (Opn)
+        ## (Of)
+        ## (Nativeint)
+        ## (Mty)
+        ## (Mtd)
+        ## (Ms)
+        ## (Mod)
+        ## (Md)
+        ## (Mb)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lazy_backtrack)
+        ## (Int64)
+        ## (Int32)
+        ## (Int)
+        ## (Incl)
+        ## (Exp)
+        ## (Cty)
+        ## (Ctf)
+        ## (Cl)
+        ## (Ci)
+        ## (Cf)
+        ## (Asttypes)
+        ## (Ast_helper)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Untypeast_cmi",
+    src  = "untypeast.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Typedtree", ## (Typing Typedtree)
+        ":Path", ## (Typing Path)
+        ## (Parsetree)
+        ## (Longident)
+        ## (Location)
+        ## (Asttypes)
+    ]
+)
+
