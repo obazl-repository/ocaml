@@ -78,9 +78,6 @@ val is_Tunivar: type_expr -> bool
 val is_Tconstr: type_expr -> bool
 val dummy_method: label
 
-val commu_repr: commutable -> commutable
-        (* Return the canonical representative of a commutation lock *)
-
 (**** polymorphic variants ****)
 
 val is_fixed: row_desc -> bool
@@ -164,7 +161,6 @@ val copy_type_desc:
 val copy_row:
     (type_expr -> type_expr) ->
     bool -> row_desc -> bool -> type_expr -> row_desc
-val copy_kind: field_kind -> field_kind
 
 module For_copy : sig
 
@@ -190,15 +186,14 @@ val not_marked_node: type_expr -> bool
         (* Return true if a type node is not yet marked *)
 
 val logged_mark_node: type_expr -> unit
-        (* Mark a type node, logging the marking so it can be backtracked.
-           No [repr]'ing *)
+        (* Mark a type node, logging the marking so it can be backtracked *)
 val try_logged_mark_node: type_expr -> bool
         (* Mark a type node if it is not yet marked, logging the marking so it
            can be backtracked.
            Return false if it was already marked *)
 
 val flip_mark_node: type_expr -> unit
-        (* Mark a type node. No [repr]'ing.
+        (* Mark a type node.
            The marking is not logged and will have to be manually undone using
            one of the various [unmark]'ing functions below. *)
 val try_mark_node: type_expr -> bool

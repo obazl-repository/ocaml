@@ -56,6 +56,7 @@ _build
 /ocamlopt
 /ocamlopt.opt
 /ocamlnat
+/_opam
 
 # specific files and patterns in sub-directories
 
@@ -96,6 +97,7 @@ _build
 /lex/parser.output
 
 /manual/src/cmds/warnings-help.etex
+/manual/src/html_processing/src/common.ml
 /manual/src/warnings-help.etex
 
 /api_docgen/build
