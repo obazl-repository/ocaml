@@ -34,18 +34,6 @@ genrule(
 )
 
 genrule(
-    name = "version_h",
-    outs  = ["version.h"],
-    tools = ["//tools:make-version-header.sh"],
-    srcs  = ["//:VERSION"],
-    cmd   = " ".join([
-        "$(location //tools:make-version-header.sh)",
-        "$(location //:VERSION)",
-        "> $@"
-    ]),
-)
-
-genrule(
     name = "jumptbl_h",
     outs = ["jumptbl.h"],
     srcs = ["//runtime/caml:instruct.h"],
@@ -67,7 +55,6 @@ cc_library(
         # ## generated files:
         ":opnames.h",
         ":jumptbl.h",
-        ":version.h"
     ] + glob(["*.h"]),
     include_prefix = "caml",
     # hdrs = ["domain_state.tbl"],

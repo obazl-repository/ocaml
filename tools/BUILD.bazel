@@ -8,7 +8,6 @@ load("//bzl:rules.bzl",
 
 exports_files([
     "check-parser-uptodate-or-warn.sh",
-    "make-version-header.sh"
 ])
 
 load("//config:BUILD.bzl",
