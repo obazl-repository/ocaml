@@ -3,6 +3,11 @@ load("@bazel_skylib//rules:common_settings.bzl",
 
 package(default_visibility = ["//visibility:public"])
 
+bool_flag( name = "debug", build_setting_default = False)
+
+bool_flag( name = "verbose", build_setting_default = False)
+
+################################################################
 bool_flag( name = "instrument", build_setting_default = False)
 
 config_setting(
@@ -14,11 +19,8 @@ config_setting(
 )
 
 config_setting(
-    name = "debug",
-    constraint_values = [
-        # "//config/debug" blah blah
-        "@platforms//os:linux",
-    ]
+    name = "debug_enabled",
+    flag_values = {":debug": "True"}
 )
 
 config_setting(

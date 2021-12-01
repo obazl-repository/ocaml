@@ -1,0 +1,67 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
+
+selects.config_setting_group(
+    name = "amd64",
+    match_any = [
+        # "@platforms//cpu:amd64",
+        "@platforms//cpu:x86_64",
+    ]
+)
+
+# selects.config_setting_group(
+#     name = "arm",
+#     match_any = [
+#         # "@platforms//cpu:arm",
+#         "@platforms//cpu:armv6-m",
+#         "@platforms//cpu:armv7-m",
+#         "@platforms//cpu:armv7e-mf",
+#         ## etc...
+#     ]
+# )
+
+selects.config_setting_group(
+    name = "arm64",
+    match_any = [
+        # "@platforms//cpu:arm64_32",
+        # "@platforms//cpu:arm64",
+        "@platforms//cpu:arm64e",
+        # "@platforms//cpu:armv7",
+        # "@platforms//cpu:armv7k",
+    ]
+)
+
+config_setting(
+    name = "i386",
+    constraint_values = [
+        "@platforms//cpu:i386",
+    ]
+)
+
+config_setting(
+    name = "power",
+    constraint_values = [
+        "@platforms//cpu:ppc",
+    ]
+)
+
+config_setting(
+    name = "riscv",
+    constraint_values = [
+        "@platforms//cpu:riscv64",
+    ]
+)
+
+config_setting(
+    name = "s390x",
+    constraint_values = [
+        "@platforms//cpu:s390x",
+    ]
+)
+
+config_setting( # Intel Macs
+    name = "x86_64",
+    constraint_values = [
+        "@platforms//cpu:x86_64",
+    ]
+)
+

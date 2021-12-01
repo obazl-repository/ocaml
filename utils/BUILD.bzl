@@ -106,6 +106,9 @@ def _write_config_impl(ctx):
         template = ctx.file.template,
         substitutions = ctx.attr.data
     )
+    return [
+        DefaultInfo(files = depset(direct=[ctx.outputs.output]))
+    ]
 
 write_config = rule(
     implementation = _write_config_impl,

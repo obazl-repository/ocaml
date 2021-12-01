@@ -1,17 +1,21 @@
-load("@obazl_rules_ocaml//ocaml:rules.bzl",
-     "ocaml_library",
+load("//bzl:rules.bzl",
      "bootstrap_module",
-     "bootstrap_signature",
-)
+     "bootstrap_library",
+     "bootstrap_signature")
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl",
+     "ROOT_MODULE_OPTS",
+     "ROOT_SIG_OPTS"
+     )
+
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS    = ROOT_MODULE_OPTS
 
 STDLIB = ["//stdlib"]
 
-ocaml_library(
+bootstrap_library(
     name = "typing",
-    modules  = [
+    manifest  = [
         ":Btype",
         ":Cmt2annot",
         ":Ctype",
@@ -56,11 +60,11 @@ ocaml_library(
         ":Types",
         ":Typetexp",
         ":Untypeast",
+
+        # ":Annot_cmi",
+        # ":Outcometree_cmi"
     ],
-    # signatures  = [
-    #     ":Annot_cmi",
-    #     ":Outcometree_cmi",
-    # ],
+    visibility = ["//compilerlibs:__pkg__"]
 )
 
 bootstrap_signature(
@@ -289,7 +293,10 @@ bootstrap_signature(
         "//file_formats:Cmi_format_cmi",
         ## (Asttypes)
     ],
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//lambda:__pkg__",
+        "//bytecomp:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -364,8 +371,7 @@ bootstrap_module(
         ## (Format)
         "//utils:Clflags"
         ## (Char)
-    ]
-)
+    ])
 
 bootstrap_signature(
     name = "Ident_cmi",
@@ -375,7 +381,10 @@ bootstrap_signature(
         "//utils:Identifiable"
         ## (Format)
     ],
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//middle_end:__pkg__",
+        "//lambda:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -690,7 +699,8 @@ bootstrap_module(
         ## (Asttypes)
         ## (Ast_helper)
         ## (Array)
-    ]
+    ],
+    visibility = ["//lambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -735,7 +745,8 @@ bootstrap_signature(
         ## (Set)
         ## (Map)
         ## (Format)
-    ]
+    ],
+    visibility = ["//middle_end:__pkg__"]
 )
 
 bootstrap_module(
@@ -828,7 +839,8 @@ bootstrap_module(
         ## (List)
         ## (Asttypes)
         "//parsing:Ast_helper" ## or Ast_helper_cmi?
-    ]
+    ],
+    visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -946,7 +958,8 @@ bootstrap_module(
         ## (Char)
         ## (Asttypes)
         ## (Array)
-    ]
+    ],
+    visibility = ["//lambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -1355,7 +1368,8 @@ bootstrap_module(
         ## (Asttypes)
         ## (Ast_helper)
         ## (Array)
-    ]
+    ],
+    visibility = ["//lambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -1646,7 +1660,10 @@ bootstrap_signature(
         ## (Location)
         ## (Asttypes)
     ],
-    visibility = ["//file_formats:__pkg__"]
+    visibility = [
+        "//file_formats:__pkg__",
+        "//lambda:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -1747,7 +1764,8 @@ bootstrap_module(
         ## (Config)
         ## (Clflags)
         ## (Asttypes)
-    ]
+    ],
+    visibility = ["//lambda:__pkg__"]
 )
 
 bootstrap_signature(

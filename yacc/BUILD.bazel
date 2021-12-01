@@ -1,4 +1,5 @@
-load("//config:BUILD.bzl", "OC_CFLAGS", "CFLAGS", "OC_LDFLAGS", "LDFLAGS")
+load("//config:BUILD.bzl",
+     "OC_CFLAGS", "CFLAGS", "OC_LDFLAGS", "LDFLAGS")
 
 # gcc -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common    -Wl,-no_compact_unwind -o ocamlyacc closure.o error.o lalr.o lr0.o main.o mkpar.o output.o reader.o skeleton.o symtab.o verbose.o warshall.o
 
@@ -22,6 +23,7 @@ cc_binary(
         "//conditions:default": []
     }),
     deps = ["//runtime/caml:hdrs"],
+    visibility = ["//bzl/toolchain:__pkg__"]
 )
 
 genrule(

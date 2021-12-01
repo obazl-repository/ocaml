@@ -1,0 +1,27 @@
+load(":BUILD.bzl", "bootstrap_toolchain_impl")
+
+toolchain_type(
+    name = "bootstrap",
+    visibility = ["//visibility:public"],
+)
+
+################
+bootstrap_toolchain_impl(
+    name = "bootstrap_toolchain_macos",
+    linkmode = "dynamic",
+)
+
+################################################################
+toolchain(
+    name = "bootstrap_macos",
+    toolchain_type = ":bootstrap",
+    exec_compatible_with = [
+        "@platforms//os:macos",
+    ],
+    target_compatible_with = [
+        "@platforms//os:macos",
+    ],
+    toolchain = ":bootstrap_toolchain_macos",
+    visibility = ["//visibility:public"]
+)
+

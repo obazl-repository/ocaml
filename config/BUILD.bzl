@@ -13,6 +13,8 @@ ROOTDIR = "/Users/gar/ocaml/ocaml" ## FIXME
 ## Makefile.common:
 # OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 # NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
+## We'll use names with a little more information content:
+## BOOT_OCAMLRUN and RUNTIME_OCAMLRUN
 
 ## OCAMLC - in bootstrap:toolchain
 # Use boot/ocamlc.opt if available
@@ -144,7 +146,7 @@ OC_CPPDEFINES = [
  #    # "//config/host:win32": ["CAMLDLLIMPORT"]
  #    "//conditions:default": []
 ] + select({
-        "//config:debug": ["DEBUG"], # runtime/Makefile
+        "//config:debug_enabled": ["DEBUG"], # runtime/Makefile
         "//conditions:default": []
 }) + select({
         "//config:instrumented": ["CAML_INSTR"],
@@ -213,7 +215,7 @@ RANLIBCMD = "ranlib"
 ################
 OUTPUTEXE = ["-o"]
 
-MKEXE_FLAGS = ["-Wl,-no_compact_unwind"]
+ROOT_MKEXE_FLAGS = ["-Wl,-no_compact_unwind"]
 
 ## Makefile.config:
 # MKEXE_USING_COMPILER=$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_LDFLAGS) $(LDFLAGS) \
@@ -221,19 +223,94 @@ MKEXE_FLAGS = ["-Wl,-no_compact_unwind"]
 
 ################################################################
 ################  OCAML BUILD FLAGS  ################
+## Makefile.common:
+# TEST_BOOT_OCAMLC_OPT = $(shell \
+#   test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
+#   echo $$?)
+# # Use boot/ocamlc.opt if available
+# ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
+#   BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
+# else
+#   BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
+# endif
+
 ## root Makefile
-# COMPFLAGS=-strict-sequence -principal -absname \
-#           -w +a-4-9-40-41-42-44-45-48-66-70 \
-#           -warn-error +a \
-#           -bin-annot -safe-string -strict-formats $(INCLUDES)
-COMPFLAGS = [
-    "-strict-sequence", "-absname",
-    "-w", "+a-4-9-41-42-44-45-48-70",
-    "-g", "-warn-error", "+A",
+# INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
+#         -I lambda -I middle_end -I middle_end/closure \
+#         -I middle_end/flambda -I middle_end/flambda/base_types \
+#         -I asmcomp \
+#         -I driver -I toplevel
+
+## NB: rules must add attr: data = ["//runtime:primitives"],
+USE_PRIMS = ["-use-prims", "runtime/primitives"]
+
+## CAMLC - bytecode
+## CAMLOPT - native
+
+# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
+ROOT_CAMLC_OPTS = [
+    "-g", "-nostdlib",
+    "-I", "boot",
+] + USE_PRIMS
+
+TOOLS_CAMLC_OPTS = ROOT_CAMLC_OPTS
+ # -g -nostdlib -I $(ROOTDIR)/boot \
+ #        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
+
+ROOT_CAMLOPT_OPTS = [
+    "-g", "-nostdlib",
+    "-I", "stdlib",
+    "-I", "otherlibs/dynlink"
+]
+
+# CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
+
+ROOT_COMPFLAGS = [
+    "-strict-sequence", "-principal", "-absname",
+    "-w", "+a-4-9-40-41-42-44-45-48-66-70",
+    "-warn-error", "+a",
     "-bin-annot",
-    "-nostdlib", "-principal",
     "-safe-string", "-strict-formats"
 ]
+
+TOOLS_COMPFLAGS = [
+    "-absname",
+    "-w", "+a-4-9-41-42-44-45-48-70",
+    "-strict-sequence",
+    "-warn-error", "+A",
+    "-principal",
+    "-safe-string", "-strict-formats",
+    "-bin-annot" ## $(INCLUDES)
+]
+
+## TODO: convert INCLUDES here to deps
+
+# COMPFLAGS = [
+#     "-strict-sequence", "-absname",
+#     "-w", "+a-4-9-40-41-42-44-45-48-66-70",
+#     "-warn-error", "+a",
+#     "-bin-annot",
+#     "-safe-string", "-strict-formats"
+# ]
+
+## stdlib/Makefile:
+# COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 \
+#           -g -warn-error +A -bin-annot -nostdlib -principal \
+#           -safe-string -strict-formats
+
+## root Makefile:
+# %.cmo: %.ml
+# 	$(CAMLC) $(COMPFLAGS) -c $< -I $(@D)
+ROOT_MODULE_OPTS = ROOT_CAMLC_OPTS + ROOT_COMPFLAGS
+
+# %.cmi: %.mli
+# 	$(CAMLC) $(COMPFLAGS) -c $<
+ROOT_SIG_OPTS = ROOT_MODULE_OPTS
+
+# %.cmx: %.ml
+# 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) -c $< -I $(@D)
+
+
 
 # LINKFLAGS=
 
@@ -262,13 +339,17 @@ OPTCOMPFLAGS = []
 ################  COMMANDS  ################
 ## Makefile.config:
 # MKEXE=$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_LDFLAGS) $(LDFLAGS) -Wl,-no_compact_unwind
-## adding spaces, to match what the makefile generates:
+## Do not edit these MK vars, they are passed to preprocessors.
+## (adding spaces, to match what the makefile generates:)
 MKEXE = [CC] + OC_CFLAGS + CFLAGS + OC_LDFLAGS + ["  "] + LDFLAGS
 
 ## Makefile.config:
 MKDLL = "gcc -shared                    -flat_namespace -undefined suppress -Wl,-no_compact_unwind                    "  #  + " ".join(LDFLAGS)
 
 MKMAINDLL="gcc -shared                    -flat_namespace -undefined suppress -Wl,-no_compact_unwind                    " # + " ".join(LDFLAGS)
+
+## for exe targets using MKEXE:
+MKEXE_FLAGS = OC_CFLAGS + CFLAGS + OC_LDFLAGS + ["  "] + LDFLAGS
 
 # bootstrap:
 

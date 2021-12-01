@@ -1,19 +1,29 @@
-## GENERATED FILE ##
-
-load("@obazl_rules_ocaml//ocaml:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+load("//bzl:rules.bzl",
+     "bootstrap_executable",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_ocamllex",
+     "bootstrap_signature"
 )
 
-exports_files(["make-version-header.sh"])
+exports_files([
+    "check-parser-uptodate-or-warn.sh",
+    "make-version-header.sh"
+])
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl",
+     "ROOT_MODULE_OPTS",
+     "ROOT_SIG_OPTS"
+     )
 
-ocaml_library(
-    name = "tools_lib",
-    modules  = [
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS    = ROOT_MODULE_OPTS
+
+STDLIB = ["//stdlib"]
+
+bootstrap_library(
+    name = "tools",
+    manifest  = [
         ":Caml_tex",
         ":Cmpbyt",
         ":Dumpobj",
@@ -33,17 +43,17 @@ ocaml_library(
     ],
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Caml_tex",
     struct = "caml_tex.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Unix)
         ## (Toploop)
         ## (Sys)
         ## (Syntaxerr)
         ## (String)
-        ## (Str)
+        "//otherlibs/str:Str",
         ## (StdLabels)
         ## (Printexc)
         ## (Parsetree)
@@ -65,26 +75,54 @@ ocaml_module(
         ## (Ast_iterator)
         ## (Ast_helper)
         ## (Arg)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Cmpbyt",
     struct = "cmpbyt.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
+        ## (Sys)
+        ## (Printf)
+        "//bytecomp:Bytesections"
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_ocamllex(
+    name = "cvt_emit_ml",
+    out  = "cvt_emit.ml",
+    src  = "cvt_emit.mll"
+)
+
+bootstrap_executable(
+    name = "cvt_emit.exe",
+    main = ":Cvt_emit",
+    # data = ["//stdlib:camlheader"]
+)
+
+bootstrap_module(
+    name   = "Cvt_emit",
+    struct = "cvt_emit.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
         ## (Sys)
         ## (Printf)
         ## (Bytesections)
         ## (Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+
+bootstrap_module(
     name   = "Dumpobj",
     struct = "dumpobj.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (Symtable)
         ## (String)
@@ -104,26 +142,28 @@ ocaml_module(
         ## (Asttypes)
         ## (Array)
         ## (Arg)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Eqparsetree",
     struct = "eqparsetree.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Parsetree)
         ## (Longident)
         ## (Location)
         ## (Asttypes)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Lintapidiff",
     struct = "lintapidiff.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (String)
         ## (Str)
@@ -141,14 +181,15 @@ ocaml_module(
         ## (Format)
         ## (Filename)
         ## (Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Objinfo",
     struct = "objinfo.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (Symtable)
         ## (Symbol)
@@ -174,14 +215,15 @@ ocaml_module(
         ## (Binutils)
         ## (Array)
         ## (Arg)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Ocamlcmt",
     struct = "ocamlcmt.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Untypeast)
         ## (Stypes)
         ## (String)
@@ -202,14 +244,15 @@ ocaml_module(
         ## (Array)
         ## (Arg)
         ## (Annot)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Ocamlcp",
     struct = "ocamlcp.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (String)
         ## (Printf)
@@ -218,23 +261,25 @@ ocaml_module(
         ## (Filename)
         ## (Compenv)
         ## (Arg)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Ocamldep",
     struct = "ocamldep.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Makedepend)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Ocamlmklib",
     struct = "ocamlmklib.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (String)
         ## (Stack)
@@ -246,28 +291,30 @@ ocaml_module(
         ## (Bytes)
         ## (Array)
         ## (Arg)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Ocamlmktop",
     struct = "ocamlmktop.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (List)
         ## (Filename)
         ## (Config)
         ## (Ccomp)
         ## (Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Ocamloptp",
     struct = "ocamloptp.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (String)
         ## (Printf)
@@ -276,14 +323,15 @@ ocaml_module(
         ## (Filename)
         ## (Compenv)
         ## (Arg)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Ocamlprof",
     struct = "ocamlprof.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Warnings)
         ## (Sys)
         ## (String)
@@ -300,53 +348,84 @@ ocaml_module(
         ## (Bytes)
         ## (Array)
         ## (Arg)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Primreq",
     struct = "primreq.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Misc)
         ## (List)
         ## (Config)
         ## (Cmo_format)
         ## (Arg)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Profiling",
     struct = "profiling.ml",
     sig    = "Profiling_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (List)
         ## (Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Profiling_cmi",
     src  = "profiling.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ]
+    deps   = STDLIB + [
+    ],
+    data = ["//runtime:primitives"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Stripdebug",
     struct = "stripdebug.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Sys)
         ## (Printf)
         ## (Misc)
         ## (List)
         ## (Bytesections)
         ## (Array)
-    ]
+    ],
+    data = ["//runtime:primitives"]
+)
+
+################################################################
+bootstrap_ocamllex(
+    name = "make_opcodes_ml",
+    out  = "make_opcodes.ml",
+    src  = "make_opcodes.mll"
+)
+
+bootstrap_module(
+    name   = "Make_opcodes",
+    struct = "make_opcodes.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_executable(
+    name = "make_opcodes.exe",
+    main = ":Make_opcodes",
+    # deps = ["//stdlib:Std_exit"],
+
+    ## Std_exit is getting linked twice. For now we ignore:
+    opts = ["-w", "-31"],
+    data = ["//stdlib:header"]
 )
 

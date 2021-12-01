@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
-load("@obazl_rules_ocaml//ocaml:rules.bzl",
-     "ocaml_module")
+load("//bzl:rules.bzl",
+     "bootstrap_module")
 
 load("//config:BUILD.bzl",
      "ARCH", "MODEL", "SYSTEM",
@@ -214,9 +214,8 @@ write_file( ## from dune file
     content  = ["let linkme = ()"]
 )
 
-ocaml_module(  ## from dune file
+bootstrap_module(  ## from dune file
     name   = "Runtime",
-    mode   = "bytecode",
     struct = "runtime.ml",
     opts   = [
         "-nostdlib", "-nopervasives",

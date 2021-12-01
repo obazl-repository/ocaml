@@ -1,4 +1,19 @@
-exports_files(["domain_state.tbl"])
+
+# most of these for otherlibs/str/strstubs.c
+exports_files([
+    "alloc.h",
+    "config.h",
+    "domain.h",
+    "domain_state.h",
+    "domain_state.tbl",
+    "compatibility.h",
+    "fail.h",
+    "m.h",
+    "memory.h",
+    "misc.h",
+    "mlvalues.h",
+    "s.h"
+])
 
 # GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h build_config.h
 
@@ -44,6 +59,7 @@ genrule(
 ## WARNING: if you build with make, these generated files will be
 ## generated and placed in the source tree, so when you then build
 ## with Bazel you'll get an error about file already existing.
+## In that case just delete the generated files in runtime/.
 cc_library(
     name = "hdrs",
     hdrs = [
@@ -56,6 +72,6 @@ cc_library(
     include_prefix = "caml",
     # hdrs = ["domain_state.tbl"],
     # static_library = ...,
-          visibility = ["//runtime:__pkg__"],
+    visibility = ["//runtime:__pkg__", "//yacc:__pkg__"],
 )
 
