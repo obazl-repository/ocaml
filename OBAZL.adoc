@@ -1,0 +1,132 @@
+# Building OCaml with OBazl
+
+## Preprocessing
+
+### utils/config.ml
+
+Uses a custom rule demonstrating use of Bazel's built-in templating support.
+
+Data is hard-coded.
+
+### utils/domainstate.ml
+
+The Makefile uses CPP to generate `utils/domainstate.ml` from
+`utils/domainstate.ml.c` and `runtime/caml/domain_state.tbl` Nutty.
+Unfortunately, Bazel's `cc_library` rule insists on inserting various
+flags, so the result, even with `-E`, is `error...`
+
+We could define a custom CC toolchain to handle this, which might be
+useful for other projects as well. But since this is a simple one-off
+task, it makes more sense to generate the file in less unorthodox
+manner: a simple sed script in genrule target `utils:domainstate`.
+
+This is the entire content of `utils/domainstate.ml.c`:
+
+```
+type t =
+#define DOMAIN_STATE(type, name) | Domain_##name
+#include "domain_state.tbl"
+#undef DOMAIN_STATE
+
+let idx_of_field =
+  let curr = 0 in
+#define DOMAIN_STATE(type, name) \
+  let idx__##name = curr in \
+  let curr = curr + 1 in
+#include "domain_state.tbl"
+#undef DOMAIN_STATE
+  let _ = curr in
+  function
+#define DOMAIN_STATE(type, name) \
+  | Domain_##name -> idx__##name
+#include "domain_state.tbl"
+#undef DOMAIN_STATE
+```
+
+This is `runtime/caml/domain_state.tbl`:
+
+```
+DOMAIN_STATE(value*, young_limit)
+DOMAIN_STATE(value*, young_ptr)
+DOMAIN_STATE(char*, exception_pointer)
+DOMAIN_STATE(void*, young_base)
+DOMAIN_STATE(value*, young_start)
+... same, repeated for list of names. note that the `type` field of the macro is not used in `domainstate.ml.c`.
+#if defined(NAKED_POINTERS_CHECKER) && !defined(_WIN32)
+DOMAIN_STATE(void*, checking_pointer_pc)
+/* See major_gc.c */
+#endif
+
+DOMAIN_STATE(extra_params_area, extra_params)
+/* This member must occur last, because it is an array, not a scalar */
+```
+
+Note that this file is `#included` in various other `runtime` assembly files:
+
+runtime/arm.S
+129:#include "../runtime/caml/domain_state.tbl"
+
+runtime/arm64.S
+63:#include "../runtime/caml/domain_state.tbl"
+
+runtime/i386.S
+89:#include "../runtime/caml/domain_state.tbl"
+
+runtime/riscv.S
+49:#include "../runtime/caml/domain_state.tbl"
+
+runtime/amd64.S
+119:#include "../runtime/caml/domain_state.tbl"
+
+runtime/power.S
+148:#include "../runtime/caml/domain_state.tbl"
+
+runtime/s390x.S
+32:#include "../runtime/caml/domain_state.tbl"
+
+runtime/caml/domain_state.h
+37:#include "domain_state.tbl"
+44:#include "domain_state.tbl"
+
+The output (`utils/domainstate.ml`) looks like this:
+
+```
+# 1 "utils/domainstate.ml.c"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 368 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "utils/domainstate.ml.c" 2
+# 17 "utils/domainstate.ml.c"
+type t =
+| Domain_young_limit
+| Domain_young_ptr
+| Domain_exception_pointer
+| Domain_young_base
+...
+| Domain_extra_params
+# 20 "utils/domainstate.ml.c" 2
+let idx_of_field =
+  let curr = 0 in
+# 1 "runtime/caml/domain_state.tbl" 1
+# 17 "runtime/caml/domain_state.tbl"
+let idx__young_limit = curr in let curr = curr + 1 in
+let idx__young_ptr = curr in let curr = curr + 1 in
+let idx__exception_pointer = curr in let curr = curr + 1 in
+let idx__young_base = curr in let curr = curr + 1 in
+let idx__young_start = curr in let curr = curr + 1 in
+...
+
+| Domain_extra_params -> idx__extra_params
+# 34 "utils/domainstate.ml.c" 2
+```
+
+I.e.
+* for each entry NM in `domain_state.tbl`, generate Domain_NM
+* for each entry NM in `domain_state.tbl`, generate:
+  let idx__##name = curr in \
+  let curr = curr + 1 in
+*  for each entry NM in `domain_state.tbl`, generate:  | Domain_NM -> idx__NM
+
+We should be able to do this with sed or even a shell script.
