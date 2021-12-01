@@ -1,0 +1,213 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-threads_lib",
+    modules  = [
+        ":Backtrace_threads",
+        ":Bank",
+        ":Beat",
+        ":Bufchan",
+        ":Close",
+        ":Delayintr",
+        ":Fileio",
+        ":Mutex_errors",
+        ":Pr4466",
+        ":Pr5325",
+        ":Pr7638",
+        ":Pr8857",
+        ":Pr9971",
+        ":Prodcons",
+        ":Prodcons2",
+        ":Sieve",
+        ":Signal",
+        ":Sockets",
+        ":Swapchan",
+        ":Tls",
+        ":Torture",
+        ":Uncaught_exception_handler",
+    ],
+)
+
+ocaml_module(
+    name   = "Backtrace_threads",
+    struct = "backtrace_threads.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Bank",
+    struct = "bank.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Beat",
+    struct = "beat.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Bufchan",
+    struct = "bufchan.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Close",
+    struct = "close.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Delayintr",
+    struct = "delayintr.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Fileio",
+    struct = "fileio.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mutex_errors",
+    struct = "mutex_errors.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4466",
+    struct = "pr4466.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5325",
+    struct = "pr5325.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7638",
+    struct = "pr7638.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr8857",
+    struct = "pr8857.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr9971",
+    struct = "pr9971.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Prodcons",
+    struct = "prodcons.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Prodcons2",
+    struct = "prodcons2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Sieve",
+    struct = "sieve.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Signal",
+    struct = "signal.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Sockets",
+    struct = "sockets.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Swapchan",
+    struct = "swapchan.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Tls",
+    struct = "tls.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Torture",
+    struct = "torture.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Uncaught_exception_handler",
+    struct = "uncaught_exception_handler.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

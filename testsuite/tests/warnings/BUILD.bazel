@@ -1,0 +1,280 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_warnings_lib",
+    modules  = [
+        ":Deprecated_module",
+        ":Deprecated_module_assigment",
+        ":Deprecated_module_use",
+        ":Deprecated_warning_specs",
+        ":W01",
+        ":W03",
+        ":W04",
+        ":W04_failure",
+        ":W06",
+        ":W32",
+        ":W32b",
+        ":W33",
+        ":W45",
+        ":W47_inline",
+        ":W50",
+        ":W51",
+        ":W51_bis",
+        ":W52",
+        ":W53",
+        ":W54",
+        ":W55",
+        ":W58",
+        ":W59",
+        ":W60",
+        ":W68",
+    ],
+    signatures  = [
+        ":Module_without_cmx_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Deprecated_module",
+    struct = "deprecated_module.ml",
+    sig    = "Deprecated_module_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Deprecated_module_cmi",
+    src  = "deprecated_module.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Deprecated_module_assigment",
+    struct = "deprecated_module_assigment.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Deprecated_module_use",
+    struct = "deprecated_module_use.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Deprecated_warning_specs",
+    struct = "deprecated_warning_specs.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Module_without_cmx_cmi",
+    src  = "module_without_cmx.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W01",
+    struct = "w01.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W03",
+    struct = "w03.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W04",
+    struct = "w04.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W04_failure",
+    struct = "w04_failure.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W06",
+    struct = "w06.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W32",
+    struct = "w32.ml",
+    sig    = "W32_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "W32_cmi",
+    src  = "w32.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W32b",
+    struct = "w32b.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W33",
+    struct = "w33.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W45",
+    struct = "w45.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W47_inline",
+    struct = "w47_inline.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W50",
+    struct = "w50.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W51",
+    struct = "w51.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W51_bis",
+    struct = "w51_bis.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W52",
+    struct = "w52.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W53",
+    struct = "w53.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W54",
+    struct = "w54.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W55",
+    struct = "w55.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W58",
+    struct = "w58.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W59",
+    struct = "w59.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W60",
+    struct = "w60.ml",
+    sig    = "W60_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "W60_cmi",
+    src  = "w60.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "W68",
+    struct = "w68.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

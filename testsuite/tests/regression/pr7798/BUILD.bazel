@@ -1,0 +1,24 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_regression_pr7798_lib",
+    modules  = [
+        ":Pr7798",
+    ],
+)
+
+ocaml_module(
+    name   = "Pr7798",
+    struct = "pr7798.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

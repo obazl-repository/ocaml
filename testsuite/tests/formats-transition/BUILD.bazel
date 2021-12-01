@@ -1,0 +1,51 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_formats-transition_lib",
+    modules  = [
+        ":Deprecated_unsigned_printers",
+        ":Ignored_scan_counters",
+        ":Legacy_incompatible_flags",
+        ":Legacy_unfinished_modifiers",
+    ],
+)
+
+ocaml_module(
+    name   = "Deprecated_unsigned_printers",
+    struct = "deprecated_unsigned_printers.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ignored_scan_counters",
+    struct = "ignored_scan_counters.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Legacy_incompatible_flags",
+    struct = "legacy_incompatible_flags.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Legacy_unfinished_modifiers",
+    struct = "legacy_unfinished_modifiers.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

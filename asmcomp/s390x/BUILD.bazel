@@ -1,0 +1,102 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "asmcomp_s390x_lib",
+    modules  = [
+        ":CSE",
+        ":Arch",
+        ":Proc",
+        ":Reload",
+        ":Scheduling",
+        ":Selection",
+    ],
+)
+
+ocaml_module(
+    name   = "CSE",
+    struct = "CSE.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":S390x", ## (Asmcomp S390x Arch)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ":CSEgen", ## (Asmcomp CSEgen)
+    ]
+)
+
+ocaml_module(
+    name   = "Arch",
+    struct = "arch.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Printf)
+        ## (Format)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Proc",
+    struct = "proc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":S390x", ## (Asmcomp S390x Arch)
+        ":Reg", ## (Asmcomp Reg)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (String)
+        ## (Misc)
+        ## (List)
+        ## (Filename)
+        ## (Config)
+        ## (Ccomp)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Reload",
+    struct = "reload.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":S390x", ## (Asmcomp S390x Arch)
+        ":Reloadgen", ## (Asmcomp Reloadgen)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Scheduling",
+    struct = "scheduling.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":S390x", ## (Asmcomp S390x Arch)
+        ":Schedgen", ## (Asmcomp Schedgen)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+    ]
+)
+
+ocaml_module(
+    name   = "Selection",
+    struct = "selection.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":S390x", ## (Asmcomp S390x Arch)
+        ":Selectgen", ## (Asmcomp Selectgen)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (Array)
+    ]
+)
+

@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-unix_unix-socket_lib",
+    modules  = [
+        ":Recvfrom",
+        ":Recvfrom_linux",
+        ":Recvfrom_unix",
+    ],
+)
+
+ocaml_module(
+    name   = "Recvfrom",
+    struct = "recvfrom.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Recvfrom_linux",
+    struct = "recvfrom_linux.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Recvfrom_unix",
+    struct = "recvfrom_unix.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

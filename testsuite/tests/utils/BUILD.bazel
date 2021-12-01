@@ -1,0 +1,51 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_utils_lib",
+    modules  = [
+        ":Edit_distance",
+        ":Magic_number",
+        ":Overflow_detection",
+        ":Test_strongly_connected_components",
+    ],
+)
+
+ocaml_module(
+    name   = "Edit_distance",
+    struct = "edit_distance.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Magic_number",
+    struct = "magic_number.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Overflow_detection",
+    struct = "overflow_detection.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_strongly_connected_components",
+    struct = "test_strongly_connected_components.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

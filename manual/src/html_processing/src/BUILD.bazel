@@ -1,0 +1,74 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "manual_src_html_processing_src_lib",
+    modules  = [
+        ":Common",
+        ":Process_api",
+        ":Process_manual",
+    ],
+)
+
+ocaml_module(
+    name   = "Common",
+    struct = "common.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (String)
+        ## (Soup)
+        ## (Scanf)
+        ## (Printf)
+        ## (Option)
+        ## (List)
+        ## (Filename)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Process_api",
+    struct = "process_api.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Src", ## (Manual Src Html_processing Src Common)
+        ## (Unix)
+        ## (Sys)
+        ## (String)
+        ## (Soup)
+        ## (Re)
+        ## (R)
+        ## (Printf)
+        ## (Option)
+        ## (List)
+        ## (Hashtbl)
+        ## (Filename)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Process_manual",
+    struct = "process_manual.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Src", ## (Manual Src Html_processing Src Common)
+        ## (Sys)
+        ## (String)
+        ## (Soup)
+        ## (Re)
+        ## (R)
+        ## (Printf)
+        ## (Option)
+        ## (List)
+        ## (Hashtbl)
+    ]
+)
+

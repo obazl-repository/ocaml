@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-hashtbl_lib",
+    modules  = [
+        ":Compatibility",
+        ":Hfun",
+        ":Htbl",
+    ],
+)
+
+ocaml_module(
+    name   = "Compatibility",
+    struct = "compatibility.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Hfun",
+    struct = "hfun.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Htbl",
+    struct = "htbl.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

@@ -1,0 +1,848 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "ocamltest_lib",
+    modules  = [
+        ":Actions",
+        ":Actions_helpers",
+        ":Builtin_actions",
+        ":Builtin_variables",
+        ":Environments",
+        ":Filecompare",
+        ":Main",
+        ":Modifier_parser",
+        ":Ocaml_actions",
+        ":Ocaml_backends",
+        ":Ocaml_commands",
+        ":Ocaml_compilers",
+        ":Ocaml_directories",
+        ":Ocaml_files",
+        ":Ocaml_filetypes",
+        ":Ocaml_flags",
+        ":Ocaml_modifiers",
+        ":Ocaml_tests",
+        ":Ocaml_tools",
+        ":Ocaml_toplevels",
+        ":Ocaml_variables",
+        ":Ocamltest_stdlib",
+        ":Ocamltest_unix_dummy",
+        ":Ocamltest_unix_real",
+        ":Options",
+        ":Result",
+        ":Run_command",
+        ":Strace",
+        ":Tests",
+        ":Tsl_ast",
+        ":Tsl_semantics",
+        ":Variables",
+    ],
+    signatures  = [
+        ":Ocamltest_config_cmi",
+        ":Ocamltest_unix_cmi",
+        ":Tsl_lexer_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Actions",
+    struct = "actions.ml",
+    sig    = "Actions_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ## (String)
+        ## (Set)
+        ## (List)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "Actions_cmi",
+    src  = "actions.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ## (Set)
+    ]
+)
+
+ocaml_module(
+    name   = "Actions_helpers",
+    struct = "actions_helpers.ml",
+    sig    = "Actions_helpers_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Strace", ## (Ocamltest Strace)
+        ":Run_command", ## (Ocamltest Run_command)
+        ":Result", ## (Ocamltest Result)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Modifier_parser", ## (Ocamltest Modifier_parser)
+        ":Filecompare", ## (Ocamltest Filecompare)
+        ":Environments", ## (Ocamltest Environments)
+        ":Builtin_variables", ## (Ocamltest Builtin_variables)
+        ":Actions", ## (Ocamltest Actions)
+        ## (Printf)
+        ## (Option)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Actions_helpers_cmi",
+    src  = "actions_helpers.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions", ## (Ocamltest Actions)
+    ]
+)
+
+ocaml_module(
+    name   = "Builtin_actions",
+    struct = "builtin_actions.ml",
+    sig    = "Builtin_actions_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Result", ## (Ocamltest Result)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
+        ":Environments", ## (Ocamltest Environments)
+        ":Builtin_variables", ## (Ocamltest Builtin_variables)
+        ":Actions_helpers", ## (Ocamltest Actions_helpers)
+        ":Actions", ## (Ocamltest Actions)
+        ## (Printf)
+    ]
+)
+
+ocaml_signature(
+    name = "Builtin_actions_cmi",
+    src  = "builtin_actions.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions", ## (Ocamltest Actions)
+    ]
+)
+
+ocaml_module(
+    name   = "Builtin_variables",
+    struct = "builtin_variables.ml",
+    sig    = "Builtin_variables_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ## (List)
+    ]
+)
+
+ocaml_signature(
+    name = "Builtin_variables_cmi",
+    src  = "builtin_variables.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+    ]
+)
+
+ocaml_module(
+    name   = "Environments",
+    struct = "environments.ml",
+    sig    = "Environments_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ## (Printf)
+        ## (Option)
+        ## (Map)
+        ## (Hashtbl)
+        ## (Buffer)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Environments_cmi",
+    src  = "environments.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+    ]
+)
+
+ocaml_module(
+    name   = "Filecompare",
+    struct = "filecompare.ml",
+    sig    = "Filecompare_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Run_command", ## (Ocamltest Run_command)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ## (Fun)
+        ## (Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "Filecompare_cmi",
+    src  = "filecompare.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Main",
+    struct = "main.ml",
+    sig    = "Main_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Tsl_semantics", ## (Ocamltest Tsl_semantics)
+        ":Tsl_lexer", ## (Ocamltest Tsl_lexer)
+        ":Tests", ## (Ocamltest Tests)
+        ":Result", ## (Ocamltest Result)
+        ":Options", ## (Ocamltest Options)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Environments", ## (Ocamltest Environments)
+        ":Builtin_variables", ## (Ocamltest Builtin_variables)
+        ":Actions_helpers", ## (Ocamltest Actions_helpers)
+        ":Actions", ## (Ocamltest Actions)
+        ## (Tsl_parser)
+        ## (Printf)
+        ## (Location)
+        ## (Lexing)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Main_cmi",
+    src  = "main.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Modifier_parser",
+    struct = "modifier_parser.ml",
+    sig    = "Modifier_parser_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Tsl_lexer", ## (Ocamltest Tsl_lexer)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Environments", ## (Ocamltest Environments)
+        ## (Lexing)
+    ]
+)
+
+ocaml_signature(
+    name = "Modifier_parser_cmi",
+    src  = "modifier_parser.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Environments", ## (Ocamltest Environments)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_actions",
+    struct = "ocaml_actions.ml",
+    sig    = "Ocaml_actions_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Result", ## (Ocamltest Result)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
+        ":Ocaml_variables", ## (Ocamltest Ocaml_variables)
+        ":Ocaml_toplevels", ## (Ocamltest Ocaml_toplevels)
+        ":Ocaml_tools", ## (Ocamltest Ocaml_tools)
+        ":Ocaml_modifiers", ## (Ocamltest Ocaml_modifiers)
+        ":Ocaml_flags", ## (Ocamltest Ocaml_flags)
+        ":Ocaml_filetypes", ## (Ocamltest Ocaml_filetypes)
+        ":Ocaml_files", ## (Ocamltest Ocaml_files)
+        ":Ocaml_directories", ## (Ocamltest Ocaml_directories)
+        ":Ocaml_compilers", ## (Ocamltest Ocaml_compilers)
+        ":Ocaml_commands", ## (Ocamltest Ocaml_commands)
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+        ":Filecompare", ## (Ocamltest Filecompare)
+        ":Environments", ## (Ocamltest Environments)
+        ":Builtin_variables", ## (Ocamltest Builtin_variables)
+        ":Actions_helpers", ## (Ocamltest Actions_helpers)
+        ":Actions", ## (Ocamltest Actions)
+        ## (Printf)
+        ## (Misc)
+        ## (Config)
+        ## (Cmo_format)
+        ## (Clflags)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_actions_cmi",
+    src  = "ocaml_actions.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions", ## (Ocamltest Actions)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_backends",
+    struct = "ocaml_backends.ml",
+    sig    = "Ocaml_backends_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_backends_cmi",
+    src  = "ocaml_backends.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_commands",
+    struct = "ocaml_commands.ml",
+    sig    = "Ocaml_commands_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Ocaml_files", ## (Ocamltest Ocaml_files)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_commands_cmi",
+    src  = "ocaml_commands.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_compilers",
+    struct = "ocaml_compilers.ml",
+    sig    = "Ocaml_compilers_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Ocaml_variables", ## (Ocamltest Ocaml_variables)
+        ":Ocaml_tools", ## (Ocamltest Ocaml_tools)
+        ":Ocaml_files", ## (Ocamltest Ocaml_files)
+        ":Ocaml_commands", ## (Ocamltest Ocaml_commands)
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+        ":Builtin_variables", ## (Ocamltest Builtin_variables)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_compilers_cmi",
+    src  = "ocaml_compilers.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Ocaml_tools", ## (Ocamltest Ocaml_tools)
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_directories",
+    struct = "ocaml_directories.ml",
+    sig    = "Ocaml_directories_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_directories_cmi",
+    src  = "ocaml_directories.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_files",
+    struct = "ocaml_files.ml",
+    sig    = "Ocaml_files_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
+        ":Ocaml_directories", ## (Ocamltest Ocaml_directories)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_files_cmi",
+    src  = "ocaml_files.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_filetypes",
+    struct = "ocaml_filetypes.ml",
+    sig    = "Ocaml_filetypes_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+        ## (String)
+        ## (Printf)
+        ## (Filename)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_filetypes_cmi",
+    src  = "ocaml_filetypes.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_flags",
+    struct = "ocaml_flags.ml",
+    sig    = "Ocaml_flags_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Ocaml_variables", ## (Ocamltest Ocaml_variables)
+        ":Ocaml_files", ## (Ocamltest Ocaml_files)
+        ":Ocaml_directories", ## (Ocamltest Ocaml_directories)
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+        ":Environments", ## (Ocamltest Environments)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_flags_cmi",
+    src  = "ocaml_flags.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+        ":Environments", ## (Ocamltest Environments)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_modifiers",
+    struct = "ocaml_modifiers.ml",
+    sig    = "Ocaml_modifiers_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
+        ":Ocaml_variables", ## (Ocamltest Ocaml_variables)
+        ":Environments", ## (Ocamltest Environments)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_modifiers_cmi",
+    src  = "ocaml_modifiers.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Environments", ## (Ocamltest Environments)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_tests",
+    struct = "ocaml_tests.ml",
+    sig    = "Ocaml_tests_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Tests", ## (Ocamltest Tests)
+        ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
+        ":Ocaml_actions", ## (Ocamltest Ocaml_actions)
+        ":Builtin_actions", ## (Ocamltest Builtin_actions)
+        ":Actions_helpers", ## (Ocamltest Actions_helpers)
+        ## (List)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_tests_cmi",
+    src  = "ocaml_tests.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Tests", ## (Ocamltest Tests)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_tools",
+    struct = "ocaml_tools.ml",
+    sig    = "Ocaml_tools_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Ocaml_variables", ## (Ocamltest Ocaml_variables)
+        ":Ocaml_files", ## (Ocamltest Ocaml_files)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions_helpers", ## (Ocamltest Actions_helpers)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_tools_cmi",
+    src  = "ocaml_tools.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Environments", ## (Ocamltest Environments)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_toplevels",
+    struct = "ocaml_toplevels.ml",
+    sig    = "Ocaml_toplevels_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ":Ocaml_variables", ## (Ocamltest Ocaml_variables)
+        ":Ocaml_tools", ## (Ocamltest Ocaml_tools)
+        ":Ocaml_files", ## (Ocamltest Ocaml_files)
+        ":Ocaml_compilers", ## (Ocamltest Ocaml_compilers)
+        ":Ocaml_commands", ## (Ocamltest Ocaml_commands)
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_toplevels_cmi",
+    src  = "ocaml_toplevels.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Ocaml_tools", ## (Ocamltest Ocaml_tools)
+        ":Ocaml_compilers", ## (Ocamltest Ocaml_compilers)
+        ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocaml_variables",
+    struct = "ocaml_variables.ml",
+    sig    = "Ocaml_variables_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocaml_variables_cmi",
+    src  = "ocaml_variables.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocamltest_config_cmi",
+    src  = "ocamltest_config.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamltest_stdlib",
+    struct = "ocamltest_stdlib.ml",
+    sig    = "Ocamltest_stdlib_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Ocamltest_unix", ## (Ocamltest Ocamltest_unix)
+        ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
+        ## (Sys)
+        ## (String)
+        ## (Seq)
+        ## (Printf)
+        ## (Misc)
+        ## (List)
+        ## (Int)
+        ## (Fun)
+        ## (Filename)
+        ## (Char)
+        ## (Bytes)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocamltest_stdlib_cmi",
+    src  = "ocamltest_stdlib.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Ocamltest_unix", ## (Ocamltest Ocamltest_unix)
+        ## (Sys)
+        ## (Seq)
+        ## (Misc)
+        ## (List)
+        ## (Filename)
+        ## (Char)
+    ]
+)
+
+ocaml_signature(
+    name = "Ocamltest_unix_cmi",
+    src  = "ocamltest_unix.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamltest_unix_dummy",
+    struct = "ocamltest_unix_dummy.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamltest_unix_real",
+    struct = "ocamltest_unix_real.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Unix)
+        ## (Printf)
+    ]
+)
+
+ocaml_module(
+    name   = "Options",
+    struct = "options.ml",
+    sig    = "Options_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Tests", ## (Ocamltest Tests)
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions", ## (Ocamltest Actions)
+        ## (Sys)
+        ## (Printf)
+        ## (List)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_signature(
+    name = "Options_cmi",
+    src  = "options.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Result",
+    struct = "result.ml",
+    sig    = "Result_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Result_cmi",
+    src  = "result.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Run_command",
+    struct = "run_command.ml",
+    sig    = "Run_command_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Run_command_cmi",
+    src  = "run_command.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Strace",
+    struct = "strace.ml",
+    sig    = "Strace_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ## (Printf)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "Strace_cmi",
+    src  = "strace.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+    ]
+)
+
+ocaml_module(
+    name   = "Tests",
+    struct = "tests.ml",
+    sig    = "Tests_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions", ## (Ocamltest Actions)
+        ## (String)
+        ## (Set)
+        ## (Printf)
+        ## (List)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "Tests_cmi",
+    src  = "tests.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions", ## (Ocamltest Actions)
+        ## (Set)
+    ]
+)
+
+ocaml_module(
+    name   = "Tsl_ast",
+    struct = "tsl_ast.ml",
+    sig    = "Tsl_ast_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Location)
+    ]
+)
+
+ocaml_signature(
+    name = "Tsl_ast_cmi",
+    src  = "tsl_ast.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Location)
+    ]
+)
+
+ocaml_signature(
+    name = "Tsl_lexer_cmi",
+    src  = "tsl_lexer.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Tsl_parser)
+        ## (Lexing)
+    ]
+)
+
+ocaml_module(
+    name   = "Tsl_semantics",
+    struct = "tsl_semantics.ml",
+    sig    = "Tsl_semantics_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variables", ## (Ocamltest Variables)
+        ":Tsl_ast", ## (Ocamltest Tsl_ast)
+        ":Tests", ## (Ocamltest Tests)
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions", ## (Ocamltest Actions)
+        ## (Printf)
+        ## (Location)
+        ## (List)
+        ## (Format)
+        ## (Buffer)
+    ]
+)
+
+ocaml_signature(
+    name = "Tsl_semantics_cmi",
+    src  = "tsl_semantics.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Tsl_ast", ## (Ocamltest Tsl_ast)
+        ":Tests", ## (Ocamltest Tests)
+        ":Result", ## (Ocamltest Result)
+        ":Environments", ## (Ocamltest Environments)
+        ":Actions", ## (Ocamltest Actions)
+    ]
+)
+
+ocaml_module(
+    name   = "Variables",
+    struct = "variables.ml",
+    sig    = "Variables_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (String)
+        ## (Printf)
+        ## (List)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "Variables_cmi",
+    src  = "variables.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

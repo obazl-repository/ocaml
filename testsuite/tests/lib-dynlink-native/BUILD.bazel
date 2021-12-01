@@ -1,0 +1,179 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-dynlink-native_lib",
+    modules  = [
+        ":A",
+        ":Api",
+        ":B",
+        ":Bug",
+        ":C",
+        ":Main",
+        ":Pack_client",
+        ":Packed1",
+        ":Packed1_client",
+        ":Plugin",
+        ":Plugin2",
+        ":Plugin4",
+        ":Plugin_ext",
+        ":Plugin_high_arity",
+        ":Plugin_ref",
+        ":Plugin_simple",
+        ":Plugin_thread",
+    ],
+)
+
+ocaml_module(
+    name   = "A",
+    struct = "a.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Api",
+    struct = "api.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "B",
+    struct = "b.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Bug",
+    struct = "bug.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "C",
+    struct = "c.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Main",
+    struct = "main.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pack_client",
+    struct = "pack_client.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Packed1",
+    struct = "packed1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Packed1_client",
+    struct = "packed1_client.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin",
+    struct = "plugin.ml",
+    sig    = "Plugin_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Plugin_cmi",
+    src  = "plugin.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin2",
+    struct = "plugin2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin4",
+    struct = "plugin4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin_ext",
+    struct = "plugin_ext.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin_high_arity",
+    struct = "plugin_high_arity.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin_ref",
+    struct = "plugin_ref.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin_simple",
+    struct = "plugin_simple.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin_thread",
+    struct = "plugin_thread.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

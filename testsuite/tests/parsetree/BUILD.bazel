@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_parsetree_lib",
+    modules  = [
+        ":Locations_test",
+        ":Source",
+        ":Test",
+    ],
+)
+
+ocaml_module(
+    name   = "Locations_test",
+    struct = "locations_test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Source",
+    struct = "source.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test",
+    struct = "test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

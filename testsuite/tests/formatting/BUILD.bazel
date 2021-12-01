@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_formatting_lib",
+    modules  = [
+        ":Errors_batch",
+        ":Margins",
+        ":Test_locations",
+    ],
+)
+
+ocaml_module(
+    name   = "Errors_batch",
+    struct = "errors_batch.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Margins",
+    struct = "margins.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_locations",
+    struct = "test_locations.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

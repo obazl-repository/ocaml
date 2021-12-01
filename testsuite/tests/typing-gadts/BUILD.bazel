@@ -1,0 +1,573 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-gadts_lib",
+    modules  = [
+        ":Ambiguity",
+        ":Ambivalent_apply",
+        ":Didier",
+        ":Dynamic_frisch",
+        ":Gadthead",
+        ":Name_existentials",
+        ":Nested_equations",
+        ":Omega07",
+        ":Or_patterns",
+        ":Pr10189",
+        ":Pr10271",
+        ":Pr5332",
+        ":Pr5689",
+        ":Pr5785",
+        ":Pr5848",
+        ":Pr5906",
+        ":Pr5948",
+        ":Pr5981",
+        ":Pr5985",
+        ":Pr5989",
+        ":Pr5997",
+        ":Pr6158",
+        ":Pr6163",
+        ":Pr6174",
+        ":Pr6241",
+        ":Pr6690",
+        ":Pr6817",
+        ":Pr6934",
+        ":Pr6980",
+        ":Pr6993_bad",
+        ":Pr7016",
+        ":Pr7160",
+        ":Pr7214",
+        ":Pr7222",
+        ":Pr7230",
+        ":Pr7234",
+        ":Pr7260",
+        ":Pr7269",
+        ":Pr7298",
+        ":Pr7374",
+        ":Pr7378",
+        ":Pr7381",
+        ":Pr7390",
+        ":Pr7391",
+        ":Pr7397",
+        ":Pr7421",
+        ":Pr7432",
+        ":Pr7520",
+        ":Pr7618",
+        ":Pr7747",
+        ":Pr7902",
+        ":Pr9019",
+        ":Pr9759",
+        ":Pr9799",
+        ":Principality-and-gadts",
+        ":Return_type",
+        ":Term-conv",
+        ":Test",
+        ":Unexpected_existentials",
+        ":Unify_mb",
+        ":Variables_in_mcomp",
+        ":Yallop_bugs",
+    ],
+)
+
+ocaml_module(
+    name   = "Ambiguity",
+    struct = "ambiguity.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ambivalent_apply",
+    struct = "ambivalent_apply.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Didier",
+    struct = "didier.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Dynamic_frisch",
+    struct = "dynamic_frisch.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gadthead",
+    struct = "gadthead.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Name_existentials",
+    struct = "name_existentials.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Nested_equations",
+    struct = "nested_equations.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Omega07",
+    struct = "omega07.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Or_patterns",
+    struct = "or_patterns.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr10189",
+    struct = "pr10189.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr10271",
+    struct = "pr10271.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5332",
+    struct = "pr5332.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5689",
+    struct = "pr5689.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5785",
+    struct = "pr5785.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5848",
+    struct = "pr5848.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5906",
+    struct = "pr5906.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5948",
+    struct = "pr5948.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5981",
+    struct = "pr5981.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5985",
+    struct = "pr5985.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5989",
+    struct = "pr5989.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5997",
+    struct = "pr5997.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6158",
+    struct = "pr6158.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6163",
+    struct = "pr6163.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6174",
+    struct = "pr6174.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6241",
+    struct = "pr6241.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6690",
+    struct = "pr6690.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6817",
+    struct = "pr6817.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6934",
+    struct = "pr6934.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6980",
+    struct = "pr6980.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6993_bad",
+    struct = "pr6993_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7016",
+    struct = "pr7016.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7160",
+    struct = "pr7160.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7214",
+    struct = "pr7214.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7222",
+    struct = "pr7222.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7230",
+    struct = "pr7230.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7234",
+    struct = "pr7234.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7260",
+    struct = "pr7260.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7269",
+    struct = "pr7269.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7298",
+    struct = "pr7298.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7374",
+    struct = "pr7374.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7378",
+    struct = "pr7378.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7381",
+    struct = "pr7381.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7390",
+    struct = "pr7390.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7391",
+    struct = "pr7391.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7397",
+    struct = "pr7397.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7421",
+    struct = "pr7421.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7432",
+    struct = "pr7432.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7520",
+    struct = "pr7520.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7618",
+    struct = "pr7618.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7747",
+    struct = "pr7747.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7902",
+    struct = "pr7902.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr9019",
+    struct = "pr9019.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr9759",
+    struct = "pr9759.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr9799",
+    struct = "pr9799.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Principality-and-gadts",
+    struct = "principality-and-gadts.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Return_type",
+    struct = "return_type.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Term-conv",
+    struct = "term-conv.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test",
+    struct = "test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unexpected_existentials",
+    struct = "unexpected_existentials.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unify_mb",
+    struct = "unify_mb.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Variables_in_mcomp",
+    struct = "variables_in_mcomp.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Yallop_bugs",
+    struct = "yallop_bugs.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

@@ -1,0 +1,96 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-polyvariants-bugs_lib",
+    modules  = [
+        ":Pr4775_ok",
+        ":Pr4933_ok",
+        ":Pr5057_ok",
+        ":Pr5057a_bad",
+        ":Pr7199_ok",
+        ":Pr7817_bad",
+        ":Pr7824",
+        ":Pr8575",
+        ":Privrowsabate_ok",
+    ],
+)
+
+ocaml_module(
+    name   = "Pr4775_ok",
+    struct = "pr4775_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4933_ok",
+    struct = "pr4933_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5057_ok",
+    struct = "pr5057_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5057a_bad",
+    struct = "pr5057a_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7199_ok",
+    struct = "pr7199_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7817_bad",
+    struct = "pr7817_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7824",
+    struct = "pr7824.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr8575",
+    struct = "pr8575.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Privrowsabate_ok",
+    struct = "privrowsabate_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

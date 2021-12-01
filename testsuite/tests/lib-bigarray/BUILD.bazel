@@ -1,0 +1,60 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-bigarray_lib",
+    modules  = [
+        ":Bigarrays",
+        ":Change_layout",
+        ":Fftba",
+        ":Pr5115",
+        ":Weak_bigarray",
+    ],
+)
+
+ocaml_module(
+    name   = "Bigarrays",
+    struct = "bigarrays.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Change_layout",
+    struct = "change_layout.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Fftba",
+    struct = "fftba.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5115",
+    struct = "pr5115.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Weak_bigarray",
+    struct = "weak_bigarray.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

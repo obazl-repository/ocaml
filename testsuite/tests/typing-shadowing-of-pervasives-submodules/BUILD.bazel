@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-shadowing-of-pervasives-submodules_lib",
+    modules  = [
+        ":LargeFile",
+        ":Redefine_largefile",
+        ":Redefine_largefile_top",
+    ],
+)
+
+ocaml_module(
+    name   = "LargeFile",
+    struct = "largeFile.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Redefine_largefile",
+    struct = "redefine_largefile.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Redefine_largefile_top",
+    struct = "redefine_largefile_top.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

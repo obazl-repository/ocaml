@@ -1,0 +1,38 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "manual_tools_lib",
+    modules  = [
+        ":Texquote2",
+        ":Transfmain",
+    ],
+)
+
+ocaml_module(
+    name   = "Texquote2",
+    struct = "texquote2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (String)
+        ## (Printf)
+    ]
+)
+
+ocaml_module(
+    name   = "Transfmain",
+    struct = "transfmain.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Transf)
+        ## (Printexc)
+        ## (Lexing)
+    ]
+)
+

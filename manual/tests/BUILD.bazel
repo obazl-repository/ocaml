@@ -1,0 +1,34 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "manual_tests_lib",
+    modules  = [
+        ":Cross_reference_checker",
+    ],
+)
+
+ocaml_module(
+    name   = "Cross_reference_checker",
+    struct = "cross_reference_checker.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (String)
+        ## (Scanf)
+        ## (Pparse)
+        ## (Parsetree)
+        ## (Map)
+        ## (Location)
+        ## (List)
+        ## (Format)
+        ## (Ast_iterator)
+        ## (Arg)
+    ]
+)
+

@@ -1,0 +1,37 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_reproducibility_lib",
+    modules  = [
+        ":Cmis_on_file_system",
+    ],
+    signatures  = [
+        ":Cmis_on_file_system_companion_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Cmis_on_file_system",
+    struct = "cmis_on_file_system.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Cmis_on_file_system_companion_cmi",
+    src  = "cmis_on_file_system_companion.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

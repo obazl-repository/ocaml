@@ -1,0 +1,60 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_runtime-naked-pointers_lib",
+    modules  = [
+        ":Np",
+        ":Np1",
+        ":Np2",
+        ":Np3",
+        ":Np4",
+    ],
+)
+
+ocaml_module(
+    name   = "Np",
+    struct = "np.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Np1",
+    struct = "np1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Np2",
+    struct = "np2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Np3",
+    struct = "np3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Np4",
+    struct = "np4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

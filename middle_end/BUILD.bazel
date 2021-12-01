@@ -1,0 +1,447 @@
+load("//bzl:rules.bzl",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
+)
+
+load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS = ROOT_SIG_OPTS
+
+STDLIB = ["//stdlib"]
+
+bootstrap_library(
+    name = "middle_end_lib",
+    manifest  = [
+        ":Backend_var",
+        ":Clambda",
+        ":Clambda_primitives",
+        ":Compilation_unit",
+        ":Compilenv",
+        ":Convert_primitives",
+        ":Internal_variable_names",
+        ":Linkage_name",
+        ":Printclambda",
+        ":Printclambda_primitives",
+        ":Semantics_of_primitives",
+        ":Symbol",
+        ":Variable",
+    ],
+    # signatures  = [
+    #     ":Backend_intf_cmi",
+    # ],
+)
+
+bootstrap_signature(
+    name = "Backend_intf_cmi",
+    src  = "backend_intf.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Simple_value_approx)
+        ## (Ident)
+        ## (Closure_id)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Backend_var",
+    struct = "backend_var.ml",
+    sig    = "Backend_var_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Path)
+        ## (Ident)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Clflags)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Backend_var_cmi",
+    src  = "backend_var.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        "//typing:Path_cmi",
+        "//typing:Ident_cmi",
+        ## (Format)
+        "//lambda:Debuginfo_cmi"
+    ],
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Clambda",
+    struct = "clambda.ml",
+    sig    = "Clambda_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ":Backend_var", ## (Middle_end Backend_var)
+        ":Debuginfo", ## (Lambda Debuginfo)
+        ## (String)
+        ## (Path)
+        ## (Nativeint)
+        ## (Int64)
+        ## (Int32)
+        ## (Ident)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Clambda_cmi",
+    src  = "clambda.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ":Backend_var", ## (Middle_end Backend_var)
+        ":Debuginfo", ## (Lambda Debuginfo)
+        ## (Path)
+        ## (Ident)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Clambda_primitives",
+    struct = "clambda_primitives.ml",
+    sig    = "Clambda_primitives_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Types)
+        ## (Primitive)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Clambda_primitives_cmi",
+    src  = "clambda_primitives.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ## (Types)
+        ## (Primitive)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Compilation_unit",
+    struct = "compilation_unit.ml",
+    sig    = "Compilation_unit_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Linkage_name", ## (Middle_end Linkage_name)
+        ## (String)
+        ## (Misc)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Compilation_unit_cmi",
+    src  = "compilation_unit.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Linkage_name", ## (Middle_end Linkage_name)
+        ## (Identifiable)
+        ## (Ident)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Compilenv",
+    struct = "compilenv.ml",
+    sig    = "Compilenv_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Symbol", ## (Middle_end Symbol)
+        ":Linkage_name", ## (Middle_end Linkage_name)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda", ## (Middle_end Clambda)
+        ## (Warnings)
+        ## (String)
+        ## (Simple_value_approx)
+        ## (Set_of_closures_id)
+        ## (Path)
+        ## (Misc)
+        ## (Map)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Int)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Export_info)
+        ## (Env)
+        ## (Digest)
+        ## (Config)
+        ## (Cmx_format)
+        ## (Closure_id)
+        ## (Clflags)
+        ## (Buffer)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Compilenv_cmi",
+    src  = "compilenv.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Symbol", ## (Middle_end Symbol)
+        ":Linkage_name", ## (Middle_end Linkage_name)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda", ## (Middle_end Clambda)
+        ## (Simple_value_approx)
+        ## (Set_of_closures_id)
+        ## (Ident)
+        ## (Format)
+        ## (Export_info)
+        ## (Digest)
+        ## (Cmx_format)
+        ## (Closure_id)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Convert_primitives",
+    struct = "convert_primitives.ml",
+    sig    = "Convert_primitives_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Printlambda)
+        ## (Misc)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Convert_primitives_cmi",
+    src  = "convert_primitives.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Internal_variable_names",
+    struct = "internal_variable_names.ml",
+    sig    = "Internal_variable_names_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Location)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Filename)
+        ## (Debuginfo)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Internal_variable_names_cmi",
+    src  = "internal_variable_names.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Linkage_name",
+    struct = "linkage_name.ml",
+    sig    = "Linkage_name_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (String)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+        ## (Hashtbl)
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Linkage_name_cmi",
+    src  = "linkage_name.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ## (Identifiable)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Printclambda",
+    struct = "printclambda.ml",
+    sig    = "Printclambda_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
+        ":Clambda", ## (Middle_end Clambda)
+        ":Backend_var", ## (Middle_end Backend_var)
+        ## (String)
+        ## (Printlambda)
+        ## (List)
+        ## (Ident)
+        ## (Format)
+        ## (Asttypes)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Printclambda_cmi",
+    src  = "printclambda.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Clambda", ## (Middle_end Clambda)
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Printclambda_primitives",
+    struct = "printclambda_primitives.ml",
+    sig    = "Printclambda_primitives_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ":Printlambda", ## (Lambda Printlambda)
+        ":Lambda", ## (Lambda Lambda)
+        ":Debuginfo", ## (Lambda Debuginfo)
+        ## (Printf)
+        ## (Primitive)
+        ## (Format)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Printclambda_primitives_cmi",
+    src  = "printclambda_primitives.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Format)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Semantics_of_primitives",
+    struct = "semantics_of_primitives.ml",
+    sig    = "Semantics_of_primitives_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Semantics_of_primitives_cmi",
+    src  = "semantics_of_primitives.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Asttypes)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Symbol",
+    struct = "symbol.ml",
+    sig    = "Symbol_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Variable", ## (Middle_end Variable)
+        ":Linkage_name", ## (Middle_end Linkage_name)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Misc)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Symbol_cmi",
+    src  = "symbol.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Variable", ## (Middle_end Variable)
+        ":Linkage_name", ## (Middle_end Linkage_name)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Identifiable)
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Variable",
+    struct = "variable.ml",
+    sig    = "Variable_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (T)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Int)
+        ## (Identifiable)
+        ## (Ident)
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Variable_cmi",
+    src  = "variable.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Identifiable)
+        ## (Ident)
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+

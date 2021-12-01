@@ -1,0 +1,195 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_asmcomp_lib",
+    modules  = [
+        ":0001-test",
+        ":Bind_tuples",
+        ":Compare",
+        ":Func_sections",
+        ":Is_static",
+        ":Is_static_flambda",
+        ":Is_static_flambda_dep",
+        ":Lift_mutable_let_flambda",
+        ":Optargs",
+        ":Polling_insertion",
+        ":Register_typing",
+        ":Register_typing_switch",
+        ":Simple_float_const",
+        ":Simple_float_const_opaque",
+        ":Static_float_array_flambda",
+        ":Static_float_array_flambda_opaque",
+        ":Staticalloc",
+        ":Try_checkbound",
+        ":Unrolling_flambda",
+        ":Unrolling_flambda2",
+    ],
+)
+
+ocaml_module(
+    name   = "0001-test",
+    struct = "0001-test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Bind_tuples",
+    struct = "bind_tuples.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Compare",
+    struct = "compare.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Func_sections",
+    struct = "func_sections.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Is_static",
+    struct = "is_static.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Is_static_flambda",
+    struct = "is_static_flambda.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Is_static_flambda_dep",
+    struct = "is_static_flambda_dep.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lift_mutable_let_flambda",
+    struct = "lift_mutable_let_flambda.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Optargs",
+    struct = "optargs.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Polling_insertion",
+    struct = "polling_insertion.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Register_typing",
+    struct = "register_typing.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Register_typing_switch",
+    struct = "register_typing_switch.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Simple_float_const",
+    struct = "simple_float_const.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Simple_float_const_opaque",
+    struct = "simple_float_const_opaque.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Static_float_array_flambda",
+    struct = "static_float_array_flambda.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Static_float_array_flambda_opaque",
+    struct = "static_float_array_flambda_opaque.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Staticalloc",
+    struct = "staticalloc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Try_checkbound",
+    struct = "try_checkbound.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unrolling_flambda",
+    struct = "unrolling_flambda.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unrolling_flambda2",
+    struct = "unrolling_flambda2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

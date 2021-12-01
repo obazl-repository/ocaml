@@ -1,0 +1,60 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_basic-float_lib",
+    modules  = [
+        ":Float_compare",
+        ":Float_literals",
+        ":Tfloat_hex",
+        ":Tfloat_record",
+        ":Zero_sized_float_arrays",
+    ],
+)
+
+ocaml_module(
+    name   = "Float_compare",
+    struct = "float_compare.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Float_literals",
+    struct = "float_literals.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Tfloat_hex",
+    struct = "tfloat_hex.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Tfloat_record",
+    struct = "tfloat_record.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Zero_sized_float_arrays",
+    struct = "zero_sized_float_arrays.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

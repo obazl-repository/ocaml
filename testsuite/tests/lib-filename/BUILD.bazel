@@ -1,0 +1,60 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-filename_lib",
+    modules  = [
+        ":Extension",
+        ":Myecho",
+        ":Null",
+        ":Quotecommand",
+        ":Suffix",
+    ],
+)
+
+ocaml_module(
+    name   = "Extension",
+    struct = "extension.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Myecho",
+    struct = "myecho.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Null",
+    struct = "null.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Quotecommand",
+    struct = "quotecommand.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Suffix",
+    struct = "suffix.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

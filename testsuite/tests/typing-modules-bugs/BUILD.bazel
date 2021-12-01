@@ -1,0 +1,357 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-modules-bugs_lib",
+    modules  = [
+        ":Gatien_baron_20131019_ok",
+        ":Pr5164_ok",
+        ":Pr51_ok",
+        ":Pr5663_ok",
+        ":Pr5914_ok",
+        ":Pr6240_ok",
+        ":Pr6293_bad",
+        ":Pr6427_bad",
+        ":Pr6485_ok",
+        ":Pr6513_ok",
+        ":Pr6572_ok",
+        ":Pr6651_ok",
+        ":Pr6752_bad",
+        ":Pr6752_ok",
+        ":Pr6899_first_bad",
+        ":Pr6899_ok",
+        ":Pr6899_second_bad",
+        ":Pr6944_ok",
+        ":Pr6954_ok",
+        ":Pr6981_ok",
+        ":Pr6982_ok",
+        ":Pr6985_extended",
+        ":Pr6985_ok",
+        ":Pr6992_bad",
+        ":Pr7036_ok",
+        ":Pr7082_ok",
+        ":Pr7112_bad",
+        ":Pr7112_ok",
+        ":Pr7152_ok",
+        ":Pr7182_ok",
+        ":Pr7305_principal",
+        ":Pr7321_ok",
+        ":Pr7414_2_bad",
+        ":Pr7414_bad",
+        ":Pr7519_ok",
+        ":Pr7601_ok",
+        ":Pr7601a_ok",
+        ":Pr9695_bad",
+    ],
+)
+
+ocaml_module(
+    name   = "Gatien_baron_20131019_ok",
+    struct = "gatien_baron_20131019_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5164_ok",
+    struct = "pr5164_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr51_ok",
+    struct = "pr51_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5663_ok",
+    struct = "pr5663_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5914_ok",
+    struct = "pr5914_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6240_ok",
+    struct = "pr6240_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6293_bad",
+    struct = "pr6293_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6427_bad",
+    struct = "pr6427_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6485_ok",
+    struct = "pr6485_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6513_ok",
+    struct = "pr6513_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6572_ok",
+    struct = "pr6572_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6651_ok",
+    struct = "pr6651_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6752_bad",
+    struct = "pr6752_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6752_ok",
+    struct = "pr6752_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6899_first_bad",
+    struct = "pr6899_first_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6899_ok",
+    struct = "pr6899_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6899_second_bad",
+    struct = "pr6899_second_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6944_ok",
+    struct = "pr6944_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6954_ok",
+    struct = "pr6954_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6981_ok",
+    struct = "pr6981_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6982_ok",
+    struct = "pr6982_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6985_extended",
+    struct = "pr6985_extended.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6985_ok",
+    struct = "pr6985_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6992_bad",
+    struct = "pr6992_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7036_ok",
+    struct = "pr7036_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7082_ok",
+    struct = "pr7082_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7112_bad",
+    struct = "pr7112_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7112_ok",
+    struct = "pr7112_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7152_ok",
+    struct = "pr7152_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7182_ok",
+    struct = "pr7182_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7305_principal",
+    struct = "pr7305_principal.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7321_ok",
+    struct = "pr7321_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7414_2_bad",
+    struct = "pr7414_2_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7414_bad",
+    struct = "pr7414_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7519_ok",
+    struct = "pr7519_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7601_ok",
+    struct = "pr7601_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7601a_ok",
+    struct = "pr7601a_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr9695_bad",
+    struct = "pr9695_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

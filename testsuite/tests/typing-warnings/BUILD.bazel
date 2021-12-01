@@ -1,0 +1,222 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-warnings_lib",
+    modules  = [
+        ":Ambiguous_guarded_disjunction",
+        ":Application",
+        ":Coercions",
+        ":Disable_warnings_classes",
+        ":Exhaustiveness",
+        ":Fragile_matching",
+        ":Never_returns",
+        ":Open_warnings",
+        ":Pr5892",
+        ":Pr6587",
+        ":Pr6872",
+        ":Pr7085",
+        ":Pr7115",
+        ":Pr7261",
+        ":Pr7297",
+        ":Pr7553",
+        ":Pr9244",
+        ":Records",
+        ":Unused_functor_parameter",
+        ":Unused_rec",
+        ":Unused_recmodule",
+        ":Unused_types",
+        ":Warning16",
+    ],
+)
+
+ocaml_module(
+    name   = "Ambiguous_guarded_disjunction",
+    struct = "ambiguous_guarded_disjunction.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Application",
+    struct = "application.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Coercions",
+    struct = "coercions.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Disable_warnings_classes",
+    struct = "disable_warnings_classes.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Exhaustiveness",
+    struct = "exhaustiveness.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Fragile_matching",
+    struct = "fragile_matching.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Never_returns",
+    struct = "never_returns.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Open_warnings",
+    struct = "open_warnings.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5892",
+    struct = "pr5892.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6587",
+    struct = "pr6587.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6872",
+    struct = "pr6872.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7085",
+    struct = "pr7085.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7115",
+    struct = "pr7115.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7261",
+    struct = "pr7261.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7297",
+    struct = "pr7297.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7553",
+    struct = "pr7553.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr9244",
+    struct = "pr9244.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Records",
+    struct = "records.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unused_functor_parameter",
+    struct = "unused_functor_parameter.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unused_rec",
+    struct = "unused_rec.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unused_recmodule",
+    struct = "unused_recmodule.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unused_types",
+    struct = "unused_types.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Warning16",
+    struct = "warning16.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

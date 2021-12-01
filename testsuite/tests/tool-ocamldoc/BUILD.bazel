@@ -1,0 +1,217 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-ocamldoc_lib",
+    modules  = [
+        ":Entities",
+        ":Extensible_variant",
+        ":Inline_records_bis",
+        ":Loop",
+        ":Module_whitespace",
+        ":Odoc_test",
+        ":T01",
+        ":T02",
+        ":T03",
+        ":T04",
+        ":T05",
+    ],
+    signatures  = [
+        ":Documentation_tags_cmi",
+        ":Include_module_type_of_cmi",
+        ":Inline_records_cmi",
+        ":Item_ids_cmi",
+        ":Level_0_cmi",
+        ":Linebreaks_cmi",
+        ":No_preamble_cmi",
+        ":Paragraph_cmi",
+        ":Test_cmi",
+        ":Variants_cmi",
+        ":Latex_ref_cmi",
+    ],
+)
+
+ocaml_signature(
+    name = "Documentation_tags_cmi",
+    src  = "Documentation_tags.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Entities",
+    struct = "Entities.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Extensible_variant",
+    struct = "Extensible_variant.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Include_module_type_of_cmi",
+    src  = "Include_module_type_of.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Inline_records_cmi",
+    src  = "Inline_records.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Inline_records_bis",
+    struct = "Inline_records_bis.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Item_ids_cmi",
+    src  = "Item_ids.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Level_0_cmi",
+    src  = "Level_0.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Linebreaks_cmi",
+    src  = "Linebreaks.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Loop",
+    struct = "Loop.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Module_whitespace",
+    struct = "Module_whitespace.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "No_preamble_cmi",
+    src  = "No_preamble.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Paragraph_cmi",
+    src  = "Paragraph.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Test_cmi",
+    src  = "Test.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Variants_cmi",
+    src  = "Variants.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Latex_ref_cmi",
+    src  = "latex_ref.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_test",
+    struct = "odoc_test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T01",
+    struct = "t01.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T02",
+    struct = "t02.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T03",
+    struct = "t03.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T04",
+    struct = "t04.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T05",
+    struct = "t05.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

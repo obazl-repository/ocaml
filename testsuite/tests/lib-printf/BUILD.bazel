@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-printf_lib",
+    modules  = [
+        ":Pr6534",
+        ":Pr6938",
+        ":Tprintf",
+    ],
+)
+
+ocaml_module(
+    name   = "Pr6534",
+    struct = "pr6534.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6938",
+    struct = "pr6938.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Tprintf",
+    struct = "tprintf.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

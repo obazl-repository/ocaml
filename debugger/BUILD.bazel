@@ -1,0 +1,935 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "debugger_lib",
+    modules  = [
+        ":Breakpoints",
+        ":Checkpoints",
+        ":Command_line",
+        ":Debugcom",
+        ":Debugger_config",
+        ":Eval",
+        ":Events",
+        ":Exec",
+        ":Frames",
+        ":History",
+        ":Input_handling",
+        ":Int64ops",
+        ":Loadprinter",
+        ":Main",
+        ":Ocamldebug_entry",
+        ":Parameters",
+        ":Pattern_matching",
+        ":Pos",
+        ":Primitives",
+        ":Printval",
+        ":Program_loading",
+        ":Program_management",
+        ":Question",
+        ":Show_information",
+        ":Show_source",
+        ":Source",
+        ":Symbols",
+        ":Time_travel",
+        ":Trap_barrier",
+        ":Unix_tools",
+    ],
+    signatures  = [
+        ":Debugger_lexer_cmi",
+        ":Parser_aux_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Breakpoints",
+    struct = "breakpoints.ml",
+    sig    = "Breakpoints_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Symbols", ## (Debugger Symbols)
+        ":Pos", ## (Debugger Pos)
+        ":Parameters", ## (Debugger Parameters)
+        ":Exec", ## (Debugger Exec)
+        ":Events", ## (Debugger Events)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ":Debugcom", ## (Debugger Debugcom)
+        ":Checkpoints", ## (Debugger Checkpoints)
+        ## (Printf)
+        ## (Misc)
+        ## (List)
+        ## (Int)
+        ## (Instruct)
+        ## (Fun)
+    ]
+)
+
+ocaml_signature(
+    name = "Breakpoints_cmi",
+    src  = "breakpoints.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Events", ## (Debugger Events)
+        ":Debugcom", ## (Debugger Debugcom)
+    ]
+)
+
+ocaml_module(
+    name   = "Checkpoints",
+    struct = "checkpoints.ml",
+    sig    = "Checkpoints_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+        ":Int64ops", ## (Debugger Int64ops)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Option)
+    ]
+)
+
+ocaml_signature(
+    name = "Checkpoints_cmi",
+    src  = "checkpoints.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+        ":Debugcom", ## (Debugger Debugcom)
+    ]
+)
+
+ocaml_module(
+    name   = "Command_line",
+    struct = "command_line.ml",
+    sig    = "Command_line_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Unix_tools", ## (Debugger Unix_tools)
+        ":Time_travel", ## (Debugger Time_travel)
+        ":Symbols", ## (Debugger Symbols)
+        ":Source", ## (Debugger Source)
+        ":Show_source", ## (Debugger Show_source)
+        ":Show_information", ## (Debugger Show_information)
+        ":Question", ## (Debugger Question)
+        ":Program_management", ## (Debugger Program_management)
+        ":Program_loading", ## (Debugger Program_loading)
+        ":Printval", ## (Debugger Printval)
+        ":Primitives", ## (Debugger Primitives)
+        ":Pos", ## (Debugger Pos)
+        ":Parser_aux", ## (Debugger Parser_aux)
+        ":Parameters", ## (Debugger Parameters)
+        ":Loadprinter", ## (Debugger Loadprinter)
+        ":Int64ops", ## (Debugger Int64ops)
+        ":Input_handling", ## (Debugger Input_handling)
+        ":History", ## (Debugger History)
+        ":Frames", ## (Debugger Frames)
+        ":Events", ## (Debugger Events)
+        ":Eval", ## (Debugger Eval)
+        ":Debugger_lexer", ## (Debugger Debugger_lexer)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ":Debugcom", ## (Debugger Debugcom)
+        ":Checkpoints", ## (Debugger Checkpoints)
+        ":Breakpoints", ## (Debugger Breakpoints)
+        ## (Unix)
+        ## (Types)
+        ## (Sys)
+        ## (String)
+        ## (Remote_value)
+        ## (Printf)
+        ## (Longident)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Lexing)
+        ## (Int)
+        ## (Instruct)
+        ## (Hashtbl)
+        ## (Fun)
+        ## (Format)
+        ## (Filename)
+        ## (Envaux)
+        ## (Env)
+        ## (Debugger_parser)
+    ]
+)
+
+ocaml_signature(
+    name = "Command_line_cmi",
+    src  = "command_line.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Lexing)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Debugcom",
+    struct = "debugcom.ml",
+    sig    = "Debugcom_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+        ":Int64ops", ## (Debugger Int64ops)
+        ":Input_handling", ## (Debugger Input_handling)
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Obj)
+        ## (Misc)
+        ## (List)
+        ## (Int64)
+        ## (Instruct)
+        ## (Char)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Debugcom_cmi",
+    src  = "debugcom.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+        ## (Instruct)
+    ]
+)
+
+ocaml_module(
+    name   = "Debugger_config",
+    struct = "debugger_config.ml",
+    sig    = "Debugger_config_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Int64ops", ## (Debugger Int64ops)
+        ## (Sys)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "Debugger_config_cmi",
+    src  = "debugger_config.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_signature(
+    name = "Debugger_lexer_cmi",
+    src  = "debugger_lexer.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Lexing)
+        ## (Debugger_parser)
+    ]
+)
+
+ocaml_module(
+    name   = "Eval",
+    struct = "eval.ml",
+    sig    = "Eval_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Printval", ## (Debugger Printval)
+        ":Parser_aux", ## (Debugger Parser_aux)
+        ":Frames", ## (Debugger Frames)
+        ":Events", ## (Debugger Events)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Types)
+        ## (Symtable)
+        ## (Subst)
+        ## (String)
+        ## (Printtyp)
+        ## (Predef)
+        ## (Path)
+        ## (Misc)
+        ## (Longident)
+        ## (List)
+        ## (Instruct)
+        ## (Ident)
+        ## (Format)
+        ## (Env)
+        ## (Ctype)
+        ## (Char)
+        ## (Btype)
+    ]
+)
+
+ocaml_signature(
+    name = "Eval_cmi",
+    src  = "eval.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Parser_aux", ## (Debugger Parser_aux)
+        ":Events", ## (Debugger Events)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Types)
+        ## (Path)
+        ## (Longident)
+        ## (Ident)
+        ## (Format)
+        ## (Env)
+    ]
+)
+
+ocaml_module(
+    name   = "Events",
+    struct = "events.ml",
+    sig    = "Events_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Location)
+        ## (Instruct)
+    ]
+)
+
+ocaml_signature(
+    name = "Events_cmi",
+    src  = "events.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Lexing)
+        ## (Instruct)
+    ]
+)
+
+ocaml_module(
+    name   = "Exec",
+    struct = "exec.ml",
+    sig    = "Exec_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+    ]
+)
+
+ocaml_signature(
+    name = "Exec_cmi",
+    src  = "exec.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Frames",
+    struct = "frames.ml",
+    sig    = "Frames_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Symbols", ## (Debugger Symbols)
+        ":Events", ## (Debugger Events)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Misc)
+        ## (Lexing)
+        ## (Instruct)
+    ]
+)
+
+ocaml_signature(
+    name = "Frames_cmi",
+    src  = "frames.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Events", ## (Debugger Events)
+    ]
+)
+
+ocaml_module(
+    name   = "History",
+    struct = "history.ml",
+    sig    = "History_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+        ":Int64ops", ## (Debugger Int64ops)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ":Checkpoints", ## (Debugger Checkpoints)
+        ## (List)
+    ]
+)
+
+ocaml_signature(
+    name = "History_cmi",
+    src  = "history.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Input_handling",
+    struct = "input_handling.ml",
+    sig    = "Input_handling_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+        ":Parameters", ## (Debugger Parameters)
+        ## (Unix)
+        ## (List)
+        ## (Fun)
+    ]
+)
+
+ocaml_signature(
+    name = "Input_handling_cmi",
+    src  = "input_handling.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+    ]
+)
+
+ocaml_module(
+    name   = "Int64ops",
+    struct = "int64ops.ml",
+    sig    = "Int64ops_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Int64)
+    ]
+)
+
+ocaml_signature(
+    name = "Int64ops_cmi",
+    src  = "int64ops.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Loadprinter",
+    struct = "loadprinter.ml",
+    sig    = "Loadprinter_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Printval", ## (Debugger Printval)
+        ":Parameters", ## (Debugger Parameters)
+        ## (Types)
+        ## (Symtable)
+        ## (String)
+        ## (Printtyp)
+        ## (Path)
+        ## (Obj)
+        ## (Misc)
+        ## (Longident)
+        ## (Load_path)
+        ## (List)
+        ## (Ident)
+        ## (Format)
+        ## (Filename)
+        ## (Env)
+        ## (Dynlink)
+        ## (Ctype)
+    ]
+)
+
+ocaml_signature(
+    name = "Loadprinter_cmi",
+    src  = "loadprinter.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Longident)
+        ## (Format)
+        ## (Dynlink)
+    ]
+)
+
+ocaml_module(
+    name   = "Main",
+    struct = "main.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Unix_tools", ## (Debugger Unix_tools)
+        ":Time_travel", ## (Debugger Time_travel)
+        ":Show_information", ## (Debugger Show_information)
+        ":Question", ## (Debugger Question)
+        ":Program_management", ## (Debugger Program_management)
+        ":Primitives", ## (Debugger Primitives)
+        ":Parameters", ## (Debugger Parameters)
+        ":Loadprinter", ## (Debugger Loadprinter)
+        ":Input_handling", ## (Debugger Input_handling)
+        ":Frames", ## (Debugger Frames)
+        ":Exec", ## (Debugger Exec)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ":Command_line", ## (Debugger Command_line)
+        ":Checkpoints", ## (Debugger Checkpoints)
+        ## (Unix)
+        ## (Sys)
+        ## (String)
+        ## (Persistent_env)
+        ## (Misc)
+        ## (Load_path)
+        ## (Lexing)
+        ## (Int64)
+        ## (Int)
+        ## (Format)
+        ## (Filename)
+        ## (Config)
+        ## (Cmi_format)
+        ## (Clflags)
+        ## (Callback)
+        ## (Buffer)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Ocamldebug_entry",
+    struct = "ocamldebug_entry.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Unix)
+        ## (Ocamldebug)
+    ]
+)
+
+ocaml_module(
+    name   = "Parameters",
+    struct = "parameters.ml",
+    sig    = "Parameters_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ## (Load_path)
+        ## (Hashtbl)
+        ## (Filename)
+        ## (Envaux)
+        ## (Config)
+    ]
+)
+
+ocaml_signature(
+    name = "Parameters_cmi",
+    src  = "parameters.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Parser_aux_cmi",
+    src  = "parser_aux.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Longident)
+    ]
+)
+
+ocaml_module(
+    name   = "Pattern_matching",
+    struct = "pattern_matching.ml",
+    sig    = "Pattern_matching_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Parser_aux", ## (Debugger Parser_aux)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Typedtree)
+        ## (Misc)
+        ## (List)
+        ## (Ctype)
+    ]
+)
+
+ocaml_signature(
+    name = "Pattern_matching_cmi",
+    src  = "pattern_matching.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Parser_aux", ## (Debugger Parser_aux)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Typedtree)
+    ]
+)
+
+ocaml_module(
+    name   = "Pos",
+    struct = "pos.ml",
+    sig    = "Pos_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Events", ## (Debugger Events)
+        ## (Printf)
+        ## (Location)
+        ## (Lexing)
+        ## (Instruct)
+    ]
+)
+
+ocaml_signature(
+    name = "Pos_cmi",
+    src  = "pos.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Events", ## (Debugger Events)
+    ]
+)
+
+ocaml_module(
+    name   = "Primitives",
+    struct = "primitives.ml",
+    sig    = "Primitives_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Unix)
+        ## (String)
+        ## (Printexc)
+    ]
+)
+
+ocaml_signature(
+    name = "Primitives_cmi",
+    src  = "primitives.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Unix)
+    ]
+)
+
+ocaml_module(
+    name   = "Printval",
+    struct = "printval.ml",
+    sig    = "Printval_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Parser_aux", ## (Debugger Parser_aux)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Types)
+        ## (Symtable)
+        ## (Printtyp)
+        ## (Outcometree)
+        ## (Oprint)
+        ## (Obj)
+        ## (Int)
+        ## (Hashtbl)
+        ## (Genprintval)
+        ## (Format)
+        ## (Env)
+    ]
+)
+
+ocaml_signature(
+    name = "Printval_cmi",
+    src  = "printval.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Parser_aux", ## (Debugger Parser_aux)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Types)
+        ## (Path)
+        ## (Obj)
+        ## (Format)
+        ## (Env)
+    ]
+)
+
+ocaml_module(
+    name   = "Program_loading",
+    struct = "program_loading.ml",
+    sig    = "Program_loading_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Unix_tools", ## (Debugger Unix_tools)
+        ":Primitives", ## (Debugger Primitives)
+        ":Parameters", ## (Debugger Parameters)
+        ":Input_handling", ## (Debugger Input_handling)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ## (Unix)
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (List)
+        ## (Filename)
+        ## (Buffer)
+    ]
+)
+
+ocaml_signature(
+    name = "Program_loading_cmi",
+    src  = "program_loading.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+    ]
+)
+
+ocaml_module(
+    name   = "Program_management",
+    struct = "program_management.ml",
+    sig    = "Program_management_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Unix_tools", ## (Debugger Unix_tools)
+        ":Time_travel", ## (Debugger Time_travel)
+        ":Symbols", ## (Debugger Symbols)
+        ":Question", ## (Debugger Question)
+        ":Program_loading", ## (Debugger Program_loading)
+        ":Primitives", ## (Debugger Primitives)
+        ":Parameters", ## (Debugger Parameters)
+        ":Int64ops", ## (Debugger Int64ops)
+        ":Input_handling", ## (Debugger Input_handling)
+        ":History", ## (Debugger History)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ":Breakpoints", ## (Debugger Breakpoints)
+        ## (Unix)
+        ## (Printf)
+        ## (Load_path)
+        ## (Envaux)
+        ## (Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "Program_management_cmi",
+    src  = "program_management.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Question",
+    struct = "question.ml",
+    sig    = "Question_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+        ":Input_handling", ## (Debugger Input_handling)
+        ":Debugger_lexer", ## (Debugger Debugger_lexer)
+        ## (String)
+        ## (Lexing)
+        ## (Fun)
+    ]
+)
+
+ocaml_signature(
+    name = "Question_cmi",
+    src  = "question.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Show_information",
+    struct = "show_information.ml",
+    sig    = "Show_information_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Symbols", ## (Debugger Symbols)
+        ":Source", ## (Debugger Source)
+        ":Show_source", ## (Debugger Show_source)
+        ":Printval", ## (Debugger Printval)
+        ":Parameters", ## (Debugger Parameters)
+        ":Frames", ## (Debugger Frames)
+        ":Events", ## (Debugger Events)
+        ":Debugcom", ## (Debugger Debugcom)
+        ":Checkpoints", ## (Debugger Checkpoints)
+        ":Breakpoints", ## (Debugger Breakpoints)
+        ## (String)
+        ## (Misc)
+        ## (List)
+        ## (Lexing)
+        ## (Instruct)
+        ## (Format)
+    ]
+)
+
+ocaml_signature(
+    name = "Show_information_cmi",
+    src  = "show_information.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Events", ## (Debugger Events)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Show_source",
+    struct = "show_source.ml",
+    sig    = "Show_source_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Source", ## (Debugger Source)
+        ":Primitives", ## (Debugger Primitives)
+        ":Parameters", ## (Debugger Parameters)
+        ":Events", ## (Debugger Events)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ## (String)
+        ## (Printf)
+        ## (Location)
+        ## (Lexing)
+        ## (Instruct)
+    ]
+)
+
+ocaml_signature(
+    name = "Show_source_cmi",
+    src  = "show_source.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Lexing)
+        ## (Instruct)
+    ]
+)
+
+ocaml_module(
+    name   = "Source",
+    struct = "source.ml",
+    sig    = "Source_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ## (Sys)
+        ## (String)
+        ## (Misc)
+        ## (Load_path)
+        ## (List)
+        ## (Lexing)
+        ## (Hashtbl)
+        ## (Filename)
+    ]
+)
+
+ocaml_signature(
+    name = "Source_cmi",
+    src  = "source.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Lexing)
+    ]
+)
+
+ocaml_module(
+    name   = "Symbols",
+    struct = "symbols.ml",
+    sig    = "Symbols_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Program_loading", ## (Debugger Program_loading)
+        ":Events", ## (Debugger Events)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ":Debugcom", ## (Debugger Debugcom)
+        ":Checkpoints", ## (Debugger Checkpoints)
+        ## (Symtable)
+        ## (Misc)
+        ## (List)
+        ## (Lexing)
+        ## (Instruct)
+        ## (Hashtbl)
+        ## (Bytesections)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Symbols_cmi",
+    src  = "symbols.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Events", ## (Debugger Events)
+        ":Debugcom", ## (Debugger Debugcom)
+        ## (Instruct)
+    ]
+)
+
+ocaml_module(
+    name   = "Time_travel",
+    struct = "time_travel.ml",
+    sig    = "Time_travel_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Trap_barrier", ## (Debugger Trap_barrier)
+        ":Symbols", ## (Debugger Symbols)
+        ":Question", ## (Debugger Question)
+        ":Program_loading", ## (Debugger Program_loading)
+        ":Primitives", ## (Debugger Primitives)
+        ":Int64ops", ## (Debugger Int64ops)
+        ":Input_handling", ## (Debugger Input_handling)
+        ":Exec", ## (Debugger Exec)
+        ":Events", ## (Debugger Events)
+        ":Debugger_config", ## (Debugger Debugger_config)
+        ":Debugcom", ## (Debugger Debugcom)
+        ":Checkpoints", ## (Debugger Checkpoints)
+        ":Breakpoints", ## (Debugger Breakpoints)
+        ## (Sys)
+        ## (Printf)
+        ## (Misc)
+        ## (List)
+        ## (Int64)
+        ## (Int)
+        ## (Instruct)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Time_travel_cmi",
+    src  = "time_travel.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Primitives", ## (Debugger Primitives)
+    ]
+)
+
+ocaml_module(
+    name   = "Trap_barrier",
+    struct = "trap_barrier.ml",
+    sig    = "Trap_barrier_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Exec", ## (Debugger Exec)
+        ":Debugcom", ## (Debugger Debugcom)
+        ":Checkpoints", ## (Debugger Checkpoints)
+        ## (Fun)
+    ]
+)
+
+ocaml_signature(
+    name = "Trap_barrier_cmi",
+    src  = "trap_barrier.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unix_tools",
+    struct = "unix_tools.ml",
+    sig    = "Unix_tools_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Unix)
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Misc)
+        ## (Filename)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Unix_tools_cmi",
+    src  = "unix_tools.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Unix)
+    ]
+)
+

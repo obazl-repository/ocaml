@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-arg_lib",
+    modules  = [
+        ":Test_rest_all",
+        ":Testarg",
+        ":Testerror",
+    ],
+)
+
+ocaml_module(
+    name   = "Test_rest_all",
+    struct = "test_rest_all.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Testarg",
+    struct = "testarg.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Testerror",
+    struct = "testerror.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

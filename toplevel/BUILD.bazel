@@ -1,0 +1,306 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "toplevel_lib",
+    modules  = [
+        ":Expunge",
+        ":Genprintval",
+        ":Topcommon",
+        ":Topdirs",
+        ":Toploop",
+        ":Topstart",
+    ],
+    signatures  = [
+        ":Topeval_cmi",
+        ":Topmain_cmi",
+        ":Trace_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Expunge",
+    struct = "expunge.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (Symtable)
+        ## (Runtimedef)
+        ## (Printexc)
+        ## (Misc)
+        ## (List)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Digest)
+        ## (Bytesections)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Genprintval",
+    struct = "genprintval.ml",
+    sig    = "Genprintval_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Types)
+        ## (Syntaxerr)
+        ## (Printtyp)
+        ## (Printexc)
+        ## (Predef)
+        ## (Path)
+        ## (Parse)
+        ## (Outcometree)
+        ## (Oprint)
+        ## (Obj)
+        ## (Misc)
+        ## (Longident)
+        ## (List)
+        ## (Lexing)
+        ## (Lexer)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Env)
+        ## (Datarepr)
+        ## (Ctype)
+        ## (Bytes)
+        ## (Btype)
+    ]
+)
+
+ocaml_signature(
+    name = "Genprintval_cmi",
+    src  = "genprintval.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Types)
+        ## (Path)
+        ## (Outcometree)
+        ## (Format)
+        ## (Env)
+    ]
+)
+
+ocaml_module(
+    name   = "Topcommon",
+    struct = "topcommon.ml",
+    sig    = "Topcommon_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Genprintval", ## (Toplevel Genprintval)
+        ## (String)
+        ## (Str)
+        ## (Printexc)
+        ## (Printast)
+        ## (Predef)
+        ## (Pprintast)
+        ## (Pparse)
+        ## (Path)
+        ## (Parsetree)
+        ## (Parse)
+        ## (Outcometree)
+        ## (Oprint)
+        ## (Obj)
+        ## (Mod)
+        ## (Misc)
+        ## (Mb)
+        ## (Longident)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Lexer)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Gc)
+        ## (Format)
+        ## (Filename)
+        ## (Env)
+        ## (Dll)
+        ## (Config)
+        ## (Compmisc)
+        ## (Compenv)
+        ## (Clflags)
+        ## (Bytes)
+        ## (Buffer)
+        ## (Ast_helper)
+        ## (Arg)
+    ]
+)
+
+ocaml_signature(
+    name = "Topcommon_cmi",
+    src  = "topcommon.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Genprintval", ## (Toplevel Genprintval)
+        ## (Warnings)
+        ## (Types)
+        ## (Path)
+        ## (Parsetree)
+        ## (Outcometree)
+        ## (Obj)
+        ## (Longident)
+        ## (Location)
+        ## (Lexing)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Env)
+        ## (Buffer)
+    ]
+)
+
+ocaml_module(
+    name   = "Topdirs",
+    struct = "topdirs.ml",
+    sig    = "Topdirs_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Toploop", ## (Toplevel Toploop)
+        ":Topeval", ## (Toplevel Topeval)
+        ":String", ## (Stdlib String)
+        ## (Warnings)
+        ## (Types)
+        ## (Sys)
+        ## (String)
+        ## (Printtyp)
+        ## (Predef)
+        ## (Path)
+        ## (Parsetree)
+        ## (Option)
+        ## (Obj)
+        ## (Misc)
+        ## (Longident)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Filename)
+        ## (Env)
+        ## (Dll)
+        ## (Ctype)
+        ## (Config)
+        ## (Compenv)
+        ## (Clflags)
+        ## (Btype)
+        ## (Asttypes)
+        ## (Ast_helper)
+        ## (Arg)
+    ]
+)
+
+ocaml_signature(
+    name = "Topdirs_cmi",
+    src  = "topdirs.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Longident)
+        ## (Format)
+    ]
+)
+
+ocaml_signature(
+    name = "Topeval_cmi",
+    src  = "topeval.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Topcommon", ## (Toplevel Topcommon)
+        ## (Parsetree)
+        ## (Obj)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Toploop",
+    struct = "toploop.ml",
+    sig    = "Toploop_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Topeval", ## (Toplevel Topeval)
+        ":Topcommon", ## (Toplevel Topcommon)
+        ## (Warnings)
+        ## (Typetexp)
+        ## (Sys)
+        ## (Printf)
+        ## (Obj)
+        ## (Misc)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Lexing)
+        ## (Lexer)
+        ## (Format)
+        ## (Filename)
+        ## (Env)
+        ## (Config)
+        ## (Compmisc)
+        ## (Compenv)
+        ## (Clflags)
+        ## (Buffer)
+        ## (Btype)
+    ]
+)
+
+ocaml_signature(
+    name = "Toploop_cmi",
+    src  = "toploop.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Warnings)
+        ## (Types)
+        ## (Path)
+        ## (Parsetree)
+        ## (Outcometree)
+        ## (Obj)
+        ## (Longident)
+        ## (Location)
+        ## (Lexing)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Env)
+    ]
+)
+
+ocaml_signature(
+    name = "Topmain_cmi",
+    src  = "topmain.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Topstart",
+    struct = "topstart.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Topmain", ## (Toplevel Topmain)
+    ]
+)
+
+ocaml_signature(
+    name = "Trace_cmi",
+    src  = "trace.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Types)
+        ## (Path)
+        ## (Obj)
+        ## (Longident)
+        ## (Format)
+        ## (Env)
+    ]
+)
+

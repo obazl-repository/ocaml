@@ -1,0 +1,55 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-dynlink-private_lib",
+    modules  = [
+        ":Sheep",
+        ":Test",
+    ],
+    signatures  = [
+        ":Pig_cmi",
+    ],
+)
+
+ocaml_signature(
+    name = "Pig_cmi",
+    src  = "pig.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Sheep",
+    struct = "sheep.ml",
+    sig    = "Sheep_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Sheep_cmi",
+    src  = "sheep.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test",
+    struct = "test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

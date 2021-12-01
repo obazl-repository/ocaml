@@ -1,0 +1,113 @@
+load("//bzl:rules.bzl",
+     "bootstrap_library",
+     "bootstrap_module",
+)
+
+load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS = ROOT_SIG_OPTS
+
+STDLIB = ["//stdlib"]
+
+bootstrap_library(
+    name = "asmcomp_i386_lib",
+    manifest  = [
+        ":CSE",
+        ":Arch",
+        ":Proc",
+        ":Reload",
+        ":Scheduling",
+        ":Selection",
+    ],
+)
+
+bootstrap_module(
+    name   = "CSE",
+    struct = "CSE.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":I386", ## (Asmcomp I386 Arch)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ":CSEgen", ## (Asmcomp CSEgen)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Arch",
+    struct = "arch.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Printf)
+        ## (Nativeint)
+        ## (Format)
+        "//utils:Config"
+        ## (Array)
+        ## (Arg)
+    ],
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Proc",
+    struct = "proc.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":I386", ## (Asmcomp I386 Arch)
+        ":X86_proc", ## (Asmcomp X86_proc)
+        ":Reg", ## (Asmcomp Reg)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (Misc)
+        ## (Config)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Reload",
+    struct = "reload.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":I386", ## (Asmcomp I386 Arch)
+        ":Reloadgen", ## (Asmcomp Reloadgen)
+        ":Reg", ## (Asmcomp Reg)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Scheduling",
+    struct = "scheduling.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Schedgen", ## (Asmcomp Schedgen)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Selection",
+    struct = "selection.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        # ":I386", ## (Asmcomp I386 Proc)
+        # "//runtime:I386", ## (Asmcomp I386 Arch)
+        ":Selectgen", ## (Asmcomp Selectgen)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (Nativeint)
+        ## (Misc)
+        ## (List)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+

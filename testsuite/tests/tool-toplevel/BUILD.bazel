@@ -1,0 +1,186 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-toplevel_lib",
+    modules  = [
+        ":Error_highlighting",
+        ":Error_highlighting_use1",
+        ":Error_highlighting_use2",
+        ":Error_highlighting_use3",
+        ":Error_highlighting_use4",
+        ":Exotic_lists",
+        ":Mod",
+        ":Mod_use",
+        ":Pr6468",
+        ":Pr7060",
+        ":Pr7751",
+        ":Printval",
+        ":Redefinition_hints",
+        ":Show",
+        ":Show_short_paths",
+        ":Strings",
+        ":Tracing",
+        ":Uncaught_exceptions",
+        ":Use_command",
+    ],
+)
+
+ocaml_module(
+    name   = "Error_highlighting",
+    struct = "error_highlighting.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Error_highlighting_use1",
+    struct = "error_highlighting_use1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Error_highlighting_use2",
+    struct = "error_highlighting_use2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Error_highlighting_use3",
+    struct = "error_highlighting_use3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Error_highlighting_use4",
+    struct = "error_highlighting_use4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Exotic_lists",
+    struct = "exotic_lists.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mod",
+    struct = "mod.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mod_use",
+    struct = "mod_use.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6468",
+    struct = "pr6468.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7060",
+    struct = "pr7060.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7751",
+    struct = "pr7751.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Printval",
+    struct = "printval.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Redefinition_hints",
+    struct = "redefinition_hints.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Show",
+    struct = "show.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Show_short_paths",
+    struct = "show_short_paths.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Strings",
+    struct = "strings.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Tracing",
+    struct = "tracing.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Uncaught_exceptions",
+    struct = "uncaught_exceptions.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Use_command",
+    struct = "use_command.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

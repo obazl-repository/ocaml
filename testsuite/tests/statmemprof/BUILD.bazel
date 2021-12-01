@@ -1,0 +1,141 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_statmemprof_lib",
+    modules  = [
+        ":Alloc_counts",
+        ":Arrays_in_major",
+        ":Arrays_in_minor",
+        ":Blocking_in_callback",
+        ":Callstacks",
+        ":Comballoc",
+        ":Custom",
+        ":Exception_callback",
+        ":Exception_callback_minor",
+        ":Intern",
+        ":Lists_in_minor",
+        ":Minor_no_postpone",
+        ":Moved_while_blocking",
+        ":Thread_exit_in_callback",
+    ],
+)
+
+ocaml_module(
+    name   = "Alloc_counts",
+    struct = "alloc_counts.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Arrays_in_major",
+    struct = "arrays_in_major.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Arrays_in_minor",
+    struct = "arrays_in_minor.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Blocking_in_callback",
+    struct = "blocking_in_callback.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Callstacks",
+    struct = "callstacks.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Comballoc",
+    struct = "comballoc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Custom",
+    struct = "custom.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Exception_callback",
+    struct = "exception_callback.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Exception_callback_minor",
+    struct = "exception_callback_minor.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Intern",
+    struct = "intern.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lists_in_minor",
+    struct = "lists_in_minor.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Minor_no_postpone",
+    struct = "minor_no_postpone.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Moved_while_blocking",
+    struct = "moved_while_blocking.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Thread_exit_in_callback",
+    struct = "thread_exit_in_callback.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

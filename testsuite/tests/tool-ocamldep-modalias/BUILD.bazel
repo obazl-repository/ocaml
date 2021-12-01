@@ -1,0 +1,82 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-ocamldep-modalias_lib",
+    modules  = [
+        ":A",
+        ":B",
+        ":C",
+        ":D",
+        ":Lib_impl",
+        ":Main",
+    ],
+    signatures  = [
+        ":Lib_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "A",
+    struct = "A.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "B",
+    struct = "B.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "C",
+    struct = "C.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "D",
+    struct = "D.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Lib_cmi",
+    src  = "lib.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lib_impl",
+    struct = "lib_impl.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Main",
+    struct = "main.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

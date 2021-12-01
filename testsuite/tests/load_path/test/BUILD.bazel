@@ -1,0 +1,33 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_load_path_test_lib",
+    modules  = [
+        ":Driver",
+        ":Payload",
+    ],
+)
+
+ocaml_module(
+    name   = "Driver",
+    struct = "driver.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Payload",
+    struct = "payload.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

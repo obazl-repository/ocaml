@@ -1,0 +1,35 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-dynlink-private_plugin4_lib",
+    modules  = [
+        ":Chicken",
+    ],
+)
+
+ocaml_module(
+    name   = "Chicken",
+    struct = "chicken.ml",
+    sig    = "Chicken_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Chicken_cmi",
+    src  = "chicken.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

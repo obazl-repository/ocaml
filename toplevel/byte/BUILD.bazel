@@ -1,0 +1,122 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "toplevel_byte_lib",
+    modules  = [
+        ":Topeval",
+        ":Topmain",
+        ":Trace",
+    ],
+)
+
+ocaml_module(
+    name   = "Topeval",
+    struct = "topeval.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Topcommon", ## (Toplevel Topcommon)
+        ## (Warnings)
+        ## (Types)
+        ## (Typemod)
+        ## (Typedtree)
+        ## (Typecore)
+        ## (Translmod)
+        ## (Sys)
+        ## (Symtable)
+        ## (Simplif)
+        ## (Printtyped)
+        ## (Printtyp)
+        ## (Printlambda)
+        ## (Printinstr)
+        ## (Printexc)
+        ## (Predef)
+        ## (Persistent_env)
+        ## (Parsetree)
+        ## (Outcometree)
+        ## (Opcodes)
+        ## (Obj)
+        ## (Misc)
+        ## (Meta)
+        ## (LongString)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Includemod)
+        ## (Ident)
+        ## (Gc)
+        ## (Fun)
+        ## (Format)
+        ## (Env)
+        ## (Emitcode)
+        ## (Dll)
+        ## (Config)
+        ## (Compmisc)
+        ## (Cmo_format)
+        ## (Clflags)
+        ## (Char)
+        ## (Bytegen)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Topmain",
+    struct = "topmain.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Byte", ## (Toplevel Byte Trace)
+        ":Byte", ## (Toplevel Byte Topeval)
+        ":Toploop", ## (Toplevel Toploop)
+        ":Topdirs", ## (Toplevel Topdirs)
+        ":Topcommon", ## (Toplevel Topcommon)
+        ## (Types)
+        ## (Sys)
+        ## (Printtyp)
+        ## (Printf)
+        ## (Printexc)
+        ## (Path)
+        ## (Obj)
+        ## (Misc)
+        ## (Main_args)
+        ## (Location)
+        ## (List)
+        ## (Format)
+        ## (Filename)
+        ## (Env)
+        ## (Ctype)
+        ## (Compmisc)
+        ## (Compenv)
+        ## (Clflags)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Trace",
+    struct = "trace.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Byte", ## (Toplevel Byte Topeval)
+        ":Topcommon", ## (Toplevel Topcommon)
+        ## (Types)
+        ## (Printtyp)
+        ## (Predef)
+        ## (Path)
+        ## (Obj)
+        ## (Misc)
+        ## (Meta)
+        ## (Longident)
+        ## (Format)
+        ## (Ctype)
+        ## (Asttypes)
+    ]
+)
+

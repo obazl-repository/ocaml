@@ -1,0 +1,33 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-debugger_dynlink_lib",
+    modules  = [
+        ":Host",
+        ":Plugin",
+    ],
+)
+
+ocaml_module(
+    name   = "Host",
+    struct = "host.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Plugin",
+    struct = "plugin.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

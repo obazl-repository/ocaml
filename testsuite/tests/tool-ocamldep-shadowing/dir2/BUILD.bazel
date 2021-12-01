@@ -1,0 +1,33 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_signature",
+)
+
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-ocamldep-shadowing_dir2_lib",
+    signatures  = [
+        ":B_cmi",
+        ":C_cmi",
+    ],
+)
+
+ocaml_signature(
+    name = "B_cmi",
+    src  = "b.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "C_cmi",
+    src  = "c.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

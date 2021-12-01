@@ -1,0 +1,51 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-misc-bugs_lib",
+    modules  = [
+        ":Core_array_reduced_ok",
+        ":Gadt_declaration_check",
+        ":Pr6303_bad",
+        ":Pr6946_bad",
+    ],
+)
+
+ocaml_module(
+    name   = "Core_array_reduced_ok",
+    struct = "core_array_reduced_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gadt_declaration_check",
+    struct = "gadt_declaration_check.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6303_bad",
+    struct = "pr6303_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6946_bad",
+    struct = "pr6946_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

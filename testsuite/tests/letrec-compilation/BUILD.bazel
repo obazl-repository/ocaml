@@ -1,0 +1,186 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_letrec-compilation_lib",
+    modules  = [
+        ":Backreferences",
+        ":Class_1",
+        ":Class_2",
+        ":Evaluation_order_1",
+        ":Evaluation_order_2",
+        ":Evaluation_order_3",
+        ":Float_block_1",
+        ":Generic_array",
+        ":Labels",
+        ":Lazy_",
+        ":Lists",
+        ":Mixing_value_closures_1",
+        ":Mixing_value_closures_2",
+        ":Mutual_functions",
+        ":Nested",
+        ":Pr4989",
+        ":Pr8681",
+        ":Record_with",
+        ":Ref",
+    ],
+)
+
+ocaml_module(
+    name   = "Backreferences",
+    struct = "backreferences.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Class_1",
+    struct = "class_1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Class_2",
+    struct = "class_2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Evaluation_order_1",
+    struct = "evaluation_order_1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Evaluation_order_2",
+    struct = "evaluation_order_2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Evaluation_order_3",
+    struct = "evaluation_order_3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Float_block_1",
+    struct = "float_block_1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Generic_array",
+    struct = "generic_array.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Labels",
+    struct = "labels.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lazy_",
+    struct = "lazy_.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lists",
+    struct = "lists.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mixing_value_closures_1",
+    struct = "mixing_value_closures_1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mixing_value_closures_2",
+    struct = "mixing_value_closures_2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mutual_functions",
+    struct = "mutual_functions.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Nested",
+    struct = "nested.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4989",
+    struct = "pr4989.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr8681",
+    struct = "pr8681.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Record_with",
+    struct = "record_with.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ref",
+    struct = "ref.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

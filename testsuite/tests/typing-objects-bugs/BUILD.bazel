@@ -1,0 +1,114 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-objects-bugs_lib",
+    modules  = [
+        ":Pr3968_bad",
+        ":Pr4018_bad",
+        ":Pr4435_bad",
+        ":Pr4766_ok",
+        ":Pr4824_ok",
+        ":Pr4824a_bad",
+        ":Pr5156_ok",
+        ":Pr7284_bad",
+        ":Pr7293_ok",
+        ":Woodyatt_ok",
+        ":Yamagata021012_ok",
+    ],
+)
+
+ocaml_module(
+    name   = "Pr3968_bad",
+    struct = "pr3968_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4018_bad",
+    struct = "pr4018_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4435_bad",
+    struct = "pr4435_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4766_ok",
+    struct = "pr4766_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4824_ok",
+    struct = "pr4824_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4824a_bad",
+    struct = "pr4824a_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5156_ok",
+    struct = "pr5156_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7284_bad",
+    struct = "pr7284_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7293_ok",
+    struct = "pr7293_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Woodyatt_ok",
+    struct = "woodyatt_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Yamagata021012_ok",
+    struct = "yamagata021012_ok.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

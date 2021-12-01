@@ -1,0 +1,2020 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "middle_end_flambda_lib",
+    modules  = [
+        ":Alias_analysis",
+        ":Allocated_const",
+        ":Augment_specialised_args",
+        ":Build_export_info",
+        ":Closure_conversion",
+        ":Closure_conversion_aux",
+        ":Closure_offsets",
+        ":Effect_analysis",
+        ":Export_info",
+        ":Export_info_for_pack",
+        ":Extract_projections",
+        ":Find_recursive_functions",
+        ":Flambda",
+        ":Flambda_invariants",
+        ":Flambda_iterators",
+        ":Flambda_middle_end",
+        ":Flambda_to_clambda",
+        ":Flambda_utils",
+        ":Freshening",
+        ":Import_approx",
+        ":Inconstant_idents",
+        ":Initialize_symbol_to_let_symbol",
+        ":Inline_and_simplify",
+        ":Inline_and_simplify_aux",
+        ":Inlining_cost",
+        ":Inlining_decision",
+        ":Inlining_stats",
+        ":Inlining_stats_types",
+        ":Inlining_transforms",
+        ":Invariant_params",
+        ":Lift_code",
+        ":Lift_constants",
+        ":Lift_let_to_initialize_symbol",
+        ":Parameter",
+        ":Pass_wrapper",
+        ":Projection",
+        ":Ref_to_variables",
+        ":Remove_free_vars_equal_to_args",
+        ":Remove_unused_arguments",
+        ":Remove_unused_closure_vars",
+        ":Remove_unused_program_constructs",
+        ":Share_constants",
+        ":Simple_value_approx",
+        ":Simplify_boxed_integer_ops",
+        ":Simplify_common",
+        ":Simplify_primitives",
+        ":Traverse_for_exported_symbols",
+        ":Un_anf",
+        ":Unbox_closures",
+        ":Unbox_free_vars_of_closures",
+        ":Unbox_specialised_args",
+    ],
+    signatures  = [
+        ":Inlining_decision_intf_cmi",
+        ":Simplify_boxed_integer_ops_intf_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Alias_analysis",
+    struct = "alias_analysis.ml",
+    sig    = "Alias_analysis_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Alias_analysis_cmi",
+    src  = "alias_analysis.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Tag)
+        ## (Format)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Allocated_const",
+    struct = "allocated_const.ml",
+    sig    = "Allocated_const_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (String)
+        ## (Nativeint)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Int64)
+        ## (Int32)
+        ## (Format)
+    ]
+)
+
+ocaml_signature(
+    name = "Allocated_const_cmi",
+    src  = "allocated_const.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Augment_specialised_args",
+    struct = "augment_specialised_args.ml",
+    sig    = "Augment_specialised_args_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Pass_wrapper)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Augment_specialised_args_cmi",
+    src  = "augment_specialised_args.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+    ]
+)
+
+ocaml_module(
+    name   = "Build_export_info",
+    struct = "build_export_info.ml",
+    sig    = "Build_export_info_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Traverse_for_exported_symbols)
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Invariant_params)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Find_recursive_functions)
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Compilenv", ## (Middle_end Compilenv)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda", ## (Middle_end Clambda)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (String)
+        ## (Set_of_closures_id)
+        ## (Misc)
+        ## (List)
+        ## (Export_id)
+        ## (Closure_id)
+        ## (Clflags)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Build_export_info_cmi",
+    src  = "build_export_info.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+    ]
+)
+
+ocaml_module(
+    name   = "Closure_conversion",
+    struct = "closure_conversion.ml",
+    sig    = "Closure_conversion_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Lift_code)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Closure_conversion_aux)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Convert_primitives", ## (Middle_end Convert_primitives)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Tag)
+        ## (Sys)
+        ## (String)
+        ## (Static_exception)
+        ## (Simplif)
+        ## (Predef)
+        ## (Option)
+        ## (Numbers)
+        ## (Mutable_variable)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Ident)
+        ## (Debuginfo)
+        ## (Config)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Clflags)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Closure_conversion_cmi",
+    src  = "closure_conversion.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Ident)
+    ]
+)
+
+ocaml_module(
+    name   = "Closure_conversion_aux",
+    struct = "closure_conversion_aux.ml",
+    sig    = "Closure_conversion_aux_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Static_exception)
+        ## (Printexc)
+        ## (Numbers)
+        ## (Mutable_variable)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Int)
+        ## (Ident)
+    ]
+)
+
+ocaml_signature(
+    name = "Closure_conversion_aux_cmi",
+    src  = "closure_conversion_aux.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Static_exception)
+        ## (Mutable_variable)
+        ## (Ident)
+    ]
+)
+
+ocaml_module(
+    name   = "Closure_offsets",
+    struct = "closure_offsets.ml",
+    sig    = "Closure_offsets_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Var_within_closure)
+        ## (Misc)
+        ## (List)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_signature(
+    name = "Closure_offsets_cmi",
+    src  = "closure_offsets.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ## (Var_within_closure)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Effect_analysis",
+    struct = "effect_analysis.ml",
+    sig    = "Effect_analysis_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Option)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Effect_analysis_cmi",
+    src  = "effect_analysis.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Export_info",
+    struct = "export_info.ml",
+    sig    = "Export_info_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (String)
+        ## (Set_of_closures_id)
+        ## (Queue)
+        ## (List)
+        ## (Format)
+        ## (Export_id)
+        ## (Closure_id)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Export_info_cmi",
+    src  = "export_info.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (Set_of_closures_id)
+        ## (Format)
+        ## (Export_id)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Export_info_for_pack",
+    struct = "export_info_for_pack.ml",
+    sig    = "Export_info_for_pack_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Var_within_closure)
+        ## (Set_of_closures_origin)
+        ## (Set_of_closures_id)
+        ## (Option)
+        ## (Export_id)
+        ## (Closure_id)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Export_info_for_pack_cmi",
+    src  = "export_info_for_pack.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+    ]
+)
+
+ocaml_module(
+    name   = "Extract_projections",
+    struct = "extract_projections.ml",
+    sig    = "Extract_projections_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Freshening)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Var_within_closure)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Closure_id)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Extract_projections_cmi",
+    src  = "extract_projections.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+    ]
+)
+
+ocaml_module(
+    name   = "Find_recursive_functions",
+    struct = "find_recursive_functions.ml",
+    sig    = "Find_recursive_functions_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Strongly_connected_components)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Find_recursive_functions_cmi",
+    src  = "find_recursive_functions.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+    ]
+)
+
+ocaml_module(
+    name   = "Flambda",
+    struct = "flambda.ml",
+    sig    = "Flambda_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Tag)
+        ## (String)
+        ## (Static_exception)
+        ## (Set_of_closures_origin)
+        ## (Set_of_closures_id)
+        ## (Printlambda)
+        ## (Printf)
+        ## (Printexc)
+        ## (Option)
+        ## (Numbers)
+        ## (Mutable_variable)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Clflags)
+        ## (Char)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Flambda_cmi",
+    src  = "flambda.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Tag)
+        ## (Static_exception)
+        ## (Set_of_closures_origin)
+        ## (Set_of_closures_id)
+        ## (Numbers)
+        ## (Mutable_variable)
+        ## (Identifiable)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Flambda_invariants",
+    struct = "flambda_invariants.ml",
+    sig    = "Flambda_invariants_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (Static_exception)
+        ## (Set_of_closures_origin)
+        ## (Set_of_closures_id)
+        ## (Printexc)
+        ## (Option)
+        ## (Numbers)
+        ## (Mutable_variable)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_id)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Flambda_invariants_cmi",
+    src  = "flambda_invariants.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Flambda_iterators",
+    struct = "flambda_iterators.ml",
+    sig    = "Flambda_iterators_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Option)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+    ]
+)
+
+ocaml_signature(
+    name = "Flambda_iterators_cmi",
+    src  = "flambda_iterators.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+    ]
+)
+
+ocaml_module(
+    name   = "Flambda_middle_end",
+    struct = "flambda_middle_end.ml",
+    sig    = "Flambda_middle_end_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Un_anf)
+        ":Flambda", ## (Middle_end Flambda Share_constants)
+        ":Flambda", ## (Middle_end Flambda Remove_unused_program_constructs)
+        ":Flambda", ## (Middle_end Flambda Remove_unused_closure_vars)
+        ":Flambda", ## (Middle_end Flambda Ref_to_variables)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Lift_let_to_initialize_symbol)
+        ":Flambda", ## (Middle_end Flambda Lift_constants)
+        ":Flambda", ## (Middle_end Flambda Lift_code)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify)
+        ":Flambda", ## (Middle_end Flambda Initialize_symbol_to_let_symbol)
+        ":Flambda", ## (Middle_end Flambda Flambda_to_clambda)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda_invariants)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Closure_conversion)
+        ":Flambda", ## (Middle_end Flambda Build_export_info)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Printclambda", ## (Middle_end Printclambda)
+        ":Linkage_name", ## (Middle_end Linkage_name)
+        ":Compilenv", ## (Middle_end Compilenv)
+        ":Clambda", ## (Middle_end Clambda)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Warnings)
+        ## (Set)
+        ## (Profile)
+        ## (Printexc)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_id)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Flambda_middle_end_cmi",
+    src  = "flambda_middle_end.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Clambda", ## (Middle_end Clambda)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Flambda_to_clambda",
+    struct = "flambda_to_clambda.ml",
+    sig    = "Flambda_to_clambda_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Un_anf)
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Initialize_symbol_to_let_symbol)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Flambda", ## (Middle_end Flambda Closure_offsets)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Linkage_name", ## (Middle_end Linkage_name)
+        ":Compilenv", ## (Middle_end Compilenv)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda", ## (Middle_end Clambda)
+        ":Backend_var", ## (Middle_end Backend_var)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (Static_exception)
+        ## (Set_of_closures_id)
+        ## (Primitive)
+        ## (Option)
+        ## (Numbers)
+        ## (Mutable_variable)
+        ## (Misc)
+        ## (List)
+        ## (Int)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_id)
+        ## (Clflags)
+        ## (Char)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Flambda_to_clambda_cmi",
+    src  = "flambda_to_clambda.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Clambda", ## (Middle_end Clambda)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Flambda_utils",
+    struct = "flambda_utils.ml",
+    sig    = "Flambda_utils_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Var_within_closure)
+        ## (Switch)
+        ## (String)
+        ## (Static_exception)
+        ## (Set_of_closures_id)
+        ## (Queue)
+        ## (Option)
+        ## (Numbers)
+        ## (Mutable_variable)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Flambda_utils_cmi",
+    src  = "flambda_utils.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (Switch)
+        ## (Static_exception)
+        ## (Set_of_closures_id)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Freshening",
+    struct = "freshening.ml",
+    sig    = "Freshening_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Var_within_closure)
+        ## (Static_exception)
+        ## (Mutable_variable)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+        ## (Format)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_signature(
+    name = "Freshening_cmi",
+    src  = "freshening.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Var_within_closure)
+        ## (Static_exception)
+        ## (Mutable_variable)
+        ## (Format)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Import_approx",
+    struct = "import_approx.ml",
+    sig    = "Import_approx_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Freshening)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Compilenv", ## (Middle_end Compilenv)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Clambda", ## (Middle_end Clambda)
+        ## (Var_within_closure)
+        ## (Set_of_closures_id)
+        ## (Misc)
+        ## (Format)
+        ## (Export_id)
+        ## (Closure_id)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Import_approx_cmi",
+    src  = "import_approx.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Symbol", ## (Middle_end Symbol)
+    ]
+)
+
+ocaml_module(
+    name   = "Inconstant_idents",
+    struct = "inconstant_idents.ml",
+    sig    = "Inconstant_idents_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Set_of_closures_id)
+        ## (Queue)
+        ## (Option)
+        ## (Numbers)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+        ## (Closure_id)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Inconstant_idents_cmi",
+    src  = "inconstant_idents.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Set_of_closures_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Initialize_symbol_to_let_symbol",
+    struct = "initialize_symbol_to_let_symbol.ml",
+    sig    = "Initialize_symbol_to_let_symbol_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+    ]
+)
+
+ocaml_signature(
+    name = "Initialize_symbol_to_let_symbol_cmi",
+    src  = "initialize_symbol_to_let_symbol.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Inline_and_simplify",
+    struct = "inline_and_simplify.ml",
+    sig    = "Inline_and_simplify_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Unbox_specialised_args)
+        ":Flambda", ## (Middle_end Flambda Unbox_free_vars_of_closures)
+        ":Flambda", ## (Middle_end Flambda Unbox_closures)
+        ":Flambda", ## (Middle_end Flambda Simplify_primitives)
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Remove_unused_arguments)
+        ":Flambda", ## (Middle_end Flambda Remove_free_vars_equal_to_args)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Lift_code)
+        ":Flambda", ## (Middle_end Flambda Invariant_params)
+        ":Flambda", ## (Middle_end Flambda Inlining_stats)
+        ":Flambda", ## (Middle_end Flambda Inlining_decision)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Freshening)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Find_recursive_functions)
+        ":Flambda", ## (Middle_end Flambda Effect_analysis)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Warnings)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (String)
+        ## (Static_exception)
+        ## (Printf)
+        ## (Predef)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Ident)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Config)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Clflags)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Inline_and_simplify_cmi",
+    src  = "inline_and_simplify.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Inline_and_simplify_aux",
+    struct = "inline_and_simplify_aux.ml",
+    sig    = "Inline_and_simplify_aux_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Inlining_stats)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Freshening)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Var_within_closure)
+        ## (Static_exception)
+        ## (Set_of_closures_origin)
+        ## (Printexc)
+        ## (Mutable_variable)
+        ## (Misc)
+        ## (List)
+        ## (Lazy)
+        ## (Int_replace_polymorphic_compare)
+        ## (Int)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Inline_and_simplify_aux_cmi",
+    src  = "inline_and_simplify_aux.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_stats_types)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Freshening)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Static_exception)
+        ## (Set_of_closures_origin)
+        ## (Mutable_variable)
+        ## (Lazy)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Inlining_cost",
+    struct = "inlining_cost.ml",
+    sig    = "Inlining_cost_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (String)
+        ## (Printf)
+        ## (Primitive)
+        ## (Option)
+        ## (Misc)
+        ## (List)
+        ## (Lazy)
+        ## (Int_replace_polymorphic_compare)
+        ## (Int)
+        ## (Format)
+        ## (Float)
+        ## (Clflags)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Inlining_cost_cmi",
+    src  = "inlining_cost.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Inlining_decision",
+    struct = "inlining_decision.ml",
+    sig    = "Inlining_decision_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Inlining_transforms)
+        ":Flambda", ## (Middle_end Flambda Inlining_stats_types)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Var_within_closure)
+        ## (Misc)
+        ## (List)
+        ## (Lazy)
+        ## (Int_replace_polymorphic_compare)
+        ## (Closure_id)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Inlining_decision_cmi",
+    src  = "inlining_decision.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_decision_intf)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Debuginfo)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_signature(
+    name = "Inlining_decision_intf_cmi",
+    src  = "inlining_decision_intf.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Debuginfo)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Inlining_stats",
+    struct = "inlining_stats.ml",
+    sig    = "Inlining_stats_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Inlining_stats_types)
+        ## (String)
+        ## (Misc)
+        ## (Map)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Closure_id)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Inlining_stats_cmi",
+    src  = "inlining_stats.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Inlining_stats_types)
+        ## (Debuginfo)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Inlining_stats_types",
+    struct = "inlining_stats_types.ml",
+    sig    = "Inlining_stats_types_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ## (String)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+    ]
+)
+
+ocaml_signature(
+    name = "Inlining_stats_types_cmi",
+    src  = "inlining_stats_types.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Inlining_transforms",
+    struct = "inlining_transforms.ml",
+    sig    = "Inlining_transforms_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Inlining_decision_intf)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Var_within_closure)
+        ## (List)
+        ## (Lazy)
+        ## (Int_replace_polymorphic_compare)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_signature(
+    name = "Inlining_transforms_cmi",
+    src  = "inlining_transforms.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_decision_intf)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Debuginfo)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Invariant_params",
+    struct = "invariant_params.ml",
+    sig    = "Invariant_params_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Closure_id)
+        ## (Clflags)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Invariant_params_cmi",
+    src  = "invariant_params.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+    ]
+)
+
+ocaml_module(
+    name   = "Lift_code",
+    struct = "lift_code.ml",
+    sig    = "Lift_code_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Strongly_connected_components)
+        ## (Mutable_variable)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Lift_code_cmi",
+    src  = "lift_code.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+    ]
+)
+
+ocaml_module(
+    name   = "Lift_constants",
+    struct = "lift_constants.ml",
+    sig    = "Lift_constants_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inconstant_idents)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Flambda", ## (Middle_end Flambda Alias_analysis)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (Strongly_connected_components)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Closure_id)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Lift_constants_cmi",
+    src  = "lift_constants.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+    ]
+)
+
+ocaml_module(
+    name   = "Lift_let_to_initialize_symbol",
+    struct = "lift_let_to_initialize_symbol.ml",
+    sig    = "Lift_let_to_initialize_symbol_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ## (Tag)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Debuginfo)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Lift_let_to_initialize_symbol_cmi",
+    src  = "lift_let_to_initialize_symbol.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+    ]
+)
+
+ocaml_module(
+    name   = "Parameter",
+    struct = "parameter.ml",
+    sig    = "Parameter_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variable", ## (Middle_end Variable)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+    ]
+)
+
+ocaml_signature(
+    name = "Parameter_cmi",
+    src  = "parameter.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variable", ## (Middle_end Variable)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Identifiable)
+    ]
+)
+
+ocaml_module(
+    name   = "Pass_wrapper",
+    struct = "pass_wrapper.ml",
+    sig    = "Pass_wrapper_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Pass_wrapper_cmi",
+    src  = "pass_wrapper.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Projection",
+    struct = "projection.ml",
+    sig    = "Projection_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Variable", ## (Middle_end Variable)
+        ## (Var_within_closure)
+        ## (Int_replace_polymorphic_compare)
+        ## (Identifiable)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_signature(
+    name = "Projection_cmi",
+    src  = "projection.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Variable", ## (Middle_end Variable)
+        ## (Var_within_closure)
+        ## (Identifiable)
+        ## (Format)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Ref_to_variables",
+    struct = "ref_to_variables.ml",
+    sig    = "Ref_to_variables_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ## (Option)
+        ## (Mutable_variable)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Ref_to_variables_cmi",
+    src  = "ref_to_variables.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Remove_free_vars_equal_to_args",
+    struct = "remove_free_vars_equal_to_args.ml",
+    sig    = "Remove_free_vars_equal_to_args_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Pass_wrapper)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+    ]
+)
+
+ocaml_signature(
+    name = "Remove_free_vars_equal_to_args_cmi",
+    src  = "remove_free_vars_equal_to_args.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Remove_unused_arguments",
+    struct = "remove_unused_arguments.ml",
+    sig    = "Remove_unused_arguments_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Invariant_params)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Find_recursive_functions)
+        ":Variable", ## (Middle_end Variable)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Format)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Remove_unused_arguments_cmi",
+    src  = "remove_unused_arguments.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Backend_intf", ## (Middle_end Backend_intf)
+    ]
+)
+
+ocaml_module(
+    name   = "Remove_unused_closure_vars",
+    struct = "remove_unused_closure_vars.ml",
+    sig    = "Remove_unused_closure_vars_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ## (Var_within_closure)
+        ## (Int_replace_polymorphic_compare)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_signature(
+    name = "Remove_unused_closure_vars_cmi",
+    src  = "remove_unused_closure_vars.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Remove_unused_program_constructs",
+    struct = "remove_unused_program_constructs.ml",
+    sig    = "Remove_unused_program_constructs_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Effect_analysis)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+    ]
+)
+
+ocaml_signature(
+    name = "Remove_unused_program_constructs_cmi",
+    src  = "remove_unused_program_constructs.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Share_constants",
+    struct = "share_constants.ml",
+    sig    = "Share_constants_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+    ]
+)
+
+ocaml_signature(
+    name = "Share_constants_cmi",
+    src  = "share_constants.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Simple_value_approx",
+    struct = "simple_value_approx.ml",
+    sig    = "Simple_value_approx_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Freshening)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Effect_analysis)
+        ":Flambda", ## (Middle_end Flambda Allocated_const)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (String)
+        ## (Set_of_closures_origin)
+        ## (Set_of_closures_id)
+        ## (Printexc)
+        ## (Option)
+        ## (Obj)
+        ## (Nativeint)
+        ## (Misc)
+        ## (List)
+        ## (Lazy)
+        ## (Int_replace_polymorphic_compare)
+        ## (Int64)
+        ## (Int32)
+        ## (Format)
+        ## (Export_id)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+        ## (Char)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Simple_value_approx_cmi",
+    src  = "simple_value_approx.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Parameter)
+        ":Flambda", ## (Middle_end Flambda Freshening)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Var_within_closure)
+        ## (Tag)
+        ## (Set_of_closures_origin)
+        ## (Set_of_closures_id)
+        ## (Lazy)
+        ## (Format)
+        ## (Export_id)
+        ## (Debuginfo)
+        ## (Closure_origin)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Simplify_boxed_integer_ops",
+    struct = "simplify_boxed_integer_ops.ml",
+    sig    = "Simplify_boxed_integer_ops_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simplify_common)
+        ":Flambda", ## (Middle_end Flambda Simplify_boxed_integer_ops_intf)
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Nativeint)
+        ## (Int_replace_polymorphic_compare)
+        ## (Int64)
+        ## (Int32)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Simplify_boxed_integer_ops_cmi",
+    src  = "simplify_boxed_integer_ops.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simplify_boxed_integer_ops_intf)
+        ## (Nativeint)
+        ## (Int64)
+        ## (Int32)
+    ]
+)
+
+ocaml_signature(
+    name = "Simplify_boxed_integer_ops_intf_cmi",
+    src  = "simplify_boxed_integer_ops_intf.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Simplify_common",
+    struct = "simplify_common.ml",
+    sig    = "Simplify_common_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Effect_analysis)
+        ## (Int_replace_polymorphic_compare)
+    ]
+)
+
+ocaml_signature(
+    name = "Simplify_common_cmi",
+    src  = "simplify_common.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Simplify_primitives",
+    struct = "simplify_primitives.ml",
+    sig    = "Simplify_primitives_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simplify_common)
+        ":Flambda", ## (Middle_end Flambda Simplify_boxed_integer_ops)
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Tag)
+        ## (String)
+        ## (Nativeint)
+        ## (Misc)
+        ## (List)
+        ## (Int_replace_polymorphic_compare)
+        ## (Int64)
+        ## (Int32)
+        ## (Float)
+        ## (Clflags)
+        ## (Char)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Simplify_primitives_cmi",
+    src  = "simplify_primitives.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ## (Debuginfo)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Traverse_for_exported_symbols",
+    struct = "traverse_for_exported_symbols.ml",
+    sig    = "Traverse_for_exported_symbols_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Variable", ## (Middle_end Variable)
+        ":Symbol", ## (Middle_end Symbol)
+        ":Compilation_unit", ## (Middle_end Compilation_unit)
+        ## (Var_within_closure)
+        ## (Set_of_closures_id)
+        ## (Queue)
+        ## (Misc)
+        ## (Export_id)
+        ## (Closure_id)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Traverse_for_exported_symbols_cmi",
+    src  = "traverse_for_exported_symbols.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Export_info)
+        ":Symbol", ## (Middle_end Symbol)
+        ## (Var_within_closure)
+        ## (Set_of_closures_id)
+        ## (Export_id)
+        ## (Closure_id)
+    ]
+)
+
+ocaml_module(
+    name   = "Un_anf",
+    struct = "un_anf.ml",
+    sig    = "Un_anf_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Symbol", ## (Middle_end Symbol)
+        ":Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
+        ":Printclambda", ## (Middle_end Printclambda)
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ":Clambda", ## (Middle_end Clambda)
+        ":Backend_var", ## (Middle_end Backend_var)
+        ## (Option)
+        ## (Misc)
+        ## (List)
+        ## (Format)
+        ## (Debuginfo)
+        ## (Clflags)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Un_anf_cmi",
+    src  = "un_anf.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Symbol", ## (Middle_end Symbol)
+        ":Clambda", ## (Middle_end Clambda)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Unbox_closures",
+    struct = "unbox_closures.ml",
+    sig    = "Unbox_closures_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Augment_specialised_args)
+        ":Variable", ## (Middle_end Variable)
+        ## (Int_replace_polymorphic_compare)
+        ## (Closure_id)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Unbox_closures_cmi",
+    src  = "unbox_closures.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+    ]
+)
+
+ocaml_module(
+    name   = "Unbox_free_vars_of_closures",
+    struct = "unbox_free_vars_of_closures.ml",
+    sig    = "Unbox_free_vars_of_closures_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Pass_wrapper)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda_utils)
+        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Extract_projections)
+        ":Variable", ## (Middle_end Variable)
+        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
+        ## (Misc)
+        ## (Int_replace_polymorphic_compare)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Unbox_free_vars_of_closures_cmi",
+    src  = "unbox_free_vars_of_closures.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+    ]
+)
+
+ocaml_module(
+    name   = "Unbox_specialised_args",
+    struct = "unbox_specialised_args.ml",
+    sig    = "Unbox_specialised_args_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Invariant_params)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Flambda", ## (Middle_end Flambda Extract_projections)
+        ":Flambda", ## (Middle_end Flambda Augment_specialised_args)
+        ":Variable", ## (Middle_end Variable)
+        ## (Int_replace_polymorphic_compare)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Unbox_specialised_args_cmi",
+    src  = "unbox_specialised_args.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Flambda", ## (Middle_end Flambda Projection)
+        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
+        ":Flambda", ## (Middle_end Flambda Flambda)
+        ":Variable", ## (Middle_end Variable)
+    ]
+)
+

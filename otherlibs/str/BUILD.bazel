@@ -1,0 +1,70 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+# bootstrap_library(
+#     name = "otherlibs_str_lib",
+#       = [
+#         ":Str",
+#     ],
+# )
+
+# ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.ml
+
+bootstrap_module(
+    name   = "Str",
+    struct = "str.ml",
+    sig    = "Str_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (String)
+        ## (Map)
+        ## (List)
+        ## (Int)
+        ## (Char)
+        ## (Bytes)
+        ## (Buffer)
+        ## (Array)
+    ]
+)
+
+# ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.mli
+
+bootstrap_signature(
+    name = "Str_cmi",
+    src  = "str.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+################################################################
+# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g    -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -I../../runtime   \
+# 	  -o strstubs.o strstubs.c
+
+cc_library(
+    name = "strstubs",
+    srcs = [
+        "strstubs.c",
+        "//runtime/caml:alloc.h",
+        "//runtime/caml:compatibility.h",
+        "//runtime/caml:config.h",
+        "//runtime/caml:domain.h",
+        "//runtime/caml:domain_state.h",
+        "//runtime/caml:fail.h",
+        "//runtime/caml:m.h",
+        "//runtime/caml:memory.h",
+        "//runtime/caml:misc.h",
+        "//runtime/caml:mlvalues.h",
+        "//runtime/caml:s.h",
+    ],
+    copts = ["-I", "runtime", "-I", "runtime/caml"],
+    hdrs = ["//runtime/caml:domain_state.tbl"]
+)

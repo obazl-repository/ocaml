@@ -1,0 +1,46 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-polyvariants-bugs-2_lib",
+    modules  = [
+        ":Pr3918c",
+    ],
+    signatures  = [
+        ":Pr3918a_cmi",
+        ":Pr3918b_cmi",
+    ],
+)
+
+ocaml_signature(
+    name = "Pr3918a_cmi",
+    src  = "pr3918a.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Pr3918b_cmi",
+    src  = "pr3918b.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr3918c",
+    struct = "pr3918c.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

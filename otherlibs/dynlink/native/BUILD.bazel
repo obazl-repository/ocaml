@@ -1,0 +1,34 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "otherlibs_dynlink_native_lib",
+    modules  = [
+        ":Dynlink",
+    ],
+)
+
+ocaml_module(
+    name   = "Dynlink",
+    struct = "dynlink.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
+        ":Dynlink", ## (Otherlibs Dynlink Dynlink_common)
+        ## (Printexc)
+        ## (Obj)
+        ## (List)
+        ## (Filename)
+        ## (Dynlink_compilerlibs)
+        ## (Digest)
+        ## (Config)
+        ## (Cmxs_format)
+    ]
+)
+

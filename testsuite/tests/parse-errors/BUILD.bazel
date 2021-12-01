@@ -1,0 +1,181 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_parse-errors_lib",
+    modules  = [
+        ":Escape_error",
+        ":Expecting",
+        ":Pr7847",
+        ":Unclosed_class_simpl_expr1",
+        ":Unclosed_class_simpl_expr2",
+        ":Unclosed_class_simpl_expr3",
+        ":Unclosed_object",
+        ":Unclosed_paren_module_expr1",
+        ":Unclosed_paren_module_expr2",
+        ":Unclosed_paren_module_expr3",
+        ":Unclosed_paren_module_expr4",
+        ":Unclosed_paren_module_expr5",
+        ":Unclosed_simple_expr",
+        ":Unclosed_simple_pattern",
+        ":Unclosed_struct",
+    ],
+    signatures  = [
+        ":Unclosed_class_signature_cmi",
+        ":Unclosed_paren_module_type_cmi",
+        ":Unclosed_sig_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Escape_error",
+    struct = "escape_error.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Expecting",
+    struct = "expecting.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7847",
+    struct = "pr7847.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Unclosed_class_signature_cmi",
+    src  = "unclosed_class_signature.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_class_simpl_expr1",
+    struct = "unclosed_class_simpl_expr1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_class_simpl_expr2",
+    struct = "unclosed_class_simpl_expr2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_class_simpl_expr3",
+    struct = "unclosed_class_simpl_expr3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_object",
+    struct = "unclosed_object.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_paren_module_expr1",
+    struct = "unclosed_paren_module_expr1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_paren_module_expr2",
+    struct = "unclosed_paren_module_expr2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_paren_module_expr3",
+    struct = "unclosed_paren_module_expr3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_paren_module_expr4",
+    struct = "unclosed_paren_module_expr4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_paren_module_expr5",
+    struct = "unclosed_paren_module_expr5.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Unclosed_paren_module_type_cmi",
+    src  = "unclosed_paren_module_type.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Unclosed_sig_cmi",
+    src  = "unclosed_sig.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_simple_expr",
+    struct = "unclosed_simple_expr.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_simple_pattern",
+    struct = "unclosed_simple_pattern.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unclosed_struct",
+    struct = "unclosed_struct.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

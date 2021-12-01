@@ -1,0 +1,91 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-short-paths_lib",
+    modules  = [
+        ":Errors",
+        ":Gpr1223",
+        ":Pr5918",
+        ":Pr6836",
+        ":Pr7543",
+        ":Short-paths",
+    ],
+    signatures  = [
+        ":Gpr1223_bar_cmi",
+        ":Gpr1223_foo_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Errors",
+    struct = "errors.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gpr1223",
+    struct = "gpr1223.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Gpr1223_bar_cmi",
+    src  = "gpr1223_bar.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Gpr1223_foo_cmi",
+    src  = "gpr1223_foo.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr5918",
+    struct = "pr5918.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6836",
+    struct = "pr6836.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7543",
+    struct = "pr7543.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Short-paths",
+    struct = "short-paths.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

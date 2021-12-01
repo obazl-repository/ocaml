@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-signatures_lib",
+    modules  = [
+        ":Els",
+        ":Pr6371",
+        ":Pr6672",
+    ],
+)
+
+ocaml_module(
+    name   = "Els",
+    struct = "els.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6371",
+    struct = "pr6371.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6672",
+    struct = "pr6672.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

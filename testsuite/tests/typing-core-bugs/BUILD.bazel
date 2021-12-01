@@ -1,0 +1,60 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-core-bugs_lib",
+    modules  = [
+        ":Const_int_hint",
+        ":Missing_rec_hint",
+        ":Repeated_did_you_mean",
+        ":Type_expected_explanation",
+        ":Unit_fun_hints",
+    ],
+)
+
+ocaml_module(
+    name   = "Const_int_hint",
+    struct = "const_int_hint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Missing_rec_hint",
+    struct = "missing_rec_hint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Repeated_did_you_mean",
+    struct = "repeated_did_you_mean.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Type_expected_explanation",
+    struct = "type_expected_explanation.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unit_fun_hints",
+    struct = "unit_fun_hints.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

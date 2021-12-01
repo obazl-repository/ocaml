@@ -1,0 +1,33 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_prim-bigstring_lib",
+    modules  = [
+        ":Bigstring_access",
+        ":String_access",
+    ],
+)
+
+ocaml_module(
+    name   = "Bigstring_access",
+    struct = "bigstring_access.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "String_access",
+    struct = "string_access.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

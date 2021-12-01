@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_signature",
+)
+
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_opaque_intf_lib",
+    signatures  = [
+        ":Opaque_impl_cmi",
+        ":Opaque_intf_cmi",
+        ":Regular_cmi",
+    ],
+)
+
+ocaml_signature(
+    name = "Opaque_impl_cmi",
+    src  = "opaque_impl.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Opaque_intf_cmi",
+    src  = "opaque_intf.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Regular_cmi",
+    src  = "regular.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

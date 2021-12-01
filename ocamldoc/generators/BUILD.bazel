@@ -1,0 +1,48 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "ocamldoc_generators_lib",
+    modules  = [
+        ":Odoc_literate",
+        ":Odoc_todo",
+    ],
+)
+
+ocaml_module(
+    name   = "Odoc_literate",
+    struct = "odoc_literate.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_html", ## (Ocamldoc Odoc_html)
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ":Odoc_args", ## (Ocamldoc Odoc_args)
+        ## (Printf)
+        ## (Buffer)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_todo",
+    struct = "odoc_todo.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_html", ## (Ocamldoc Odoc_html)
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ":Odoc_args", ## (Ocamldoc Odoc_args)
+        ## (Printf)
+        ## (List)
+        ## (Filename)
+        ## (Buffer)
+    ]
+)
+

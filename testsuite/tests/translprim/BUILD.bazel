@@ -1,0 +1,69 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_translprim_lib",
+    modules  = [
+        ":Array_spec",
+        ":Comparison_table",
+        ":Locs",
+        ":Module_coercion",
+        ":Ref_spec",
+        ":Sendcache",
+    ],
+)
+
+ocaml_module(
+    name   = "Array_spec",
+    struct = "array_spec.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Comparison_table",
+    struct = "comparison_table.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Locs",
+    struct = "locs.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Module_coercion",
+    struct = "module_coercion.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ref_spec",
+    struct = "ref_spec.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Sendcache",
+    struct = "sendcache.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

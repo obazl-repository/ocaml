@@ -1,0 +1,33 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-stream_lib",
+    modules  = [
+        ":Count_concat_bug",
+        ":Mpr7769",
+    ],
+)
+
+ocaml_module(
+    name   = "Count_concat_bug",
+    struct = "count_concat_bug.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mpr7769",
+    struct = "mpr7769.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

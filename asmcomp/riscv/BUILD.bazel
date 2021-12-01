@@ -1,0 +1,93 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "asmcomp_riscv_lib",
+    modules  = [
+        ":CSE",
+        ":Arch",
+        ":Proc",
+        ":Reload",
+        ":Scheduling",
+        ":Selection",
+    ],
+)
+
+ocaml_module(
+    name   = "CSE",
+    struct = "CSE.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Riscv", ## (Asmcomp Riscv Arch)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ":CSEgen", ## (Asmcomp CSEgen)
+    ]
+)
+
+ocaml_module(
+    name   = "Arch",
+    struct = "arch.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Printf)
+        ## (Format)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Proc",
+    struct = "proc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Riscv", ## (Asmcomp Riscv Arch)
+        ":Reg", ## (Asmcomp Reg)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (Misc)
+        ## (List)
+        ## (Filename)
+        ## (Config)
+        ## (Clflags)
+        ## (Ccomp)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Reload",
+    struct = "reload.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Reloadgen", ## (Asmcomp Reloadgen)
+    ]
+)
+
+ocaml_module(
+    name   = "Scheduling",
+    struct = "scheduling.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Schedgen", ## (Asmcomp Schedgen)
+    ]
+)
+
+ocaml_module(
+    name   = "Selection",
+    struct = "selection.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Riscv", ## (Asmcomp Riscv Arch)
+        ":Selectgen", ## (Asmcomp Selectgen)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+    ]
+)
+

@@ -1,0 +1,447 @@
+load("//bzl:rules.bzl",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
+)
+
+load("//config:BUILD.bzl",
+     "ROOT_MODULE_OPTS",
+     "ROOT_SIG_OPTS")
+
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS = ROOT_SIG_OPTS
+
+STDLIB = ["//stdlib"]
+
+bootstrap_library(
+    name = "bytecomp",
+    manifest  = [
+        ":Bytegen",
+        ":Bytelibrarian",
+        ":Bytelink",
+        ":Bytepackager",
+        ":Bytesections",
+        ":Dll",
+        ":Emitcode",
+        ":Instruct",
+        ":Meta",
+        ":Printinstr",
+        ":Symtable",
+    ],
+)
+
+bootstrap_module(
+    name   = "Bytegen",
+    struct = "bytegen.ml",
+    sig    = "Bytegen_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        "//lambda:Switch", ## (Lambda Switch)
+        "//lambda:Matching", ## (Lambda Matching)
+        # ":Lambda", ## (Lambda Lambda)
+        # ":Debuginfo", ## (Lambda Debuginfo)
+        "//stdlib:Stdlib",
+        ":Instruct", ## (Bytecomp Instruct)
+        ## (Types)
+        ## (Subst)
+        ## (Stack)
+        ## (Printf)
+        ## (Primitive)
+        ## (Misc)
+        ## (List)
+        ## (Int)
+        ## (Ident)
+        ## (Env)
+        ## (Config)
+        ## (Clflags)
+        ## (Asttypes)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Bytegen_cmi",
+    src  = "bytegen.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Instruct", ## (Bytecomp Instruct)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Bytelibrarian",
+    struct = "bytelibrarian.ml",
+    sig    = "Bytelibrarian_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Emitcode", ## (Bytecomp Emitcode)
+        ":Bytelink", ## (Bytecomp Bytelink)
+        ## (String)
+        ## (Misc)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Format)
+        ## (Config)
+        ## (Cmo_format)
+        ## (Clflags)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Bytelibrarian_cmi",
+    src  = "bytelibrarian.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Bytelink",
+    struct = "bytelink.ml",
+    sig    = "Bytelink_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Symtable", ## (Bytecomp Symtable)
+        ":Instruct", ## (Bytecomp Instruct)
+        ":Emitcode", ## (Bytecomp Emitcode)
+        ":Dll", ## (Bytecomp Dll)
+        ":Bytesections", ## (Bytecomp Bytesections)
+        ## (Warnings)
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Option)
+        ## (Opcodes)
+        ## (Obj)
+        ## (Misc)
+        ## (Marshal)
+        ## (LongString)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Ident)
+        ## (Format)
+        ## (Filename)
+        ## (Consistbl)
+        ## (Config)
+        ## (Cmo_format)
+        ## (Clflags)
+        ## (Char)
+        ## (Ccomp)
+        ## (Bytes)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives", "//stdlib:camlheader"],
+)
+
+bootstrap_signature(
+    name = "Bytelink_cmi",
+    src  = "bytelink.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Symtable", ## (Bytecomp Symtable)
+        ## (Misc)
+        ## (Format)
+        ## (Cmo_format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Bytepackager",
+    struct = "bytepackager.ml",
+    sig    = "Bytepackager_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Instruct", ## (Bytecomp Instruct)
+        ":Emitcode", ## (Bytecomp Emitcode)
+        ":Bytelink", ## (Bytecomp Bytelink)
+        ":Bytegen", ## (Bytecomp Bytegen)
+        ## (Typemod)
+        ## (Translmod)
+        ## (Subst)
+        ## (Simplif)
+        ## (Printlambda)
+        ## (Path)
+        ## (Misc)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Ident)
+        ## (Format)
+        ## (Filename)
+        ## (Env)
+        ## (Config)
+        ## (Cmo_format)
+        ## (Clflags)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Bytepackager_cmi",
+    src  = "bytepackager.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ## (Ident)
+        ## (Format)
+        "//typing:Env_cmi"
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Bytesections",
+    struct = "bytesections.ml",
+    sig    = "Bytesections_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (String)
+        ## (List)
+        "//utils:Config"
+    ],
+    data = ["//runtime:primitives"],
+    visibility = ["//tools:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Bytesections_cmi",
+    src  = "bytesections.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Dll",
+    struct = "dll.ml",
+    sig    = "Dll_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Sys)
+        ## (String)
+        ## (Obj)
+        "//utils:Misc",
+        ## (List)
+        ## (Filename)
+        "//utils:Config",
+        "//utils:Binutils"
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Dll_cmi",
+    src  = "dll.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Emitcode",
+    struct = "emitcode.ml",
+    sig    = "Emitcode_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        "//lambda:Translmod", ## (Lambda Translmod)
+        ":Instruct", ## (Bytecomp Instruct)
+        ":Bytegen", ## (Bytecomp Bytegen)
+        ## (Sys)
+        ## (Primitive)
+        # "//tools:Opcodes"
+        ## (Misc)
+        ## (Marshal)
+        ## (LongString)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Ident)
+        ## (Format)
+        ## (Filename)
+        ## (Env)
+        ## (Config)
+        ## (Clflags)
+        ## (Char)
+        ## (Btype)
+        ## (Asttypes)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Emitcode_cmi",
+    src  = "emitcode.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Instruct", ## (Bytecomp Instruct)
+        ## (Misc)
+        ## (Ident)
+        "//file_formats:Cmo_format_cmi",
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Instruct",
+    struct = "instruct.ml",
+    sig    = "Instruct_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        "//stdlib:Stdlib",
+        ## (Types)
+        ## (Subst)
+        ## (Location)
+        ## (Ident)
+        ## (Env)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Instruct_cmi",
+    src  = "instruct.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        "//stdlib:Stdlib",
+        "//lambda:Lambda_cmi"
+        ## (Types)
+        ## (Subst)
+        ## (Location)
+        ## (Ident)
+        ## (Env)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Meta",
+    struct = "meta.ml",
+    sig    = "Meta_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Instruct", ## (Bytecomp Instruct)
+        ## (Obj)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Meta_cmi",
+    src  = "meta.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Instruct", ## (Bytecomp Instruct)
+        ## (Obj)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Opcodes",
+    struct = "opcodes.ml",
+    sig    = ":Opcodes_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Opcodes_cmi",
+    src  = "opcodes.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Printinstr",
+    struct = "printinstr.ml",
+    sig    = "Printinstr_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        "//lambda:Printlambda",
+        "//lambda:Lambda", ## (Lambda Lambda)
+        ":Instruct", ## (Bytecomp Instruct)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Ident)
+        ## (Format)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Printinstr_cmi",
+    src  = "printinstr.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Instruct", ## (Bytecomp Instruct)
+        ## (Format)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_module(
+    name   = "Symtable",
+    struct = "symtable.ml",
+    sig    = "Symtable_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        "//lambda:Runtimedef", ## (Lambda Runtimedef)
+        ":Meta", ## (Bytecomp Meta)
+        ":Dll", ## (Bytecomp Dll)
+        ":Bytesections", ## (Bytecomp Bytesections)
+        ## (Sys)
+        ## (Printf)
+        "//typing:Predef",
+        ## (Obj)
+        ## (Misc)
+        ## (Map)
+        ## (LongString)
+        ## (Location)
+        ## (List)
+        ## (Ident)
+        ## (Format)
+        ## (Filename)
+        ## (Digest)
+        ## (Config)
+        ## (Cmo_format)
+        ## (Clflags)
+        ## (Char)
+        ## (Buffer)
+        ## (Asttypes)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+bootstrap_signature(
+    name = "Symtable_cmi",
+    src  = "symtable.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ## (Obj)
+        ## (Misc)
+        ## (Ident)
+        ## (Format)
+        ## (Digest)
+        "//file_formats:Cmo_format_cmi"
+    ],
+    data = ["//runtime:primitives"]
+)
+

@@ -1,0 +1,87 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_match-exception_lib",
+    modules  = [
+        ":Allocation",
+        ":Exception_propagation",
+        ":Identifier_sharing",
+        ":Match_failure",
+        ":Nested_handlers",
+        ":Raise_from_success_continuation",
+        ":Streams",
+        ":Tail_calls",
+    ],
+)
+
+ocaml_module(
+    name   = "Allocation",
+    struct = "allocation.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Exception_propagation",
+    struct = "exception_propagation.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Identifier_sharing",
+    struct = "identifier_sharing.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Match_failure",
+    struct = "match_failure.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Nested_handlers",
+    struct = "nested_handlers.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Raise_from_success_continuation",
+    struct = "raise_from_success_continuation.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Streams",
+    struct = "streams.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Tail_calls",
+    struct = "tail_calls.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

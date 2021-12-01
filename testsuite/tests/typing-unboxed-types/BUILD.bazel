@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-unboxed-types_lib",
+    modules  = [
+        ":Test",
+        ":Test_flat",
+        ":Test_no_flat",
+    ],
+)
+
+ocaml_module(
+    name   = "Test",
+    struct = "test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_flat",
+    struct = "test_flat.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_no_flat",
+    struct = "test_no_flat.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

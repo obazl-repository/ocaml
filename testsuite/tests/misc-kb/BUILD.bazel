@@ -1,0 +1,98 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_misc-kb_lib",
+    modules  = [
+        ":Equations",
+        ":Kb",
+        ":Kbmain",
+        ":Orderings",
+        ":Terms",
+    ],
+)
+
+ocaml_module(
+    name   = "Equations",
+    struct = "equations.ml",
+    sig    = "Equations_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Equations_cmi",
+    src  = "equations.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Kb",
+    struct = "kb.ml",
+    sig    = "Kb_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Kb_cmi",
+    src  = "kb.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Kbmain",
+    struct = "kbmain.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Orderings",
+    struct = "orderings.ml",
+    sig    = "Orderings_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Orderings_cmi",
+    src  = "orderings.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Terms",
+    struct = "terms.ml",
+    sig    = "Terms_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Terms_cmi",
+    src  = "terms.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

@@ -1,0 +1,109 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-sigsubst_lib",
+    modules  = [
+        ":Sig_local_aliases",
+        ":Sig_local_aliases_syntax_errors",
+        ":Sigsubst",
+        ":Test_functor",
+        ":Test_loc_modtype_type_eq",
+        ":Test_loc_modtype_type_subst",
+        ":Test_loc_type_eq",
+        ":Test_loc_type_subst",
+        ":Test_locations",
+    ],
+    signatures  = [
+        ":Mpr7852_cmi",
+    ],
+)
+
+ocaml_signature(
+    name = "Mpr7852_cmi",
+    src  = "mpr7852.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Sig_local_aliases",
+    struct = "sig_local_aliases.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Sig_local_aliases_syntax_errors",
+    struct = "sig_local_aliases_syntax_errors.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Sigsubst",
+    struct = "sigsubst.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_functor",
+    struct = "test_functor.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_loc_modtype_type_eq",
+    struct = "test_loc_modtype_type_eq.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_loc_modtype_type_subst",
+    struct = "test_loc_modtype_type_subst.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_loc_type_eq",
+    struct = "test_loc_type_eq.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_loc_type_subst",
+    struct = "test_loc_type_subst.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test_locations",
+    struct = "test_locations.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

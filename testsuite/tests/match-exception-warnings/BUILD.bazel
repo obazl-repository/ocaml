@@ -1,0 +1,69 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_match-exception-warnings_lib",
+    modules  = [
+        ":Exhaustiveness_warnings",
+        ":No_mixing_under_guard",
+        ":No_value_clauses",
+        ":Placement",
+        ":Pr7083",
+        ":Reachability",
+    ],
+)
+
+ocaml_module(
+    name   = "Exhaustiveness_warnings",
+    struct = "exhaustiveness_warnings.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "No_mixing_under_guard",
+    struct = "no_mixing_under_guard.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "No_value_clauses",
+    struct = "no_value_clauses.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Placement",
+    struct = "placement.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7083",
+    struct = "pr7083.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Reachability",
+    struct = "reachability.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

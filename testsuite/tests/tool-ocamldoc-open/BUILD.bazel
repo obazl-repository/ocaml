@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-ocamldoc-open_lib",
+    modules  = [
+        ":Alias",
+        ":Inner",
+        ":Main",
+    ],
+)
+
+ocaml_module(
+    name   = "Alias",
+    struct = "alias.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Inner",
+    struct = "inner.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Main",
+    struct = "main.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

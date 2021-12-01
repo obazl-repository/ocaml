@@ -1,0 +1,177 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_backtrace_lib",
+    modules  = [
+        ":Backtrace",
+        ":Backtrace2",
+        ":Backtrace3",
+        ":Backtrace_deprecated",
+        ":Backtrace_or_exception",
+        ":Backtrace_slots",
+        ":Backtraces_and_finalizers",
+        ":Callstack",
+        ":Event_after_prim",
+        ":Inline_test",
+        ":Inline_traversal_test",
+        ":Lazy",
+        ":Methods",
+        ":Names",
+        ":Pr2195",
+        ":Pr6920_why_at",
+        ":Pr6920_why_swallow",
+        ":Raw_backtrace",
+    ],
+)
+
+ocaml_module(
+    name   = "Backtrace",
+    struct = "backtrace.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Backtrace2",
+    struct = "backtrace2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Backtrace3",
+    struct = "backtrace3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Backtrace_deprecated",
+    struct = "backtrace_deprecated.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Backtrace_or_exception",
+    struct = "backtrace_or_exception.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Backtrace_slots",
+    struct = "backtrace_slots.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Backtraces_and_finalizers",
+    struct = "backtraces_and_finalizers.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Callstack",
+    struct = "callstack.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Event_after_prim",
+    struct = "event_after_prim.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Inline_test",
+    struct = "inline_test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Inline_traversal_test",
+    struct = "inline_traversal_test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lazy",
+    struct = "lazy.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Methods",
+    struct = "methods.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Names",
+    struct = "names.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr2195",
+    struct = "pr2195.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6920_why_at",
+    struct = "pr6920_why_at.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6920_why_swallow",
+    struct = "pr6920_why_swallow.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Raw_backtrace",
+    struct = "raw_backtrace.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

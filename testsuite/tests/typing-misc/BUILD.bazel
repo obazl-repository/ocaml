@@ -1,0 +1,474 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-misc_lib",
+    modules  = [
+        ":Build_as_type",
+        ":Constraints",
+        ":Deep",
+        ":Disambiguate_principality",
+        ":Empty_ppx",
+        ":Empty_variant",
+        ":Enrich_typedecl",
+        ":Exotic_unifications",
+        ":External_arity",
+        ":Filter_params",
+        ":Gpr2277",
+        ":Includeclass_errors",
+        ":Injectivity",
+        ":Inside_out",
+        ":Is_expansive",
+        ":Labels",
+        ":Mapping",
+        ":Normalize_type",
+        ":Occur_check",
+        ":Optbinders",
+        ":Pat_type_sharing",
+        ":Pattern_open",
+        ":Polyvars",
+        ":Pr6416",
+        ":Pr6634",
+        ":Pr6939-flat-float-array",
+        ":Pr6939-no-flat-float-array",
+        ":Pr7103",
+        ":Pr7228",
+        ":Pr7668_bad",
+        ":Pr7712",
+        ":Pr7937",
+        ":Pr8548",
+        ":Pr8548_split",
+        ":Printing",
+        ":Range",
+        ":Range_intf",
+        ":Ranged",
+        ":Ranged_intf",
+        ":Records",
+        ":Scope_escape",
+        ":Typecore_empty_polyvariant_error",
+        ":Typecore_errors",
+        ":Typecore_nolabel_errors",
+        ":Typetexp_errors",
+        ":Unbound_type_variables",
+        ":Unique_names_in_unification",
+        ":Variance",
+        ":Variant",
+        ":Wellfounded",
+        ":Wrong_kind",
+    ],
+)
+
+ocaml_module(
+    name   = "Build_as_type",
+    struct = "build_as_type.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Constraints",
+    struct = "constraints.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Deep",
+    struct = "deep.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Disambiguate_principality",
+    struct = "disambiguate_principality.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Empty_ppx",
+    struct = "empty_ppx.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Empty_variant",
+    struct = "empty_variant.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Enrich_typedecl",
+    struct = "enrich_typedecl.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Exotic_unifications",
+    struct = "exotic_unifications.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "External_arity",
+    struct = "external_arity.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Filter_params",
+    struct = "filter_params.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gpr2277",
+    struct = "gpr2277.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Includeclass_errors",
+    struct = "includeclass_errors.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Injectivity",
+    struct = "injectivity.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Inside_out",
+    struct = "inside_out.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Is_expansive",
+    struct = "is_expansive.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Labels",
+    struct = "labels.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mapping",
+    struct = "mapping.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Normalize_type",
+    struct = "normalize_type.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Occur_check",
+    struct = "occur_check.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Optbinders",
+    struct = "optbinders.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pat_type_sharing",
+    struct = "pat_type_sharing.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pattern_open",
+    struct = "pattern_open.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Polyvars",
+    struct = "polyvars.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6416",
+    struct = "pr6416.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6634",
+    struct = "pr6634.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6939-flat-float-array",
+    struct = "pr6939-flat-float-array.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6939-no-flat-float-array",
+    struct = "pr6939-no-flat-float-array.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7103",
+    struct = "pr7103.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7228",
+    struct = "pr7228.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7668_bad",
+    struct = "pr7668_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7712",
+    struct = "pr7712.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7937",
+    struct = "pr7937.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr8548",
+    struct = "pr8548.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr8548_split",
+    struct = "pr8548_split.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Printing",
+    struct = "printing.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Range",
+    struct = "range.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Range_intf",
+    struct = "range_intf.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ranged",
+    struct = "ranged.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Ranged_intf",
+    struct = "ranged_intf.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Records",
+    struct = "records.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Scope_escape",
+    struct = "scope_escape.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Typecore_empty_polyvariant_error",
+    struct = "typecore_empty_polyvariant_error.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Typecore_errors",
+    struct = "typecore_errors.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Typecore_nolabel_errors",
+    struct = "typecore_nolabel_errors.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Typetexp_errors",
+    struct = "typetexp_errors.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unbound_type_variables",
+    struct = "unbound_type_variables.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unique_names_in_unification",
+    struct = "unique_names_in_unification.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Variance",
+    struct = "variance.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Variant",
+    struct = "variant.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Wellfounded",
+    struct = "wellfounded.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Wrong_kind",
+    struct = "wrong_kind.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

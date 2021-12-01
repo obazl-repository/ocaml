@@ -1,0 +1,53 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-dynlink-private_plugin6_lib",
+    modules  = [
+        ":Partridge",
+        ":Pheasant",
+    ],
+)
+
+ocaml_module(
+    name   = "Partridge",
+    struct = "partridge.ml",
+    sig    = "Partridge_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Partridge_cmi",
+    src  = "partridge.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pheasant",
+    struct = "pheasant.ml",
+    sig    = "Pheasant_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Pheasant_cmi",
+    src  = "pheasant.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

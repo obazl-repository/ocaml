@@ -1,0 +1,91 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_no-alias-deps_lib",
+    modules  = [
+        ":A2235",
+        ":Aliases",
+        ":Gpr2235",
+        ":Lib2235",
+        ":Lib__2235",
+        ":User_of_lib2235",
+    ],
+    signatures  = [
+        ":C_cmi",
+        ":D_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "A2235",
+    struct = "a2235.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Aliases",
+    struct = "aliases.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "C_cmi",
+    src  = "c.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "D_cmi",
+    src  = "d.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gpr2235",
+    struct = "gpr2235.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lib2235",
+    struct = "lib2235.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lib__2235",
+    struct = "lib__2235.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "User_of_lib2235",
+    struct = "user_of_lib2235.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

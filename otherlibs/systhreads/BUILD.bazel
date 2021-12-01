@@ -1,0 +1,142 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "otherlibs_systhreads_lib",
+    modules  = [
+        ":Condition",
+        ":Event",
+        ":Mutex",
+        ":Semaphore",
+        ":Thread",
+        ":ThreadUnix",
+    ],
+)
+
+ocaml_module(
+    name   = "Condition",
+    struct = "condition.ml",
+    sig    = "Condition_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Systhreads", ## (Otherlibs Systhreads Mutex)
+    ]
+)
+
+ocaml_signature(
+    name = "Condition_cmi",
+    src  = "condition.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Systhreads", ## (Otherlibs Systhreads Mutex)
+    ]
+)
+
+ocaml_module(
+    name   = "Event",
+    struct = "event.ml",
+    sig    = "Event_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Systhreads", ## (Otherlibs Systhreads Mutex)
+        ":Systhreads", ## (Otherlibs Systhreads Condition)
+        ## (Random)
+        ## (Queue)
+        ## (List)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Event_cmi",
+    src  = "event.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mutex",
+    struct = "mutex.ml",
+    sig    = "Mutex_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Mutex_cmi",
+    src  = "mutex.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Semaphore",
+    struct = "semaphore.ml",
+    sig    = "Semaphore_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Systhreads", ## (Otherlibs Systhreads Mutex)
+        ":Systhreads", ## (Otherlibs Systhreads Condition)
+    ]
+)
+
+ocaml_signature(
+    name = "Semaphore_cmi",
+    src  = "semaphore.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Thread",
+    struct = "thread.ml",
+    sig    = "Thread_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (Printf)
+        ## (Printexc)
+        ## (Callback)
+    ]
+)
+
+ocaml_signature(
+    name = "Thread_cmi",
+    src  = "thread.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "ThreadUnix",
+    struct = "threadUnix.ml",
+    sig    = "ThreadUnix_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Unix", ## (Otherlibs Unix Unix)
+        ":Systhreads", ## (Otherlibs Systhreads Thread)
+        ## (Bytes)
+    ]
+)
+
+ocaml_signature(
+    name = "ThreadUnix_cmi",
+    src  = "threadUnix.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

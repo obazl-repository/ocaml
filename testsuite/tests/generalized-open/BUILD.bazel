@@ -1,0 +1,87 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_generalized-open_lib",
+    modules  = [
+        ":Accepted_batch",
+        ":Accepted_expect",
+        ":Clambda_optim",
+        ":Expansiveness",
+        ":Funct_body",
+        ":Gpr1506",
+        ":Pr10048",
+        ":Shadowing",
+    ],
+)
+
+ocaml_module(
+    name   = "Accepted_batch",
+    struct = "accepted_batch.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Accepted_expect",
+    struct = "accepted_expect.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Clambda_optim",
+    struct = "clambda_optim.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Expansiveness",
+    struct = "expansiveness.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Funct_body",
+    struct = "funct_body.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gpr1506",
+    struct = "gpr1506.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr10048",
+    struct = "pr10048.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Shadowing",
+    struct = "shadowing.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

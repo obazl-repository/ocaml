@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-missing-cmi-3_lib",
+    modules  = [
+        ":Middle",
+        ":Original",
+        ":User",
+    ],
+)
+
+ocaml_module(
+    name   = "Middle",
+    struct = "middle.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Original",
+    struct = "original.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "User",
+    struct = "user.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

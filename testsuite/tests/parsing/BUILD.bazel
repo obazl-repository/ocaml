@@ -1,0 +1,222 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_parsing_lib",
+    modules  = [
+        ":Anonymous_class_parameter",
+        ":Arrow_ambiguity",
+        ":Attributes",
+        ":Broken_invariants",
+        ":Change_start_loc",
+        ":Constructor_declarations",
+        ":Docstrings",
+        ":Extended_indexoperators",
+        ":Extension_operators",
+        ":Extensions",
+        ":Hash_ambiguity",
+        ":Illegal_ppx",
+        ":Int_and_float_with_modifier",
+        ":Multi_indices",
+        ":Pr10468",
+        ":Pr6604",
+        ":Pr6604_2",
+        ":Pr6604_3",
+        ":Pr6865",
+        ":Pr7165",
+        ":Quotedextensions",
+        ":Reloc",
+        ":Shortcut_ext_attr",
+    ],
+)
+
+ocaml_module(
+    name   = "Anonymous_class_parameter",
+    struct = "anonymous_class_parameter.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Arrow_ambiguity",
+    struct = "arrow_ambiguity.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Attributes",
+    struct = "attributes.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Broken_invariants",
+    struct = "broken_invariants.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Change_start_loc",
+    struct = "change_start_loc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Constructor_declarations",
+    struct = "constructor_declarations.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Docstrings",
+    struct = "docstrings.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Extended_indexoperators",
+    struct = "extended_indexoperators.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Extension_operators",
+    struct = "extension_operators.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Extensions",
+    struct = "extensions.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Hash_ambiguity",
+    struct = "hash_ambiguity.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Illegal_ppx",
+    struct = "illegal_ppx.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Int_and_float_with_modifier",
+    struct = "int_and_float_with_modifier.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Multi_indices",
+    struct = "multi_indices.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr10468",
+    struct = "pr10468.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6604",
+    struct = "pr6604.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6604_2",
+    struct = "pr6604_2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6604_3",
+    struct = "pr6604_3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6865",
+    struct = "pr6865.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7165",
+    struct = "pr7165.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Quotedextensions",
+    struct = "quotedextensions.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Reloc",
+    struct = "reloc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Shortcut_ext_attr",
+    struct = "shortcut_ext_attr.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

@@ -1,0 +1,335 @@
+load("//bzl:rules.bzl",
+     "bootstrap_executable",
+     "bootstrap_module",
+     "bootstrap_ocamllex",
+     "bootstrap_ocamlyacc",
+     "bootstrap_signature",
+     "bootstrap_library",
+)
+
+## Makefile.common
+# Lexer generation
+# BOOT_OCAMLLEX ?= $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
+# Default value for OCAMLLEX
+# In those directories where this needs to be overridden, the overriding
+# should take place *before* Makefile.common is included.
+# OCAMLLEX ?= $(BEST_OCAMLLEX)
+# OCAMLLEXFLAGS ?= -q
+# %.ml: %.mll
+# 	$(OCAMLLEX) $(OCAMLLEXFLAGS) $<
+
+# Parser generation
+# OCAMLYACC ?= $(ROOTDIR)/yacc/ocamlyacc$(EXE)
+# OCAMLYACCFLAGS ?=
+# %.ml %.mli: %.mly
+# 	$(OCAMLYACC) $(OCAMLYACCFLAGS) $<
+
+## BOOT_OCAMLLEX = //boot/ocamllex is the default for this dir
+# We implement it in the toolchain used by bootstrap_ocamllex
+
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+STDLIB = ["//stdlib"]
+
+bootstrap_executable(
+    name = "ocamllex.opt",
+    main = ":Main",
+    opts = [
+        "-verbose",
+        "-g", "-nostdlib",
+        # "-I", "boot",      ## home of std_exit.cmo?
+        # "-use-prims", "runtime/primitives",
+        # "-I", "stdlib",
+        "-I", "runtime",
+        "-compat-32",
+        # "-ccopt", "-Wno-error=ignored-optimization-argument",
+        # "-ccopt", "-Wl,-export_dynamic",
+        # "-ccopt", "-Wno-error=unknown-argument"
+    ],
+    data = ["//runtime:primitives"],
+    deps = [
+        ":Cset", ":Syntax", ":Parser",
+        ":Lexer",
+        ":Table", ":Lexgen",
+        ":Compact", ":Common", ":Output", ":Outputbis",
+        "//boot:Std_exit",
+    ]
+)
+
+bootstrap_library(
+    name = "lex",
+    manifest  = [
+        ":Common",
+        ":Compact",
+        ":Cset",
+        ":Lexer",
+        ":Lexgen",
+        ":Output",
+        ":Outputbis",
+        ":Parser",
+        ":Syntax",
+        ":Table",
+    ],
+)
+
+bootstrap_module(
+    name   = "Common",
+    struct = "common.ml",
+    sig    = "Common_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+        ":Lexgen", ## (Lex Lexgen)
+        ## (Sys)
+        ## (Printf)
+        ## (List)
+        ## (Int)
+        ## (Bytes)
+    ]
+)
+
+bootstrap_signature(
+    name = "Common_cmi",
+    src  = "common.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+        ":Lexgen", ## (Lex Lexgen)
+    ]
+)
+
+bootstrap_module(
+    name   = "Compact",
+    struct = "compact.ml",
+    sig    = "Compact_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Table", ## (Lex Table)
+        ":Lexgen", ## (Lex Lexgen)
+        ## (List)
+        ## (Hashtbl)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Compact_cmi",
+    src  = "compact.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+        ":Lexgen", ## (Lex Lexgen)
+    ]
+)
+
+bootstrap_module(
+    name   = "Cset",
+    struct = "cset.ml",
+    sig    = "Cset_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (List)
+        ## (Int)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Cset_cmi",
+    src  = "cset.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ]
+)
+
+bootstrap_module(
+    name   = "Lexer",
+    struct = "lexer.ml",
+    sig    = "Lexer_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Parser"
+    ],
+    visibility = ["//file_formats:__pkg__"]
+)
+
+bootstrap_ocamllex(
+    name = "lexer_ml",
+    out  = "lexer.ml",
+    src  = "lexer.mll"
+)
+
+bootstrap_signature(
+    name = "Lexer_cmi",
+    src  = "lexer.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parser"
+    ]
+)
+
+bootstrap_module(
+    name   = "Lexgen",
+    struct = "lexgen.ml",
+    sig    = "Lexgen_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Table", ## (Lex Table)
+        ":Syntax", ## (Lex Syntax)
+        ":Cset", ## (Lex Cset)
+        ## (String)
+        ## (Stack)
+        ## (Set)
+        ## (Map)
+        ## (List)
+        ## (Int)
+        ## (Hashtbl)
+        ## (Bool)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Lexgen_cmi",
+    src  = "lexgen.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+    ]
+)
+
+bootstrap_module(
+    name   = "Main",
+    struct = "main.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+        ":Outputbis", ## (Lex Outputbis)
+        ":Output", ## (Lex Output)
+        ":Lexgen", ## (Lex Lexgen)
+        ":Lexer", ## (Lex Lexer)
+        ":Cset", ## (Lex Cset)
+        ":Compact", ## (Lex Compact)
+        ":Common", ## (Lex Common)
+        ## (Sys)
+        ## (Printf)
+        ## (Printexc)
+        ":Parser"
+        ## (Lexing)
+        ## (Filename)
+        ## (Arg)
+    ]
+)
+
+bootstrap_module(
+    name   = "Output",
+    struct = "output.ml",
+    sig    = "Output_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+        ":Lexgen", ## (Lex Lexgen)
+        ":Compact", ## (Lex Compact)
+        ":Common", ## (Lex Common)
+        ## (Printf)
+        ## (List)
+        ## (Char)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Output_cmi",
+    src  = "output.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+        ":Lexgen", ## (Lex Lexgen)
+        ":Compact", ## (Lex Compact)
+        ":Common", ## (Lex Common)
+    ]
+)
+
+bootstrap_module(
+    name   = "Outputbis",
+    struct = "outputbis.ml",
+    sig    = "Outputbis_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+        ":Lexgen", ## (Lex Lexgen)
+        ":Common", ## (Lex Common)
+        ## (Printf)
+        ## (List)
+        ## (Hashtbl)
+        ## (Char)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Outputbis_cmi",
+    src  = "outputbis.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Syntax", ## (Lex Syntax)
+        ":Lexgen", ## (Lex Lexgen)
+        ":Common", ## (Lex Common)
+    ]
+)
+
+bootstrap_module(
+    name   = "Parser",
+    struct = "parser.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Syntax"
+    ]
+)
+
+bootstrap_ocamlyacc(
+    name = "parser_ml",
+    out  = "parser.ml",
+    src  = "parser.mly",
+    opts = ["-v"]
+)
+
+bootstrap_module(
+    name   = "Syntax",
+    struct = "syntax.ml",
+    sig    = "Syntax_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Cset", ## (Lex Cset)
+    ]
+)
+
+bootstrap_signature(
+    name = "Syntax_cmi",
+    src  = "syntax.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Cset", ## (Lex Cset)
+    ]
+)
+
+bootstrap_module(
+    name   = "Table",
+    struct = "table.ml",
+    sig    = "Table_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "Table_cmi",
+    src  = "table.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ]
+)
+

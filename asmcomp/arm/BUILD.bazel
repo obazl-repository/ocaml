@@ -1,0 +1,109 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "asmcomp_arm_lib",
+    modules  = [
+        ":CSE",
+        ":Arch",
+        ":Proc",
+        ":Reload",
+        ":Scheduling",
+        ":Selection",
+    ],
+)
+
+ocaml_module(
+    name   = "CSE",
+    struct = "CSE.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Arm", ## (Asmcomp Arm Arch)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ":CSEgen", ## (Asmcomp CSEgen)
+    ]
+)
+
+ocaml_module(
+    name   = "Arch",
+    struct = "arch.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Int32)
+        ## (Format)
+        ## (Config)
+        ## (Clflags)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Proc",
+    struct = "proc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Arm", ## (Asmcomp Arm Arch)
+        ":Reg", ## (Asmcomp Reg)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (String)
+        ## (Misc)
+        ## (List)
+        ## (Filename)
+        ## (Config)
+        ## (Clflags)
+        ## (Ccomp)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Reload",
+    struct = "reload.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Arm", ## (Asmcomp Arm Arch)
+        ":Reloadgen", ## (Asmcomp Reloadgen)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Scheduling",
+    struct = "scheduling.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Arm", ## (Asmcomp Arm Arch)
+        ":Schedgen", ## (Asmcomp Schedgen)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+    ]
+)
+
+ocaml_module(
+    name   = "Selection",
+    struct = "selection.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Arm", ## (Asmcomp Arm Proc)
+        ":Arm", ## (Asmcomp Arm Arch)
+        ":Selectgen", ## (Asmcomp Selectgen)
+        ":Reg", ## (Asmcomp Reg)
+        ":Mach", ## (Asmcomp Mach)
+        ":Cmm", ## (Asmcomp Cmm)
+        ## (List)
+        ## (Int32)
+        ## (Array)
+    ]
+)
+

@@ -1,0 +1,1437 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-ocaml_lib",
+    modules  = [
+        ":Directive_failure",
+        ":T000",
+        ":T010-const0",
+        ":T010-const1",
+        ":T010-const2",
+        ":T010-const3",
+        ":T011-constint",
+        ":T020",
+        ":T021-pushconst1",
+        ":T021-pushconst2",
+        ":T021-pushconst3",
+        ":T022-pushconstint",
+        ":T040-makeblock1",
+        ":T040-makeblock2",
+        ":T040-makeblock3",
+        ":T041-makeblock",
+        ":T050-getglobal",
+        ":T050-pushgetglobal",
+        ":T051-getglobalfield",
+        ":T051-pushgetglobalfield",
+        ":T060-raise",
+        ":T070-branch",
+        ":T070-branchif",
+        ":T070-branchifnot",
+        ":T071-boolnot",
+        ":T080-eq",
+        ":T080-geint",
+        ":T080-gtint",
+        ":T080-leint",
+        ":T080-ltint",
+        ":T080-neq",
+        ":T090-acc0",
+        ":T090-acc1",
+        ":T090-acc2",
+        ":T090-acc3",
+        ":T090-acc4",
+        ":T090-acc5",
+        ":T090-acc6",
+        ":T090-acc7",
+        ":T091-acc",
+        ":T092-pushacc",
+        ":T092-pushacc0",
+        ":T092-pushacc1",
+        ":T092-pushacc2",
+        ":T092-pushacc3",
+        ":T092-pushacc4",
+        ":T092-pushacc5",
+        ":T092-pushacc6",
+        ":T092-pushacc7",
+        ":T093-pushacc",
+        ":T100-pushtrap",
+        ":T101-poptrap",
+        ":T110-addint",
+        ":T110-andint",
+        ":T110-asrint-1",
+        ":T110-asrint-2",
+        ":T110-divint-1",
+        ":T110-divint-2",
+        ":T110-divint-3",
+        ":T110-lslint",
+        ":T110-lsrint",
+        ":T110-modint-1",
+        ":T110-modint-2",
+        ":T110-mulint",
+        ":T110-negint",
+        ":T110-offsetint",
+        ":T110-orint",
+        ":T110-subint",
+        ":T110-xorint",
+        ":T120-getstringchar",
+        ":T121-setstringchar",
+        ":T130-getvectitem",
+        ":T130-vectlength",
+        ":T131-setvectitem",
+        ":T140-switch-1",
+        ":T140-switch-2",
+        ":T140-switch-3",
+        ":T140-switch-4",
+        ":T141-switch-5",
+        ":T141-switch-6",
+        ":T141-switch-7",
+        ":T142-switch-8",
+        ":T142-switch-9",
+        ":T142-switch-A",
+        ":T150-push-1",
+        ":T150-push-2",
+        ":T160-closure",
+        ":T161-apply1",
+        ":T162-return",
+        ":T163",
+        ":T164-apply2",
+        ":T164-apply3",
+        ":T165-apply",
+        ":T170-envacc2",
+        ":T170-envacc3",
+        ":T170-envacc4",
+        ":T171-envacc",
+        ":T172-pushenvacc1",
+        ":T172-pushenvacc2",
+        ":T172-pushenvacc3",
+        ":T172-pushenvacc4",
+        ":T173-pushenvacc",
+        ":T180-appterm1",
+        ":T180-appterm2",
+        ":T180-appterm3",
+        ":T181-appterm",
+        ":T190-makefloatblock-1",
+        ":T190-makefloatblock-2",
+        ":T190-makefloatblock-3",
+        ":T191-vectlength",
+        ":T192-getfloatfield-1",
+        ":T192-getfloatfield-2",
+        ":T193-setfloatfield-1",
+        ":T193-setfloatfield-2",
+        ":T200-getfield0",
+        ":T200-getfield1",
+        ":T200-getfield2",
+        ":T200-getfield3",
+        ":T201-getfield",
+        ":T210-setfield0",
+        ":T210-setfield1",
+        ":T210-setfield2",
+        ":T210-setfield3",
+        ":T211-setfield",
+        ":T220-assign",
+        ":T230-check_signals",
+        ":T240-c_call1",
+        ":T240-c_call2",
+        ":T240-c_call3",
+        ":T240-c_call4",
+        ":T240-c_call5",
+        ":T250-closurerec-1",
+        ":T250-closurerec-2",
+        ":T251-pushoffsetclosure0",
+        ":T251-pushoffsetclosure2",
+        ":T251-pushoffsetclosurem2",
+        ":T252-pushoffsetclosure",
+        ":T253-offsetclosure0",
+        ":T253-offsetclosure2",
+        ":T253-offsetclosurem2",
+        ":T254-offsetclosure",
+        ":T260-offsetref",
+        ":T270-push_retaddr",
+        ":T300-getmethod",
+        ":T301-object",
+        ":T310-alloc-1",
+        ":T310-alloc-2",
+        ":T320-gc-1",
+        ":T320-gc-2",
+        ":T320-gc-3",
+        ":T330-compact-1",
+        ":T330-compact-2",
+        ":T330-compact-3",
+        ":T330-compact-4",
+        ":T340-weak",
+        ":T350-heapcheck",
+        ":T360-stacks-1",
+        ":T360-stacks-2",
+    ],
+)
+
+ocaml_module(
+    name   = "Directive_failure",
+    struct = "directive_failure.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T000",
+    struct = "t000.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T010-const0",
+    struct = "t010-const0.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T010-const1",
+    struct = "t010-const1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T010-const2",
+    struct = "t010-const2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T010-const3",
+    struct = "t010-const3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T011-constint",
+    struct = "t011-constint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T020",
+    struct = "t020.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T021-pushconst1",
+    struct = "t021-pushconst1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T021-pushconst2",
+    struct = "t021-pushconst2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T021-pushconst3",
+    struct = "t021-pushconst3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T022-pushconstint",
+    struct = "t022-pushconstint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T040-makeblock1",
+    struct = "t040-makeblock1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T040-makeblock2",
+    struct = "t040-makeblock2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T040-makeblock3",
+    struct = "t040-makeblock3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T041-makeblock",
+    struct = "t041-makeblock.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T050-getglobal",
+    struct = "t050-getglobal.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T050-pushgetglobal",
+    struct = "t050-pushgetglobal.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T051-getglobalfield",
+    struct = "t051-getglobalfield.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T051-pushgetglobalfield",
+    struct = "t051-pushgetglobalfield.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T060-raise",
+    struct = "t060-raise.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T070-branch",
+    struct = "t070-branch.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T070-branchif",
+    struct = "t070-branchif.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T070-branchifnot",
+    struct = "t070-branchifnot.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T071-boolnot",
+    struct = "t071-boolnot.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T080-eq",
+    struct = "t080-eq.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T080-geint",
+    struct = "t080-geint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T080-gtint",
+    struct = "t080-gtint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T080-leint",
+    struct = "t080-leint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T080-ltint",
+    struct = "t080-ltint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T080-neq",
+    struct = "t080-neq.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T090-acc0",
+    struct = "t090-acc0.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T090-acc1",
+    struct = "t090-acc1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T090-acc2",
+    struct = "t090-acc2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T090-acc3",
+    struct = "t090-acc3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T090-acc4",
+    struct = "t090-acc4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T090-acc5",
+    struct = "t090-acc5.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T090-acc6",
+    struct = "t090-acc6.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T090-acc7",
+    struct = "t090-acc7.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T091-acc",
+    struct = "t091-acc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc",
+    struct = "t092-pushacc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc0",
+    struct = "t092-pushacc0.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc1",
+    struct = "t092-pushacc1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc2",
+    struct = "t092-pushacc2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc3",
+    struct = "t092-pushacc3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc4",
+    struct = "t092-pushacc4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc5",
+    struct = "t092-pushacc5.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc6",
+    struct = "t092-pushacc6.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T092-pushacc7",
+    struct = "t092-pushacc7.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T093-pushacc",
+    struct = "t093-pushacc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T100-pushtrap",
+    struct = "t100-pushtrap.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T101-poptrap",
+    struct = "t101-poptrap.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-addint",
+    struct = "t110-addint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-andint",
+    struct = "t110-andint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-asrint-1",
+    struct = "t110-asrint-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-asrint-2",
+    struct = "t110-asrint-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-divint-1",
+    struct = "t110-divint-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-divint-2",
+    struct = "t110-divint-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-divint-3",
+    struct = "t110-divint-3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-lslint",
+    struct = "t110-lslint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-lsrint",
+    struct = "t110-lsrint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-modint-1",
+    struct = "t110-modint-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-modint-2",
+    struct = "t110-modint-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-mulint",
+    struct = "t110-mulint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-negint",
+    struct = "t110-negint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-offsetint",
+    struct = "t110-offsetint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-orint",
+    struct = "t110-orint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-subint",
+    struct = "t110-subint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T110-xorint",
+    struct = "t110-xorint.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T120-getstringchar",
+    struct = "t120-getstringchar.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T121-setstringchar",
+    struct = "t121-setstringchar.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T130-getvectitem",
+    struct = "t130-getvectitem.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T130-vectlength",
+    struct = "t130-vectlength.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T131-setvectitem",
+    struct = "t131-setvectitem.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T140-switch-1",
+    struct = "t140-switch-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T140-switch-2",
+    struct = "t140-switch-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T140-switch-3",
+    struct = "t140-switch-3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T140-switch-4",
+    struct = "t140-switch-4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T141-switch-5",
+    struct = "t141-switch-5.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T141-switch-6",
+    struct = "t141-switch-6.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T141-switch-7",
+    struct = "t141-switch-7.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T142-switch-8",
+    struct = "t142-switch-8.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T142-switch-9",
+    struct = "t142-switch-9.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T142-switch-A",
+    struct = "t142-switch-A.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T150-push-1",
+    struct = "t150-push-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T150-push-2",
+    struct = "t150-push-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T160-closure",
+    struct = "t160-closure.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T161-apply1",
+    struct = "t161-apply1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T162-return",
+    struct = "t162-return.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T163",
+    struct = "t163.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T164-apply2",
+    struct = "t164-apply2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T164-apply3",
+    struct = "t164-apply3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T165-apply",
+    struct = "t165-apply.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T170-envacc2",
+    struct = "t170-envacc2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T170-envacc3",
+    struct = "t170-envacc3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T170-envacc4",
+    struct = "t170-envacc4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T171-envacc",
+    struct = "t171-envacc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T172-pushenvacc1",
+    struct = "t172-pushenvacc1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T172-pushenvacc2",
+    struct = "t172-pushenvacc2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T172-pushenvacc3",
+    struct = "t172-pushenvacc3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T172-pushenvacc4",
+    struct = "t172-pushenvacc4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T173-pushenvacc",
+    struct = "t173-pushenvacc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T180-appterm1",
+    struct = "t180-appterm1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T180-appterm2",
+    struct = "t180-appterm2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T180-appterm3",
+    struct = "t180-appterm3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T181-appterm",
+    struct = "t181-appterm.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T190-makefloatblock-1",
+    struct = "t190-makefloatblock-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T190-makefloatblock-2",
+    struct = "t190-makefloatblock-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T190-makefloatblock-3",
+    struct = "t190-makefloatblock-3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T191-vectlength",
+    struct = "t191-vectlength.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T192-getfloatfield-1",
+    struct = "t192-getfloatfield-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T192-getfloatfield-2",
+    struct = "t192-getfloatfield-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T193-setfloatfield-1",
+    struct = "t193-setfloatfield-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T193-setfloatfield-2",
+    struct = "t193-setfloatfield-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T200-getfield0",
+    struct = "t200-getfield0.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T200-getfield1",
+    struct = "t200-getfield1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T200-getfield2",
+    struct = "t200-getfield2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T200-getfield3",
+    struct = "t200-getfield3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T201-getfield",
+    struct = "t201-getfield.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T210-setfield0",
+    struct = "t210-setfield0.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T210-setfield1",
+    struct = "t210-setfield1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T210-setfield2",
+    struct = "t210-setfield2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T210-setfield3",
+    struct = "t210-setfield3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T211-setfield",
+    struct = "t211-setfield.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T220-assign",
+    struct = "t220-assign.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T230-check_signals",
+    struct = "t230-check_signals.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T240-c_call1",
+    struct = "t240-c_call1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T240-c_call2",
+    struct = "t240-c_call2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T240-c_call3",
+    struct = "t240-c_call3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T240-c_call4",
+    struct = "t240-c_call4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T240-c_call5",
+    struct = "t240-c_call5.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T250-closurerec-1",
+    struct = "t250-closurerec-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T250-closurerec-2",
+    struct = "t250-closurerec-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T251-pushoffsetclosure0",
+    struct = "t251-pushoffsetclosure0.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T251-pushoffsetclosure2",
+    struct = "t251-pushoffsetclosure2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T251-pushoffsetclosurem2",
+    struct = "t251-pushoffsetclosurem2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T252-pushoffsetclosure",
+    struct = "t252-pushoffsetclosure.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T253-offsetclosure0",
+    struct = "t253-offsetclosure0.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T253-offsetclosure2",
+    struct = "t253-offsetclosure2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T253-offsetclosurem2",
+    struct = "t253-offsetclosurem2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T254-offsetclosure",
+    struct = "t254-offsetclosure.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T260-offsetref",
+    struct = "t260-offsetref.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T270-push_retaddr",
+    struct = "t270-push_retaddr.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T300-getmethod",
+    struct = "t300-getmethod.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T301-object",
+    struct = "t301-object.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T310-alloc-1",
+    struct = "t310-alloc-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T310-alloc-2",
+    struct = "t310-alloc-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T320-gc-1",
+    struct = "t320-gc-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T320-gc-2",
+    struct = "t320-gc-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T320-gc-3",
+    struct = "t320-gc-3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T330-compact-1",
+    struct = "t330-compact-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T330-compact-2",
+    struct = "t330-compact-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T330-compact-3",
+    struct = "t330-compact-3.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T330-compact-4",
+    struct = "t330-compact-4.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T340-weak",
+    struct = "t340-weak.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T350-heapcheck",
+    struct = "t350-heapcheck.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T360-stacks-1",
+    struct = "t360-stacks-1.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "T360-stacks-2",
+    struct = "t360-stacks-2.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

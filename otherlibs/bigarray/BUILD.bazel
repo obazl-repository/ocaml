@@ -1,0 +1,37 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "otherlibs_bigarray_lib",
+    modules  = [
+        ":Bigarray",
+    ],
+)
+
+ocaml_module(
+    name   = "Bigarray",
+    struct = "bigarray.ml",
+    sig    = "Bigarray_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Bigarray)
+    ]
+)
+
+ocaml_signature(
+    name = "Bigarray_cmi",
+    src  = "bigarray.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Bigarray)
+    ]
+)
+

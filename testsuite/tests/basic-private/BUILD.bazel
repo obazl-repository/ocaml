@@ -1,0 +1,44 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_basic-private_lib",
+    modules  = [
+        ":Length",
+        ":Tlength",
+    ],
+)
+
+ocaml_module(
+    name   = "Length",
+    struct = "length.ml",
+    sig    = "Length_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Length_cmi",
+    src  = "length.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Tlength",
+    struct = "tlength.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

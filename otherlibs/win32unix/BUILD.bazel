@@ -1,0 +1,36 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "otherlibs_win32unix_lib",
+    modules  = [
+        ":Unix",
+    ],
+)
+
+ocaml_module(
+    name   = "Unix",
+    struct = "unix.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Printexc)
+        ## (List)
+        ## (Int)
+        ## (Hashtbl)
+        ## (Filename)
+        ## (Callback)
+        ## (Bytes)
+        ## (Bigarray)
+        ## (Array)
+    ]
+)
+

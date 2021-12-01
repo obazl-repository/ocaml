@@ -1,0 +1,51 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-ocamlopt-save-ir_lib",
+    modules  = [
+        ":Check_for_pack",
+        ":Save_ir_after_scheduling",
+        ":Save_ir_after_typing",
+        ":Start_from_emit",
+    ],
+)
+
+ocaml_module(
+    name   = "Check_for_pack",
+    struct = "check_for_pack.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Save_ir_after_scheduling",
+    struct = "save_ir_after_scheduling.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Save_ir_after_typing",
+    struct = "save_ir_after_typing.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Start_from_emit",
+    struct = "start_from_emit.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

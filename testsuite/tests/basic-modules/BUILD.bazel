@@ -1,0 +1,98 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_basic-modules_lib",
+    modules  = [
+        ":Anonymous",
+        ":Main",
+        ":Offset",
+        ":Pr4008",
+        ":Pr6726",
+        ":Pr7427",
+        ":Recursive_module_evaluation_errors",
+        ":Recursive_module_init",
+    ],
+)
+
+ocaml_module(
+    name   = "Anonymous",
+    struct = "anonymous.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Main",
+    struct = "main.ml",
+    sig    = "Main_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Main_cmi",
+    src  = "main.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Offset",
+    struct = "offset.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4008",
+    struct = "pr4008.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6726",
+    struct = "pr6726.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7427",
+    struct = "pr7427.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Recursive_module_evaluation_errors",
+    struct = "recursive_module_evaluation_errors.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Recursive_module_init",
+    struct = "recursive_module_init.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

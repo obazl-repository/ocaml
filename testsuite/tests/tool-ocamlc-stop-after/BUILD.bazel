@@ -1,0 +1,55 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-ocamlc-stop-after_lib",
+    modules  = [
+        ":Stop_after_parsing_impl",
+        ":Stop_after_scheduling",
+        ":Stop_after_typing_impl",
+    ],
+    signatures  = [
+        ":Stop_after_parsing_intf_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Stop_after_parsing_impl",
+    struct = "stop_after_parsing_impl.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Stop_after_parsing_intf_cmi",
+    src  = "stop_after_parsing_intf.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Stop_after_scheduling",
+    struct = "stop_after_scheduling.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Stop_after_typing_impl",
+    struct = "stop_after_typing_impl.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

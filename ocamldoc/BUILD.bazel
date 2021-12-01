@@ -1,0 +1,1096 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "ocamldoc_lib",
+    modules  = [
+        ":Odoc",
+        ":Odoc_analyse",
+        ":Odoc_args",
+        ":Odoc_ast",
+        ":Odoc_class",
+        ":Odoc_comments",
+        ":Odoc_comments_global",
+        ":Odoc_config",
+        ":Odoc_control",
+        ":Odoc_cross",
+        ":Odoc_dag2html",
+        ":Odoc_dep",
+        ":Odoc_dot",
+        ":Odoc_env",
+        ":Odoc_exception",
+        ":Odoc_extension",
+        ":Odoc_gen",
+        ":Odoc_global",
+        ":Odoc_html",
+        ":Odoc_info",
+        ":Odoc_inherit",
+        ":Odoc_latex",
+        ":Odoc_latex_style",
+        ":Odoc_man",
+        ":Odoc_merge",
+        ":Odoc_messages",
+        ":Odoc_misc",
+        ":Odoc_module",
+        ":Odoc_name",
+        ":Odoc_parameter",
+        ":Odoc_print",
+        ":Odoc_scan",
+        ":Odoc_search",
+        ":Odoc_sig",
+        ":Odoc_str",
+        ":Odoc_test",
+        ":Odoc_texi",
+        ":Odoc_text",
+        ":Odoc_to_text",
+        ":Odoc_type",
+        ":Odoc_types",
+        ":Odoc_value",
+    ],
+)
+
+ocaml_module(
+    name   = "Odoc",
+    struct = "odoc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ":Odoc_config", ## (Ocamldoc Odoc_config)
+        ":Odoc_args", ## (Ocamldoc Odoc_args)
+        ":Odoc_analyse", ## (Ocamldoc Odoc_analyse)
+        ## (Sys)
+        ## (List)
+        ## (Filename)
+        ## (Dynlink)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_analyse",
+    struct = "odoc_analyse.ml",
+    sig    = "Odoc_analyse_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_text", ## (Ocamldoc Odoc_text)
+        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_dep", ## (Ocamldoc Odoc_dep)
+        ":Odoc_cross", ## (Ocamldoc Odoc_cross)
+        ":Odoc_comments", ## (Ocamldoc Odoc_comments)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_ast", ## (Ocamldoc Odoc_ast)
+        ## (Warnings)
+        ## (Types)
+        ## (Typemod)
+        ## (Typedtree)
+        ## (Syntaxerr)
+        ## (String)
+        ## (Printexc)
+        ## (Pparse)
+        ## (Parse)
+        ## (Location)
+        ## (List)
+        ## (Lexer)
+        ## (Format)
+        ## (Filename)
+        ## (Env)
+        ## (Config)
+        ## (Compmisc)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_analyse_cmi",
+    src  = "odoc_analyse.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_args",
+    struct = "odoc_args.ml",
+    sig    = "Odoc_args_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_man", ## (Ocamldoc Odoc_man)
+        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
+        ":Odoc_html", ## (Ocamldoc Odoc_html)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ":Odoc_dot", ## (Ocamldoc Odoc_dot)
+        ":Odoc_config", ## (Ocamldoc Odoc_config)
+        ## (String)
+        ## (Str)
+        ## (Printf)
+        ## (Main_args)
+        ## (List)
+        ## (Filename)
+        ## (Config)
+        ## (Compenv)
+        ## (Arg)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_args_cmi",
+    src  = "odoc_args.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_ast",
+    struct = "odoc_ast.ml",
+    sig    = "Odoc_ast_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_env", ## (Ocamldoc Odoc_env)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Types)
+        ## (Typedtree)
+        ## (String)
+        ## (Printf)
+        ## (Predef)
+        ## (Path)
+        ## (Parsetree)
+        ## (Option)
+        ## (Name)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Filename)
+        ## (Btype)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_ast_cmi",
+    src  = "odoc_ast.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ## (Types)
+        ## (Typedtree)
+        ## (Parsetree)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_class",
+    struct = "odoc_class.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ## (Types)
+        ## (List)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_comments",
+    struct = "odoc_comments.ml",
+    sig    = "Odoc_comments_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_text", ## (Ocamldoc Odoc_text)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_cross", ## (Ocamldoc Odoc_cross)
+        ":Odoc_comments_global", ## (Ocamldoc Odoc_comments_global)
+        ## (String)
+        ## (Str)
+        ## (Printf)
+        ## (Odoc_see_lexer)
+        ## (Odoc_parser)
+        ## (Odoc_lexer)
+        ## (List)
+        ## (Lexing)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_comments_cmi",
+    src  = "odoc_comments.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_comments_global",
+    struct = "odoc_comments_global.ml",
+    sig    = "Odoc_comments_global_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_comments_global_cmi",
+    src  = "odoc_comments_global.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_config",
+    struct = "odoc_config.ml",
+    sig    = "Odoc_config_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Filename)
+        ## (Config)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_config_cmi",
+    src  = "odoc_config.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_control",
+    struct = "odoc_control.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_cross",
+    struct = "odoc_cross.ml",
+    sig    = "Odoc_cross_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_search", ## (Ocamldoc Odoc_search)
+        ":Odoc_scan", ## (Ocamldoc Odoc_scan)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Str)
+        ## (Set)
+        ## (Printf)
+        ## (Misc)
+        ## (List)
+        ## (Hashtbl)
+        ## (Char)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_cross_cmi",
+    src  = "odoc_cross.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_dag2html",
+    struct = "odoc_dag2html.ml",
+    sig    = "Odoc_dag2html_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ## (Set)
+        ## (Printf)
+        ## (List)
+        ## (Int)
+        ## (Buffer)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_dag2html_cmi",
+    src  = "odoc_dag2html.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_dep",
+    struct = "odoc_dep.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_print", ## (Ocamldoc Odoc_print)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ## (Str)
+        ## (Parsetree)
+        ## (Misc)
+        ## (List)
+        ## (Depend)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_dot",
+    struct = "odoc_dot.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ## (List)
+        ## (Format)
+        ## (Filename)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_env",
+    struct = "odoc_env.ml",
+    sig    = "Odoc_env_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ## (Types)
+        ## (Printtyp)
+        ## (Predef)
+        ## (Path)
+        ## (List)
+        ## (Btype)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_env_cmi",
+    src  = "odoc_env.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ## (Types)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_exception",
+    struct = "odoc_exception.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ## (Types)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_extension",
+    struct = "odoc_extension.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ## (Types)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_gen",
+    struct = "odoc_gen.ml",
+    sig    = "Odoc_gen_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_man", ## (Ocamldoc Odoc_man)
+        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
+        ":Odoc_html", ## (Ocamldoc Odoc_html)
+        ":Odoc_dot", ## (Ocamldoc Odoc_dot)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_gen_cmi",
+    src  = "odoc_gen.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_man", ## (Ocamldoc Odoc_man)
+        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_html", ## (Ocamldoc Odoc_html)
+        ":Odoc_dot", ## (Ocamldoc Odoc_dot)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_global",
+    struct = "odoc_global.ml",
+    sig    = "Odoc_global_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_config", ## (Ocamldoc Odoc_config)
+        ## (Filename)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_global_cmi",
+    src  = "odoc_global.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_html",
+    struct = "odoc_html.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_text", ## (Ocamldoc Odoc_text)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_dag2html", ## (Ocamldoc Odoc_dag2html)
+        ## (Sys)
+        ## (Str)
+        ## (Printf)
+        ## (Odoc_ocamlhtml)
+        ## (Misc)
+        ## (List)
+        ## (Filename)
+        ## (Char)
+        ## (Buffer)
+        ## (Asttypes)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_info",
+    struct = "odoc_info.ml",
+    sig    = "Odoc_info_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_text", ## (Ocamldoc Odoc_text)
+        ":Odoc_str", ## (Ocamldoc Odoc_str)
+        ":Odoc_search", ## (Ocamldoc Odoc_search)
+        ":Odoc_scan", ## (Ocamldoc Odoc_scan)
+        ":Odoc_print", ## (Ocamldoc Odoc_print)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_dep", ## (Ocamldoc Odoc_dep)
+        ":Odoc_config", ## (Ocamldoc Odoc_config)
+        ":Odoc_comments", ## (Ocamldoc Odoc_comments)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_analyse", ## (Ocamldoc Odoc_analyse)
+        ## (String)
+        ## (Printtyp)
+        ## (Printf)
+        ## (Location)
+        ## (List)
+        ## (Buffer)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_info_cmi",
+    src  = "odoc_info.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_search", ## (Ocamldoc Odoc_search)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Types)
+        ## (Str)
+        ## (Location)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_inherit",
+    struct = "odoc_inherit.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_latex",
+    struct = "odoc_latex.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_to_text", ## (Ocamldoc Odoc_to_text)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_latex_style", ## (Ocamldoc Odoc_latex_style)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ## (Sys)
+        ## (String)
+        ## (Str)
+        ## (Printf)
+        ## (List)
+        ## (Format)
+        ## (Filename)
+        ## (Buffer)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_latex_style",
+    struct = "odoc_latex_style.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_man",
+    struct = "odoc_man.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_str", ## (Ocamldoc Odoc_str)
+        ":Odoc_print", ## (Ocamldoc Odoc_print)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ## (String)
+        ## (Str)
+        ## (Printf)
+        ## (Option)
+        ## (List)
+        ## (Filename)
+        ## (Buffer)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_merge",
+    struct = "odoc_merge.ml",
+    sig    = "Odoc_merge_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Str)
+        ## (List)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_merge_cmi",
+    src  = "odoc_merge.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_messages",
+    struct = "odoc_messages.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (String)
+        ## (Str)
+        ## (Printf)
+        ## (List)
+        ## (Int)
+        ## (Config)
+        ## (Array)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_misc",
+    struct = "odoc_misc.ml",
+    sig    = "Odoc_misc_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ## (Unix)
+        ## (Types)
+        ## (Transient_expr)
+        ## (Sys)
+        ## (String)
+        ## (Set)
+        ## (Printf)
+        ## (Predef)
+        ## (Path)
+        ## (Longident)
+        ## (List)
+        ## (Int)
+        ## (Char)
+        ## (Bytes)
+        ## (Buffer)
+        ## (Btype)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_misc_cmi",
+    src  = "odoc_misc.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ## (Types)
+        ## (Longident)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_module",
+    struct = "odoc_module.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Types)
+        ## (Misc)
+        ## (List)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_name",
+    struct = "odoc_name.ml",
+    sig    = "Odoc_name_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ## (String)
+        ## (Str)
+        ## (Path)
+        ## (Map)
+        ## (List)
+        ## (Ident)
+        ## (Buffer)
+        ## (Array)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_name_cmi",
+    src  = "odoc_name.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Path)
+        ## (Map)
+        ## (Longident)
+        ## (Ident)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_parameter",
+    struct = "odoc_parameter.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ## (Types)
+        ## (String)
+        ## (List)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_print",
+    struct = "odoc_print.ml",
+    sig    = "Odoc_print_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Vars)
+        ## (Types)
+        ## (Transient_expr)
+        ## (Printtyp)
+        ## (Meths)
+        ## (Format)
+        ## (Buffer)
+        ## (Btype)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_print_cmi",
+    src  = "odoc_print.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Types)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_scan",
+    struct = "odoc_scan.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (List)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_search",
+    struct = "odoc_search.ml",
+    sig    = "Odoc_search_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Str)
+        ## (Printf)
+        ## (List)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_search_cmi",
+    src  = "odoc_search.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Str)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_sig",
+    struct = "odoc_sig.ml",
+    sig    = "Odoc_sig_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_env", ## (Ocamldoc Odoc_env)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Types)
+        ## (Typedtree)
+        ## (String)
+        ## (Parsetree)
+        ## (Option)
+        ## (Name)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Ident)
+        ## (Hashtbl)
+        ## (Filename)
+        ## (Ctype)
+        ## (Btype)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_sig_cmi",
+    src  = "odoc_sig.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_env", ## (Ocamldoc Odoc_env)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Types)
+        ## (Typedtree)
+        ## (Parsetree)
+        ## (Location)
+        ## (Hashtbl)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_str",
+    struct = "odoc_str.ml",
+    sig    = "Odoc_str_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_print", ## (Ocamldoc Odoc_print)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Types)
+        ## (String)
+        ## (Printtyp)
+        ## (Printf)
+        ## (List)
+        ## (Format)
+        ## (Buffer)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_str_cmi",
+    src  = "odoc_str.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ## (Types)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_test",
+    struct = "odoc_test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ":Odoc_args", ## (Ocamldoc Odoc_args)
+        ## (Printexc)
+        ## (List)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_texi",
+    struct = "odoc_texi.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_to_text", ## (Ocamldoc Odoc_to_text)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ## (Types)
+        ## (String)
+        ## (Str)
+        ## (Printf)
+        ## (List)
+        ## (Hashtbl)
+        ## (Filename)
+        ## (Bytes)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_text",
+    struct = "odoc_text.ml",
+    sig    = "Odoc_text_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ## (String)
+        ## (Printf)
+        ## (Odoc_text_parser)
+        ## (Odoc_text_lexer)
+        ## (List)
+        ## (Lexing)
+        ## (Buffer)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_text_cmi",
+    src  = "odoc_text.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_to_text",
+    struct = "odoc_to_text.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_str", ## (Ocamldoc Odoc_str)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ## (String)
+        ## (Str)
+        ## (Printf)
+        ## (List)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_type",
+    struct = "odoc_type.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ## (Types)
+        ## (Asttypes)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_types",
+    struct = "odoc_types.ml",
+    sig    = "Odoc_types_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ## (Location)
+    ]
+)
+
+ocaml_signature(
+    name = "Odoc_types_cmi",
+    src  = "odoc_types.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Location)
+    ]
+)
+
+ocaml_module(
+    name   = "Odoc_value",
+    struct = "odoc_value.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ## (Types)
+        ## (Printtyp)
+        ## (List)
+        ## (Asttypes)
+    ]
+)
+

@@ -1,0 +1,60 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-ocamlc-i_lib",
+    modules  = [
+        ":Pervasives_leitmotiv",
+        ":Pr4791",
+        ":Pr6323",
+        ":Pr7402",
+        ":Pr7620_bad",
+    ],
+)
+
+ocaml_module(
+    name   = "Pervasives_leitmotiv",
+    struct = "pervasives_leitmotiv.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr4791",
+    struct = "pr4791.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr6323",
+    struct = "pr6323.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7402",
+    struct = "pr7402.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7620_bad",
+    struct = "pr7620_bad.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

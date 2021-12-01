@@ -1,0 +1,60 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-extensions_lib",
+    modules  = [
+        ":Cast",
+        ":Disambiguation",
+        ":Extensions",
+        ":Msg",
+        ":Open_types",
+    ],
+)
+
+ocaml_module(
+    name   = "Cast",
+    struct = "cast.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Disambiguation",
+    struct = "disambiguation.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Extensions",
+    struct = "extensions.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Msg",
+    struct = "msg.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Open_types",
+    struct = "open_types.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

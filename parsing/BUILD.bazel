@@ -1,0 +1,597 @@
+load("//bzl:rules.bzl",
+     "bootstrap_module",
+     "bootstrap_ocamllex",
+     "bootstrap_signature",
+     "bootstrap_library",
+     "bootstrap_ocamlyacc",
+)
+
+load("//config:BUILD.bzl",
+     "ROOT_MODULE_OPTS",
+     "ROOT_SIG_OPTS"
+     )
+
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS    = ROOT_MODULE_OPTS
+
+STDLIB = ["//stdlib"]
+
+bootstrap_library(
+    name = "parsing",
+    manifest  = [
+        ":Ast_helper",
+        ":Ast_invariants",
+        ":Ast_iterator",
+        ":Ast_mapper",
+        ":Attr_helper",
+        ":Builtin_attributes",
+        ":CamlinternalMenhirLib",
+        ":Depend",
+        ":Docstrings",
+        ":Lexer",
+        ":Location",
+        ":Longident",
+        ":Parse",
+        ":Parser",
+        ":Pprintast",
+        ":Printast",
+        ":Syntaxerr",
+
+        # ":Asttypes_cmi",
+        # ":Parsetree_cmi",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Ast_helper",
+    struct = "ast_helper.ml",
+    sig    = "Ast_helper_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Syntaxerr", ## (Parsing Syntaxerr)
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Docstrings", ## (Parsing Docstrings)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ## (Nativeint)
+        ## (Misc)
+        ## (List)
+        ## (Int64)
+        ## (Int32)
+        ## (Int)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Ast_helper_cmi",
+    src  = "ast_helper.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Docstrings", ## (Parsing Docstrings)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Ast_invariants",
+    struct = "ast_invariants.ml",
+    sig    = "Ast_invariants_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Syntaxerr", ## (Parsing Syntaxerr)
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Builtin_attributes", ## (Parsing Builtin_attributes)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ":Ast_iterator", ## (Parsing Ast_iterator)
+        ## (List)
+    ]
+)
+
+bootstrap_signature(
+    name = "Ast_invariants_cmi",
+    src  = "ast_invariants.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Ast_iterator",
+    struct = "ast_iterator.ml",
+    sig    = "Ast_iterator_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Location", ## (Parsing Location)
+        ## (List)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Ast_iterator_cmi",
+    src  = "ast_iterator.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Ast_mapper",
+    struct = "ast_mapper.ml",
+    sig    = "Ast_mapper_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ":Ast_helper", ## (Parsing Ast_helper)
+        ## (Sys)
+        ## (Printf)
+        ## (Printexc)
+        ## (Misc)
+        "//utils:Load_path",
+        ## (List)
+        ## (Format)
+        ## (Config)
+        ## (Clflags)
+        ## (Array)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Ast_mapper_cmi",
+    src  = "ast_mapper.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Format)
+    ]
+)
+
+bootstrap_signature(
+    name = "Asttypes_cmi",
+    src  = "asttypes.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Location", ## (Parsing Location)
+        ## (Format)
+    ],
+    visibility = ["//lambda:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Attr_helper",
+    struct = "attr_helper.ml",
+    sig    = "Attr_helper_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Location", ## (Parsing Location)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ## (List)
+        ## (Format)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Attr_helper_cmi",
+    src  = "attr_helper.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Builtin_attributes",
+    struct = "builtin_attributes.ml",
+    sig    = "Builtin_attributes_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ## (Warnings)
+        ## (Printf)
+        ## (Option)
+        ## (Misc)
+        ## (List)
+        ## (Format)
+        ## (Arg)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Builtin_attributes_cmi",
+    src  = "builtin_attributes.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Misc)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Depend",
+    struct = "depend.ml",
+    sig    = "Depend_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Builtin_attributes", ## (Parsing Builtin_attributes)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ## (Option)
+        ## (Misc)
+        ## (List)
+        ## (Clflags)
+    ]
+)
+
+bootstrap_signature(
+    name = "Depend_cmi",
+    src  = "depend.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Misc)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Docstrings",
+    struct = "docstrings.ml",
+    sig    = "Docstrings_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Location", ## (Parsing Location)
+        ## (Warnings)
+        ## (List)
+        ## (Lexing)
+        ## (Hashtbl)
+    ]
+)
+
+bootstrap_signature(
+    name = "Docstrings_cmi",
+    src  = "docstrings.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Lexing)
+        ## (Lazy)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "CamlinternalMenhirLib",
+    struct = "//boot/menhir:menhirLib.ml",
+    sig    = "CamlinternalMenhirLib_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+    ]
+)
+
+bootstrap_signature(
+    name   = "CamlinternalMenhirLib_cmi",
+    src    = "camlinternalMenhirLib.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ]
+)
+
+genrule(
+    name = "camlinternalMenhirLib_mli",
+    outs = ["camlinternalMenhirLib.mli"],
+    srcs = ["//boot/menhir:menhirLib.mli"],
+    cmd  = "\n".join([
+        "echo '[@@@ocaml.warning \"-67\"]' > $@;",
+	    "cat $(location //boot/menhir:menhirLib.mli) >> $@"
+    ])
+)
+
+bootstrap_ocamllex(
+    name = "lexer_ml",
+    out  = "lexer.ml",
+    src  = "lexer.mll"
+)
+
+bootstrap_module(
+    name   = "Lexer",
+    struct = "lexer.ml",
+    sig    = "Lexer_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+    ],
+    visibility = ["//file_formats:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Lexer_cmi",
+    src  = "lexer.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parser"
+    ]
+)
+
+bootstrap_module(
+    name   = "Location",
+    struct = "location.ml",
+    sig    = "Location_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Warnings)
+        "//utils:Terminfo",
+        ## (Sys)
+        ## (String)
+        ## (Option)
+        ## (Misc)
+        ## (List)
+        ## (Lexing)
+        ## (Int)
+        ## (Format)
+        ## (Filename)
+        "//utils:Clflags"
+        ## (Bytes)
+        ## (Build_path_prefix_map)
+        ## (Buffer)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Location_cmi",
+    src  = "location.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        "//utils:Warnings"
+        ## (Lexing)
+        ## (Format)
+        ## (Buffer)
+    ],
+)
+
+bootstrap_module(
+    name   = "Longident",
+    struct = "longident.ml",
+    sig    = "Longident_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (String)
+        "//utils:Misc"
+        ## (List)
+    ]
+)
+
+bootstrap_signature(
+    name = "Longident_cmi",
+    src  = "longident.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+    ]
+)
+
+bootstrap_module(
+    name   = "Parse",
+    struct = "parse.ml",
+    sig    = "Parse_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Syntaxerr", ## (Parsing Syntaxerr)
+        ":Pprintast", ## (Parsing Pprintast)
+        ":Location", ## (Parsing Location)
+        ":Lexer", ## (Parsing Lexer)
+        ":Docstrings", ## (Parsing Docstrings)
+        ## (Parser)
+        ## (Lexing)
+        ## (Format)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Parse_cmi",
+    src  = "parse.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Lexing)
+        ## (Format)
+    ]
+)
+
+# parsing/parser.ml: boot/menhir/parser.ml parsing/parser.mly \
+#   tools/check-parser-uptodate-or-warn.sh
+# 	@-tools/check-parser-uptodate-or-warn.sh
+# 	sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
+
+genrule(
+    name = "parser_ml",
+    outs  = ["parser.ml"],
+    srcs  = [
+        "//:VERSION",
+        "//boot/menhir:parser.ml",
+        "//tools:check-parser-uptodate-or-warn.sh",
+        "parser.mly"
+    ],
+    cmd  = "\n".join([
+        "$(location //tools:check-parser-uptodate-or-warn.sh) \\ ",
+	    "sed \"s/MenhirLib/CamlinternalMenhirLib/g\" " +
+        "$(location //boot/menhir:parser.ml) > $@"
+    ])
+)
+
+bootstrap_module(
+    name   = "Parser",
+    struct = "parser.ml", ##FIXME: bug in rule
+    sig    = "Parser_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Ast_helper"
+    ]
+)
+
+bootstrap_signature(
+    name = "Parser_cmi",
+    src  = "parser.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":CamlinternalMenhirLib",
+        ":Docstrings",
+        ":Location"
+    ]
+)
+
+genrule(
+    name = "parser_mli",
+    outs  = ["parser.mli"],
+    srcs  = [
+        "//boot/menhir:parser.mli",
+    ],
+    cmd  = "\n".join([
+	    "sed \"s/MenhirLib/CamlinternalMenhirLib/g\" " +
+        "$(location //boot/menhir:parser.mli) > $@"
+    ])
+)
+
+bootstrap_signature(
+    name = "Parsetree_cmi",
+    src  = "parsetree.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ## (Format)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_module(
+    name   = "Pprintast",
+    struct = "pprintast.ml",
+    sig    = "Pprintast_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ":Ast_helper", ## (Parsing Ast_helper)
+        ## (String)
+        ## (Option)
+        ## (List)
+        ## (Format)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Pprintast_cmi",
+    src  = "pprintast.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Printast",
+    struct = "printast.ml",
+    sig    = "Printast_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Pprintast", ## (Parsing Pprintast)
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ":Asttypes_cmi", ## (Parsing Asttypes)
+        ## (String)
+        ## (Option)
+        ## (List)
+        ## (Lexing)
+        ## (Format)
+        ## (Clflags)
+        ## (Char)
+    ],
+    visibility = ["//typing:__pkg__"]
+)
+
+bootstrap_signature(
+    name = "Printast_cmi",
+    src  = "printast.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Parsetree_cmi", ## (Parsing Parsetree)
+        ":Longident", ## (Parsing Longident)
+        ":Location", ## (Parsing Location)
+        ## (Format)
+    ]
+)
+
+bootstrap_module(
+    name   = "Syntaxerr",
+    struct = "syntaxerr.ml",
+    sig    = "Syntaxerr_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Location", ## (Parsing Location)
+        ## (Format)
+    ]
+)
+
+bootstrap_signature(
+    name = "Syntaxerr_cmi",
+    src  = "syntaxerr.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Location", ## (Parsing Location)
+        ## (Format)
+    ]
+)
+

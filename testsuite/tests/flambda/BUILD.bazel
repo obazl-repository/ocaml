@@ -1,0 +1,60 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_flambda_lib",
+    modules  = [
+        ":Afl_lazy",
+        ":Approx_meet",
+        ":Gpr2239",
+        ":Gpr998",
+        ":Specialise",
+    ],
+)
+
+ocaml_module(
+    name   = "Afl_lazy",
+    struct = "afl_lazy.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Approx_meet",
+    struct = "approx_meet.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gpr2239",
+    struct = "gpr2239.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Gpr998",
+    struct = "gpr998.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Specialise",
+    struct = "specialise.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

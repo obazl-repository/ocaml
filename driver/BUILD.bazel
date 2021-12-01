@@ -1,0 +1,466 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "driver_lib",
+    modules  = [
+        ":Compenv",
+        ":Compile",
+        ":Compile_common",
+        ":Compmisc",
+        ":Errors",
+        ":Main",
+        ":Main_args",
+        ":Maindriver",
+        ":Makedepend",
+        ":Optcompile",
+        ":Opterrors",
+        ":Optmain",
+        ":Optmaindriver",
+        ":Pparse",
+    ],
+)
+
+ocaml_module(
+    name   = "Compenv",
+    struct = "compenv.ml",
+    sig    = "Compenv_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Warnings)
+        ## (Sys)
+        ## (String)
+        ## (Scanf)
+        ## (Profile)
+        ## (Printf)
+        ## (Printexc)
+        ## (Option)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Int_arg_helper)
+        ## (Float_arg_helper)
+        ## (Filename)
+        ## (Config)
+        ## (Compiler_pass)
+        ## (Clflags)
+        ## (Ccomp)
+        ## (Arg)
+    ]
+)
+
+ocaml_signature(
+    name = "Compenv_cmi",
+    src  = "compenv.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Format)
+        ## (Clflags)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Compile",
+    struct = "compile.ml",
+    sig    = "Compile_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Compile_common", ## (Driver Compile_common)
+        ## (Typedtree)
+        ## (Translmod)
+        ## (Simplif)
+        ## (Profile)
+        ## (Printlambda)
+        ## (Printinstr)
+        ## (Misc)
+        ## (Emitcode)
+        ## (Clflags)
+        ## (Bytegen)
+    ]
+)
+
+ocaml_signature(
+    name = "Compile_cmi",
+    src  = "compile.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Compile_common", ## (Driver Compile_common)
+        ## (Typedtree)
+        ## (Instruct)
+        ## (Ident)
+        ## (Clflags)
+    ]
+)
+
+ocaml_module(
+    name   = "Compile_common",
+    struct = "compile_common.ml",
+    sig    = "Compile_common_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Pparse", ## (Driver Pparse)
+        ":Compmisc", ## (Driver Compmisc)
+        ":Compenv", ## (Driver Compenv)
+        ## (Warnings)
+        ## (Typemod)
+        ## (Typedtree)
+        ## (Typecore)
+        ## (String)
+        ## (Profile)
+        ## (Printtyped)
+        ## (Printtyp)
+        ## (Printast)
+        ## (Pprintast)
+        ## (Misc)
+        ## (List)
+        ## (Includemod)
+        ## (Format)
+        ## (Env)
+        ## (Config)
+        ## (Compiler_pass)
+        ## (Clflags)
+        ## (Builtin_attributes)
+    ]
+)
+
+ocaml_signature(
+    name = "Compile_common_cmi",
+    src  = "compile_common.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Typedtree)
+        ## (Parsetree)
+        ## (Format)
+        ## (Env)
+    ]
+)
+
+ocaml_module(
+    name   = "Compmisc",
+    struct = "compmisc.ml",
+    sig    = "Compmisc_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Compenv", ## (Driver Compenv)
+        ## (Warnings)
+        ## (Types)
+        ## (Typemod)
+        ## (Sys)
+        ## (Option)
+        ## (Misc)
+        ## (Location)
+        ## (Load_path)
+        ## (List)
+        ## (Ident)
+        ## (Format)
+        ## (Env)
+        ## (Config)
+        ## (Clflags)
+    ]
+)
+
+ocaml_signature(
+    name = "Compmisc_cmi",
+    src  = "compmisc.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Format)
+        ## (Env)
+        ## (Clflags)
+    ]
+)
+
+ocaml_module(
+    name   = "Errors",
+    struct = "errors.ml",
+    sig    = "Errors_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Location)
+    ]
+)
+
+ocaml_signature(
+    name = "Errors_cmi",
+    src  = "errors.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Main",
+    struct = "main.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Maindriver", ## (Driver Maindriver)
+        ## (Sys)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Main_args",
+    struct = "main_args.ml",
+    sig    = "Main_args_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Compenv", ## (Driver Compenv)
+        ## (Warnings)
+        ## (Sys)
+        ## (Profile)
+        ## (Printf)
+        ## (Option)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Int_arg_helper)
+        ## (Format)
+        ## (Float_arg_helper)
+        ## (Filename)
+        ## (Config)
+        ## (Compiler_pass)
+        ## (Clflags)
+        ## (Arg)
+    ]
+)
+
+ocaml_signature(
+    name = "Main_args_cmi",
+    src  = "main_args.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Maindriver",
+    struct = "maindriver.ml",
+    sig    = "Maindriver_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Makedepend", ## (Driver Makedepend)
+        ":Main_args", ## (Driver Main_args)
+        ":Compmisc", ## (Driver Compmisc)
+        ":Compile", ## (Driver Compile)
+        ":Compenv", ## (Driver Compenv)
+        ## (Warnings)
+        ## (String)
+        ## (Profile)
+        ## (Printf)
+        ## (Location)
+        ## (List)
+        ## (Format)
+        ## (Filename)
+        ## (Config)
+        ## (Clflags)
+        ## (Bytepackager)
+        ## (Bytelink)
+        ## (Bytelibrarian)
+        ## (Arg)
+    ]
+)
+
+ocaml_signature(
+    name = "Maindriver_cmi",
+    src  = "maindriver.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Makedepend",
+    struct = "makedepend.ml",
+    sig    = "Makedepend_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Pparse", ## (Driver Pparse)
+        ":Compenv", ## (Driver Compenv)
+        ## (Sys)
+        ## (Printf)
+        ## (Parsetree)
+        ## (Parser)
+        ## (Parse)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Lexer)
+        ## (Hashtbl)
+        ## (Format)
+        ## (Filename)
+        ## (Depend)
+        ## (Config)
+        ## (Clflags)
+        ## (Bytes)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_signature(
+    name = "Makedepend_cmi",
+    src  = "makedepend.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Optcompile",
+    struct = "optcompile.ml",
+    sig    = "Optcompile_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Compile_common", ## (Driver Compile_common)
+        ## (Typedtree)
+        ## (Translmod)
+        ## (Simplif)
+        ## (Profile)
+        ## (Printlambda)
+        ## (Misc)
+        ## (Flambda_middle_end)
+        ## (Config)
+        ## (Compilenv)
+        ## (Closure_middle_end)
+        ## (Clflags)
+        ## (Asmgen)
+    ]
+)
+
+ocaml_signature(
+    name = "Optcompile_cmi",
+    src  = "optcompile.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Compile_common", ## (Driver Compile_common)
+        ## (Typedtree)
+        ## (Clflags)
+        ## (Backend_intf)
+    ]
+)
+
+ocaml_module(
+    name   = "Opterrors",
+    struct = "opterrors.ml",
+    sig    = "Opterrors_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Location)
+    ]
+)
+
+ocaml_signature(
+    name = "Opterrors_cmi",
+    src  = "opterrors.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Optmain",
+    struct = "optmain.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Optmaindriver", ## (Driver Optmaindriver)
+        ## (Sys)
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Optmaindriver",
+    struct = "optmaindriver.ml",
+    sig    = "Optmaindriver_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Optcompile", ## (Driver Optcompile)
+        ":Makedepend", ## (Driver Makedepend)
+        ":Main_args", ## (Driver Main_args)
+        ":Compmisc", ## (Driver Compmisc)
+        ":Compenv", ## (Driver Compenv)
+        ## (Warnings)
+        ## (String)
+        ## (Profile)
+        ## (Proc)
+        ## (Printf)
+        ## (Location)
+        ## (List)
+        ## (Import_approx)
+        ## (Format)
+        ## (Filename)
+        ## (Config)
+        ## (Compilenv)
+        ## (Clflags)
+        ## (Backend_intf)
+        ## (Asmpackager)
+        ## (Asmlink)
+        ## (Asmlibrarian)
+        ## (Arg)
+        ## (Arch)
+    ]
+)
+
+ocaml_signature(
+    name = "Optmaindriver_cmi",
+    src  = "optmaindriver.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Format)
+    ]
+)
+
+ocaml_module(
+    name   = "Pparse",
+    struct = "pparse.ml",
+    sig    = "Pparse_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Warnings)
+        ## (Sys)
+        ## (String)
+        ## (Profile)
+        ## (Printf)
+        ## (Parsetree)
+        ## (Parse)
+        ## (Misc)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Format)
+        ## (Filename)
+        ## (Config)
+        ## (Clflags)
+        ## (Ccomp)
+        ## (Ast_mapper)
+        ## (Ast_invariants)
+    ]
+)
+
+ocaml_signature(
+    name = "Pparse_cmi",
+    src  = "pparse.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Parsetree)
+        ## (Lexing)
+        ## (Format)
+    ]
+)
+

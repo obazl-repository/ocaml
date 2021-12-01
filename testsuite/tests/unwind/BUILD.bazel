@@ -1,0 +1,44 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_unwind_lib",
+    modules  = [
+        ":Driver",
+        ":Mylib",
+    ],
+)
+
+ocaml_module(
+    name   = "Driver",
+    struct = "driver.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Mylib",
+    struct = "mylib.ml",
+    sig    = "Mylib_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Mylib_cmi",
+    src  = "mylib.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

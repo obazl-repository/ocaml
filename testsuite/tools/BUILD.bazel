@@ -1,0 +1,64 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tools_lib",
+    modules  = [
+        ":Codegen_main",
+        ":Expect_test",
+        ":Parsecmmaux",
+    ],
+    signatures  = [
+        ":Lexcmm_cmi",
+    ],
+)
+
+ocaml_module(
+    name   = "Codegen_main",
+    struct = "codegen_main.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Expect_test",
+    struct = "expect_test.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Lexcmm_cmi",
+    src  = "lexcmm.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Parsecmmaux",
+    struct = "parsecmmaux.ml",
+    sig    = "Parsecmmaux_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_signature(
+    name = "Parsecmmaux_cmi",
+    src  = "parsecmmaux.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+

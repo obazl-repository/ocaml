@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_tool-command-line_lib",
+    modules  = [
+        ":Test-o-one-c-file",
+        ":Test-o-several-files",
+        ":Test-unknown-file",
+    ],
+)
+
+ocaml_module(
+    name   = "Test-o-one-c-file",
+    struct = "test-o-one-c-file.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test-o-several-files",
+    struct = "test-o-several-files.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Test-unknown-file",
+    struct = "test-unknown-file.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

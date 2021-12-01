@@ -1,0 +1,42 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_lib-marshal_lib",
+    modules  = [
+        ":Intern_final",
+        ":Intext",
+        ":Marshal_bigarray",
+    ],
+)
+
+ocaml_module(
+    name   = "Intern_final",
+    struct = "intern_final.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Intext",
+    struct = "intext.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Marshal_bigarray",
+    struct = "marshal_bigarray.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

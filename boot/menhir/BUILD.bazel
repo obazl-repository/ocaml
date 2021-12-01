@@ -1,0 +1,119 @@
+load("//bzl:rules.bzl",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
+)
+
+exports_files([
+    "menhirLib.ml", "menhirLib.mli",
+    "parser.ml", "parser.mli"
+])
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+bootstrap_library(
+    name = "boot_menhir_lib",
+    manifest= [
+        ":MenhirLib",
+        ":Parser",
+    ],
+)
+
+bootstrap_module(
+    name   = "MenhirLib",
+    struct = "menhirLib.ml",
+    sig    = "MenhirLib_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Sys)
+        ## (String)
+        ## (Printf)
+        ## (Obj)
+        ## (List)
+        ## (Lexing)
+        ## (Lazy)
+        ## (Char)
+        ## (Bytes)
+        ## (Buffer)
+        ## (Array)
+    ]
+)
+
+bootstrap_signature(
+    name = "MenhirLib_cmi",
+    src  = "menhirLib.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Obj)
+        ## (Lexing)
+        ## (Lazy)
+    ]
+)
+
+bootstrap_module(
+    name   = "Parser",
+    struct = "parser.ml",
+    sig    = "Parser_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Menhir", ## (Boot Menhir MenhirLib)
+        ## (Vb)
+        ## (Val)
+        ## (Type)
+        ## (Typ)
+        ## (Te)
+        ## (Syntaxerr)
+        ## (String)
+        ## (Str)
+        ## (Sig)
+        ## (Rf)
+        ## (Pat)
+        ## (Parsetree)
+        ## (Opn)
+        ## (Of)
+        ## (Obj)
+        ## (Mty)
+        ## (Mtd)
+        ## (Ms)
+        ## (Mod)
+        ## (Md)
+        ## (Mb)
+        ## (Longident)
+        ## (Location)
+        ## (List)
+        ## (Lexing)
+        ## (Lazy)
+        ## (Incl)
+        ## (Exp)
+        ## (Docstrings)
+        ## (Cty)
+        ## (Ctf)
+        ## (Cstr)
+        ## (Csig)
+        ## (Clflags)
+        ## (Cl)
+        ## (Ci)
+        ## (Cf)
+        ## (Attr)
+        ## (Asttypes)
+        ## (Ast_helper)
+    ]
+)
+
+bootstrap_signature(
+    name = "Parser_cmi",
+    src  = "parser.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Menhir", ## (Boot Menhir MenhirLib)
+        ## (Parsetree)
+        ## (Obj)
+        ## (Longident)
+        ## (Location)
+        ## (Lexing)
+        ## (Lazy)
+        ## (Docstrings)
+    ]
+)
+

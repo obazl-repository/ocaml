@@ -1,0 +1,51 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_typing-poly_lib",
+    modules  = [
+        ":Error_messages",
+        ":Poly",
+        ":Pr7636",
+        ":Pr9603",
+    ],
+)
+
+ocaml_module(
+    name   = "Error_messages",
+    struct = "error_messages.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Poly",
+    struct = "poly.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7636",
+    struct = "pr7636.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr9603",
+    struct = "pr9603.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

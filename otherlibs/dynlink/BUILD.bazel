@@ -1,0 +1,112 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+     "ocaml_signature",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+SIG_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "otherlibs_dynlink_lib",
+    modules  = [
+        ":Dynlink_common",
+        ":Dynlink_platform_intf",
+        ":Dynlink_types",
+        ":Extract_crc",
+    ],
+    signatures  = [
+        ":Dynlink_cmi",
+    ],
+)
+
+ocaml_signature(
+    name = "Dynlink_cmi",
+    src  = "dynlink.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ## (Obj)
+    ]
+)
+
+ocaml_module(
+    name   = "Dynlink_common",
+    struct = "dynlink_common.ml",
+    sig    = "Dynlink_common_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
+        ":Dynlink", ## (Otherlibs Dynlink Dynlink_platform_intf)
+        ## (Sys)
+        ## (Set)
+        ## (Printf)
+        ## (Misc)
+        ## (Map)
+        ## (List)
+        ## (Lazy)
+        ## (Format)
+        ## (Filename)
+        ## (Dynlink_compilerlibs)
+        ## (Digest)
+    ]
+)
+
+ocaml_signature(
+    name = "Dynlink_common_cmi",
+    src  = "dynlink_common.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Dynlink", ## (Otherlibs Dynlink Dynlink_platform_intf)
+        ## (Obj)
+    ]
+)
+
+ocaml_module(
+    name   = "Dynlink_platform_intf",
+    struct = "dynlink_platform_intf.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
+        ## (Obj)
+        ## (Digest)
+    ]
+)
+
+ocaml_module(
+    name   = "Dynlink_types",
+    struct = "dynlink_types.ml",
+    sig    = "Dynlink_types_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Printf)
+        ## (Printexc)
+    ]
+)
+
+ocaml_signature(
+    name = "Dynlink_types_cmi",
+    src  = "dynlink_types.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Extract_crc",
+    struct = "extract_crc.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (String)
+        ## (Printf)
+        ## (Printexc)
+        ## (Misc)
+        ## (Dynlink_compilerlibs)
+        ## (Config)
+        ## (Cmi_format)
+        ## (Char)
+        ## (Arg)
+    ]
+)
+

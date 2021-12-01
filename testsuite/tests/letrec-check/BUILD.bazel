@@ -1,0 +1,141 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "testsuite_tests_letrec-check_lib",
+    modules  = [
+        ":Basic",
+        ":Extension_constructor",
+        ":Flat_float_array",
+        ":Float_unboxing",
+        ":Labels",
+        ":Lazy_",
+        ":Modules",
+        ":No_flat_float_array",
+        ":Objects",
+        ":Pr7215",
+        ":Pr7231",
+        ":Pr7706",
+        ":Records",
+        ":Unboxed",
+    ],
+)
+
+ocaml_module(
+    name   = "Basic",
+    struct = "basic.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Extension_constructor",
+    struct = "extension_constructor.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Flat_float_array",
+    struct = "flat_float_array.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Float_unboxing",
+    struct = "float_unboxing.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Labels",
+    struct = "labels.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Lazy_",
+    struct = "lazy_.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Modules",
+    struct = "modules.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "No_flat_float_array",
+    struct = "no_flat_float_array.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Objects",
+    struct = "objects.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7215",
+    struct = "pr7215.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7231",
+    struct = "pr7231.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Pr7706",
+    struct = "pr7706.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Records",
+    struct = "records.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+
+ocaml_module(
+    name   = "Unboxed",
+    struct = "unboxed.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+    ]
+)
+

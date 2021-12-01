@@ -1,0 +1,7 @@
+exports_files(["ocamlc", "ocamllex"])
+
+alias(
+    name = "Std_exit",
+    actual = "//stdlib:Std_exit",
+    visibility = ["//visibility:public"]
+)

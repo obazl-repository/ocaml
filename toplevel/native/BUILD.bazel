@@ -1,0 +1,106 @@
+## GENERATED FILE ##
+
+load("//bzl:rules.bzl",
+     "ocaml_library",
+     "ocaml_module",
+)
+
+MODULE_OPTS = ["-nostdlib"]
+
+ocaml_library(
+    name = "toplevel_native_lib",
+    modules  = [
+        ":Topeval",
+        ":Topmain",
+        ":Trace",
+    ],
+)
+
+ocaml_module(
+    name   = "Topeval",
+    struct = "topeval.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Topcommon", ## (Toplevel Topcommon)
+        ## (Warnings)
+        ## (Types)
+        ## (Typemod)
+        ## (Typedtree)
+        ## (Typecore)
+        ## (Translmod)
+        ## (Sys)
+        ## (Simplif)
+        ## (Proc)
+        ## (Printtyped)
+        ## (Printtyp)
+        ## (Printlambda)
+        ## (Printf)
+        ## (Predef)
+        ## (Parsetree)
+        ## (Outcometree)
+        ## (Option)
+        ## (Obj)
+        ## (Misc)
+        ## (Location)
+        ## (Load_path)
+        ## (Includemod)
+        ## (Import_approx)
+        ## (Ident)
+        ## (Gc)
+        ## (Fun)
+        ## (Format)
+        ## (Flambda_middle_end)
+        ## (Filename)
+        ## (Env)
+        ## (Dynlink)
+        ## (Config)
+        ## (Compmisc)
+        ## (Compilenv)
+        ## (Closure_middle_end)
+        ## (Clflags)
+        ## (Backend_intf)
+        ## (Asttypes)
+        ## (Ast_helper)
+        ## (Asmlink)
+        ## (Asmgen)
+        ## (Array)
+        ## (Arch)
+    ]
+)
+
+ocaml_module(
+    name   = "Topmain",
+    struct = "topmain.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Native", ## (Toplevel Native Topeval)
+        ":Toploop", ## (Toplevel Toploop)
+        ":Topcommon", ## (Toplevel Topcommon)
+        ## (Sys)
+        ## (Printf)
+        ## (Printexc)
+        ## (Obj)
+        ## (Misc)
+        ## (Main_args)
+        ## (Location)
+        ## (List)
+        ## (Format)
+        ## (Filename)
+        ## (Compmisc)
+        ## (Compenv)
+        ## (Clflags)
+        ## (Array)
+        ## (Arg)
+    ]
+)
+
+ocaml_module(
+    name   = "Trace",
+    struct = "trace.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        ## (Path)
+        ## (Obj)
+    ]
+)
+
