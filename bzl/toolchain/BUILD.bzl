@@ -218,55 +218,61 @@ def _bootstrap_toolchain_impl(ctx):
     #          )
     # mode = ctx.attr.mode[CompilationModeSettingProvider].value
 
-    return [platform_common.ToolchainInfo(
-        # Public fields
+    return [
+        platform_common.ToolchainInfo(
+            # Public fields
         name = ctx.label.name,
-        # platform   = _platform,
+            # platform   = _platform,
         path       = ctx.attr.path,
-        # sdk_home   = ctx.attr.sdk_home,
-        # opam_root  = ctx.attr.opam_root,
+            # sdk_home   = ctx.attr.sdk_home,
+            # opam_root  = ctx.attr.opam_root,
         linkmode       = ctx.attr.linkmode,
 
         ocamlrun   = ctx.attr.ocamlrun.files.to_list()[0],
-        ocamlc     = ctx.file.ocamlc, #.files.to_list()[0],
-        # ocamlc_opt = ctx.attr._ocamlc_opt.files.to_list()[0],
-        # ocamlopt   = ctx.attr._ocamlopt.files.to_list()[0],
-        # ocamlopt_opt = ctx.attr._ocamlopt_opt.files.to_list()[0],
+            ocamlc     = ctx.file.ocamlc, #.files.to_list()[0],
+            # ocamlc_opt = ctx.attr._ocamlc_opt.files.to_list()[0],
+            # ocamlopt   = ctx.attr._ocamlopt.files.to_list()[0],
+            # ocamlopt_opt = ctx.attr._ocamlopt_opt.files.to_list()[0],
 
         ocamllex   = ctx.attr.ocamllex.files.to_list()[0],
-        ocamlyacc  = ctx.attr.ocamlyacc.files.to_list()[0],
+            ocamlyacc  = ctx.attr.ocamlyacc.files.to_list()[0],
 
         # bootstrap_std_exit = ctx.attr._bootstrap_std_exit,
 
         # cc_toolchain = ctx.attr.cc_toolchain,
-        ## rules add [cc_toolchain.all_files] to action inputs
-        ## at least, rules linking to cc libs must do this;
-        ## pure ocaml code need not?
+            ## rules add [cc_toolchain.all_files] to action inputs
+            ## at least, rules linking to cc libs must do this;
+            ## pure ocaml code need not?
         cc_toolchain = the_cc_toolchain,
-        cc_exe = _c_exe, ## to be passed via `-cc` (will be a sh script on mac)
+            cc_exe = _c_exe, ## to be passed via `-cc` (will be a sh script on mac)
 
         cc_opts = _cc_opts,
 
         ## config frag.cpp fld `linkopts` contains whatever was passed
-        ## by CLI using `--linkopt`
+            ## by CLI using `--linkopt`
         linkopts  = None,
 
         # std_exit = ctx.attr._std_exit.files.to_list()[0],
         camlheader = ctx.attr._camlheader.files.to_list()[0],
 
         # ocamlbuild = ctx.attr._ocamlbuild.files.to_list()[0],
-        # ocamlfind  = ctx.attr._ocamlfind.files.to_list()[0],
-        # ocamldep   = ctx.attr._ocamldep.files.to_list()[0],
-        # objext     = ".cmx" if mode == "native" else ".cmo",
-        # archext    = ".cmxa" if mode == "native" else ".cma",
-        # dllpath    = ctx.path(Label("@opam//pkg:stublibs"))
-    )]
+            # ocamlfind  = ctx.attr._ocamlfind.files.to_list()[0],
+            # ocamldep   = ctx.attr._ocamldep.files.to_list()[0],
+            # objext     = ".cmx" if mode == "native" else ".cmo",
+            # archext    = ".cmxa" if mode == "native" else ".cma",
+            # dllpath    = ctx.path(Label("@opam//pkg:stublibs"))
+        ),
+        ## provide vars so toolchain can be used in genrules
+        # platform_common.TemplateVariableInfo({
+        #     "OCAMLRUN": ctx.attr.ocamlrun.files.to_list()[0].path
+        # })
+    ]
 
 bootstrap_toolchain_impl = rule(
     _bootstrap_toolchain_impl,
     attrs = _bootstrap_tools_attrs,
     doc = "Defines a Ocaml toolchain based on an SDK",
-    provides = [platform_common.ToolchainInfo],
+    provides = [platform_common.ToolchainInfo], # platform_common.TemplateVariableInfo],
 
     ## NB: config frags evidently expose CLI opts like `--cxxopt`;
     ## see https://docs.bazel.build/versions/main/skylark/lib/cpp.html

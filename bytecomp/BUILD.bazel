@@ -30,6 +30,19 @@ bootstrap_library(
     ],
 )
 
+
+## for ocamlcommmon archive:
+bootstrap_library( # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
+    name = "ocamlcommon",
+    manifest  = [
+        ":Meta",
+        ":Opcodes",
+        ":Bytesections",
+        ":Dll",
+        ":Symtable"
+    ]
+)
+
 bootstrap_module(
     name   = "Bytegen",
     struct = "bytegen.ml",
@@ -57,7 +70,8 @@ bootstrap_module(
         ## (Asttypes)
         ## (Array)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -88,7 +102,8 @@ bootstrap_module(
         ## (Cmo_format)
         ## (Clflags)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -133,7 +148,7 @@ bootstrap_module(
         ## (Cmo_format)
         ## (Clflags)
         ## (Char)
-        ## (Ccomp)
+        "//utils:Ccomp"
         ## (Bytes)
         ## (Array)
     ],
@@ -258,7 +273,7 @@ bootstrap_module(
         ":Bytegen", ## (Bytecomp Bytegen)
         ## (Sys)
         ## (Primitive)
-        # "//tools:Opcodes"
+        ":Opcodes"
         ## (Misc)
         ## (Marshal)
         ## (LongString)
@@ -276,7 +291,8 @@ bootstrap_module(
         ## (Asttypes)
         ## (Array)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -348,6 +364,12 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
+## root Makefile:
+# bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
+# 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
+# bytecomp/opcodes.mli: bytecomp/opcodes.ml
+# 	$(CAMLC) -i $< > $@
+## make_opcodes is //tools:make_opcodes.exe
 bootstrap_module(
     name   = "Opcodes",
     struct = "opcodes.ml",

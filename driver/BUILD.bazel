@@ -48,16 +48,16 @@ bootstrap_module(
         ## (Printf)
         ## (Printexc)
         ## (Option)
-        ## (Misc)
+        "//utils:Misc",
         "//parsing:Location",
         ## (List)
         ## (Lexing)
         ## (Int_arg_helper)
         ## (Float_arg_helper)
         ## (Filename)
-        ## (Config)
+        "//utils:Config",
         ## (Compiler_pass)
-        ## (Clflags)
+        "//utils:Clflags",
         "//utils:Ccomp"
         ## (Arg)
     ]
@@ -82,15 +82,15 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
         ## (Typedtree)
-        ## (Translmod)
-        ## (Simplif)
+        "//lambda:Translmod",
+        "//lambda:Simplif",
         ## (Profile)
         ## (Printlambda)
-        "//bytecomp:Printinstr"
-        ## (Misc)
-        ## (Emitcode)
-        ## (Clflags)
-        ## (Bytegen)
+        "//bytecomp:Printinstr",
+        "//utils:Misc",
+        "//bytecomp:Emitcode",
+        "//utils:Clflags",
+        "//bytecomp:Bytegen"
     ]
 )
 
@@ -101,9 +101,9 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
         ## (Typedtree)
-        "//bytecomp:Instruct_cmi"
+        "//bytecomp:Instruct_cmi",
         ## (Ident)
-        ## (Clflags)
+        "//utils:Clflags",
     ]
 )
 
@@ -126,14 +126,14 @@ bootstrap_module(
         ## (Printtyp)
         "//parsing:Printast",
         ## (Pprintast)
-        ## (Misc)
+        "//utils:Misc",
         ## (List)
         ## (Includemod)
         ## (Format)
         ## (Env)
-        ## (Config)
+        "//utils:Config",
         ## (Compiler_pass)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Builtin_attributes)
     ]
 )
@@ -144,7 +144,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         "//typing:Typedtree_cmi",
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Format)
         "//typing:Env_cmi"
     ]
@@ -159,18 +159,18 @@ bootstrap_module(
         ":Compenv", ## (Driver Compenv)
         ## (Warnings)
         ## (Types)
-        "//typing:Typemod"
+        "//typing:Typemod",
         ## (Sys)
         ## (Option)
-        ## (Misc)
-        ## (Location)
+        "//utils:Misc",
+        "//parsing:Location",
         ## (Load_path)
         ## (List)
         ## (Ident)
         ## (Format)
         ## (Env)
-        ## (Config)
-        ## (Clflags)
+        "//utils:Config",
+        "//utils:Clflags",
     ]
 )
 
@@ -180,8 +180,8 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ## (Format)
-        "//typing:Env_cmi"
-        ## (Clflags)
+        "//typing:Env_cmi",
+        "//utils:Clflags",
     ]
 )
 
@@ -227,16 +227,16 @@ bootstrap_module(
         ## (Profile)
         ## (Printf)
         ## (Option)
-        ## (Misc)
-        ## (Location)
+        "//utils:Misc",
+        "//parsing:Location",
         ## (List)
         ## (Int_arg_helper)
         ## (Format)
         ## (Float_arg_helper)
         ## (Filename)
-        ## (Config)
+        "//utils:Config",
         ## (Compiler_pass)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Arg)
     ]
 )
@@ -265,15 +265,15 @@ bootstrap_module(
         ## (String)
         ## (Profile)
         ## (Printf)
-        ## (Location)
+        "//parsing:Location",
         ## (List)
         ## (Format)
         ## (Filename)
-        ## (Config)
-        ## (Clflags)
+        "//utils:Config",
+        "//utils:Clflags",
         ## (Bytepackager)
         ## (Bytelink)
-        ## (Bytelibrarian)
+        "//bytecomp:Bytelibrarian",
         ## (Arg)
     ]
 )
@@ -297,11 +297,11 @@ bootstrap_module(
         ":Compenv", ## (Driver Compenv)
         ## (Sys)
         ## (Printf)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Parser)
         ## (Parse)
-        ## (Misc)
-        ## (Location)
+        "//utils:Misc",
+        "//parsing:Location",
         ## (List)
         ## (Lexing)
         ## (Lexer)
@@ -309,8 +309,8 @@ bootstrap_module(
         ## (Format)
         ## (Filename)
         "//parsing:Depend",
-        ## (Config)
-        ## (Clflags)
+        "//utils:Config",
+        "//utils:Clflags",
         ## (Bytes)
         ## (Array)
         ## (Arg)
@@ -332,18 +332,18 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
-        ## (Typedtree)
-        ## (Translmod)
-        ## (Simplif)
-        ## (Profile)
-        ## (Printlambda)
-        ## (Misc)
-        ## (Flambda_middle_end)
-        ## (Config)
-        ## (Compilenv)
-        ## (Closure_middle_end)
-        ## (Clflags)
-        ## (Asmgen)
+        "//typing:Typedtree",
+        "//lambda:Translmod",
+        "//lambda:Simplif",
+        "//utils:Profile",
+        "//lambda:Printlambda",
+        "//utils:Misc",
+        "//middle_end/flambda:Flambda_middle_end",
+        "//utils:Config",
+        "//middle_end:Compilenv",
+        "//middle_end/closure:Closure_middle_end",
+        "//utils:Clflags",
+        "//asmcomp:Asmgen"
     ]
 )
 
@@ -354,7 +354,7 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
         ## (Typedtree)
-        ## (Clflags)
+        "//utils:Clflags",
         "//middle_end:Backend_intf_cmi"
     ]
 )
@@ -405,14 +405,14 @@ bootstrap_module(
         ## (Profile)
         ## (Proc)
         ## (Printf)
-        ## (Location)
+        "//parsing:Location",
         ## (List)
         ## (Import_approx)
         ## (Format)
         ## (Filename)
-        ## (Config)
+        "//utils:Config",
         ## (Compilenv)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Backend_intf)
         ## (Asmpackager)
         ## (Asmlink)
@@ -442,16 +442,16 @@ bootstrap_module(
         ## (String)
         ## (Profile)
         ## (Printf)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         "//parsing:Parse",
-        ## (Misc)
-        ## (Location)
+        "//utils:Misc",
+        "//parsing:Location",
         ## (List)
         ## (Lexing)
         ## (Format)
         ## (Filename)
-        ## (Config)
-        ## (Clflags)
+        "//utils:Config",
+        "//utils:Clflags",
         "//utils:Ccomp",
         "//parsing:Ast_mapper",
         "//parsing:Ast_invariants"

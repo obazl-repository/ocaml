@@ -160,6 +160,7 @@ bootstrap_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
         "//driver:__pkg__"
     ]
 )
@@ -191,6 +192,7 @@ bootstrap_module(
     ],
     visibility = [
         "//asmcomp:__subpackages__",
+        "//driver:__subpackages__",
         "//parsing:__pkg__",
         "//middle_end/flambda:__pkg__",
         "//typing:__pkg__"
@@ -227,8 +229,9 @@ bootstrap_module(
     data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__pkg__",
-        "//asmcomp/i386:__pkg__",
-        "//bytecomp:__pkg__"
+        "//asmcomp:__subpackages__",
+        "//bytecomp:__pkg__",
+        "//driver:__pkg__"
     ]
 )
 
@@ -328,7 +331,8 @@ bootstrap_module(
     sig    = "Domainstate_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-    ]
+    ],
+    visibility = ["//asmcomp:__subpackages__"]
 )
 
 genrule(
@@ -553,6 +557,7 @@ bootstrap_module(
     visibility = [
         "//asmcomp:__subpackages__",
         "//bytecomp:__pkg__",
+        "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__"
@@ -628,6 +633,10 @@ bootstrap_module(
         ## (Float)
         ## (Digest)
         ## (Array)
+    ],
+    visibility = [
+        "//driver:__pkg__",
+        "//asmcomp:__pkg__"
     ]
 )
 

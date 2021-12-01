@@ -12,7 +12,7 @@ SIG_OPTS = ROOT_SIG_OPTS
 STDLIB = ["//stdlib"]
 
 bootstrap_library(
-    name = "middle_end_lib",
+    name = "middle_end",
     manifest  = [
         ":Backend_var",
         ":Clambda",
@@ -27,10 +27,9 @@ bootstrap_library(
         ":Semantics_of_primitives",
         ":Symbol",
         ":Variable",
+
+        ":Backend_intf_cmi",
     ],
-    # signatures  = [
-    #     ":Backend_intf_cmi",
-    # ],
 )
 
 bootstrap_signature(
@@ -45,8 +44,9 @@ bootstrap_signature(
     ],
     data = ["//runtime:primitives"],
     visibility = [
+        "//asmcomp:__pkg__",
         "//driver:__pkg__",
-        "//middle_end/flambda:__pkg__"
+        "//middle_end:__subpackages__"
     ]
 )
 
@@ -63,7 +63,7 @@ bootstrap_module(
         ## (Clflags)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = ["//middle_end:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -98,7 +98,10 @@ bootstrap_module(
         ## (Asttypes)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//middle_end:__subpackages__"
+    ]
 )
 
 bootstrap_signature(
@@ -115,6 +118,7 @@ bootstrap_signature(
     ],
     data = ["//runtime:primitives"],
     visibility = [
+        "//asmcomp:__pkg__",
         "//file_formats:__pkg__",
         "//middle_end/flambda:__pkg__",
     ]
@@ -131,7 +135,7 @@ bootstrap_module(
         ## (Asttypes)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = ["//middle_end:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -217,7 +221,11 @@ bootstrap_module(
         ## (Buffer)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = [
+        "//asmcomp:__subpackages__",
+        "//driver:__pkg__",
+        "//middle_end:__subpackages__"
+    ]
 )
 
 bootstrap_signature(
@@ -253,7 +261,7 @@ bootstrap_module(
         ## (Asttypes)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = ["//middle_end:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -340,7 +348,7 @@ bootstrap_module(
         ## (Array)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = ["//middle_end:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -395,7 +403,7 @@ bootstrap_module(
         ## (Asttypes)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = ["//middle_end:__subpackages__"]
 )
 
 bootstrap_signature(

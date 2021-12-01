@@ -51,8 +51,8 @@ bootstrap_module(
         ## (Asttypes)
     ],
     visibility = [
-        "//middle_end:__pkg__",
-        "//asmcomp:__pkg__"
+        "//asmcomp:__pkg__",
+        "//middle_end:__subpackages__",
     ]
 )
 
@@ -91,8 +91,7 @@ bootstrap_module(
     visibility = [
         "//bytecomp:__pkg__",
         "//file_formats:__pkg__",
-        "//middle_end:__pkg__",
-        "//middle_end/flambda/base_types:__pkg__"
+        "//middle_end:__subpackages__",
     ]
 )
 
@@ -193,6 +192,7 @@ bootstrap_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//driver:__pkg__",
         "//middle_end:__pkg__"
     ]
 )
@@ -273,7 +273,11 @@ bootstrap_module(
         ## (Clflags)
         ## (Asttypes)
     ],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//middle_end/closure:__pkg__",
+        "//middle_end/flambda:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -299,7 +303,10 @@ bootstrap_module(
         ## (Hashtbl)
         ## (Array)
     ],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//middle_end/closure:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -500,7 +507,11 @@ bootstrap_module(
         ## (Asttypes)
         ## (Array)
     ],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//driver:__pkg__",
+        "//bytecomp:__pkg__"
+    ]
 )
 
 bootstrap_signature(

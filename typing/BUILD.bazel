@@ -368,7 +368,9 @@ bootstrap_module(
         ## (Format)
         "//utils:Clflags"
         ## (Char)
-    ])
+    ],
+    visibility = ["//asmcomp:__pkg__"]
+)
 
 bootstrap_signature(
     name = "Ident_cmi",
@@ -865,7 +867,8 @@ bootstrap_module(
         ## (List)
         ## (Format)
         "//parsing:Attr_helper"
-    ]
+    ],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -1659,7 +1662,8 @@ bootstrap_module(
         ## (List)
         ## (Lazy_backtrack)
         ## (Asttypes)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(

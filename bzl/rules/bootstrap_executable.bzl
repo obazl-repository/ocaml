@@ -90,7 +90,7 @@ def _bootstrap_executable(ctx):
         # args.add("-custom")
 
     _options = get_options(rule, ctx)
-    print("OPTIONS: %s" % _options)
+    # print("OPTIONS: %s" % _options)
     # do not uniquify options, it collapses all -I
     args.add_all(_options)
 

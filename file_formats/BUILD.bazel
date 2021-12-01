@@ -18,9 +18,15 @@ bootstrap_library(
         ":Cmt_format",
         ":Linear_format",
     ],
-    #     ":Cmo_format_cmi",
-    #     ":Cmx_format_cmi",
-    #     ":Cmxs_format_cmi",
+)
+
+bootstrap_library( ## defined in compilerlibs/Makefile.compilerlibs as COMP_CMI
+    name = "ocamlcommon",
+    manifest  = [
+        ":Cmo_format_cmi",
+        ":Cmx_format_cmi",
+        ":Cmxs_format_cmi",
+    ],
 )
 
 bootstrap_module(
@@ -119,7 +125,10 @@ bootstrap_signature(
         ## (Digest)
         "//middle_end:Clambda_cmi"
     ],
-    visibility = ["//middle_end:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//middle_end:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -127,9 +136,10 @@ bootstrap_signature(
     src  = "cmxs_format.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Misc)
-        ## (Digest)
-    ]
+        "//utils:Misc_cmi",
+        "//stdlib:Stdlib.Digest"
+    ],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_module(
@@ -146,7 +156,8 @@ bootstrap_module(
         ## (Digest)
         ## (Config)
         ## (Cmm)
-    ]
+    ],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_signature(

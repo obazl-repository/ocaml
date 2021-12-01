@@ -147,7 +147,7 @@ bootstrap_module(
         ":Cmm", ## (Asmcomp Cmm)
         ## (Random)
         ## (List)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Backend_var)
         ## (Asttypes)
         ## (Array)
@@ -195,34 +195,35 @@ bootstrap_module(
         ":Cmm_invariants", ## (Asmcomp Cmm_invariants)
         ":Cmm_helpers", ## (Asmcomp Cmm_helpers)
         ":Cmm", ## (Asmcomp Cmm)
-        ## (Translmod)
-        ## (Profile)
-        ## (Primitive)
-        ## (Misc)
-        ## (Location)
+        "//lambda:Translmod",
+        "//utils:Profile",
+        "//typing:Primitive",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//file_formats:Linear_format",
+        "//typing:Ident",
         ## (List)
-        ## (Linear_format)
-        ## (Ident)
         ## (Format)
         ## (Filename)
         ## (Config)
         ## (Compiler_pass)
-        ## (Compilenv)
-        ## (Clflags)
-        ## (Clambda)
-        ## (CSE)
-        ## (Backend_intf)
+        "//middle_end:Compilenv",
+        "//utils:Clflags",
+        "//middle_end:Clambda",
+        "//middle_end:Backend_intf_cmi",
     ]
     + select({
         "//config/arch:x86_64": [
             "//asmcomp/amd64:Emit",
+            "//asmcomp/amd64:CSE",
             "//asmcomp/amd64:Proc",
             "//asmcomp/amd64:Reload",
             "//asmcomp/amd64:Selection",
             "//asmcomp/amd64:Scheduling",
         ],
     }, no_match_error = "unsupported arch"),
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -233,8 +234,8 @@ bootstrap_signature(
         ":Emitaux", ## (Asmcomp Emitaux)
         ":Cmm", ## (Asmcomp Cmm)
         ## (Format)
-        ## (Clambda)
-        ## (Backend_intf)
+        "//middle_end:Clambda",
+        "//middle_end:Backend_intf_cmi"
     ],
     data = ["//runtime:primitives"]
 )
@@ -254,10 +255,10 @@ bootstrap_module(
         ## (Filename)
         ## (Export_info)
         ## (Config)
-        ## (Compilenv)
+        "//middle_end:Compilenv",
         ## (Cmx_format)
-        ## (Clflags)
-        ## (Clambda)
+        "//utils:Clflags",
+        "//middle_end:Clambda",
         ## (Ccomp)
     ],
     data = ["//runtime:primitives"]
@@ -298,12 +299,12 @@ bootstrap_module(
         ## (Digest)
         ## (Consistbl)
         ## (Config)
-        ## (Compilenv)
+        "//middle_end:Compilenv",
         ## (Cmx_format)
-        ## (Clflags)
-        ## (Clambda)
+        "//utils:Clflags",
+        "//middle_end:Clambda",
         ## (Ccomp)
-        ## (Backend_intf)
+        "//middle_end:Backend_intf_cmi",
         ## (Array)
     ],
     data = ["//runtime:primitives"]
@@ -348,14 +349,14 @@ bootstrap_module(
         ## (Export_info)
         ## (Env)
         ## (Config)
-        ## (Compilenv)
+        "//middle_end:Compilenv",
         ## (Compilation_unit)
         ## (Cmx_format)
         ## (Closure_middle_end)
-        ## (Clflags)
-        ## (Clambda)
+        "//utils:Clflags",
+        "//middle_end:Clambda",
         ## (Ccomp)
-        ## (Backend_intf)
+        "//middle_end:Backend_intf_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -367,7 +368,7 @@ bootstrap_signature(
     deps   = STDLIB + [
         ## (Format)
         ## (Env)
-        ## (Backend_intf)
+        "//middle_end:Backend_intf_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -387,7 +388,8 @@ bootstrap_module(
         ## (Int)
         ## (Hashtbl)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -483,12 +485,12 @@ bootstrap_module(
         ## (Int)
         ## (Debuginfo)
         ## (Config)
-        ## (Compilenv)
-        ## (Cmxs_format)
-        ## (Cmx_format)
-        ## (Clflags)
+        "//middle_end:Compilenv",
+        "//file_formats:Cmxs_format_cmi",
+        "//file_formats:Cmx_format_cmi",
+        "//utils:Clflags",
         ## (Clambda_primitives)
-        ## (Clambda)
+        "//middle_end:Clambda",
         ## (Backend_var)
         ## (Asttypes)
         ## (Array)
@@ -513,7 +515,7 @@ bootstrap_signature(
         ## (Debuginfo)
         ## (Cmx_format)
         ## (Clambda_primitives)
-        ## (Clambda)
+        "//middle_end:Clambda",
         ## (Asttypes)
     ],
     data = ["//runtime:primitives"]
@@ -572,10 +574,10 @@ bootstrap_module(
         ## (Int)
         ## (Debuginfo)
         ## (Config)
-        ## (Compilenv)
-        ## (Clflags)
+        "//middle_end:Compilenv",
+        "//utils:Clflags",
         ## (Clambda_primitives)
-        ## (Clambda)
+        "//middle_end:Clambda",
         ## (Backend_var)
         ## (Asttypes)
         ## (Array)
@@ -590,7 +592,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Cmm", ## (Asmcomp Cmm)
-        ## (Clambda)
+        "//middle_end:Clambda",
     ],
     data = ["//runtime:primitives"]
 )
@@ -606,8 +608,8 @@ bootstrap_module(
         ## (Misc)
         ## (List)
         ## (Hashtbl)
-        ## (Compilenv)
-        ## (Clambda)
+        "//middle_end:Compilenv",
+        "//middle_end:Clambda",
     ],
     data = ["//runtime:primitives"]
 )
@@ -617,9 +619,9 @@ bootstrap_signature(
     src  = "cmmgen_state.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Cmm_cmi",
         ## (Misc)
-        ## (Clambda)
+        "//middle_end:Clambda_cmi"
     ],
     data = ["//runtime:primitives"]
 )
@@ -771,11 +773,12 @@ bootstrap_module(
         ## (Format)
         ## (Debuginfo)
         ## (Config)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Char)
         ## (Arch)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -873,7 +876,8 @@ bootstrap_module(
         ":Cmm", ## (Asmcomp Cmm)
         ## (Debuginfo)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -1052,7 +1056,7 @@ bootstrap_module(
         ## (List)
         ## (Format)
         ## (Debuginfo)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Backend_var)
         ## (Asttypes)
         ## (Array)
@@ -1084,7 +1088,7 @@ bootstrap_module(
         ":Cmm", ## (Asmcomp Cmm)
         ## (Format)
         ## (Debuginfo)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Array)
     ],
     data = ["//runtime:primitives"]
@@ -1120,7 +1124,7 @@ bootstrap_module(
         ## (Int64)
         ## (Format)
         ## (Debuginfo)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Array)
         ## (Arch)
     ] + select({
@@ -1259,7 +1263,7 @@ bootstrap_module(
         ## (List)
         ## (Int)
         ## (Hashtbl)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Array)
         ## (Arch)
     ] + select({
@@ -1385,7 +1389,7 @@ bootstrap_module(
         ## (List)
         ## (Int)
         ## (Hashtbl)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Array)
     ] + select({
         "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
@@ -1484,7 +1488,8 @@ bootstrap_module(
         ":X86_ast_cmi", ## (Asmcomp X86_ast)
         ## (Int64)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -1513,7 +1518,8 @@ bootstrap_module(
         ## (Int)
         ## (Buffer)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -1539,7 +1545,8 @@ bootstrap_module(
         ## (Int64)
         ## (Buffer)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__subpackages__"]
 )
 
 bootstrap_signature(

@@ -385,6 +385,7 @@ bootstrap_module(
         ## (Buffer)
     ],
     visibility = [
+        "//asmcomp:__pkg__",
         "//driver:__pkg__",
         "//typing:__pkg__"
     ]

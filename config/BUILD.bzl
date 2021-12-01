@@ -4,56 +4,6 @@
 #  (release (flags (:standard -w +a-4-9-40-41-42-44-45-48))))
 
 
-## Makefile
-# ROOTDIR = .
-ROOTDIR = "/Users/gar/ocaml/ocaml" ## FIXME
-
-################  BOOTSTRAP TOOLS  ################
-# OCAMLRUN - in bootstrap:toolchain
-## Makefile.common:
-# OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
-# NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
-## We'll use names with a little more information content:
-## BOOT_OCAMLRUN and RUNTIME_OCAMLRUN
-
-## OCAMLC - in bootstrap:toolchain
-# Use boot/ocamlc.opt if available
-# ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
-#   BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
-# else
-#   BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
-# endif
-
-## root Makefile:
-# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
-# CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
-
-## stdlib/Makefile:
-# COMPILER=$(ROOTDIR)/ocamlc$(EXE)
-# CAMLC=$(OCAMLRUN) $(COMPILER)
-
-## root Makefile.best_binaries
-# choose_best = $(strip $(if ...
-# BEST_OCAMLC := $(call choose_best,ocamlc)
-# BEST_OCAMLOPT := $(call choose_best,ocamlopt)
-# BEST_OCAMLLEX := $(call choose_best,lex/ocamllex)
-## e.g. chooses either native $(ROOTDIR)/ocamlc.opt
-## or bytecode $(OCAMLRUN) $(ROOTDIR)/$1$(EXE)
-## so this is handled by toolchain:bootstrap
-
-#### OCAMLLEX
-# NOTE: it is important that OCAMLLEX is defined *before* Makefile.common
-# gets included, so that its definition here takes precedence
-# over the one there.
-# OCAMLLEX ?= $(BOOT_OCAMLLEX)
-# include Makefile.common
-
-# BOOT_OCAMLLEX ?= $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
-# use rule: bootstrap_ocamllex( )
-
-################ CAMLC
-# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
-
 ################################
 ## Makefile.config:
 TARGET = "x86_64-apple-darwin20.6.0"  ## FIXME
@@ -73,6 +23,68 @@ LIBDIR = EXEC_PREFIX + "/lib/ocaml"
 
 ### Where to install the stub code for the standard library
 # STUBLIBDIR=${exec_prefix}/lib/ocaml/stublibs
+
+## root Makefile
+# ROOTDIR = .
+ROOTDIR = "/Users/gar/ocaml/ocaml" ## FIXME
+
+# NOTE: it is important that OCAMLLEX is defined *before* Makefile.common
+# gets included, so that its definition here takes precedence
+# over the one there.
+# OCAMLLEX ?= $(BOOT_OCAMLLEX)
+# include Makefile.common
+
+################  BOOTSTRAP TOOLS  ################
+# BOOT_OCAMLC is defined in //bzl/toolchain:bootstrap as tc.ocamlc => //boot:ocamlc
+# OCAMLRUN is defined in //bzl/toolchain:bootstrap as tc.ocamlrun => //runtime:ocamlrun
+# OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
+# NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
+
+
+# Use boot/ocamlc.opt if available
+# ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
+#   BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
+# else
+#   BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
+# endif
+
+## Makefile.common:
+# TEST_BOOT_OCAMLC_OPT = $(shell \
+#   test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
+#   echo $$?)
+# # Use boot/ocamlc.opt if available
+# ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
+#   BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
+# else
+#   BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
+# endif
+
+## stdlib/Makefile:
+# COMPILER=$(ROOTDIR)/ocamlc$(EXE)
+# CAMLC=$(OCAMLRUN) $(COMPILER)
+
+# BOOT_OCAMLLEX ?= $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
+# use rule: bootstrap_ocamllex( )
+
+# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
+
+## root Makefile.best_binaries
+# choose_best = $(strip $(if ...
+# BEST_OCAMLC := $(call choose_best,ocamlc)
+# BEST_OCAMLOPT := $(call choose_best,ocamlopt)
+# BEST_OCAMLLEX := $(call choose_best,lex/ocamllex)
+## e.g. chooses either native $(ROOTDIR)/ocamlc.opt
+## or bytecode $(OCAMLRUN) $(ROOTDIR)/$1$(EXE)
+## so this is handled by toolchain:bootstrap
+
+## root Makefile
+# INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
+#         -I lambda -I middle_end -I middle_end/closure \
+#         -I middle_end/flambda -I middle_end/flambda/base_types \
+#         -I asmcomp \
+#         -I driver -I toplevel
+
+# OCaml build flags defined below, after the cc flags
 
 ################################################################
 ################ C BUILD FLAGS & DEFINES ################
@@ -223,23 +235,22 @@ ROOT_MKEXE_FLAGS = ["-Wl,-no_compact_unwind"]
 
 ################################################################
 ################  OCAML BUILD FLAGS  ################
-## Makefile.common:
-# TEST_BOOT_OCAMLC_OPT = $(shell \
-#   test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
-#   echo $$?)
-# # Use boot/ocamlc.opt if available
-# ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
-#   BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
-# else
-#   BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
-# endif
+## root Makefile:
+# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
+# CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
 
-## root Makefile
-# INCLUDES=-I utils -I parsing -I typing -I bytecomp -I file_formats \
-#         -I lambda -I middle_end -I middle_end/closure \
-#         -I middle_end/flambda -I middle_end/flambda/base_types \
-#         -I asmcomp \
-#         -I driver -I toplevel
+## tools/Makefile:
+# CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
+#         -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
+# CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) \
+#   -g -nostdlib -I $(ROOTDIR)/stdlib
+# COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
+# -warn-error +A -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
+
+## lex/Makefile
+# CAMLC = $(BOOT_OCAMLC) -strict-sequence -nostdlib \
+#         -I $(ROOTDIR)/boot -use-prims $(ROOTDIR)/runtime/primitives
+# CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -nostdlib -I $(ROOTDIR)/stdlib
 
 ## NB: rules must add attr: data = ["//runtime:primitives"],
 USE_PRIMS = ["-use-prims", "runtime/primitives"]
@@ -254,8 +265,6 @@ ROOT_CAMLC_OPTS = [
 ] + USE_PRIMS
 
 TOOLS_CAMLC_OPTS = ROOT_CAMLC_OPTS
- # -g -nostdlib -I $(ROOTDIR)/boot \
- #        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
 
 ROOT_CAMLOPT_OPTS = [
     "-g", "-nostdlib",
@@ -263,7 +272,11 @@ ROOT_CAMLOPT_OPTS = [
     "-I", "otherlibs/dynlink"
 ]
 
-# CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
+## stdlib/Makefile:
+# COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 \
+#           -g -warn-error +A -bin-annot -nostdlib -principal \
+#           -safe-string -strict-formats
+
 
 ROOT_COMPFLAGS = [
     "-strict-sequence", "-principal", "-absname",
@@ -273,7 +286,9 @@ ROOT_COMPFLAGS = [
     "-safe-string", "-strict-formats"
 ]
 
-TOOLS_COMPFLAGS = [
+TOOLS_COMPFLAGS = [  # tools/Makefile
+# COMPFLAGS = -absname -w +a-4-9-41-42-44-45-48-70 -strict-sequence \
+# -warn-error +A -principal -safe-string -strict-formats -bin-annot $(INCLUDES)
     "-absname",
     "-w", "+a-4-9-41-42-44-45-48-70",
     "-strict-sequence",
@@ -285,19 +300,6 @@ TOOLS_COMPFLAGS = [
 
 ## TODO: convert INCLUDES here to deps
 
-# COMPFLAGS = [
-#     "-strict-sequence", "-absname",
-#     "-w", "+a-4-9-40-41-42-44-45-48-66-70",
-#     "-warn-error", "+a",
-#     "-bin-annot",
-#     "-safe-string", "-strict-formats"
-# ]
-
-## stdlib/Makefile:
-# COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 \
-#           -g -warn-error +A -bin-annot -nostdlib -principal \
-#           -safe-string -strict-formats
-
 ## root Makefile:
 # %.cmo: %.ml
 # 	$(CAMLC) $(COMPFLAGS) -c $< -I $(@D)
@@ -307,8 +309,20 @@ ROOT_MODULE_OPTS = ROOT_CAMLC_OPTS + ROOT_COMPFLAGS
 # 	$(CAMLC) $(COMPFLAGS) -c $<
 ROOT_SIG_OPTS = ROOT_MODULE_OPTS
 
+TOOLS_MODULE_OPTS = TOOLS_CAMLC_OPTS + TOOLS_COMPFLAGS
+TOOLS_SIG_OPTS = TOOLS_MODULE_OPTS
+
 # %.cmx: %.ml
 # 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) -c $< -I $(@D)
+
+## tools/Makefile, CAMLC == :
+# %.cmo: %.ml
+# 	$(CAMLC) -c $(COMPFLAGS) - $<
+# %.cmi: %.mli
+# 	$(CAMLC) -c $(COMPFLAGS) - $<
+# %.cmx: %.ml
+# 	$(CAMLOPT) $(COMPFLAGS) -c - $<
+
 
 
 

@@ -36,7 +36,8 @@ bootstrap_module(
         "//asmcomp:Cmm", ## (Asmcomp Cmm)
         "//asmcomp:CSEgen", ## (Asmcomp CSEgen)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_module(
@@ -54,6 +55,43 @@ bootstrap_module(
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__pkg__"]
 )
+
+# # root Makefile:
+# asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp $(cvt_emit)
+# 	echo \# 1 \"$(ARCH)/emit.mlp\" > $@
+# 	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
+# 	|| { rm -f $@; exit 2; }
+genrule(
+    name = "emit_ml",
+    srcs = ["emit.mlp", "//tools:cvt_emit.exe"],
+    outs = ["emit.ml"],
+    tools = ["//runtime:ocamlrun"], ## fixme: find a way to use the toolchain
+    cmd  = "\n".join([
+	    "echo '# 1 \"{ARCH}/emit.mlp\"' > $@;".format(ARCH = "FIXME"),
+        "$(execpath //runtime:ocamlrun) $(location //tools:cvt_emit.exe) < $(location :emit.mlp) >> $@"
+    ]),
+)
+
+bootstrap_module(
+    name   = "Emit",
+    struct = "emit.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        "//asmcomp:Branch_relaxation",
+        "//asmcomp:Cmm",
+        "//asmcomp:Emitaux",
+        "//asmcomp:Linear",
+        "//asmcomp:X86_dsl",
+        "//asmcomp:X86_gas",
+        "//asmcomp:X86_masm",
+        "//middle_end:Compilenv",
+        "//utils:Domainstate",
+        ":Proc"
+    ],
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__pkg__"]
+)
+
 
 bootstrap_module(
     name   = "Proc",
@@ -88,7 +126,8 @@ bootstrap_module(
         ## (Clflags)
         ## (Array)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_module(
@@ -98,7 +137,8 @@ bootstrap_module(
     deps   = STDLIB + [
         "//asmcomp:Schedgen",
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_module(
@@ -116,6 +156,7 @@ bootstrap_module(
         ## (Clflags)
         ## (Array)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__pkg__"]
 )
 

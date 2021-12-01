@@ -260,12 +260,11 @@ def _bootstrap_module(ctx):
             # in_structfile = ctx.file.struct
             # if debug:
             if ctx.file.struct.is_source:
-                print("symlinking src structfile: %s" % ctx.file.struct)
+                # print("symlinking src structfile: %s" % ctx.file.struct)
                 in_structfile = ctx.actions.declare_file(scope + ctx.file.struct.basename)
                 ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
             else:
                in_structfile = ctx.file.struct
- 
 
             cmi = module_name + ".cmi"
             cmifile = ctx.actions.declare_file(scope + cmi)

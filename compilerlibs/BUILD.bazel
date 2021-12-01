@@ -14,26 +14,12 @@ bootstrap_archive(
         "//file_formats",
         "//lambda",
 
-        # "//bytecomp:comp"
-        # "//driver:comp"
+        ## COMP = [
+        "//bytecomp:ocamlcommon",
+        "//file_formats:ocamlcommon",
+        "//driver:ocamlcommon"
+        #  ]
     ]
-# COMP = \
-#   bytecomp/meta.cmo \
-#   bytecomp/opcodes.cmo \
-#   bytecomp/bytesections.cmo \
-#   bytecomp/dll.cmo \
-#   bytecomp/symtable.cmo \
-#   driver/pparse.cmo \
-#   driver/compenv.cmo \
-#   driver/main_args.cmo \
-#   driver/compmisc.cmo \
-#   driver/makedepend.cmo \
-#   driver/compile_common.cmo
-        # "//file_formats:comp_cmi"
-# COMP_CMI = \
-#   file_formats/cmo_format.cmi \
-#   file_formats/cmx_format.cmi \
-#   file_formats/cmxs_format.cmi
 )
 
 ##################

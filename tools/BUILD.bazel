@@ -11,15 +11,186 @@ exports_files([
 ])
 
 load("//config:BUILD.bzl",
-     "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS"
+     "TOOLS_MODULE_OPTS",
+     "TOOLS_SIG_OPTS"
      )
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS    = ROOT_MODULE_OPTS
+MODULE_OPTS = TOOLS_MODULE_OPTS
+SIG_OPTS    = TOOLS_SIG_OPTS
 
 STDLIB = ["//stdlib"]
 
+## first the executables. modules and sigs below.
+# programs_byte := \
+#   ocamldep ocamlprof ocamlcp ocamloptp ocamlmklib  \
+#   ocamlmktop ocamlcmt dumpobj ocamlobjinfo \
+#   primreq stripdebug cmpbyt
+# $(programs_byte:%=%$(EXE)):
+# 	$(CAMLC) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
+
+# Profiling: https://ocaml.org/manual/profil.html
+# The OCaml profiling compilers: ocamlcp, ocamloptp
+# Viewer: ocamlprof
+
+# OCAMLPROF=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
+#   numbers.cmo arg_helper.cmo clflags.cmo terminfo.cmo \
+#   warnings.cmo location.cmo longident.cmo docstrings.cmo \
+#   syntaxerr.cmo ast_helper.cmo \
+#   camlinternalMenhirLib.cmo parser.cmo \
+#   pprintast.cmo \
+#   lexer.cmo parse.cmo ocamlprof.cmo
+# ocamlprof$(EXE): $(OCAMLPROF)
+# ocamlcp$(EXE): $(OCAMLCP) ocamlcp.cmo
+# ocamlcp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamlcp.cmo)
+# ocamloptp$(EXE): $(OCAMLCP) ocamloptp.cmo
+# ocamloptp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamloptp.cmo)
+
+# other tools
+# OCAMLMKLIB = config.cmo build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo
+# ocamlmklib$(EXE): $(OCAMLMKLIB)
+# ocamlmklib.opt$(EXE): $(call byte2native, $(OCAMLMKLIB))
+
+# To make custom toplevels
+# OCAMLMKTOP=config.cmo build_path_prefix_map.cmo misc.cmo \
+#        identifiable.cmo numbers.cmo arg_helper.cmo clflags.cmo \
+#        local_store.cmo load_path.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
+# ocamlmktop$(EXE): $(OCAMLMKTOP)
+# ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
+
+# The preprocessor for asm generators
+# cvt_emit := cvt_emit$(EXE)
+# $(eval $(call PROGRAM_SYNONYM,cvt_emit))
+# $(cvt_emit): cvt_emit.cmo
+# 	$(CAMLC) $(LINKFLAGS) -o $@ $^
+
+bootstrap_ocamllex(
+    name = "cvt_emit_ml",
+    out  = "cvt_emit.ml",
+    src  = "cvt_emit.mll"
+)
+
+bootstrap_executable(
+    name = "cvt_emit.exe",
+    main = ":Cvt_emit",
+    visibility = ["//asmcomp:__subpackages__"]
+)
+
+bootstrap_module(
+    name   = "Cvt_emit",
+    struct = "cvt_emit.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ## (Sys)
+        ## (Printf)
+        ## (Bytesections)
+        ## (Array)
+    ],
+    data = ["//runtime:primitives"]
+)
+
+################
+# Reading cmt files
+# OCAMLCMT = \
+#           $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#           $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#           ocamlcmt.cmo
+# ocamlcmt$(EXE): $(OCAMLCMT)
+# ocamlcmt.opt$(EXE): $(call byte2native, $(OCAMLCMT))
+
+
+################
+# The bytecode disassembler
+# DUMPOBJ= \
+#           $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#           $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#           opnames.cmo dumpobj.cmo
+# dumpobj$(EXE): $(DUMPOBJ)
+# dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
+
+################
+# make_opcodes, opnames.ml
+
+################
+## ocamlobjinfo - Display info on compiled files
+# DEF_SYMBOL_PREFIX = '-Dsymbol_prefix=""'
+# ifeq "$(SYSTEM)" "macosx"
+# DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
+# endif
+# ifeq "$(SYSTEM)" "cygwin"
+# DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
+# endif
+# OCAMLOBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#              $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#              $(ROOTDIR)/compilerlibs/ocamlmiddleend.cma \
+#              objinfo.cmo
+# ocamlobjinfo$(EXE): $(OCAMLOBJINFO)
+# ocamlobjinfo.opt$(EXE): $(call byte2native, $(OCAMLOBJINFO))
+
+
+################
+# # Scan object files for required primitives
+# primreq$(EXE): $(PRIMREQ)
+# primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
+
+################
+# LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
+#         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cmxa \
+#         $(ROOTDIR)/compilerlibs/ocamlmiddleend.cmxa \
+#         $(ROOTDIR)/otherlibs/str/str.cmxa \
+#         lintapidiff.cmx
+
+# lintapidiff.opt$(EXE): INCLUDES+= -I $(ROOTDIR)/otherlibs/str
+# lintapidiff.opt$(EXE): $(LINTAPIDIFF)
+# 	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
+
+################
+# Copy a bytecode executable, stripping debug info
+# STRIPDEBUG=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#            $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#            stripdebug.cmo
+# stripdebug$(EXE): $(STRIPDEBUG)
+# stripdebug.opt$(EXE): $(call byte2native, $(STRIPDEBUG))
+
+################
+# Compare two bytecode executables
+# CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#        cmpbyt.cmo
+# cmpbyt$(EXE): $(CMPBYT)
+# cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
+
+################
+# checkstack tool
+# checkstack$(EXE): checkstack.$(O)
+# 	$(MKEXE) $(OUTPUTEXE)$@ $<
+
+################
+#Scan latex files, and run ocaml code examples
+# caml_tex_files := \
+#   $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#   $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#   $(ROOTDIR)/compilerlibs/ocamltoplevel.cma \
+#   $(ROOTDIR)/otherlibs/str/str.cma \
+#   $(ROOTDIR)/otherlibs/$(UNIXLIB)/unix.cma \
+#   caml_tex.ml
+# caml_tex := caml-tex$(EXE)
+# caml-tex uses str.cma and unix.cma and so must be compiled with
+# $(ROOTDIR)/ocamlc not $(ROOTDIR)/boot/ocamlc since the boot
+# compiler does not necessarily have the correct shared library
+# configuration.
+# $(caml_tex): INCLUDES += $(addprefix -I $(ROOTDIR)/otherlibs/,str $(UNIXLIB))
+# $(caml_tex): $(caml_tex_files)
+# 	$(OCAMLRUN) $(ROOTDIR)/ocamlc$(EXE) -nostdlib -I $(ROOTDIR)/stdlib \
+# 	  $(LINKFLAGS) -linkall -o $@ -no-alias-deps $^
+# # we need str and unix which depend on the bytecode version of other tools
+# # thus we delay building caml-tex to the opt.opt stage
+# ifneq "$(WITH_CAMLTEX)" ""
+# opt.opt: $(caml_tex)
+# endif
+
+
+################################################################
+####  ocaml modules and sigs
 bootstrap_library(
     name = "tools",
     manifest  = [
@@ -90,32 +261,6 @@ bootstrap_module(
     ],
     data = ["//runtime:primitives"]
 )
-
-bootstrap_ocamllex(
-    name = "cvt_emit_ml",
-    out  = "cvt_emit.ml",
-    src  = "cvt_emit.mll"
-)
-
-bootstrap_executable(
-    name = "cvt_emit.exe",
-    main = ":Cvt_emit",
-    # data = ["//stdlib:camlheader"]
-)
-
-bootstrap_module(
-    name   = "Cvt_emit",
-    struct = "cvt_emit.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
-        ## (Sys)
-        ## (Printf)
-        ## (Bytesections)
-        ## (Array)
-    ],
-    data = ["//runtime:primitives"]
-)
-
 
 bootstrap_module(
     name   = "Dumpobj",

@@ -733,7 +733,8 @@ bootstrap_module(
         ## (Debuginfo)
         ## (Closure_id)
         ## (Clflags)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(

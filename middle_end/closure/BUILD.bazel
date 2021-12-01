@@ -15,8 +15,8 @@ SIG_OPTS    = ROOT_MODULE_OPTS
 STDLIB = ["//stdlib"]
 
 bootstrap_library(
-    name = "middle_end_closure_lib",
-    modules  = [
+    name = "closure",
+    manifest  = [
         ":Closure",
         ":Closure_middle_end",
     ],
@@ -28,17 +28,17 @@ bootstrap_module(
     sig    = "Closure_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
-        ":Convert_primitives", ## (Middle_end Convert_primitives)
-        ":Compilenv", ## (Middle_end Compilenv)
-        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
-        ":Clambda", ## (Middle_end Clambda)
-        ":Backend_var", ## (Middle_end Backend_var)
-        ":Backend_intf", ## (Middle_end Backend_intf)
-        ":Switch", ## (Lambda Switch)
-        ":Simplif", ## (Lambda Simplif)
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
+        "//middle_end:Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
+        "//middle_end:Convert_primitives", ## (Middle_end Convert_primitives)
+        "//middle_end:Compilenv", ## (Middle_end Compilenv)
+        "//middle_end:Clambda_primitives", ## (Middle_end Clambda_primitives)
+        "//middle_end:Clambda", ## (Middle_end Clambda)
+        "//middle_end:Backend_var", ## (Middle_end Backend_var)
+        "//middle_end:Backend_intf_cmi", ## (Middle_end Backend_intf)
+        "//lambda:Switch", ## (Lambda Switch)
+        "//lambda:Simplif", ## (Lambda Simplif)
+        "//lambda:Lambda", ## (Lambda Lambda)
+        "//lambda:Debuginfo", ## (Lambda Debuginfo)
         ## (Warnings)
         ## (Sys)
         ## (String)
@@ -66,8 +66,8 @@ bootstrap_signature(
     src  = "closure.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Clambda", ## (Middle_end Clambda)
-        ":Backend_intf", ## (Middle_end Backend_intf)
+        "//middle_end:Clambda", ## (Middle_end Clambda)
+        "//middle_end:Backend_intf_cmi", ## (Middle_end Backend_intf)
     ]
 )
 
@@ -77,16 +77,17 @@ bootstrap_module(
     sig    = "Closure_middle_end_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Closure", ## (Middle_end Closure Closure)
-        ":Printclambda", ## (Middle_end Printclambda)
-        ":Compilenv", ## (Middle_end Compilenv)
-        ":Clambda", ## (Middle_end Clambda)
+        ":Closure",
+        "//middle_end:Printclambda", ## (Middle_end Printclambda)
+        "//middle_end:Compilenv", ## (Middle_end Compilenv)
+        "//middle_end:Clambda", ## (Middle_end Clambda)
         ## (Path)
         ## (List)
         ## (Ident)
         ## (Format)
         ## (Clflags)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -94,8 +95,8 @@ bootstrap_signature(
     src  = "closure_middle_end.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Clambda", ## (Middle_end Clambda)
-        ":Backend_intf", ## (Middle_end Backend_intf)
+        "//middle_end:Clambda", ## (Middle_end Clambda)
+        "//middle_end:Backend_intf_cmi", ## (Middle_end Backend_intf)
         ## (Format)
     ]
 )
