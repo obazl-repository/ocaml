@@ -40,6 +40,7 @@ bootstrap_library(
         ":Printtyp",
         ":Printtyped",
         ":Rec_check",
+        ":Shape",
         ":Signature_group",
         ":Stypes",
         ":Subst",
@@ -109,13 +110,8 @@ bootstrap_signature(
     src  = "btype.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ## (Set)
-        ## (Map)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Asttypes)
+        ":Types",
+        ":Path",
     ]
 )
 
@@ -1052,6 +1048,25 @@ bootstrap_signature(
 )
 
 bootstrap_module(
+    name   = "Shape",
+    struct = "shape.ml",
+    sig    = "Shape_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+    ]
+)
+
+bootstrap_signature(
+    name = "Shape_cmi",
+    src  = "shape.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Ident_cmi",
+        ":Path_cmi"
+    ]
+)
+
+bootstrap_module(
     name   = "Signature_group",
     struct = "signature_group.ml",
     sig    = "Signature_group_cmi",
@@ -1813,18 +1828,11 @@ bootstrap_signature(
     src  = "types.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Primitive", ## (Typing Primitive)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ## (Set)
-        ## (Parsetree)
-        ## (Map)
-        ## (Longident)
-        ## (Location)
-        ## (Identifiable)
-        ## (Format)
-        ## (Asttypes)
+        ":Ident",
+        ":Path",
+        ":Primitive",
+        ":Shape_cmi",
+        ":Type_immediacy",
     ],
     visibility = ["//lambda:__pkg__"]
 )
