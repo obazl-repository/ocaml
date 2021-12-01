@@ -44,7 +44,10 @@ bootstrap_signature(
         ## (Closure_id)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//middle_end/flambda:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -59,7 +62,8 @@ bootstrap_module(
         ## (Debuginfo)
         ## (Clflags)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -84,7 +88,7 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ":Backend_var", ## (Middle_end Backend_var)
-        ":Debuginfo", ## (Lambda Debuginfo)
+        "//lambda:Debuginfo", ## (Lambda Debuginfo)
         ## (String)
         ## (Path)
         ## (Nativeint)
@@ -93,7 +97,8 @@ bootstrap_module(
         ## (Ident)
         ## (Asttypes)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -103,12 +108,16 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ":Backend_var", ## (Middle_end Backend_var)
-        ":Debuginfo", ## (Lambda Debuginfo)
+        "//lambda:Debuginfo",
         ## (Path)
         ## (Ident)
         ## (Asttypes)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = [
+        "//file_formats:__pkg__",
+        "//middle_end/flambda:__pkg__",
+    ]
 )
 
 bootstrap_module(
@@ -207,7 +216,8 @@ bootstrap_module(
         ## (Clflags)
         ## (Buffer)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -215,17 +225,17 @@ bootstrap_signature(
     src  = "compilenv.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Symbol", ## (Middle_end Symbol)
-        ":Linkage_name", ## (Middle_end Linkage_name)
-        ":Compilation_unit", ## (Middle_end Compilation_unit)
-        ":Clambda", ## (Middle_end Clambda)
+        ":Symbol_cmi",
+        ":Linkage_name_cmi",
+        ":Compilation_unit_cmi",
+        ":Clambda_cmi",
         ## (Simple_value_approx)
         ## (Set_of_closures_id)
         ## (Ident)
         ## (Format)
         ## (Export_info)
         ## (Digest)
-        ## (Cmx_format)
+        "//file_formats:Cmx_format_cmi"
         ## (Closure_id)
     ],
     data = ["//runtime:primitives"]
@@ -238,11 +248,12 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
-        ## (Printlambda)
+        "//lambda:Printlambda",
         ## (Misc)
         ## (Asttypes)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -268,7 +279,8 @@ bootstrap_module(
         ## (Filename)
         ## (Debuginfo)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -279,7 +291,9 @@ bootstrap_signature(
         "//lambda:Lambda_cmi"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda/base_types:__pkg__"]
+    visibility = [
+        "//middle_end/flambda:__subpackages__"
+    ]
 )
 
 bootstrap_module(
@@ -294,7 +308,8 @@ bootstrap_module(
         ## (Hashtbl)
         ## (Format)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -324,7 +339,8 @@ bootstrap_module(
         ## (Asttypes)
         ## (Array)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -378,7 +394,8 @@ bootstrap_module(
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ## (Asttypes)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(

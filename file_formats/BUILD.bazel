@@ -114,11 +114,12 @@ bootstrap_signature(
     src  = "cmx_format.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Misc)
-        ## (Export_info)
+        "//utils:Misc_cmi",
+        "//middle_end/flambda:Export_info_cmi",
         ## (Digest)
-        ## (Clambda)
-    ]
+        "//middle_end:Clambda_cmi"
+    ],
+    visibility = ["//middle_end:__pkg__"]
 )
 
 bootstrap_signature(

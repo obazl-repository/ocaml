@@ -120,7 +120,8 @@ bootstrap_signature(
     deps   = STDLIB + [
         "//middle_end:Compilation_unit_cmi", ## (Middle_end Compilation_unit)
         ## (Identifiable)
-    ]
+    ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_module(

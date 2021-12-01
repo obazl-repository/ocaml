@@ -192,6 +192,7 @@ bootstrap_module(
     visibility = [
         "//asmcomp:__subpackages__",
         "//parsing:__pkg__",
+        "//middle_end/flambda:__pkg__",
         "//typing:__pkg__"
     ]
 )
@@ -440,7 +441,7 @@ bootstrap_module(
     visibility = [
         "//lambda:__pkg__",
         "//middle_end:__pkg__",
-        "//middle_end/flambda/base_types:__pkg__"
+        "//middle_end/flambda:__subpackages__"
     ]
 )
 
@@ -654,7 +655,8 @@ bootstrap_module(
         ## (Hashtbl)
         ## (Digest)
         ## (Array)
-    ]
+    ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
