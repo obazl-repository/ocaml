@@ -1,3 +1,13 @@
+If a new dep is added to a Stdlib submodule you may get an error like:
+
+```
+File "/private/var/tmp/_bazel_gar/ba1c75d812847fde1b60b213320a2786/sandbox/darwin-sandbox/188/execroot/__main__/bazel-out/darwin-fastbuild/bin/stdlib/Stdlib__Seq.ml", line 404, characters 36-42:
+404 |   let to_lazy : 'a suspension -> 'a Lazy.t =
+                                          ^^^^^^
+Error: The module Lazy is an alias for module Stdlib__Lazy, which is missing
+```
+
+The fix is to add ":Stdlib.Lazy" to the deps of Stdlib.Seq.
 
 ## NB: "Error: Unbound module Stdlib".
 # When bootstrapping there is no std lib yet; we pass -nostdlib to

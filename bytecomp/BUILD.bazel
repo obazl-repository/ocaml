@@ -321,7 +321,8 @@ bootstrap_signature(
         ## (Ident)
         ## (Env)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_module(
@@ -382,7 +383,8 @@ bootstrap_module(
         ## (Format)
         ## (Array)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(

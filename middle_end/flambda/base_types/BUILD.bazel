@@ -1,17 +1,22 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl",
+     "ROOT_MODULE_OPTS",
+     "ROOT_SIG_OPTS"
+     )
 
-ocaml_library(
-    name = "middle_end_flambda_base_types_lib",
-    modules  = [
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS    = ROOT_MODULE_OPTS
+
+STDLIB = ["//stdlib"]
+
+bootstrap_library(
+    name = "base_types",
+    manifest  = [
         ":Closure_element",
         ":Closure_id",
         ":Closure_origin",
@@ -26,23 +31,23 @@ ocaml_library(
     ],
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Closure_element",
     struct = "closure_element.ml",
     sig    = "Closure_element_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Variable", ## (Middle_end Variable)
+    deps   = STDLIB + [
+        "//middle_end:Variable", ## (Middle_end Variable)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Closure_element_cmi",
     src  = "closure_element.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Variable", ## (Middle_end Variable)
+    deps   = STDLIB + [
+        "//middle_end:Variable", ## (Middle_end Variable)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Set)
         ## (Map)
@@ -50,77 +55,77 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Closure_id",
     struct = "closure_id.ml",
     sig    = "Closure_id_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Closure_element)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Closure_element)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Closure_id_cmi",
     src  = "closure_id.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Closure_element)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda_cmi", ## (Middle_end Flambda Base_types Closure_element)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Closure_origin",
     struct = "closure_origin.ml",
     sig    = "Closure_origin_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Closure_id)
+    deps   = STDLIB + [
+        # "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Closure_id)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Closure_origin_cmi",
     src  = "closure_origin.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Closure_id)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda_cmi", ## (Middle_end Flambda Base_types Closure_id)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Identifiable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Export_id",
     struct = "export_id.ml",
     sig    = "Export_id_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Id_types)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Id_types)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Int_replace_polymorphic_compare)
         ## (Identifiable)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Export_id_cmi",
     src  = "export_id.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Identifiable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Id_types",
     struct = "id_types.ml",
     sig    = "Id_types_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Printf)
         ## (Int_replace_polymorphic_compare)
         ## (Int)
@@ -130,33 +135,33 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Id_types_cmi",
     src  = "id_types.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Identifiable)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Mutable_variable",
     struct = "mutable_variable.ml",
     sig    = "Mutable_variable_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Variable", ## (Middle_end Variable)
+    deps   = STDLIB + [
+        "//middle_end:Variable", ## (Middle_end Variable)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Mutable_variable_cmi",
     src  = "mutable_variable.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Variable", ## (Middle_end Variable)
+    deps   = STDLIB + [
+        "//middle_end:Variable_cmi", ## (Middle_end Variable)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Identifiable)
@@ -165,77 +170,77 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Set_of_closures_id",
     struct = "set_of_closures_id.ml",
     sig    = "Set_of_closures_id_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Id_types)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Id_types)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Int_replace_polymorphic_compare)
         ## (Identifiable)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Set_of_closures_id_cmi",
     src  = "set_of_closures_id.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Identifiable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Set_of_closures_origin",
     struct = "set_of_closures_origin.ml",
     sig    = "Set_of_closures_origin_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Set_of_closures_id)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Set_of_closures_id)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Set_of_closures_origin_cmi",
     src  = "set_of_closures_origin.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Set_of_closures_id)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Set_of_closures_id)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Identifiable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Static_exception",
     struct = "static_exception.ml",
     sig    = "Static_exception_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Numbers)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Static_exception_cmi",
     src  = "static_exception.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Identifiable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Tag",
     struct = "tag.ml",
     sig    = "Tag_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Printf)
         ## (Obj)
         ## (Numbers)
@@ -245,32 +250,32 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Tag_cmi",
     src  = "tag.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Identifiable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Var_within_closure",
     struct = "var_within_closure.ml",
     sig    = "Var_within_closure_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Closure_element)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Closure_element)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Var_within_closure_cmi",
     src  = "var_within_closure.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Base_types Closure_element)
+    deps   = STDLIB + [
+        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Closure_element)
     ]
 )
 

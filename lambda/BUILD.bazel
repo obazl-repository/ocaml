@@ -107,6 +107,7 @@ bootstrap_signature(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
+        "//middle_end:__pkg__",
         "//typing:__pkg__"
     ]
 )

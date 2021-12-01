@@ -39,11 +39,12 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Symbol", ## (Middle_end Symbol)
-        ## (Simple_value_approx)
+        "//middle_end/flambda:Simple_value_approx_cmi",
         ## (Ident)
         ## (Closure_id)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_module(
@@ -120,7 +121,8 @@ bootstrap_module(
         ## (Primitive)
         ## (Asttypes)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -130,9 +132,11 @@ bootstrap_signature(
     deps   = STDLIB + [
         ## (Types)
         ## (Primitive)
-        ## (Asttypes)
+        "//lambda:Lambda_cmi",
+        "//parsing:Asttypes_cmi"
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_module(
@@ -160,7 +164,7 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Linkage_name", ## (Middle_end Linkage_name)
         ## (Identifiable)
-        ## (Ident)
+        "//typing:Ident_cmi"
     ],
     data = ["//runtime:primitives"]
 )
@@ -267,6 +271,7 @@ bootstrap_signature(
     src  = "internal_variable_names.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//lambda:Lambda_cmi"
     ],
     data = ["//runtime:primitives"]
 )
@@ -278,7 +283,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ## (String)
-        ## (Int_replace_polymorphic_compare)
+        "//utils:Int_replace_polymorphic_compare"
         ## (Identifiable)
         ## (Hashtbl)
         ## (Format)
@@ -291,7 +296,7 @@ bootstrap_signature(
     src  = "linkage_name.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Identifiable)
+        "//utils:Identifiable_cmi"
     ],
     data = ["//runtime:primitives"]
 )
@@ -408,7 +413,8 @@ bootstrap_signature(
         ## (Identifiable)
         ## (Format)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_module(
@@ -428,7 +434,8 @@ bootstrap_module(
         ## (Ident)
         ## (Format)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__subpackages__"]
 )
 
 bootstrap_signature(
@@ -442,6 +449,7 @@ bootstrap_signature(
         ## (Ident)
         ## (Format)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//middle_end/flambda:__subpackages__"]
 )
 

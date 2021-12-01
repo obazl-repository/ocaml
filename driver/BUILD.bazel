@@ -1,17 +1,22 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl",
+     "ROOT_MODULE_OPTS",
+     "ROOT_SIG_OPTS"
+     )
 
-ocaml_library(
-    name = "driver_lib",
-    modules  = [
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS    = ROOT_MODULE_OPTS
+
+STDLIB = ["//stdlib"]
+
+bootstrap_library(
+    name = "driver",
+    manifest  = [
         ":Compenv",
         ":Compile",
         ":Compile_common",
@@ -29,12 +34,12 @@ ocaml_library(
     ],
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Compenv",
     struct = "compenv.ml",
     sig    = "Compenv_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Warnings)
         ## (Sys)
         ## (String)
@@ -44,7 +49,7 @@ ocaml_module(
         ## (Printexc)
         ## (Option)
         ## (Misc)
-        ## (Location)
+        "//parsing:Location",
         ## (List)
         ## (Lexing)
         ## (Int_arg_helper)
@@ -53,35 +58,35 @@ ocaml_module(
         ## (Config)
         ## (Compiler_pass)
         ## (Clflags)
-        ## (Ccomp)
+        "//utils:Ccomp"
         ## (Arg)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Compenv_cmi",
     src  = "compenv.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
-        ## (Clflags)
+        "//utils:Clflags_cmi"
         ## (Arg)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Compile",
     struct = "compile.ml",
     sig    = "Compile_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
         ## (Typedtree)
         ## (Translmod)
         ## (Simplif)
         ## (Profile)
         ## (Printlambda)
-        ## (Printinstr)
+        "//bytecomp:Printinstr"
         ## (Misc)
         ## (Emitcode)
         ## (Clflags)
@@ -89,25 +94,25 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Compile_cmi",
     src  = "compile.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
         ## (Typedtree)
-        ## (Instruct)
+        "//bytecomp:Instruct_cmi"
         ## (Ident)
         ## (Clflags)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Compile_common",
     struct = "compile_common.ml",
     sig    = "Compile_common_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Pparse", ## (Driver Pparse)
         ":Compmisc", ## (Driver Compmisc)
         ":Compenv", ## (Driver Compenv)
@@ -117,9 +122,9 @@ ocaml_module(
         ## (Typecore)
         ## (String)
         ## (Profile)
-        ## (Printtyped)
+        "//typing:Printtyped",
         ## (Printtyp)
-        ## (Printast)
+        "//parsing:Printast",
         ## (Pprintast)
         ## (Misc)
         ## (List)
@@ -133,28 +138,28 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Compile_common_cmi",
     src  = "compile_common.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ## (Typedtree)
+    deps   = STDLIB + [
+        "//typing:Typedtree_cmi",
         ## (Parsetree)
         ## (Format)
-        ## (Env)
+        "//typing:Env_cmi"
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Compmisc",
     struct = "compmisc.ml",
     sig    = "Compmisc_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Compenv", ## (Driver Compenv)
         ## (Warnings)
         ## (Types)
-        ## (Typemod)
+        "//typing:Typemod"
         ## (Sys)
         ## (Option)
         ## (Misc)
@@ -169,53 +174,53 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Compmisc_cmi",
     src  = "compmisc.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
-        ## (Env)
+        "//typing:Env_cmi"
         ## (Clflags)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Errors",
     struct = "errors.ml",
     sig    = "Errors_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ## (Location)
+    deps   = STDLIB + [
+        "//parsing:Location"
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Errors_cmi",
     src  = "errors.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Main",
     struct = "main.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Maindriver", ## (Driver Maindriver)
         ## (Sys)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Main_args",
     struct = "main_args.ml",
     sig    = "Main_args_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Compenv", ## (Driver Compenv)
         ## (Warnings)
         ## (Sys)
@@ -236,21 +241,21 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Main_args_cmi",
     src  = "main_args.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Arg)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Maindriver",
     struct = "maindriver.ml",
     sig    = "Maindriver_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Makedepend", ## (Driver Makedepend)
         ":Main_args", ## (Driver Main_args)
         ":Compmisc", ## (Driver Compmisc)
@@ -273,21 +278,21 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Maindriver_cmi",
     src  = "maindriver.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Makedepend",
     struct = "makedepend.ml",
     sig    = "Makedepend_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Pparse", ## (Driver Pparse)
         ":Compenv", ## (Driver Compenv)
         ## (Sys)
@@ -303,7 +308,7 @@ ocaml_module(
         ## (Hashtbl)
         ## (Format)
         ## (Filename)
-        ## (Depend)
+        "//parsing:Depend",
         ## (Config)
         ## (Clflags)
         ## (Bytes)
@@ -312,20 +317,20 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Makedepend_cmi",
     src  = "makedepend.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Optcompile",
     struct = "optcompile.ml",
     sig    = "Optcompile_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
         ## (Typedtree)
         ## (Translmod)
@@ -342,54 +347,54 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Optcompile_cmi",
     src  = "optcompile.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
         ## (Typedtree)
         ## (Clflags)
-        ## (Backend_intf)
+        "//middle_end:Backend_intf_cmi"
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Opterrors",
     struct = "opterrors.ml",
     sig    = "Opterrors_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ## (Location)
+    deps   = STDLIB + [
+        "//parsing:Location"
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Opterrors_cmi",
     src  = "opterrors.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Optmain",
     struct = "optmain.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Optmaindriver", ## (Driver Optmaindriver)
         ## (Sys)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Optmaindriver",
     struct = "optmaindriver.ml",
     sig    = "Optmaindriver_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Optcompile", ## (Driver Optcompile)
         ":Makedepend", ## (Driver Makedepend)
         ":Main_args", ## (Driver Main_args)
@@ -417,28 +422,28 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Optmaindriver_cmi",
     src  = "optmaindriver.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Pparse",
     struct = "pparse.ml",
     sig    = "Pparse_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Warnings)
         ## (Sys)
         ## (String)
         ## (Profile)
         ## (Printf)
         ## (Parsetree)
-        ## (Parse)
+        "//parsing:Parse",
         ## (Misc)
         ## (Location)
         ## (List)
@@ -447,18 +452,18 @@ ocaml_module(
         ## (Filename)
         ## (Config)
         ## (Clflags)
-        ## (Ccomp)
-        ## (Ast_mapper)
-        ## (Ast_invariants)
+        "//utils:Ccomp",
+        "//parsing:Ast_mapper",
+        "//parsing:Ast_invariants"
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Pparse_cmi",
     src  = "pparse.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ## (Parsetree)
+    deps   = STDLIB + [
+        "//parsing:Parsetree_cmi"
         ## (Lexing)
         ## (Format)
     ]

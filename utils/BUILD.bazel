@@ -158,7 +158,10 @@ bootstrap_module(
         ## (List)
         ## (Filename)
     ],
-    visibility = ["//asmcomp:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//driver:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -202,7 +205,8 @@ bootstrap_signature(
         ":Misc", ## (Utils Misc)
         ## (Digest)
         ## (Arg)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 write_config(
@@ -415,7 +419,8 @@ bootstrap_signature(
         ## (Map)
         ## (Hashtbl)
         ## (Format)
-    ]
+    ],
+    visibility = ["//middle_end:__pkg__"]
 )
 
 bootstrap_module(
@@ -425,7 +430,10 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
     ],
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//lambda:__pkg__",
+        "//middle_end:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -536,8 +544,9 @@ bootstrap_module(
     visibility = [
         "//asmcomp:__subpackages__",
         "//bytecomp:__pkg__",
+        "//file_formats:__pkg__",
         "//parsing:__pkg__",
-        "//file_formats:__pkg__"
+        "//tools:__pkg__"
     ]
 )
 

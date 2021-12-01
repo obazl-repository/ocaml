@@ -195,7 +195,7 @@ bootstrap_module(
         ## (String)
         ## (Printf)
         ## (Printclambda)
-        ## (Misc)
+        "//utils:Misc"
         ## (List)
         ## (Linkage_name)
         ## (LargeFile)
@@ -269,7 +269,7 @@ bootstrap_module(
     struct = "ocamldep.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Makedepend)
+        "//driver:Makedepend"
     ],
     data = ["//runtime:primitives"]
 )

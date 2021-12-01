@@ -6,8 +6,12 @@ load("//bzl:rules.bzl",
      "bootstrap_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS = ROOT_SIG_OPTS
+
+STDLIB = ["//stdlib"]
 
 # bootstrap_library(
 #     name = "otherlibs_str_lib",
@@ -23,7 +27,7 @@ bootstrap_module(
     struct = "str.ml",
     sig    = "Str_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (String)
         ## (Map)
         ## (List)
@@ -32,7 +36,8 @@ bootstrap_module(
         ## (Bytes)
         ## (Buffer)
         ## (Array)
-    ]
+    ],
+    visibility = ["//tools:__pkg__"]
 )
 
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.mli
@@ -41,7 +46,7 @@ bootstrap_signature(
     name = "Str_cmi",
     src  = "str.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
     ]
 )
 

@@ -92,7 +92,8 @@ bootstrap_module(
         ":Asttypes_cmi", ## (Parsing Asttypes)
         ":Ast_iterator", ## (Parsing Ast_iterator)
         ## (List)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -154,7 +155,10 @@ bootstrap_module(
         ## (Clflags)
         ## (Array)
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -177,7 +181,10 @@ bootstrap_signature(
         ":Location", ## (Parsing Location)
         ## (Format)
     ],
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//lambda:__pkg__",
+        "//middle_end:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -257,7 +264,8 @@ bootstrap_module(
         ## (Misc)
         ## (List)
         ## (Clflags)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -376,7 +384,10 @@ bootstrap_module(
         ## (Build_path_prefix_map)
         ## (Buffer)
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -426,7 +437,10 @@ bootstrap_module(
         ## (Lexing)
         ## (Format)
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -506,7 +520,10 @@ bootstrap_signature(
         ":Asttypes_cmi", ## (Parsing Asttypes)
         ## (Format)
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -525,7 +542,9 @@ bootstrap_module(
         ## (List)
         ## (Format)
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -559,7 +578,10 @@ bootstrap_module(
         ## (Clflags)
         ## (Char)
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(

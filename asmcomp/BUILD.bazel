@@ -1169,9 +1169,9 @@ bootstrap_signature(
     src  = "proc.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Reg_cmi", ## (Asmcomp Reg)
+        ":Mach_cmi", ## (Asmcomp Mach)
+        ":Cmm_cmi", ## (Asmcomp Cmm)
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]

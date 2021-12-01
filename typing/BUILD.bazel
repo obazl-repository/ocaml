@@ -290,8 +290,9 @@ bootstrap_signature(
         ## (Asttypes)
     ],
     visibility = [
+        "//bytecomp:__pkg__",
+        "//driver:__pkg__",
         "//lambda:__pkg__",
-        "//bytecomp:__pkg__"
     ]
 )
 
@@ -999,7 +1000,8 @@ bootstrap_module(
         ## (Char)
         ## (Asttypes)
         ## (Array)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -1676,6 +1678,7 @@ bootstrap_signature(
         ## (Asttypes)
     ],
     visibility = [
+        "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__"
     ]
@@ -1733,7 +1736,8 @@ bootstrap_module(
         ## (Attr_helper)
         ## (Asttypes)
         ## (Array)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(

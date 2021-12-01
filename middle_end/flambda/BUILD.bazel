@@ -1,17 +1,69 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl",
+     "ROOT_MODULE_OPTS",
+     "ROOT_SIG_OPTS"
+     )
 
-ocaml_library(
-    name = "middle_end_flambda_lib",
-    modules  = [
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS    = ROOT_MODULE_OPTS
+
+STDLIB = ["//stdlib"]
+
+## compilerlibs/Makefile.compilerlibs:
+MIDDLE_END_FLAMBDA = [
+    "alias_analysis.cmo",
+    "augment_specialised_args.cmo",
+    "build_export_info.cmo",
+    "closure_conversion.cmo",
+    "closure_conversion_aux.cmo",
+    "closure_offsets.cmo",
+    "extract_projections.cmo",
+    "find_recursive_functions.cmo",
+    "flambda_invariants.cmo",
+    "flambda_middle_end.cmo",
+    "flambda_to_clambda.cmo",
+    "import_approx.cmo",
+    "inconstant_idents.cmo",
+    "initialize_symbol_to_let_symbol.cmo",
+    "inline_and_simplify.cmo",
+    "inline_and_simplify_aux.cmo",
+    "inlining_decision.cmo",
+    "inlining_stats.cmo",
+    "inlining_stats_types.cmo",
+    "inlining_transforms.cmo",
+    "invariant_params.cmo",
+    "lift_code.cmo",
+    "lift_constants.cmo",
+    "lift_let_to_initialize_symbol.cmo",
+    "ref_to_variables.cmo",
+    "remove_free_vars_equal_to_args.cmo",
+    "remove_unused_arguments.cmo",
+    "remove_unused_closure_vars.cmo",
+    "remove_unused_program_constructs.cmo",
+    "share_constants.cmo",
+    "simplify_boxed_integer_ops.cmo",
+    "simplify_common.cmo",
+    "simplify_primitives.cmo",
+    "traverse_for_exported_symbols.cmo",
+    "un_anf.cmo",
+    "unbox_closures.cmo",
+    "unbox_free_vars_of_closures.cmo",
+    "unbox_specialised_args.cmo"
+]
+
+MIDDLE_END_FLAMBDA_CMI = [
+    "inlining_decision_intf.cmi", "simplify_boxed_integer_ops_intf.cmi"
+]
+
+
+bootstrap_library(
+    name = "flambda",
+    manifest  = [
         ":Alias_analysis",
         ":Allocated_const",
         ":Augment_specialised_args",
@@ -64,20 +116,20 @@ ocaml_library(
         ":Unbox_free_vars_of_closures",
         ":Unbox_specialised_args",
     ],
-    signatures  = [
-        ":Inlining_decision_intf_cmi",
-        ":Simplify_boxed_integer_ops_intf_cmi",
-    ],
+    # signatures  = [
+    #     ":Inlining_decision_intf_cmi",
+    #     ":Simplify_boxed_integer_ops_intf_cmi",
+    # ],
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Alias_analysis",
     struct = "alias_analysis.ml",
     sig    = "Alias_analysis_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ## (Var_within_closure)
@@ -90,14 +142,14 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Alias_analysis_cmi",
     src  = "alias_analysis.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ## (Tag)
@@ -106,12 +158,12 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Allocated_const",
     struct = "allocated_const.ml",
     sig    = "Allocated_const_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (String)
         ## (Nativeint)
         ## (List)
@@ -122,28 +174,28 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Allocated_const_cmi",
     src  = "allocated_const.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Augment_specialised_args",
     struct = "augment_specialised_args.ml",
     sig    = "Augment_specialised_args_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Pass_wrapper)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Pass_wrapper)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
         ":Backend_intf", ## (Middle_end Backend_intf)
@@ -160,34 +212,34 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Augment_specialised_args_cmi",
     src  = "augment_specialised_args.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Build_export_info",
     struct = "build_export_info.ml",
     sig    = "Build_export_info_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Traverse_for_exported_symbols)
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Invariant_params)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Find_recursive_functions)
-        ":Flambda", ## (Middle_end Flambda Export_info)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Traverse_for_exported_symbols)
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Invariant_params)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Find_recursive_functions)
+        ## (Middle_end Flambda Export_info)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Compilenv", ## (Middle_end Compilenv)
@@ -207,29 +259,29 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Build_export_info_cmi",
     src  = "build_export_info.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Export_info)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Export_info)
         ":Backend_intf", ## (Middle_end Backend_intf)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Closure_conversion",
     struct = "closure_conversion.ml",
     sig    = "Closure_conversion_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Lift_code)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Closure_conversion_aux)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Lift_code)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Closure_conversion_aux)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
@@ -260,24 +312,24 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Closure_conversion_cmi",
     src  = "closure_conversion.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Backend_intf", ## (Middle_end Backend_intf)
         ## (Ident)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Closure_conversion_aux",
     struct = "closure_conversion_aux.ml",
     sig    = "Closure_conversion_aux_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ## (Static_exception)
@@ -292,11 +344,11 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Closure_conversion_aux_cmi",
     src  = "closure_conversion_aux.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ## (Static_exception)
@@ -305,14 +357,14 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Closure_offsets",
     struct = "closure_offsets.ml",
     sig    = "Closure_offsets_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Var_within_closure)
         ## (Misc)
@@ -321,25 +373,25 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Closure_offsets_cmi",
     src  = "closure_offsets.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ## (Var_within_closure)
         ## (Closure_id)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Effect_analysis",
     struct = "effect_analysis.ml",
     sig    = "Effect_analysis_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Flambda)
         ":Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ## (Option)
@@ -349,24 +401,24 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Effect_analysis_cmi",
     src  = "effect_analysis.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Export_info",
     struct = "export_info.ml",
     sig    = "Export_info_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -383,14 +435,14 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Export_info_cmi",
     src  = "export_info.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -403,16 +455,16 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Export_info_for_pack",
     struct = "export_info_for_pack.ml",
     sig    = "Export_info_for_pack_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Export_info)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Export_info)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -426,28 +478,28 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Export_info_for_pack_cmi",
     src  = "export_info_for_pack.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Export_info)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Export_info)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Extract_projections",
     struct = "extract_projections.ml",
     sig    = "Extract_projections_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Freshening)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Freshening)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Var_within_closure)
         ## (List)
@@ -457,26 +509,26 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Extract_projections_cmi",
     src  = "extract_projections.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Find_recursive_functions",
     struct = "find_recursive_functions.ml",
     sig    = "Find_recursive_functions_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Backend_intf", ## (Middle_end Backend_intf)
         ## (Strongly_connected_components)
@@ -486,27 +538,27 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Find_recursive_functions_cmi",
     src  = "find_recursive_functions.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Backend_intf", ## (Middle_end Backend_intf)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Flambda",
     struct = "flambda.ml",
     sig    = "Flambda_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
@@ -538,17 +590,17 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Flambda_cmi",
     src  = "flambda.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
-        ":Variable", ## (Middle_end Variable)
-        ":Symbol", ## (Middle_end Symbol)
-        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Allocated_const)
+        "//middle_end:Clambda_primitives_cmi", ## (Middle_end Clambda_primitives)
+        "//middle_end:Symbol_cmi", ## (Middle_end Symbol)
+        "//middle_end:Variable_cmi", ## (Middle_end Variable)
         ## (Tag)
         ## (Static_exception)
         ## (Set_of_closures_origin)
@@ -559,22 +611,22 @@ ocaml_signature(
         ## (Format)
         ## (Debuginfo)
         ## (Closure_origin)
-        ## (Closure_id)
+        "//middle_end/flambda/base_types:Closure_id_cmi"
         ## (Asttypes)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Flambda_invariants",
     struct = "flambda_invariants.ml",
     sig    = "Flambda_invariants_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
@@ -598,24 +650,24 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Flambda_invariants_cmi",
     src  = "flambda_invariants.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Flambda_iterators",
     struct = "flambda_iterators.ml",
     sig    = "Flambda_iterators_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Option)
         ## (List)
@@ -623,42 +675,42 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Flambda_iterators_cmi",
     src  = "flambda_iterators.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Flambda_middle_end",
     struct = "flambda_middle_end.ml",
     sig    = "Flambda_middle_end_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Un_anf)
-        ":Flambda", ## (Middle_end Flambda Share_constants)
-        ":Flambda", ## (Middle_end Flambda Remove_unused_program_constructs)
-        ":Flambda", ## (Middle_end Flambda Remove_unused_closure_vars)
-        ":Flambda", ## (Middle_end Flambda Ref_to_variables)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Lift_let_to_initialize_symbol)
-        ":Flambda", ## (Middle_end Flambda Lift_constants)
-        ":Flambda", ## (Middle_end Flambda Lift_code)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify)
-        ":Flambda", ## (Middle_end Flambda Initialize_symbol_to_let_symbol)
-        ":Flambda", ## (Middle_end Flambda Flambda_to_clambda)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda_invariants)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Closure_conversion)
-        ":Flambda", ## (Middle_end Flambda Build_export_info)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Un_anf)
+        ## (Middle_end Flambda Share_constants)
+        ## (Middle_end Flambda Remove_unused_program_constructs)
+        ## (Middle_end Flambda Remove_unused_closure_vars)
+        ## (Middle_end Flambda Ref_to_variables)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Lift_let_to_initialize_symbol)
+        ## (Middle_end Flambda Lift_constants)
+        ## (Middle_end Flambda Lift_code)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify)
+        ## (Middle_end Flambda Initialize_symbol_to_let_symbol)
+        ## (Middle_end Flambda Flambda_to_clambda)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda_invariants)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Closure_conversion)
+        ## (Middle_end Flambda Build_export_info)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Printclambda", ## (Middle_end Printclambda)
@@ -681,33 +733,33 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Flambda_middle_end_cmi",
     src  = "flambda_middle_end.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Clambda", ## (Middle_end Clambda)
         ":Backend_intf", ## (Middle_end Backend_intf)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Flambda_to_clambda",
     struct = "flambda_to_clambda.ml",
     sig    = "Flambda_to_clambda_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Un_anf)
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Initialize_symbol_to_let_symbol)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Export_info)
-        ":Flambda", ## (Middle_end Flambda Closure_offsets)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Un_anf)
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Initialize_symbol_to_let_symbol)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Export_info)
+        ## (Middle_end Flambda Closure_offsets)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Linkage_name", ## (Middle_end Linkage_name)
@@ -735,31 +787,31 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Flambda_to_clambda_cmi",
     src  = "flambda_to_clambda.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Export_info)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Export_info)
         ":Symbol", ## (Middle_end Symbol)
         ":Clambda", ## (Middle_end Clambda)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Flambda_utils",
     struct = "flambda_utils.ml",
     sig    = "Flambda_utils_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
@@ -785,14 +837,14 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Flambda_utils_cmi",
     src  = "flambda_utils.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
@@ -805,17 +857,17 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Freshening",
     struct = "freshening.ml",
     sig    = "Freshening_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ## (Var_within_closure)
@@ -830,13 +882,13 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Freshening_cmi",
     src  = "freshening.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ## (Var_within_closure)
@@ -847,18 +899,18 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Import_approx",
     struct = "import_approx.ml",
     sig    = "Import_approx_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Freshening)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Export_info)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Freshening)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Export_info)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Compilenv", ## (Middle_end Compilenv)
@@ -874,28 +926,28 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Import_approx_cmi",
     src  = "import_approx.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Symbol", ## (Middle_end Symbol)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Inconstant_idents",
     struct = "inconstant_idents.ml",
     sig    = "Inconstant_idents_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -912,13 +964,13 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inconstant_idents_cmi",
     src  = "inconstant_idents.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ":Backend_intf", ## (Middle_end Backend_intf)
@@ -926,14 +978,14 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Initialize_symbol_to_let_symbol",
     struct = "initialize_symbol_to_let_symbol.ml",
     sig    = "Initialize_symbol_to_let_symbol_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Misc)
         ## (List)
@@ -941,43 +993,43 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Initialize_symbol_to_let_symbol_cmi",
     src  = "initialize_symbol_to_let_symbol.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Inline_and_simplify",
     struct = "inline_and_simplify.ml",
     sig    = "Inline_and_simplify_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Unbox_specialised_args)
-        ":Flambda", ## (Middle_end Flambda Unbox_free_vars_of_closures)
-        ":Flambda", ## (Middle_end Flambda Unbox_closures)
-        ":Flambda", ## (Middle_end Flambda Simplify_primitives)
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Remove_unused_arguments)
-        ":Flambda", ## (Middle_end Flambda Remove_free_vars_equal_to_args)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Lift_code)
-        ":Flambda", ## (Middle_end Flambda Invariant_params)
-        ":Flambda", ## (Middle_end Flambda Inlining_stats)
-        ":Flambda", ## (Middle_end Flambda Inlining_decision)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Freshening)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Find_recursive_functions)
-        ":Flambda", ## (Middle_end Flambda Effect_analysis)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Unbox_specialised_args)
+        ## (Middle_end Flambda Unbox_free_vars_of_closures)
+        ## (Middle_end Flambda Unbox_closures)
+        ## (Middle_end Flambda Simplify_primitives)
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Remove_unused_arguments)
+        ## (Middle_end Flambda Remove_free_vars_equal_to_args)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Lift_code)
+        ## (Middle_end Flambda Invariant_params)
+        ## (Middle_end Flambda Inlining_stats)
+        ## (Middle_end Flambda Inlining_decision)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Freshening)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Find_recursive_functions)
+        ## (Middle_end Flambda Effect_analysis)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
@@ -1006,34 +1058,34 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inline_and_simplify_cmi",
     src  = "inline_and_simplify.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Backend_intf", ## (Middle_end Backend_intf)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Inline_and_simplify_aux",
     struct = "inline_and_simplify_aux.ml",
     sig    = "Inline_and_simplify_aux_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Inlining_stats)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Freshening)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Inlining_stats)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Freshening)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -1056,17 +1108,17 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inline_and_simplify_aux_cmi",
     src  = "inline_and_simplify_aux.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_stats_types)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Freshening)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_stats_types)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Freshening)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Backend_intf", ## (Middle_end Backend_intf)
@@ -1081,17 +1133,17 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Inlining_cost",
     struct = "inlining_cost.ml",
     sig    = "Inlining_cost_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Variable", ## (Middle_end Variable)
-        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        "//middle_end:Variable",
+        "//middle_end:Clambda_primitives",
         ## (String)
         ## (Printf)
         ## (Primitive)
@@ -1108,31 +1160,31 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inlining_cost_cmi",
     src  = "inlining_cost.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        "//middle_end/flambda:Flambda_cmi"
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Inlining_decision",
     struct = "inlining_decision.ml",
     sig    = "Inlining_decision_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Inlining_transforms)
-        ":Flambda", ## (Middle_end Flambda Inlining_stats_types)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Inlining_transforms)
+        ## (Middle_end Flambda Inlining_stats_types)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Var_within_closure)
         ## (Misc)
@@ -1144,44 +1196,44 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inlining_decision_cmi",
     src  = "inlining_decision.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_decision_intf)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_decision_intf)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Debuginfo)
         ## (Closure_id)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inlining_decision_intf_cmi",
     src  = "inlining_decision_intf.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Debuginfo)
         ## (Closure_id)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Inlining_stats",
     struct = "inlining_stats.ml",
     sig    = "Inlining_stats_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Inlining_stats_types)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Inlining_stats_types)
         ## (String)
         ## (Misc)
         ## (Map)
@@ -1194,55 +1246,55 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inlining_stats_cmi",
     src  = "inlining_stats.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Inlining_stats_types)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Inlining_stats_types)
         ## (Debuginfo)
         ## (Closure_id)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Inlining_stats_types",
     struct = "inlining_stats_types.ml",
     sig    = "Inlining_stats_types_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Inlining_cost)
         ## (String)
         ## (Int_replace_polymorphic_compare)
         ## (Format)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inlining_stats_types_cmi",
     src  = "inlining_stats_types.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Inlining_cost)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Inlining_transforms",
     struct = "inlining_transforms.ml",
     sig    = "Inlining_transforms_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Inlining_decision_intf)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Inlining_decision_intf)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -1256,33 +1308,33 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Inlining_transforms_cmi",
     src  = "inlining_transforms.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_decision_intf)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_decision_intf)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Debuginfo)
         ## (Closure_id)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Invariant_params",
     struct = "invariant_params.ml",
     sig    = "Invariant_params_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Backend_intf", ## (Middle_end Backend_intf)
@@ -1295,27 +1347,27 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Invariant_params_cmi",
     src  = "invariant_params.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Backend_intf", ## (Middle_end Backend_intf)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Lift_code",
     struct = "lift_code.ml",
     sig    = "Lift_code_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Strongly_connected_components)
@@ -1326,32 +1378,32 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Lift_code_cmi",
     src  = "lift_code.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Lift_constants",
     struct = "lift_constants.ml",
     sig    = "Lift_constants_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inconstant_idents)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
-        ":Flambda", ## (Middle_end Flambda Alias_analysis)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inconstant_idents)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Allocated_const)
+        ## (Middle_end Flambda Alias_analysis)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
@@ -1370,26 +1422,26 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Lift_constants_cmi",
     src  = "lift_constants.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Backend_intf", ## (Middle_end Backend_intf)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Lift_let_to_initialize_symbol",
     struct = "lift_let_to_initialize_symbol.ml",
     sig    = "Lift_let_to_initialize_symbol_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
@@ -1401,23 +1453,23 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Lift_let_to_initialize_symbol_cmi",
     src  = "lift_let_to_initialize_symbol.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Backend_intf", ## (Middle_end Backend_intf)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Parameter",
     struct = "parameter.ml",
     sig    = "Parameter_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Variable", ## (Middle_end Variable)
         ## (List)
         ## (Int_replace_polymorphic_compare)
@@ -1425,44 +1477,44 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Parameter_cmi",
     src  = "parameter.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Variable", ## (Middle_end Variable)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (Identifiable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Pass_wrapper",
     struct = "pass_wrapper.ml",
     sig    = "Pass_wrapper_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Int_replace_polymorphic_compare)
         ## (Format)
         ## (Clflags)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Pass_wrapper_cmi",
     src  = "pass_wrapper.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Projection",
     struct = "projection.ml",
     sig    = "Projection_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Variable", ## (Middle_end Variable)
         ## (Var_within_closure)
         ## (Int_replace_polymorphic_compare)
@@ -1473,11 +1525,11 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Projection_cmi",
     src  = "projection.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Variable", ## (Middle_end Variable)
         ## (Var_within_closure)
         ## (Identifiable)
@@ -1486,15 +1538,15 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Ref_to_variables",
     struct = "ref_to_variables.ml",
     sig    = "Ref_to_variables_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
         ## (Option)
@@ -1506,57 +1558,57 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Ref_to_variables_cmi",
     src  = "ref_to_variables.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Remove_free_vars_equal_to_args",
     struct = "remove_free_vars_equal_to_args.ml",
     sig    = "Remove_free_vars_equal_to_args_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Pass_wrapper)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Pass_wrapper)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (List)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Remove_free_vars_equal_to_args_cmi",
     src  = "remove_free_vars_equal_to_args.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Remove_unused_arguments",
     struct = "remove_unused_arguments.ml",
     sig    = "Remove_unused_arguments_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Invariant_params)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Find_recursive_functions)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Invariant_params)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Find_recursive_functions)
         ":Variable", ## (Middle_end Variable)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (List)
@@ -1568,28 +1620,28 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Remove_unused_arguments_cmi",
     src  = "remove_unused_arguments.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
         ":Backend_intf", ## (Middle_end Backend_intf)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Remove_unused_closure_vars",
     struct = "remove_unused_closure_vars.ml",
     sig    = "Remove_unused_closure_vars_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ## (Var_within_closure)
         ## (Int_replace_polymorphic_compare)
@@ -1597,80 +1649,80 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Remove_unused_closure_vars_cmi",
     src  = "remove_unused_closure_vars.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Remove_unused_program_constructs",
     struct = "remove_unused_program_constructs.ml",
     sig    = "Remove_unused_program_constructs_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Effect_analysis)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Effect_analysis)
         ":Symbol", ## (Middle_end Symbol)
         ## (List)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Remove_unused_program_constructs_cmi",
     src  = "remove_unused_program_constructs.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Share_constants",
     struct = "share_constants.ml",
     sig    = "Share_constants_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
         ":Symbol", ## (Middle_end Symbol)
         ## (List)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Share_constants_cmi",
     src  = "share_constants.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Simple_value_approx",
     struct = "simple_value_approx.ml",
     sig    = "Simple_value_approx_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Freshening)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Effect_analysis)
-        ":Flambda", ## (Middle_end Flambda Allocated_const)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Freshening)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Effect_analysis)
+        ## (Middle_end Flambda Allocated_const)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
@@ -1700,15 +1752,15 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Simple_value_approx_cmi",
     src  = "simple_value_approx.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Parameter)
-        ":Flambda", ## (Middle_end Flambda Freshening)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Parameter)
+        ## (Middle_end Flambda Freshening)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ## (Var_within_closure)
@@ -1724,18 +1776,18 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Simplify_boxed_integer_ops",
     struct = "simplify_boxed_integer_ops.ml",
     sig    = "Simplify_boxed_integer_ops_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simplify_common)
-        ":Flambda", ## (Middle_end Flambda Simplify_boxed_integer_ops_intf)
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simplify_common)
+        ## (Middle_end Flambda Simplify_boxed_integer_ops_intf)
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Flambda)
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ## (Nativeint)
         ## (Int_replace_polymorphic_compare)
@@ -1745,71 +1797,71 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Simplify_boxed_integer_ops_cmi",
     src  = "simplify_boxed_integer_ops.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simplify_boxed_integer_ops_intf)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simplify_boxed_integer_ops_intf)
         ## (Nativeint)
         ## (Int64)
         ## (Int32)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Simplify_boxed_integer_ops_intf_cmi",
     src  = "simplify_boxed_integer_ops_intf.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Flambda)
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ## (Asttypes)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Simplify_common",
     struct = "simplify_common.ml",
     sig    = "Simplify_common_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Effect_analysis)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Effect_analysis)
         ## (Int_replace_polymorphic_compare)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Simplify_common_cmi",
     src  = "simplify_common.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Simplify_primitives",
     struct = "simplify_primitives.ml",
     sig    = "Simplify_primitives_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simplify_common)
-        ":Flambda", ## (Middle_end Flambda Simplify_boxed_integer_ops)
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simplify_common)
+        ## (Middle_end Flambda Simplify_boxed_integer_ops)
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Flambda)
         ":Symbol", ## (Middle_end Symbol)
         ":Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
@@ -1829,15 +1881,15 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Simplify_primitives_cmi",
     src  = "simplify_primitives.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ## (Debuginfo)
@@ -1845,17 +1897,17 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Traverse_for_exported_symbols",
     struct = "traverse_for_exported_symbols.ml",
     sig    = "Traverse_for_exported_symbols_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Export_info)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Export_info)
         ":Variable", ## (Middle_end Variable)
         ":Symbol", ## (Middle_end Symbol)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -1869,15 +1921,15 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Traverse_for_exported_symbols_cmi",
     src  = "traverse_for_exported_symbols.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Simple_value_approx)
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Export_info)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Simple_value_approx)
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Export_info)
         ":Symbol", ## (Middle_end Symbol)
         ## (Var_within_closure)
         ## (Set_of_closures_id)
@@ -1886,12 +1938,12 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Un_anf",
     struct = "un_anf.ml",
     sig    = "Un_anf_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Symbol", ## (Middle_end Symbol)
         ":Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
         ":Printclambda", ## (Middle_end Printclambda)
@@ -1909,30 +1961,30 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Un_anf_cmi",
     src  = "un_anf.mli",
     opts = SIG_OPTS,
-    deps   = [
+    deps   = STDLIB + [
         ":Symbol", ## (Middle_end Symbol)
         ":Clambda", ## (Middle_end Clambda)
         ## (Format)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Unbox_closures",
     struct = "unbox_closures.ml",
     sig    = "Unbox_closures_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Augment_specialised_args)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Augment_specialised_args)
         ":Variable", ## (Middle_end Variable)
         ## (Int_replace_polymorphic_compare)
         ## (Closure_id)
@@ -1940,33 +1992,33 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Unbox_closures_cmi",
     src  = "unbox_closures.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Unbox_free_vars_of_closures",
     struct = "unbox_free_vars_of_closures.ml",
     sig    = "Unbox_free_vars_of_closures_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Pass_wrapper)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda_utils)
-        ":Flambda", ## (Middle_end Flambda Flambda_iterators)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Extract_projections)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Pass_wrapper)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda_utils)
+        ## (Middle_end Flambda Flambda_iterators)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Extract_projections)
         ":Variable", ## (Middle_end Variable)
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
         ## (Misc)
@@ -1975,45 +2027,45 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Unbox_free_vars_of_closures_cmi",
     src  = "unbox_free_vars_of_closures.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Unbox_specialised_args",
     struct = "unbox_specialised_args.ml",
     sig    = "Unbox_specialised_args_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Invariant_params)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
-        ":Flambda", ## (Middle_end Flambda Extract_projections)
-        ":Flambda", ## (Middle_end Flambda Augment_specialised_args)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Invariant_params)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
+        ## (Middle_end Flambda Extract_projections)
+        ## (Middle_end Flambda Augment_specialised_args)
         ":Variable", ## (Middle_end Variable)
         ## (Int_replace_polymorphic_compare)
         ## (Clflags)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Unbox_specialised_args_cmi",
     src  = "unbox_specialised_args.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Flambda", ## (Middle_end Flambda Projection)
-        ":Flambda", ## (Middle_end Flambda Inlining_cost)
-        ":Flambda", ## (Middle_end Flambda Inline_and_simplify_aux)
-        ":Flambda", ## (Middle_end Flambda Flambda)
+    deps   = STDLIB + [
+        ## (Middle_end Flambda Projection)
+        ## (Middle_end Flambda Inlining_cost)
+        ## (Middle_end Flambda Inline_and_simplify_aux)
+        ## (Middle_end Flambda Flambda)
         ":Variable", ## (Middle_end Variable)
     ]
 )
