@@ -407,7 +407,10 @@ bootstrap_module(
         ## (Hashtbl)
         ## (Format)
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//middle_end/flambda/base_types:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -420,7 +423,11 @@ bootstrap_signature(
         ## (Hashtbl)
         ## (Format)
     ],
-    visibility = ["//middle_end:__pkg__"]
+    visibility = [
+        "//middle_end:__subpackages__",
+        "//middle_end/flambda/base_types:__subpackages__",
+        "//utils:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -432,7 +439,8 @@ bootstrap_module(
     ],
     visibility = [
         "//lambda:__pkg__",
-        "//middle_end:__pkg__"
+        "//middle_end:__pkg__",
+        "//middle_end/flambda/base_types:__pkg__"
     ]
 )
 
@@ -584,7 +592,8 @@ bootstrap_module(
         ## (Hashtbl)
         ## (Format)
         ## (Digest)
-    ]
+    ],
+    visibility = ["//middle_end/flambda/base_types:__pkg__"]
 )
 
 bootstrap_signature(

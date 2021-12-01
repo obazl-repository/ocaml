@@ -559,11 +559,11 @@ bootstrap_module(
         ## (Middle_end Flambda Projection)
         ## (Middle_end Flambda Parameter)
         ## (Middle_end Flambda Allocated_const)
-        ":Variable", ## (Middle_end Variable)
-        ":Symbol", ## (Middle_end Symbol)
-        ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
-        ":Compilation_unit", ## (Middle_end Compilation_unit)
-        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        "//middle_end:Compilation_unit", ## (Middle_end Compilation_unit)
+        "//middle_end:Clambda_primitives", ## (Middle_end Clambda_primitives)
+        "//middle_end:Printclambda_primitives", ## (Middle_end Printclambda_primitives)
+        "//middle_end:Symbol", ## (Middle_end Symbol)
+        "//middle_end:Variable", ## (Middle_end Variable)
         ## (Tag)
         ## (String)
         ## (Static_exception)
@@ -587,7 +587,8 @@ bootstrap_module(
         ## (Clflags)
         ## (Char)
         ## (Asttypes)
-    ]
+    ],
+    visibility = ["//middle_end/flambda/base_types:__pkg__"]
 )
 
 bootstrap_signature(
@@ -595,25 +596,26 @@ bootstrap_signature(
     src  = "flambda.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Middle_end Flambda Projection)
-        ## (Middle_end Flambda Parameter)
-        ## (Middle_end Flambda Allocated_const)
+        ":Allocated_const_cmi",
+        ":Parameter_cmi",
+        ":Projection_cmi",
         "//middle_end:Clambda_primitives_cmi", ## (Middle_end Clambda_primitives)
         "//middle_end:Symbol_cmi", ## (Middle_end Symbol)
         "//middle_end:Variable_cmi", ## (Middle_end Variable)
-        ## (Tag)
-        ## (Static_exception)
-        ## (Set_of_closures_origin)
-        ## (Set_of_closures_id)
+        "//middle_end/flambda/base_types:Tag_cmi",
+        "//middle_end/flambda/base_types:Static_exception_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_origin_cmi",
         ## (Numbers)
-        ## (Mutable_variable)
+        "//middle_end/flambda/base_types:Mutable_variable_cmi",
         ## (Identifiable)
         ## (Format)
         ## (Debuginfo)
-        ## (Closure_origin)
-        "//middle_end/flambda/base_types:Closure_id_cmi"
+        "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda/base_types:Closure_origin_cmi",
         ## (Asttypes)
-    ]
+    ],
+    visibility = ["//middle_end/flambda/base_types:__pkg__"]
 )
 
 bootstrap_module(
@@ -1482,10 +1484,10 @@ bootstrap_signature(
     src  = "parameter.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Variable", ## (Middle_end Variable)
-        ":Compilation_unit", ## (Middle_end Compilation_unit)
-        ## (Identifiable)
-    ]
+        "//middle_end:Compilation_unit_cmi",
+        "//middle_end:Variable_cmi",
+        "//utils:Identifiable_cmi"
+    ],
 )
 
 bootstrap_module(
@@ -1530,11 +1532,11 @@ bootstrap_signature(
     src  = "projection.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Variable", ## (Middle_end Variable)
-        ## (Var_within_closure)
+        "//middle_end:Variable_cmi", ## (Middle_end Variable)
+        "//middle_end/flambda/base_types:Var_within_closure_cmi",
         ## (Identifiable)
         ## (Format)
-        ## (Closure_id)
+        "//middle_end/flambda/base_types:Closure_id_cmi"
     ]
 )
 

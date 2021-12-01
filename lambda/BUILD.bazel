@@ -50,7 +50,10 @@ bootstrap_module(
         ## (Format)
         ## (Asttypes)
     ],
-    visibility = ["//asmcomp:__pkg__"]
+    visibility = [
+        "//middle_end:__pkg__",
+        "//asmcomp:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -88,6 +91,8 @@ bootstrap_module(
     visibility = [
         "//bytecomp:__pkg__",
         "//file_formats:__pkg__",
+        "//middle_end:__pkg__",
+        "//middle_end/flambda/base_types:__pkg__"
     ]
 )
 
@@ -186,7 +191,10 @@ bootstrap_module(
         ## (Clflags)
         ## (Asttypes)
     ],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//middle_end:__pkg__"
+    ]
 )
 
 bootstrap_signature(
