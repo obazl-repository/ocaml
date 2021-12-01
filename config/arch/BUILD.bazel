@@ -1,5 +1,8 @@
 load("@bazel_skylib//lib:selects.bzl", "selects")
 
+# to see the full list of values for @platforms:cpu,
+# look in `bazel info output_base`/external/platforms/cpu
+
 selects.config_setting_group(
     name = "amd64",
     match_any = [
@@ -8,27 +11,46 @@ selects.config_setting_group(
     ]
 )
 
+config_setting(
+    name = "arm",
+    constraint_values = [
+        "@platforms//cpu:arm",
+    ]
+)
+
+config_setting(
+    name = "armv6-m",
+    constraint_values = [
+        "@platforms//cpu:armv6-m",
+    ]
+)
+## ... other arm archs
+config_setting(
+    name = "armv8-m",
+    constraint_values = [
+        "@platforms//cpu:armv8-m",
+    ]
+)
+
+config_setting(
+    name = "arm64",
+    constraint_values = [
+        "@platforms//cpu:arm64",
+    ]
+)
+## ...etc...
+
+## this does not seem to work:
 # selects.config_setting_group(
 #     name = "arm",
 #     match_any = [
-#         # "@platforms//cpu:arm",
+#         "@platforms//cpu:arm",
 #         "@platforms//cpu:armv6-m",
 #         "@platforms//cpu:armv7-m",
 #         "@platforms//cpu:armv7e-mf",
-#         ## etc...
+#         # etc...
 #     ]
 # )
-
-selects.config_setting_group(
-    name = "arm64",
-    match_any = [
-        # "@platforms//cpu:arm64_32",
-        # "@platforms//cpu:arm64",
-        "@platforms//cpu:arm64e",
-        # "@platforms//cpu:armv7",
-        # "@platforms//cpu:armv7k",
-    ]
-)
 
 config_setting(
     name = "i386",
@@ -38,14 +60,14 @@ config_setting(
 )
 
 config_setting(
-    name = "power",
+    name = "ppc",
     constraint_values = [
         "@platforms//cpu:ppc",
     ]
 )
 
 config_setting(
-    name = "riscv",
+    name = "riscv64",
     constraint_values = [
         "@platforms//cpu:riscv64",
     ]

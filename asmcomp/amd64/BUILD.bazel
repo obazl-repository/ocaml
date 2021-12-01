@@ -5,6 +5,8 @@ load("//bzl:rules.bzl",
 
 load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
 
+exports_files(["proc.ml"])
+
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS = ROOT_SIG_OPTS
 

@@ -1142,6 +1142,28 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
+bootstrap_module(
+    name   = "Proc",
+    struct = select({
+        ## supported archs: amd64, arm, arm64, i386, power, riscv, s390x
+        ## NB: amd64 == x86_64
+        "//config/arch:x86_64": "//asmcomp/amd64:proc.ml",
+        "//config/arch:arm"   : "//asmcomp/arm:proc.ml",
+        "//config/arch:arm64"   : "//asmcomp/arm64:proc.ml",
+        "//config/arch:i386"   : "//asmcomp/i386:proc.ml",
+        "//config/arch:ppc"   : "//asmcomp/power:proc.ml",
+        "//config/arch:riscv64"   : "//asmcomp/riscv:proc.ml",
+        "//config/arch:s390x"   : "//asmcomp/s390x:proc.ml",
+    }, no_match_error = "unknown arch"),
+    sig    = "Proc_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":X86_proc",
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//asmcomp:__subpackages__"]
+)
+
 bootstrap_signature(
     name = "Proc_cmi",
     src  = "proc.mli",
