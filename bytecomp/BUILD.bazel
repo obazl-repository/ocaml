@@ -5,6 +5,7 @@ load("//bzl:rules.bzl",
 )
 
 load("//config:BUILD.bzl",
+     "RUNTIME_OCAMLRUN",
      "ROOT_MODULE_OPTS",
      "ROOT_SIG_OPTS")
 
@@ -178,10 +179,10 @@ bootstrap_module(
         ":Emitcode", ## (Bytecomp Emitcode)
         ":Bytelink", ## (Bytecomp Bytelink)
         ":Bytegen", ## (Bytecomp Bytegen)
-        ## (Typemod)
+        "//typing:Typemod",
         ## (Translmod)
         ## (Subst)
-        ## (Simplif)
+        "//lambda:Simplif",
         ## (Printlambda)
         ## (Path)
         ## (Misc)
@@ -196,7 +197,8 @@ bootstrap_module(
         ## (Cmo_format)
         ## (Clflags)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -364,30 +366,69 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-## root Makefile:
-# bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
-# 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
-# bytecomp/opcodes.mli: bytecomp/opcodes.ml
-# 	$(CAMLC) -i $< > $@
-## make_opcodes is //tools:make_opcodes.exe
 bootstrap_module(
     name   = "Opcodes",
     struct = "opcodes.ml",
-    sig    = ":Opcodes_cmi",
+    # sig    = ":Opcodes_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
     ],
     data = ["//runtime:primitives"]
 )
 
-bootstrap_signature(
-    name = "Opcodes_cmi",
-    src  = "opcodes.mli",
-    opts = SIG_OPTS,
-    deps   = STDLIB + [
-    ],
-    data = ["//runtime:primitives"]
+## root Makefile:
+# bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
+# 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
+## NEW_OCAMLRUN = //runtime:ocamlrun, we call it RUNTIME_OCAMLRUN
+## make_opcodes is //tools:make_opcodes.bc
+genrule(
+    name  = "opcodes_ml",
+    srcs  = ["//runtime/caml:instruct.h", "//tools:opcodes.bc"],
+    tools = [RUNTIME_OCAMLRUN],
+    outs  = ["opcodes.ml"],
+    cmd   = " ".join([
+        "$(execpath {NEW_OCAMLRUN})".format(
+            NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
+        "$(location //tools:opcodes.bc)",
+        "-opcodes",
+        "< $(location //runtime/caml:instruct.h)",
+        "> $@"
+    ])
 )
+
+## NB: the makefile extracts the mli file using ocamlc -i
+# the rules don't seem to work for that
+# but we can just compile the ml file without an mli file, no?
+
+# bootstrap_signature(
+#     name = "opcodes_mli",
+#     src  = "opcodes.ml",
+#     opts = SIG_OPTS,
+#     deps   = STDLIB + [
+#     ],
+#     data = ["//runtime:primitives"]
+# )
+
+# bytecomp/opcodes.mli: bytecomp/opcodes.ml
+# 	$(CAMLC) -i $< > $@
+# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
+# BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
+
+# genrule(
+#     name  = "opcodes_mli",
+#     srcs  = ["opcodes.ml", "//boot:ocamlc", "//stdlib"],
+#     outs  = ["opcodes.mli"],
+#     tools = ["//runtime:ocamlrun"],
+#     cmd   = " ".join([
+#         # "STDLIB=echo `dirname $(location //stdlib)` &&",
+#         "$(execpath //runtime:ocamlrun)",
+#         "$(location //boot:ocamlc)",
+#         "-g -nostdlib -I boot -use-prims runtime/primitives",
+#         "-I bazel-out/darwin-fastbuild/bin/stdlib",
+#         "-i $(location opcodes.ml)",
+#         "> $@"
+#     ])
+# )
 
 bootstrap_module(
     name   = "Printinstr",

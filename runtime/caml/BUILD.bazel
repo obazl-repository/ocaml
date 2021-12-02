@@ -1,6 +1,6 @@
 
-# most of these for otherlibs/str/strstubs.c
 exports_files([
+    # most of these for otherlibs/str/strstubs.c
     "alloc.h",
     "config.h",
     "domain.h",
@@ -12,7 +12,9 @@ exports_files([
     "memory.h",
     "misc.h",
     "mlvalues.h",
-    "s.h"
+    "s.h",
+    ## used by //bytecomp:opcodes_ml:
+    "instruct.h"
 ])
 
 # GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h build_config.h

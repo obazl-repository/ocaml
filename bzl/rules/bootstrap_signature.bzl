@@ -132,6 +132,9 @@ def _bootstrap_signature_impl(ctx):
     if debug:
         print("sig_src: %s" % sig_src)
 
+    # if sig_src.extension == "ml":
+    #     # extract mli file from ml file
+
     # add prefix if namespaced. from_name == normalized module name
     # derived from sig_src; module_name == prefixed if ns else same as
     # from_name.
@@ -172,7 +175,11 @@ def _bootstrap_signature_impl(ctx):
         if debug:
             print("mlifile %s" % mlifile)
 
-    out_cmi = ctx.actions.declare_file(scope + module_name + ".cmi")
+    if sig_src.extension == "ml":
+        out_cmi = ctx.actions.declare_file(scope + sig_src.basename + "i")
+    else:
+        out_cmi = ctx.actions.declare_file(scope + module_name + ".cmi")
+
     if debug:
         print("out_cmi %s" % out_cmi)
 
@@ -261,8 +268,12 @@ def _bootstrap_signature_impl(ctx):
             args.add("-no-alias-deps")
             args.add("-open", ns)
 
-    args.add("-c")
-    args.add("-o", out_cmi)
+    if sig_src.extension == "ml":
+        args.add("-i")
+        args.add("-o", out_cmi)
+    else:
+        args.add("-c")
+        args.add("-o", out_cmi)
 
     args.add("-intf", mlifile)
 

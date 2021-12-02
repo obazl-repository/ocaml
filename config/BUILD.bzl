@@ -40,6 +40,9 @@ ROOTDIR = "/Users/gar/ocaml/ocaml" ## FIXME
 # OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 # NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 
+BOOT_OCAMLRUN = "//boot:ocamlrun"
+RUNTIME_OCAMLRUN = "//runtime:ocamlrun"
+
 
 # Use boot/ocamlc.opt if available
 # ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"

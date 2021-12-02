@@ -271,7 +271,7 @@ bootstrap_module(
         ## (Filename)
         "//utils:Config",
         "//utils:Clflags",
-        ## (Bytepackager)
+        "//bytecomp:Bytepackager",
         ## (Bytelink)
         "//bytecomp:Bytelibrarian",
         ## (Arg)
@@ -407,16 +407,16 @@ bootstrap_module(
         ## (Printf)
         "//parsing:Location",
         ## (List)
-        ## (Import_approx)
+        "//middle_end/flambda:Import_approx",
         ## (Format)
         ## (Filename)
         "//utils:Config",
         ## (Compilenv)
         "//utils:Clflags",
         ## (Backend_intf)
-        ## (Asmpackager)
+        "//asmcomp:Asmpackager",
         ## (Asmlink)
-        ## (Asmlibrarian)
+        "//asmcomp:Asmlibrarian"
         ## (Arg)
         ## (Arch)
     ]

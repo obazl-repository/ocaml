@@ -240,7 +240,10 @@ bootstrap_module(
     deps   = STDLIB + [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -274,9 +277,10 @@ bootstrap_module(
         ## (Asttypes)
     ],
     visibility = [
+        "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
         "//driver:__pkg__",
-        "//middle_end/closure:__pkg__",
-        "//middle_end/flambda:__pkg__"
+        "//middle_end:__subpackages__"
     ]
 )
 

@@ -2,18 +2,9 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
 
 
-# load("//bzl:providers.bzl",
-#      "CompilationModeSettingProvider",
-#      "OcamlSDK")
-
 ## obtaining CC toolchain:  https://github.com/bazelbuild/bazel/issues/7260
 
 # ###################################################################
-# def ocaml_register_toolchains(installation = None, noocaml = None):
-#     # print("ocaml_register_toolchains");
-#     native.register_toolchains("@ocaml//toolchain:ocaml_macos")
-#     native.register_toolchains("@ocaml//toolchain:ocaml_linux")
-
 def bootstrap_register_toolchains(installation = None, noocaml = None):
     # print("ocaml_register_toolchains");
     native.register_toolchains("//bzl/toolchain:bootstrap_macos")
@@ -22,20 +13,9 @@ def bootstrap_register_toolchains(installation = None, noocaml = None):
 ################################################################
 _bootstrap_tools_attrs = {
     "path": attr.string(),
-    # "sdk_home": attr.string(),
-    # "opam_root": attr.string(),
     "linkmode": attr.string(
         doc = "Default link mode: 'static' or 'dynamic'"
-        # default = "static"
     ),
-
-    ## hidden attr required to make find_cpp_toolchain work:
-    "_cc_toolchain": attr.label(
-        default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
-    ),
-    # "_cc_opts": attr.string_list(
-    #     default = ["-Wl,-no_compact_unwind"]
-    # ),
 
     "ocamlrun": attr.label(
         default    = "//runtime:ocamlrun",
@@ -94,6 +74,15 @@ _bootstrap_tools_attrs = {
     # ),
 
     ################
+    ## hidden attr required to make find_cpp_toolchain work:
+    "_cc_toolchain": attr.label(
+        default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+    ),
+    # "_cc_opts": attr.string_list(
+    #     default = ["-Wl,-no_compact_unwind"]
+    # ),
+
+
     # "_ocamlc_opt": attr.label(
     #     default = Label("@ocaml//bin:ocamlc.opt"),
     #     executable = True,

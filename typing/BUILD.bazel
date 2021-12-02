@@ -1741,7 +1741,11 @@ bootstrap_module(
         ## (Asttypes)
         ## (Array)
     ],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
+        "//driver:__pkg__"
+    ]
 )
 
 bootstrap_signature(

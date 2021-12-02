@@ -211,10 +211,12 @@ bootstrap_module(
         "//utils:Clflags",
         "//middle_end:Clambda",
         "//middle_end:Backend_intf_cmi",
+
+        ":Emit" ## selects impl; we could also build it in the arch dirs
     ]
     + select({
         "//config/arch:x86_64": [
-            "//asmcomp/amd64:Emit",
+            # "//asmcomp/amd64:Emit",
             "//asmcomp/amd64:CSE",
             "//asmcomp/amd64:Proc",
             "//asmcomp/amd64:Reload",
@@ -261,7 +263,8 @@ bootstrap_module(
         "//middle_end:Clambda",
         ## (Ccomp)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(
@@ -286,7 +289,7 @@ bootstrap_module(
         ":Cmm", ## (Asmcomp Cmm)
         ":Asmgen", ## (Asmcomp Asmgen)
         ## (Sys)
-        ## (Runtimedef)
+        "//lambda:Runtimedef",
         ## (Profile)
         ## (Printf)
         ## (Misc)
@@ -315,10 +318,10 @@ bootstrap_signature(
     src  = "asmlink.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Misc)
+        "//utils:Misc_cmi",
         ## (Format)
         ## (Digest)
-        ## (Cmx_format)
+        "//file_formats:Cmx_format_cmi"
     ],
     data = ["//runtime:primitives"]
 )
@@ -331,10 +334,10 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Asmlink", ## (Asmcomp Asmlink)
         ":Asmgen", ## (Asmcomp Asmgen)
-        ## (Typemod)
+        "//typing:Typemod",
         ## (Translmod)
         ## (String)
-        ## (Simplif)
+        "//lambda:Simplif",
         ## (Profile)
         ## (Printf)
         ## (Misc)
@@ -343,22 +346,26 @@ bootstrap_module(
         ## (List)
         ## (Ident)
         ## (Format)
-        ## (Flambda_middle_end)
+        "//middle_end/flambda:Flambda_middle_end",
         ## (Filename)
-        ## (Export_info_for_pack)
+        "//middle_end/flambda:Export_info_for_pack",
         ## (Export_info)
         ## (Env)
         ## (Config)
         "//middle_end:Compilenv",
         ## (Compilation_unit)
         ## (Cmx_format)
-        ## (Closure_middle_end)
+        "//middle_end/closure:Closure_middle_end",
         "//utils:Clflags",
         "//middle_end:Clambda",
         ## (Ccomp)
         "//middle_end:Backend_intf_cmi",
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//driver:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -742,6 +749,37 @@ bootstrap_signature(
 # 	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
 # 	|| { rm -f $@; exit 2; }
 
+## here we select the impl to go with the interfact; we could also
+## build in the arch dirs, so clients would do the selecting
+bootstrap_module(
+    name   = "Emit",
+    struct = select({
+        ## supported archs: amd64, arm, arm64, i386, power, riscv, s390x
+        ## NB: amd64 == x86_64
+        "//config/arch:x86_64": "//asmcomp/amd64:emit.ml",
+        "//config/arch:arm"   : "//asmcomp/arm:emit.ml",
+        "//config/arch:arm64"   : "//asmcomp/arm64:emit.ml",
+        "//config/arch:i386"   : "//asmcomp/i386:emit.ml",
+        "//config/arch:ppc"   : "//asmcomp/power:emit.ml",
+        "//config/arch:riscv64"   : "//asmcomp/riscv:emit.ml",
+        "//config/arch:s390x"   : "//asmcomp/s390x:emit.ml",
+    }, no_match_error = "unknown arch"),
+    sig = "Emit_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        ":Proc",
+        "//asmcomp:Branch_relaxation",
+        "//asmcomp:Emitaux",
+        "//asmcomp:X86_dsl",
+        "//asmcomp:X86_gas",
+        "//asmcomp:X86_masm",
+        "//middle_end:Compilenv",
+        "//utils:Domainstate"
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//asmcomp:__pkg__"]
+)
+
 bootstrap_signature(
     name = "Emit_cmi",
     src  = "emit.mli",
@@ -750,7 +788,8 @@ bootstrap_signature(
         ":Linear", ## (Asmcomp Linear)
         ":Cmm", ## (Asmcomp Cmm)
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//asmcomp:__subpackages__"]
 )
 
 bootstrap_module(

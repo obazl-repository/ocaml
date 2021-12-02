@@ -476,7 +476,8 @@ bootstrap_module(
         ## (Export_id)
         ## (Closure_id)
         ## (Array)
-    ]
+    ],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -734,7 +735,10 @@ bootstrap_module(
         ## (Closure_id)
         ## (Clflags)
     ],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//driver:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -927,7 +931,8 @@ bootstrap_module(
         ## (Export_id)
         ## (Closure_id)
         ## (Array)
-    ]
+    ],
+    visibility = ["//driver:__pkg__"]
 )
 
 bootstrap_signature(

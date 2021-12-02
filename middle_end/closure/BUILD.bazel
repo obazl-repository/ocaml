@@ -87,7 +87,10 @@ bootstrap_module(
         ## (Format)
         ## (Clflags)
     ],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//driver:__pkg__"
+    ]
 )
 
 bootstrap_signature(

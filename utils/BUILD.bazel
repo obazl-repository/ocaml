@@ -579,7 +579,10 @@ bootstrap_signature(
         ## (Digest)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//file_formats:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//file_formats:__pkg__"
+    ]
 )
 
 bootstrap_module(

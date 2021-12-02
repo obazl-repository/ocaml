@@ -548,10 +548,31 @@ bootstrap_module(
 )
 
 ################################################################
-bootstrap_ocamllex(
-    name = "make_opcodes_ml",
-    out  = "make_opcodes.ml",
-    src  = "make_opcodes.mll"
+## root Makefile: The numeric opcodes
+# make_opcodes := tools/make_opcodes$(EXE)
+# bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
+# 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
+# bytecomp/opcodes.mli: bytecomp/opcodes.ml
+# 	$(CAMLC) -i $< > $@
+# $(make_opcodes): tools/make_opcodes.mll
+# 	$(MAKE) -C tools make_opcodes
+
+## tools/Makefile
+# CAMLC = $(BOOT_OCAMLC) -g -nostdlib -I $(ROOTDIR)/boot \
+#         -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
+# make_opcodes := make_opcodes$(EXE)
+# $(eval $(call PROGRAM_SYNONYM,make_opcodes))
+# $(make_opcodes): make_opcodes.ml
+# 	$(CAMLC) $< -o $@
+
+# toolchain uses //boot:ocamlc ==  BOOT_OCAMLC
+bootstrap_executable(
+    name = "opcodes.bc",
+    main = ":Make_opcodes",
+    # deps = ["//stdlib:Std_exit"],
+    # opts = ["-w", "-31"],
+    data = ["//stdlib:header"],
+    visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_module(
@@ -563,13 +584,8 @@ bootstrap_module(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_executable(
-    name = "make_opcodes.exe",
-    main = ":Make_opcodes",
-    # deps = ["//stdlib:Std_exit"],
-
-    ## Std_exit is getting linked twice. For now we ignore:
-    opts = ["-w", "-31"],
-    data = ["//stdlib:header"]
+bootstrap_ocamllex(
+    name = "make_opcodes_ml",
+    out  = "make_opcodes.ml",
+    src  = "make_opcodes.mll"
 )
-
