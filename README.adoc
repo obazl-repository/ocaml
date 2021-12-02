@@ -1,4 +1,4 @@
-= OBazl Proof-of-Concept Build
+= OCaml: Proof-of-Concept OBazl Build
 
 See the link:https://github.com/ocaml/ocaml[upstream repository] for the original OCaml README.
 
