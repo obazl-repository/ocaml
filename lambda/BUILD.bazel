@@ -33,6 +33,27 @@ bootstrap_library(
     ],
 )
 
+bootstrap_library(
+    name = "ocamlcommon",
+    manifest  = [
+        ":Debuginfo",
+        ":Lambda",
+        ":Matching",
+        ":Printlambda",
+        ":Runtimedef",
+        ":Simplif",
+        ":Switch",
+        ":Translattribute",
+        ":Translclass",
+        ":Translcore",
+        ":Translmod",
+        ":Translobj",
+        ":Translprim",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
+
+################################################################
 bootstrap_module(
     name   = "Debuginfo",
     struct = "debuginfo.ml",

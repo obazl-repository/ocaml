@@ -28,21 +28,23 @@ load("//bzl:rules.bzl",
 # We implement it in the toolchain used by bootstrap_ocamllex
 
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS = ROOT_SIG_OPTS
 
 STDLIB = ["//stdlib"]
 
 bootstrap_executable(
-    name = "ocamllex.opt",
+    name = "ocamllex",
     main = ":Main",
     opts = [
-        "-verbose",
+        # "-verbose",
         "-g", "-nostdlib",
         # "-I", "boot",      ## home of std_exit.cmo?
         # "-use-prims", "runtime/primitives",
         # "-I", "stdlib",
-        "-I", "runtime",
+        # "-I", "runtime",
         "-compat-32",
         # "-ccopt", "-Wno-error=ignored-optimization-argument",
         # "-ccopt", "-Wl,-export_dynamic",
@@ -50,13 +52,45 @@ bootstrap_executable(
     ],
     data = ["//runtime:primitives"],
     deps = [
-        ":Cset", ":Syntax", ":Parser",
+        ":Table",
+        ":Common",
+        ":Compact",
+        ":Cset",
         ":Lexer",
-        ":Table", ":Lexgen",
-        ":Compact", ":Common", ":Output", ":Outputbis",
+        ":Lexgen",
+        ":Output",
+        ":Outputbis",
+        ":Parser",
+        ":Syntax",
         "//boot:Std_exit",
     ]
 )
+
+# bootstrap_executable(
+#     name = "ocamllex.opt",
+#     mode = "native",
+#     main = ":Main",
+#     opts = [
+#         "-verbose",
+#         "-g", "-nostdlib",
+#         # "-I", "boot",      ## home of std_exit.cmo?
+#         # "-use-prims", "runtime/primitives",
+#         # "-I", "stdlib",
+#         "-I", "runtime",
+#         "-compat-32",
+#         # "-ccopt", "-Wno-error=ignored-optimization-argument",
+#         # "-ccopt", "-Wl,-export_dynamic",
+#         # "-ccopt", "-Wno-error=unknown-argument"
+#     ],
+#     data = ["//runtime:primitives"],
+#     deps = [
+#         ":Cset", ":Syntax", ":Parser",
+#         ":Lexer",
+#         ":Table", ":Lexgen",
+#         ":Compact", ":Common", ":Output", ":Outputbis",
+#         "//boot:Std_exit",
+#     ]
+# )
 
 bootstrap_library(
     name = "lex",

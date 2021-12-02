@@ -200,7 +200,8 @@ def _bootstrap_executable(ctx):
         args.add(dep)
 
     ## 'main' dep must come last on cmd line
-    args.add(ctx.file.main)
+    if ctx.file.main:
+        args.add(ctx.file.main)
 
     # args.add("external/ounit2/oUnit.cmx")
 

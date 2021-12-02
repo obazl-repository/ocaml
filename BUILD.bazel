@@ -331,6 +331,59 @@ OCAMLOPTCOMP_DEPS = [
     # "//.:ocamlmiddleend",
 ]
 
+## root Makefile:
+# The bytecode compiler
+# ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
+#               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+# 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+bootstrap_executable(
+    name = "ocamlc",
+    opts = ["-compat-32"],
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//compilerlibs:ocamlbytecomp"
+    ]
+)
+
+# The bytecode compiler compiled with the native-code compiler
+# ocamlc.opt$(EXE): compilerlibs/ocamlcommon.cmxa \
+#                   compilerlibs/ocamlbytecomp.cmxa $(BYTESTART:.cmo=.cmx)
+# 	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^ -cclib "$(BYTECCLIBS)"
+# bootstrap_executable(
+#     name = "ocamlc.opt",
+#     opts = ["-compat-32"],
+#     deps = [
+#         "//compilerlibs:ocamlcommon",
+#         "//compilerlibs:ocamloptcomp"
+#     ]
+# )
+
+
+
+
+# The native-code compiler
+# OPTSTART=driver/optmain.cmo
+# ocamlopt$(EXE): compilerlibs/ocamlcommon.cma compilerlibs/ocamloptcomp.cma \
+#           $(OPTSTART)
+# 	$(CAMLC) $(LINKFLAGS) -o $@ $^
+bootstrap_executable(
+    name = "ocamlopt",
+    opts = [],
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//compilerlibs:ocamloptcomp",
+        "//driver/Optmain"
+    ]
+)
+
+# The native-code compiler compiled with itself
+# ocamlopt.opt$(EXE): \
+#                     compilerlibs/ocamlcommon.cmxa \
+#                     compilerlibs/ocamloptcomp.cmxa \
+#                     $(OPTSTART:.cmo=.cmx)
+# 	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^
+
+
 ################
 # ocamlc.opt$(EXE): compilerlibs/ocamlcommon.cmxa \
 #                   compilerlibs/ocamlbytecomp.cmxa $(BYTESTART:.cmo=.cmx)

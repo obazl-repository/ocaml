@@ -2,7 +2,7 @@ load("//bzl:rules.bzl",
      "bootstrap_archive",
      "bootstrap_module",
      "bootstrap_signature",
-     # "ocaml_library"
+     "bootstrap_library"
 )
 
 load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
@@ -24,9 +24,9 @@ STDLIB = ["//stdlib"]
 # compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(COMMON)
 # 	$(CAMLC) -a -linkall -o $@ $(COMMON)
 
-bootstrap_archive(
-# bootstrap_library(
-    name = "utils",
+# bootstrap_archive(
+bootstrap_library(
+    name = "ocamlcommon",
     mode = "bytecode",
     manifest  = [
         ## list from compilerlibs/Makefile.compilerlibs UTILS

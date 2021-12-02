@@ -58,7 +58,8 @@ bootstrap_module(
         ## (Char)
         ## (Asttypes)
         ## (Array)
-    ]
+    ],
+    visibility = ["//middle_end:__pkg__"]
 )
 
 bootstrap_signature(
@@ -89,7 +90,8 @@ bootstrap_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
-        "//driver:__pkg__"
+        "//driver:__pkg__",
+        "//middle_end:__pkg__"
     ]
 )
 

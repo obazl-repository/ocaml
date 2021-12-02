@@ -32,6 +32,44 @@ bootstrap_library(
     ],
 )
 
+bootstrap_library(
+    name = "ocamloptcomp",
+    manifest  = [
+        ## NB: the makefiles take pains to put stuff in order, across
+        ## pkg boundaries in some cases. OBazl doesn't need that, so
+        ## long as each target lists its direct deps. So we can list
+        ## targets from any packages, in alpha order, and OBazl will
+        ## put them in dependency order.
+
+        ":Internal_variable_names",
+        ":Linkage_name",
+        ":Compilation_unit",
+        ":Variable",
+        # flambda stuff..
+        ":Symbol",
+        ":Backend_var",
+        ":Clambda_primitives",
+        ":Printclambda_primitives",
+        ":Clambda",
+        ":Printclambda",
+        ":Semantics_of_primitives",
+        ":Convert_primitives",
+        # flambda stuff
+        ":Compilenv",
+
+        ## includes all flambda deps, inline and $(MIDDLE_END_FLAMBDA)
+        "//middle_end/flambda:ocamloptcomp",
+
+        # $(MIDDLE_END_CLOSURE)
+        "//middle_end/closure:Closure",
+        "//middle_end/closure:Closure_middle_end",
+
+        # ":Backend_intf_cmi",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
+
+################################################################
 bootstrap_signature(
     name = "Backend_intf_cmi",
     src  = "backend_intf.mli",

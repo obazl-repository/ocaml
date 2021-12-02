@@ -34,6 +34,31 @@ bootstrap_library(
     ],
 )
 
+bootstrap_library(
+    name = "ocamlcommon",
+    manifest  = [
+        ":Compenv",
+        ":Compile_common",
+        ":Compmisc",
+        ":Main_args",
+        ":Makedepend",
+        ":Pparse",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
+
+## compilerlibs/Makefile.compilerlibs
+bootstrap_library(
+    name = "ocamlbytecomp",
+    manifest  = [
+        ":Compile",
+        ":Errors",
+        ":Maindriver",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
+
+################################################################
 bootstrap_module(
     name   = "Compenv",
     struct = "compenv.ml",

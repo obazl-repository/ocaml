@@ -20,13 +20,15 @@ bootstrap_library(
     ],
 )
 
-bootstrap_library( ## defined in compilerlibs/Makefile.compilerlibs as COMP_CMI
+## defined in compilerlibs/Makefile.compilerlibs as COMP_CMI
+bootstrap_library(
     name = "ocamlcommon",
     manifest  = [
         ":Cmo_format_cmi",
         ":Cmx_format_cmi",
         ":Cmxs_format_cmi",
     ],
+    visibility = ["//compilerlibs:__pkg__"]
 )
 
 bootstrap_module(

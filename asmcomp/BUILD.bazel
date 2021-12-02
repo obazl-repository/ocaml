@@ -106,6 +106,75 @@ bootstrap_library(
     # ],
 )
 
+bootstrap_library(
+    name = "ocamloptcomp",
+    visibility = ["//compilerlibs:__pkg__"],
+    manifest  = [
+        ":Afl_instrument",
+        ":Asmgen",
+        ":Asmlibrarian",
+        ":Asmlink",
+        ":Asmpackager",
+        ":Branch_relaxation",
+        ":Branch_relaxation_intf",
+        ":Cmm",
+        ":Cmm_helpers",
+        ":Cmm_invariants",
+        ":Cmmgen",
+        ":Cmmgen_state",
+        ":Coloring",
+        ":Comballoc",
+        ":CSEgen",
+        ":Dataflow",
+        ":Deadcode",
+        ":Emitaux",
+        ":Interf",
+        ":Interval",
+        ":Linear",
+        ":Linearize",
+        ":Linscan",
+        ":Liveness",
+        ":Mach",
+        ":Polling",
+        ":Printcmm",
+        ":Printlinear",
+        ":Printmach",
+        ":Reg",
+        ":Reloadgen",
+        ":Schedgen",
+        ":Selectgen",
+        ":Spill",
+        ":Split",
+        ":Strmatch",
+
+    ] + select(
+        {
+        "//config/arch:x86_64":
+        [
+            ":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc",
+            "//asmcomp/amd64"
+         ],
+        # "//config/arch:amd64":
+        # [
+        #     ":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc",
+        #     # "//asmcomp/amd64
+        #  ],
+        "//config/arch:i386":
+        ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+    }, no_match_error = "Unsupported arch"),
+
+    # signatures  = [
+    #     ":Emit_cmi",
+    #     ":Emitenv_cmi",
+    #     ":Proc_cmi",
+    #     ":Reload_cmi",
+    #     ":Scheduling_cmi",
+    #     ":Selection_cmi",
+    #     ":X86_ast_cmi",
+    # ],
+)
+
+################################################################
 bootstrap_module(
     name   = "CSEgen",
     struct = "CSEgen.ml",
@@ -882,13 +951,14 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Reg", ## (Asmcomp Reg)
-        # ":Proc", ## (Asmcomp Proc)
+        ":Proc", ## (Asmcomp Proc)
         ":Mach", ## (Asmcomp Mach)
         ## (List)
         ## (Array)
-    ] + select({
-        "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
-    }, no_match_error = "unsupported arch"),
+    # ] + select({
+    #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
+    # }, no_match_error = "unsupported arch"),
+    ],
     data = ["//runtime:primitives"]
 )
 
@@ -1422,7 +1492,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Reg", ## (Asmcomp Reg)
-        # ":Proc", ## (Asmcomp Proc)
+        ":Proc", ## (Asmcomp Proc)
         ":Mach", ## (Asmcomp Mach)
         ":Cmm", ## (Asmcomp Cmm)
         ## (List)
@@ -1430,9 +1500,10 @@ bootstrap_module(
         ## (Hashtbl)
         "//utils:Clflags",
         ## (Array)
-    ] + select({
-        "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
-    }, no_match_error = "unsupported arch"),
+    # ] + select({
+    #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
+    # }, no_match_error = "unsupported arch"),
+    ],
     data = ["//runtime:primitives"]
 )
 
@@ -1441,9 +1512,10 @@ bootstrap_signature(
     src  = "spill.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-    ],
+        ":Mach_cmi", ## (Asmcomp Mach)
+        ":Cmm_cmi", ## (Asmcomp Cmm)
+        ":Proc_cmi"
+   ],
     data = ["//runtime:primitives"]
 )
 

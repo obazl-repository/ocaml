@@ -31,6 +31,26 @@ bootstrap_library(
     ],
 )
 
+## compilerlibs/Makefile.compilerlibs:
+## flambda/base_types deps embedded in MIDDLE_END
+bootstrap_library(
+    name = "ocamloptcomp",
+    manifest  = [
+        ":Closure_element",
+        ":Closure_id",
+        ":Id_types",
+        ":Export_id",
+        ":Tag",
+        ":Mutable_variable",
+        ":Set_of_closures_id",
+        ":Set_of_closures_origin",
+        ":Closure_origin",
+        ":Var_within_closure",
+        ":Static_exception",
+    ],
+)
+
+################################################################
 bootstrap_module(
     name   = "Closure_element",
     struct = "closure_element.ml",

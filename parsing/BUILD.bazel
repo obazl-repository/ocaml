@@ -43,6 +43,34 @@ bootstrap_library(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
+bootstrap_library(
+    name = "ocamlcommon",
+    manifest  = [
+        ":Ast_helper",
+        ":Ast_invariants",
+        ":Ast_iterator",
+        ":Ast_mapper",
+        ":Attr_helper",
+        ":Builtin_attributes",
+        ":CamlinternalMenhirLib",
+        ":Depend",
+        ":Docstrings",
+        ":Lexer",
+        ":Location",
+        ":Longident",
+        ":Parse",
+        ":Parser",
+        ":Pprintast",
+        ":Printast",
+        ":Syntaxerr",
+
+        # ":Asttypes_cmi",
+        # ":Parsetree_cmi",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
+
+################################################################
 bootstrap_module(
     name   = "Ast_helper",
     struct = "ast_helper.ml",

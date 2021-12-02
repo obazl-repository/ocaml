@@ -122,6 +122,75 @@ bootstrap_library(
     # ],
 )
 
+## compilerlibs/Makefile.compilerlibs:
+## MIDDLE_END contains two sets of flambda deps. some are inlined, the
+## rest are grouped in MIDDLE_END_FLAMBDA.
+bootstrap_library(
+    name = "ocamloptcomp",
+    manifest  = [
+        ## inlined in MIDDLE_END:
+        ":Pass_wrapper",
+        ":Allocated_const",
+        ":Parameter",
+        ":Projection",
+        ":Flambda",
+        ":Flambda_iterators",
+        ":Flambda_utils",
+        ":Freshening",
+        ":Effect_analysis",
+        ":Inlining_cost",
+        ":Simple_value_approx",
+        ":Export_info",
+        ":Export_info_for_pack",
+
+        ## MIDDLE_END_FLAMBDA:
+        ":Import_approx",
+        ":Lift_code",
+        ":Closure_conversion_aux",
+        ":Closure_conversion",
+        ":Initialize_symbol_to_let_symbol",
+        ":Lift_let_to_initialize_symbol",
+        ":Find_recursive_functions",
+        ":Invariant_params",
+        ":Inconstant_idents",
+        ":Alias_analysis",
+        ":Lift_constants",
+        ":Share_constants",
+        ":Simplify_common",
+        ":Remove_unused_arguments",
+        ":Remove_unused_closure_vars",
+        ":Remove_unused_program_constructs",
+        ":Simplify_boxed_integer_ops",
+        ":Simplify_primitives",
+        ":Inlining_stats_types",
+        ":Inlining_stats",
+        ":Inline_and_simplify_aux",
+        ":Remove_free_vars_equal_to_args",
+        ":Extract_projections",
+        ":Augment_specialised_args",
+        ":Unbox_free_vars_of_closures",
+        ":Unbox_specialised_args",
+        ":Unbox_closures",
+        ":Inlining_transforms",
+        ":Inlining_decision",
+        ":Inline_and_simplify",
+        ":Ref_to_variables",
+        ":Flambda_invariants",
+        ":Traverse_for_exported_symbols",
+        ":Build_export_info",
+        ":Closure_offsets",
+        ":Un_anf",
+        ":Flambda_to_clambda",
+        ":Flambda_middle_end",
+
+        ## MIDDLE_END_FLAMBDA_CMI:
+        # ":Inlining_decision_intf_cmi",
+        # ":Simplify_boxed_integer_ops_intf_cmi",
+    ],
+    visibility = ["//middle_end:__pkg__"]
+)
+
+################################################################
 bootstrap_module(
     name   = "Alias_analysis",
     struct = "alias_analysis.ml",

@@ -31,9 +31,29 @@ bootstrap_library(
     ],
 )
 
+## compilerlibs/Makefile.compilerlibs
+# compilerlibs/ocamlbytecomp.cma: $(BYTECOMP_CMI) $(BYTECOMP)
+# 	$(CAMLC) -a -o $@ $(BYTECOMP)
+# compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
+# 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
+
+bootstrap_library(
+    name = "ocamlbytecomp",
+    manifest  = [
+        ":Bytegen",
+        ":Bytelibrarian",
+        ":Bytelink",
+        ":Bytepackager",
+        ":Emitcode",
+        ":Instruct",
+        ":Printinstr",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
 
 ## for ocamlcommmon archive:
-bootstrap_library( # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
+# defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
+bootstrap_library(
     name = "ocamlcommon",
     manifest  = [
         ":Meta",
@@ -41,9 +61,11 @@ bootstrap_library( # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP
         ":Bytesections",
         ":Dll",
         ":Symtable"
-    ]
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
 )
 
+################################################################
 bootstrap_module(
     name   = "Bytegen",
     struct = "bytegen.ml",

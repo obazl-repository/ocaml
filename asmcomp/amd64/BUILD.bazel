@@ -22,6 +22,7 @@ bootstrap_library(
         ":Scheduling",
         ":Selection",
     ],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 # ./boot/ocamlrun ./boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66-70 -warn-error +a -bin-annot -safe-string -strict-formats -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c asmcomp/arch.ml -I asmcomp

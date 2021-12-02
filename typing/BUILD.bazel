@@ -68,6 +68,65 @@ bootstrap_library(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
+bootstrap_library(
+    name = "ocamlcommon",
+    manifest  = [
+        ":Btype",
+        ":Cmt2annot",
+        ":Ctype",
+        ":Datarepr",
+        ":Env",
+        ":Envaux",
+        ":Errortrace",
+        ":Ident",
+        ":Includeclass",
+        ":Includecore",
+        ":Includemod",
+        ":Includemod_errorprinter",
+        ":Mtype",
+        ":Oprint",
+        ":Parmatch",
+        ":Path",
+        ":Patterns",
+        ":Persistent_env",
+        ":Predef",
+        ":Primitive",
+        ":Printpat",
+        ":Printtyp",
+        ":Printtyped",
+        ":Rec_check",
+        ":Shape",
+        ":Signature_group",
+        ":Stypes",
+        ":Subst",
+        ":Tast_iterator",
+        ":Tast_mapper",
+        ":Type_immediacy",
+        ":Typeclass",
+        ":Typecore",
+        ":Typedecl",
+        ":Typedecl_immediacy",
+        ":Typedecl_properties",
+        ":Typedecl_separability",
+        ":Typedecl_unboxed",
+        ":Typedecl_variance",
+        ":Typedtree",
+        ":Typemod",
+        ":Typeopt",
+        ":Types",
+        ":Typetexp",
+        ":Untypeast",
+
+        # ":Annot_cmi",
+        # ":Outcometree_cmi",
+
+        "//file_formats:Cmi_format",
+        "//file_formats:Cmt_format"
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
+
+################################################################
 bootstrap_signature(
     name = "Annot_cmi",
     src  = "annot.mli",

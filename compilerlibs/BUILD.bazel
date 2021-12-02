@@ -7,20 +7,38 @@ load("//bzl:rules.bzl", "bootstrap_archive")
 bootstrap_archive(
     name = "ocamlcommon",
     mode = "bytecode",
-    modules  = [
-        "//utils",
-        "//parsing",
-        "//typing",
-        "//file_formats",
-        "//lambda",
+    manifest  = [
+        "//utils:ocamlcommon",
+        "//parsing:ocamlcommon",
+        "//typing:ocamlcommon",
+        "//lambda:ocamlcommon",
 
         ## COMP = [
         "//bytecomp:ocamlcommon",
-        "//file_formats:ocamlcommon",
-        "//driver:ocamlcommon"
+        "//driver:ocamlcommon",
+
+        # "//file_formats:ocamlcommon",
         #  ]
-    ]
+    ],
+    visibility = ["//:__pkg__"]
 )
+
+################
+# compilerlibs/ocamlbytecomp.cma: $(BYTECOMP_CMI) $(BYTECOMP)
+# 	$(CAMLC) -a -o $@ $(BYTECOMP)
+bootstrap_archive(
+    name = "ocamlbytecomp",
+    manifest = [
+        "//bytecomp:ocamlbytecomp",
+        # "//bytecomp:ocamlbytecomp_cmi",
+        "//driver:ocamlbytecomp",
+    ],
+    visibility = ["//:__pkg__"]
+)
+
+################
+# compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
+# 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
 
 ##################
 # ASMCOMP = \
@@ -39,60 +57,8 @@ bootstrap_archive(
     name    = "ocamloptcomp",
     visibility = ["//visibility:public"],
     manifest = [
-        ":CSE",
-        ":CSEgen",
-        ":Afl_instrument",
-        ":Arch",
-        ":Asmgen",
-        ":Asmlibrarian",
-        ":Asmlink",
-        ":Asmpackager",
-        ":Branch_relaxation",
-        ":Branch_relaxation_intf",
-        ":Cmm",
-        ":Cmm_helpers",
-        ":Cmm_invariants",
-        ":Cmmgen",
-        ":Cmmgen_state",
-        ":Coloring",
-        ":Comballoc",
-        ":Dataflow",
-        ":Deadcode",
-        ":Domainstate",
-        ":Emit",
-        ":Emitaux",
-        ":Emitenv",
-        ":Interf",
-        ":Interval",
-        ":Linear",
-        ":Linear_format",
-        ":Linearize",
-        ":Linscan",
-        ":Liveness",
-        ":Mach",
-        ":Optcompile",
-        ":Opterrors",
-        ":Optmaindriver",
-        ":Polling",
-        ":Printcmm",
-        ":Printlinear",
-        ":Printmach",
-        ":Proc",
-        ":Reg",
-        ":Reload",
-        ":Reloadgen",
-        ":Schedgen",
-        ":Scheduling",
-        ":Selectgen",
-        ":Selection",
-        ":Spill",
-        ":Split",
-        ":Strmatch",
-        ":X86_ast",
-        ":X86_dsl",
-        ":X86_gas",
-        ":X86_masm",
-        ":X86_proc",
+        "//middle_end:ocamloptcomp",
+        "//asmcomp:ocamloptcomp"
     ],
 )
 
