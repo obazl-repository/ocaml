@@ -41,7 +41,8 @@ more complicated, but understandable. The most complicated part is
 probably the preprocessing; but even the more complicated bits of
 preprocessing are handled fairly easily by standard Bazel facilities.
 It involves C interfacing. All of this makes this a useful starting
-point for people interested in learning how to use Obazl.
+point for people interested in learning how to build OCaml software
+using Obazl.
 
 
 link:https://obazl.github.io/docs_obazl/[OBazl Version 1 documentation] - outdated but still useful.
