@@ -1,5 +1,17 @@
 # Building OCaml with OBazl
 
+## Stdlib
+
+An interesting feature of OBazl is that we can depend on individual
+submodules in a namespace. For example, `utils/config.ml` depends on
+`Stdlib.String`. Instead of depending on the Stdlib archive file
+(`stdlib.cma`), we can depend ln the String module directly, by label
+`//stdlib:Stdlib.String`. So we can build the compiler code without
+depending on the Stdlib _archive_, instead depending only on Stdlib
+modules. (This is because depending on a namespaced module
+automatically injects the needed dependency on the namespace's
+resolver (mapping) module.)
+
 ## Preprocessing
 
 ### utils/config.ml
