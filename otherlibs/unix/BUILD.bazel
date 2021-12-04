@@ -23,18 +23,18 @@ ocaml_module(
     sig    = "Unix_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Printexc)
-        ## (List)
-        ## (Int)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Hashtbl",
         ## (Fun)
         ## (Callback)
-        ## (Bytes)
+        "//stdlib:Stdlib.Bytes",
         ## (Bigarray)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 

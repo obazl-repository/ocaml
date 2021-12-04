@@ -31,17 +31,17 @@ ocaml_module(
     struct = "expunge.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Sys)
+        "//stdlib:Stdlib.Sys",
         ## (Symtable)
         ## (Runtimedef)
-        ## (Printexc)
-        ## (Misc)
-        ## (List)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Digest)
+        "//stdlib:Stdlib.Printexc",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Digest",
         ## (Bytesections)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -51,28 +51,28 @@ ocaml_module(
     sig    = "Genprintval_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Types)
+        "//typing:Types",
         ## (Syntaxerr)
         ## (Printtyp)
-        ## (Printexc)
-        ## (Predef)
+        "//stdlib:Stdlib.Printexc",
+        "//typing:Predef",
         ## (Path)
         ## (Parse)
         ## (Outcometree)
         ## (Oprint)
-        ## (Obj)
-        ## (Misc)
-        ## (Longident)
-        ## (List)
-        ## (Lexing)
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         ## (Lexer)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Format)
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
         ## (Env)
         ## (Datarepr)
         ## (Ctype)
-        ## (Bytes)
+        "//stdlib:Stdlib.Bytes",
         ## (Btype)
     ]
 )
@@ -82,10 +82,10 @@ ocaml_signature(
     src  = "genprintval.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Types)
+        "//typing:Types",
         ## (Path)
         ## (Outcometree)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         ## (Env)
     ]
 )
@@ -97,42 +97,42 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Genprintval", ## (Toplevel Genprintval)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Str)
-        ## (Printexc)
+        "//stdlib:Stdlib.Printexc",
         ## (Printast)
-        ## (Predef)
-        ## (Pprintast)
+        "//typing:Predef",
+        "//parsing:Pprintast",
         ## (Pparse)
         ## (Path)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Parse)
         ## (Outcometree)
         ## (Oprint)
-        ## (Obj)
+        "//stdlib:Stdlib.Obj",
         ## (Mod)
-        ## (Misc)
+        "//utils:Misc",
         ## (Mb)
-        ## (Longident)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
         ## (Lexer)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Gc)
-        ## (Format)
-        ## (Filename)
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Env)
         ## (Dll)
-        ## (Config)
+        "//utils:Config",
         ## (Compmisc)
         ## (Compenv)
-        ## (Clflags)
-        ## (Bytes)
-        ## (Buffer)
-        ## (Ast_helper)
-        ## (Arg)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Buffer",
+        "//parsing:Ast_helper",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -142,20 +142,20 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Genprintval", ## (Toplevel Genprintval)
-        ## (Warnings)
-        ## (Types)
+        "//utils:Warnings",
+        "//typing:Types",
         ## (Path)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Outcometree)
-        ## (Obj)
-        ## (Longident)
-        ## (Location)
-        ## (Lexing)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Format)
+        "//stdlib:Stdlib.Obj",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Lexing",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
         ## (Env)
-        ## (Buffer)
+        "//stdlib:Stdlib.Buffer",
     ]
 )
 
@@ -168,35 +168,35 @@ ocaml_module(
         ":Toploop", ## (Toplevel Toploop)
         ":Topeval", ## (Toplevel Topeval)
         ":String", ## (Stdlib String)
-        ## (Warnings)
-        ## (Types)
-        ## (Sys)
-        ## (String)
+        "//utils:Warnings",
+        "//typing:Types",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Printtyp)
-        ## (Predef)
+        "//typing:Predef",
         ## (Path)
-        ## (Parsetree)
-        ## (Option)
-        ## (Obj)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Filename)
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Env)
         ## (Dll)
         ## (Ctype)
-        ## (Config)
+        "//utils:Config",
         ## (Compenv)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Btype)
-        ## (Asttypes)
-        ## (Ast_helper)
-        ## (Arg)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Ast_helper",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -205,8 +205,8 @@ ocaml_signature(
     src  = "topdirs.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Longident)
-        ## (Format)
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -216,9 +216,9 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Topcommon", ## (Toplevel Topcommon)
-        ## (Parsetree)
-        ## (Obj)
-        ## (Format)
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -230,25 +230,25 @@ ocaml_module(
     deps   = [
         ":Topeval", ## (Toplevel Topeval)
         ":Topcommon", ## (Toplevel Topcommon)
-        ## (Warnings)
+        "//utils:Warnings",
         ## (Typetexp)
-        ## (Sys)
-        ## (Printf)
-        ## (Obj)
-        ## (Misc)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Lexing)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         ## (Lexer)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Env)
-        ## (Config)
+        "//utils:Config",
         ## (Compmisc)
         ## (Compenv)
-        ## (Clflags)
-        ## (Buffer)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Buffer",
         ## (Btype)
     ]
 )
@@ -258,17 +258,17 @@ ocaml_signature(
     src  = "toploop.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Warnings)
-        ## (Types)
+        "//utils:Warnings",
+        "//typing:Types",
         ## (Path)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Outcometree)
-        ## (Obj)
-        ## (Longident)
-        ## (Location)
-        ## (Lexing)
-        ## (Hashtbl)
-        ## (Format)
+        "//stdlib:Stdlib.Obj",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
         ## (Env)
     ]
 )
@@ -295,11 +295,11 @@ ocaml_signature(
     src  = "trace.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Types)
+        "//typing:Types",
         ## (Path)
-        ## (Obj)
-        ## (Longident)
-        ## (Format)
+        "//stdlib:Stdlib.Obj",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
     ]
 )

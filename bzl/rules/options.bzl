@@ -1,9 +1,9 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl/providers:ocaml.bzl", "OcamlVerboseFlagProvider")
+load("//bzl:providers.bzl", "OcamlVerboseFlagProvider")
 
-load("//bzl/providers:ocaml.bzl",
-     "OcamlArchiveMarker",
+load("//bzl:providers.bzl",
+     "OcamlArchiveProvider",
      "OcamlImportMarker",
      "OcamlLibraryMarker",
      "OcamlNsResolverProvider",
@@ -109,7 +109,7 @@ def options_executable(ws):
         ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
-            providers = [[OcamlArchiveMarker],
+            providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
                          [OcamlLibraryMarker],
                          [OcamlModuleMarker],
@@ -156,7 +156,7 @@ def options_executable(ws):
 #######################
 def options_module(ws):
 
-    _providers = [[OcamlArchiveMarker],
+    _providers = [[OcamlArchiveProvider],
                   [OcamlImportMarker],
                   [OcamlLibraryMarker],
                   [OcamlModuleMarker],
@@ -247,7 +247,7 @@ def options_module(ws):
 #######################
 # def options_pack_library(ws):
 
-#     providers = [[OcamlArchiveMarker],
+#     providers = [[OcamlArchiveProvider],
 #                  [OcamlSignatureProvider],
 #                  [OcamlLibraryMarker],
 #                  [OcamlModuleMarker],
@@ -541,7 +541,7 @@ def options_ns_resolver(ws):
 #             doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",
 #             providers = [
 #                 [OcamlProvider],
-#                 [OcamlArchiveMarker],
+#                 [OcamlArchiveProvider],
 #                 [OcamlImportMarker],
 #                 [OcamlLibraryMarker],
 #                 [OcamlModuleMarker],

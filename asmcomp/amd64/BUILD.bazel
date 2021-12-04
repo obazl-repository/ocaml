@@ -1,10 +1,3 @@
-load("//bzl:rules.bzl",
-     "bootstrap_library",
-     "bootstrap_module",
-)
-
-load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
-
 exports_files([
     "arch.ml", "CSE.ml", "proc.ml",
     "reload.ml", "scheduling.ml", "selection.ml"
@@ -15,13 +8,14 @@ exports_files([
 # 	echo \# 1 \"$(ARCH)/emit.mlp\" > $@
 # 	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
 # 	|| { rm -f $@; exit 2; }
+
 genrule(
     name = "emit_ml",
     srcs = ["emit.mlp", "//tools:cvt_emit.exe"],
     outs = ["emit.ml"],
     tools = ["//runtime:ocamlrun"], ## fixme: find a way to use the toolchain
     cmd  = "\n".join([
-	    "echo '# 1 \"{ARCH}/emit.mlp\"' > $@;".format(ARCH = "FIXME"),
+	    "echo '# 1 \"amd64/emit.mlp\"' > $@;",
         "$(execpath //runtime:ocamlrun) $(location //tools:cvt_emit.exe) < $(location :emit.mlp) >> $@"
     ]),
     visibility = ["//asmcomp:__pkg__"]

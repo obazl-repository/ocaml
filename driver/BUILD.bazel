@@ -65,26 +65,26 @@ bootstrap_module(
     sig    = "Compenv_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Warnings)
-        ## (Sys)
-        ## (String)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Scanf)
-        ## (Profile)
-        ## (Printf)
-        ## (Printexc)
-        ## (Option)
+        "//utils:Profile",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Option",
         "//utils:Misc",
         "//parsing:Location",
-        ## (List)
-        ## (Lexing)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         ## (Int_arg_helper)
         ## (Float_arg_helper)
-        ## (Filename)
+        "//stdlib:Stdlib.Filename",
         "//utils:Config",
         ## (Compiler_pass)
         "//utils:Clflags",
-        "//utils:Ccomp"
-        ## (Arg)
+        "//utils:Ccomp",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -93,9 +93,9 @@ bootstrap_signature(
     src  = "compenv.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
-        "//utils:Clflags_cmi"
-        ## (Arg)
+        "//stdlib:Stdlib.Format",
+        "//utils:Clflags_cmi",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -109,8 +109,8 @@ bootstrap_module(
         ## (Typedtree)
         "//lambda:Translmod",
         "//lambda:Simplif",
-        ## (Profile)
-        ## (Printlambda)
+        "//utils:Profile",
+        "//lambda:Printlambda",
         "//bytecomp:Printinstr",
         "//utils:Misc",
         "//bytecomp:Emitcode",
@@ -127,7 +127,7 @@ bootstrap_signature(
         ":Compile_common", ## (Driver Compile_common)
         ## (Typedtree)
         "//bytecomp:Instruct_cmi",
-        ## (Ident)
+        "//typing:Ident",
         "//utils:Clflags",
     ]
 )
@@ -141,25 +141,25 @@ bootstrap_module(
         ":Pparse", ## (Driver Pparse)
         ":Compmisc", ## (Driver Compmisc)
         ":Compenv", ## (Driver Compenv)
-        ## (Warnings)
+        "//utils:Warnings",
         ## (Typemod)
         ## (Typedtree)
         ## (Typecore)
-        ## (String)
-        ## (Profile)
+        "//stdlib:Stdlib.String",
+        "//utils:Profile",
         "//typing:Printtyped",
         ## (Printtyp)
         "//parsing:Printast",
-        ## (Pprintast)
+        "//parsing:Pprintast",
         "//utils:Misc",
-        ## (List)
+        "//stdlib:Stdlib.List",
         ## (Includemod)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         ## (Env)
         "//utils:Config",
         ## (Compiler_pass)
         "//utils:Clflags",
-        ## (Builtin_attributes)
+        "//parsing:Builtin_attributes",
     ]
 )
 
@@ -170,7 +170,7 @@ bootstrap_signature(
     deps   = STDLIB + [
         "//typing:Typedtree_cmi",
         "//parsing:Parsetree_cmi",
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         "//typing:Env_cmi"
     ]
 )
@@ -182,17 +182,17 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Compenv", ## (Driver Compenv)
-        ## (Warnings)
-        ## (Types)
+        "//utils:Warnings",
+        "//typing:Types",
         "//typing:Typemod",
-        ## (Sys)
-        ## (Option)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Option",
         "//utils:Misc",
         "//parsing:Location",
-        ## (Load_path)
-        ## (List)
-        ## (Ident)
-        ## (Format)
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
         "//utils:Config",
         "//utils:Clflags",
@@ -204,7 +204,7 @@ bootstrap_signature(
     src  = "compmisc.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         "//typing:Env_cmi",
         "//utils:Clflags",
     ]
@@ -225,7 +225,7 @@ bootstrap_signature(
     src  = "errors.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -235,8 +235,8 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Maindriver", ## (Driver Maindriver)
-        ## (Sys)
-        ## (Format)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -247,22 +247,22 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Compenv", ## (Driver Compenv)
-        ## (Warnings)
-        ## (Sys)
-        ## (Profile)
-        ## (Printf)
-        ## (Option)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.Sys",
+        "//utils:Profile",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
         "//utils:Misc",
         "//parsing:Location",
-        ## (List)
+        "//stdlib:Stdlib.List",
         ## (Int_arg_helper)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         ## (Float_arg_helper)
-        ## (Filename)
+        "//stdlib:Stdlib.Filename",
         "//utils:Config",
         ## (Compiler_pass)
         "//utils:Clflags",
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -271,7 +271,7 @@ bootstrap_signature(
     src  = "main_args.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -286,20 +286,20 @@ bootstrap_module(
         ":Compmisc", ## (Driver Compmisc)
         ":Compile", ## (Driver Compile)
         ":Compenv", ## (Driver Compenv)
-        ## (Warnings)
-        ## (String)
-        ## (Profile)
-        ## (Printf)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.String",
+        "//utils:Profile",
+        "//stdlib:Stdlib.Printf",
         "//parsing:Location",
-        ## (List)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         "//utils:Config",
         "//utils:Clflags",
         "//bytecomp:Bytepackager",
         ## (Bytelink)
         "//bytecomp:Bytelibrarian",
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -308,7 +308,7 @@ bootstrap_signature(
     src  = "maindriver.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -320,25 +320,25 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Pparse", ## (Driver Pparse)
         ":Compenv", ## (Driver Compenv)
-        ## (Sys)
-        ## (Printf)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
         "//parsing:Parsetree_cmi",
         ## (Parser)
         ## (Parse)
         "//utils:Misc",
         "//parsing:Location",
-        ## (List)
-        ## (Lexing)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         ## (Lexer)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         "//parsing:Depend",
         "//utils:Config",
         "//utils:Clflags",
-        ## (Bytes)
-        ## (Array)
-        ## (Arg)
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -369,7 +369,8 @@ bootstrap_module(
         "//middle_end/closure:Closure_middle_end",
         "//utils:Clflags",
         "//asmcomp:Asmgen"
-    ]
+    ],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -391,7 +392,8 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//parsing:Location"
-    ]
+    ],
+    visibility = ["//asmcomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -399,7 +401,7 @@ bootstrap_signature(
     src  = "opterrors.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -408,10 +410,9 @@ bootstrap_module(
     struct = "optmain.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Optmaindriver", ## (Driver Optmaindriver)
-        ## (Sys)
-        ## (Format)
-    ]
+        ":Optmaindriver",
+    ],
+    visibility = ["//:__pkg__"]
 )
 
 bootstrap_module(
@@ -425,25 +426,28 @@ bootstrap_module(
         ":Main_args", ## (Driver Main_args)
         ":Compmisc", ## (Driver Compmisc)
         ":Compenv", ## (Driver Compenv)
-        ## (Warnings)
-        ## (String)
-        ## (Profile)
-        ## (Proc)
-        ## (Printf)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.String",
+        "//utils:Profile",
+        "//asmcomp:Proc",
+        "//stdlib:Stdlib.Printf",
         "//parsing:Location",
-        ## (List)
+        "//stdlib:Stdlib.List",
         "//middle_end/flambda:Import_approx",
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         "//utils:Config",
-        ## (Compilenv)
+        "//middle_end:Compilenv",
         "//utils:Clflags",
-        ## (Backend_intf)
+        "//middle_end:Backend_intf_cmi",
         "//asmcomp:Asmpackager",
         ## (Asmlink)
-        "//asmcomp:Asmlibrarian"
-        ## (Arg)
+        "//asmcomp:Asmlibrarian",
+        "//stdlib:Stdlib.Arg",
         ## (Arch)
+    ],
+    visibility = [
+        "//asmcomp:__pkg__"
     ]
 )
 
@@ -452,7 +456,7 @@ bootstrap_signature(
     src  = "optmaindriver.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -462,19 +466,19 @@ bootstrap_module(
     sig    = "Pparse_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Warnings)
-        ## (Sys)
-        ## (String)
-        ## (Profile)
-        ## (Printf)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//utils:Profile",
+        "//stdlib:Stdlib.Printf",
         "//parsing:Parsetree_cmi",
         "//parsing:Parse",
         "//utils:Misc",
         "//parsing:Location",
-        ## (List)
-        ## (Lexing)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         "//utils:Config",
         "//utils:Clflags",
         "//utils:Ccomp",
@@ -488,9 +492,9 @@ bootstrap_signature(
     src  = "pparse.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//parsing:Parsetree_cmi"
-        ## (Lexing)
-        ## (Format)
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
     ]
 )
 

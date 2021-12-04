@@ -1,4 +1,5 @@
 load("//bzl:rules.bzl",
+     "bootstrap_archive",
      "bootstrap_library",
      "bootstrap_module",
      "bootstrap_signature",
@@ -12,7 +13,7 @@ SIG_OPTS = ROOT_SIG_OPTS
 STDLIB = ["//stdlib"]
 
 ## dev/test target, builds everything
-bootstrap_library(
+bootstrap_archive(
     name = "asmcomp",
     manifest  = [
         ":Afl_instrument",
@@ -71,6 +72,7 @@ bootstrap_library(
     # ],
 )
 
+# bootstrap_archive(
 bootstrap_library(
     name = "ocamloptcomp",
     visibility = ["//compilerlibs:__pkg__"],
@@ -112,9 +114,21 @@ bootstrap_library(
         ":Split",
         ":Strmatch",
 
+        "//file_formats:Linear_format",
+        "//driver:Opterrors",
+        "//driver:Optcompile",
+        "//driver:Optmaindriver",
+
         ## arch-dependent configured deps:
-        "CSE", "Arch", "Emit", "Proc", "Reload", "Scheduling", "Selection"
+        ":Arch",
+        ":CSE",
+        ":Emit",
+        ":Proc",
+        ":Reload",
+        ":Scheduling",
+        ":Selection"
     ] + select(
+        # $(ARCH_SPECIFIC_ASMCOMP) = INTEL_ASM = x86_[proc,dsl,gas,masm]
         {
         "//config/arch:x86_64":
         [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
@@ -162,9 +176,9 @@ bootstrap_module(
     }, no_match_error = "unknown arch"),
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ":CSEgen", ## (Asmcomp CSEgen)
-        ":Mach", ## (Asmcomp Mach)
+        ":Cmm",
+        ":CSEgen",
+        ":Mach",
     ],
     data = ["//runtime:primitives"],
 )
@@ -175,14 +189,14 @@ bootstrap_module(
     sig    = "CSEgen_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ":Mach", ## (Asmcomp Mach)
+        ":Cmm",
+        ":Mach",
         ":Proc",
-        ":Reg", ## (Asmcomp Reg)
-        ## (Map)
-        ## (List)
-        ## (Asttypes)
-        ## (Array)
+        ":Reg",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.List",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -196,9 +210,9 @@ bootstrap_signature(
     src  = "CSEgen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Asttypes)
+        ":Mach",
+        ":Cmm",
+        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -209,13 +223,13 @@ bootstrap_module(
     sig    = "Afl_instrument_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Cmm",
         ## (Random)
-        ## (List)
+        "//stdlib:Stdlib.List",
         "//utils:Clflags",
-        ## (Backend_var)
-        ## (Asttypes)
-        ## (Array)
+        "//middle_end:Backend_var",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -225,8 +239,8 @@ bootstrap_signature(
     src  = "afl_instrument.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Debuginfo)
+        ":Cmm",
+        "//lambda:Debuginfo",
     ],
     data = ["//runtime:primitives"]
 )
@@ -255,28 +269,28 @@ bootstrap_module(
     sig    = "Asmgen_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Split", ## (Asmcomp Split)
-        ":Spill", ## (Asmcomp Spill)
-        ":Reg", ## (Asmcomp Reg)
-        ":Printmach", ## (Asmcomp Printmach)
-        ":Printlinear", ## (Asmcomp Printlinear)
-        ":Printcmm", ## (Asmcomp Printcmm)
-        ":Polling", ## (Asmcomp Polling)
-        ":Mach", ## (Asmcomp Mach)
-        ":Liveness", ## (Asmcomp Liveness)
-        ":Linscan", ## (Asmcomp Linscan)
-        ":Linearize", ## (Asmcomp Linearize)
-        ":Linear", ## (Asmcomp Linear)
-        ":Interval", ## (Asmcomp Interval)
-        ":Interf", ## (Asmcomp Interf)
-        ":Emitaux", ## (Asmcomp Emitaux)
-        ":Deadcode", ## (Asmcomp Deadcode)
-        ":Comballoc", ## (Asmcomp Comballoc)
-        ":Coloring", ## (Asmcomp Coloring)
-        ":Cmmgen", ## (Asmcomp Cmmgen)
-        ":Cmm_invariants", ## (Asmcomp Cmm_invariants)
-        ":Cmm_helpers", ## (Asmcomp Cmm_helpers)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Split",
+        ":Spill",
+        ":Reg",
+        ":Printmach",
+        ":Printlinear",
+        ":Printcmm",
+        ":Polling",
+        ":Mach",
+        ":Liveness",
+        ":Linscan",
+        ":Linearize",
+        ":Linear",
+        ":Interval",
+        ":Interf",
+        ":Emitaux",
+        ":Deadcode",
+        ":Comballoc",
+        ":Coloring",
+        ":Cmmgen",
+        ":Cmm_invariants",
+        ":Cmm_helpers",
+        ":Cmm",
         "//lambda:Translmod",
         "//utils:Profile",
         "//typing:Primitive",
@@ -284,10 +298,10 @@ bootstrap_module(
         "//parsing:Location",
         "//file_formats:Linear_format",
         "//typing:Ident",
-        ## (List)
-        ## (Format)
-        ## (Filename)
-        ## (Config)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
+        "//utils:Config",
         ## (Compiler_pass)
         "//middle_end:Compilenv",
         "//utils:Clflags",
@@ -295,12 +309,7 @@ bootstrap_module(
         "//middle_end:Backend_intf_cmi",
 
         # arch-dependent targets
-        ":CSE",
-        ":Emit",
-        ":Proc",
-        ":Reload",
-        ":Scheduling",
-        ":Selection"
+        ":CSE", ":Emit", ":Reload", ":Scheduling", ":Selection"
     ],
     data = ["//runtime:primitives"],
     visibility = ["//driver:__pkg__"]
@@ -311,9 +320,9 @@ bootstrap_signature(
     src  = "asmgen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Emitaux", ## (Asmcomp Emitaux)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Format)
+        ":Emitaux",
+        ":Cmm",
+        "//stdlib:Stdlib.Format",
         "//middle_end:Clambda",
         "//middle_end:Backend_intf_cmi"
     ],
@@ -326,15 +335,15 @@ bootstrap_module(
     sig    = "Asmlibrarian_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Asmlink", ## (Asmcomp Asmlink)
-        ## (Misc)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Format)
-        ## (Filename)
+        ":Asmlink",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Export_info)
-        ## (Config)
+        "//utils:Config",
         "//middle_end:Compilenv",
         ## (Cmx_format)
         "//utils:Clflags",
@@ -350,7 +359,7 @@ bootstrap_signature(
     src  = "asmlibrarian.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"]
 )
@@ -361,32 +370,32 @@ bootstrap_module(
     sig    = "Asmlink_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Emitaux", ## (Asmcomp Emitaux)
-        ":Emit", ## (Asmcomp Emit)
-        ":Cmm_helpers", ## (Asmcomp Cmm_helpers)
-        ":Cmm", ## (Asmcomp Cmm)
-        ":Asmgen", ## (Asmcomp Asmgen)
-        ## (Sys)
+        ":Emitaux",
+        ":Emit",
+        ":Cmm_helpers",
+        ":Cmm",
+        ":Asmgen",
+        "//stdlib:Stdlib.Sys",
         "//lambda:Runtimedef",
-        ## (Profile)
-        ## (Printf)
-        ## (Misc)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Filename)
-        ## (Digest)
+        "//utils:Profile",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Digest",
         ## (Consistbl)
-        ## (Config)
+        "//utils:Config",
         "//middle_end:Compilenv",
         ## (Cmx_format)
         "//utils:Clflags",
         "//middle_end:Clambda",
         ## (Ccomp)
         "//middle_end:Backend_intf_cmi",
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -397,8 +406,8 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         "//utils:Misc_cmi",
-        ## (Format)
-        ## (Digest)
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Digest",
         "//file_formats:Cmx_format_cmi"
     ],
     data = ["//runtime:primitives"]
@@ -410,26 +419,26 @@ bootstrap_module(
     sig    = "Asmpackager_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Asmlink", ## (Asmcomp Asmlink)
-        ":Asmgen", ## (Asmcomp Asmgen)
+        ":Asmlink",
+        ":Asmgen",
         "//typing:Typemod",
         ## (Translmod)
-        ## (String)
+        "//stdlib:Stdlib.String",
         "//lambda:Simplif",
-        ## (Profile)
-        ## (Printf)
-        ## (Misc)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Ident)
-        ## (Format)
+        "//utils:Profile",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         "//middle_end/flambda:Flambda_middle_end",
-        ## (Filename)
+        "//stdlib:Stdlib.Filename",
         "//middle_end/flambda:Export_info_for_pack",
         ## (Export_info)
         ## (Env)
-        ## (Config)
+        "//utils:Config",
         "//middle_end:Compilenv",
         ## (Compilation_unit)
         ## (Cmx_format)
@@ -451,7 +460,7 @@ bootstrap_signature(
     src  = "asmpackager.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         ## (Env)
         "//middle_end:Backend_intf_cmi",
     ],
@@ -464,14 +473,14 @@ bootstrap_module(
     sig    = "Branch_relaxation_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
-        ":Branch_relaxation_intf", ## (Asmcomp Branch_relaxation_intf)
-        ## (Misc)
-        ## (List)
-        ## (Int)
-        ## (Hashtbl)
+        ":Mach",
+        ":Linear",
+        ":Cmm",
+        ":Branch_relaxation_intf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Hashtbl",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -482,9 +491,9 @@ bootstrap_signature(
     src  = "branch_relaxation.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
-        ":Branch_relaxation_intf", ## (Asmcomp Branch_relaxation_intf)
+        ":Linear",
+        ":Cmm",
+        ":Branch_relaxation_intf",
     ],
     data = ["//runtime:primitives"]
 )
@@ -494,9 +503,9 @@ bootstrap_module(
     struct = "branch_relaxation_intf.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Debuginfo)
+        ":Linear",
+        ":Cmm",
+        "//lambda:Debuginfo",
         ## (Arch)
     ],
     data = ["//runtime:primitives"]
@@ -508,29 +517,21 @@ bootstrap_module(
     sig    = "Cmm_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Arch"
-        ## (Targetint)
-        ## (Misc)
-        ## (List)
-        ## (Debuginfo)
-        ## (Backend_var)
-        ## (Asttypes)
-        ## (Array)
-    # ] + select ({
-    #     # "//config/arch:x86_64": ["//asmcomp/amd64:Arch"],
-    #     # "//config/arch:amd64": ["//asmcomp/amd64:Arch"],
-
-    #     # "//config/arch:arm": ["//asmcomp/arm:Arch"],
-    #     # "//config/arch:arm64": ["//asmcomp/arm64:Arch"],
-    #     # "//config/arch:i386": ["//asmcomp/i386:Arch"],
-    #     # "//config/arch:power": ["//asmcomp/power:Arch"],
-    #     # "//config/arch:riscv": ["//asmcomp/riscv:Arch"],
-    #     # "//config/arch:s390x": ["//asmcomp/s390x:Arch"],
-    #     # "//conditions:default": []
-    # }, no_match_error = "Unsupported arch"),
+        "//lambda:Lambda",
+        ":Arch",
+        "//utils:Targetint",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//lambda:Debuginfo",
+        "//middle_end:Backend_var",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//asmcomp:__subpackages__"]
+    visibility = [
+        "//asmcomp:__subpackages__",
+        "//file_formats:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -540,9 +541,9 @@ bootstrap_signature(
     deps   = STDLIB + [
         "//lambda:Lambda_cmi",
         "//utils:Targetint_cmi",
-        ## (Debuginfo)
-        "//middle_end:Backend_var_cmi"
-        ## (Asttypes)
+        "//lambda:Debuginfo",
+        "//middle_end:Backend_var_cmi",
+        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -553,34 +554,34 @@ bootstrap_module(
     sig    = "Cmm_helpers_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Strmatch", ## (Asmcomp Strmatch)
-        ":Proc", ## (Asmcomp Proc)
-        ":Cmmgen_state", ## (Asmcomp Cmmgen_state)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Strmatch",
+        ":Proc",
+        ":Cmmgen_state",
+        ":Cmm",
         ## (Targetint)
         ## (Switch)
-        ## (String)
-        ## (Printf)
-        ## (Primitive)
-        ## (Obj)
-        ## (Numbers)
-        ## (Nativeint)
-        ## (Misc)
-        ## (Marshal)
-        ## (List)
-        ## (Int64)
-        ## (Int)
-        ## (Debuginfo)
-        ## (Config)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//typing:Primitive",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Numbers",
+        "//stdlib:Stdlib.Nativeint",
+        "//utils:Misc",
+        "//stdlib:Stdlib.Marshal",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Int",
+        "//lambda:Debuginfo",
+        "//utils:Config",
         "//middle_end:Compilenv",
         "//file_formats:Cmxs_format_cmi",
         "//file_formats:Cmx_format_cmi",
         "//utils:Clflags",
         ## (Clambda_primitives)
         "//middle_end:Clambda",
-        ## (Backend_var)
-        ## (Asttypes)
-        ## (Array)
+        "//middle_end:Backend_var",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
         ## (Arch)
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
@@ -594,17 +595,17 @@ bootstrap_signature(
     src  = "cmm_helpers.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmmgen_state", ## (Asmcomp Cmmgen_state)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Cmmgen_state",
+        ":Cmm",
         ## (Targetint)
-        ## (Primitive)
-        ## (Nativeint)
-        ## (Digest)
-        ## (Debuginfo)
+        "//typing:Primitive",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Digest",
+        "//lambda:Debuginfo",
         ## (Cmx_format)
         ## (Clambda_primitives)
         "//middle_end:Clambda",
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -615,12 +616,12 @@ bootstrap_module(
     sig    = "Cmm_invariants_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Set)
-        ## (Numbers)
-        ## (List)
-        ## (Format)
-        ## (Array)
+        ":Cmm",
+        "//stdlib:Stdlib.Set",
+        "//utils:Numbers",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -630,8 +631,8 @@ bootstrap_signature(
     src  = "cmm_invariants.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Format)
+        ":Cmm",
+        "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"]
 )
@@ -642,34 +643,33 @@ bootstrap_module(
     sig    = "Cmmgen_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//lambda:Debuginfo", ## (Lambda Debuginfo)
-        ":Cmmgen_state", ## (Asmcomp Cmmgen_state)
-        ":Cmm_helpers", ## (Asmcomp Cmm_helpers)
-        ":Cmm", ## (Asmcomp Cmm)
-        ":Afl_instrument", ## (Asmcomp Afl_instrument)
-        ## (VP)
-        ## (V)
-        ## (Types)
-        ## (Printclambda_primitives)
-        ## (Primitive)
-        ## (Option)
-        ## (Obj)
-        ## (Nativeint)
-        ## (Misc)
-        ## (Map)
-        ## (List)
-        ## (Int64)
-        ## (Int)
-        ## (Debuginfo)
-        ## (Config)
-        "//middle_end:Compilenv",
-        "//utils:Clflags",
-        ## (Clambda_primitives)
+        "//lambda:Debuginfo",
         "//middle_end:Clambda",
-        ## (Backend_var)
-        ## (Asttypes)
-        ## (Array)
-        ## (Arch)
+        "//middle_end:Compilenv",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Option",
+        "//typing:Primitive",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Misc",
+        ":Afl_instrument",
+        ":Cmm",
+        ":Cmm_helpers",
+        ":Cmmgen_state",
+        ":Arch",
+        "//middle_end:Backend_var",
+        ## (Clambda_primitives)
+        ## (Printclambda_primitives)
+        ## (V)
+        ## (VP)
     ],
     data = ["//runtime:primitives"]
 )
@@ -679,7 +679,7 @@ bootstrap_signature(
     src  = "cmmgen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Cmm",
         "//middle_end:Clambda",
     ],
     data = ["//runtime:primitives"]
@@ -691,11 +691,11 @@ bootstrap_module(
     sig    = "Cmmgen_state_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Queue)
-        ## (Misc)
-        ## (List)
-        ## (Hashtbl)
+        ":Cmm",
+        "//stdlib:Stdlib.Queue",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
         "//middle_end:Compilenv",
         "//middle_end:Clambda",
     ],
@@ -708,7 +708,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Cmm_cmi",
-        ## (Misc)
+        "//utils:Misc",
         "//middle_end:Clambda_cmi"
     ],
     data = ["//runtime:primitives"]
@@ -720,12 +720,12 @@ bootstrap_module(
     sig    = "Coloring_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ## (Set)
-        ## (List)
-        ## (Int)
-        ## (Array)
+        ":Reg",
+        ":Proc",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -748,12 +748,12 @@ bootstrap_module(
     sig    = "Comballoc_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ## (List)
-        ## (Debuginfo)
-        ## (Config)
-        ## (Array)
+        ":Reg",
+        ":Mach",
+        "//stdlib:Stdlib.List",
+        "//lambda:Debuginfo",
+        "//utils:Config",
+        "//stdlib:Stdlib.Array",
         ## (Arch)
     ],
     data = ["//runtime:primitives"]
@@ -764,8 +764,8 @@ bootstrap_signature(
     src  = "comballoc.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -776,11 +776,11 @@ bootstrap_module(
     sig    = "Dataflow_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (List)
-        ## (Hashtbl)
-        ## (Array)
+        ":Mach",
+        ":Cmm",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -790,8 +790,8 @@ bootstrap_signature(
     src  = "dataflow.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -802,13 +802,13 @@ bootstrap_module(
     sig    = "Deadcode_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Numbers)
-        ## (List)
-        ## (Array)
+        ":Reg",
+        ":Proc",
+        ":Mach",
+        ":Cmm",
+        "//utils:Numbers",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -821,8 +821,8 @@ bootstrap_signature(
     src  = "deadcode.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -863,8 +863,8 @@ bootstrap_signature(
     src  = "emit.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Linear",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -876,23 +876,23 @@ bootstrap_module(
     sig    = "Emitaux_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        # ":Emitenv", ## (Asmcomp Emitenv)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (String)
-        ## (Scoped_location)
-        ## (Printf)
-        ## (Nativeint)
-        ## (List)
-        ## (Int64)
-        ## (Int32)
-        ## (Int)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Debuginfo)
-        ## (Config)
+        "//lambda:Debuginfo",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
         "//utils:Clflags",
-        ## (Char)
-        ## (Arch)
+        "//utils:Config",
+        ":Arch",
+        ":Cmm",
+        ":Emitenv_cmi",
+        ## (Scoped_location)
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -903,11 +903,11 @@ bootstrap_signature(
     src  = "emitaux.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Linear_cmi", ## (Asmcomp Linear)
-        ":Emitenv_cmi", ## (Asmcomp Emitenv)
-        ":Cmm_cmi", ## (Asmcomp Cmm)
-        ## (Format)
-        ## (Debuginfo)
+        ":Linear_cmi",
+        ":Emitenv_cmi",
+        ":Cmm_cmi",
+        "//stdlib:Stdlib.Format",
+        "//lambda:Debuginfo",
     ],
     data = ["//runtime:primitives"]
 )
@@ -917,8 +917,8 @@ bootstrap_signature(
     src  = "emitenv.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Linear",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -929,13 +929,13 @@ bootstrap_module(
     sig    = "Interf_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Set)
-        ## (List)
-        ## (Array)
+        ":Reg",
+        ":Proc",
+        ":Mach",
+        ":Cmm",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -948,8 +948,8 @@ bootstrap_signature(
     src  = "interf.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -960,11 +960,11 @@ bootstrap_module(
     sig    = "Interval_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ":Mach", ## (Asmcomp Mach)
-        ## (List)
-        ## (Array)
+        ":Reg",
+        ":Proc",
+        ":Mach",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -977,9 +977,9 @@ bootstrap_signature(
     src  = "interval.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Reg",
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -990,13 +990,16 @@ bootstrap_module(
     sig    = "Linear_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Debuginfo)
+        ":Reg",
+        ":Mach",
+        ":Cmm",
+        "//lambda:Debuginfo",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//asmcomp:__subpackages__"]
+    visibility = [
+        "//asmcomp:__subpackages__",
+        "//file_formats:__subpackages__"
+    ]
 )
 
 bootstrap_signature(
@@ -1004,10 +1007,10 @@ bootstrap_signature(
     src  = "linear.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Debuginfo)
+        ":Reg",
+        ":Mach",
+        ":Cmm",
+        "//lambda:Debuginfo",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//file_formats:__pkg__"]
@@ -1019,15 +1022,15 @@ bootstrap_module(
     sig    = "Linearize_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ":Mach", ## (Asmcomp Mach)
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Misc)
-        ## (List)
-        ## (Debuginfo)
-        ## (Array)
+        ":Reg",
+        ":Proc",
+        ":Mach",
+        ":Linear",
+        ":Cmm",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//lambda:Debuginfo",
+        "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -1040,9 +1043,9 @@ bootstrap_signature(
     src  = "linearize.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Linear",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1053,11 +1056,11 @@ bootstrap_module(
     sig    = "Linscan_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ":Interval", ## (Asmcomp Interval)
-        ## (List)
-        ## (Array)
+        ":Reg",
+        ":Proc",
+        ":Interval",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -1080,12 +1083,12 @@ bootstrap_module(
     sig    = "Liveness_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ":Printmach", ## (Asmcomp Printmach)
-        ":Mach", ## (Asmcomp Mach)
-        ":Dataflow", ## (Asmcomp Dataflow)
-        ## (Misc)
+        ":Reg",
+        ":Proc",
+        ":Printmach",
+        ":Mach",
+        ":Dataflow",
+        "//utils:Misc",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -1098,8 +1101,8 @@ bootstrap_signature(
     src  = "liveness.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1131,13 +1134,13 @@ bootstrap_module(
     sig    = "Polling_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Dataflow", ## (Asmcomp Dataflow)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Numbers)
-        ## (Misc)
-        ## (List)
-        ## (Array)
+        ":Mach",
+        ":Dataflow",
+        ":Cmm",
+        "//utils:Numbers",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1147,9 +1150,9 @@ bootstrap_signature(
     src  = "polling.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Misc)
+        ":Mach",
+        ":Cmm",
+        "//utils:Misc",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1160,17 +1163,17 @@ bootstrap_module(
     sig    = "Printcmm_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Cmm",
         ## (Targetint)
-        ## (Printf)
-        ## (Nativeint)
-        ## (List)
-        ## (Format)
-        ## (Debuginfo)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//lambda:Debuginfo",
         "//utils:Clflags",
-        ## (Backend_var)
-        ## (Asttypes)
-        ## (Array)
+        "//middle_end:Backend_var",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1180,9 +1183,9 @@ bootstrap_signature(
     src  = "printcmm.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Format)
-        ## (Debuginfo)
+        ":Cmm",
+        "//stdlib:Stdlib.Format",
+        "//lambda:Debuginfo",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1193,14 +1196,14 @@ bootstrap_module(
     sig    = "Printlinear_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Printmach", ## (Asmcomp Printmach)
-        ":Mach", ## (Asmcomp Mach)
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Format)
-        ## (Debuginfo)
+        ":Printmach",
+        ":Mach",
+        ":Linear",
+        ":Cmm",
+        "//stdlib:Stdlib.Format",
+        "//lambda:Debuginfo",
         "//utils:Clflags",
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1210,9 +1213,9 @@ bootstrap_signature(
     src  = "printlinear.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Format)
+        ":Linear",
+        ":Cmm",
+        "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1223,20 +1226,20 @@ bootstrap_module(
     sig    = "Printmach_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ":Printcmm", ## (Asmcomp Printcmm)
-        ":Mach", ## (Asmcomp Mach)
-        ":Interval", ## (Asmcomp Interval)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Printf)
-        ## (Nativeint)
-        ## (List)
-        ## (Int64)
-        ## (Format)
-        ## (Debuginfo)
+        ":Reg",
+        ":Proc",
+        ":Printcmm",
+        ":Mach",
+        ":Interval",
+        ":Cmm",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Format",
+        "//lambda:Debuginfo",
         "//utils:Clflags",
-        ## (Array)
+        "//stdlib:Stdlib.Array",
         ## (Arch)
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
@@ -1250,10 +1253,10 @@ bootstrap_signature(
     src  = "printmach.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Format)
+        ":Reg",
+        ":Mach",
+        ":Cmm",
+        "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1274,10 +1277,17 @@ bootstrap_module(
     sig    = "Proc_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
+        ":Arch",
+        ":Cmm",
+        ":Mach",
+        ":Reg",
         ":X86_proc",
     ],
     data = ["//runtime:primitives"],
-    # visibility = ["//asmcomp:__subpackages__"]
+    visibility = [
+        # "//asmcomp:__subpackages__"
+        "//driver:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -1285,9 +1295,9 @@ bootstrap_signature(
     src  = "proc.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Reg_cmi", ## (Asmcomp Reg)
-        ":Mach_cmi", ## (Asmcomp Mach)
-        ":Cmm_cmi", ## (Asmcomp Cmm)
+        ":Reg_cmi",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1299,14 +1309,14 @@ bootstrap_module(
     sig    = "Reg_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (String)
-        ## (Set)
-        ## (Map)
-        ## (List)
-        ## (Int)
-        ## (Backend_var)
-        ## (Array)
+        ":Cmm",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//middle_end:Backend_var",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1317,10 +1327,10 @@ bootstrap_signature(
     src  = "reg.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Set)
-        ## (Map)
-        ## (Backend_var)
+        ":Cmm",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Map",
+        "//middle_end:Backend_var",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1339,13 +1349,13 @@ bootstrap_module(
     sig    = "Reload_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reloadgen"
-        # ":Reg", ## (Asmcomp Reg)
-        # ":Mach", ## (Asmcomp Mach)
-        # ":Cmm", ## (Asmcomp Cmm)
-        ## (Misc)
-        ## (List)
-        ## (Array)
+        ":Reloadgen",
+        # ":Reg",
+        # ":Mach",
+        # ":Cmm",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1356,8 +1366,8 @@ bootstrap_signature(
     src  = "reload.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1368,12 +1378,12 @@ bootstrap_module(
     sig    = "Reloadgen_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Misc)
-        ## (List)
-        ## (Array)
+        ":Reg",
+        ":Mach",
+        ":Cmm",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1384,9 +1394,9 @@ bootstrap_signature(
     src  = "reloadgen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Reg",
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1398,36 +1408,19 @@ bootstrap_module(
     sig    = "Schedgen_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (List)
-        ## (Int)
-        ## (Hashtbl)
         "//utils:Clflags",
-        ## (Array)
-        ## (Arch)
+        ":Cmm",
+        ":Linear",
+        ":Mach",
         ":Proc",
-    ] + select({
-        "//config/arch:x86_64": [ # intel mac
-            ":Reg",
-            # "//asmcomp/amd64:Proc", ## (Asmcomp Proc)
-            ":Mach", ## (Asmcomp Mach)
-            ":Linear", ## (Asmcomp Linear)
-            ":Cmm", ## (Asmcomp Cmm)
-        ],
-        # "//config/arch:amd64": [
-        #     ":Reg",
-        #     "//asmcomp/amd64:Proc", ## (Asmcomp Proc)
-        #     ":Mach", ## (Asmcomp Mach)
-        #     ":Linear", ## (Asmcomp Linear)
-        #     ":Cmm", ## (Asmcomp Cmm)
-        # ],
-        "//config/arch:i386": [
-            "//asmcomp/amd64:Reg",
-            # "//asmcomp/amd64:Proc", ## (Asmcomp Proc)
-            ":Mach", ## (Asmcomp Mach)
-            ":Linear", ## (Asmcomp Linear)
-            ":Cmm", ## (Asmcomp Cmm)
-        ],
-    }, no_match_error = "Unsupported arch"),
+        ":Reg",
+
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Array",
+        ## (Arch)
+    ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1437,9 +1430,9 @@ bootstrap_signature(
     src  = "schedgen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Linear",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1468,8 +1461,8 @@ bootstrap_signature(
     src  = "scheduling.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Linear", ## (Asmcomp Linear)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Linear",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1501,25 +1494,25 @@ bootstrap_module(
     sig    = "Selectgen_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//stdlib:Stdlib.Int", ## (Stdlib Int)
-        ":Cmm", ## (Asmcomp Cmm)
-        ":Mach", ## (Asmcomp Mach)
+        "//stdlib:Stdlib.Int",
+        ":Cmm",
+        ":Mach",
         ":Proc",
-        ":Polling", ## (Asmcomp Polling)
-        ":Reg", ## (Asmcomp Reg)
-        ## (Numbers)
-        ## (Nativeint)
-        ## (Misc)
-        ## (List)
-        ## (Int64)
-        ## (Debuginfo)
-        ## (Backend_var)
-        ## (Asttypes)
-        ## (Array)
+        ":Polling",
+        ":Reg",
+        "//utils:Numbers",
+        "//stdlib:Stdlib.Nativeint",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
+        "//lambda:Debuginfo",
+        "//middle_end:Backend_var",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
         ## (Arch)
     # ] + select({
     #     "//config/arch:x86_64": [
-    #         "//asmcomp/amd64:Proc", ## (Asmcomp Proc)
+    #         "//asmcomp/amd64:Proc",
     #     ]
     # }, no_match_error = "unknown arch"),
     ],
@@ -1532,13 +1525,13 @@ bootstrap_signature(
     src  = "selectgen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Misc)
-        ## (Debuginfo)
-        ## (Backend_var)
-        ## (Asttypes)
+        ":Reg",
+        ":Mach",
+        ":Cmm",
+        "//utils:Misc",
+        "//lambda:Debuginfo",
+        "//middle_end:Backend_var",
+        "//parsing:Asttypes_cmi",
         ## (Arch)
     ],
     data = ["//runtime:primitives"]
@@ -1549,9 +1542,9 @@ bootstrap_signature(
     src  = "selection.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Misc)
+        ":Mach",
+        ":Cmm",
+        "//utils:Misc",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1562,15 +1555,15 @@ bootstrap_module(
     sig    = "Spill_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Proc", ## (Asmcomp Proc)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (List)
-        ## (Int)
-        ## (Hashtbl)
+        ":Reg",
+        ":Proc",
+        ":Mach",
+        ":Cmm",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Hashtbl",
         "//utils:Clflags",
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -1583,8 +1576,8 @@ bootstrap_signature(
     src  = "spill.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach_cmi", ## (Asmcomp Mach)
-        ":Cmm_cmi", ## (Asmcomp Cmm)
+        ":Mach_cmi",
+        ":Cmm_cmi",
         ":Proc_cmi"
    ],
     data = ["//runtime:primitives"]
@@ -1596,12 +1589,12 @@ bootstrap_module(
     sig    = "Split_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Misc)
-        ## (List)
-        ## (Array)
+        ":Reg",
+        ":Mach",
+        ":Cmm",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1611,8 +1604,8 @@ bootstrap_signature(
     src  = "split.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
+        ":Mach",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1623,19 +1616,19 @@ bootstrap_module(
     sig    = "Strmatch_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//lambda:Debuginfo", ## (Lambda Debuginfo)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (String)
-        ## (Set)
-        ## (Printf)
-        ## (Nativeint)
-        ## (Map)
-        ## (List)
-        ## (Int)
-        ## (Char)
-        ## (Backend_var)
-        ## (Asttypes)
-        ## (Arch)
+        "//lambda:Debuginfo",
+        "//middle_end:Backend_var",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.String",
+        ":Arch",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1645,8 +1638,8 @@ bootstrap_signature(
     src  = "strmatch.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Debuginfo)
+        ":Cmm",
+        "//lambda:Debuginfo",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1666,9 +1659,9 @@ bootstrap_module(
     sig    = "X86_dsl_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":X86_proc", ## (Asmcomp X86_proc)
-        ":X86_ast_cmi", ## (Asmcomp X86_ast)
-        ## (Int64)
+        ":X86_proc",
+        ":X86_ast_cmi",
+        "//stdlib:Stdlib.Int64",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1679,7 +1672,7 @@ bootstrap_signature(
     src  = "x86_dsl.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":X86_ast_cmi", ## (Asmcomp X86_ast)
+        ":X86_ast_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1690,15 +1683,15 @@ bootstrap_module(
     sig    = "X86_gas_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":X86_proc", ## (Asmcomp X86_proc)
-        ":X86_ast_cmi", ## (Asmcomp X86_ast)
-        ## (String)
-        ## (Printf)
-        ## (Misc)
-        ## (List)
-        ## (Int64)
-        ## (Int)
-        ## (Buffer)
+        ":X86_proc",
+        ":X86_ast_cmi",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Buffer",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1709,7 +1702,7 @@ bootstrap_signature(
     src  = "x86_gas.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":X86_ast_cmi", ## (Asmcomp X86_ast)
+        ":X86_ast_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1720,12 +1713,12 @@ bootstrap_module(
     sig    = "X86_masm_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":X86_proc", ## (Asmcomp X86_proc)
-        ":X86_ast_cmi", ## (Asmcomp X86_ast)
-        ## (Printf)
-        ## (List)
-        ## (Int64)
-        ## (Buffer)
+        ":X86_proc",
+        ":X86_ast_cmi",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Buffer",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1736,7 +1729,7 @@ bootstrap_signature(
     src  = "x86_masm.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":X86_ast_cmi", ## (Asmcomp X86_ast)
+        ":X86_ast_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1747,17 +1740,17 @@ bootstrap_module(
     sig    = "X86_proc_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":X86_ast_cmi", ## (Asmcomp X86_ast)
-        ## (String)
-        ## (Printf)
-        ## (Misc)
-        ## (List)
-        ## (Filename)
+        ":X86_ast_cmi",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
         "//utils:Config",
         "//utils:Clflags",
-        ## (Char)
-        "//utils:Ccomp"
-        ## (Buffer)
+        "//stdlib:Stdlib.Char",
+        "//utils:Ccomp",
+        "//stdlib:Stdlib.Buffer",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1768,8 +1761,8 @@ bootstrap_signature(
     src  = "x86_proc.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":X86_ast_cmi", ## (Asmcomp X86_ast)
-        ## (Buffer)
+        ":X86_ast_cmi",
+        "//stdlib:Stdlib.Buffer",
     ],
     data = ["//runtime:primitives"]
 )

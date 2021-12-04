@@ -22,48 +22,48 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Topcommon", ## (Toplevel Topcommon)
-        ## (Warnings)
-        ## (Types)
+        "//utils:Warnings",
+        "//typing:Types",
         ## (Typemod)
         ## (Typedtree)
         ## (Typecore)
         ## (Translmod)
-        ## (Sys)
+        "//stdlib:Stdlib.Sys",
         ## (Simplif)
-        ## (Proc)
+        "//asmcomp:Proc",
         ## (Printtyped)
         ## (Printtyp)
-        ## (Printlambda)
-        ## (Printf)
-        ## (Predef)
-        ## (Parsetree)
+        "//lambda:Printlambda",
+        "//stdlib:Stdlib.Printf",
+        "//typing:Predef",
+        "//parsing:Parsetree_cmi",
         ## (Outcometree)
-        ## (Option)
-        ## (Obj)
-        ## (Misc)
-        ## (Location)
-        ## (Load_path)
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//utils:Load_path",
         ## (Includemod)
         ## (Import_approx)
-        ## (Ident)
-        ## (Gc)
+        "//typing:Ident",
+        "//stdlib:Stdlib.Gc",
         ## (Fun)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         ## (Flambda_middle_end)
-        ## (Filename)
+        "//stdlib:Stdlib.Filename",
         ## (Env)
         ## (Dynlink)
-        ## (Config)
+        "//utils:Config",
         ## (Compmisc)
-        ## (Compilenv)
+        "//middle_end:Compilenv",
         ## (Closure_middle_end)
-        ## (Clflags)
-        ## (Backend_intf)
-        ## (Asttypes)
-        ## (Ast_helper)
+        "//utils:Clflags",
+        "//middle_end:Backend_intf_cmi",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Ast_helper",
         ## (Asmlink)
         ## (Asmgen)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
         ## (Arch)
     ]
 )
@@ -76,21 +76,21 @@ ocaml_module(
         ":Native", ## (Toplevel Native Topeval)
         ":Toploop", ## (Toplevel Toploop)
         ":Topcommon", ## (Toplevel Topcommon)
-        ## (Sys)
-        ## (Printf)
-        ## (Printexc)
-        ## (Obj)
-        ## (Misc)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
         ## (Main_args)
-        ## (Location)
-        ## (List)
-        ## (Format)
-        ## (Filename)
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Compmisc)
         ## (Compenv)
-        ## (Clflags)
-        ## (Array)
-        ## (Arg)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -100,7 +100,7 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ## (Path)
-        ## (Obj)
+        "//stdlib:Stdlib.Obj",
     ]
 )
 

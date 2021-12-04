@@ -4,9 +4,9 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 
 # load("//ocaml/_transitions:ns_transitions.bzl", "nsarchive_in_transition")
 
-load("//bzl/providers:ocaml.bzl",
+load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
-     "OcamlArchiveMarker",
+     "OcamlArchiveProvider",
      "OcamlLibraryMarker",
      "OcamlModuleMarker",
      "OcamlProvider",
@@ -37,78 +37,20 @@ load(":impl_common.bzl",
 
 scope = tmpdir
 
-# def _extract_cmi(ctx):
-#     if len(ctx.attr.ns_submodule) > 1:
-#         fail("only one ns_submodule supported")
-#     (ns, module) = ctx.attr.ns_submodule.items()[0];
-#     print("Extracting cmi {cmi} from {ns}".format(
-#         cmi = module, ns = ns))
-#     # print("NS marker: %s" % ns[OcamlNsMarker])
-#     # print("OcamlProvider: %s" % ns[OcamlProvider])
-
-#     in_cmi  = None
-#     out_cmi = None
-#     # for f in ns[OcamlProvider].inputs.to_list(): # nope
-#     # for f in ns[OcamlProvider].linkargs.to_list(): #nope
-#     for f in ns[OcamlProvider].linkargs.to_list():
-#         print("linkarg: %s" % f)
-#         if f.basename.endswith(module + ".cmi"):
-#             in_cmi = f
-
-#     if in_cmi == None:
-#         print("LBL: %s" % ctx.label)
-#         fail("ns_submodule submodule: '{m}' not found".format(m=module))
-
-#     if ctx.attr.as_cmi:
-#         if ctx.attr.as_cmi.endswith(".cmi"):
-#             as_cmi = ctx.attr.as_cmi
-#         else:
-#             as_cmi = ctx.attr.as_cmi + ".cmi"
-#         out_cmi = ctx.actions.declare_file(as_cmi)
-
-#         ctx.actions.symlink(
-#             output = out_cmi,
-#             target_file = in_cmi
-#         )
-
-#     else:
-#         out_cmi = in_cmi
-
-#     default_depset = depset(
-#         order = dsorder,
-#             direct = [out_cmi],
-#     )
-
-#     defaultInfo = DefaultInfo(
-#         files = default_depset
-#     )
-
-#     sigProvider = OcamlSignatureProvider(
-#         # mli = mlifile,
-#         cmi = out_cmi
-#     )
-
-#     return [defaultInfo, sigProvider]
-
 ########## RULE:  BOOTSTRAP_SIGNATURE  ################
 def _bootstrap_signature_impl(ctx):
 
     debug = False
-    # if ctx.label.name in ["Config_cmi"]:
+    # if ctx.label.name in ["Config_cmi", "Emit_cmi"]:
     #     debug = True
 
     # env = {"PATH": get_sdkpath(ctx)}
-
-    # if ctx.attr.ns_submodule:
-    #     return _extract_cmi(ctx)
 
     # mode = ctx.attr._mode[CompilationModeSettingProvider].value
 
     mode = "bytecode"
 
     tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
-    # tc = ctx.toolchains["@obazl_rules_ocaml//ocaml:toolchain"]
-
     # if mode == "native":
     #     exe = tc.ocamlopt.basename
     # else:
@@ -138,8 +80,7 @@ def _bootstrap_signature_impl(ctx):
     # add prefix if namespaced. from_name == normalized module name
     # derived from sig_src; module_name == prefixed if ns else same as
     # from_name.
-    if debug:
-        print("SIGNATURE sig_src: %s" % sig_src)
+
     ns = None
     (from_name, ns, module_name) = get_module_name(ctx, sig_src)
     if debug:
@@ -153,13 +94,21 @@ def _bootstrap_signature_impl(ctx):
     #                                  module_name + ".mli")
     # else:
     if from_name == module_name:
-        ## no ns
+        if debug:
+            print("not namespaced")
         if sig_src.is_source:
             mlifile = ctx.actions.declare_file(scope + sig_src.basename)
             ctx.actions.symlink(output = mlifile,
                                 target_file = sig_src)
+            if debug:
+                print("symlinked {src} => {dst}".format(
+                    src = sig_src.path, dst = mlifile.path))
         else:
             ## generated file, already in bazel dir
+            if debug:
+                print("not symlinking {src}".format(
+                    src = sig_src))
+
             mlifile = sig_src
 
     else:
@@ -278,7 +227,7 @@ def _bootstrap_signature_impl(ctx):
     args.add("-intf", mlifile)
 
     direct_inputs = [mlifile]
-    if ctx.attr.data:
+    if ctx.files.data:
         direct_inputs.extend(ctx.files.data)
 
     if ctx.attr.ns:
@@ -301,6 +250,7 @@ def _bootstrap_signature_impl(ctx):
     inputs_depset = depset(
         order = dsorder,
         direct = direct_inputs, # + ctx.files._ns_resolver,
+        # + ctx.files.data if ctx.files.data else [],
         transitive = indirect_inputs_depsets + ns_resolver_depset
         + bottomup_ns_inputs
     )
@@ -339,11 +289,11 @@ def _bootstrap_signature_impl(ctx):
     )
 
     fileset_depset = depset(
-        direct= [out_cmi, mlifile],
+        direct= [out_cmi], # mlifile],
         transitive = bottomup_ns_fileset
     )
 
-    new_inputs_depset = depset(
+    closure_depset = depset(
         direct = [out_cmi, mlifile],
         transitive = indirect_inputs_depsets
     )
@@ -354,7 +304,7 @@ def _bootstrap_signature_impl(ctx):
 
     ocamlProvider = OcamlProvider(
         fileset  = fileset_depset,
-        inputs   = new_inputs_depset,
+        inputs   = closure_depset,
         linkargs = linkargs_depset,
         paths    = paths_depset,
     )
@@ -436,7 +386,7 @@ bootstrap_signature = rule(
             doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",
             providers = [
                 [OcamlProvider],
-                [OcamlArchiveMarker],
+                [OcamlArchiveProvider],
                 # [OcamlImportMarker],
                 [OcamlLibraryMarker],
                 [OcamlModuleMarker],
@@ -490,7 +440,7 @@ bootstrap_signature = rule(
         # ns_submodule = attr.label_keyed_string_dict(
         #     doc = "Extract cmi file from namespaced module",
         #     providers = [
-        #         [OcamlNsMarker, OcamlArchiveMarker],
+        #         [OcamlNsMarker, OcamlArchiveProvider],
         #     ]
         # ),
 
@@ -506,7 +456,7 @@ bootstrap_signature = rule(
         #     doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",
         #     providers = [
         #         [OcamlProvider],
-        #         [OcamlArchiveMarker],
+        #         [OcamlArchiveProvider],
         #         [OcamlImportMarker],
         #         [OcamlLibraryMarker],
         #         [OcamlModuleMarker],

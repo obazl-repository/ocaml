@@ -21,15 +21,15 @@ ocaml_module(
     struct = "common.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Sys)
-        ## (String)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Soup)
         ## (Scanf)
-        ## (Printf)
-        ## (Option)
-        ## (List)
-        ## (Filename)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -40,17 +40,17 @@ ocaml_module(
     deps   = [
         ":Src", ## (Manual Src Html_processing Src Common)
         ## (Unix)
-        ## (Sys)
-        ## (String)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Soup)
         ## (Re)
         ## (R)
-        ## (Printf)
-        ## (Option)
-        ## (List)
-        ## (Hashtbl)
-        ## (Filename)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -60,15 +60,15 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Src", ## (Manual Src Html_processing Src Common)
-        ## (Sys)
-        ## (String)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Soup)
         ## (Re)
         ## (R)
-        ## (Printf)
-        ## (Option)
-        ## (List)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 

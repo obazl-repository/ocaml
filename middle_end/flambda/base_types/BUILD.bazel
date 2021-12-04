@@ -48,6 +48,7 @@ bootstrap_library(
         ":Var_within_closure",
         ":Static_exception",
     ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 ################################################################
@@ -57,9 +58,10 @@ bootstrap_module(
     sig    = "Closure_element_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//middle_end:Variable", ## (Middle_end Variable)
-        "//utils:Int_replace_polymorphic_compare"
-    ]
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    visibility = ["//:__pkg__"]
 )
 
 bootstrap_signature(
@@ -67,11 +69,11 @@ bootstrap_signature(
     src  = "closure_element.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//middle_end:Variable", ## (Middle_end Variable)
-        "//middle_end:Compilation_unit_cmi", ## (Middle_end Compilation_unit)
-        ## (Set)
-        ## (Map)
-        ## (Identifiable)
+        "//middle_end:Variable",
+        "//middle_end:Compilation_unit_cmi",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Map",
+        "//utils:Identifiable",
     ]
 )
 
@@ -81,8 +83,12 @@ bootstrap_module(
     sig    = "Closure_id_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Closure_element)
-        "//utils:Int_replace_polymorphic_compare"
+        ":Closure_element",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    visibility = [
+        "//:__pkg__",
+        "//middle_end:__subpackages__"
     ]
 )
 
@@ -91,8 +97,7 @@ bootstrap_signature(
     src  = "closure_id.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        # "//middle_end/flambda:Flambda_cmi", ## (Middle_end Flambda Base_types Closure_element)
-        "Closure_element_cmi"
+        ":Closure_element_cmi"
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -103,9 +108,10 @@ bootstrap_module(
     sig    = "Closure_origin_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        # "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Closure_id)
-        "//utils:Int_replace_polymorphic_compare"
-    ]
+        ":Closure_id",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -114,8 +120,8 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Closure_id_cmi",
-        "//middle_end:Compilation_unit_cmi", ## (Middle_end Compilation_unit)
-        ## (Identifiable)
+        "//middle_end:Compilation_unit_cmi",
+        "//utils:Identifiable",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -130,7 +136,8 @@ bootstrap_module(
         "//middle_end:Compilation_unit",
         "//utils:Int_replace_polymorphic_compare",
         "//utils:Identifiable"
-    ]
+    ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -138,8 +145,8 @@ bootstrap_signature(
     src  = "export_id.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//middle_end:Compilation_unit_cmi", ## (Middle_end Compilation_unit)
-        ## (Identifiable)
+        "//middle_end:Compilation_unit_cmi",
+        "//utils:Identifiable",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -150,12 +157,12 @@ bootstrap_module(
     sig    = "Id_types_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Printf)
-        "//utils:Int_replace_polymorphic_compare"
-        ## (Int)
-        ## (Identifiable)
-        ## (Hashtbl)
-        ## (Format)
+        "//stdlib:Stdlib.Printf",
+        "//utils:Int_replace_polymorphic_compare",
+        "//stdlib:Stdlib.Int",
+        "//utils:Identifiable",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -164,8 +171,8 @@ bootstrap_signature(
     src  = "id_types.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//utils:Identifiable_cmi"
-        ## (Format)
+        "//utils:Identifiable_cmi",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -175,9 +182,10 @@ bootstrap_module(
     sig    = "Mutable_variable_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//middle_end:Variable", ## (Middle_end Variable)
-        "//utils:Int_replace_polymorphic_compare"
-    ]
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -185,12 +193,12 @@ bootstrap_signature(
     src  = "mutable_variable.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//middle_end:Variable_cmi", ## (Middle_end Variable)
-        "//middle_end:Internal_variable_names_cmi", ## (Middle_end Internal_variable_names)
-        "//middle_end:Compilation_unit_cmi", ## (Middle_end Compilation_unit)
-        ## (Identifiable)
-        ## (Ident)
-        ## (Format)
+        "//middle_end:Variable_cmi",
+        "//middle_end:Internal_variable_names_cmi",
+        "//middle_end:Compilation_unit_cmi",
+        "//utils:Identifiable",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -202,10 +210,11 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Id_types",
-        "//middle_end:Compilation_unit", ## (Middle_end Compilation_unit)
-        "//utils:Int_replace_polymorphic_compare"
-        ## (Identifiable)
-    ]
+        "//middle_end:Compilation_unit",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Identifiable",
+    ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -213,8 +222,8 @@ bootstrap_signature(
     src  = "set_of_closures_id.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//middle_end:Compilation_unit_cmi", ## (Middle_end Compilation_unit)
-        ## (Identifiable)
+        "//middle_end:Compilation_unit_cmi",
+        "//utils:Identifiable",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -225,9 +234,10 @@ bootstrap_module(
     sig    = "Set_of_closures_origin_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Set_of_closures_id)
-        "//utils:Int_replace_polymorphic_compare"
-    ]
+        ":Set_of_closures_id",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -237,7 +247,7 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Set_of_closures_id_cmi",
         "//middle_end:Compilation_unit_cmi",
-        ## (Identifiable)
+        "//utils:Identifiable",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -250,9 +260,9 @@ bootstrap_module(
     deps   = STDLIB + [
         "//lambda:Lambda",
         "//utils:Numbers",
-        "//utils:Int_replace_polymorphic_compare"
+        "//utils:Int_replace_polymorphic_compare",
     ],
-    visibility = []
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -271,13 +281,14 @@ bootstrap_module(
     sig    = "Tag_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Printf)
-        ## (Obj)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Obj",
         "//utils:Numbers",
-        ## (Misc)
-        "//utils:Int_replace_polymorphic_compare"
-        ## (Identifiable)
-    ]
+        "//utils:Misc",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Identifiable",
+    ],
+    visibility = ["//middle_end/flambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -296,8 +307,12 @@ bootstrap_module(
     sig    = "Var_within_closure_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//middle_end/flambda:Flambda", ## (Middle_end Flambda Base_types Closure_element)
-        "//utils:Int_replace_polymorphic_compare"
+        ":Closure_element",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    visibility = [
+        "//middle_end/flambda:__pkg__",
+        "//tools:__pkg__"
     ]
 )
 

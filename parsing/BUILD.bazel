@@ -83,12 +83,12 @@ bootstrap_module(
         ":Location", ## (Parsing Location)
         ":Docstrings", ## (Parsing Docstrings)
         ":Asttypes_cmi", ## (Parsing Asttypes)
-        ## (Nativeint)
-        ## (Misc)
-        ## (List)
-        ## (Int64)
-        ## (Int32)
-        ## (Int)
+        "//stdlib:Stdlib.Nativeint",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int",
     ],
     visibility = ["//typing:__pkg__"]
 )
@@ -103,7 +103,7 @@ bootstrap_signature(
         ":Location", ## (Parsing Location)
         ":Docstrings", ## (Parsing Docstrings)
         ":Asttypes_cmi", ## (Parsing Asttypes)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -119,7 +119,7 @@ bootstrap_module(
         ":Builtin_attributes", ## (Parsing Builtin_attributes)
         ":Asttypes_cmi", ## (Parsing Asttypes)
         ":Ast_iterator", ## (Parsing Ast_iterator)
-        ## (List)
+        "//stdlib:Stdlib.List",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -132,7 +132,7 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -144,7 +144,7 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Location", ## (Parsing Location)
-        ## (List)
+        "//stdlib:Stdlib.List",
     ],
     visibility = ["//typing:__pkg__"]
 )
@@ -157,7 +157,7 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -172,16 +172,16 @@ bootstrap_module(
         ":Location", ## (Parsing Location)
         ":Asttypes_cmi", ## (Parsing Asttypes)
         ":Ast_helper", ## (Parsing Ast_helper)
-        ## (Sys)
-        ## (Printf)
-        ## (Printexc)
-        ## (Misc)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
+        "//utils:Misc",
         "//utils:Load_path",
-        ## (List)
-        ## (Format)
-        ## (Config)
-        ## (Clflags)
-        ## (Array)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//utils:Config",
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -197,7 +197,7 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -207,11 +207,14 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Location", ## (Parsing Location)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ],
     visibility = [
+        "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
         "//lambda:__pkg__",
-        "//middle_end:__pkg__"
+        "//middle_end:__subpackages__",
+        "//typing:__pkg__"
     ]
 )
 
@@ -224,8 +227,8 @@ bootstrap_module(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Location", ## (Parsing Location)
         ":Asttypes_cmi", ## (Parsing Asttypes)
-        ## (List)
-        ## (Format)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
     ],
     visibility = ["//typing:__pkg__"]
 )
@@ -239,7 +242,7 @@ bootstrap_signature(
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
         ":Asttypes_cmi", ## (Parsing Asttypes)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -253,15 +256,18 @@ bootstrap_module(
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
         ":Asttypes_cmi", ## (Parsing Asttypes)
-        ## (Warnings)
-        ## (Printf)
-        ## (Option)
-        ## (Misc)
-        ## (List)
-        ## (Format)
-        ## (Arg)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Arg",
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -272,8 +278,8 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Misc)
-        ## (Format)
+        "//utils:Misc",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -288,10 +294,10 @@ bootstrap_module(
         ":Location", ## (Parsing Location)
         ":Builtin_attributes", ## (Parsing Builtin_attributes)
         ":Asttypes_cmi", ## (Parsing Asttypes)
-        ## (Option)
-        ## (Misc)
-        ## (List)
-        ## (Clflags)
+        "//stdlib:Stdlib.Option",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//utils:Clflags",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -304,8 +310,8 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Misc)
-        ## (Format)
+        "//utils:Misc",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -317,10 +323,10 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Location", ## (Parsing Location)
-        ## (Warnings)
-        ## (List)
-        ## (Lexing)
-        ## (Hashtbl)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -332,19 +338,29 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Lexing)
-        ## (Lazy)
-        ## (Format)
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
 bootstrap_module(
     name   = "CamlinternalMenhirLib",
-    struct = "//boot/menhir:menhirLib.ml",
+    struct = "camlinternalMenhirLib.ml",
+    # struct = "//boot/menhir:menhirLib.ml",
     sig    = "CamlinternalMenhirLib_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
     ]
+)
+
+genrule(
+    name = "camlinternalMenhirLib_ml",
+    outs = ["camlinternalMenhirLib.ml"],
+    srcs = ["//boot/menhir:menhirLib.ml"],
+    cmd  = "\n".join([
+	    "cp $(location //boot/menhir:menhirLib.ml) $@"
+    ])
 )
 
 bootstrap_signature(
@@ -365,20 +381,22 @@ genrule(
     ])
 )
 
-bootstrap_ocamllex(
-    name = "lexer_ml",
-    out  = "lexer.ml",
-    src  = "lexer.mll"
-)
-
 bootstrap_module(
     name   = "Lexer",
     struct = "lexer.ml",
     sig    = "Lexer_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
+        "//utils:Misc",
+        ":Parser"
     ],
     visibility = ["//file_formats:__pkg__"]
+)
+
+bootstrap_ocamllex(
+    name = "lexer_ml",
+    out  = "lexer.ml",
+    src  = "lexer.mll"
 )
 
 bootstrap_signature(
@@ -386,7 +404,7 @@ bootstrap_signature(
     src  = "lexer.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Parser"
+        ":Parser_cmi"
     ]
 )
 
@@ -396,27 +414,31 @@ bootstrap_module(
     sig    = "Location_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Warnings)
+        "//utils:Warnings",
         "//utils:Terminfo",
-        ## (Sys)
-        ## (String)
-        ## (Option)
-        ## (Misc)
-        ## (List)
-        ## (Lexing)
-        ## (Int)
-        ## (Format)
-        ## (Filename)
-        "//utils:Clflags"
-        ## (Bytes)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Option",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Bytes",
         ## (Build_path_prefix_map)
-        ## (Buffer)
+        "//stdlib:Stdlib.Buffer",
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
         "//driver:__pkg__",
+        "//file_formats:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end:__subpackages__",
         "//typing:__pkg__"
-    ]
+    ],
 )
 
 bootstrap_signature(
@@ -424,11 +446,12 @@ bootstrap_signature(
     src  = "location.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//utils:Warnings"
-        ## (Lexing)
-        ## (Format)
-        ## (Buffer)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Buffer",
     ],
+    visibility = ["//lambda:__pkg__"]
 )
 
 bootstrap_module(
@@ -437,9 +460,13 @@ bootstrap_module(
     sig    = "Longident_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (String)
-        "//utils:Misc"
-        ## (List)
+        "//stdlib:Stdlib.String",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+    ],
+    visibility = [
+        "//lambda:__pkg__",
+        "//typing:__pkg__"
     ]
 )
 
@@ -463,8 +490,8 @@ bootstrap_module(
         ":Lexer", ## (Parsing Lexer)
         ":Docstrings", ## (Parsing Docstrings)
         ## (Parser)
-        ## (Lexing)
-        ## (Format)
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -480,8 +507,8 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Lexing)
-        ## (Format)
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -512,7 +539,8 @@ bootstrap_module(
     sig    = "Parser_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Ast_helper"
+        ":Ast_helper",
+        ":CamlinternalMenhirLib",
     ]
 )
 
@@ -547,10 +575,11 @@ bootstrap_signature(
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
         ":Asttypes_cmi", ## (Parsing Asttypes)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ],
     visibility = [
         "//driver:__pkg__",
+        "//lambda:__pkg__",
         "//typing:__pkg__"
     ]
 )
@@ -566,12 +595,13 @@ bootstrap_module(
         ":Location", ## (Parsing Location)
         ":Asttypes_cmi", ## (Parsing Asttypes)
         ":Ast_helper", ## (Parsing Ast_helper)
-        ## (String)
-        ## (Option)
-        ## (List)
-        ## (Format)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
     ],
     visibility = [
+        "//driver:__pkg__",
         "//typing:__pkg__"
     ]
 )
@@ -584,7 +614,7 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -599,13 +629,13 @@ bootstrap_module(
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
         ":Asttypes_cmi", ## (Parsing Asttypes)
-        ## (String)
-        ## (Option)
-        ## (List)
-        ## (Lexing)
-        ## (Format)
-        ## (Clflags)
-        ## (Char)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Char",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -621,7 +651,7 @@ bootstrap_signature(
         ":Parsetree_cmi", ## (Parsing Parsetree)
         ":Longident", ## (Parsing Longident)
         ":Location", ## (Parsing Location)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -632,7 +662,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Location", ## (Parsing Location)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -642,7 +672,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Location", ## (Parsing Location)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 

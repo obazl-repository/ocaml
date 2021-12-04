@@ -37,12 +37,13 @@ bootstrap_module(
     sig    = "Cmi_format_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (String)
-        ## (Misc)
-        ## (Location)
-        ## (Format)
-        ## (Digest)
-        ## (Config)
+        "//typing:Types",
+        "//stdlib:Stdlib.String",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Digest",
+        "//utils:Config",
     ],
     visibility = ["//typing:__pkg__"]
 )
@@ -53,9 +54,9 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         "//typing:Types",
-        "//utils:Misc"
-        ## (Format)
-        ## (Digest)
+        "//utils:Misc",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Digest",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -69,7 +70,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         "//utils:Misc_cmi",
-        ## (Ident)
+        "//typing:Ident",
         "//lambda:Lambda"
     ],
     visibility = ["//bytecomp:__pkg__"]
@@ -82,22 +83,22 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Cmi_format", ## (File_formats Cmi_format)
-        ## (Types)
+        "//typing:Types",
         ## (Typedtree)
         "//typing:Tast_mapper",
-        ## (Sys)
-        ## (String)
-        ## (Option)
-        ## (Misc)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        "//parsing:Lexer"  ## NB: not //lex:Lexer!
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Option",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//parsing:Lexer",
         ## (Env)
-        ## (Digest)
-        ## (Config)
-        ## (Clflags)
-        ## (Array)
+        "//stdlib:Stdlib.Digest",
+        "//utils:Config",
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = ["//typing:__pkg__"]
 )
@@ -108,12 +109,12 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Cmi_format", ## (File_formats Cmi_format)
-        ## (Types)
-        "//typing:Typedtree_cmi"
-        ## (Misc)
-        ## (Location)
+        "//typing:Types",
+        "//typing:Typedtree_cmi",
+        "//utils:Misc",
+        "//parsing:Location",
         ## (Env)
-        ## (Digest)
+        "//stdlib:Stdlib.Digest",
     ]
 )
 
@@ -124,7 +125,7 @@ bootstrap_signature(
     deps   = STDLIB + [
         "//utils:Misc_cmi",
         "//middle_end/flambda:Export_info_cmi",
-        ## (Digest)
+        "//stdlib:Stdlib.Digest",
         "//middle_end:Clambda_cmi"
     ],
     visibility = [
@@ -150,14 +151,14 @@ bootstrap_module(
     sig    = "Linear_format_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (String)
-        ## (Misc)
-        ## (Location)
-        ## (Linear)
-        ## (Format)
-        ## (Digest)
-        ## (Config)
-        ## (Cmm)
+        "//stdlib:Stdlib.String",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//asmcomp:Linear",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Digest",
+        "//utils:Config",
+        "//asmcomp:Cmm"
     ],
     visibility = ["//asmcomp:__pkg__"]
 )
@@ -167,9 +168,9 @@ bootstrap_signature(
     src  = "linear_format.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//asmcomp:Linear_cmi"
-        ## (Digest)
-        ## (Cmm)
+        "//asmcomp:Linear_cmi",
+        "//stdlib:Stdlib.Digest_cmi",
+        "//asmcomp:Cmm"
     ]
 )
 

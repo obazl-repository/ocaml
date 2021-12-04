@@ -142,25 +142,25 @@ bootstrap_module(
     sig    = "Btype_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ## (Vars)
-        ## (VarSet)
-        ## (Transient_expr)
-        ## (TransientTypeOps)
-        ## (String)
-        ## (Set)
-        ## (Option)
-        ## (Meths)
-        ## (MethSet)
-        ## (Map)
-        ## (Local_store)
-        ## (List)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Char)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.String",
+        "//utils:Local_store",
+        ":Ident",
+        ":Path",
+        ":Types",
+        #### (MethSet)
+        #### (Meths)
+        #### (TransientTypeOps)
+        #### (Transient_expr)
+        #### (VarSet)
+        #### (Vars)
     ]
 )
 
@@ -179,24 +179,24 @@ bootstrap_module(
     struct = "cmt2annot.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Tast_iterator", ## (Typing Tast_iterator)
-        ":Stypes", ## (Typing Stypes)
-        ":Path", ## (Typing Path)
-        ":Oprint", ## (Typing Oprint)
-        ":Ident", ## (Typing Ident)
-        ":Envaux", ## (Typing Envaux)
-        ":Env", ## (Typing Env)
-        ":Annot_cmi", ## (Typing Annot)
-        ## (Parsetree)
-        ## (Option)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        "//file_formats:Cmt_format"
-        ## (Asttypes)
-        ## (Array)
+        ":Types",
+        ":Typedtree",
+        ":Tast_iterator",
+        ":Stypes",
+        ":Path",
+        ":Oprint",
+        ":Ident",
+        ":Envaux",
+        ":Env",
+        ":Annot_cmi",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Option",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//file_formats:Cmt_format",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -206,39 +206,40 @@ bootstrap_module(
     sig    = "Ctype_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Subst", ## (Typing Subst)
-        ":Predef", ## (Typing Predef)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Btype", ## (Typing Btype)
-        ## (Vars)
-        ## (Variance)
-        ## (Uid)
-        ## (TypeSet)
-        ## (TypePairs)
-        ## (TypeMap)
-        ## (TypeHash)
-        ## (Transient_expr)
-        ## (Subtype)
-        ## (String)
-        ## (Printf)
-        ## (Option)
-        ## (Misc)
-        ## (Meths)
-        ## (Longident)
-        ## (Location)
-        ## (Local_store)
-        ## (List)
-        ## (Lazy)
-        ## (Int)
-        ## (Hashtbl)
-        ## (For_copy)
-        ## (Clflags)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//utils:Clflags",
+        "//utils:Local_store",
+        "//utils:Misc",
+        ":Btype",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Path",
+        ":Predef",
+        ":Subst",
+        ":Type_immediacy",
+        ":Types",
+
+        #### (Meths)
+        #### (For_copy)
+        #### (Vars)
+        #### (Variance)
+        #### (Uid)
+        #### (TypeSet)
+        #### (TypePairs)
+        #### (TypeMap)
+        #### (TypeHash)
+        #### (Transient_expr)
+        #### (Subtype)
     ]
 )
 
@@ -247,16 +248,16 @@ bootstrap_signature(
     src  = "ctype.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Btype", ## (Typing Btype)
-        ## (Longident)
-        ## (Location)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        ":Btype",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Path",
+        ":Type_immediacy",
+        ":Types",
     ]
 )
 
@@ -266,17 +267,17 @@ bootstrap_module(
     sig    = "Datarepr_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Btype", ## (Typing Btype)
-        ## (Variance)
-        ## (Uid)
-        ## (TypeSet)
-        ## (Location)
-        ## (List)
-        ## (Asttypes)
-        ## (Array)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+        ":Btype",
+        ":Ident",
+        ":Path",
+        ":Types",
+        #### (TypeSet)
+        #### (Uid)
+        #### (Variance)
     ]
 )
 
@@ -285,9 +286,9 @@ bootstrap_signature(
     src  = "datarepr.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
+        ":Types",
+        ":Path",
+        ":Ident",
     ]
 )
 
@@ -297,35 +298,37 @@ bootstrap_module(
     sig    = "Env_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Subst", ## (Typing Subst)
-        ":Predef", ## (Typing Predef)
-        ":Persistent_env", ## (Typing Persistent_env)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Datarepr", ## (Typing Datarepr)
-        ":Btype", ## (Typing Btype)
-        ## (Warnings)
-        ## (Uid)
-        ## (Seq)
-        ## (Printf)
-        ## (Option)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (Local_store)
-        ## (Load_path)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Lazy)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Filename)
-        ## (Cmi_format)
-        ## (Clflags)
-        ## (Builtin_attributes)
-        ## (Asttypes)
-    ]
+        "//file_formats:Cmi_format",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Builtin_attributes",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Seq",
+        "//utils:Clflags",
+        "//utils:Lazy_backtrack",
+        "//utils:Load_path",
+        "//utils:Local_store",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Btype",
+        ":Datarepr",
+        ":Ident",
+        ":Path",
+        ":Persistent_env",
+        ":Predef",
+        ":Shape",
+        ":Subst",
+        ":Types",
+        #### (Uid)
+    ],
+    visibility = ["//lambda:__pkg__"]
 )
 
 bootstrap_signature(
@@ -333,20 +336,20 @@ bootstrap_signature(
     src  = "env.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Subst", ## (Typing Subst)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        "//stdlib:Stdlib.String", ## (Stdlib String)
-        ## (Warnings)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (Load_path)
-        ## (Format)
-        ## (Digest)
         "//file_formats:Cmi_format_cmi",
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.String",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Ident",
+        ":Path",
+        ":Subst",
+        ":Types",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -361,17 +364,17 @@ bootstrap_module(
     sig    = "Envaux_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Subst", ## (Typing Subst)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Location)
-        ## (Lazy_backtrack)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//utils:Lazy_backtrack",
+        ":Env",
+        ":Ident",
+        ":Path",
+        ":Printtyp",
+        ":Subst",
+        ":Types",
     ]
 )
 
@@ -380,10 +383,10 @@ bootstrap_signature(
     src  = "envaux.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Subst", ## (Typing Subst)
-        ":Path", ## (Typing Path)
-        ":Env", ## (Typing Env)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
+        ":Env",
+        ":Path",
+        ":Subst",
     ]
 )
 
@@ -393,11 +396,11 @@ bootstrap_module(
     sig    = "Errortrace_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ## (List)
-        ## (Format)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        ":Path",
+        ":Types",
     ]
 )
 
@@ -406,10 +409,10 @@ bootstrap_signature(
     src  = "errortrace.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ## (Format)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Format",
+        ":Path",
+        ":Types",
     ]
 )
 
@@ -419,16 +422,23 @@ bootstrap_module(
     sig    = "Ident_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (String)
-        ## (Misc)
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.String",
+        "//utils:Clflags",
+        "//utils:Identifiable",
         "//utils:Local_store",
-        ## (Int)
-        ## (Identifiable)
-        ## (Format)
-        "//utils:Clflags"
-        ## (Char)
+        "//utils:Misc",
     ],
-    visibility = ["//asmcomp:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
+        "//driver:__pkg__",
+        "//file_formats:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end:__subpackages__",
+    ]
 )
 
 bootstrap_signature(
@@ -436,8 +446,8 @@ bootstrap_signature(
     src  = "ident.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//utils:Identifiable"
-        ## (Format)
+        "//stdlib:Stdlib.Format",
+        "//utils:Identifiable",
     ],
     visibility = [
         "//middle_end:__pkg__",
@@ -451,13 +461,13 @@ bootstrap_module(
     sig    = "Includeclass_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Path", ## (Typing Path)
-        ":Ctype", ## (Typing Ctype)
-        ## (List)
-        ## (Format)
-        ## (Builtin_attributes)
+        "//parsing:Builtin_attributes",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        ":Ctype",
+        ":Path",
+        ":Printtyp",
+        ":Types",
     ]
 )
 
@@ -466,12 +476,12 @@ bootstrap_signature(
     src  = "includeclass.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ## (Location)
-        ## (Format)
+        "//parsing:Location",
+        "//stdlib:Stdlib.Format",
+        ":Ctype",
+        ":Env",
+        ":Printtyp",
+        ":Types",
     ]
 )
 
@@ -481,30 +491,30 @@ bootstrap_module(
     sig    = "Includecore_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Subst", ## (Typing Subst)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Primitive", ## (Typing Primitive)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Variance)
-        ## (StringLabels)
-        ## (String)
-        ## (Option)
-        ## (Misc)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Int)
-        ## (Format)
-        ## (Diffing_with_keys)
-        ## (Builtin_attributes)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Builtin_attributes",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.StringLabels",
+        "//utils:Diffing_with_keys",
+        "//utils:Lazy_backtrack",
+        "//utils:Misc",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Path",
+        ":Primitive",
+        ":Printtyp",
+        ":Subst",
+        ":Type_immediacy",
+        ":Typedtree",
+        ":Types",
+        #### (Variance)
     ]
 )
 
@@ -513,18 +523,18 @@ bootstrap_signature(
     src  = "includecore.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Format)
-        "//utils:Diffing_with_keys_cmi"
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Format",
+        "//utils:Diffing_with_keys_cmi",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Path",
+        ":Type_immediacy",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -534,35 +544,35 @@ bootstrap_module(
     sig    = "Includemod_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Subst", ## (Typing Subst)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Primitive", ## (Typing Primitive)
-        ":Predef", ## (Typing Predef)
-        ":Path", ## (Typing Path)
-        ":Mtype", ## (Typing Mtype)
-        ":Includecore", ## (Typing Includecore)
-        ":Includeclass", ## (Typing Includeclass)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (String)
-        ## (Result)
-        ## (Option)
-        ## (Misc)
-        ## (Map)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Format)
-        ## (Diffing_with_keys)
-        ## (Diffing)
-        "//file_formats:Cmt_format"
-        ## (Builtin_attributes)
-        ## (Array)
+        "//file_formats:Cmt_format",
+        "//parsing:Builtin_attributes",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Result",
+        "//stdlib:Stdlib.String",
+        "//utils:Diffing",
+        "//utils:Diffing_with_keys",
+        "//utils:Lazy_backtrack",
+        "//utils:Misc",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Ident",
+        ":Includeclass",
+        ":Includecore",
+        ":Mtype",
+        ":Path",
+        ":Predef",
+        ":Primitive",
+        ":Printtyp",
+        ":Subst",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -571,20 +581,20 @@ bootstrap_signature(
     src  = "includemod.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Includecore", ## (Typing Includecore)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ## (Parsetree)
-        ## (Map)
-        ## (Longident)
-        ## (Location)
-        ## (Format)
-        ## (Diffing_with_keys)
-        ## (Diffing)
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Map",
+        "//utils:Diffing",
+        "//utils:Diffing_with_keys",
+        ":Ctype",
+        ":Env",
+        ":Ident",
+        ":Includecore",
+        ":Path",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -594,28 +604,28 @@ bootstrap_module(
     sig    = "Includemod_errorprinter_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Subst", ## (Typing Subst)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Path", ## (Typing Path)
-        ":Oprint", ## (Typing Oprint)
-        ":Includemod", ## (Typing Includemod)
-        ":Includecore", ## (Typing Includecore)
-        ":Includeclass", ## (Typing Includeclass)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Misc)
-        ## (Marshal)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Lazy_backtrack)
-        ## (Format)
-        ## (Diffing_with_keys)
-        ## (Diffing)
-        ## (Clflags)
-        ## (Bytes)
+        "//parsing:Location",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Marshal",
+        "//utils:Clflags",
+        "//utils:Diffing",
+        "//utils:Diffing_with_keys",
+        "//utils:Lazy_backtrack",
+        "//utils:Misc",
+        ":Env",
+        ":Ident",
+        ":Includeclass",
+        ":Includecore",
+        ":Includemod",
+        ":Oprint",
+        ":Path",
+        ":Printtyp",
+        ":Subst",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -624,15 +634,15 @@ bootstrap_signature(
     src  = "includemod_errorprinter.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Includemod", ## (Typing Includemod)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Format)
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Format",
+        ":Env",
+        ":Ident",
+        ":Includemod",
+        ":Path",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -642,19 +652,19 @@ bootstrap_module(
     sig    = "Mtype_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Subst", ## (Typing Subst)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Option)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Clflags)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//utils:Clflags",
+        "//utils:Lazy_backtrack",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Ident",
+        ":Path",
+        ":Subst",
+        ":Types",
     ]
 )
 
@@ -663,10 +673,10 @@ bootstrap_signature(
     src  = "mtype.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
+        ":Env",
+        ":Ident",
+        ":Path",
+        ":Types",
     ]
 )
 
@@ -676,18 +686,18 @@ bootstrap_module(
     sig    = "Oprint_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Outcometree_cmi", ## (Typing Outcometree)
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Printexc)
-        "//parsing:Pprintast"
-        ## (Option)
-        ## (List)
-        ## (Format)
-        ## (Char)
-        ## (Bytes)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Pprintast",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+        ":Outcometree_cmi",
     ]
 )
 
@@ -696,9 +706,9 @@ bootstrap_signature(
     src  = "oprint.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Outcometree_cmi", ## (Typing Outcometree)
-        ## (Format)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Format",
+        ":Outcometree_cmi",
     ]
 )
 
@@ -709,9 +719,9 @@ bootstrap_signature(
     src  = "outcometree.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ## (Format)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Format",
+        ":Type_immediacy",
     ]
 )
 
@@ -721,42 +731,42 @@ bootstrap_module(
     sig    = "Parmatch_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Untypeast", ## (Typing Untypeast)
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Tast_iterator", ## (Typing Tast_iterator)
-        ":Subst", ## (Typing Subst)
-        ":Printpat", ## (Typing Printpat)
-        ":Predef", ## (Typing Predef)
-        ":Patterns", ## (Typing Patterns)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Warnings)
-        ## (String)
-        ## (Set)
-        ## (Seq)
-        ## (Parsetree)
-        ## (Option)
-        ## (Nativeint)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Int64)
-        ## (Int32)
-        ## (Int)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Config)
-        ## (Char)
-        ## (Buffer)
-        ## (Asttypes)
-        ## (Ast_helper)
-        ## (Array)
+        "//parsing:Ast_helper",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Seq",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.String",
+        "//utils:Config",
+        "//utils:Lazy_backtrack",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Ident",
+        ":Path",
+        ":Patterns",
+        ":Predef",
+        ":Printpat",
+        ":Subst",
+        ":Tast_iterator",
+        ":Typedtree",
+        ":Types",
+        ":Untypeast",
     ],
     visibility = ["//lambda:__pkg__"]
 )
@@ -766,15 +776,15 @@ bootstrap_signature(
     src  = "parmatch.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Hashtbl)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Hashtbl",
+        ":Env",
+        ":Path",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -784,14 +794,15 @@ bootstrap_module(
     sig    = "Path_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Ident", ## (Typing Ident)
-        ## (String)
-        ## (Set)
-        ## (Map)
-        ## (List)
-        ## (Int)
-        ## (Format)
-    ]
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.String",
+        ":Ident",
+    ],
+    visibility = ["//middle_end:__pkg__"]
 )
 
 bootstrap_signature(
@@ -799,10 +810,10 @@ bootstrap_signature(
     src  = "path.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Ident", ## (Typing Ident)
-        ## (Set)
-        ## (Map)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set",
+        ":Ident",
     ],
     visibility = ["//middle_end:__pkg__"]
 )
@@ -813,17 +824,17 @@ bootstrap_module(
     sig    = "Patterns_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Subst", ## (Typing Subst)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.List",
+        "//utils:Lazy_backtrack",
+        ":Ctype",
+        ":Env",
+        ":Ident",
+        ":Subst",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -832,13 +843,13 @@ bootstrap_signature(
     src  = "patterns.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        ":Ident",
+        ":Path",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -848,20 +859,20 @@ bootstrap_module(
     sig    = "Persistent_env_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Warnings)
-        ## (Printf)
-        ## (Misc)
-        ## (Location)
+        "//file_formats:Cmi_format",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Consistbl",
+        "//utils:Lazy_backtrack",
         "//utils:Load_path",
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Digest)
-        # "//utils:Consistbl"
-        ## (Config)
-        ## (Cmi_format)
-        ## (Clflags)
+        "//utils:Misc",
+        "//utils:Warnings",
     ]
 )
 
@@ -870,14 +881,14 @@ bootstrap_signature(
     src  = "persistent_env.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types",
-        ## (Misc)
-        ## (Location)
-        "//utils:Lazy_backtrack_cmi",
-        ## (Format)
-        ## (Digest)
+        "//file_formats:Cmi_format_cmi",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
         "//utils:Consistbl",
-        "//file_formats:Cmi_format_cmi"
+        "//utils:Lazy_backtrack_cmi",
+        "//utils:Misc",
+        ":Types",
     ]
 )
 
@@ -887,18 +898,23 @@ bootstrap_module(
     sig    = "Predef_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Btype", ## (Typing Btype)
-        ## (Parsetree)
-        ## (Location)
-        ## (List)
-        ## (Asttypes)
-        "//parsing:Ast_helper" ## or Ast_helper_cmi?
+        "//parsing:Ast_helper",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.List",
+        ":Btype",
+        ":Ident",
+        ":Path",
+        ":Shape",
+        ":Type_immediacy",
+        ":Types",
     ],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end/flambda:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -906,9 +922,9 @@ bootstrap_signature(
     src  = "predef.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
+        ":Ident",
+        ":Path",
+        ":Types",
     ]
 )
 
@@ -918,16 +934,21 @@ bootstrap_module(
     sig    = "Primitive_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Outcometree_cmi", ## (Typing Outcometree)
-        ## (String)
-        ## (Parsetree)
-        ## (Misc)
-        ## (Location)
-        ## (List)
-        ## (Format)
-        "//parsing:Attr_helper"
+        "//parsing:Attr_helper",
+        "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
+        "//utils:Misc",
+        ":Outcometree_cmi",
     ],
-    visibility = ["//asmcomp:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end:__subpackages__",
+    ]
 )
 
 bootstrap_signature(
@@ -935,10 +956,10 @@ bootstrap_signature(
     src  = "primitive.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Outcometree_cmi", ## (Typing Outcometree)
-        ## (Parsetree)
-        ## (Location)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        ":Outcometree_cmi",
     ]
 )
 
@@ -948,15 +969,15 @@ bootstrap_module(
     sig    = "Printpat_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Ident", ## (Typing Ident)
-        ## (String)
-        ## (Printf)
-        ## (List)
-        ## (Format)
-        ## (Asttypes)
-        ## (Array)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        ":Ident",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -965,12 +986,12 @@ bootstrap_signature(
     src  = "printpat.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Format)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Format",
+        ":Path",
+        ":Typedtree",
     ]
 )
 
@@ -980,43 +1001,43 @@ bootstrap_module(
     sig    = "Printtyp_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Subst", ## (Typing Subst)
-        ":Signature_group", ## (Typing Signature_group)
-        ":Primitive", ## (Typing Primitive)
-        ":Predef", ## (Typing Predef)
-        ":Path", ## (Typing Path)
-        ":Outcometree_cmi", ## (Typing Outcometree)
-        ":Oprint", ## (Typing Oprint)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Warnings)
-        ## (Vars)
-        ## (Variance)
-        ## (Uid)
-        ## (TypeMap)
-        ## (Transient_expr)
-        ## (TransientTypeMap)
-        ## (Printf)
-        ## (Parsetree)
-        ## (Option)
-        ## (Misc)
-        ## (Meths)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Lazy_backtrack)
-        ## (Int)
-        ## (Format)
-        ## (Clflags)
-        ## (Char)
-        ## (Asttypes)
-        ## (Array)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Clflags",
+        "//utils:Lazy_backtrack",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Oprint",
+        ":Outcometree_cmi",
+        ":Path",
+        ":Predef",
+        ":Primitive",
+        ":Signature_group",
+        ":Subst",
+        ":Type_immediacy",
+        ":Types",
+        #### (Meths)
+        #### (TransientTypeMap)
+        #### (Transient_expr)
+        #### (TypeMap)
+        #### (Uid)
+        #### (Variance)
+        #### (Vars)
     ],
     visibility = ["//lambda:__pkg__"]
 )
@@ -1026,16 +1047,16 @@ bootstrap_signature(
     src  = "printtyp.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ":Outcometree_cmi", ## (Typing Outcometree)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ## (Longident)
-        ## (Location)
-        ## (Format)
-        ## (Asttypes)
+        ":Types",
+        ":Path",
+        ":Outcometree_cmi",
+        ":Ident",
+        ":Errortrace",
+        ":Env",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Format",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1045,23 +1066,23 @@ bootstrap_module(
     sig    = "Printtyped_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ## (String)
+        ":Types",
+        ":Typedtree",
+        ":Path",
+        ":Ident",
+        "//stdlib:Stdlib.String",
         "//parsing:Printast",
         "//parsing:Pprintast",
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Format)
-        ## (Clflags)
-        ## (Char)
-        ## (Asttypes)
-        ## (Array)
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Char",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -1071,11 +1092,11 @@ bootstrap_signature(
     src  = "printtyped.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Format)
+        ":Typedtree",
+        ":Path",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -1085,16 +1106,16 @@ bootstrap_module(
     sig    = "Rec_check_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typeopt", ## (Typing Typeopt)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Primitive", ## (Typing Primitive)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ## (Map)
-        ## (List)
-        ## (Asttypes)
-        ## (Array)
+        ":Types",
+        ":Typeopt",
+        ":Typedtree",
+        ":Primitive",
+        ":Path",
+        ":Ident",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.List",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -1103,11 +1124,11 @@ bootstrap_signature(
     src  = "rec_check.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ## (Parsetree)
-        ## (Longident)
+        ":Typedtree",
+        ":Path",
+        ":Ident",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
     ]
 )
 
@@ -1117,6 +1138,9 @@ bootstrap_module(
     sig    = "Shape_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
+        ":Ident",
+        "//typing:Path",
+        "//utils:Identifiable"
     ]
 )
 
@@ -1136,11 +1160,11 @@ bootstrap_module(
     sig    = "Signature_group_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Ident", ## (Typing Ident)
-        ":Btype", ## (Typing Btype)
-        ## (Seq)
-        ## (List)
+        ":Types",
+        ":Ident",
+        ":Btype",
+        "//stdlib:Stdlib.Seq",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -1149,8 +1173,8 @@ bootstrap_signature(
     src  = "signature_group.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ## (Seq)
+        ":Types",
+        "//stdlib:Stdlib.Seq",
     ]
 )
 
@@ -1160,18 +1184,18 @@ bootstrap_module(
     sig    = "Stypes_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Typedtree", ## (Typing Typedtree)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Annot_cmi", ## (Typing Annot)
-        ## (String)
-        ## (Misc)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Int)
-        ## (Format)
-        ## (Clflags)
-    ]
+        ":Typedtree",
+        ":Printtyp",
+        ":Annot_cmi",
+        "//stdlib:Stdlib.String",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Format",
+        "//utils:Clflags",
+    ],
 )
 
 bootstrap_signature(
@@ -1179,12 +1203,12 @@ bootstrap_signature(
     src  = "stypes.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Annot_cmi", ## (Typing Annot)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
+        ":Typedtree",
+        ":Path",
+        ":Annot_cmi",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
     ]
 )
 
@@ -1194,25 +1218,25 @@ bootstrap_module(
     sig    = "Subst_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Btype", ## (Typing Btype)
-        ## (Vars)
-        ## (Uid)
-        ## (Transient_expr)
-        ## (String)
-        ## (Parsetree)
-        ## (Option)
-        ## (Misc)
-        ## (Meths)
-        ## (Location)
-        ## (Local_store)
-        ## (List)
+        "//parsing:Ast_mapper",
+        "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.String",
+        "//utils:Clflags",
         "//utils:Lazy_backtrack",
-        ## (For_copy)
-        ## (Clflags)
-        "//parsing:Ast_mapper"
+        "//utils:Local_store",
+        "//utils:Misc",
+        ":Btype",
+        ":Ident",
+        ":Path",
+        ":Types",
+        #### (For_copy)
+        #### (Meths)
+        #### (Transient_expr)
+        #### (Uid)
+        #### (Vars)
     ]
 )
 
@@ -1221,11 +1245,11 @@ bootstrap_signature(
     src  = "subst.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ## (Parsetree)
-        ## (Location)
+        ":Types",
+        ":Path",
+        ":Ident",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Location",
     ]
 )
 
@@ -1235,15 +1259,15 @@ bootstrap_module(
     sig    = "Tast_iterator_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Subst", ## (Typing Subst)
-        ":Env", ## (Typing Env)
-        ## (Option)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Asttypes)
-        ## (Array)
+        ":Types",
+        ":Typedtree",
+        ":Subst",
+        ":Env",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//utils:Lazy_backtrack",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -1252,12 +1276,12 @@ bootstrap_signature(
     src  = "tast_iterator.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Asttypes)
+        ":Typedtree",
+        ":Path",
+        ":Env",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1267,15 +1291,15 @@ bootstrap_module(
     sig    = "Tast_mapper_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Subst", ## (Typing Subst)
-        ":Env", ## (Typing Env)
-        ## (Option)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Asttypes)
-        ## (Array)
+        ":Types",
+        ":Typedtree",
+        ":Subst",
+        ":Env",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//utils:Lazy_backtrack",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = ["//file_formats:__pkg__"]
 )
@@ -1285,12 +1309,12 @@ bootstrap_signature(
     src  = "tast_mapper.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Asttypes)
+        ":Typedtree",
+        ":Path",
+        ":Env",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1319,51 +1343,51 @@ bootstrap_module(
     sig    = "Typeclass_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Typetexp", ## (Typing Typetexp)
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl_variance", ## (Typing Typedecl_variance)
-        ":Typedecl", ## (Typing Typedecl)
-        ":Typecore", ## (Typing Typecore)
-        ":Subst", ## (Typing Subst)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Predef", ## (Typing Predef)
-        ":Path", ## (Typing Path)
-        ":Oprint", ## (Typing Oprint)
-        ":Includeclass", ## (Typing Includeclass)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Warnings)
-        ## (Vb)
-        ## (Vars)
-        ## (Variance)
-        ## (VarSet)
-        ## (Uid)
-        ## (Typ)
-        ## (Pat)
-        ## (Parsetree)
-        ## (Option)
-        ## (Meths)
-        ## (MethSet)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Lazy)
-        ## (Int)
-        ## (Format)
-        ## (Exp)
-        ## (Cty)
-        ## (Csig)
-        ## (Cmt_format)
-        ## (Clflags)
-        ## (Cl)
-        ## (Builtin_attributes)
-        ## (Asttypes)
-        ## (Ast_helper)
+        "//file_formats:Cmt_format",
+        "//parsing:Ast_helper",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Builtin_attributes",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//utils:Clflags",
+        "//utils:Lazy_backtrack",
+        "//utils:Warnings",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Includeclass",
+        ":Oprint",
+        ":Path",
+        ":Predef",
+        ":Printtyp",
+        ":Subst",
+        ":Typecore",
+        ":Typedecl",
+        ":Typedecl_variance",
+        ":Typedtree",
+        ":Types",
+        ":Typetexp",
+        #### (Cl)
+        #### (Csig)
+        #### (Cty)
+        #### (Exp)
+        #### (Pat)
+        #### (Typ)
+        #### (VarSet)
+        #### (Vars)
+        #### (Vb)
+        ###### (MethSet)
+        ###### (Meths)
+        ###### (Uid)
+        ###### (Variance)
     ]
 )
 
@@ -1372,18 +1396,18 @@ bootstrap_signature(
     src  = "typeclass.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Format)
-        ## (Asttypes)
+        ":Types",
+        ":Typedtree",
+        ":Path",
+        ":Ident",
+        ":Errortrace",
+        ":Env",
+        ":Ctype",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Format",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1393,60 +1417,59 @@ bootstrap_module(
     sig    = "Typecore_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Typetexp", ## (Typing Typetexp)
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl", ## (Typing Typedecl)
-        ":Subst", ## (Typing Subst)
-        ":Rec_check", ## (Typing Rec_check)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Printpat", ## (Typing Printpat)
-        ":Primitive", ## (Typing Primitive)
-        ":Predef", ## (Typing Predef)
-        ":Persistent_env", ## (Typing Persistent_env)
-        ":Path", ## (Typing Path)
-        ":Parmatch", ## (Typing Parmatch)
-        ":Mtype", ## (Typing Mtype)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Warnings)
-        ## (Vb)
-        ## (Vars)
-        ## (Uid)
-        ## (TypeSet)
-        ## (TypePairs)
-        ## (String)
-        ## (Result)
-        ## (Pat)
-        ## (Parsetree)
-        ## (Option)
-        ## (Nativeint)
-        ## (Mod)
-        ## (Misc)
-        ## (Meths)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Int64)
-        ## (Int32)
-        ## (Int)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Exp)
-        "//file_formats:Cmt_format"
-        ## (Clflags)
-        ## (Char)
-        ## (CamlinternalFormatBasics)
-        ## (CamlinternalFormat)
-        ## (Builtin_attributes)
+        "//file_formats:Cmt_format",
+        "//parsing:Ast_helper",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Builtin_attributes",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Result",
+        "//stdlib:Stdlib.String",
+        "//utils:Clflags",
+        "//utils:Lazy_backtrack",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Mtype",
+        ":Parmatch",
+        ":Path",
+        ":Persistent_env",
+        ":Predef",
+        ":Primitive",
+        ":Printpat",
+        ":Printtyp",
+        ":Rec_check",
+        ":Subst",
+        ":Typedecl",
+        ":Typedtree",
+        ":Types",
+        ":Typetexp",
         ## (Attr)
-        ## (Asttypes)
-        ## (Ast_helper)
-        ## (Array)
+        ## (CamlinternalFormat)
+        ## (CamlinternalFormatBasics)
+        ## (Exp)
+        #### (Meths)
+        #### (Mod)
+        #### (Pat)
+        #### (TypePairs)
+        #### (TypeSet)
+        #### (Vars)
+        ###### (Uid)
     ],
     visibility = ["//lambda:__pkg__"]
 )
@@ -1456,16 +1479,16 @@ bootstrap_signature(
     src  = "typecore.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Asttypes)
+        ":Types",
+        ":Typedtree",
+        ":Path",
+        ":Ident",
+        ":Errortrace",
+        ":Env",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1475,47 +1498,48 @@ bootstrap_module(
     sig    = "Typedecl_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Typetexp", ## (Typing Typetexp)
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl_variance", ## (Typing Typedecl_variance)
-        ":Typedecl_unboxed", ## (Typing Typedecl_unboxed)
-        ":Typedecl_separability", ## (Typing Typedecl_separability)
-        ":Typedecl_immediacy", ## (Typing Typedecl_immediacy)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Subst", ## (Typing Subst)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Primitive", ## (Typing Primitive)
-        ":Predef", ## (Typing Predef)
-        ":Path", ## (Typing Path)
-        ":Oprint", ## (Typing Oprint)
-        ":Includecore", ## (Typing Includecore)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Warnings)
-        ## (Variance)
-        ## (Uid)
-        ## (Pprintast)
-        ## (Parsetree)
-        ## (Option)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Diffing_with_keys)
-        ## (Config)
-        ## (Clflags)
-        ## (Builtin_attributes)
-        ## (Attr_helper)
-        ## (Asttypes)
-        "//parsing:Ast_iterator"
-        ## (Ast_helper)
+
+        "//parsing:Ast_helper",
+        "//parsing:Ast_iterator",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Attr_helper",
+        "//parsing:Builtin_attributes",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Pprintast",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Diffing_with_keys",
+        "//utils:Lazy_backtrack",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Includecore",
+        ":Oprint",
+        ":Path",
+        ":Predef",
+        ":Primitive",
+        ":Printtyp",
+        ":Subst",
+        ":Type_immediacy",
+        ":Typedecl_immediacy",
+        ":Typedecl_separability",
+        ":Typedecl_unboxed",
+        ":Typedecl_variance",
+        ":Typedtree",
+        ":Types",
+        ":Typetexp",
+        #### (Uid)
+        #### (Variance)
     ]
 )
 
@@ -1524,22 +1548,22 @@ bootstrap_signature(
     src  = "typedecl.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl_variance", ## (Typing Typedecl_variance)
-        ":Typedecl_separability", ## (Typing Typedecl_separability)
-        ":Typedecl_immediacy", ## (Typing Typedecl_immediacy)
-        ":Path", ## (Typing Path)
-        ":Includecore", ## (Typing Includecore)
-        ":Ident", ## (Typing Ident)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Format)
-        ## (Diffing_with_keys)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Format",
+        "//utils:Diffing_with_keys",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Includecore",
+        ":Path",
+        ":Typedecl_immediacy",
+        ":Typedecl_separability",
+        ":Typedecl_variance",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -1549,13 +1573,13 @@ bootstrap_module(
     sig    = "Typedecl_immediacy_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedecl_unboxed", ## (Typing Typedecl_unboxed)
-        ":Typedecl_properties", ## (Typing Typedecl_properties)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Ctype", ## (Typing Ctype)
-        ## (Location)
-        ## (List)
+        ":Types",
+        ":Typedecl_unboxed",
+        ":Typedecl_properties",
+        ":Type_immediacy",
+        ":Ctype",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -1564,12 +1588,12 @@ bootstrap_signature(
     src  = "typedecl_immediacy.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedecl_properties", ## (Typing Typedecl_properties)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Location)
+        ":Types",
+        ":Typedecl_properties",
+        ":Type_immediacy",
+        ":Ident",
+        ":Env",
+        "//parsing:Location",
     ]
 )
 
@@ -1579,13 +1603,13 @@ bootstrap_module(
     sig    = "Typedecl_properties_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Subst", ## (Typing Subst)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Builtin_attributes)
+        ":Types",
+        ":Subst",
+        ":Ident",
+        ":Env",
+        "//stdlib:Stdlib.List",
+        "//utils:Lazy_backtrack",
+        "//parsing:Builtin_attributes",
     ]
 )
 
@@ -1594,9 +1618,9 @@ bootstrap_signature(
     src  = "typedecl_properties.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
+        ":Types",
+        ":Ident",
+        ":Env",
     ]
 )
 
@@ -1606,18 +1630,18 @@ bootstrap_module(
     sig    = "Typedecl_separability_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedecl_properties", ## (Typing Typedecl_properties)
-        ":Subst", ## (Typing Subst)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Set)
-        ## (Map)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Config)
+        ":Types",
+        ":Typedecl_properties",
+        ":Subst",
+        ":Env",
+        ":Ctype",
+        ":Btype",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Map",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//utils:Lazy_backtrack",
+        "//utils:Config",
     ]
 )
 
@@ -1626,11 +1650,11 @@ bootstrap_signature(
     src  = "typedecl_separability.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedecl_properties", ## (Typing Typedecl_properties)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Location)
+        ":Types",
+        ":Typedecl_properties",
+        ":Ident",
+        ":Env",
+        "//parsing:Location",
     ]
 )
 
@@ -1640,11 +1664,11 @@ bootstrap_module(
     sig    = "Typedecl_unboxed_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Subst", ## (Typing Subst)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ## (Lazy_backtrack)
+        ":Types",
+        ":Subst",
+        ":Env",
+        ":Ctype",
+        "//utils:Lazy_backtrack",
     ]
 )
 
@@ -1653,8 +1677,8 @@ bootstrap_signature(
     src  = "typedecl_unboxed.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Env", ## (Typing Env)
+        ":Types",
+        ":Env",
     ]
 )
 
@@ -1664,21 +1688,21 @@ bootstrap_module(
     sig    = "Typedecl_variance_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl_properties", ## (Typing Typedecl_properties)
-        ":Subst", ## (Typing Subst)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (Variance)
-        ## (String)
-        ## (Parsetree)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
+        "//utils:Lazy_backtrack",
+        ":Btype",
+        ":Ctype",
+        ":Env",
+        ":Ident",
+        ":Subst",
+        ":Typedecl_properties",
+        ":Typedtree",
+        ":Types",
+        #### (Variance)
     ]
 )
 
@@ -1687,16 +1711,16 @@ bootstrap_signature(
     src  = "typedecl_variance.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl_properties", ## (Typing Typedecl_properties)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Asttypes)
+        ":Types",
+        ":Typedtree",
+        ":Typedecl_properties",
+        ":Path",
+        ":Ident",
+        ":Env",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1706,23 +1730,26 @@ bootstrap_module(
     sig    = "Typedtree_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Subst", ## (Typing Subst)
-        ":Primitive", ## (Typing Primitive)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Option)
-        ## (Meths)
-        ## (MethSet)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//utils:Lazy_backtrack",
+        ":Env",
+        ":Ident",
+        ":Path",
+        ":Primitive",
+        ":Subst",
+        ":Types",
+        #### (MethSet)
+        #### (Meths)
     ],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//lambda:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -1730,15 +1757,15 @@ bootstrap_signature(
     src  = "typedtree.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Primitive", ## (Typing Primitive)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Asttypes)
+        ":Types",
+        ":Primitive",
+        ":Path",
+        ":Ident",
+        ":Env",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//parsing:Asttypes_cmi",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -1753,52 +1780,52 @@ bootstrap_module(
     sig    = "Typemod_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Typetexp", ## (Typing Typetexp)
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl", ## (Typing Typedecl)
-        ":Typecore", ## (Typing Typecore)
-        ":Typeclass", ## (Typing Typeclass)
-        ":Subst", ## (Typing Subst)
-        ":Signature_group", ## (Typing Signature_group)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Path", ## (Typing Path)
-        ":Mtype", ## (Typing Mtype)
-        ":Includemod_errorprinter", ## (Typing Includemod_errorprinter)
-        ":Includemod", ## (Typing Includemod)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Cmt2annot", ## (Typing Cmt2annot)
-        ":Btype", ## (Typing Btype)
-        ## (Warnings)
-        ## (Variance)
-        ## (Uid)
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Parsetree)
+        "//file_formats:Cmi_format",
+        "//file_formats:Cmt_format",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Attr_helper",
+        "//parsing:Builtin_attributes",
+        "//parsing:Location",
+        "//parsing:Longident",
         "//parsing:Parse",
-        ## (Option)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Lexing)
-        ## (Lazy_backtrack)
-        ## (Lazy)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Filename)
-        ## (Config)
-        ## (Cmt_format)
-        ## (Cmi_format)
-        ## (Clflags)
-        ## (Builtin_attributes)
-        ## (Attr_helper)
-        ## (Asttypes)
-        ## (Array)
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Lazy_backtrack",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Btype",
+        ":Cmt2annot",
+        ":Ctype",
+        ":Env",
+        ":Ident",
+        ":Includemod",
+        ":Includemod_errorprinter",
+        ":Mtype",
+        ":Path",
+        ":Printtyp",
+        ":Signature_group",
+        ":Subst",
+        ":Typeclass",
+        ":Typecore",
+        ":Typedecl",
+        ":Typedtree",
+        ":Types",
+        ":Typetexp",
+        #### (Uid)
+        #### (Variance)
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -1812,17 +1839,17 @@ bootstrap_signature(
     src  = "typemod.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl", ## (Typing Typedecl)
-        ":Path", ## (Typing Path)
-        ":Includemod", ## (Typing Includemod)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Cmi_format)
+        ":Types",
+        ":Typedtree",
+        ":Typedecl",
+        ":Path",
+        ":Includemod",
+        ":Ident",
+        ":Env",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//file_formats:Cmi_format",
     ]
 )
 
@@ -1832,24 +1859,25 @@ bootstrap_module(
     sig    = "Typeopt_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Typedecl_unboxed", ## (Typing Typedecl_unboxed)
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Subst", ## (Typing Subst)
-        ":Predef", ## (Typing Predef)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ## (Sys)
-        ## (Parsetree)
-        ## (Longident)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Config)
-        ## (Clflags)
-        ## (Asttypes)
+        ":Types",
+        ":Typedtree",
+        ":Typedecl_unboxed",
+        ":Type_immediacy",
+        ":Subst",
+        ":Predef",
+        ":Path",
+        ":Ident",
+        ":Env",
+        ":Ctype",
+        "//lambda:Lambda",
+        "//stdlib:Stdlib.Sys",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.List",
+        "//utils:Lazy_backtrack",
+        "//utils:Config",
+        "//utils:Clflags",
+        "//parsing:Asttypes_cmi",
     ],
     visibility = ["//lambda:__pkg__"]
 )
@@ -1859,13 +1887,13 @@ bootstrap_signature(
     src  = "typeopt.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Env", ## (Typing Env)
-        "//lambda:Lambda_cmi"
-        ## (Parsetree)
-        ## (Longident)
+        ":Types",
+        ":Typedtree",
+        ":Path",
+        ":Env",
+        "//lambda:Lambda_cmi",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
     ]
 )
 
@@ -1875,23 +1903,31 @@ bootstrap_module(
     sig    = "Types_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Type_immediacy", ## (Typing Type_immediacy)
-        ":Primitive", ## (Typing Primitive)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ## (Parsetree)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (Local_store)
-        ## (List)
-        ## (Identifiable)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Config)
-        ## (Asttypes)
+        ":Type_immediacy",
+        ":Primitive",
+        ":Path",
+        ":Ident",
+        ":Shape",
+        "//parsing:Parsetree_cmi",
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//utils:Local_store",
+        "//stdlib:Stdlib.List",
+        "//utils:Identifiable",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
+        "//utils:Config",
+        "//parsing:Asttypes_cmi",
     ],
-    visibility = ["//file_formats:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
+        "//driver:__pkg__",
+        "//file_formats:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -1914,31 +1950,31 @@ bootstrap_module(
     sig    = "Typetexp_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Subst", ## (Typing Subst)
-        ":Printtyp", ## (Typing Printtyp)
-        ":Predef", ## (Typing Predef)
-        ":Path", ## (Typing Path)
-        ":Oprint", ## (Typing Oprint)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ":Ctype", ## (Typing Ctype)
-        ":Btype", ## (Typing Btype)
-        ## (String)
-        ## (Pprintast)
-        ## (Parsetree)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Clflags)
-        ## (Builtin_attributes)
-        ## (Asttypes)
-        ## (Ast_helper)
+        ":Types",
+        ":Typedtree",
+        ":Subst",
+        ":Printtyp",
+        ":Predef",
+        ":Path",
+        ":Oprint",
+        ":Errortrace",
+        ":Env",
+        ":Ctype",
+        ":Btype",
+        "//stdlib:Stdlib.String",
+        "//parsing:Pprintast",
+        "//parsing:Parsetree_cmi",
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//utils:Lazy_backtrack",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
+        "//utils:Clflags",
+        "//parsing:Builtin_attributes",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Ast_helper",
     ]
 )
 
@@ -1947,16 +1983,16 @@ bootstrap_signature(
     src  = "typetexp.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ":Errortrace", ## (Typing Errortrace)
-        ":Env", ## (Typing Env)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Format)
-        ## (Asttypes)
+        ":Types",
+        ":Typedtree",
+        ":Path",
+        ":Errortrace",
+        ":Env",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Format",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1966,50 +2002,50 @@ bootstrap_module(
     sig    = "Untypeast_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Types", ## (Typing Types)
-        ":Typedtree", ## (Typing Typedtree)
-        ":Subst", ## (Typing Subst)
-        ":Path", ## (Typing Path)
-        ":Ident", ## (Typing Ident)
-        ":Env", ## (Typing Env)
-        ## (Vb)
-        ## (Val)
-        ## (Type)
-        ## (Typ)
-        ## (Te)
-        ## (String)
-        ## (Str)
-        ## (Sig)
-        ## (Rf)
-        ## (Pat)
-        ## (Parsetree)
-        ## (Option)
-        ## (Opn)
-        ## (Of)
-        ## (Nativeint)
-        ## (Mty)
-        ## (Mtd)
-        ## (Ms)
-        ## (Mod)
-        ## (Md)
-        ## (Mb)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy_backtrack)
-        ## (Int64)
-        ## (Int32)
-        ## (Int)
-        ## (Incl)
-        ## (Exp)
-        ## (Cty)
-        ## (Ctf)
-        ## (Cl)
-        ## (Ci)
-        ## (Cf)
-        ## (Asttypes)
-        ## (Ast_helper)
-        ## (Array)
+        "//parsing:Ast_helper",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.String",
+        "//utils:Lazy_backtrack",
+        ":Env",
+        ":Ident",
+        ":Path",
+        ":Subst",
+        ":Typedtree",
+        ":Types",
+        #### (Cf)
+        #### (Ci)
+        #### (Cl)
+        #### (Ctf)
+        #### (Cty)
+        #### (Exp)
+        #### (Incl)
+        #### (Mb)
+        #### (Md)
+        #### (Mod)
+        #### (Ms)
+        #### (Mtd)
+        #### (Mty)
+        #### (Of)
+        #### (Opn)
+        #### (Pat)
+        #### (Rf)
+        #### (Sig)
+        #### (Str)
+        #### (Te)
+        #### (Typ)
+        #### (Type)
+        #### (Val)
+        #### (Vb)
     ]
 )
 
@@ -2018,12 +2054,12 @@ bootstrap_signature(
     src  = "untypeast.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Typedtree", ## (Typing Typedtree)
-        ":Path", ## (Typing Path)
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Asttypes)
+        ":Typedtree",
+        ":Path",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//parsing:Asttypes_cmi",
     ]
 )
 

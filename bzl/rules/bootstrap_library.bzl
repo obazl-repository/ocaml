@@ -1,4 +1,4 @@
-load("//bzl/providers:ocaml.bzl",
+load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
      "OcamlLibraryMarker",
      "OcamlModuleMarker",
@@ -84,7 +84,7 @@ Packages](../ug/collections.md).
         manifest = attr.label_list(
             doc = "List of elements of library, which may be compiled modules, signatures, or other libraries.",
             providers = [
-                # [OcamlArchiveMarker],
+                # [OcamlArchiveProvider],
                 [OcamlLibraryMarker],
                 [OcamlModuleMarker],
                 [OcamlNsResolverProvider],

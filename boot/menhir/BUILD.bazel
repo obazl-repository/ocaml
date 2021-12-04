@@ -26,17 +26,17 @@ bootstrap_module(
     sig    = "MenhirLib_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Obj)
-        ## (List)
-        ## (Lexing)
-        ## (Lazy)
-        ## (Char)
-        ## (Bytes)
-        ## (Buffer)
-        ## (Array)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -45,9 +45,9 @@ bootstrap_signature(
     src  = "menhirLib.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Obj)
-        ## (Lexing)
-        ## (Lazy)
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Lazy",
     ]
 )
 
@@ -64,26 +64,26 @@ bootstrap_module(
         ## (Typ)
         ## (Te)
         ## (Syntaxerr)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Str)
         ## (Sig)
         ## (Rf)
         ## (Pat)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Opn)
         ## (Of)
-        ## (Obj)
+        "//stdlib:Stdlib.Obj",
         ## (Mty)
         ## (Mtd)
         ## (Ms)
         ## (Mod)
         ## (Md)
         ## (Mb)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Lazy)
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Lazy",
         ## (Incl)
         ## (Exp)
         ## (Docstrings)
@@ -91,13 +91,13 @@ bootstrap_module(
         ## (Ctf)
         ## (Cstr)
         ## (Csig)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (Cl)
         ## (Ci)
         ## (Cf)
         ## (Attr)
-        ## (Asttypes)
-        ## (Ast_helper)
+        "//parsing:Asttypes_cmi",
+        "//parsing:Ast_helper",
     ]
 )
 
@@ -107,12 +107,12 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Menhir", ## (Boot Menhir MenhirLib)
-        ## (Parsetree)
-        ## (Obj)
-        ## (Longident)
-        ## (Location)
-        ## (Lexing)
-        ## (Lazy)
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Obj",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Lazy",
         ## (Docstrings)
     ]
 )

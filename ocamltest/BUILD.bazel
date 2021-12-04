@@ -61,10 +61,10 @@ ocaml_module(
         ":Variables", ## (Ocamltest Variables)
         ":Result", ## (Ocamltest Result)
         ":Environments", ## (Ocamltest Environments)
-        ## (String)
-        ## (Set)
-        ## (List)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -76,7 +76,7 @@ ocaml_signature(
         ":Variables", ## (Ocamltest Variables)
         ":Result", ## (Ocamltest Result)
         ":Environments", ## (Ocamltest Environments)
-        ## (Set)
+        "//stdlib:Stdlib.Set",
     ]
 )
 
@@ -96,9 +96,9 @@ ocaml_module(
         ":Environments", ## (Ocamltest Environments)
         ":Builtin_variables", ## (Ocamltest Builtin_variables)
         ":Actions", ## (Ocamltest Actions)
-        ## (Printf)
-        ## (Option)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -127,7 +127,7 @@ ocaml_module(
         ":Builtin_variables", ## (Ocamltest Builtin_variables)
         ":Actions_helpers", ## (Ocamltest Actions_helpers)
         ":Actions", ## (Ocamltest Actions)
-        ## (Printf)
+        "//stdlib:Stdlib.Printf",
     ]
 )
 
@@ -149,7 +149,7 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Variables", ## (Ocamltest Variables)
-        ## (List)
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -170,12 +170,12 @@ ocaml_module(
     deps   = [
         ":Variables", ## (Ocamltest Variables)
         ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
-        ## (Printf)
-        ## (Option)
-        ## (Map)
-        ## (Hashtbl)
-        ## (Buffer)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -197,7 +197,7 @@ ocaml_module(
         ":Run_command", ## (Ocamltest Run_command)
         ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
         ## (Fun)
-        ## (Bytes)
+        "//stdlib:Stdlib.Bytes",
     ]
 )
 
@@ -226,10 +226,10 @@ ocaml_module(
         ":Actions_helpers", ## (Ocamltest Actions_helpers)
         ":Actions", ## (Ocamltest Actions)
         ## (Tsl_parser)
-        ## (Printf)
-        ## (Location)
-        ## (Lexing)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -251,7 +251,7 @@ ocaml_module(
         ":Tsl_lexer", ## (Ocamltest Tsl_lexer)
         ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
         ":Environments", ## (Ocamltest Environments)
-        ## (Lexing)
+        "//stdlib:Stdlib.Lexing",
     ]
 )
 
@@ -289,12 +289,12 @@ ocaml_module(
         ":Builtin_variables", ## (Ocamltest Builtin_variables)
         ":Actions_helpers", ## (Ocamltest Actions_helpers)
         ":Actions", ## (Ocamltest Actions)
-        ## (Printf)
-        ## (Misc)
-        ## (Config)
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//utils:Config",
         ## (Cmo_format)
-        ## (Clflags)
-        ## (Array)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -419,9 +419,9 @@ ocaml_module(
     deps   = [
         ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
         ":Ocaml_backends", ## (Ocamltest Ocaml_backends)
-        ## (String)
-        ## (Printf)
-        ## (Filename)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Filename",
     ]
 )
 
@@ -491,7 +491,7 @@ ocaml_module(
         ":Ocaml_actions", ## (Ocamltest Ocaml_actions)
         ":Builtin_actions", ## (Ocamltest Builtin_actions)
         ":Actions_helpers", ## (Ocamltest Actions_helpers)
-        ## (List)
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -594,18 +594,18 @@ ocaml_module(
     deps   = [
         ":Ocamltest_unix", ## (Ocamltest Ocamltest_unix)
         ":Ocamltest_config", ## (Ocamltest Ocamltest_config)
-        ## (Sys)
-        ## (String)
-        ## (Seq)
-        ## (Printf)
-        ## (Misc)
-        ## (List)
-        ## (Int)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Seq",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
         ## (Fun)
-        ## (Filename)
-        ## (Char)
-        ## (Bytes)
-        ## (Array)
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -615,12 +615,12 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Ocamltest_unix", ## (Ocamltest Ocamltest_unix)
-        ## (Sys)
-        ## (Seq)
-        ## (Misc)
-        ## (List)
-        ## (Filename)
-        ## (Char)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Seq",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Char",
     ]
 )
 
@@ -646,7 +646,7 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ## (Unix)
-        ## (Printf)
+        "//stdlib:Stdlib.Printf",
     ]
 )
 
@@ -661,11 +661,11 @@ ocaml_module(
         ":Result", ## (Ocamltest Result)
         ":Environments", ## (Ocamltest Environments)
         ":Actions", ## (Ocamltest Actions)
-        ## (Sys)
-        ## (Printf)
-        ## (List)
-        ## (Array)
-        ## (Arg)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -701,7 +701,7 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -720,8 +720,8 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Variables", ## (Ocamltest Variables)
-        ## (Printf)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -743,11 +743,11 @@ ocaml_module(
         ":Result", ## (Ocamltest Result)
         ":Environments", ## (Ocamltest Environments)
         ":Actions", ## (Ocamltest Actions)
-        ## (String)
-        ## (Set)
-        ## (Printf)
-        ## (List)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -759,7 +759,7 @@ ocaml_signature(
         ":Result", ## (Ocamltest Result)
         ":Environments", ## (Ocamltest Environments)
         ":Actions", ## (Ocamltest Actions)
-        ## (Set)
+        "//stdlib:Stdlib.Set",
     ]
 )
 
@@ -769,7 +769,7 @@ ocaml_module(
     sig    = "Tsl_ast_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Location)
+        "//parsing:Location",
     ]
 )
 
@@ -778,7 +778,7 @@ ocaml_signature(
     src  = "tsl_ast.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Location)
+        "//parsing:Location",
     ]
 )
 
@@ -788,7 +788,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ## (Tsl_parser)
-        ## (Lexing)
+        "//stdlib:Stdlib.Lexing",
     ]
 )
 
@@ -804,11 +804,11 @@ ocaml_module(
         ":Result", ## (Ocamltest Result)
         ":Environments", ## (Ocamltest Environments)
         ":Actions", ## (Ocamltest Actions)
-        ## (Printf)
-        ## (Location)
-        ## (List)
-        ## (Format)
-        ## (Buffer)
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Buffer",
     ]
 )
 
@@ -831,10 +831,10 @@ ocaml_module(
     sig    = "Variables_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (String)
-        ## (Printf)
-        ## (List)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 

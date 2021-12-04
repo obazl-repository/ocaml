@@ -1,100 +1,22 @@
-## GENERATED FILE ##
+exports_files([
+    "arch.ml", "CSE.ml", "proc.ml",
+    "reload.ml", "scheduling.ml", "selection.ml"
+])
 
-load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
+# # root Makefile:
+# asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp $(cvt_emit)
+# 	echo \# 1 \"$(ARCH)/emit.mlp\" > $@
+# 	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
+# 	|| { rm -f $@; exit 2; }
+
+genrule(
+    name = "emit_ml",
+    srcs = ["emit.mlp", "//tools:cvt_emit.exe"],
+    outs = ["emit.ml"],
+    tools = ["//runtime:ocamlrun"], ## fixme: find a way to use the toolchain
+    cmd  = "\n".join([
+	    "echo '# 1 \"power/emit.mlp\"' > $@;",
+        "$(execpath //runtime:ocamlrun) $(location //tools:cvt_emit.exe) < $(location :emit.mlp) >> $@"
+    ]),
+    visibility = ["//asmcomp:__pkg__"]
 )
-
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "asmcomp_power_lib",
-    modules  = [
-        ":CSE",
-        ":Arch",
-        ":Proc",
-        ":Reload",
-        ":Scheduling",
-        ":Selection",
-    ],
-)
-
-ocaml_module(
-    name   = "CSE",
-    struct = "CSE.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Power", ## (Asmcomp Power Arch)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ":CSEgen", ## (Asmcomp CSEgen)
-    ]
-)
-
-ocaml_module(
-    name   = "Arch",
-    struct = "arch.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        ## (Printf)
-        ## (Format)
-        ## (Debuginfo)
-        ## (Config)
-        ## (Array)
-        ## (Arg)
-    ]
-)
-
-ocaml_module(
-    name   = "Proc",
-    struct = "proc.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Power", ## (Asmcomp Power Arch)
-        ":Reg", ## (Asmcomp Reg)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (String)
-        ## (Misc)
-        ## (List)
-        ## (Filename)
-        ## (Config)
-        ## (Ccomp)
-        ## (Array)
-    ]
-)
-
-ocaml_module(
-    name   = "Reload",
-    struct = "reload.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Reloadgen", ## (Asmcomp Reloadgen)
-    ]
-)
-
-ocaml_module(
-    name   = "Scheduling",
-    struct = "scheduling.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Power", ## (Asmcomp Power Arch)
-        ":Schedgen", ## (Asmcomp Schedgen)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-    ]
-)
-
-ocaml_module(
-    name   = "Selection",
-    struct = "selection.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Power", ## (Asmcomp Power Arch)
-        ":Selectgen", ## (Asmcomp Selectgen)
-        ":Mach", ## (Asmcomp Mach)
-        ":Cmm", ## (Asmcomp Cmm)
-        ## (Debuginfo)
-    ]
-)
-

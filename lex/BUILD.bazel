@@ -116,11 +116,11 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Syntax", ## (Lex Syntax)
         ":Lexgen", ## (Lex Lexgen)
-        ## (Sys)
-        ## (Printf)
-        ## (List)
-        ## (Int)
-        ## (Bytes)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Bytes",
     ]
 )
 
@@ -142,9 +142,9 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Table", ## (Lex Table)
         ":Lexgen", ## (Lex Lexgen)
-        ## (List)
-        ## (Hashtbl)
-        ## (Array)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -164,9 +164,9 @@ bootstrap_module(
     sig    = "Cset_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (List)
-        ## (Int)
-        ## (Array)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -213,15 +213,15 @@ bootstrap_module(
         ":Table", ## (Lex Table)
         ":Syntax", ## (Lex Syntax)
         ":Cset", ## (Lex Cset)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Stack)
-        ## (Set)
-        ## (Map)
-        ## (List)
-        ## (Int)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Hashtbl",
         ## (Bool)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -247,13 +247,13 @@ bootstrap_module(
         ":Cset", ## (Lex Cset)
         ":Compact", ## (Lex Compact)
         ":Common", ## (Lex Common)
-        ## (Sys)
-        ## (Printf)
-        ## (Printexc)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
         ":Parser"
-        ## (Lexing)
-        ## (Filename)
-        ## (Arg)
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -267,10 +267,10 @@ bootstrap_module(
         ":Lexgen", ## (Lex Lexgen)
         ":Compact", ## (Lex Compact)
         ":Common", ## (Lex Common)
-        ## (Printf)
-        ## (List)
-        ## (Char)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -295,11 +295,11 @@ bootstrap_module(
         ":Syntax", ## (Lex Syntax)
         ":Lexgen", ## (Lex Lexgen)
         ":Common", ## (Lex Common)
-        ## (Printf)
-        ## (List)
-        ## (Hashtbl)
-        ## (Char)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -355,7 +355,7 @@ bootstrap_module(
     sig    = "Table_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 

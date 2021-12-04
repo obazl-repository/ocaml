@@ -22,47 +22,47 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Topcommon", ## (Toplevel Topcommon)
-        ## (Warnings)
-        ## (Types)
+        "//utils:Warnings",
+        "//typing:Types",
         ## (Typemod)
         ## (Typedtree)
         ## (Typecore)
         ## (Translmod)
-        ## (Sys)
+        "//stdlib:Stdlib.Sys",
         ## (Symtable)
         ## (Simplif)
         ## (Printtyped)
         ## (Printtyp)
-        ## (Printlambda)
+        "//lambda:Printlambda",
         ## (Printinstr)
-        ## (Printexc)
-        ## (Predef)
+        "//stdlib:Stdlib.Printexc",
+        "//typing:Predef",
         ## (Persistent_env)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Outcometree)
         ## (Opcodes)
-        ## (Obj)
-        ## (Misc)
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
         ## (Meta)
         ## (LongString)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
         ## (Includemod)
-        ## (Ident)
-        ## (Gc)
+        "//typing:Ident",
+        "//stdlib:Stdlib.Gc",
         ## (Fun)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         ## (Env)
         ## (Emitcode)
         ## (Dll)
-        ## (Config)
+        "//utils:Config",
         ## (Compmisc)
         ## (Cmo_format)
-        ## (Clflags)
-        ## (Char)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Char",
         ## (Bytegen)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -76,26 +76,26 @@ ocaml_module(
         ":Toploop", ## (Toplevel Toploop)
         ":Topdirs", ## (Toplevel Topdirs)
         ":Topcommon", ## (Toplevel Topcommon)
-        ## (Types)
-        ## (Sys)
+        "//typing:Types",
+        "//stdlib:Stdlib.Sys",
         ## (Printtyp)
-        ## (Printf)
-        ## (Printexc)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
         ## (Path)
-        ## (Obj)
-        ## (Misc)
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
         ## (Main_args)
-        ## (Location)
-        ## (List)
-        ## (Format)
-        ## (Filename)
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Env)
         ## (Ctype)
         ## (Compmisc)
         ## (Compenv)
-        ## (Clflags)
-        ## (Array)
-        ## (Arg)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -106,17 +106,17 @@ ocaml_module(
     deps   = [
         ":Byte", ## (Toplevel Byte Topeval)
         ":Topcommon", ## (Toplevel Topcommon)
-        ## (Types)
+        "//typing:Types",
         ## (Printtyp)
-        ## (Predef)
+        "//typing:Predef",
         ## (Path)
-        ## (Obj)
-        ## (Misc)
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
         ## (Meta)
-        ## (Longident)
-        ## (Format)
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Format",
         ## (Ctype)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
     ]
 )
 

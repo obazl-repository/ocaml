@@ -49,9 +49,9 @@ ocaml_module(
         ":Systhreads", ## (Otherlibs Systhreads Mutex)
         ":Systhreads", ## (Otherlibs Systhreads Condition)
         ## (Random)
-        ## (Queue)
-        ## (List)
-        ## (Array)
+        "//stdlib:Stdlib.Queue",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -105,9 +105,9 @@ ocaml_module(
     sig    = "Thread_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Sys)
-        ## (Printf)
-        ## (Printexc)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
         ## (Callback)
     ]
 )
@@ -128,7 +128,7 @@ ocaml_module(
     deps   = [
         ":Unix", ## (Otherlibs Unix Unix)
         ":Systhreads", ## (Otherlibs Systhreads Thread)
-        ## (Bytes)
+        "//stdlib:Stdlib.Bytes",
     ]
 )
 

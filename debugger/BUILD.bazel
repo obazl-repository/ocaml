@@ -63,10 +63,10 @@ ocaml_module(
         ":Debugger_config", ## (Debugger Debugger_config)
         ":Debugcom", ## (Debugger Debugcom)
         ":Checkpoints", ## (Debugger Checkpoints)
-        ## (Printf)
-        ## (Misc)
-        ## (List)
-        ## (Int)
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
         ## (Instruct)
         ## (Fun)
     ]
@@ -91,7 +91,7 @@ ocaml_module(
         ":Primitives", ## (Debugger Primitives)
         ":Int64ops", ## (Debugger Int64ops)
         ":Debugcom", ## (Debugger Debugcom)
-        ## (Option)
+        "//stdlib:Stdlib.Option",
     ]
 )
 
@@ -138,22 +138,22 @@ ocaml_module(
         ":Checkpoints", ## (Debugger Checkpoints)
         ":Breakpoints", ## (Debugger Breakpoints)
         ## (Unix)
-        ## (Types)
-        ## (Sys)
-        ## (String)
+        "//typing:Types",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Remote_value)
-        ## (Printf)
-        ## (Longident)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Lexing)
-        ## (Int)
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Int",
         ## (Instruct)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Hashtbl",
         ## (Fun)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Envaux)
         ## (Env)
         ## (Debugger_parser)
@@ -165,8 +165,8 @@ ocaml_signature(
     src  = "command_line.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Lexing)
-        ## (Format)
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -179,16 +179,16 @@ ocaml_module(
         ":Primitives", ## (Debugger Primitives)
         ":Int64ops", ## (Debugger Int64ops)
         ":Input_handling", ## (Debugger Input_handling)
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Obj)
-        ## (Misc)
-        ## (List)
-        ## (Int64)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
         ## (Instruct)
-        ## (Char)
-        ## (Array)
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -209,8 +209,8 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Int64ops", ## (Debugger Int64ops)
-        ## (Sys)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -219,7 +219,7 @@ ocaml_signature(
     src  = "debugger_config.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -228,7 +228,7 @@ ocaml_signature(
     src  = "debugger_lexer.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Lexing)
+        "//stdlib:Stdlib.Lexing",
         ## (Debugger_parser)
     ]
 )
@@ -244,22 +244,22 @@ ocaml_module(
         ":Frames", ## (Debugger Frames)
         ":Events", ## (Debugger Events)
         ":Debugcom", ## (Debugger Debugcom)
-        ## (Types)
+        "//typing:Types",
         ## (Symtable)
         ## (Subst)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Printtyp)
-        ## (Predef)
+        "//typing:Predef",
         ## (Path)
-        ## (Misc)
-        ## (Longident)
-        ## (List)
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.List",
         ## (Instruct)
-        ## (Ident)
-        ## (Format)
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
         ## (Ctype)
-        ## (Char)
+        "//stdlib:Stdlib.Char",
         ## (Btype)
     ]
 )
@@ -272,11 +272,11 @@ ocaml_signature(
         ":Parser_aux", ## (Debugger Parser_aux)
         ":Events", ## (Debugger Events)
         ":Debugcom", ## (Debugger Debugcom)
-        ## (Types)
+        "//typing:Types",
         ## (Path)
-        ## (Longident)
-        ## (Ident)
-        ## (Format)
+        "//parsing:Longident",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
     ]
 )
@@ -287,7 +287,7 @@ ocaml_module(
     sig    = "Events_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Location)
+        "//parsing:Location",
         ## (Instruct)
     ]
 )
@@ -297,7 +297,7 @@ ocaml_signature(
     src  = "events.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Lexing)
+        "//stdlib:Stdlib.Lexing",
         ## (Instruct)
     ]
 )
@@ -308,7 +308,7 @@ ocaml_module(
     sig    = "Exec_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Sys)
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
@@ -329,8 +329,8 @@ ocaml_module(
         ":Symbols", ## (Debugger Symbols)
         ":Events", ## (Debugger Events)
         ":Debugcom", ## (Debugger Debugcom)
-        ## (Misc)
-        ## (Lexing)
+        "//utils:Misc",
+        "//stdlib:Stdlib.Lexing",
         ## (Instruct)
     ]
 )
@@ -354,7 +354,7 @@ ocaml_module(
         ":Int64ops", ## (Debugger Int64ops)
         ":Debugger_config", ## (Debugger Debugger_config)
         ":Checkpoints", ## (Debugger Checkpoints)
-        ## (List)
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -375,7 +375,7 @@ ocaml_module(
         ":Primitives", ## (Debugger Primitives)
         ":Parameters", ## (Debugger Parameters)
         ## (Unix)
-        ## (List)
+        "//stdlib:Stdlib.List",
         ## (Fun)
     ]
 )
@@ -395,7 +395,7 @@ ocaml_module(
     sig    = "Int64ops_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Int64)
+        "//stdlib:Stdlib.Int64",
     ]
 )
 
@@ -415,19 +415,19 @@ ocaml_module(
     deps   = [
         ":Printval", ## (Debugger Printval)
         ":Parameters", ## (Debugger Parameters)
-        ## (Types)
+        "//typing:Types",
         ## (Symtable)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Printtyp)
         ## (Path)
-        ## (Obj)
-        ## (Misc)
-        ## (Longident)
-        ## (Load_path)
-        ## (List)
-        ## (Ident)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Env)
         ## (Dynlink)
         ## (Ctype)
@@ -439,8 +439,8 @@ ocaml_signature(
     src  = "loadprinter.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Longident)
-        ## (Format)
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Format",
         ## (Dynlink)
     ]
 )
@@ -465,23 +465,23 @@ ocaml_module(
         ":Command_line", ## (Debugger Command_line)
         ":Checkpoints", ## (Debugger Checkpoints)
         ## (Unix)
-        ## (Sys)
-        ## (String)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Persistent_env)
-        ## (Misc)
-        ## (Load_path)
-        ## (Lexing)
-        ## (Int64)
-        ## (Int)
-        ## (Format)
-        ## (Filename)
-        ## (Config)
-        ## (Cmi_format)
-        ## (Clflags)
+        "//utils:Misc",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
+        "//utils:Config",
+        "//file_formats:Cmi_format",
+        "//utils:Clflags",
         ## (Callback)
-        ## (Buffer)
-        ## (Array)
-        ## (Arg)
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -502,11 +502,11 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Debugger_config", ## (Debugger Debugger_config)
-        ## (Load_path)
-        ## (Hashtbl)
-        ## (Filename)
+        "//utils:Load_path",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Filename",
         ## (Envaux)
-        ## (Config)
+        "//utils:Config",
     ]
 )
 
@@ -524,7 +524,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Debugcom", ## (Debugger Debugcom)
-        ## (Longident)
+        "//parsing:Longident",
     ]
 )
 
@@ -538,8 +538,8 @@ ocaml_module(
         ":Debugger_config", ## (Debugger Debugger_config)
         ":Debugcom", ## (Debugger Debugcom)
         ## (Typedtree)
-        ## (Misc)
-        ## (List)
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
         ## (Ctype)
     ]
 )
@@ -562,9 +562,9 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Events", ## (Debugger Events)
-        ## (Printf)
-        ## (Location)
-        ## (Lexing)
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Lexing",
         ## (Instruct)
     ]
 )
@@ -585,8 +585,8 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ## (Unix)
-        ## (String)
-        ## (Printexc)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printexc",
     ]
 )
 
@@ -607,16 +607,16 @@ ocaml_module(
     deps   = [
         ":Parser_aux", ## (Debugger Parser_aux)
         ":Debugcom", ## (Debugger Debugcom)
-        ## (Types)
+        "//typing:Types",
         ## (Symtable)
         ## (Printtyp)
         ## (Outcometree)
         ## (Oprint)
-        ## (Obj)
-        ## (Int)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Hashtbl",
         ## (Genprintval)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
         ## (Env)
     ]
 )
@@ -628,10 +628,10 @@ ocaml_signature(
     deps   = [
         ":Parser_aux", ## (Debugger Parser_aux)
         ":Debugcom", ## (Debugger Debugcom)
-        ## (Types)
+        "//typing:Types",
         ## (Path)
-        ## (Obj)
-        ## (Format)
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Format",
         ## (Env)
     ]
 )
@@ -648,12 +648,12 @@ ocaml_module(
         ":Input_handling", ## (Debugger Input_handling)
         ":Debugger_config", ## (Debugger Debugger_config)
         ## (Unix)
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (List)
-        ## (Filename)
-        ## (Buffer)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Buffer",
     ]
 )
 
@@ -685,10 +685,10 @@ ocaml_module(
         ":Debugger_config", ## (Debugger Debugger_config)
         ":Breakpoints", ## (Debugger Breakpoints)
         ## (Unix)
-        ## (Printf)
-        ## (Load_path)
+        "//stdlib:Stdlib.Printf",
+        "//utils:Load_path",
         ## (Envaux)
-        ## (Bytes)
+        "//stdlib:Stdlib.Bytes",
     ]
 )
 
@@ -709,8 +709,8 @@ ocaml_module(
         ":Primitives", ## (Debugger Primitives)
         ":Input_handling", ## (Debugger Input_handling)
         ":Debugger_lexer", ## (Debugger Debugger_lexer)
-        ## (String)
-        ## (Lexing)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Lexing",
         ## (Fun)
     ]
 )
@@ -739,12 +739,12 @@ ocaml_module(
         ":Debugcom", ## (Debugger Debugcom)
         ":Checkpoints", ## (Debugger Checkpoints)
         ":Breakpoints", ## (Debugger Breakpoints)
-        ## (String)
-        ## (Misc)
-        ## (List)
-        ## (Lexing)
+        "//stdlib:Stdlib.String",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         ## (Instruct)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -754,7 +754,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Events", ## (Debugger Events)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -769,10 +769,10 @@ ocaml_module(
         ":Parameters", ## (Debugger Parameters)
         ":Events", ## (Debugger Events)
         ":Debugger_config", ## (Debugger Debugger_config)
-        ## (String)
-        ## (Printf)
-        ## (Location)
-        ## (Lexing)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Lexing",
         ## (Instruct)
     ]
 )
@@ -782,7 +782,7 @@ ocaml_signature(
     src  = "show_source.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Lexing)
+        "//stdlib:Stdlib.Lexing",
         ## (Instruct)
     ]
 )
@@ -795,14 +795,14 @@ ocaml_module(
     deps   = [
         ":Primitives", ## (Debugger Primitives)
         ":Debugger_config", ## (Debugger Debugger_config)
-        ## (Sys)
-        ## (String)
-        ## (Misc)
-        ## (Load_path)
-        ## (List)
-        ## (Lexing)
-        ## (Hashtbl)
-        ## (Filename)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//utils:Misc",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Filename",
     ]
 )
 
@@ -811,7 +811,7 @@ ocaml_signature(
     src  = "source.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Lexing)
+        "//stdlib:Stdlib.Lexing",
     ]
 )
 
@@ -827,13 +827,13 @@ ocaml_module(
         ":Debugcom", ## (Debugger Debugcom)
         ":Checkpoints", ## (Debugger Checkpoints)
         ## (Symtable)
-        ## (Misc)
-        ## (List)
-        ## (Lexing)
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         ## (Instruct)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Hashtbl",
         ## (Bytesections)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -867,14 +867,14 @@ ocaml_module(
         ":Debugcom", ## (Debugger Debugcom)
         ":Checkpoints", ## (Debugger Checkpoints)
         ":Breakpoints", ## (Debugger Breakpoints)
-        ## (Sys)
-        ## (Printf)
-        ## (Misc)
-        ## (List)
-        ## (Int64)
-        ## (Int)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Int",
         ## (Instruct)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -915,12 +915,12 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ## (Unix)
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Misc)
-        ## (Filename)
-        ## (Array)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Array",
     ]
 )
 

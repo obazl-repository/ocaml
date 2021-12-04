@@ -1,5 +1,8 @@
-load("//bzl/providers:ocaml.bzl",
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
+load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
+     "OcamlArchiveProvider",
      "OcamlModuleMarker",
      "OcamlNsResolverProvider",
      "OcamlProvider",
@@ -34,6 +37,207 @@ load(":impl_common.bzl",
 
 scope = tmpdir
 
+sigdeps_closure = None
+sig_linkargs = None
+sig_paths = None
+
+in_structfile = None
+
+########################
+def handle_cmi_dep(ctx, debug):
+
+    debug = False
+
+    sig_attr = ctx.attr.sig
+
+    if debug:
+        print("sig is cmi")
+    # sig is ocaml_signature target providing cmi file
+    # derive module name from sigfile
+    # for submodules, sigfile name will already contain ns prefix
+
+    sigProvider = sig_attr[OcamlSignatureProvider]
+    provider_output_cmi = sigProvider.cmi
+    provider_output_mli = sigProvider.mli
+
+    if debug:
+        print("provider_output_cmi: %s" % provider_output_cmi.path)
+        print("provider_output_cmi shortdir: {d}".format(
+            d = paths.dirname(provider_output_cmi.short_path)))
+        print("provider_output_mli: %s" % provider_output_mli.path)
+        print("provider_output_mli shortdir: {d}".format(
+            d = paths.dirname(provider_output_mli.short_path)))
+    ## provider_output_cmi and provider_output_mli should be in same dir, so
+    ## paths.dirname(short_path) should match
+
+    ## we're given a sig cmi, so we're going to derive the module
+    ## name from the signame rather than the structfile name.
+    ## provider_output_cmi has been ppxed and ns-renamed if necessary
+    module_name = provider_output_cmi.basename[:-4]
+
+    (from_name, ns, module_name) = get_module_name(ctx, ctx.file.struct)
+    if debug:
+        print("From '{src}' To: '{dst}'".format(
+            src = from_name, dst = module_name))
+
+    if from_name == module_name:
+        if debug:
+            print("not namespaced") # was not renamed
+            print("src longpath: %s" % ctx.file.struct.path)
+            print("src shortpath: %s" % ctx.file.struct.short_path)
+            print("src shortdirname: {d}".format(
+                d =  paths.dirname(ctx.file.struct.short_path)))
+
+        if ctx.file.struct.is_source:
+            # structfile in src dir, link to bazel dir
+            in_structfile = ctx.actions.declare_file(scope + ctx.file.struct.basename)
+            ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+            if debug:
+                print("symlinking src: {src} -> {dst}".format(
+                    src = ctx.file.struct, dst = in_structfile))
+        else:
+            # structfile is generated, e.g. by ocamllex or a genrule.
+            # make sure it's in same dir as mli/cmi
+            mlidir = paths.dirname(provider_output_mli.short_path)
+            if paths.dirname(ctx.file.struct.short_path) != mlidir:
+                in_structfile = ctx.actions.declare_file(
+                    scope + ctx.file.struct.basename)
+                ctx.actions.symlink(
+                    output = in_structfile,
+                    target_file = ctx.file.struct)
+                if debug:
+                    print("symlinked {src} => {dst}".format(
+                    src = ctx.file.struct, dst = in_structfile))
+            else:
+                if debug:
+                    print("not symlinking src: {src}".format(
+                        src = ctx.file.struct.path))
+                in_structfile = ctx.file.struct
+
+    else:  ## not from_name == module_name
+        if debug:
+            print("module is namespaced: %s" % module_name)
+
+        ## provider_output_mli name should match renamed structfile
+
+        ## FIXME: use case: configured module binding w/in ns
+        ## make sure structfile is renamed to match sigfile
+
+        ## structfile must be renamed, whether it is src or gen
+        # if ctx.file.struct.is_source:
+        in_structfile = ctx.actions.declare_file(
+            scope + module_name + ".ml"
+        )
+        ctx.actions.symlink(
+            output = in_structfile,
+            target_file = ctx.file.struct
+        )
+        # else:
+        #     ## generated file, already in bazel dir
+        #     in_structfile = ctx.file.struct
+
+    if debug:
+        print("renamed structfile {src} => {dest}".format(
+            src = ctx.file.struct.path,
+            dest = in_structfile
+        ))
+
+    # includes.append(provider_output_mli.dirname)
+
+    # sigdeps_closure = sig_attr[DefaultInfo].files
+    # sigdeps_closure = sig_attr[OcamlProvider].inputs
+    # sig_linkargs = sig_attr[OcamlProvider].linkargs
+    # sig_paths = sig_attr[OcamlProvider].paths
+
+    ## NB: provider_output_cmi and provider_output_mli must be kept together,
+    ## so both go into inputs (and provided outputs)
+    # sig_inputs = [provider_output_cmi, provider_output_mli] # , in_structfile]
+
+    return (provider_output_mli, provider_output_cmi, None,
+            ns, module_name, in_structfile)
+
+####################
+## if we have ctx.attr.sig, we need to add the cmi file to
+## compile_action_inputs. if mode is native, we also need to add the
+## mli file.
+
+## we do not need to pass on the depgraph of the cmi target.
+def handle_sig(ctx, debug):
+
+    if ctx.attr.sig:
+        ## cmi file already provided. rename structfile to match it if
+        ## needed.
+        if debug:
+            print("SIG attr: %s" % ctx.attr.sig)
+        if OcamlSignatureProvider in ctx.attr.sig:
+            return handle_cmi_dep(ctx, debug)
+            # sig_inputs = [cmifile, mlifile]
+        else:
+            ## bootstrap_signature always uses OcamlSignature
+            ## provider, so either ctx.file.sig is a source file or it
+            ## was produced by a genrule or some other mechanism.
+            if debug:
+                fail("ERROR: invalid value for 'sig' attr: %s" % ctx.file.sig)
+
+    else:
+        ## no ctx.attr.sig. rename structfile if in ns, and declare
+        ## cmi outfile, which will be added to action outputs
+        if debug:
+            print("No sigfile")
+
+        (from_name, ns, module_name) = get_module_name(ctx, ctx.file.struct)
+        # print("module_name: %s" % module_name)
+        if from_name == module_name:
+            if debug:
+                print("module not in ns - no renaming: %s" % module_name)
+            if ctx.file.struct.is_source:
+                ## structfile in src tree, symlink it to bazel dir
+                in_structfile = ctx.actions.declare_file(
+                    scope + ctx.file.struct.basename
+                )
+                ctx.actions.symlink(
+                    output = in_structfile,
+                    target_file = ctx.file.struct
+                )
+                if debug:
+                    print("symlinked {src} -> {dst}".format(
+                        src = ctx.file.struct, dst = in_structfile))
+            else:
+                ## structfile was generated, so its already in a bazel dir
+                in_structfile = ctx.file.struct
+        else:
+            if debug:
+                print("module in ns - renaming: {src} -> {dst}".format(
+                    src = ctx.file.struct, dst = module_name))
+            ## renaming input puts it into output dir; not strictly
+            # necessary, since w/o an mli file, input can be
+            # non-namepaced name and no confusion about cmi file ensues.
+            ## but for consistency and clarity, we symlink the input
+            ## file to ns-prefixed name in output dir. then we could
+            ## omit the -o arg, since compiler writes to its input dir
+            ## (which after symlinking is our Bazel output dir).
+            # w/o renaming we get stuff like:
+            # -c -impl modules/namespaced/green.ml
+            #    -o bazel-out/ ... /Color__Green.cmx
+            # with renaming:
+            # -c -impl bazel-out/darwin-fastbuild/ ... /Color__Green.ml
+            #    -o bazel-out/darwin-fastbuild-ST ... /Color__Green.cmx
+
+            in_structfile = ctx.actions.declare_file(
+                scope + module_name + ".ml"
+            )
+            ctx.actions.symlink(
+                output = in_structfile, target_file = ctx.file.struct
+            )
+
+        cmi = module_name + ".cmi"
+        action_output_cmi = ctx.actions.declare_file(scope + cmi)
+        # print("cmi out: %s" % cmifile.path)
+        # action_outputs.append(cmifile)
+        # sig_inputs = [] # in_structfile]
+
+        return None, None, action_output_cmi, ns, module_name, in_structfile
+
 ###############################
 def _bootstrap_module(ctx):
 
@@ -53,8 +257,8 @@ def _bootstrap_module(ctx):
     # return impl_module(ctx, mode, tool, tool_args)
 
     debug = False
-    if ctx.label.name in ["Make_opcodes"]:
-        debug = True
+    # if ctx.label.name in ["Stdlib.List"]:
+    #     debug = True
 
     # env = {"PATH": get_sdkpath(ctx)}
 
@@ -80,7 +284,7 @@ def _bootstrap_module(ctx):
     default_outputs    = [] # just the cmx/cmo files, for efaultInfo
     action_outputs   = [] # .cmx, .cmi, .o
     # direct_linkargs = []
-    old_cmi = None
+    # old_cmi = None
 
     ## module name is derived from sigfile name, so start with sig
     # if we have an input cmi, we will pass it on as Provider output,
@@ -97,216 +301,31 @@ def _bootstrap_module(ctx):
     # compile action will fail before we can do that, since it's
     # outputs will be in the wrong place.
 
-    in_structfile = None
+    # in_structfile = None
     module_name = None
     mlifile = None
     cmifile = None
     sig_src = None
 
-    sig_inputs = None
-    sig_linkargs = None
-    sig_paths = None
+    # ns = None
 
-    ns = None
+    (provider_output_mli, # None if no sig passed
+     ## one of the following two returned:
+     provider_output_cmi, # None if no sig passed
+     action_output_cmi,   # None if sig passed
+     ns,
+     module_name,
+     in_structfile) = handle_sig(ctx, debug)
 
-    if ctx.attr.sig:
-        sig_attr = ctx.attr.sig
-        if debug:
-            print("SIG attr: %s" % sig_attr)
+    if action_output_cmi:
+        action_outputs.append(action_output_cmi)
 
-        if OcamlSignatureProvider in sig_attr:
-            if debug:
-                print("sig is cmi")
-            # sig is ocaml_signature target providing cmi file
-            # derive module name from sigfile
-            # for submodules, sigfile name will already contain ns prefix
-
-            sigProvider = sig_attr[OcamlSignatureProvider]
-            cmifile = sigProvider.cmi
-            old_cmi = [cmifile]
-            mlifile = sigProvider.mli
-
-            if debug:
-                print("cmifile: %s" % cmifile)
-                print("mlifile: %s" % mlifile)
-
-            ## we're given a sig cmi, so we're going to derive the module
-            ## name from the signame rather than the structfile name.
-            ## cmifile has been ppxed and ns-renamed if necessary
-            module_name = cmifile.basename[:-4]
-
-            (from_name, ns, module_name) = get_module_name(ctx, ctx.file.struct)
-            if debug:
-                print("From {src} To: {dst}".format(
-                    src = from_name, dst = module_name))
-
-            if from_name == module_name:
-                if debug:
-                    print("not namespaced") # was not renamed
-
-                if ctx.file.struct.is_source:
-                    in_structfile = ctx.actions.declare_file(scope + ctx.file.struct.basename)
-                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-                else:
-                    ## generated file already in bazel dir
-                    in_structfile = ctx.file.struct
-
-            else:
-                if debug:
-                    print("mlifile was renamed: %s" % mlifile)
-                    print("module_name: %s" % module_name)
-                # so we need to rename structfile to match
-                # NB: mlifile must be added to provider output
-                # if ctx.attr.ppx:
-                #     in_structfile = impl_ppx_transform(
-                #         ctx.attr._rule, ctx,
-                #         ctx.file.struct, module_name + ".ml"
-                #     )
-                # else:
-
-                if ctx.file.struct.is_source:
-                    in_structfile = ctx.actions.declare_file(
-                        scope + module_name + ".ml"
-                    )
-                    ctx.actions.symlink(
-                        output = in_structfile,
-                        target_file = ctx.file.struct
-                    )
-                else:
-                    ## generated file, already in bazel dir
-                    in_structfile = ctx.file.struct
-                # print("renamed structfile {src} => {dest}".format(
-                #     src = ctx.file.struct.path,
-                #     dest = in_structfile
-                # ))
-
-            includes.append(mlifile.dirname)
-
-            # sig_inputs = sig_attr[DefaultInfo].files
-            sig_inputs = sig_attr[OcamlProvider].inputs
-            sig_linkargs = sig_attr[OcamlProvider].linkargs
-            sig_paths = sig_attr[OcamlProvider].paths
-
-            ## NB: cmifile and mlifile must be kept together,
-            ## so both go into inputs (and provided outputs)
-##FIXME: rename src_inputs -> sig_inputs
-            src_inputs = [cmifile, mlifile] # , in_structfile]
-        else:
-            if debug:
-                print("sig is source file")
-            (from_name, ns, module_name) = get_module_name(ctx, ctx.file.sig)
-            # print("module_name: %s" % module_name)
-            if from_name == module_name:
-                if debug:
-                    print("not namespaced")
-                    print("struct file: %s" % ctx.file.struct.path)
-                in_structfile = ctx.actions.declare_file(scope + ctx.file.struct.basename)
-                ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-                # print("in_structfile: %s" % in_structfile)
-                # print("sig file: %s" % ctx.file.sig.path)
-                sig_src = ctx.actions.declare_file(scope + ctx.file.sig.basename)
-                ctx.actions.symlink(output=sig_src,
-                                    target_file = ctx.file.sig)
-                # print("sig_src: %s" % sig_src.path)
-                cmi = sig_src.basename[:-4] + ".cmi"
-                cmifile = ctx.actions.declare_file(scope + cmi)
-                # print("cmi out: %s" % cmifile.path)
-                action_outputs.append(cmifile)
-
-                ## NB: cmifile and mlifile must be kept together,
-                ## so both go into inputs (and provided outputs)
-                src_inputs = [sig_src] # , in_structfile] ## , ctx.file.sig]
-            else:
-                ## namespaced - symlink to ns-prefixed names
-                in_structfile = ctx.actions.declare_file(
-                    scope + module_name + ".ml"
-                )
-                ctx.actions.symlink(
-                    output = in_structfile, target_file = ctx.file.struct
-                )
-                # print("in_structfile: %s" % in_structfile)
-                # print("sig file: %s" % ctx.file.sig.path)
-                sig_src = ctx.actions.declare_file(
-                    scope + module_name + ".mli"
-                )
-                ctx.actions.symlink(
-                    output=sig_src, target_file = ctx.file.sig
-                )
-                # print("sig_src: %s" % sig_src.path)
-                cmi = sig_src.basename[:-4] + ".cmi"
-                cmifile = ctx.actions.declare_file(scope + cmi)
-                # print("cmi out: %s" % cmifile.path)
-                action_outputs.append(cmifile)
-
-                ## NB: cmifile and mlifile must be kept together,
-                ## so both go into inputs (and provided outputs)
-                src_inputs = [sig_src] #, in_structfile] # , ctx.file.sig]
-    else:
-        if debug:
-            print("No sigfile")
-        (from_name, ns, module_name) = get_module_name(ctx, ctx.file.struct)
-        # print("module_name: %s" % module_name)
-        if from_name == module_name:
-            # print("not namespaced")
-            # if ctx.attr.ppx:
-            #     # print("ppxed")
-            #     in_structfile = impl_ppx_transform(
-            #         ctx.attr._rule, ctx,
-            #         ctx.file.struct, module_name + ".ml"
-            #     )
-            # else:
-
-            # print("no ppx")
-            # in_structfile = ctx.file.struct
-            # if debug:
-            if ctx.file.struct.is_source:
-                # print("symlinking src structfile: %s" % ctx.file.struct)
-                in_structfile = ctx.actions.declare_file(scope + ctx.file.struct.basename)
-                ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-            else:
-               in_structfile = ctx.file.struct
-
-            cmi = module_name + ".cmi"
-            cmifile = ctx.actions.declare_file(scope + cmi)
-            # print("cmi out: %s" % cmifile.path)
-            action_outputs.append(cmifile)
-            src_inputs = [] # in_structfile]
-        else:
-            # print("namespaced")
-            ## renaming input puts it into output dir; not strictly
-            # necessary, since w/o an mli file, input can be
-            # non-namepaced name and no confusion about cmi file ensues.
-            ## but for consistency and clarity, we symlink the input
-            ## file to ns-prefixed name in output dir. then we could
-            ## omit the -o arg, since compiler writes to its input dir
-            ## (which after symlinking is our Bazel output dir).
-            # w/o renaming we get stuff like:
-            # -c -impl modules/namespaced/green.ml
-            #    -o bazel-out/ ... /Color__Green.cmx
-            # with renaming:
-            # -c -impl bazel-out/darwin-fastbuild/ ... /Color__Green.ml
-            #    -o bazel-out/darwin-fastbuild-ST ... /Color__Green.cmx
-
-            # if ctx.attr.ppx:
-            #     # print("ppxed")
-            #     in_structfile = impl_ppx_transform(
-            #         ctx.attr._rule, ctx,
-            #         ctx.file.struct, module_name + ".ml"
-            #     )
-            # else:
-            # print("no ppx")
-            in_structfile = ctx.actions.declare_file(
-                scope + module_name + ".ml"
-            )
-            ctx.actions.symlink(
-                output = in_structfile, target_file = ctx.file.struct
-            )
-
-            cmi = module_name + ".cmi"
-            cmifile = ctx.actions.declare_file(scope + cmi)
-            # print("cmi out: %s" % cmifile.path)
-            action_outputs.append(cmifile)
-            src_inputs = [] # in_structfile]
+    ## add provided cmi/mli files to action inputs depgraph
+    sig_inputs = []
+    if provider_output_cmi:
+        sig_inputs.append(provider_output_cmi)
+    if provider_output_mli:
+        sig_inputs.append(provider_output_mli)
 
     out_cm_ = ctx.actions.declare_file(scope + module_name + ext)
                                        # sibling = new_cmi) # fname)
@@ -332,6 +351,7 @@ def _bootstrap_module(ctx):
     if ctx.attr.ns:
         ns_resolver = ctx.attr.ns
         ns_resolver_files = ctx.files.ns
+    # print("NS_RESOLVER: %s" % ns_resolver)
 
     paths_direct = [out_cm_.dirname] # d.dirname for d in direct_linkargs]
     if ns_resolver:
@@ -371,11 +391,18 @@ def _bootstrap_module(ctx):
     # these are "indirect" from the perspective of the consumer
     indirect_inputs_depsets = []
     indirect_linkargs_depsets = []
+    indirect_linkargs_files = []
     indirect_paths_depsets = []
 
     ccInfo_list = []
 
+    archive_manifest_depsets = []
+
     for dep in the_deps:
+        if OcamlArchiveProvider in dep:
+            # print("Found OcamlArchiveProvider in %s" % ctx.label)
+            archive_manifest_depsets.append(dep[OcamlArchiveProvider].manifest)
+
         if CcInfo in dep:
             # if ctx.label.name == "Main":
             #     dump_CcInfo(ctx, dep)
@@ -395,12 +422,15 @@ def _bootstrap_module(ctx):
             indirect_linkargs_depsets.append(dep[OcamlProvider].linkargs)
             indirect_paths_depsets.append(dep[OcamlProvider].paths)
 
-        indirect_linkargs_depsets.append(dep[DefaultInfo].files)
+        for f in dep[DefaultInfo].files.to_list():
+            if f.extension not in ["cmi", "mli"]:
+                indirect_linkargs_files.append(f)
+
 
     ################ Signature Dep ################
     if ctx.attr.sig:
-        if sig_inputs:
-            indirect_inputs_depsets.append(sig_inputs)
+        if sigdeps_closure:
+            indirect_inputs_depsets.append(sigdeps_closure)
             indirect_linkargs_depsets.append(sig_linkargs)
             indirect_paths_depsets.append(sig_paths)
 
@@ -410,8 +440,9 @@ def _bootstrap_module(ctx):
         transitive = indirect_paths_depsets
     )
 
-    args.add_all(paths_depset.to_list(), before_each="-I")
+    # args.add_all(paths_depset.to_list(), before_each="-I")
     # args.add("-absname")
+    includes.extend(paths_depset.to_list())
     args.add_all(includes, before_each="-I", uniquify = True)
 
     # if hasattr(ctx.attr._ns_resolver[OcamlNsResolverProvider], "resolver"):
@@ -430,9 +461,9 @@ def _bootstrap_module(ctx):
     ## if we rec'd a .cmi sigfile, we must add its SOURCE file to the dep graph!
     ## otherwise the ocaml compiler will not use the cmx file, it will generate
     ## one from the module source.
-    sig_in = [sig_src] if sig_src else []
-    mli_out = [mlifile] if mlifile else []
-    cmi_out = [cmifile] if cmifile else [] # new_cmi]
+    # sig_in = [sig_src] if sig_src else []
+    # mli_out = [mlifile] if mlifile else []
+    # cmi_out = [cmifile] if cmifile else [] # new_cmi]
 
     ## runtime deps must be added to the depgraph (so they get built),
     ## but not the command line (they are not build-time deps).
@@ -466,15 +497,16 @@ def _bootstrap_module(ctx):
     # print("bottomup_ns_inputs: %s" % bottomup_ns_inputs)
 
     if debug:
-        print("SRC_INPUTS: %s" % src_inputs)
+        print("SIG_INPUTS: %s" % sig_inputs)
+        print("in_structfile %s" % in_structfile)
 
     inputs_depset = depset(
         order = dsorder,
-        direct = src_inputs + [in_structfile] + ns_resolver_files
-        + mli_out
-
+        direct = sig_inputs
+        + [in_structfile] + ns_resolver_files
+        # + mli_out
+        + (ctx.files.data if ctx.files.data else [])
         # + [sig_src, in_structfile]
-        # + mli_out ##
         # + cmi_out
         # + (old_cmi if old_cmi else [])
         + ctx.files.deps_runtime,
@@ -539,17 +571,17 @@ def _bootstrap_module(ctx):
 
     ocamlProvider_files_depset = depset(
         order  = dsorder,
-        direct = action_outputs + cmi_out + mli_out,
+        direct = action_outputs # + cmi_out + mli_out,
     )
 
-    # new_inputs_depset = depset(
+    # closure_depset = depset(
     #     direct = action_outputs,
     #     transitive = [inputs_depset] ## indirect_inputs_depsets
     # )
     ## same as inputs_depset except structfile omitted
-    new_inputs_depset = depset(
+    closure_depset = depset(
         order = dsorder,
-        direct = src_inputs + action_outputs + ns_resolver_files
+        direct = sig_inputs + action_outputs + ns_resolver_files
         + ctx.files.deps_runtime,
         transitive = indirect_inputs_depsets
         + ns_deps
@@ -557,22 +589,45 @@ def _bootstrap_module(ctx):
     )
 
     # if debug:
-    #     print("CLOSURE: %s" % new_inputs_depset)
+    #     print("CLOSURE: %s" % closure_depset)
 
-    linkset    = depset(transitive = indirect_linkargs_depsets)
+    linkset    = depset(
+        transitive = indirect_linkargs_depsets +
+        [depset(direct = indirect_linkargs_files)]
+    )
+
+    if debug:
+        print("linkset: %s" % linkset)
 
     fileset_depset = depset(
-        direct= action_outputs + cmi_out + mli_out,
+        # direct= mli_out + cmi_out + action_outputs,
+        direct= action_outputs,
         transitive = bottomup_ns_fileset
+    )
+
+    archiveManifestDepset = depset(
+        transitive = archive_manifest_depsets
+    )
+    # print("manifest depset for {lbl}: {m}".format(
+    #     lbl = ctx.label, m = archiveManifestDepset))
+
+    # print("provider_output_cmi: %s" % provider_output_cmi)
+    # print("action_output_cmi: %s" % action_output_cmi)
+    # print("bottomup_ns_cmi: %s" % bottomup_ns_cmi)
+
+    cmi_depset = depset(
+        direct = ([provider_output_cmi] if provider_output_cmi else [action_output_cmi]),
+        transitive = bottomup_ns_cmi if bottomup_ns_cmi else []
     )
 
     ocamlProvider = OcamlProvider(
         # files = ocamlProvider_files_depset,
-        cmi      = depset(direct = [cmifile]),
+        cmi      = cmi_depset, # depset(direct = [cmifile]),
         fileset  = fileset_depset,
-        inputs   = new_inputs_depset,
+        inputs   = closure_depset,
         linkargs = linkset,
         paths    = paths_depset,
+        archive_manifests = archiveManifestDepset
     )
 
     ################################################################
@@ -621,15 +676,13 @@ def _bootstrap_module(ctx):
     ################
     outputGroupInfo = OutputGroupInfo(
         # cc         = ccInfo.linking_context.linker_inputs.libraries,
-        cmi        = depset(
-            direct=cmi_out,
-            transitive = bottomup_ns_cmi
-        ),
+        cmi        = cmi_depset,
         fileset    = fileset_depset,
         linkset    = linkset,
         # ppx_codeps = ppx_codeps_depset,
         # cc = action_inputs_ccdep_filelist,
-        closure = new_inputs_depset,
+        closure = closure_depset,
+        manifest = archiveManifestDepset,
         all = depset(
             order = dsorder,
             transitive=[

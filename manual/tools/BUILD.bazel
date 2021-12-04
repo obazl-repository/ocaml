@@ -20,8 +20,8 @@ ocaml_module(
     struct = "texquote2.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ## (String)
-        ## (Printf)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
     ]
 )
 
@@ -31,8 +31,8 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ## (Transf)
-        ## (Printexc)
-        ## (Lexing)
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Lexing",
     ]
 )
 

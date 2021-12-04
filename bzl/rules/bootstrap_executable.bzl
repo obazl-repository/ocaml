@@ -1,6 +1,6 @@
-load("//bzl/providers:ocaml.bzl",
+load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
-     "OcamlArchiveMarker",
+     "OcamlArchiveProvider",
      "OcamlExecutableMarker",
      "OcamlImportMarker",
      "OcamlLibraryMarker",
@@ -98,6 +98,17 @@ def _bootstrap_executable(ctx):
         args.add("-runtime-variant", "d") # FIXME: verify compile built for debugging
 
     ################################################################
+    ## deps mgmt
+    ## * deps attr
+    ##   * linkargs
+    ##   * files
+    ## * main attr - comes last
+    ##   * linkargs
+    ##   * file
+    ## * cc deps
+
+    ## merge deps and main, to elim dups
+
     main_deps_list = []
     paths_direct   = []
     paths_indirect = []
@@ -135,12 +146,30 @@ def _bootstrap_executable(ctx):
         #         if ppxadep.paths:
         #             indirect_ppx_codep_depsets_paths.append(ppxadep.paths)
 
-    ################################################################
-    #### MAIN ####
+    ## end ctx.attr.deps handling:
+
     action_inputs_ccdep_filelist = []
 
+    includes = []
+    manifest_list = []
+
+    ################################################################
+    #### MAIN ####
     if ctx.attr.main:
         main = ctx.attr.main
+
+        if OcamlProvider in main:
+            if hasattr(main[OcamlProvider], "archive_manifests"):
+                manifest_list.append(main[OcamlProvider].archive_manifests)
+
+        direct_inputs_depsets.append(main[OcamlProvider].inputs)
+        direct_linkargs_depsets.append(main[OcamlProvider].linkargs)
+        direct_paths_depsets.append(main[OcamlProvider].paths)
+
+        direct_linkargs_depsets.append(main[DefaultInfo].files)
+
+        paths_indirect.append(main[OcamlProvider].paths)
+
         if CcInfo in main: # [0]:
             # print("CcInfo main: %s" % main[0][CcInfo])
             ccInfo_list.append(main[CcInfo]) # [0][CcInfo])
@@ -154,18 +183,12 @@ def _bootstrap_executable(ctx):
                         args,
                         ccInfo)
 
-        direct_inputs_depsets.append(main[OcamlProvider].inputs)
-        direct_linkargs_depsets.append(main[OcamlProvider].linkargs)
-        direct_paths_depsets.append(main[OcamlProvider].paths)
 
-        direct_linkargs_depsets.append(main[DefaultInfo].files)
+    ## end ctx.attr.main handling
 
-        paths_indirect.append(main[OcamlProvider].paths)
-
-    # if ctx.label.name == "tezos-node.exe":
-    #     print("CcInfo_list: {cc}".format(cc=ccInfo_list))
-    #     print("CcInfo merged: {cc}".format(cc=ccInfo))
-    #     print("Cc deps: {cc}".format(cc = action_inputs_ccdep_filelist))
+    merged_manifests = depset(transitive = manifest_list)
+    archive_filter_list = merged_manifests.to_list()
+    print("Merged manifests: %s" % archive_filter_list)
 
     ################
     paths_depset  = depset(
@@ -173,7 +196,7 @@ def _bootstrap_executable(ctx):
         transitive = direct_paths_depsets
     )
 
-    args.add_all(paths_depset.to_list(), before_each="-I")
+    # args.add_all(paths_depset.to_list(), before_each="-I")
 
     linkargs_depset = depset(
         transitive = direct_linkargs_depsets
@@ -182,21 +205,39 @@ def _bootstrap_executable(ctx):
         transitive = direct_inputs_depsets
     )
 
+
+    # for dep in direct_inputs_depset.to_list():
+    #     # if dep.extension not in ["a", "o", "cmi", "mli", "cmti"]:
+    #     #     if dep.basename != "oUnit2.cmx":  ## FIXME: why?
+    #     if dep.extension in ["cmx", "cmxa", "cma"]:
+    #         includes.append(dep.dirname)
+    #         args.add(dep)
+
+
     # args.add("external/ounit2/oUnit2.cmx")
 
     ## Archives containing deps needed by direct deps or main must be
     ## on cmd line.  FIXME: how to include only those actually needed?
+    # args.add_all(includes, before_each="-I", uniquify=True)
 
     for dep in linkargs_depset.to_list():
     # for dep in direct_inputs_depset.to_list():
         # if dep.extension not in ["a", "o", "cmi", "mli", "cmti"]:
             # if dep.basename != "oUnit2.cmx":  ## FIXME: why?
-        if dep.extension in ["cmx", "cmxa"]: # "cma"]:
-            args.add(dep)
+        if dep not in archive_filter_list:
+            # if dep.extension in ["cmx", "cmxa", "cmo", "cma"]:
+            # if dep.extension in ["cma"]:
+                includes.append(dep.dirname)
+                # args.add("-I", dep.dirname)
+                # args.add(dep)
+        else:
+            print("removing double link: %s" % dep)
+
 
     ## all direct deps must be on cmd line:
     for dep in ctx.files.deps:
         ## print("DIRECT DEP: %s" % dep)
+        includes.append(dep.dirname)
         args.add(dep)
 
     ## 'main' dep must come last on cmd line
@@ -205,8 +246,8 @@ def _bootstrap_executable(ctx):
 
     # args.add("external/ounit2/oUnit.cmx")
 
-
-    args.add_all(includes, before_each="-I", uniquify=True)
+    ## this exposes stdlib, camlheader, etc.
+    args.add("-I", ctx.file._stdexit.dirname)
 
     args.add("-o", out_exe)
 
@@ -220,11 +261,18 @@ def _bootstrap_executable(ctx):
     # else:
     #     std_exit = []
 
+    print("LINKARGS: %s" % linkargs_depset)
+
     inputs_depset = depset(
-        direct = [],
-        transitive = [direct_inputs_depset] + data_inputs
+        direct = [ctx.file._stdexit],
+        transitive = [direct_inputs_depset]
+        + [linkargs_depset]
+        + data_inputs
         + [depset(action_inputs_ccdep_filelist)]
     )
+
+    # for dep in inputs_depset.to_list():
+    #     print("XDEP: %s" % dep)
 
     if ctx.attr._rule == "ocaml_executable":
         mnemonic = "CompileOcamlExecutable"
@@ -330,13 +378,18 @@ bootstrap_executable = rule(
         ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
-            providers = [[OcamlArchiveMarker],
+            providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
                          [OcamlLibraryMarker],
                          [OcamlModuleMarker],
                          [OcamlNsMarker],
                          [CcInfo]],
             # cfg = ocaml_executable_deps_out_transition
+        ),
+
+        _stdexit = attr.label(
+            default = "//stdlib:Std_exit",
+            allow_single_file = True
         ),
 
         ## FIXME: add cc_linkopts?

@@ -20,6 +20,8 @@ OcamlProvider = provider(
 
         "cmi" : "Cmi files provided",
 
+        "archive_manifests": "Depset of inherited archive manifests",
+
         "closure"             : "File depset of transitive closure of deps",
         "inputs"             : "file depset",
         "linkargs"             : "file depset",
@@ -41,6 +43,7 @@ OcamlArchiveProvider = provider(
 Produced only by ocaml_archive, ocaml_ns_archive, ocaml_import.  Archive files are delivered in DefaultInfo; this provider holds deps of the archive, to serve as action inputs.
 """,
     fields = {
+        "manifest": "Depset of direct deps, i.e. members of the archive",
         "files": "file depset of archive's deps",
         "paths": "string depset"
     }
@@ -85,7 +88,7 @@ OcamlSignatureProvider = provider(
     # }
 )
 
-OcamlArchiveMarker    = provider(doc = "OCaml Archive Marker provider.")
+# OcamlArchiveMarker    = provider(doc = "OCaml Archive Marker provider.")
 OcamlExecutableMarker = provider(doc = "OCaml Executable Marker provider.")
 OcamlImportMarker    = provider(doc = "OCaml Library Marker provider.")
 OcamlLibraryMarker   = provider(doc = "OCaml Library Marker provider.")

@@ -27,7 +27,7 @@ ocaml_signature(
     src  = "dynlink.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Obj)
+        "//stdlib:Stdlib.Obj",
     ]
 )
 
@@ -39,17 +39,17 @@ ocaml_module(
     deps   = [
         ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
         ":Dynlink", ## (Otherlibs Dynlink Dynlink_platform_intf)
-        ## (Sys)
-        ## (Set)
-        ## (Printf)
-        ## (Misc)
-        ## (Map)
-        ## (List)
-        ## (Lazy)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Dynlink_compilerlibs)
-        ## (Digest)
+        "//stdlib:Stdlib.Digest",
     ]
 )
 
@@ -59,7 +59,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Dynlink", ## (Otherlibs Dynlink Dynlink_platform_intf)
-        ## (Obj)
+        "//stdlib:Stdlib.Obj",
     ]
 )
 
@@ -69,8 +69,8 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
-        ## (Obj)
-        ## (Digest)
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Digest",
     ]
 )
 
@@ -80,8 +80,8 @@ ocaml_module(
     sig    = "Dynlink_types_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Printf)
-        ## (Printexc)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
     ]
 )
 
@@ -98,15 +98,15 @@ ocaml_module(
     struct = "extract_crc.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ## (String)
-        ## (Printf)
-        ## (Printexc)
-        ## (Misc)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
+        "//utils:Misc",
         ## (Dynlink_compilerlibs)
-        ## (Config)
-        ## (Cmi_format)
-        ## (Char)
-        ## (Arg)
+        "//utils:Config",
+        "//file_formats:Cmi_format",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Arg",
     ]
 )
 

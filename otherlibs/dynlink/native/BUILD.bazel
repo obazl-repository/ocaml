@@ -21,13 +21,13 @@ ocaml_module(
     deps   = [
         ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
         ":Dynlink", ## (Otherlibs Dynlink Dynlink_common)
-        ## (Printexc)
-        ## (Obj)
-        ## (List)
-        ## (Filename)
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
         ## (Dynlink_compilerlibs)
-        ## (Digest)
-        ## (Config)
+        "//stdlib:Stdlib.Digest",
+        "//utils:Config",
         ## (Cmxs_format)
     ]
 )

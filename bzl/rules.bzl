@@ -13,6 +13,9 @@ load("//bzl/rules:bootstrap_library.bzl",
 load("//bzl/rules:bootstrap_ns_resolver.bzl",
      _bootstrap_ns_resolver = "bootstrap_ns_resolver")
 
+load("//bzl/rules:bootstrap_preprocess.bzl",
+     _bootstrap_preprocess = "bootstrap_preprocess")
+
 load("//bzl/rules:bootstrap_ocamllex.bzl",
      _bootstrap_ocamllex = "bootstrap_ocamllex")
 
@@ -28,6 +31,7 @@ bootstrap_executable      = _bootstrap_executable
 bootstrap_library  = _bootstrap_library
 bootstrap_module      = _bootstrap_module
 # bootstrap_ns_resolver = _bootstrap_ns_resolver
+bootstrap_preprocess  = _bootstrap_preprocess
 bootstrap_ocamllex    = _bootstrap_ocamllex
 bootstrap_ocamlyacc   = _bootstrap_ocamlyacc
 bootstrap_signature   = _bootstrap_signature

@@ -1,7 +1,20 @@
+load("//bzl:rules.bzl", "bootstrap_library")
+
 exports_files(["ocamlc", "ocamllex"])
 
-alias(
-    name = "Std_exit",
-    actual = "//stdlib:Std_exit",
-    visibility = ["//visibility:public"]
-)
+## The makefiles copy stuff into boot and make it accessible to build
+## targets by passing '-I boot'. OBazl does not (need to) do that.
+## Instead we define a library target that aggregates the same
+## resources by label, so targets can depend on '//boot:stdlib'. NB:
+## the only difference between //stdlib and //boot:stdlib is that the
+## latter includes //stdlib:Std_exit and //stdlib:camlheader.
+
+# bootstrap_library(
+#     name = "stdlib",
+#     manifest = [
+#         "//stdlib",  ## this is an archive, oops
+#         "//stdlib:Std_exit",
+#     ],
+#     visibility = ["//visibility:public"]
+#     # data = ["//stdlib:camlheader"]
+# )

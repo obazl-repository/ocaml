@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl/providers:ocaml.bzl",
+load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
      "OcamlProvider",
      "OcamlNsResolverProvider")

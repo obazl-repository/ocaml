@@ -1,6 +1,8 @@
 load("//bzl:rules.bzl",
      "bootstrap_archive",
+     "bootstrap_library",
      "bootstrap_module",
+     "bootstrap_preprocess",
      "bootstrap_signature")
 
 load("//config:BUILD.bzl",
@@ -8,11 +10,16 @@ load("//config:BUILD.bzl",
      ## "ROOT_CAMLC_OPTS",
 
      ## make log indictates USE_PRIMS is inserted, no idea how
-     "USE_PRIMS"
+     "USE_PRIMS", "DATA_PRIMITIVES"
      )
+
+package(default_visibility = ["//visibility:public"])
 
 exports_files(["expand_module_aliases.awk"])
 
+# load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+
+# to match the makefile log:
 COMPFLAGS = [
     "-strict-sequence", "-absname",
     "-w", "+a-4-9-41-42-44-45-48-70",
@@ -23,8 +30,12 @@ COMPFLAGS = [
     "-safe-string", "-strict-formats"
 ]
 
-MODULE_OPTS = USE_PRIMS + COMPFLAGS
+MODULE_OPTS = COMPFLAGS
+CAMLINTERNAL_OPTS = COMPFLAGS
+
+# MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS = MODULE_OPTS
+
 
 LABEL_OPTS = ["-nolabels", "-no-alias-deps"]
 LABEL_SIGOPTS = [
@@ -39,11 +50,12 @@ LABEL_SIGOPTS = [
 # 	         -o stdlib__Bigarray.cmi -c bigarray.mli
 
 # camlinternal: Atomic, Format, FormatBasics, Lazy, Mod, OO
-CAMLINTERNAL_OPTS = [
-    # "-use-prims", "../runtime/primitives",
-    # "-nopervasives"
-    # "-open", "Stdlib"
-] + COMPFLAGS
+# CAMLINTERNAL_OPTS = [
+#     # "-use-prims", "../runtime/primitives",
+#     # "-nopervasives"
+#     # "-open", "Stdlib"
+# ] + COMPFLAGS
+
 # Atomic, FormatBasics:  ["-nopervasives"]
 #Format: ["-w", "+A", "-w", "-fragile-match"]
 
@@ -63,7 +75,10 @@ CAMLINTERNAL_OPTS = [
 ## This library target just aggregates the resolver and submodules.
 ## They can be listed in any order.
 bootstrap_archive(
-    name   = "stdlib",
+# bootstrap_library(
+    name       = "stdlib",
+    opts       = USE_PRIMS,
+    # data       = ["//runtime:primitives"],
     manifest   = [
         ":Stdlib", ## functions as the ns_resolver module
         ## Namespace submodules:
@@ -131,13 +146,35 @@ bootstrap_archive(
         ":Stdlib.In_channel",
         ":Stdlib.Out_channel",
 
-        ":Std_exit",
+        # ":Std_exit",
     ],
-    visibility = ["//visibility:public"],
+    # visibility = ["//visibility:public"],
 )
 
 ##################################################################
 ##############  Main Resolver Module: Stdlib  ####################
+
+bootstrap_module(
+    name   = "Stdlib",
+    struct = "x/stdlib.ml",
+    sig    = "Stdlib_cmi",
+    opts = MODULE_OPTS + [
+        "-nopervasives",
+        "-no-alias-deps",
+        "-w", "-49",
+        # "-pp", "awk -f expand_module_aliases.awk",
+    ],
+    deps = [
+        ":CamlinternalFormatBasics",
+        ":CamlinternalAtomic",
+    ],
+    # pp_deps = ["//stdlib:expand_module_aliases.awk"],
+
+    ## executables need camlheader. works here, dunno if this is the
+    ## right place though
+    deps_runtime = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
 
 # ../runtime/ocamlrun ../boot/ocamlc
 # -use-prims ../runtime/primitives
@@ -158,7 +195,7 @@ bootstrap_archive(
 
 genrule(
     name = "stdlib_ml_awk",
-    outs = ["x/stdlib.ml"],
+    outs = ["x/stdlib.ml"], ## FIXME
     srcs = ["stdlib.ml", "//stdlib:expand_module_aliases.awk"],
     cmd_bash  = " ".join([
         "awk -f $(location //stdlib:expand_module_aliases.awk) $(location :stdlib.ml)",
@@ -166,28 +203,15 @@ genrule(
     ]),
 )
 
-bootstrap_module(
-    name   = "Stdlib",
-    struct = "x/stdlib.ml",
-    sig    = "Stdlib_cmi",
-    opts = MODULE_OPTS + [
-        "-nopervasives",
-        "-no-alias-deps", "-w", "-49",
-        # "-pp", "awk -f expand_module_aliases.awk",
-        "-I", "stdlib",
-        # "-verbose"
-    ],
-    deps = [
-        ":CamlinternalFormatBasics",
-        ":CamlinternalAtomic",
-    ],
-    # pp_deps = ["//stdlib:expand_module_aliases.awk"],
-
-    ## executables need camlheader. works here, dunno if this is the
-    ## right place though
-    deps_runtime = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
-)
+# bootstrap_preprocess(
+#     name = "stdlib_ml_awk",
+#     outs = ["stdlib.ml"],
+#     srcs = ["stdlib.ml", "//stdlib:expand_module_aliases.awk"],
+#     cmd_bash  = " ".join([
+#         "awk -f $(location //stdlib:expand_module_aliases.awk) $(location :stdlib.ml)",
+#         "> $@"
+#     ]),
+# )
 
 genrule(
     name = "stdlib_mli_awk",
@@ -210,7 +234,7 @@ bootstrap_signature(
         ":CamlinternalFormatBasics",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 ################################################################
@@ -233,7 +257,7 @@ bootstrap_module(
     ## dunno if this is the right place for this, but we need to force
     ## it for now:
     deps_runtime = [":camlheader"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -241,7 +265,7 @@ bootstrap_signature(
     src  = "camlinternalAtomic.mli",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
     # deps   = [],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -263,7 +287,7 @@ bootstrap_module(
         ":Stdlib.String", ## (Stdlib String)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -303,7 +327,7 @@ bootstrap_signature(
         # could list sibling deps directly.
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -312,7 +336,7 @@ bootstrap_module(
     sig    = "CamlinternalFormatBasics_cmi",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
     # deps   = [],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -320,7 +344,7 @@ bootstrap_signature(
     src  = "camlinternalFormatBasics.mli",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
     # deps   = [],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -334,7 +358,7 @@ bootstrap_module(
         ":Stdlib.Sys",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -348,7 +372,7 @@ bootstrap_signature(
         ":Stdlib",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -365,7 +389,7 @@ bootstrap_module(
         ":Stdlib.Array", ## (Stdlib Array)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -377,7 +401,7 @@ bootstrap_signature(
         ":Stdlib.Obj",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -396,7 +420,7 @@ bootstrap_module(
         ":Stdlib.Map"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -408,22 +432,20 @@ bootstrap_signature(
         ":Stdlib.Obj"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
-    opts = MODULE_OPTS + [
-        "-use-prims", "../runtime/primitives",
-    ],
+    opts = USE_PRIMS + MODULE_OPTS,
+    data = DATA_PRIMITIVES,
     deps   = [
         ## NB: this depends on Stdlib module, which is the resolver.
         ## Does not depend on entire stdlib archive (//stdlib).
         ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 #########################################################
@@ -435,6 +457,7 @@ bootstrap_module(
     struct = "arg.ml",
     sig    = "Stdlib.Arg_cmi",
     opts = MODULE_OPTS,
+    data = DATA_PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -444,8 +467,7 @@ bootstrap_module(
         ":Stdlib.Buffer",
         ":Stdlib.Array",
     ],
-    data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -463,7 +485,7 @@ bootstrap_signature(
         ":Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -477,7 +499,7 @@ bootstrap_module(
         ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -489,7 +511,7 @@ bootstrap_signature(
         ":Stdlib.Seq",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -502,7 +524,7 @@ bootstrap_module(
         ":Stdlib.Array"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 ## WARNING: output name same as input name, so write to tmp dir:
@@ -515,7 +537,7 @@ genrule(
         "$(location :arrayLabels.mli)",
         "> $@"
     ]),
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -527,7 +549,7 @@ bootstrap_signature(
         ":Stdlib.Seq",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -540,7 +562,7 @@ bootstrap_module(
         ":CamlinternalAtomic"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -552,7 +574,7 @@ bootstrap_signature(
         # ":Stdlib_cmi"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -572,7 +594,7 @@ bootstrap_module(
         ## (Array0)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -589,7 +611,7 @@ bootstrap_signature(
         ## (Array0)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -601,7 +623,7 @@ bootstrap_module(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -612,7 +634,7 @@ bootstrap_signature(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -634,7 +656,7 @@ bootstrap_module(
         ":Stdlib.Bytes",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -647,7 +669,7 @@ bootstrap_signature(
         ":Stdlib.Seq",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -657,13 +679,14 @@ bootstrap_module(
     sig    = "Stdlib.Bytes_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Stdlib.Sys",
-        ":Stdlib.Seq",
-        ":Stdlib.Int",
         ":Stdlib.Char",
+        ":Stdlib.Int",
+        ":Stdlib.Seq",
+        ":Stdlib.Sys",
+        ":Stdlib.Uchar",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -677,7 +700,7 @@ bootstrap_signature(
         ":Stdlib.Uchar_cmi",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -690,7 +713,7 @@ bootstrap_module(
         ":Stdlib.Bytes",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -703,7 +726,7 @@ bootstrap_signature(
         ":Stdlib.Uchar_cmi"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -716,7 +739,7 @@ bootstrap_module(
         ":Stdlib.Obj"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -728,7 +751,7 @@ bootstrap_signature(
         ":Stdlib.In_channel"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -739,7 +762,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = [":Stdlib"],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -751,7 +774,7 @@ bootstrap_signature(
         # ":Stdlib_cmi"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -762,7 +785,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = [":Stdlib"],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -771,10 +794,10 @@ bootstrap_signature(
     src  = "complex.mli",
     opts = SIG_OPTS,
     deps   = [
-        # ":Stdlib"
+        # ":Stdlib_cmi"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -789,7 +812,7 @@ bootstrap_module(
         ":Stdlib.Bytes",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -798,11 +821,11 @@ bootstrap_signature(
     src  = "digest.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.In_channel"
+        ":Stdlib.In_channel_cmi"
         # ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -814,7 +837,7 @@ bootstrap_module(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -826,7 +849,7 @@ bootstrap_signature(
         # ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -847,7 +870,7 @@ bootstrap_module(
         ":Stdlib.Sys",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -856,10 +879,10 @@ bootstrap_signature(
     src  = "ephemeron.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Hashtbl",
+        ":Stdlib.Hashtbl_cmi",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -878,7 +901,7 @@ bootstrap_module(
         ":Stdlib.Buffer",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -887,10 +910,10 @@ bootstrap_signature(
     src  = "filename.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib"
+        ":Stdlib_cmi"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -905,7 +928,7 @@ bootstrap_module(
         ":Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -918,7 +941,7 @@ bootstrap_signature(
         ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -942,7 +965,7 @@ bootstrap_module(
         ":Stdlib.Queue"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -957,7 +980,7 @@ bootstrap_signature(
         ## (Stdlib)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -970,7 +993,7 @@ bootstrap_module(
         ":Stdlib.Printexc",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -981,7 +1004,7 @@ bootstrap_signature(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -997,7 +1020,7 @@ bootstrap_module(
         ":Stdlib.Printexc",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1009,7 +1032,7 @@ bootstrap_signature(
         ":Stdlib.Printexc",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1019,15 +1042,15 @@ bootstrap_module(
     sig    = "Stdlib.Genlex_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Stdlib.String",
-        ":Stdlib.List",
-        ":Stdlib.Char",
         ":Stdlib.Bytes",
-        ## (Stream)
-        ":Stdlib.Hashtbl"
+        ":Stdlib.Char",
+        ":Stdlib.Hashtbl",
+        ":Stdlib.List",
+        ":Stdlib.Stream",
+        ":Stdlib.String",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1040,7 +1063,7 @@ bootstrap_signature(
         ":Stdlib.Stream"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1063,7 +1086,7 @@ bootstrap_module(
         ## (H)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1076,7 +1099,7 @@ bootstrap_signature(
         ## (H)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1089,7 +1112,7 @@ bootstrap_module(
         ":Stdlib.Fun"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1101,7 +1124,7 @@ bootstrap_signature(
         ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1114,7 +1137,7 @@ bootstrap_module(
         ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1126,7 +1149,7 @@ bootstrap_signature(
         # ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1140,7 +1163,7 @@ bootstrap_module(
         ":Stdlib.Sys",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1153,7 +1176,7 @@ bootstrap_signature(
         ":Stdlib.Sys",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1166,7 +1189,7 @@ bootstrap_module(
         ":Stdlib",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1178,7 +1201,7 @@ bootstrap_signature(
         # ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1195,7 +1218,7 @@ bootstrap_module(
         ":CamlinternalLazy",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1207,7 +1230,7 @@ bootstrap_signature(
         ":CamlinternalLazy",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1224,7 +1247,7 @@ bootstrap_module(
         ":Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1236,12 +1259,12 @@ bootstrap_signature(
         ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
-    ns    = ":Stdlib",
     name   = "Stdlib.List",
+    ns    = ":Stdlib",
     struct = "list.ml",
     sig    = "Stdlib.List_cmi",
     opts = MODULE_OPTS,
@@ -1251,7 +1274,7 @@ bootstrap_module(
         ":Stdlib.Either",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1260,12 +1283,11 @@ bootstrap_signature(
     src  = "list.mli",
     opts = SIG_OPTS,
     deps   = [
-        # ":Stdlib_cmi",
         ":Stdlib.Seq",
         ":Stdlib.Either",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1278,7 +1300,7 @@ bootstrap_module(
         ":Stdlib.List",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1291,7 +1313,7 @@ bootstrap_signature(
         ":Stdlib.Either",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1306,7 +1328,7 @@ bootstrap_module(
         ## (Ord)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1319,7 +1341,7 @@ bootstrap_signature(
         ## (Ord)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1332,7 +1354,7 @@ bootstrap_module(
         ":Stdlib.Bytes",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1344,7 +1366,7 @@ bootstrap_signature(
         ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1359,7 +1381,7 @@ bootstrap_module(
         ":Stdlib.Hashtbl"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1376,7 +1398,7 @@ bootstrap_signature(
         # H
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1390,7 +1412,7 @@ bootstrap_module(
         ":Stdlib.Sys",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1403,7 +1425,7 @@ bootstrap_signature(
         ":Stdlib.Sys",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1418,7 +1440,7 @@ bootstrap_module(
         ":Stdlib.Int32",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1431,7 +1453,7 @@ bootstrap_signature(
         ":Stdlib.Int32",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1444,7 +1466,7 @@ bootstrap_module(
         ":CamlinternalOO",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1456,7 +1478,7 @@ bootstrap_signature(
         ":CamlinternalOO",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1469,7 +1491,7 @@ bootstrap_module(
         ":Stdlib.Seq",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1481,7 +1503,7 @@ bootstrap_signature(
         ":Stdlib.Seq",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1492,7 +1514,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = [":Stdlib.Fun"],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1503,7 +1525,7 @@ bootstrap_signature(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1518,7 +1540,7 @@ bootstrap_module(
         ":Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1531,7 +1553,7 @@ bootstrap_signature(
         ":Stdlib.Lexing",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1544,7 +1566,7 @@ bootstrap_module(
         ## (LargeFile)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1562,7 +1584,7 @@ bootstrap_module(
         ":Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1574,7 +1596,7 @@ bootstrap_signature(
         ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1589,7 +1611,7 @@ bootstrap_module(
         ":Stdlib.Buffer",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1601,7 +1623,7 @@ bootstrap_signature(
         ":Stdlib.Buffer",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1615,7 +1637,7 @@ bootstrap_module(
         ":Stdlib.Seq",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1628,7 +1650,7 @@ bootstrap_signature(
         # ":Stdlib",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1649,7 +1671,7 @@ bootstrap_module(
         ":Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1663,7 +1685,7 @@ bootstrap_signature(
         ":Stdlib.Int32",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1677,7 +1699,7 @@ bootstrap_module(
         # ":Stdlib"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1690,7 +1712,7 @@ bootstrap_signature(
         ":Stdlib.Seq"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1713,7 +1735,7 @@ bootstrap_module(
         ":Stdlib.String",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1729,17 +1751,20 @@ bootstrap_signature(
         ## (Stdlib)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
     ns    = ":Stdlib",
-    name   = "Stdlib.Seq",
     struct = "seq.ml",
+    name   = "Stdlib.Seq",
     sig    = "Stdlib.Seq_cmi",
     opts = MODULE_OPTS,
-    deps   = [":Stdlib.Lazy"],
-    visibility = ["//visibility:public"]
+    deps   = [
+        ":Stdlib.Either",
+        ":Stdlib.Lazy"
+    ],
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1748,7 +1773,7 @@ bootstrap_signature(
     src  = "seq.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib.Either_cmi"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1762,7 +1787,7 @@ bootstrap_module(
         ":Stdlib.List",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1774,7 +1799,7 @@ bootstrap_signature(
         ":Stdlib.Seq",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1788,7 +1813,7 @@ bootstrap_module(
         ":Stdlib.List",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1800,7 +1825,7 @@ bootstrap_signature(
         ":Stdlib.Seq",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1816,7 +1841,7 @@ bootstrap_module(
         ":Stdlib.ArrayLabels",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1831,7 +1856,7 @@ bootstrap_signature(
         ":Stdlib.ArrayLabels",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1848,7 +1873,7 @@ bootstrap_module(
         ":Stdlib.Bytes",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1859,7 +1884,7 @@ bootstrap_signature(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1872,7 +1897,7 @@ bootstrap_module(
         ":Stdlib.Bytes",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1885,7 +1910,7 @@ bootstrap_signature(
         ":Stdlib.Uchar_cmi"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1898,7 +1923,7 @@ bootstrap_module(
         ":Stdlib.String",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1911,7 +1936,7 @@ bootstrap_signature(
         ":Stdlib.Uchar_cmi"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1923,7 +1948,7 @@ bootstrap_module(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1934,7 +1959,7 @@ bootstrap_signature(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1947,7 +1972,7 @@ bootstrap_module(
         ":Stdlib.Char",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1959,7 +1984,7 @@ bootstrap_signature(
         ":Stdlib.Char",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -1971,7 +1996,7 @@ bootstrap_module(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -1982,7 +2007,7 @@ bootstrap_signature(
     deps   = [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_module(
@@ -2000,7 +2025,7 @@ bootstrap_module(
         ## (H)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(
@@ -2013,7 +2038,7 @@ bootstrap_signature(
         ## (H)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//visibility:public"]
+    # visibility = ["//visibility:public"]
 )
 
 ################################################################
@@ -2042,5 +2067,5 @@ genrule(
     cmd  = "\n".join([
         "echo '#!/usr/local/bin/ocamlrun' > $@"
     ]),
-    visibility = ["//visibility:public"]
+    visibility = ["//tools:__pkg__"]
 )

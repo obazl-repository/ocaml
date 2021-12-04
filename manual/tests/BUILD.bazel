@@ -19,16 +19,16 @@ ocaml_module(
     struct = "cross_reference_checker.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Scanf)
         ## (Pparse)
-        ## (Parsetree)
-        ## (Map)
-        ## (Location)
-        ## (List)
-        ## (Format)
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Map",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
         ## (Ast_iterator)
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ]
 )
 

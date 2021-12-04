@@ -28,14 +28,14 @@ bootstrap_module(
     sig    = "Str_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (String)
-        ## (Map)
-        ## (List)
-        ## (Int)
-        ## (Char)
-        ## (Bytes)
-        ## (Buffer)
-        ## (Array)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = ["//tools:__pkg__"]
 )

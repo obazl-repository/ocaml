@@ -8,8 +8,8 @@ load("//bzl/rules:impl_common.bzl",
      )
 
 
-load("//bzl/providers:ocaml.bzl",
-     "OcamlArchiveMarker",
+load("//bzl:providers.bzl",
+     "OcamlArchiveProvider",
      "OcamlImportMarker",
      "OcamlLibraryMarker",
      "OcamlNsResolverProvider",
@@ -203,8 +203,8 @@ def get_module_name (ctx, src):
 
     if ctx.label.name == "Std_exit":
         out_module = "std_exit"
-    if ctx.label.name == "Stdlib":
-        out_module = "stdlib"
+    # if ctx.label.name == "Stdlib":
+    #     out_module = "stdlib"
 
     return this_module, fs_prefix, out_module
 

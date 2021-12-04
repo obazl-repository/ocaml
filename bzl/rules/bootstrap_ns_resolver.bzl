@@ -1,6 +1,6 @@
 load(":options.bzl", "options", "options_ns_resolver")
 
-load("//bzl/providers:ocaml.bzl",
+load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
      "OcamlNsResolverProvider")
 

@@ -18,7 +18,7 @@ load("//config:BUILD.bzl",
 MODULE_OPTS = TOOLS_MODULE_OPTS
 SIG_OPTS    = TOOLS_SIG_OPTS
 
-STDLIB = ["//stdlib"]
+STDLIB = ["//stdlib", "//stdlib:Std_exit"]
 
 ## first the executables. modules and sigs below.
 # programs_byte := \
@@ -63,15 +63,10 @@ STDLIB = ["//stdlib"]
 # $(cvt_emit): cvt_emit.cmo
 # 	$(CAMLC) $(LINKFLAGS) -o $@ $^
 
-bootstrap_ocamllex(
-    name = "cvt_emit_ml",
-    out  = "cvt_emit.ml",
-    src  = "cvt_emit.mll"
-)
-
 bootstrap_executable(
     name = "cvt_emit.exe",
     main = ":Cvt_emit",
+    # deps = STDLIB,
     visibility = ["//asmcomp:__subpackages__"]
 )
 
@@ -80,12 +75,18 @@ bootstrap_module(
     struct = "cvt_emit.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (Printf)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
         ## (Bytesections)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
+)
+
+bootstrap_ocamllex(
+    name = "cvt_emit_ml",
+    out  = "cvt_emit.ml",
+    src  = "cvt_emit.mll"
 )
 
 ################
@@ -220,31 +221,31 @@ bootstrap_module(
     deps   = STDLIB + [
         ## (Unix)
         ## (Toploop)
-        ## (Sys)
+        "//stdlib:Stdlib.Sys",
         ## (Syntaxerr)
-        ## (String)
+        "//stdlib:Stdlib.String",
         "//otherlibs/str:Str",
         ## (StdLabels)
-        ## (Printexc)
-        ## (Parsetree)
+        "//stdlib:Stdlib.Printexc",
+        "//parsing:Parsetree_cmi",
         ## (Parse)
         ## (Mty)
         ## (Mtd)
-        ## (Misc)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
+        "//utils:Misc",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         ## (Lexer)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Compmisc)
         ## (Compenv)
-        ## (Clflags)
-        ## (Bytes)
-        ## (Buffer)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Buffer",
         ## (Ast_iterator)
-        ## (Ast_helper)
-        ## (Arg)
+        "//parsing:Ast_helper",
+        "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
 )
@@ -254,10 +255,10 @@ bootstrap_module(
     struct = "cmpbyt.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (Printf)
-        "//bytecomp:Bytesections"
-        ## (Array)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//bytecomp:Bytesections",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -267,25 +268,25 @@ bootstrap_module(
     struct = "dumpobj.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
+        "//stdlib:Stdlib.Sys",
         ## (Symtable)
-        ## (String)
-        ## (Printf)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
         ## (Opnames)
         ## (Opcodes)
-        ## (Obj)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
+        "//stdlib:Stdlib.Obj",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         ## (Instruct)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Config)
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//utils:Config",
         ## (Cmo_format)
         ## (Bytesections)
-        ## (Asttypes)
-        ## (Array)
-        ## (Arg)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
 )
@@ -295,10 +296,10 @@ bootstrap_module(
     struct = "eqparsetree.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Parsetree)
-        ## (Longident)
-        ## (Location)
-        ## (Asttypes)
+        "//parsing:Parsetree_cmi",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -308,23 +309,23 @@ bootstrap_module(
     struct = "lintapidiff.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (String)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Str)
         ## (Scanf)
         ## (Printtyp)
-        ## (Printf)
+        "//stdlib:Stdlib.Printf",
         ## (Pparse)
         ## (Path)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Parse)
-        ## (Misc)
-        ## (Location)
-        ## (List)
-        ## (Ident)
-        ## (Format)
-        ## (Filename)
-        ## (Array)
+        "//utils:Misc",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -334,31 +335,31 @@ bootstrap_module(
     struct = "objinfo.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
+        "//stdlib:Stdlib.Sys",
         ## (Symtable)
         ## (Symbol)
-        ## (String)
-        ## (Printf)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
         ## (Printclambda)
-        "//utils:Misc"
-        ## (List)
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
         ## (Linkage_name)
         ## (LargeFile)
-        ## (Ident)
-        ## (Format)
-        ## (Filename)
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Export_info)
-        ## (Digest)
+        "//stdlib:Stdlib.Digest",
         ## (Compilation_unit)
         ## (Cmxs_format)
         ## (Cmx_format)
-        ## (Cmt_format)
+        "//file_formats:Cmt_format",
         ## (Cmo_format)
-        ## (Cmi_format)
+        "//file_formats:Cmi_format",
         ## (Bytesections)
         ## (Binutils)
-        ## (Array)
-        ## (Arg)
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
 )
@@ -370,23 +371,23 @@ bootstrap_module(
     deps   = STDLIB + [
         ## (Untypeast)
         ## (Stypes)
-        ## (String)
-        ## (Printf)
-        ## (Pprintast)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Lexing)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Pprintast",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Envaux)
-        ## (Digest)
+        "//stdlib:Stdlib.Digest",
         ## (Compmisc)
-        ## (Cmt_format)
+        "//file_formats:Cmt_format",
         ## (Cmt2annot)
-        ## (Clflags)
-        ## (Array)
-        ## (Arg)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
         ## (Annot)
     ],
     data = ["//runtime:primitives"]
@@ -397,14 +398,14 @@ bootstrap_module(
     struct = "ocamlcp.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (String)
-        ## (Printf)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
         ## (Main_args)
-        ## (List)
-        ## (Filename)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
         ## (Compenv)
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
 )
@@ -424,17 +425,17 @@ bootstrap_module(
     struct = "ocamlmklib.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (String)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Stack)
-        ## (Printf)
-        ## (Misc)
-        ## (List)
-        ## (Filename)
-        ## (Config)
-        ## (Bytes)
-        ## (Array)
-        ## (Arg)
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//utils:Config",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
 )
@@ -444,12 +445,12 @@ bootstrap_module(
     struct = "ocamlmktop.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (List)
-        ## (Filename)
-        ## (Config)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//utils:Config",
         ## (Ccomp)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -459,14 +460,14 @@ bootstrap_module(
     struct = "ocamloptp.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (String)
-        ## (Printf)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
         ## (Main_args)
-        ## (List)
-        ## (Filename)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
         ## (Compenv)
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
 )
@@ -476,22 +477,22 @@ bootstrap_module(
     struct = "ocamlprof.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Warnings)
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Parsetree)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Parsetree_cmi",
         ## (Parse)
-        ## (Option)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Int)
-        ## (Format)
-        ## (Filename)
-        ## (Bytes)
-        ## (Array)
-        ## (Arg)
+        "//stdlib:Stdlib.Option",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
 )
@@ -501,11 +502,11 @@ bootstrap_module(
     struct = "primreq.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Misc)
-        ## (List)
-        ## (Config)
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//utils:Config",
         ## (Cmo_format)
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
 )
@@ -516,9 +517,9 @@ bootstrap_module(
     sig    = "Profiling_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (List)
-        ## (Array)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -537,12 +538,12 @@ bootstrap_module(
     struct = "stripdebug.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (Printf)
-        ## (Misc)
-        ## (List)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
         ## (Bytesections)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )

@@ -72,26 +72,26 @@ bootstrap_module(
     sig    = "Bytegen_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//lambda:Switch", ## (Lambda Switch)
-        "//lambda:Matching", ## (Lambda Matching)
-        # ":Lambda", ## (Lambda Lambda)
-        # ":Debuginfo", ## (Lambda Debuginfo)
+        "//lambda:Switch",
+        "//lambda:Matching",
+        # ":Lambda",
+        # ":Debuginfo",
         "//stdlib:Stdlib",
-        ":Instruct", ## (Bytecomp Instruct)
-        ## (Types)
+        ":Instruct",
+        "//typing:Types",
         ## (Subst)
         ## (Stack)
-        ## (Printf)
-        ## (Primitive)
-        ## (Misc)
-        ## (List)
-        ## (Int)
-        ## (Ident)
+        "//stdlib:Stdlib.Printf",
+        "//typing:Primitive",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//typing:Ident",
         ## (Env)
-        ## (Config)
-        ## (Clflags)
-        ## (Asttypes)
-        ## (Array)
+        "//utils:Config",
+        "//utils:Clflags",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//driver:__pkg__"]
@@ -102,7 +102,7 @@ bootstrap_signature(
     src  = "bytegen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Instruct", ## (Bytecomp Instruct)
+        ":Instruct",
     ],
     data = ["//runtime:primitives"]
 )
@@ -113,17 +113,17 @@ bootstrap_module(
     sig    = "Bytelibrarian_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Emitcode", ## (Bytecomp Emitcode)
-        ":Bytelink", ## (Bytecomp Bytelink)
-        ## (String)
-        ## (Misc)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Format)
-        ## (Config)
+        ":Emitcode",
+        ":Bytelink",
+        "//stdlib:Stdlib.String",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//utils:Config",
         ## (Cmo_format)
-        ## (Clflags)
+        "//utils:Clflags",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//driver:__pkg__"]
@@ -134,7 +134,7 @@ bootstrap_signature(
     src  = "bytelibrarian.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"]
 )
@@ -145,37 +145,38 @@ bootstrap_module(
     sig    = "Bytelink_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Symtable", ## (Bytecomp Symtable)
-        ":Instruct", ## (Bytecomp Instruct)
-        ":Emitcode", ## (Bytecomp Emitcode)
-        ":Dll", ## (Bytecomp Dll)
-        ":Bytesections", ## (Bytecomp Bytesections)
-        ## (Warnings)
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Option)
+        ":Symtable",
+        ":Instruct",
+        ":Emitcode",
+        ":Dll",
+        ":Bytesections",
+        "//utils:Warnings",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
         ## (Opcodes)
-        ## (Obj)
-        ## (Misc)
-        ## (Marshal)
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//stdlib:Stdlib.Marshal",
         ## (LongString)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Ident)
-        ## (Format)
-        ## (Filename)
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Consistbl)
-        ## (Config)
+        "//utils:Config",
         ## (Cmo_format)
-        ## (Clflags)
-        ## (Char)
-        "//utils:Ccomp"
-        ## (Bytes)
-        ## (Array)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Char",
+        "//utils:Ccomp",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Array",
     ],
-    data = ["//runtime:primitives", "//stdlib:camlheader"],
+    data = ["//runtime:primitives"],
+    ## "//stdlib:camlheader"
 )
 
 bootstrap_signature(
@@ -183,9 +184,9 @@ bootstrap_signature(
     src  = "bytelink.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Symtable", ## (Bytecomp Symtable)
-        ## (Misc)
-        ## (Format)
+        ":Symtable",
+        "//utils:Misc",
+        "//stdlib:Stdlib.Format",
         ## (Cmo_format)
     ],
     data = ["//runtime:primitives"]
@@ -197,27 +198,27 @@ bootstrap_module(
     sig    = "Bytepackager_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Instruct", ## (Bytecomp Instruct)
-        ":Emitcode", ## (Bytecomp Emitcode)
-        ":Bytelink", ## (Bytecomp Bytelink)
-        ":Bytegen", ## (Bytecomp Bytegen)
+        ":Instruct",
+        ":Emitcode",
+        ":Bytelink",
+        ":Bytegen",
         "//typing:Typemod",
         ## (Translmod)
         ## (Subst)
         "//lambda:Simplif",
-        ## (Printlambda)
+        "//lambda:Printlambda",
         ## (Path)
-        ## (Misc)
-        ## (Location)
-        ## (Load_path)
-        ## (List)
-        ## (Ident)
-        ## (Format)
-        ## (Filename)
+        "//utils:Misc",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Env)
-        ## (Config)
+        "//utils:Config",
         ## (Cmo_format)
-        ## (Clflags)
+        "//utils:Clflags",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//driver:__pkg__"]
@@ -228,8 +229,8 @@ bootstrap_signature(
     src  = "bytepackager.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Ident)
-        ## (Format)
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         "//typing:Env_cmi"
     ],
     data = ["//runtime:primitives"]
@@ -241,8 +242,8 @@ bootstrap_module(
     sig    = "Bytesections_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (String)
-        ## (List)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.List",
         "//utils:Config"
     ],
     data = ["//runtime:primitives"],
@@ -264,15 +265,15 @@ bootstrap_module(
     sig    = "Dll_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Sys)
-        ## (String)
-        ## (Obj)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Obj",
         "//utils:Misc",
-        ## (List)
-        ## (Filename)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
         "//utils:Config",
-        "//utils:Binutils"
-        ## (Array)
+        "//utils:Binutils",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
 )
@@ -292,28 +293,29 @@ bootstrap_module(
     sig    = "Emitcode_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//lambda:Translmod", ## (Lambda Translmod)
-        ":Instruct", ## (Bytecomp Instruct)
-        ":Bytegen", ## (Bytecomp Bytegen)
-        ## (Sys)
-        ## (Primitive)
-        ":Opcodes"
-        ## (Misc)
-        ## (Marshal)
-        ## (LongString)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Ident)
-        ## (Format)
-        ## (Filename)
-        ## (Env)
-        ## (Config)
-        ## (Clflags)
-        ## (Char)
+        "//file_formats:Cmo_format_cmi",
+        "//lambda:Translmod",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Marshal",
+        "//stdlib:Stdlib.Sys",
+        "//typing:Ident",
+        "//typing:Primitive",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Misc",
+        ":Bytegen",
+        ":Instruct",
+        ":Opcodes",
         ## (Btype)
-        ## (Asttypes)
-        ## (Array)
+        ## (Env)
+        ## (LongString)
     ],
     data = ["//runtime:primitives"],
     visibility = ["//driver:__pkg__"]
@@ -324,10 +326,10 @@ bootstrap_signature(
     src  = "emitcode.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Instruct", ## (Bytecomp Instruct)
-        ## (Misc)
-        ## (Ident)
         "//file_formats:Cmo_format_cmi",
+        "//typing:Ident",
+        "//utils:Misc",
+        ":Instruct",
     ],
     data = ["//runtime:primitives"]
 )
@@ -338,11 +340,12 @@ bootstrap_module(
     sig    = "Instruct_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
+        "//lambda:Lambda",
         "//stdlib:Stdlib",
-        ## (Types)
+        "//typing:Types",
         ## (Subst)
-        ## (Location)
-        ## (Ident)
+        "//parsing:Location",
+        "//typing:Ident",
         ## (Env)
     ],
     data = ["//runtime:primitives"]
@@ -354,11 +357,11 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         "//stdlib:Stdlib",
-        "//lambda:Lambda_cmi"
-        ## (Types)
+        "//lambda:Lambda_cmi",
+        "//typing:Types",
         ## (Subst)
-        ## (Location)
-        ## (Ident)
+        "//parsing:Location",
+        "//typing:Ident",
         ## (Env)
     ],
     data = ["//runtime:primitives"],
@@ -371,8 +374,8 @@ bootstrap_module(
     sig    = "Meta_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Instruct", ## (Bytecomp Instruct)
-        ## (Obj)
+        ":Instruct",
+        "//stdlib:Stdlib.Obj",
     ],
     data = ["//runtime:primitives"]
 )
@@ -382,8 +385,8 @@ bootstrap_signature(
     src  = "meta.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Instruct", ## (Bytecomp Instruct)
-        ## (Obj)
+        ":Instruct",
+        "//stdlib:Stdlib.Obj",
     ],
     data = ["//runtime:primitives"]
 )
@@ -459,14 +462,14 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//lambda:Printlambda",
-        "//lambda:Lambda", ## (Lambda Lambda)
-        ":Instruct", ## (Bytecomp Instruct)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Ident)
-        ## (Format)
-        ## (Array)
+        "//lambda:Lambda",
+        ":Instruct",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//driver:__pkg__"]
@@ -477,8 +480,8 @@ bootstrap_signature(
     src  = "printinstr.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Instruct", ## (Bytecomp Instruct)
-        ## (Format)
+        ":Instruct",
+        "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"]
 )
@@ -489,30 +492,30 @@ bootstrap_module(
     sig    = "Symtable_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//lambda:Runtimedef", ## (Lambda Runtimedef)
-        ":Meta", ## (Bytecomp Meta)
-        ":Dll", ## (Bytecomp Dll)
-        ":Bytesections", ## (Bytecomp Bytesections)
-        ## (Sys)
-        ## (Printf)
+        "//file_formats:Cmo_format_cmi",
+        "//lambda:Runtimedef",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+        "//typing:Ident",
         "//typing:Predef",
-        ## (Obj)
-        ## (Misc)
-        ## (Map)
-        ## (LongString)
-        ## (Location)
-        ## (List)
-        ## (Ident)
-        ## (Format)
-        ## (Filename)
-        ## (Digest)
-        ## (Config)
-        ## (Cmo_format)
-        ## (Clflags)
-        ## (Char)
-        ## (Buffer)
-        ## (Asttypes)
-        ## (Array)
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Misc",
+        ":Bytesections",
+        ":Dll",
+        ":Meta",
+        #### (LongString)
     ],
     data = ["//runtime:primitives"]
 )
@@ -522,11 +525,11 @@ bootstrap_signature(
     src  = "symtable.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Obj)
-        ## (Misc)
-        ## (Ident)
-        ## (Format)
-        ## (Digest)
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Digest",
         "//file_formats:Cmo_format_cmi"
     ],
     data = ["//runtime:primitives"]

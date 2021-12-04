@@ -24,8 +24,8 @@ ocaml_module(
         ":Odoc_html", ## (Ocamldoc Odoc_html)
         ":Odoc_gen", ## (Ocamldoc Odoc_gen)
         ":Odoc_args", ## (Ocamldoc Odoc_args)
-        ## (Printf)
-        ## (Buffer)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Buffer",
     ]
 )
 
@@ -39,10 +39,10 @@ ocaml_module(
         ":Odoc_html", ## (Ocamldoc Odoc_html)
         ":Odoc_gen", ## (Ocamldoc Odoc_gen)
         ":Odoc_args", ## (Ocamldoc Odoc_args)
-        ## (Printf)
-        ## (List)
-        ## (Filename)
-        ## (Buffer)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Buffer",
     ]
 )
 

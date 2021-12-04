@@ -570,7 +570,7 @@ bootstrap_module(
         # ":List", ## (Stdlib List)
         # ":Char", ## (Stdlib Char)
         # ":Array", ## (Stdlib Array)
-        ## (Map)
+        "//stdlib:Stdlib.Map",
     ],
     data = ["//runtime:primitives"]
 )
@@ -681,7 +681,7 @@ bootstrap_module(
         ":Lazy", ## (Stdlib Lazy)
         ":Int", ## (Stdlib Int)
         ":Array", ## (Stdlib Array)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Hashtbl",
     ],
     data = ["//runtime:primitives"]
 )
@@ -766,7 +766,7 @@ bootstrap_module(
         ":Bytes", ## (Stdlib Bytes)
         ":Buffer", ## (Stdlib Buffer)
         ## (Stack)
-        ## (Queue)
+        "//stdlib:Stdlib.Queue",
     ],
     data = ["//runtime:primitives"]
 )
@@ -840,7 +840,7 @@ bootstrap_module(
         ":Char", ## (Stdlib Char)
         ":Bytes", ## (Stdlib Bytes)
         ## (Stream)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Hashtbl",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1123,8 +1123,8 @@ bootstrap_module(
     opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
     deps   = [
         ":Set", ## (Stdlib Set)
-        ## (Map)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Hashtbl",
     ],
     data = ["//runtime:primitives"]
 )
@@ -1137,8 +1137,8 @@ bootstrap_signature(
         ":Set", ## (Stdlib Set)
         ":Seq", ## (Stdlib Seq)
         ## (Ord)
-        ## (Map)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Hashtbl",
         ## (H)
     ],
     data = ["//runtime:primitives"]
@@ -1759,7 +1759,7 @@ bootstrap_module(
         ":Obj", ## (Stdlib Obj)
         ":Int", ## (Stdlib Int)
         ":Array", ## (Stdlib Array)
-        ## (Hashtbl)
+        "//stdlib:Stdlib.Hashtbl",
         ## (H)
     ],
     data = ["//runtime:primitives"]

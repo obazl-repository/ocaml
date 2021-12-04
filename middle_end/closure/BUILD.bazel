@@ -39,25 +39,25 @@ bootstrap_module(
         "//lambda:Simplif", ## (Lambda Simplif)
         "//lambda:Lambda", ## (Lambda Lambda)
         "//lambda:Debuginfo", ## (Lambda Debuginfo)
-        ## (Warnings)
-        ## (Sys)
-        ## (String)
-        ## (Primitive)
-        ## (Option)
-        ## (Numbers)
-        ## (Nativeint)
-        ## (Misc)
-        ## (Location)
-        ## (List)
-        ## (Int64)
-        ## (Int32)
-        ## (Ident)
+        "//utils:Warnings",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//typing:Primitive",
+        "//stdlib:Stdlib.Option",
+        "//utils:Numbers",
+        "//stdlib:Stdlib.Nativeint",
+        "//utils:Misc",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Int32",
+        "//typing:Ident",
         ## (Env)
-        ## (Config)
-        ## (Clflags)
-        ## (Char)
-        ## (Asttypes)
-        ## (Array)
+        "//utils:Config",
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Char",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = ["//middle_end:__pkg__"]
 )
@@ -83,10 +83,10 @@ bootstrap_module(
         "//middle_end:Compilenv", ## (Middle_end Compilenv)
         "//middle_end:Clambda", ## (Middle_end Clambda)
         ## (Path)
-        ## (List)
-        ## (Ident)
-        ## (Format)
-        ## (Clflags)
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//utils:Clflags",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -102,7 +102,7 @@ bootstrap_signature(
     deps   = [
         "//middle_end:Clambda", ## (Middle_end Clambda)
         "//middle_end:Backend_intf_cmi", ## (Middle_end Backend_intf)
-        ## (Format)
+        "//stdlib:Stdlib.Format",
     ]
 )
 

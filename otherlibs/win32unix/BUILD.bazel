@@ -19,18 +19,18 @@ ocaml_module(
     struct = "unix.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Sys)
-        ## (String)
-        ## (Printf)
-        ## (Printexc)
-        ## (List)
-        ## (Int)
-        ## (Hashtbl)
-        ## (Filename)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Filename",
         ## (Callback)
-        ## (Bytes)
+        "//stdlib:Stdlib.Bytes",
         ## (Bigarray)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 

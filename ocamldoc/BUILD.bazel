@@ -69,11 +69,11 @@ ocaml_module(
         ":Odoc_config", ## (Ocamldoc Odoc_config)
         ":Odoc_args", ## (Ocamldoc Odoc_args)
         ":Odoc_analyse", ## (Ocamldoc Odoc_analyse)
-        ## (Sys)
-        ## (List)
-        ## (Filename)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
         ## (Dynlink)
-        ## (Array)
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -96,24 +96,24 @@ ocaml_module(
         ":Odoc_comments", ## (Ocamldoc Odoc_comments)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
         ":Odoc_ast", ## (Ocamldoc Odoc_ast)
-        ## (Warnings)
-        ## (Types)
+        "//utils:Warnings",
+        "//typing:Types",
         ## (Typemod)
         ## (Typedtree)
         ## (Syntaxerr)
-        ## (String)
-        ## (Printexc)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printexc",
         ## (Pparse)
         ## (Parse)
-        ## (Location)
-        ## (List)
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
         ## (Lexer)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Env)
-        ## (Config)
+        "//utils:Config",
         ## (Compmisc)
-        ## (Clflags)
+        "//utils:Clflags",
     ]
 )
 
@@ -143,15 +143,15 @@ ocaml_module(
         ":Odoc_gen", ## (Ocamldoc Odoc_gen)
         ":Odoc_dot", ## (Ocamldoc Odoc_dot)
         ":Odoc_config", ## (Ocamldoc Odoc_config)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Str)
-        ## (Printf)
+        "//stdlib:Stdlib.Printf",
         ## (Main_args)
-        ## (List)
-        ## (Filename)
-        ## (Config)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//utils:Config",
         ## (Compenv)
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -161,7 +161,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Odoc_gen", ## (Ocamldoc Odoc_gen)
-        ## (Arg)
+        "//stdlib:Stdlib.Arg",
     ]
 )
 
@@ -183,23 +183,23 @@ ocaml_module(
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_env", ## (Ocamldoc Odoc_env)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ## (Types)
+        "//typing:Types",
         ## (Typedtree)
-        ## (String)
-        ## (Printf)
-        ## (Predef)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//typing:Predef",
         ## (Path)
-        ## (Parsetree)
-        ## (Option)
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Option",
         ## (Name)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Filename)
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Filename",
         ## (Btype)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -211,10 +211,10 @@ ocaml_signature(
         ":Odoc_sig", ## (Ocamldoc Odoc_sig)
         ":Odoc_name", ## (Ocamldoc Odoc_name)
         ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ## (Types)
+        "//typing:Types",
         ## (Typedtree)
-        ## (Parsetree)
-        ## (Hashtbl)
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -227,8 +227,8 @@ ocaml_module(
         ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
         ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ## (Types)
-        ## (List)
+        "//typing:Types",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -246,14 +246,14 @@ ocaml_module(
         ":Odoc_global", ## (Ocamldoc Odoc_global)
         ":Odoc_cross", ## (Ocamldoc Odoc_cross)
         ":Odoc_comments_global", ## (Ocamldoc Odoc_comments_global)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Str)
-        ## (Printf)
+        "//stdlib:Stdlib.Printf",
         ## (Odoc_see_lexer)
         ## (Odoc_parser)
         ## (Odoc_lexer)
-        ## (List)
-        ## (Lexing)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
     ]
 )
 
@@ -290,8 +290,8 @@ ocaml_module(
     sig    = "Odoc_config_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Filename)
-        ## (Config)
+        "//stdlib:Stdlib.Filename",
+        "//utils:Config",
     ]
 )
 
@@ -332,12 +332,12 @@ ocaml_module(
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
         ## (Str)
-        ## (Set)
-        ## (Printf)
-        ## (Misc)
-        ## (List)
-        ## (Hashtbl)
-        ## (Char)
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Char",
     ]
 )
 
@@ -358,12 +358,12 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ## (Set)
-        ## (Printf)
-        ## (List)
-        ## (Int)
-        ## (Buffer)
-        ## (Array)
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -385,9 +385,9 @@ ocaml_module(
         ":Odoc_print", ## (Ocamldoc Odoc_print)
         ":Odoc_module", ## (Ocamldoc Odoc_module)
         ## (Str)
-        ## (Parsetree)
-        ## (Misc)
-        ## (List)
+        "//parsing:Parsetree_cmi",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
         ## (Depend)
     ]
 )
@@ -399,9 +399,9 @@ ocaml_module(
     deps   = [
         ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ## (List)
-        ## (Format)
-        ## (Filename)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
     ]
 )
 
@@ -412,11 +412,11 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ## (Types)
+        "//typing:Types",
         ## (Printtyp)
-        ## (Predef)
+        "//typing:Predef",
         ## (Path)
-        ## (List)
+        "//stdlib:Stdlib.List",
         ## (Btype)
     ]
 )
@@ -427,7 +427,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ## (Types)
+        "//typing:Types",
     ]
 )
 
@@ -439,7 +439,7 @@ ocaml_module(
         ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_type", ## (Ocamldoc Odoc_type)
         ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ## (Types)
+        "//typing:Types",
     ]
 )
 
@@ -451,8 +451,8 @@ ocaml_module(
         ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_type", ## (Ocamldoc Odoc_type)
         ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ## (Types)
-        ## (Asttypes)
+        "//typing:Types",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -495,8 +495,8 @@ ocaml_module(
         ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ":Odoc_config", ## (Ocamldoc Odoc_config)
-        ## (Filename)
-        ## (Clflags)
+        "//stdlib:Stdlib.Filename",
+        "//utils:Clflags",
     ]
 )
 
@@ -519,17 +519,17 @@ ocaml_module(
         ":Odoc_info", ## (Ocamldoc Odoc_info)
         ":Odoc_global", ## (Ocamldoc Odoc_global)
         ":Odoc_dag2html", ## (Ocamldoc Odoc_dag2html)
-        ## (Sys)
+        "//stdlib:Stdlib.Sys",
         ## (Str)
-        ## (Printf)
+        "//stdlib:Stdlib.Printf",
         ## (Odoc_ocamlhtml)
-        ## (Misc)
-        ## (List)
-        ## (Filename)
-        ## (Char)
-        ## (Buffer)
-        ## (Asttypes)
-        ## (Array)
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Buffer",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -559,12 +559,12 @@ ocaml_module(
         ":Odoc_comments", ## (Ocamldoc Odoc_comments)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
         ":Odoc_analyse", ## (Ocamldoc Odoc_analyse)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Printtyp)
-        ## (Printf)
-        ## (Location)
-        ## (List)
-        ## (Buffer)
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Buffer",
     ]
 )
 
@@ -583,10 +583,10 @@ ocaml_signature(
         ":Odoc_extension", ## (Ocamldoc Odoc_extension)
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ## (Types)
+        "//typing:Types",
         ## (Str)
-        ## (Location)
-        ## (Asttypes)
+        "//parsing:Location",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -607,15 +607,15 @@ ocaml_module(
         ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ":Odoc_latex_style", ## (Ocamldoc Odoc_latex_style)
         ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ## (Sys)
-        ## (String)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Str)
-        ## (Printf)
-        ## (List)
-        ## (Format)
-        ## (Filename)
-        ## (Buffer)
-        ## (Asttypes)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Buffer",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -637,14 +637,14 @@ ocaml_module(
         ":Odoc_misc", ## (Ocamldoc Odoc_misc)
         ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Str)
-        ## (Printf)
-        ## (Option)
-        ## (List)
-        ## (Filename)
-        ## (Buffer)
-        ## (Asttypes)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Buffer",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -665,7 +665,7 @@ ocaml_module(
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
         ## (Str)
-        ## (List)
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -684,14 +684,14 @@ ocaml_module(
     struct = "odoc_messages.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Sys)
-        ## (String)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
         ## (Str)
-        ## (Printf)
-        ## (List)
-        ## (Int)
-        ## (Config)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//utils:Config",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -704,20 +704,20 @@ ocaml_module(
         ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ## (Unix)
-        ## (Types)
+        "//typing:Types",
         ## (Transient_expr)
-        ## (Sys)
-        ## (String)
-        ## (Set)
-        ## (Printf)
-        ## (Predef)
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Printf",
+        "//typing:Predef",
         ## (Path)
-        ## (Longident)
-        ## (List)
-        ## (Int)
-        ## (Char)
-        ## (Bytes)
-        ## (Buffer)
+        "//parsing:Longident",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Buffer",
         ## (Btype)
     ]
 )
@@ -728,9 +728,9 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ## (Types)
-        ## (Longident)
-        ## (Asttypes)
+        "//typing:Types",
+        "//parsing:Longident",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -746,9 +746,9 @@ ocaml_module(
         ":Odoc_extension", ## (Ocamldoc Odoc_extension)
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ## (Types)
-        ## (Misc)
-        ## (List)
+        "//typing:Types",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -759,14 +759,14 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Str)
         ## (Path)
-        ## (Map)
-        ## (List)
-        ## (Ident)
-        ## (Buffer)
-        ## (Array)
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -776,9 +776,9 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ## (Path)
-        ## (Map)
-        ## (Longident)
-        ## (Ident)
+        "//stdlib:Stdlib.Map",
+        "//parsing:Longident",
+        "//typing:Ident",
     ]
 )
 
@@ -788,9 +788,9 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ## (Types)
-        ## (String)
-        ## (List)
+        "//typing:Types",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -801,12 +801,12 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ## (Vars)
-        ## (Types)
+        "//typing:Types",
         ## (Transient_expr)
         ## (Printtyp)
         ## (Meths)
-        ## (Format)
-        ## (Buffer)
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Buffer",
         ## (Btype)
     ]
 )
@@ -816,7 +816,7 @@ ocaml_signature(
     src  = "odoc_print.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Types)
+        "//typing:Types",
     ]
 )
 
@@ -832,7 +832,7 @@ ocaml_module(
         ":Odoc_extension", ## (Ocamldoc Odoc_extension)
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ## (List)
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -851,8 +851,8 @@ ocaml_module(
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
         ## (Str)
-        ## (Printf)
-        ## (List)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -891,22 +891,22 @@ ocaml_module(
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_env", ## (Ocamldoc Odoc_env)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ## (Types)
+        "//typing:Types",
         ## (Typedtree)
-        ## (String)
-        ## (Parsetree)
-        ## (Option)
+        "//stdlib:Stdlib.String",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Option",
         ## (Name)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Filename)
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Filename",
         ## (Ctype)
         ## (Btype)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -921,11 +921,11 @@ ocaml_signature(
         ":Odoc_module", ## (Ocamldoc Odoc_module)
         ":Odoc_env", ## (Ocamldoc Odoc_env)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ## (Types)
+        "//typing:Types",
         ## (Typedtree)
-        ## (Parsetree)
-        ## (Location)
-        ## (Hashtbl)
+        "//parsing:Parsetree_cmi",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -944,14 +944,14 @@ ocaml_module(
         ":Odoc_extension", ## (Ocamldoc Odoc_extension)
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ## (Types)
-        ## (String)
+        "//typing:Types",
+        "//stdlib:Stdlib.String",
         ## (Printtyp)
-        ## (Printf)
-        ## (List)
-        ## (Format)
-        ## (Buffer)
-        ## (Asttypes)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Buffer",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -965,7 +965,7 @@ ocaml_signature(
         ":Odoc_extension", ## (Ocamldoc Odoc_extension)
         ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ## (Types)
+        "//typing:Types",
     ]
 )
 
@@ -977,9 +977,9 @@ ocaml_module(
         ":Odoc_info", ## (Ocamldoc Odoc_info)
         ":Odoc_gen", ## (Ocamldoc Odoc_gen)
         ":Odoc_args", ## (Ocamldoc Odoc_args)
-        ## (Printexc)
-        ## (List)
-        ## (Format)
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -991,15 +991,15 @@ ocaml_module(
         ":Odoc_to_text", ## (Ocamldoc Odoc_to_text)
         ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ## (Types)
-        ## (String)
+        "//typing:Types",
+        "//stdlib:Stdlib.String",
         ## (Str)
-        ## (Printf)
-        ## (List)
-        ## (Hashtbl)
-        ## (Filename)
-        ## (Bytes)
-        ## (Asttypes)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Bytes",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1010,13 +1010,13 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ## (String)
-        ## (Printf)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
         ## (Odoc_text_parser)
         ## (Odoc_text_lexer)
-        ## (List)
-        ## (Lexing)
-        ## (Buffer)
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Buffer",
     ]
 )
 
@@ -1038,11 +1038,11 @@ ocaml_module(
         ":Odoc_module", ## (Ocamldoc Odoc_module)
         ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Str)
-        ## (Printf)
-        ## (List)
-        ## (Format)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -1053,8 +1053,8 @@ ocaml_module(
     deps   = [
         ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ## (Types)
-        ## (Asttypes)
+        "//typing:Types",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1065,7 +1065,7 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ## (Location)
+        "//parsing:Location",
     ]
 )
 
@@ -1074,7 +1074,7 @@ ocaml_signature(
     src  = "odoc_types.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Location)
+        "//parsing:Location",
     ]
 )
 
@@ -1087,10 +1087,10 @@ ocaml_module(
         ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
         ":Odoc_name", ## (Ocamldoc Odoc_name)
         ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ## (Types)
+        "//typing:Types",
         ## (Printtyp)
-        ## (List)
-        ## (Asttypes)
+        "//stdlib:Stdlib.List",
+        "//parsing:Asttypes_cmi",
     ]
 )
 

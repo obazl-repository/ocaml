@@ -60,16 +60,16 @@ bootstrap_module(
     sig    = "Debuginfo_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (String)
-        ## (Printf)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        "//utils:Int_replace_polymorphic_compare"
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi", # => "//parsing:Location_cmi",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//utils:Int_replace_polymorphic_compare",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -82,10 +82,9 @@ bootstrap_signature(
     src  = "debuginfo.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ## (Location)
+        "//parsing:Asttypes_cmi", # => "//parsing:Location_cmi",
         "//typing:Ident_cmi",
-        ## (Format)
-        "//parsing:Asttypes_cmi"
+        "//stdlib:Stdlib.Format",
     ],
     visibility = ["//middle_end:__pkg__"]
 )
@@ -96,24 +95,26 @@ bootstrap_module(
     sig    = "Lambda_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
-        ## (Primitive)
+        ":Debuginfo",
+        "//typing:Types",
+        "//typing:Primitive",
         ## (Path)
-        ## (Option)
-        ## (Misc)
-        ## (Longident)
-        ## (List)
-        ## (Ident)
-        ## (Env)
-        ## (Clflags)
-        ## (Asttypes)
+        "//stdlib:Stdlib.Option",
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//typing:Env",
+        "//utils:Clflags",
+        "//parsing:Asttypes_cmi",
     ],
     visibility = [
+        "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//file_formats:__pkg__",
         "//middle_end:__subpackages__",
-    ]
+        "//typing:__pkg__",
+    ],
 )
 
 bootstrap_signature(
@@ -123,11 +124,11 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Types_cmi",
-        ## (Primitive)
+        "//typing:Primitive",
         ## (Path)
-        ## (Ident)
-        "//typing:Env_cmi"
-        ## (Asttypes)
+        "//typing:Ident",
+        "//typing:Env_cmi",
+        "//parsing:Asttypes_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -147,32 +148,32 @@ bootstrap_module(
         ":Printlambda", ## (Lambda Printlambda)
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
+        "//typing:Types",
         "//typing:Typeopt",
         ## (Typedtree)
         ## (Printpat)
-        ## (Printf)
-        ## (Primitive)
-        ## (Predef)
+        "//stdlib:Stdlib.Printf",
+        "//typing:Primitive",
+        "//typing:Predef",
         ## (Patterns)
         "//typing:Parmatch",
-        ## (Option)
-        ## (Obj)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Lazy)
-        ## (Ident)
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lazy",
+        "//typing:Ident",
         ## (Head)
-        ## (Hashtbl)
-        ## (Format)
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
         ## (Env)
-        ## (Clflags)
-        ## (Char)
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Char",
         ## (Btype)
-        ## (Asttypes)
-        ## (Array)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = ["//bytecomp:__pkg__"]
 )
@@ -185,8 +186,8 @@ bootstrap_signature(
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Typedtree_cmi",
-        ## (Location)
-        ## (Ident)
+        "//parsing:Location",
+        "//typing:Ident",
     ]
 )
 
@@ -198,23 +199,24 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
-        ## (String)
-        "//typing:Printtyp"
-        ## (Printf)
-        ## (Primitive)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Ident)
-        ## (Format)
-        ## (Clflags)
-        ## (Asttypes)
+        "//typing:Types",
+        "//stdlib:Stdlib.String",
+        "//typing:Printtyp",
+        "//stdlib:Stdlib.Printf",
+        "//typing:Primitive",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//utils:Clflags",
+        "//parsing:Asttypes_cmi",
     ],
     visibility = [
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
-        "//middle_end:__pkg__"
+        "//middle_end:__pkg__",
+        "//middle_end/flambda:__pkg__"
     ]
 )
 
@@ -225,8 +227,8 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
-        ## (Format)
+        "//typing:Types",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -285,17 +287,17 @@ bootstrap_module(
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         ":Tmc",
-        ## (Warnings)
-        ## (Primitive)
-        ## (Option)
-        ## (Location)
-        ## (List)
-        ## (Int)
-        ## (Ident)
-        ## (Hashtbl)
+        "//utils:Warnings",
+        "//typing:Primitive",
+        "//stdlib:Stdlib.Option",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Int",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
         ## (Fun)
-        ## (Clflags)
-        ## (Asttypes)
+        "//utils:Clflags",
+        "//parsing:Asttypes_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -312,7 +314,7 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Ident)
+        "//typing:Ident",
     ]
 )
 
@@ -322,16 +324,16 @@ bootstrap_module(
     sig    = "Switch_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ## (Printf)
-        ## (Map)
-        ## (List)
-        ## (Hashtbl)
-        ## (Array)
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = [
         "//bytecomp:__pkg__",
-        "//middle_end/closure:__pkg__"
-    ]
+        "//middle_end:__subpackages__"
+     ]
 )
 
 bootstrap_signature(
@@ -349,6 +351,7 @@ bootstrap_module(
     sig    = "Tmc_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
+        ":Lambda"
     ],
 )
 
@@ -367,20 +370,20 @@ bootstrap_module(
     sig    = "Translattribute_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Warnings)
-        ## (Typedtree)
-        ## (String)
-        ## (Result)
-        ## (Printf)
-        ## (Parsetree)
-        ## (Option)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Config)
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Result",
+        "//stdlib:Stdlib.String",
+        "//typing:Typedtree",
+        "//utils:Config",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Debuginfo",
+        ":Lambda",
     ]
 )
 
@@ -392,8 +395,8 @@ bootstrap_signature(
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Typedtree_cmi",
-        ## (Parsetree)
-        ## (Location)
+        "//parsing:Parsetree_cmi",
+        "//parsing:Location",
     ]
 )
 
@@ -408,23 +411,23 @@ bootstrap_module(
         ":Matching", ## (Lambda Matching)
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
+        "//typing:Types",
         ## (Typeopt)
         ## (Typedtree)
-        ## (String)
+        "//stdlib:Stdlib.String",
         ## (Path)
-        ## (Obj)
+        "//stdlib:Stdlib.Obj",
         ## (Meths)
         ## (MethSet)
-        ## (Location)
-        ## (List)
-        ## (Ident)
-        ## (Format)
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
-        ## (Clflags)
+        "//utils:Clflags",
         ## (CamlinternalOO)
         ## (Btype)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -436,10 +439,10 @@ bootstrap_signature(
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
          "//typing:Typedtree_cmi",
-        ## (Location)
-        ## (Ident)
-        ## (Format)
-        ## (Asttypes)
+        "//parsing:Location",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -455,31 +458,31 @@ bootstrap_module(
         ":Matching", ## (Lambda Matching)
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
+        "//typing:Types",
         ## (Typeopt)
         ## (Typedtree)
         "//typing:Typecore",
         ## (Printtyp)
-        ## (Printf)
-        ## (Primitive)
-        ## (Predef)
+        "//stdlib:Stdlib.Printf",
+        "//typing:Primitive",
+        "//typing:Predef",
         ## (Path)
-        ## (Parsetree)
+        "//parsing:Parsetree_cmi",
         ## (Parmatch)
-        ## (Option)
-        ## (Obj)
-        ## (Misc)
-        ## (Longident)
-        ## (Location)
-        ## (List)
-        ## (Ident)
-        ## (Format)
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//parsing:Longident",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
-        ## (Config)
-        ## (Clflags)
+        "//utils:Config",
+        "//utils:Clflags",
         ## (Btype)
-        ## (Asttypes)
-        ## (Array)
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ]
 )
 
@@ -492,11 +495,11 @@ bootstrap_signature(
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Typedtree_cmi",
         ## (Path)
-        ## (Location)
-        ## (Ident)
-        ## (Format)
+        "//parsing:Location",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -513,24 +516,24 @@ bootstrap_module(
         ":Translattribute", ## (Lambda Translattribute)
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
+        "//typing:Types",
         ## (Typedtree)
-        ## (Result)
-        ## (Primitive)
-        ## (Predef)
+        "//stdlib:Stdlib.Result",
+        "//typing:Primitive",
+        "//typing:Predef",
         ## (Path)
-        ## (Option)
+        "//stdlib:Stdlib.Option",
         ## (Mtype)
-        ## (Misc)
-        ## (Location)
-        ## (List)
-        ## (Ident)
-        ## (Format)
+        "//utils:Misc",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
         ## (Ctype)
-        ## (Clflags)
-        ## (Asttypes)
-        ## (Array)
+        "//utils:Clflags",
+        "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Array",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -547,9 +550,9 @@ bootstrap_signature(
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Typedtree_cmi",
-        ## (Primitive)
-        ## (Location)
-        ## (Ident)
+        "//typing:Primitive",
+        "//parsing:Location",
+        "//typing:Ident",
     ]
 )
 
@@ -561,16 +564,16 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Primitive)
-        ## (Misc)
-        ## (List)
-        ## (Ident)
-        ## (Hashtbl)
+        "//typing:Primitive",
+        "//utils:Misc",
+        "//stdlib:Stdlib.List",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
         ## (Env)
-        ## (Config)
-        ## (Clflags)
+        "//utils:Config",
+        "//utils:Clflags",
         ## (Btype)
-        ## (Asttypes)
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -581,7 +584,7 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Ident)
+        "//typing:Ident",
         ## (Env)
     ]
 )
@@ -595,26 +598,26 @@ bootstrap_module(
         ":Matching", ## (Lambda Matching)
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
+        "//typing:Types",
         ## (Typeopt)
         ## (Typedtree)
-        ## (String)
-        ## (Printf)
-        ## (Primitive)
-        ## (Predef)
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Printf",
+        "//typing:Primitive",
+        "//typing:Predef",
         ## (Path)
-        ## (Misc)
-        ## (Location)
-        ## (List)
-        ## (Lexing)
-        ## (Ident)
-        ## (Hashtbl)
-        ## (Format)
-        ## (Filename)
+        "//utils:Misc",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
         ## (Env)
-        ## (Config)
-        ## (Clflags)
-        ## (Asttypes)
+        "//utils:Config",
+        "//utils:Clflags",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -625,13 +628,13 @@ bootstrap_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
-        ## (Types)
+        "//typing:Types",
          "//typing:Typedtree_cmi",
-        ## (Primitive)
+        "//typing:Primitive",
         ## (Path)
-        ## (Location)
-        ## (Ident)
-        ## (Format)
+        "//parsing:Location",
+        "//typing:Ident",
+        "//stdlib:Stdlib.Format",
         ## (Env)
     ]
 )

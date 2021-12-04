@@ -255,8 +255,9 @@ ROOT_MKEXE_FLAGS = ["-Wl,-no_compact_unwind"]
 #         -I $(ROOTDIR)/boot -use-prims $(ROOTDIR)/runtime/primitives
 # CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -nostdlib -I $(ROOTDIR)/stdlib
 
-## NB: rules must add attr: data = ["//runtime:primitives"],
 USE_PRIMS = ["-use-prims", "runtime/primitives"]
+## NB: rules must add attr: data = ["//runtime:primitives"],
+DATA_PRIMITIVES = ["//runtime:primitives"]
 
 ## CAMLC - bytecode
 ## CAMLOPT - native

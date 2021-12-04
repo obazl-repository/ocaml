@@ -1,6 +1,6 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl/providers:ocaml.bzl", "CompilationModeSettingProvider")
+load("//bzl:providers.bzl", "CompilationModeSettingProvider")
 
 # load("//ocaml/_functions:utils.bzl", "get_sdkpath")
 

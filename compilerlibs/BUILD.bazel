@@ -1,12 +1,17 @@
-load("//bzl:rules.bzl", "bootstrap_archive")
+load("//bzl:rules.bzl",
+     "bootstrap_archive",
+     "bootstrap_library")
 
 # COMMON_CMI = $(UTILS_CMI) $(PARSING_CMI) $(TYPING_CMI) $(LAMBDA_CMI) $(COMP_CMI)
 
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
+## no //middle_end stuff:
+# bootstrap_library(
 bootstrap_archive(
     name = "ocamlcommon",
     mode = "bytecode",
+    opts = ["-linkall"],
     manifest  = [
         "//utils:ocamlcommon",
         "//parsing:ocamlcommon",
@@ -53,12 +58,14 @@ bootstrap_archive(
 # compilerlibs/ocamloptcomp.cma: $(OPTCOMP_CMI) $(OPTCOMP)
 # 	$(CAMLC) -a -o $@ $(OPTCOMP)
 
+# bootstrap_library(
 bootstrap_archive(
     name    = "ocamloptcomp",
     visibility = ["//visibility:public"],
+    opts = ["-linkall"],
     manifest = [
+        "//asmcomp:ocamloptcomp",
         "//middle_end:ocamloptcomp",
-        "//asmcomp:ocamloptcomp"
     ],
 )
 
