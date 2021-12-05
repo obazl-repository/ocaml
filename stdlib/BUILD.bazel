@@ -2075,12 +2075,17 @@ bootstrap_signature(
 ## it into the deps list we add it to deps_runtime of stdlib.ml, until we
 ## figure out how best to do this.
 
+## use --stamp and --workspace_status_command (see .bazelrc)
 genrule(
     name = "header",
     outs = ["camlheader"],
     srcs = [],
-    cmd  = "\n".join([
-        "echo '#!/usr/local/bin/ocamlrun' > $@"
+    cmd  = " ".join([
+        "cat bazel-out/stable-status.txt | ",
+        "grep STABLE_OCAMLRUN | ",
+        "cut -d ' ' -f 2 - ",
+        "> $@"
     ]),
+    stamp = True,
     visibility = ["//tools:__pkg__"]
 )

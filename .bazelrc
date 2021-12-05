@@ -10,3 +10,6 @@ build:bytecode --@ocaml//mode=bytecode
 build:bytecode --@ppx//mode=bytecode
 
 try-import .private/user.bazelrc
+
+# https://docs.bazel.build/versions/main/user-manual.html#flag--workspace_status_command
+build --stamp --workspace_status_command=$PWD/bzl/camlheader.sh
