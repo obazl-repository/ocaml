@@ -20,17 +20,16 @@ _bootstrap_tools_attrs = {
         doc = "Default link mode: 'static' or 'dynamic'"
     ),
 
-    "_allowlist_function_transition" : attr.label(
-        default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-    ),
-
     "ocamlrun": attr.label(
         default    = "//runtime:ocamlrun",
         executable = True,
         allow_single_file = True,
-        cfg = ocamlrun_out_transition,
-        # cfg = "exec",
+        # cfg = ocamlrun_out_transition,
+        cfg = "exec",
     ),
+    # "_allowlist_function_transition" : attr.label(
+    #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+    # ),
 
     # rebuilt bc compiler emits bytecode
     "ocamlc": attr.label(

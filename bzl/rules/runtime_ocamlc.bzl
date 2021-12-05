@@ -266,14 +266,16 @@ def _runtime_ocamlc(ctx):
     # for dep in inputs_depset.to_list():
     #     print("XDEP: %s" % dep)
 
-    if ctx.attr._rule == "ocaml_executable":
-        mnemonic = "CompileOcamlExecutable"
-    # elif ctx.attr._rule == "ppx_executable":
-    #     mnemonic = "CompilePpxExecutable"
-    elif ctx.attr._rule == "ocaml_test":
-        mnemonic = "CompileOcamlTest"
-    else:
-        fail("Unknown rule for executable: %s" % ctx.attr._rule)
+    # if ctx.attr._rule == "ocaml_executable":
+    #     mnemonic = "CompileOcamlExecutable"
+    # # elif ctx.attr._rule == "ppx_executable":
+    # #     mnemonic = "CompilePpxExecutable"
+    # elif ctx.attr._rule == "ocaml_test":
+    #     mnemonic = "CompileOcamlTest"
+    # else:
+    #     fail("Unknown rule for executable: %s" % ctx.attr._rule)
+
+    mnemonic = "runtimeOcamlc"
 
     ################
     ctx.actions.run(
@@ -286,7 +288,7 @@ def _runtime_ocamlc(ctx):
       mnemonic = mnemonic,
       progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
           mode = mode,
-          rule = ctx.attr._rule,
+          rule = "runtime_ocamlc",
           ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
           pkg = ctx.label.package,
           tgt = ctx.label.name,
@@ -316,12 +318,14 @@ def _runtime_ocamlc(ctx):
     #     exe_provider = PpxExecutableMarker(
     #         args = ctx.attr.args
     #     )
-    if ctx.attr._rule == "ocaml_executable":
-        exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "ocaml_test":
-        exe_provider = OcamlTestMarker()
-    else:
-        fail("Wrong rule called impl_executable: %s" % ctx.attr._rule)
+    # if ctx.attr._rule == "ocaml_executable":
+    #     exe_provider = OcamlExecutableMarker()
+    # elif ctx.attr._rule == "ocaml_test":
+    #     exe_provider = OcamlTestMarker()
+    # else:
+    #     fail("Wrong rule called impl_executable: %s" % ctx.attr._rule)
+
+    exe_provider = OcamlExecutableMarker()
 
     providers = [
         defaultInfo,
@@ -386,7 +390,7 @@ runtime_ocamlc = rule(
         ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
-            cfg = runtime_ocamlc_out_transition,
+            # cfg = runtime_ocamlc_out_transition,
             providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
                          [OcamlLibraryMarker],
@@ -421,10 +425,10 @@ runtime_ocamlc = rule(
 
         # _debug           = attr.label(default = "@ocaml//debug"),
 
-        _rule = attr.string( default  = "ocaml_executable" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
+        # _rule = attr.string( default  = "ocaml_executable" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
     ## this is not an ns archive, and it does not use ns ConfigState,
     ## but we need to reset the ConfigState anyway, so the deps are
