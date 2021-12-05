@@ -43,7 +43,7 @@ def dump_library_to_link(ctx, idx, lib):
 
 #########################
 def dump_CcInfo(ctx, cc_info): # dep):
-    # print("DUMP_CCINFO for %s" % ctx.label)
+    print("DUMP_CCINFO for %s" % ctx.label)
     # print("CcInfo dep: {d}".format(d = dep))
 
     # dfiles = dep[DefaultInfo].files.to_list()
@@ -55,22 +55,22 @@ def dump_CcInfo(ctx, cc_info): # dep):
         ## ASSUMPTION: all files in DefaultInfo are also in CcInfo
         # print("dep[CcInfo].linking_context:")
         # cc_info = dep[CcInfo]
-        compilation_ctx = cc_info.compilation_context
-        linking_ctx     = cc_info.linking_context
-        linker_inputs = linking_ctx.linker_inputs.to_list()
-        # print("linker_inputs count: %s" % len(linker_inputs))
-        lidx = 0
-        for linput in linker_inputs:
-            # print(" linker_input[{i}]".format(i=lidx))
-            # print(" linkflags[{i}]: {f}".format(i=lidx, f= linput.user_link_flags))
-            libs = linput.libraries
-            # print(" libs count: %s" % len(libs))
-            if len(libs) > 0:
-                i = 0
-                for lib in linput.libraries:
-                    dump_library_to_link(ctx, i, lib)
-                    i = i+1
-            lidx = lidx + 1
+    compilation_ctx = cc_info.compilation_context
+    linking_ctx     = cc_info.linking_context
+    linker_inputs = linking_ctx.linker_inputs.to_list()
+    print("linker_inputs count: %s" % len(linker_inputs))
+    lidx = 0
+    for linput in linker_inputs:
+        # print(" linker_input[{i}]".format(i=lidx))
+        # print(" linkflags[{i}]: {f}".format(i=lidx, f= linput.user_link_flags))
+        libs = linput.libraries
+        # print(" libs count: %s" % len(libs))
+        if len(libs) > 0:
+            i = 0
+            for lib in linput.libraries:
+                dump_library_to_link(ctx, i, lib)
+                i = i+1
+        lidx = lidx + 1
 
     # else:
     #     for dep in dfiles:

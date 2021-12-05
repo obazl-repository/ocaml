@@ -2,6 +2,21 @@ load("//bzl:rules.bzl",
      "bootstrap_archive",
      "bootstrap_library")
 
+## NB: there is no compelling reason that we should put these targets
+## here in this empty directory. Better to build locally; for example,
+## instead of //compilerlibs:ocamltoplevel, why not
+## //toplevel:ocamltoplevel? More felicitous.
+
+## The exception is ocamlcommon, which depends on multiple packages,
+## and mybeocamloptcomp.
+
+## libraries in this pkg defined in compilerlibs/Makefile.compilerlibs
+## ocamlcommon.[cma,cmxa]
+## ocamlbytecomp.[cma,cmxa]
+## ocamlmiddleend.[cma,cmxa]
+## ocamloptcomp.[cma,cmxa]
+## ocamltoplevel.[cma,cmxa]
+
 # COMMON_CMI = $(UTILS_CMI) $(PARSING_CMI) $(TYPING_CMI) $(LAMBDA_CMI) $(COMP_CMI)
 
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
@@ -10,51 +25,73 @@ load("//bzl:rules.bzl",
 # bootstrap_library(
 bootstrap_archive(
     name = "ocamlcommon",
-    mode = "bytecode",
     opts = ["-linkall"],
     manifest  = [
-        "//utils:ocamlcommon",
+        "//bytecomp:ocamlcommon",
+        "//lambda:ocamlcommon",
         "//parsing:ocamlcommon",
         "//typing:ocamlcommon",
-        "//lambda:ocamlcommon",
-
-        ## COMP = [
-        "//bytecomp:ocamlcommon",
-        "//driver:ocamlcommon",
-
-        # "//file_formats:ocamlcommon",
-        #  ]
+        "//utils:ocamlcommon",
     ],
-    visibility = ["//:__pkg__"]
+    visibility = [
+        "//boot:__pkg__",
+        "//runtime:__pkg__"
+    ]
 )
 
 ################
 # compilerlibs/ocamlbytecomp.cma: $(BYTECOMP_CMI) $(BYTECOMP)
 # 	$(CAMLC) -a -o $@ $(BYTECOMP)
-bootstrap_archive(
-    name = "ocamlbytecomp",
-    manifest = [
-        "//bytecomp:ocamlbytecomp",
-        # "//bytecomp:ocamlbytecomp_cmi",
-        "//driver:ocamlbytecomp",
-    ],
-    visibility = ["//:__pkg__"]
-)
-
 ################
 # compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
 # 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
 
+bootstrap_archive(
+    ## FIXME: move to //bytecomp:ocamlbytecomp (or :bytecomp.archive?)
+    name = "ocamlbytecomp",
+    opts = select({
+        "//bzl/toolchain:boot": [],
+        "//bzl/toolchain:bc_bc": [],
+        "//bzl/toolchain:n_bc": [],
+        "//bzl/toolchain:bc_n": [],
+        "//bzl/toolchain:n_n": []
+    }),
+    manifest = [
+        "//bytecomp:ocamlbytecomp",
+    ],
+    visibility = [
+        "//boot:__pkg__",
+        "//runtime:__pkg__"
+    ]
+)
+
 ##################
+## ocamlmiddlend.[cma,cmxa]
+# MIDDLE_END = \
+#   middle_end/internal_variable_names.cmo \
+#   ... etc...
+# compilerlibs/ocamlmiddleend.cma: $(MIDDLE_END_CMI) $(MIDDLE_END)
+# 	$(CAMLC) -a -o $@ $(MIDDLE_END)
+# compilerlibs/ocamlmiddleend.cmxa: $(MIDDLE_END_CMI) $(MIDDLE_END:%.cmo=%.cmx)
+# 	$(CAMLOPT) -a -o $@ $(MIDDLE_END:%.cmo=%.cmx)
+bootstrap_archive( # FIXME: move to //middle_end:ocamlmiddleend
+    name    = "ocamlmiddlend",
+    visibility = ["//visibility:public"],
+    opts = ["-linkall"],
+    manifest = [
+        "//middle_end:ocamlmiddleend",
+    ],
+)
+
+################
+## ocamloptcomp.[cma,cmxa]
 # ASMCOMP = \
 #   $(ARCH_SPECIFIC_ASMCOMP) \
 #   asmcomp/arch.cmo \
-#   ...
-# MIDDLE_END = \
-#   middle_end/internal_variable_names.cmo \
-#   ...
+#   ... etc...
 # OPTCOMP = $(MIDDLE_END) $(ASMCOMP)
 # OPTCOMP_CMI = $(MIDDLE_END_CMI) $(ASMCOMP_CMI)
+
 # compilerlibs/ocamloptcomp.cma: $(OPTCOMP_CMI) $(OPTCOMP)
 # 	$(CAMLC) -a -o $@ $(OPTCOMP)
 
@@ -69,3 +106,5 @@ bootstrap_archive(
     ],
 )
 
+################
+## compilerlibs/ocamltoplevel.[cma,cmxa]: see //toplevel:ocamltoplevel

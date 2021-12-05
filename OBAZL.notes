@@ -1,3 +1,59 @@
+
+NOTE:  '-I boot' means depend on //stdlib:Std_exit and //stdlib:camlheader
+
+The makefile builds those two, then copies them into `boot/`, then
+adds '-I boot' to build targets.
+
+So we have bootstrapping stages reflected in cmd args:
+
+0.  build the c "runtime" stuff, libocamlrun etc. esp. runtime/ocamlrun
+
+1. use runtime/ocamlrun to build Stdlib archive, using predefined
+'boot/ocamlc'
+
+2. build std_exit, camlheader, camlheaderd, etc.
+
+3. copy the following to 'boot/':
+
+    a. cp runtime/ocamlrun boot/ocamlrun
+    b. cd boot; rm -f stdlib.cma std_exit.cmo *.cmi camlheader
+    c. cd stdlib; cp stdlib.cma std_exit.cmo *.cmi camlheader ../boot
+    d. cd boot; ln -sf ../runtime/libcamlrun.a .
+
+    OBazl does not do this. ocamlrun is in the toolchain, the others
+    we access directly by label.
+
+4.  softlink runtime/libcamlrun.a to boot/
+
+then:
+make opt.opt
+make checkstack
+make coreall
+make -C runtime all (this has already been done in step 0)
+
+5.  softlink runtime/libcamlrun.a to stdlib/
+
+make ocamlc - build //utils etc. with 'boot/ocamlrun boot/ocamlc -I boot'
+
+    NB: boot/ocamlrun is the version we just built in stage 0; in
+    obazl this is in the toolchain. boot/ocamlc is the prebuilt
+    bytecode compiler that comes with the repo. so this can be done by
+    rule based on the toolchain. this step builds a new one (in the
+    root dir)
+
+    To get the effect of '-I boot' - access std_exit.cmo and
+    camlheader - we define a target '//boot:stdlib' that exposes them.
+    so the build targets here must depend on that.
+
+6 make lex
+
+etc.
+
+Then: rebuild stdlib, std_exit, etc. using the newly built ocamlc
+
+Then build tools (ocaml, ocamlopt etc) using boot/ocamlc
+
+================
 If a new dep is added to a Stdlib submodule you may get an error like:
 
 ```

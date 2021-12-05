@@ -1,4 +1,44 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "bool_setting",
+     "string_flag", "string_setting")
+
 load(":BUILD.bzl", "bootstrap_toolchain_impl")
+
+package(default_visibility = ["//visibility:public"])
+
+# bool_flag( name = "boot", build_setting_default = True)
+# bool_setting( name = "enable-boot", build_setting_default = True)
+# config_setting(name = "boot-mode-enabled",
+#                flag_values = {":boot": str(True)})
+
+label_flag(
+    name = "ocamlc.boot",
+    build_setting_default = "//boot:ocamlc"
+    # build_setting_default = "//runtime:ocamlc"
+)
+
+label_flag(
+    name = "ocamlc",
+    build_setting_default = "//boot:ocamlc"
+    # build_setting_default = "//runtime:ocamlc"
+)
+
+label_flag(
+    name = "tc",
+    build_setting_default = ":toolchain"
+)
+
+string_flag(
+    name = "toolchain",
+    values = ["boot", "bc_bc", "bc_n", "n_bc", "n_n"],
+    build_setting_default = "boot",
+)
+
+config_setting(name = "boot", flag_values = {":toolchain": "boot"})
+config_setting(name = "bc_bc", flag_values = {":toolchain": "bc_bc"})
+config_setting(name = "bc_n", flag_values = {":toolchain": "bc_n"})
+config_setting(name = "n_bc", flag_values = {":toolchain": "n_bc"})
+config_setting(name = "n_n", flag_values = {":toolchain": "n_n"})
 
 toolchain_type(
     name = "bootstrap",
@@ -7,9 +47,15 @@ toolchain_type(
 
 ################
 bootstrap_toolchain_impl(
-    name = "bootstrap_toolchain_macos",
+    name = "bootstrap_tc_macos",
     linkmode = "dynamic",
 )
+
+# bootstrap_toolchain_impl(
+#     name = "bootstrap_tc_macos_native",
+#     ocamlc = "//:ocamlopt",
+#     linkmode = "dynamic",
+# )
 
 ################################################################
 toolchain(
@@ -21,7 +67,37 @@ toolchain(
     target_compatible_with = [
         "@platforms//os:macos",
     ],
-    toolchain = ":bootstrap_toolchain_macos",
+    toolchain = ":bootstrap_tc_macos",
     visibility = ["//visibility:public"]
 )
+
+# toolchain(
+#     name = "bootstrap_macos_native",
+#     toolchain_type = ":bootstrap",
+#     exec_compatible_with = [
+#         "@platforms//os:macos",
+#         # ":bytecode",
+#     ],
+#     target_compatible_with = [
+#         "@platforms//os:macos",
+#         # ":bytecode",
+#     ],
+#     target_settings = [":native"],
+#     toolchain = ":bootstrap_tc_macos_native",
+#     visibility = ["//visibility:public"]
+# )
+
+# config_setting(
+#     name = "bytecode",
+#     flag_values = {
+#         "//bzl/toolchain": "bc_bc"
+#     }
+# )
+
+# config_setting(
+#     name = "native",
+#     flag_values = {
+#         "//bzl:mode": "native"
+#     }
+# )
 

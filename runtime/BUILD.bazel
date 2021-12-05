@@ -1,6 +1,11 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 load("//bzl:rules.bzl",
+     "ocamlrun",
+     "bootstrap_executable",
+     "runtime_ocamlc")
+
+load("//bzl:rules.bzl",
      "bootstrap_module")
 
 load("//config:BUILD.bzl",
@@ -14,6 +19,21 @@ load("//config:BUILD.bzl",
      "OUTPUTEXE", "MKEXE_FLAGS",
      "BYTECCLIBS"
      )
+
+## root Makefile:
+# The bytecode compiler
+# ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
+#               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+# 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+runtime_ocamlc(
+    name = "ocamlc",
+    opts = ["-compat-32"],
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//compilerlibs:ocamlbytecomp"
+    ],
+    visibility = ["//visibility:public"]
+)
 
 # ifeq "$(TOOLCHAIN)" "msvc"
 # ASM_EXT := asm
@@ -159,11 +179,16 @@ cc_library(
     deps = ["//runtime/caml:hdrs"]
 )
 
+ocamlrun(
+    name = "ocamlrun.X",
+    visibility = ["//visibility:public"]
+)
+
 cc_binary(
     name = "ocamlrun",
     srcs = ["prims.c", "instrtrace.c"],
-    copts = OC_CFLAGS + CFLAGS,
-    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS,
+    copts = OC_CFLAGS + CFLAGS, # + ["-v"],
+    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS, # + ["-v"],
     deps= [":camlrun"],
     visibility = ["//visibility:public"]
 )

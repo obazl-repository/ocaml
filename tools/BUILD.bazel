@@ -77,7 +77,7 @@ bootstrap_module(
     deps   = STDLIB + [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
-        ## (Bytesections)
+        "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
@@ -222,24 +222,24 @@ bootstrap_module(
         ## (Unix)
         ## (Toploop)
         "//stdlib:Stdlib.Sys",
-        ## (Syntaxerr)
+        "//parsing:Syntaxerr",
         "//stdlib:Stdlib.String",
         "//otherlibs/str:Str",
         ## (StdLabels)
         "//stdlib:Stdlib.Printexc",
         "//parsing:Parsetree_cmi",
-        ## (Parse)
+        "//parsing:Parse",
         ## (Mty)
         ## (Mtd)
         "//utils:Misc",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Lexing",
-        ## (Lexer)
+        "//parsing:Lexer",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        ## (Compmisc)
-        ## (Compenv)
+        "//driver:Compmisc",
+        "//driver:Compenv",
         "//utils:Clflags",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Buffer",
@@ -269,11 +269,11 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Sys",
-        ## (Symtable)
+        "//bytecomp:Symtable",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         ## (Opnames)
-        ## (Opcodes)
+        "//bytecomp:Opcodes",
         "//stdlib:Stdlib.Obj",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
@@ -282,8 +282,8 @@ bootstrap_module(
         "//typing:Ident",
         "//stdlib:Stdlib.Hashtbl",
         "//utils:Config",
-        ## (Cmo_format)
-        ## (Bytesections)
+        "//file_formats:Cmo_format_cmi",
+        "//bytecomp:Bytesections",
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
@@ -313,12 +313,12 @@ bootstrap_module(
         "//stdlib:Stdlib.String",
         ## (Str)
         ## (Scanf)
-        ## (Printtyp)
+        "//typing:Printtyp",
         "//stdlib:Stdlib.Printf",
-        ## (Pparse)
-        ## (Path)
+        "//driver:Pparse",
+        "//typing:Path",
         "//parsing:Parsetree_cmi",
-        ## (Parse)
+        "//parsing:Parse",
         "//utils:Misc",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
@@ -336,7 +336,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Sys",
-        ## (Symtable)
+        "//bytecomp:Symtable",
         ## (Symbol)
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -354,9 +354,9 @@ bootstrap_module(
         ## (Cmxs_format)
         ## (Cmx_format)
         "//file_formats:Cmt_format",
-        ## (Cmo_format)
+        "//file_formats:Cmo_format_cmi",
         "//file_formats:Cmi_format",
-        ## (Bytesections)
+        "//bytecomp:Bytesections",
         ## (Binutils)
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
@@ -382,7 +382,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Filename",
         ## (Envaux)
         "//stdlib:Stdlib.Digest",
-        ## (Compmisc)
+        "//driver:Compmisc",
         "//file_formats:Cmt_format",
         ## (Cmt2annot)
         "//utils:Clflags",
@@ -401,10 +401,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
-        ## (Main_args)
+        "//driver:Main_args",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Filename",
-        ## (Compenv)
+        "//driver:Compenv",
         "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
@@ -463,10 +463,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
-        ## (Main_args)
+        "//driver:Main_args",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Filename",
-        ## (Compenv)
+        "//driver:Compenv",
         "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
@@ -482,7 +482,7 @@ bootstrap_module(
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         "//parsing:Parsetree_cmi",
-        ## (Parse)
+        "//parsing:Parse",
         "//stdlib:Stdlib.Option",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
@@ -505,7 +505,7 @@ bootstrap_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//utils:Config",
-        ## (Cmo_format)
+        "//file_formats:Cmo_format_cmi",
         "//stdlib:Stdlib.Arg",
     ],
     data = ["//runtime:primitives"]
@@ -542,7 +542,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Printf",
         "//utils:Misc",
         "//stdlib:Stdlib.List",
-        ## (Bytesections)
+        "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]

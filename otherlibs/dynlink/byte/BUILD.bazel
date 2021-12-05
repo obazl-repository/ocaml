@@ -22,21 +22,21 @@ ocaml_module(
         ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
         ":Dynlink", ## (Otherlibs Dynlink Dynlink_common)
         "//stdlib:Stdlib.Sys",
-        ## (Symtable)
+        "//bytecomp:Symtable",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printexc",
-        ## (Opcodes)
+        "//bytecomp:Opcodes",
         "//stdlib:Stdlib.Obj",
         "//utils:Misc",
-        ## (Meta)
+        "//bytecomp:Meta",
         ## (LongString)
         "//stdlib:Stdlib.List",
         "//typing:Ident",
         ## (Dynlink_compilerlibs)
-        ## (Dll)
+        "//bytecomp:Dll",
         "//stdlib:Stdlib.Digest",
         "//utils:Config",
-        ## (Cmo_format)
+        "//file_formats:Cmo_format_cmi",
         "//stdlib:Stdlib.Char",
     ]
 )

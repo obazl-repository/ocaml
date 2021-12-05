@@ -1,17 +1,36 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "bootstrap_archive",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
 )
 
 MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
-ocaml_library(
-    name = "toplevel_lib",
-    modules  = [
+################################################################
+# # root Makefile:
+# ocamlnat_dependencies := \
+#   compilerlibs/ocamlcommon.cmxa \
+#   compilerlibs/ocamloptcomp.cmxa \
+#   compilerlibs/ocamlbytecomp.cmxa \
+#   otherlibs/dynlink/dynlink.cmxa \
+#   compilerlibs/ocamltoplevel.cmxa \
+#   $(TOPLEVELSTART:.cmo=.cmx)
+
+# # compilerlibs/Makefile.compilerlibs:
+# compilerlibs/ocamltoplevel.cmxa: $(OPTTOPLEVEL_CMI) $(OPTTOPLEVEL:.cmo=.cmx)
+# 	$(CAMLOPT) -a -o $@ -I toplevel/native $(OPTTOPLEVEL:.cmo=.cmx)
+
+# ocamlnat$(EXE): $(ocamlnat_dependencies)
+# 	$(CAMLOPT_CMD) $(LINKFLAGS) -linkall -I toplevel/native -o $@ $^
+
+
+################################################################
+## dev/test, build all
+bootstrap_library(
+    name = "toplevel",
+    manifest  = [
         ":Expunge",
         ":Genprintval",
         ":Topcommon",
@@ -19,134 +38,162 @@ ocaml_library(
         ":Toploop",
         ":Topstart",
     ],
-    signatures  = [
-        ":Topeval_cmi",
-        ":Topmain_cmi",
-        ":Trace_cmi",
-    ],
+    # deps  = [
+    #     ":Topeval_cmi",
+    #     ":Topmain_cmi",
+    #     ":Trace_cmi",
+    # ],
 )
 
-ocaml_module(
+## defined in compilerlibs/Makefile.compilerlibs:
+TOPLEVEL = [
+    "//toplevel/byte:Topeval",
+    "//toplevel/byte:Topmain",
+    "//toplevel/byte:Trace",
+    ":Genprintval",
+    ":Topcommon",
+    ":Topdirs",
+    ":Toploop",
+]
+
+TOPLEVEL_CMI = [
+    "//toplevel/byte:Topeval",
+    "//toplevel/byte:Topmain",
+    "//toplevel/byte:Trace",
+    ":Topcommon",
+    ":Topdirs",
+    ":Toploop",
+]
+
+bootstrap_archive(
+    name = "archive", # //toplevel:archive instead of ocamltoplevel
+    manifest  = TOPLEVEL,
+    # deps      = TOPLEVEL_CMI
+)
+
+################################################################
+bootstrap_module(
     name   = "Expunge",
     struct = "expunge.ml",
     opts = MODULE_OPTS,
     deps   = [
         "//stdlib:Stdlib.Sys",
-        ## (Symtable)
-        ## (Runtimedef)
+        "//bytecomp:Symtable",
+        "//lambda:Runtimedef",
         "//stdlib:Stdlib.Printexc",
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//typing:Ident",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Digest",
-        ## (Bytesections)
+        "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Genprintval",
     struct = "genprintval.ml",
     sig    = "Genprintval_cmi",
     opts = MODULE_OPTS,
     deps   = [
         "//typing:Types",
-        ## (Syntaxerr)
-        ## (Printtyp)
+        "//parsing:Syntaxerr",
+        "//typing:Printtyp",
         "//stdlib:Stdlib.Printexc",
         "//typing:Predef",
-        ## (Path)
-        ## (Parse)
-        ## (Outcometree)
-        ## (Oprint)
+        "//typing:Path",
+        "//parsing:Parse",
+        "//typing:Outcometree_cmi",
+        "//typing:Oprint",
         "//stdlib:Stdlib.Obj",
         "//utils:Misc",
         "//parsing:Longident",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Lexing",
-        ## (Lexer)
+        "//parsing:Lexer",
         "//typing:Ident",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
-        ## (Env)
-        ## (Datarepr)
-        ## (Ctype)
+        "//typing:Env",
+        "//typing:Datarepr",
+        "//typing:Ctype",
         "//stdlib:Stdlib.Bytes",
-        ## (Btype)
+        "//typing:Btype",
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Genprintval_cmi",
     src  = "genprintval.mli",
     opts = SIG_OPTS,
     deps   = [
         "//typing:Types",
-        ## (Path)
-        ## (Outcometree)
+        "//typing:Path",
+        "//typing:Outcometree_cmi",
         "//stdlib:Stdlib.Format",
-        ## (Env)
+        "//typing:Env",
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Topcommon",
     struct = "topcommon.ml",
     sig    = "Topcommon_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Genprintval", ## (Toplevel Genprintval)
-        "//stdlib:Stdlib.String",
-        ## (Str)
-        "//stdlib:Stdlib.Printexc",
-        ## (Printast)
-        "//typing:Predef",
-        "//parsing:Pprintast",
-        ## (Pparse)
-        ## (Path)
-        "//parsing:Parsetree_cmi",
-        ## (Parse)
-        ## (Outcometree)
-        ## (Oprint)
-        "//stdlib:Stdlib.Obj",
-        ## (Mod)
-        "//utils:Misc",
-        ## (Mb)
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        ## (Lexer)
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Gc",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        ## (Env)
-        ## (Dll)
-        "//utils:Config",
-        ## (Compmisc)
-        ## (Compenv)
-        "//utils:Clflags",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Buffer",
+        "//bytecomp:Dll",
+        "//driver:Compenv",
+        "//driver:Compmisc",
+        "//parsing:Lexer",
         "//parsing:Ast_helper",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parse",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Pprintast",
         "//stdlib:Stdlib.Arg",
-    ]
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.String",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Oprint",
+        "//typing:Outcometree_cmi",
+        "//typing:Path",
+        "//typing:Predef",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Load_path",
+        "//utils:Misc",
+        ":Genprintval",
+        "//driver:Pparse",
+        "//parsing:Printast",
+        #### (Str)
+        #### (Mb)
+        #### (Mod)
+    ],
+    visibility = ["//toplevel/byte:__pkg__"]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Topcommon_cmi",
     src  = "topcommon.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Genprintval", ## (Toplevel Genprintval)
+        ":Genprintval",
         "//utils:Warnings",
         "//typing:Types",
-        ## (Path)
+        "//typing:Path",
         "//parsing:Parsetree_cmi",
-        ## (Outcometree)
+        "//typing:Outcometree_cmi",
         "//stdlib:Stdlib.Obj",
         "//parsing:Longident",
         "//parsing:Location",
@@ -154,27 +201,26 @@ ocaml_signature(
         "//typing:Ident",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
-        ## (Env)
+        "//typing:Env",
         "//stdlib:Stdlib.Buffer",
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Topdirs",
     struct = "topdirs.ml",
     sig    = "Topdirs_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Toploop", ## (Toplevel Toploop)
-        ":Topeval", ## (Toplevel Topeval)
-        ":String", ## (Stdlib String)
+        ":Toploop",
+        "//toplevel/byte:Topeval",
         "//utils:Warnings",
         "//typing:Types",
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
-        ## (Printtyp)
+        "//typing:Printtyp",
         "//typing:Predef",
-        ## (Path)
+        "//typing:Path",
         "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Obj",
@@ -187,20 +233,21 @@ ocaml_module(
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        ## (Env)
-        ## (Dll)
-        ## (Ctype)
+        "//typing:Env",
+        "//bytecomp:Dll",
+        "//typing:Ctype",
         "//utils:Config",
-        ## (Compenv)
+        "//driver:Compenv",
         "//utils:Clflags",
-        ## (Btype)
+        "//typing:Btype",
         "//parsing:Asttypes_cmi",
         "//parsing:Ast_helper",
         "//stdlib:Stdlib.Arg",
-    ]
+    ],
+    visibility = ["//toplevel/byte:__pkg__"]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Topdirs_cmi",
     src  = "topdirs.mli",
     opts = SIG_OPTS,
@@ -210,28 +257,29 @@ ocaml_signature(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Topeval_cmi",
     src  = "topeval.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Topcommon", ## (Toplevel Topcommon)
+        ":Topcommon",
         "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Format",
-    ]
+    ],
+    visibility = ["//toplevel:__subpackages__"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Toploop",
     struct = "toploop.ml",
     sig    = "Toploop_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Topeval", ## (Toplevel Topeval)
-        ":Topcommon", ## (Toplevel Topcommon)
+        ":Topeval_cmi",
+        ":Topcommon",
         "//utils:Warnings",
-        ## (Typetexp)
+        "//typing:Typetexp",
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Obj",
@@ -240,67 +288,70 @@ ocaml_module(
         "//utils:Load_path",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Lexing",
-        ## (Lexer)
+        "//parsing:Lexer",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        ## (Env)
+        "//typing:Env",
         "//utils:Config",
-        ## (Compmisc)
-        ## (Compenv)
+        "//driver:Compmisc",
+        "//driver:Compenv",
         "//utils:Clflags",
         "//stdlib:Stdlib.Buffer",
-        ## (Btype)
-    ]
+        "//typing:Btype",
+    ],
+    visibility = ["//toplevel/byte:__pkg__"]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Toploop_cmi",
     src  = "toploop.mli",
     opts = SIG_OPTS,
     deps   = [
         "//utils:Warnings",
         "//typing:Types",
-        ## (Path)
+        "//typing:Path",
         "//parsing:Parsetree_cmi",
-        ## (Outcometree)
+        "//typing:Outcometree_cmi",
         "//stdlib:Stdlib.Obj",
         "//parsing:Longident",
         "//parsing:Location",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
-        ## (Env)
+        "//typing:Env",
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Topmain_cmi",
     src  = "topmain.mli",
-    opts = SIG_OPTS,
+    opts = SIG_OPTS + ["-nopervasives"],
     deps   = [
-    ]
+    ],
+    visibility = ["//toplevel:__subpackages__"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Topstart",
     struct = "topstart.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Topmain", ## (Toplevel Topmain)
+        ":Topmain",
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Trace_cmi",
     src  = "trace.mli",
     opts = SIG_OPTS,
     deps   = [
         "//typing:Types",
-        ## (Path)
+        "//typing:Path",
         "//stdlib:Stdlib.Obj",
         "//parsing:Longident",
         "//stdlib:Stdlib.Format",
-        ## (Env)
-    ]
+        "//typing:Env",
+    ],
+    visibility = ["//toplevel:__subpackages__"]
 )
 

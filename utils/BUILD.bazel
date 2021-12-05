@@ -238,6 +238,7 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//parsing:__pkg__",
         "//middle_end:__subpackages__",
+        "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
 )
@@ -275,6 +276,7 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
         "//parsing:__pkg__",
+        "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
 )
@@ -565,6 +567,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//middle_end:__pkg__",
         "//parsing:__pkg__",
+        "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
 )
@@ -585,7 +588,7 @@ bootstrap_module(
     data = DATA_PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.List",
-        ## (Fun)
+        "//stdlib:Stdlib.Fun",
     ],
     visibility = ["//typing:__pkg__"]
 )
@@ -620,7 +623,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Int32",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Hashtbl",
-        ## (Fun)
+        "//stdlib:Stdlib.Fun",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Digest",
@@ -637,6 +640,8 @@ bootstrap_module(
         "//middle_end:__subpackages__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
+        "//toplevel:__pkg__",
+        "//toplevel/byte:__pkg__",
         "//typing:__pkg__"
     ]
 )
@@ -841,7 +846,8 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//parsing:__pkg__",
         "//middle_end:__subpackages__",
-        "//typing:__pkg__"
+        "//toplevel:__subpackages__",
+        "//typing:__pkg__",
     ]
 )
 

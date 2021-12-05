@@ -12,9 +12,10 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker")
 
 load("//bzl:functions.bzl",
-     # "compile_mode_in_transition",
-     # "compile_mode_out_transition",
-     # "ocamlc_out_transition",
+     "compile_mode_in_transition",
+     "compile_mode_out_transition",
+     "bootstrap_ocamlc_in_transition",
+     "bootstrap_ocamlc_out_transition",
      "config_tc")
 
 load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
@@ -32,9 +33,11 @@ load(":options.bzl",
 # ## load("//ocaml/_transitions:ns_transitions.bzl", "nsarchive_in_transition")
 
 ###############################
-def _bootstrap_executable(ctx):
+def _bootstrap_ocamlc(ctx):
 
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+
+    # tool_args = ["//boot:ocamlc"]
 
     # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
@@ -222,8 +225,8 @@ def _bootstrap_executable(ctx):
                 includes.append(dep.dirname)
                 # args.add("-I", dep.dirname)
                 # args.add(dep)
-        # else:
-        #     print("removing double link: %s" % dep)
+        else:
+            print("removing double link: %s" % dep)
 
 
     ## all direct deps must be on cmd line:
@@ -245,7 +248,7 @@ def _bootstrap_executable(ctx):
 
     data_inputs = []
     if ctx.attr.data:
-        # print("DATA: %s" % ctx.files.data)
+        print("DATA: %s" % ctx.files.data)
         data_inputs = [depset(direct = ctx.files.data)]
     # data_inputs.append(depset(direct = [tc.camlheader]))
     # if tc.bootstrap_std_exit:
@@ -266,15 +269,6 @@ def _bootstrap_executable(ctx):
     # for dep in inputs_depset.to_list():
     #     print("XDEP: %s" % dep)
 
-    if ctx.attr._rule == "ocaml_executable":
-        mnemonic = "CompileOcamlExecutable"
-    # elif ctx.attr._rule == "ppx_executable":
-    #     mnemonic = "CompilePpxExecutable"
-    elif ctx.attr._rule == "ocaml_test":
-        mnemonic = "CompileOcamlTest"
-    else:
-        fail("Unknown rule for executable: %s" % ctx.attr._rule)
-
     ################
     ctx.actions.run(
       # env = env,
@@ -283,7 +277,7 @@ def _bootstrap_executable(ctx):
       inputs = inputs_depset,
       outputs = [out_exe],
       tools = [tool] + tool_args,  # [tc.ocamlopt],
-      mnemonic = mnemonic,
+      mnemonic = "bootstrapOcamlc",
       progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
           mode = mode,
           rule = ctx.attr._rule,
@@ -316,12 +310,14 @@ def _bootstrap_executable(ctx):
     #     exe_provider = PpxExecutableMarker(
     #         args = ctx.attr.args
     #     )
-    if ctx.attr._rule == "ocaml_executable":
-        exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "ocaml_test":
-        exe_provider = OcamlTestMarker()
-    else:
-        fail("Wrong rule called impl_executable: %s" % ctx.attr._rule)
+    exe_provider = OcamlExecutableMarker()
+
+    # if ctx.attr._rule == "ocaml_executable":
+    #     exe_provider = OcamlExecutableMarker()
+    # elif ctx.attr._rule == "ocaml_test":
+    #     exe_provider = OcamlTestMarker()
+    # else:
+    #     fail("Wrong rule called impl_executable: %s" % ctx.attr._rule)
 
     providers = [
         defaultInfo,
@@ -335,8 +331,8 @@ def _bootstrap_executable(ctx):
 rule_options = options_executable("ocaml")
 
 ########################
-bootstrap_executable = rule(
-    implementation = _bootstrap_executable,
+bootstrap_ocamlc = rule(
+    implementation = _bootstrap_ocamlc,
 
     doc = "Generates an OCaml executable binary using the bootstrap toolchain",
     attrs = dict(
@@ -347,7 +343,7 @@ bootstrap_executable = rule(
 
         ocamlc = attr.label(
             allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
+            default = "//bzl/toolchain:ocamlc.boot"
         ),
 
         # _boot       = attr.label(
@@ -386,7 +382,7 @@ bootstrap_executable = rule(
         ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
-            # cfg = ocamlc_out_transition,
+            cfg = bootstrap_ocamlc_out_transition,
             providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
                          [OcamlLibraryMarker],
@@ -396,7 +392,7 @@ bootstrap_executable = rule(
         ),
 
         _stdexit = attr.label(
-            # cfg = ocamlc_out_transition,
+            cfg = bootstrap_ocamlc_out_transition,
             default = "//stdlib:Std_exit",
             allow_single_file = True
         ),
@@ -421,16 +417,16 @@ bootstrap_executable = rule(
 
         # _debug           = attr.label(default = "@ocaml//debug"),
 
-        _rule = attr.string( default  = "ocaml_executable" ),
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        _rule = attr.string( default  = "bootstrap_ocamlc" ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
     ),
     ## this is not an ns archive, and it does not use ns ConfigState,
     ## but we need to reset the ConfigState anyway, so the deps are
     ## not affected if this is a dependency of an ns aggregator.
 
-    # cfg = compile_mode_in_transition,
+    cfg = bootstrap_ocamlc_in_transition,
     executable = True,
     toolchains = ["//bzl/toolchain:bootstrap"],
 )

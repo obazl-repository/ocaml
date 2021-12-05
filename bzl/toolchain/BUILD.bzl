@@ -1,5 +1,8 @@
-load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
-load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
+load("//bzl:functions.bzl",
+     "ocamlrun_out_transition")
+
+# load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
+# load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
 
 
 ## obtaining CC toolchain:  https://github.com/bazelbuild/bazel/issues/7260
@@ -17,19 +20,33 @@ _bootstrap_tools_attrs = {
         doc = "Default link mode: 'static' or 'dynamic'"
     ),
 
+    "_allowlist_function_transition" : attr.label(
+        default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+    ),
+
     "ocamlrun": attr.label(
         default    = "//runtime:ocamlrun",
         executable = True,
         allow_single_file = True,
-        cfg = "exec",
+        cfg = ocamlrun_out_transition,
+        # cfg = "exec",
     ),
 
+    # rebuilt bc compiler emits bytecode
     "ocamlc": attr.label(
         default   = "//boot:ocamlc",
         executable = False,
         allow_single_file = True,
         # cfg = "exec",
     ),
+
+    ## native compiler, built by byte-compiler
+    # "ocamlopt": attr.label(
+    #     default   = "//:ocamlopt",
+    #     executable = False,
+    #     allow_single_file = True,
+    #     # cfg = "exec",
+    # ),
 
     # "stdlib": attr.label(
     #     default   = "//stdlib",
@@ -74,29 +91,29 @@ _bootstrap_tools_attrs = {
 
     ################
     ## hidden attr required to make find_cpp_toolchain work:
-    "_cc_toolchain": attr.label(
-        default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
-    ),
+    # "_cc_toolchain": attr.label(
+    #     default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+    # ),
 }
 
 def _bootstrap_toolchain_impl(ctx):
 
-    if ctx.host_fragments.apple:
-        _cc_opts = ["-Wl,-no_compact_unwind"]
-    else:
-        _cc_opts = []
+    # if ctx.host_fragments.apple:
+    #     _cc_opts = ["-Wl,-no_compact_unwind"]
+    # else:
+    #     _cc_opts = []
 
-    the_cc_toolchain = find_cpp_toolchain(ctx)
-    feature_configuration = cc_common.configure_features(
-        ctx = ctx,
-        cc_toolchain = the_cc_toolchain,
-        requested_features = ctx.features,
-        unsupported_features = ctx.disabled_features,
-    )
-    _c_exe = cc_common.get_tool_for_action(
-        feature_configuration = feature_configuration,
-        action_name = C_COMPILE_ACTION_NAME,
-    )
+    # the_cc_toolchain = find_cpp_toolchain(ctx)
+    # feature_configuration = cc_common.configure_features(
+    #     ctx = ctx,
+    #     cc_toolchain = the_cc_toolchain,
+    #     requested_features = ctx.features,
+    #     unsupported_features = ctx.disabled_features,
+    # )
+    # _c_exe = cc_common.get_tool_for_action(
+    #     feature_configuration = feature_configuration,
+    #     action_name = C_COMPILE_ACTION_NAME,
+    # )
 
     return [
         platform_common.ToolchainInfo(
@@ -108,17 +125,18 @@ def _bootstrap_toolchain_impl(ctx):
             # opam_root  = ctx.attr.opam_root,
         linkmode       = ctx.attr.linkmode,
 
-        ocamlrun   = ctx.attr.ocamlrun.files.to_list()[0],
+        ocamlrun   = ctx.file.ocamlrun,
+        # ocamlrun   = ctx.attr.ocamlrun.files.to_list()[0],
 
         ocamlc     = ctx.file.ocamlc, #.files.to_list()[0],
 
         ocamllex   = ctx.attr.ocamllex.files.to_list()[0],
         ocamlyacc  = ctx.attr.ocamlyacc.files.to_list()[0],
 
-        cc_toolchain = the_cc_toolchain,
-            cc_exe = _c_exe, ## to be passed via `-cc` (will be a sh script on mac)
+        # cc_toolchain = the_cc_toolchain,
+        #     cc_exe = _c_exe, ## to be passed via `-cc` (will be a sh script on mac)
 
-        cc_opts = _cc_opts,
+        # cc_opts = _cc_opts,
 
         # std_exit = ctx.attr._std_exit.files.to_list()[0],
         # camlheader = ctx.attr._camlheader.files.to_list()[0],
@@ -134,7 +152,7 @@ bootstrap_toolchain_impl = rule(
 
     ## NB: config frags evidently expose CLI opts like `--cxxopt`;
     ## see https://docs.bazel.build/versions/main/skylark/lib/cpp.html
-    fragments = ["cpp", "apple", "platform"],
-    host_fragments = ["apple", "platform"],
-    toolchains = ["@bazel_tools//tools/cpp:toolchain_type"]
+    # fragments = ["cpp", "apple", "platform"],
+    # host_fragments = ["apple", "platform"],
+    # toolchains = ["@bazel_tools//tools/cpp:toolchain_type"]
 )

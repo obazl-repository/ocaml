@@ -422,7 +422,7 @@ bootstrap_module(
         ":Asmlink",
         ":Asmgen",
         "//typing:Typemod",
-        ## (Translmod)
+        "//lambda:Translmod",
         "//stdlib:Stdlib.String",
         "//lambda:Simplif",
         "//utils:Profile",
@@ -437,7 +437,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Filename",
         "//middle_end/flambda:Export_info_for_pack",
         ## (Export_info)
-        ## (Env)
+        "//typing:Env",
         "//utils:Config",
         "//middle_end:Compilenv",
         ## (Compilation_unit)
@@ -461,7 +461,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
-        ## (Env)
+        "//typing:Env",
         "//middle_end:Backend_intf_cmi",
     ],
     data = ["//runtime:primitives"]

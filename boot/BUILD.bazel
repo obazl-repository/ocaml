@@ -1,6 +1,15 @@
-load("//bzl:rules.bzl", "bootstrap_library")
+load("//bzl:rules.bzl",
+     "bootstrap_archive",
+     "bootstrap_ocamlc",
+     "bootstrap_library")
 
-exports_files(["ocamlc", "ocamllex"])
+exports_files(["ocamlc",
+               "ocamllex"])
+
+# alias(
+#     name = "boot.ocamlc",
+#     actual = "ocamlc"
+# )
 
 ## The makefiles copy stuff into boot and make it accessible to build
 ## targets by passing '-I boot'. OBazl does not (need to) do that.
@@ -9,12 +18,18 @@ exports_files(["ocamlc", "ocamllex"])
 ## the only difference between //stdlib and //boot:stdlib is that the
 ## latter includes //stdlib:Std_exit and //stdlib:camlheader.
 
-# bootstrap_library(
-#     name = "stdlib",
-#     manifest = [
-#         "//stdlib",  ## this is an archive, oops
-#         "//stdlib:Std_exit",
-#     ],
-#     visibility = ["//visibility:public"]
-#     # data = ["//stdlib:camlheader"]
-# )
+## root Makefile:
+# The bytecode compiler
+# ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
+#               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+# 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+bootstrap_ocamlc(
+    name = "boot.ocamlc",
+    # exe  = "ocamlc",
+    opts = ["-compat-32"],
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//compilerlibs:ocamlbytecomp"
+    ],
+    visibility = ["//visibility:public"]
+)

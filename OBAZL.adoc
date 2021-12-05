@@ -1,5 +1,35 @@
 # Building OCaml with OBazl
 
+## structuring
+
+Its easy to make the OBazl build structure mimic the Makefile-based
+structure more-or-less exactly. But where's the fun in that? OBazl's
+expressivity allows us to write a much more felicitous build program.
+For example, we can put archive targets where they naturally belong,
+e.g. `//toplevel:ocamltoplevel`, instead of putting them in an empty
+package (//compilelibs) whose only purpose is to provide a common
+naming prefix. Even better, we can support both designs by using a
+Bazel alias in `//compilerlibs:ocamltoplevel` redirecting to
+`//toplevel:ocamltoplevel`.
+
+Furthermore the decoupling of target names from output names allows us
+to use more felicitous names. For example, for archive targets the PoC
+uses `archive`, and removes some otiose info. Example: for
+`//compilerlibs:ocamltoplevel` we have `//toplevel:archive`. We could
+also just use the package name, `//toplevel:toplevel`, which shortens
+to `//toplevel`. Or `toplevel.archive`, or any other legal Bazel name.
+
+
+## Inspecting build cmds
+
+To see the generated command that Bazel will run, use `aquery`. This
+will print the command (and the list of inputs and outputs) without
+actually buildig anything.
+
+Archives: to see what's directly included via the command line, use
+`aquery` as above. To see what actually gets included (i.e. the deps
+as well), run the build and pass `--output_groups=manifest`.
+
 ## Stdlib
 
 An interesting feature of OBazl is that we can depend on individual

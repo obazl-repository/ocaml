@@ -24,8 +24,8 @@ def _bootstrap_ocamlyacc_impl(ctx):
 
   tmpdir = "_obazl_/"
 
-  # yaccer = ctx.actions.declare_file(tmpdir + yaccer_fname)
-  # yacceri = ctx.actions.declare_file(tmpdir + yacceri_fname)
+  # yaccer = ctx.actions.declare_file(scope + yaccer_fname)
+  # yacceri = ctx.actions.declare_file(scope + yacceri_fname)
 
   yaccer = ctx.outputs.out
 

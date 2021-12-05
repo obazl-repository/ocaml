@@ -21,7 +21,7 @@ ocaml_module(
     deps   = [
         "//stdlib:Stdlib.String",
         ## (Scanf)
-        ## (Pparse)
+        "//driver:Pparse",
         "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Map",
         "//parsing:Location",

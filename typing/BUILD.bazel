@@ -161,6 +161,11 @@ bootstrap_module(
         #### (Transient_expr)
         #### (VarSet)
         #### (Vars)
+    ],
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//lambda:__pkg__",
+        "//toplevel:__pkg__"
     ]
 )
 
@@ -240,6 +245,10 @@ bootstrap_module(
         #### (TypeHash)
         #### (Transient_expr)
         #### (Subtype)
+    ],
+    visibility = [
+        "//lambda:__pkg__",
+        "//toplevel:__subpackages__"
     ]
 )
 
@@ -278,7 +287,8 @@ bootstrap_module(
         #### (TypeSet)
         #### (Uid)
         #### (Variance)
-    ]
+    ],
+    visibility = ["//toplevel:__pkg__"]
 )
 
 bootstrap_signature(
@@ -328,7 +338,13 @@ bootstrap_module(
         ":Types",
         #### (Uid)
     ],
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//driver:__pkg__",
+        "//file_formats:__pkg__",
+        "//lambda:__pkg__",
+        "//toplevel:__subpackages__",
+    ]
 )
 
 bootstrap_signature(
@@ -438,6 +454,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
+        "//toplevel:__subpackages__"
     ]
 )
 
@@ -573,6 +590,10 @@ bootstrap_module(
         ":Subst",
         ":Typedtree",
         ":Types",
+    ],
+    visibility = [
+        "//driver:__pkg__",
+        "//toplevel/byte:__pkg__"
     ]
 )
 
@@ -698,6 +719,9 @@ bootstrap_module(
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
         ":Outcometree_cmi",
+    ],
+    visibility = [
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -722,7 +746,8 @@ bootstrap_signature(
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
         ":Type_immediacy",
-    ]
+    ],
+    visibility = ["//toplevel:__subpackages__"]
 )
 
 bootstrap_module(
@@ -802,7 +827,12 @@ bootstrap_module(
         "//stdlib:Stdlib.String",
         ":Ident",
     ],
-    visibility = ["//middle_end:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end:__pkg__",
+        "//toplevel:__subpackages__",
+    ]
 )
 
 bootstrap_signature(
@@ -873,7 +903,8 @@ bootstrap_module(
         "//utils:Load_path",
         "//utils:Misc",
         "//utils:Warnings",
-    ]
+    ],
+    visibility = ["//toplevel/byte:__pkg__"]
 )
 
 bootstrap_signature(
@@ -914,6 +945,8 @@ bootstrap_module(
         "//bytecomp:__pkg__",
         "//lambda:__pkg__",
         "//middle_end/flambda:__pkg__",
+        "//toplevel:__pkg__",
+        "//toplevel/byte:__pkg__",
     ]
 )
 
@@ -1039,7 +1072,11 @@ bootstrap_module(
         #### (Variance)
         #### (Vars)
     ],
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//lambda:__pkg__",
+        "//toplevel:__subpackages__",
+    ]
 )
 
 bootstrap_signature(
@@ -1084,7 +1121,10 @@ bootstrap_module(
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//toplevel/byte:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -1471,7 +1511,11 @@ bootstrap_module(
         #### (Vars)
         ###### (Uid)
     ],
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//lambda:__pkg__",
+        "//toplevel/byte:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -1748,7 +1792,9 @@ bootstrap_module(
     ],
     visibility = [
         "//driver:__pkg__",
-        "//lambda:__pkg__"
+        "//file_formats:__pkg__",
+        "//lambda:__pkg__",
+        "//toplevel/byte:__pkg__",
     ]
 )
 
@@ -1830,7 +1876,8 @@ bootstrap_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
-        "//driver:__pkg__"
+        "//driver:__pkg__",
+        "//toplevel/byte:__pkg__",
     ]
 )
 
@@ -1927,6 +1974,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__pkg__",
+        "//toplevel:__subpackages__"
     ]
 )
 
@@ -1975,7 +2023,8 @@ bootstrap_module(
         "//parsing:Builtin_attributes",
         "//parsing:Asttypes_cmi",
         "//parsing:Ast_helper",
-    ]
+    ],
+    visibility = ["//toplevel:__pkg__"]
 )
 
 bootstrap_signature(

@@ -1,19 +1,23 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
      "OcamlArchiveProvider",
+     "OcamlLibraryMarker",
      "OcamlModuleMarker",
+     "OcamlNsMarker",
      "OcamlNsResolverProvider",
      "OcamlProvider",
      "OcamlSignatureProvider")
 
 
-# load("//ocaml/_transitions:transitions.bzl",
-#      "bootstrap_module_in_transition")
-
 load("//bzl:functions.bzl",
      "capitalize_initial_char",
+     # "compile_mode_in_transition",
+     # "compile_mode_out_transition",
+     # "ocamlc_out_transition",
+     "config_tc",
      "get_fs_prefix",
      "get_module_name",
      # "get_sdkpath",
@@ -22,9 +26,9 @@ load("//bzl:functions.bzl",
      "file_to_lib_name")
 
 load(":options.bzl",
-     "get_options",
-     "options",
-     "options_module")
+     "get_options")
+     # "options",
+     # "options_module")
      # "options_ns_opts")
 
 # load(":impl_module.bzl", "impl_module")
@@ -35,7 +39,7 @@ load(":impl_common.bzl",
      "tmpdir"
      )
 
-scope = tmpdir
+# scope = tmpdir
 
 sigdeps_closure = None
 sig_linkargs = None
@@ -43,10 +47,8 @@ sig_paths = None
 
 in_structfile = None
 
-########################
-def handle_cmi_dep(ctx, debug):
-
-    debug = False
+########################################
+def handle_cmi_dep(ctx, scope, debug):
 
     sig_attr = ctx.attr.sig
 
@@ -70,15 +72,18 @@ def handle_cmi_dep(ctx, debug):
     ## provider_output_cmi and provider_output_mli should be in same dir, so
     ## paths.dirname(short_path) should match
 
-    ## we're given a sig cmi, so we're going to derive the module
-    ## name from the signame rather than the structfile name.
-    ## provider_output_cmi has been ppxed and ns-renamed if necessary
+    ## derive the module name from the signame rather than the
+    ## structfile name. provider_output_cmi has been ppxed and
+    ## ns-renamed if necessary
     module_name = provider_output_cmi.basename[:-4]
 
     (from_name, ns, module_name) = get_module_name(ctx, ctx.file.struct)
     if debug:
         print("From '{src}' To: '{dst}'".format(
             src = from_name, dst = module_name))
+
+    ## used in 2 places below, so do it here:
+    mli_dir = paths.dirname(provider_output_mli.short_path)
 
     if from_name == module_name:
         if debug:
@@ -89,7 +94,7 @@ def handle_cmi_dep(ctx, debug):
                 d =  paths.dirname(ctx.file.struct.short_path)))
 
         if ctx.file.struct.is_source:
-            # structfile in src dir, link to bazel dir
+            # structfile in src dir, link to bazel dir containing cmi
             in_structfile = ctx.actions.declare_file(scope + ctx.file.struct.basename)
             ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
             if debug:
@@ -98,8 +103,9 @@ def handle_cmi_dep(ctx, debug):
         else:
             # structfile is generated, e.g. by ocamllex or a genrule.
             # make sure it's in same dir as mli/cmi
-            mlidir = paths.dirname(provider_output_mli.short_path)
-            if paths.dirname(ctx.file.struct.short_path) != mlidir:
+            ## FIXME: other way 'round, put cmi in same dir as struct
+
+            if paths.dirname(ctx.file.struct.short_path) != mli_dir:
                 in_structfile = ctx.actions.declare_file(
                     scope + ctx.file.struct.basename)
                 ctx.actions.symlink(
@@ -123,7 +129,7 @@ def handle_cmi_dep(ctx, debug):
         ## FIXME: use case: configured module binding w/in ns
         ## make sure structfile is renamed to match sigfile
 
-        ## structfile must be renamed, whether it is src or gen
+        ## input structfile must be in bzl dir , whether it is src or gen
         # if ctx.file.struct.is_source:
         in_structfile = ctx.actions.declare_file(
             scope + module_name + ".ml"
@@ -142,12 +148,45 @@ def handle_cmi_dep(ctx, debug):
             dest = in_structfile
         ))
 
-    # includes.append(provider_output_mli.dirname)
+    ## now make sure srcs and cmi in same dir. otherwise we're vulnerable to
+    ## the "Inconsistent assumptions over interface" error.
 
-    # sigdeps_closure = sig_attr[DefaultInfo].files
-    # sigdeps_closure = sig_attr[OcamlProvider].inputs
-    # sig_linkargs = sig_attr[OcamlProvider].linkargs
-    # sig_paths = sig_attr[OcamlProvider].paths
+    ##  easily done with 'sibling' attr of declare_file. we can only
+    ##  link to files within the tree rooted at the target, so we link
+    ##  the mli/cmi deps to the dir containing the (possibly renamed)
+    ##  struct file.
+    structfile_dir = paths.dirname(in_structfile.short_path)
+    if debug:
+        print("mli owner: %s" % provider_output_mli.owner)
+        print("mli dir: %s" % mli_dir)
+        print("mli root: %s" % provider_output_mli.root.path)
+        print("structfile owner: %s" % in_structfile.owner)
+        print("structfile dir: %s" % structfile_dir)
+    if structfile_dir != mli_dir:
+        # case 1: link mli/cmi to structfile bzl dir
+        new_mli = ctx.actions.declare_file(
+            provider_output_mli.basename,
+            sibling = in_structfile
+        )
+        ctx.actions.symlink(
+            output = new_mli,
+            target_file = provider_output_mli
+        )
+        print("linked {src} => {dst}".format(
+              src = provider_output_mli, dst = new_mli))
+        provider_output_mli = new_mli
+
+        new_cmi = ctx.actions.declare_file(
+            provider_output_cmi.basename,
+            sibling  = in_structfile,
+        )
+        ctx.actions.symlink(
+            output = new_cmi,
+            target_file = provider_output_cmi
+        )
+        print("linked {src} => {dst}".format(
+              src = provider_output_cmi, dst = new_cmi))
+        provider_output_cmi = new_cmi
 
     ## NB: provider_output_cmi and provider_output_mli must be kept together,
     ## so both go into inputs (and provided outputs)
@@ -158,26 +197,27 @@ def handle_cmi_dep(ctx, debug):
 
 ####################
 ## if we have ctx.attr.sig, we need to add the cmi file to
-## compile_action_inputs. if mode is native, we also need to add the
+## compile_action_inputs. if mode is n_*, we also need to add the
 ## mli file.
 
 ## we do not need to pass on the depgraph of the cmi target.
-def handle_sig(ctx, debug):
-
+def handle_sig(ctx, scope, debug):
+    if debug:
+        print("handle_sig:")
     if ctx.attr.sig:
-        ## cmi file already provided. rename structfile to match it if
-        ## needed.
-        if debug:
-            print("SIG attr: %s" % ctx.attr.sig)
+
+        ## cmi file already provided. make sure its in the same dir as
+        ## the struct file. rename structfile to match it if needed.
+        ## out transitions force the attr to be a list, index by 0:
         if OcamlSignatureProvider in ctx.attr.sig:
-            return handle_cmi_dep(ctx, debug)
+            return handle_cmi_dep(ctx, scope, debug)
             # sig_inputs = [cmifile, mlifile]
         else:
             ## bootstrap_signature always uses OcamlSignature
             ## provider, so either ctx.file.sig is a source file or it
             ## was produced by a genrule or some other mechanism.
             if debug:
-                fail("ERROR: invalid value for 'sig' attr: %s" % ctx.file.sig)
+                fail("ERROR: invalid value for 'sig' attr: %s" % ctx.attr.sig)
 
     else:
         ## no ctx.attr.sig. rename structfile if in ns, and declare
@@ -243,41 +283,11 @@ def _bootstrap_module(ctx):
 
     tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
 
-    ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
-
-    mode = "bytecode"
-
-    # if mode == "bytecode":
-    tool = tc.ocamlrun
-    tool_args = [tc.ocamlc]
-    # else:
-    #     tool = tc.ocamlrun.opt
-    #     tool_args = []
-
-    # return impl_module(ctx, mode, tool, tool_args)
+    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     debug = False
-    # if ctx.label.name in ["Stdlib.List"]:
+    # if ctx.label.name in ["CamlinternalAtomic"]:
     #     debug = True
-
-    # env = {"PATH": get_sdkpath(ctx)}
-
-    # mode = ctx.attr._mode[CompilationModeSettingProvider].value
-
-    # if ctx.attr._rule.startswith("bootstrap"):
-    #     tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
-    #     if mode == "native":
-    #         exe = tc.ocamlrun
-    #     else:
-    #         ext = ".cmo"
-    # else:
-    #     tc = ctx.toolchains["@obazl_rules_ocaml//ocaml:toolchain"]
-    #     if mode == "native":
-    #         exe = tc.ocamlopt.basename
-    #     else:
-    #         exe = tc.ocamlc.basename
-
-    ext  = ".cmx" if  mode == "native" else ".cmo"
 
     ################
     includes   = []
@@ -315,7 +325,7 @@ def _bootstrap_module(ctx):
      action_output_cmi,   # None if sig passed
      ns,
      module_name,
-     in_structfile) = handle_sig(ctx, debug)
+     in_structfile) = handle_sig(ctx, scope, debug)
 
     if action_output_cmi:
         action_outputs.append(action_output_cmi)
@@ -328,8 +338,9 @@ def _bootstrap_module(ctx):
         sig_inputs.append(provider_output_mli)
 
     out_cm_ = ctx.actions.declare_file(scope + module_name + ext)
-                                       # sibling = new_cmi) # fname)
-    # print("OUT_CM_: %s" % out_cm_.path)
+    # sibling = new_cmi) # fname)
+    if debug:
+        print("OUT_CM_: %s" % out_cm_.path)
     action_outputs.append(out_cm_)
     # direct_linkargs.append(out_cm_)
     default_outputs.append(out_cm_)
@@ -362,9 +373,6 @@ def _bootstrap_module(ctx):
     args = ctx.actions.args()
 
     args.add_all(tool_args)
-
-    # if ctx.attr._rule.startswith("bootstrap"):
-    #         args.add(tc.ocamlc)
 
     _options = get_options(ctx.attr._rule, ctx)
     # if "-for-pack" in _options:
@@ -496,9 +504,9 @@ def _bootstrap_module(ctx):
 
     # print("bottomup_ns_inputs: %s" % bottomup_ns_inputs)
 
-    if debug:
-        print("SIG_INPUTS: %s" % sig_inputs)
-        print("in_structfile %s" % in_structfile)
+    # if debug:
+    #     print("SIG_INPUTS: %s" % sig_inputs)
+    #     print("in_structfile %s" % in_structfile)
 
     inputs_depset = depset(
         order = dsorder,
@@ -531,14 +539,6 @@ def _bootstrap_module(ctx):
     else:
         args.add("-impl", in_structfile) # structfile)
         args.add("-o", out_cm_)
-
-    # if ctx.attr._rule.startswith("bootstrap"):
-    #     toolset = [tc.ocamlrun, tc.ocamlc]
-    # else:
-    #     toolset = [tc.ocamlopt, tc.ocamlc]
-
-    # if debug:
-    #     print("INPUTS: %s" % inputs_depset)
 
     ################
     ctx.actions.run(
@@ -596,8 +596,8 @@ def _bootstrap_module(ctx):
         [depset(direct = indirect_linkargs_files)]
     )
 
-    if debug:
-        print("linkset: %s" % linkset)
+    # if debug:
+    #     print("linkset: %s" % linkset)
 
     fileset_depset = depset(
         # direct= mli_out + cmi_out + action_outputs,
@@ -699,7 +699,7 @@ def _bootstrap_module(ctx):
 
 ################################
 # rule_options = options("ocaml") ## we don't want global config defaults
-rule_options = options_module("ocaml")
+# rule_options = options_module("ocaml")
 # FIXME: no need for ppx support here
 # rule_options.update(options_ppx)
 ## FIXME: bootstrap ns are bottomup, no need for this:
@@ -718,13 +718,81 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
     """,
     attrs = dict(
 
-        rule_options,
+        # _boot       = attr.label(
+        #     default = "//bzl/toolchain:boot",
+        # ),
+
+        _mode       = attr.label(
+            default = "//bzl/toolchain",
+        ),
+
+        mode       = attr.string(
+            doc     = "Overrides global mode build setting.",
+        ),
 
         ## opts thru _sdkpath pulled from options fn
         opts = attr.string_list(
             doc = "List of OCaml options. Will override configurable default options."
         ),
         debug           = attr.label(default = "//config:debug"),
+
+        ns = attr.label(
+            doc = "Bottom-up namespacing",
+            allow_single_file = True,
+            mandatory = False
+        ),
+
+        struct = attr.label(
+            doc = "A single module (struct) source file label.",
+            mandatory = False, # pack libs may not need a src file
+            allow_single_file = True # no constraints on extension
+        ),
+
+        pack = attr.string(
+            doc = "Experimental.  Name of pack lib module for which this module is to be compiled using -for-pack"
+        ),
+
+        sig = attr.label(
+            doc = "Single label of a target producing OcamlSignatureProvider (i.e. rule 'ocaml_signature'). Optional.",
+            # cfg = compile_mode_out_transition,
+            allow_single_file = True, # [".cmi"],
+            ## FIXME: how to specify OcamlSignatureProvider OR FileProvider?
+            #providers = [[OcamlSignatureProvider]],
+        ),
+
+        ################
+        deps = attr.label_list(
+            doc = "List of OCaml dependencies.",
+            # cfg = compile_mode_out_transition,
+            providers = [[OcamlArchiveProvider],
+                         [OcamlLibraryMarker],
+                         [OcamlModuleMarker],
+                         [OcamlNsMarker],
+                         [OcamlSignatureProvider],
+                         [CcInfo]]
+            # transition undoes changes that may have been made by ns_lib
+        ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
+
+        deps_runtime = attr.label_list(
+            doc = "Deps needed at runtime, but not build time. E.g. .cmxs plugins.",
+            allow_files = True,
+        ),
+
+        data = attr.label_list(
+            allow_files = True,
+            doc = "Runtime dependencies: list of labels of data files needed by this module at runtime."
+        ),
+        ################
+        cc_deps = attr.label_keyed_string_dict(
+            doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
+            """,
+            # providers = since this is a dictionary depset, no providers
+            ## but the keys must have CcInfo providers, check at build time
+            # cfg = ocaml_module_cc_deps_out_transition
+        ),
 
         _verbose = attr.label(default = "//config:verbose"),
 
@@ -742,25 +810,22 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
         # _warnings = attr.label(
         # ),
 
+        _toolchain = attr.label(
+            default = "//bzl/toolchain:tc"
+        ),
+
+        ocamlc = attr.label(
+            # cfg = ocamlc_out_transition,
+            allow_single_file = True,
+            default = "//bzl/toolchain:ocamlc"
+        ),
+
         _rule = attr.string( default = "bootstrap_module" ),
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),
     ),
-    # incompatible_use_toolchain_transition = True,
-    # exec_groups = {
-    #     "compile": exec_group(
-    #         exec_compatible_with = [
-    #             # "@platforms//os:linux",
-    #             "@platforms//os:macos"
-    #         ],
-    #         toolchains = [
-    #             "@obazl_rules_ocaml//ocaml:toolchain",
-    #             # "@obazl_rules_ocaml//coq:toolchain_type",
-    #         ],
-    #     ),
-    # },
-    # cfg     = bootstrap_module_in_transition,
+    # cfg = compile_mode_in_transition,
     provides = [OcamlModuleMarker],
     executable = False,
     toolchains = ["//bzl/toolchain:bootstrap"],

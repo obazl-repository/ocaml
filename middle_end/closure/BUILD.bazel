@@ -52,7 +52,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Int32",
         "//typing:Ident",
-        ## (Env)
+        "//typing:Env",
         "//utils:Config",
         "//utils:Clflags",
         "//stdlib:Stdlib.Char",
@@ -82,7 +82,7 @@ bootstrap_module(
         "//middle_end:Printclambda", ## (Middle_end Printclambda)
         "//middle_end:Compilenv", ## (Middle_end Compilenv)
         "//middle_end:Clambda", ## (Middle_end Clambda)
-        ## (Path)
+        "//typing:Path",
         "//stdlib:Stdlib.List",
         "//typing:Ident",
         "//stdlib:Stdlib.Format",

@@ -30,7 +30,7 @@ ocaml_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Hashtbl",
-        ## (Fun)
+        "//stdlib:Stdlib.Fun",
         ## (Callback)
         "//stdlib:Stdlib.Bytes",
         ## (Bigarray)

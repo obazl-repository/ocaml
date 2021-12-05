@@ -73,7 +73,10 @@ bootstrap_signature(
         "//typing:Ident",
         "//lambda:Lambda"
     ],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//toplevel/byte:__pkg__",
+    ]
 )
 
 bootstrap_module(
@@ -84,7 +87,7 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Cmi_format", ## (File_formats Cmi_format)
         "//typing:Types",
-        ## (Typedtree)
+        "//typing:Typedtree",
         "//typing:Tast_mapper",
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
@@ -94,7 +97,7 @@ bootstrap_module(
         "//utils:Load_path",
         "//stdlib:Stdlib.List",
         "//parsing:Lexer",
-        ## (Env)
+        "//typing:Env",
         "//stdlib:Stdlib.Digest",
         "//utils:Config",
         "//utils:Clflags",
@@ -113,7 +116,7 @@ bootstrap_signature(
         "//typing:Typedtree_cmi",
         "//utils:Misc",
         "//parsing:Location",
-        ## (Env)
+        "//typing:Env",
         "//stdlib:Stdlib.Digest",
     ]
 )

@@ -7,6 +7,12 @@ load("//bzl:providers.bzl",
      "OcamlNsMarker",
      "OcamlSignatureMarker")
 
+load("//bzl:functions.bzl",
+     # "compile_mode_in_transition",
+     # "compile_mode_out_transition",
+     # "ocamlc_out_transition",
+     "config_tc")
+
 load(":options.bzl", "options")
 
 load("impl_library.bzl", "impl_library")
@@ -18,18 +24,17 @@ load(":options.bzl", "NEGATION_OPTS")
 ###############################
 def _bootstrap_archive(ctx):
 
-    tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
-
-    mode = "bytecode"
-
-    if mode == "bytecode":
-        tool = tc.ocamlrun
-        tool_args = [tc.ocamlc]
-    # else:
-    #     tool = tc.ocamlrun.opt
-    #     tool_args = []
+    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
+    # mode = "bytecode"
+    # if mode == "bytecode":
+    #     tool = tc.ocamlrun
+    #     tool_args = [tc.ocamlc]
+    # # else:
+    # #     tool = tc.ocamlrun.opt
+    # #     tool_args = []
 
     # return impl_archive(ctx, mode, tc.linkmode, tool, tool_args)
 
@@ -39,23 +44,6 @@ def _bootstrap_archive(ctx):
 
     # env = {"PATH": get_sdkpath(ctx)}
 
-    # mode = ctx.attr._mode[CompilationModeSettingProvider].value
-
-    # tc = ctx.toolchains["@obazl_rules_ocaml//ocaml:toolchain"]
-
-    # if mode == "native":
-    #     tool = tc.ocamlopt # .basename
-    # else:
-    #     tool = tc.ocamlc # .basename
-    # tool_args = []
-
-    # ns_resolver = ctx.files._ns_resolver if ctx.attr._rule.startswith("ocaml_ns") else []
-
-    # if debug:
-    #     for f in ns_resolver:
-    #         print("_ns_resolver f: %s" % f.path)
-
-    ################################
     #########################################
     # FIXME: improve the return vals handling
     # print("CALL IMPL_LIB %s" % ctx.label)
@@ -133,13 +121,13 @@ def _bootstrap_archive(ctx):
         print("archive_name: %s" % archive_name)
 
     archive_filename = tmpdir + archive_name + ext
-    archive_file = ctx.actions.declare_file(archive_filename)
+    archive_file = ctx.actions.declare_file(scope + archive_filename)
     paths_direct.append(archive_file.dirname)
     action_outputs.append(archive_file)
 
     if mode == "native":
         archive_a_filename = tmpdir + archive_name + ".a"
-        archive_a_file = ctx.actions.declare_file(archive_a_filename)
+        archive_a_file = ctx.actions.declare_file(scope + archive_a_filename)
         paths_direct.append(archive_a_file.dirname)
         action_outputs.append(archive_a_file)
 
@@ -452,13 +440,31 @@ bootstrap_archive = rule(
     attrs = dict(
         # options("ocaml"),
 
-        opts             = attr.string_list(
-            doc          = "List of OCaml options. Will override configurable default options."
+        _toolchain = attr.label(
+            default = "//bzl/toolchain:tc"
+        ),
+
+        ocamlc = attr.label(
+            # cfg = ocamlc_out_transition,
+            allow_single_file = True,
+            default = "//bzl/toolchain:ocamlc"
+        ),
+
+        # _boot       = attr.label(
+        #     default = "//bzl/toolchain:boot",
+        # ),
+
+        _mode       = attr.label(
+            default = "//bzl/toolchain",
         ),
 
         mode       = attr.string(
             doc     = "Overrides mode build setting.",
             # default = ""
+        ),
+
+        opts             = attr.string_list(
+            doc          = "List of OCaml options. Will override configurable default options."
         ),
 
         archive_name = attr.string(
@@ -527,11 +533,15 @@ bootstrap_archive = rule(
         #     default = Label("@ocaml//:sdkpath")
         # ),
         _rule = attr.string( default = "bootstrap_archive" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
     ## this is not an ns archive, and it does not use ns ConfigState,
     ## but we need to reset the ConfigState anyway, so the deps are
     ## not affected if this is a dependency of an ns aggregator.
     # cfg     = nsarchive_in_transition,
+    # cfg = compile_mode_in_transition,
     provides = [OcamlArchiveProvider, OcamlProvider],
     executable = False,
     toolchains = ["//bzl/toolchain:bootstrap"],

@@ -20,6 +20,58 @@ load("//bzl:providers.bzl",
 
 WARNING_FLAGS = "@1..3@5..28@30..39@43@46..47@49..57@61..62-40"
 
+################
+def config_tc(ctx):
+
+    tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+
+    # if ctx.attr.mode:
+    #     mode = ctx.attr.mode
+    # else:
+    #     mode = ctx.attr._mode[BuildSettingInfo].value
+
+    mode = ctx.attr._toolchain[BuildSettingInfo].value
+    # print("MODE: %s" % mode)
+
+    if mode == "boot":
+        tool = tc.ocamlrun
+        tool_args = [ctx.file.ocamlc]
+        # tool_args = [tc.ocamlc] # FIXME: rename tc.boot_ocamlc
+        ext       = ".cmo"
+        scope     = "__boot/"
+    elif mode == "bc_bc":
+        tool = tc.ocamlrun
+        tool_args = [ctx.file.ocamlc]
+        ext       = ".cmo"
+        scope     = "__bc/"
+    elif mode == "bc_n":
+        tool = tc.ocamlrun
+        tool_args = [ctx.file.ocamlc]
+        # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+        ext  = ".cmx"
+        scope     = "__n/"
+    elif mode == "n_bc":  # FIXME
+        tool = tc.ocamlrun
+        tool_args = [ctx.file.ocamlc]
+        # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+        ext  = ".cmo"
+        scope     = "__bc/"
+    elif mode == "n_n":  # FIXME
+        tool = tc.ocamlrun
+        tool_args = [ctx.file.ocamlc]
+        # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+        ext  = ".cmx"
+        scope     = "__n/"
+    else:
+        fail("Unsupported mode: %s" % mode)
+
+    # print("tool_args: %s" % tool_args)
+
+    # if ctx.attr._boot:
+    #     scope = "__boot/"
+
+    return mode, tc, tool, tool_args, scope, ext
+
 ###############################
 def submodule_from_label_string(s):
     """Derive module name from label string."""
@@ -321,3 +373,198 @@ def rename_srcfile(ctx, src, dest):
       )
     )
     return outfile
+
+################################################################
+def _compile_mode_in_transition_impl(settings, attr):
+    # print("compile_mode_in_transition tc: %s" % attr._mode)
+
+    ocamlc = settings["//bzl/toolchain:ocamlc"]
+    # print("ocamlc: %s" % ocamlc)
+
+    if attr.mode == "bc_bc":
+        ocamlc = "//runtime:ocamlc"
+    else:
+        ocamlc = "//boot:ocamlc"
+
+    return {
+        "//bzl/toolchain:ocamlc" : ocamlc
+    }
+
+#######################
+compile_mode_in_transition = transition(
+    implementation = _compile_mode_in_transition_impl,
+    inputs = [
+        "//bzl/toolchain:ocamlc"
+    ],
+    outputs = [
+        "//bzl/toolchain:ocamlc"
+    ]
+)
+
+################################################################
+def _compile_mode_out_transition_impl(settings, attr):
+    # print("compile_mode_in_transition tc: %s" % attr._mode)
+
+    ocamlc = settings["//bzl/toolchain:ocamlc"]
+    # print("ocamlc: %s" % ocamlc)
+
+    if attr.mode == "bc_bc":
+        ocamlc = "//runtime:ocamlc"
+    else:
+        ocamlc = "//boot:ocamlc"
+
+    ocamlc = "//boot:ocamlc"
+    # ocamlc = "//runtime:ocamlc"
+
+    return {
+        "//bzl/toolchain:ocamlc" : ocamlc
+    }
+
+#######################
+compile_mode_out_transition = transition(
+    implementation = _compile_mode_out_transition_impl,
+    inputs = [
+        "//bzl/toolchain:ocamlc"
+    ],
+    outputs = [
+        "//bzl/toolchain:ocamlc"
+    ]
+)
+
+################################################################
+def _bootstrap_ocamlc_transition_impl(settings, attr):
+    # print("bootstrap_ocamlc_transition tc: %s" % attr._toolchain)
+    # print("tc: %s" % attr._toolchain[BuildSettingInfo].value)
+    tc = settings["//bzl/toolchain:tc"]
+    # print("tc: %s" % tc)
+    # print("lbl: %s" % attr.name)
+    # if hasattr(attr, "struct"):
+    #     print("struct: %s" % attr.struct)
+    # print("mode: %s" % attr.mode)
+    # print("attr: %s" % attr)
+
+    ocamlc = settings["//bzl/toolchain:ocamlc"]
+    # print("ocamlc: %s" % ocamlc)
+
+    if attr._mode == "bc_bc":
+        ocamlc = "//runtime:ocamlc"
+    else:
+        ocamlc = "//boot:ocamlc"
+
+    # ocamlc = "//runtime:ocamlc"
+    ocamlc = "//boot:ocamlc"
+
+    return {
+        "//bzl/toolchain:ocamlc" : ocamlc
+    }
+
+#######################
+bootstrap_ocamlc_in_transition = transition(
+    implementation = _bootstrap_ocamlc_transition_impl,
+    inputs = [
+        "//bzl/toolchain:tc",
+        "//bzl/toolchain:ocamlc"
+    ],
+    outputs = [
+        "//bzl/toolchain:ocamlc"
+    ]
+)
+
+bootstrap_ocamlc_out_transition = transition(
+    implementation = _bootstrap_ocamlc_transition_impl,
+    inputs = [
+        "//bzl/toolchain:tc",
+        "//bzl/toolchain:ocamlc"
+    ],
+    outputs = [
+        "//bzl/toolchain:ocamlc"
+    ]
+)
+
+################################################################
+def _runtime_ocamlc_out_transition_impl(settings, attr):
+    # print("runtime_ocamlc_out_transition tc: %s" % attr._toolchain)
+    # print("tc: %s" % attr._toolchain[BuildSettingInfo].value)
+    tc = settings["//bzl/toolchain:tc"]
+    # print("tc: %s" % tc)
+    # print("lbl: %s" % attr.name)
+    # if hasattr(attr, "struct"):
+    #     print("struct: %s" % attr.struct)
+    # print("mode: %s" % attr.mode)
+    # print("attr: %s" % attr)
+
+    ocamlc = settings["//bzl/toolchain:ocamlc"]
+    # print("ocamlc: %s" % ocamlc)
+
+    if attr._mode == "bc_bc":
+        ocamlc = "//runtime:ocamlc"
+    else:
+        ocamlc = "//boot:ocamlc"
+
+    ocamlc = "//boot:boot.ocamlc"
+    # ocamlc = "//boot:ocamlc"
+
+    return {
+        "//bzl/toolchain:ocamlc" : ocamlc
+    }
+
+#######################
+runtime_ocamlc_out_transition = transition(
+    implementation = _runtime_ocamlc_out_transition_impl,
+    inputs = [
+        "//bzl/toolchain:tc",
+        "//bzl/toolchain:ocamlc"
+    ],
+    outputs = [
+        "//bzl/toolchain:ocamlc"
+    ]
+)
+################################################################
+def _ocamlrun_in_transition_impl(settings, attr):
+    print("ocamlrun_in_transition_impl")
+    print("n: %s" % attr.name)
+    tc = settings["//bzl/toolchain:ocamlc"]
+    print("TC: %s" % tc)
+
+    print(attr)
+
+    ocamlc = "//boot:boot.ocamlc"
+
+    return {
+        "//bzl/toolchain:ocamlc" : ocamlc
+    }
+
+#######################
+ocamlrun_in_transition = transition(
+    implementation = _ocamlrun_in_transition_impl,
+    inputs = [
+        "//bzl/toolchain:ocamlc"
+    ],
+    outputs = [
+        "//bzl/toolchain:ocamlc"
+    ]
+)
+
+################################################################
+def _ocamlrun_out_transition_impl(settings, attr):
+    print("ocamlrun_out_transition_impl")
+    print("n: %s" % attr.name)
+    tc = settings["//bzl/toolchain:ocamlc"]
+    print("TC: %s" % tc)
+
+    ocamlc = "//boot:boot.ocamlc"
+
+    return {
+        "//bzl/toolchain:ocamlc" : ocamlc
+    }
+
+#######################
+ocamlrun_out_transition = transition(
+    implementation = _ocamlrun_out_transition_impl,
+    inputs = [
+        "//bzl/toolchain:ocamlc"
+    ],
+    outputs = [
+        "//bzl/toolchain:ocamlc"
+    ]
+)

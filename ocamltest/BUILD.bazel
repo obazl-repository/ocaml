@@ -196,7 +196,7 @@ ocaml_module(
     deps   = [
         ":Run_command", ## (Ocamltest Run_command)
         ":Ocamltest_stdlib", ## (Ocamltest Ocamltest_stdlib)
-        ## (Fun)
+        "//stdlib:Stdlib.Fun",
         "//stdlib:Stdlib.Bytes",
     ]
 )
@@ -292,7 +292,7 @@ ocaml_module(
         "//stdlib:Stdlib.Printf",
         "//utils:Misc",
         "//utils:Config",
-        ## (Cmo_format)
+        "//file_formats:Cmo_format_cmi",
         "//utils:Clflags",
         "//stdlib:Stdlib.Array",
     ]
@@ -601,7 +601,7 @@ ocaml_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int",
-        ## (Fun)
+        "//stdlib:Stdlib.Fun",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Bytes",

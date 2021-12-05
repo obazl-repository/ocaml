@@ -1,122 +1,126 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
+     "bootstrap_library",
+     "bootstrap_module",
 )
 
 MODULE_OPTS = ["-nostdlib"]
 
-ocaml_library(
-    name = "toplevel_byte_lib",
-    modules  = [
+bootstrap_library(
+    name = "byte",
+    manifest  = [
         ":Topeval",
         ":Topmain",
         ":Trace",
     ],
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Topeval",
     struct = "topeval.ml",
+    sig    = "//toplevel:Topeval_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Topcommon", ## (Toplevel Topcommon)
-        "//utils:Warnings",
-        "//typing:Types",
-        ## (Typemod)
-        ## (Typedtree)
-        ## (Typecore)
-        ## (Translmod)
-        "//stdlib:Stdlib.Sys",
-        ## (Symtable)
-        ## (Simplif)
-        ## (Printtyped)
-        ## (Printtyp)
+        "//bytecomp:Bytegen",
+        "//bytecomp:Dll",
+        "//bytecomp:Emitcode",
+        "//bytecomp:Meta",
+        "//bytecomp:Opcodes",
+        "//bytecomp:Printinstr",
+        "//bytecomp:Symtable",
+        "//driver:Compmisc",
+        "//file_formats:Cmo_format_cmi",
         "//lambda:Printlambda",
-        ## (Printinstr)
-        "//stdlib:Stdlib.Printexc",
-        "//typing:Predef",
-        ## (Persistent_env)
-        "//parsing:Parsetree_cmi",
-        ## (Outcometree)
-        ## (Opcodes)
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        ## (Meta)
-        ## (LongString)
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        ## (Includemod)
-        "//typing:Ident",
-        "//stdlib:Stdlib.Gc",
-        ## (Fun)
-        "//stdlib:Stdlib.Format",
-        ## (Env)
-        ## (Emitcode)
-        ## (Dll)
-        "//utils:Config",
-        ## (Compmisc)
-        ## (Cmo_format)
-        "//utils:Clflags",
-        "//stdlib:Stdlib.Char",
-        ## (Bytegen)
+        "//lambda:Simplif",
+        "//lambda:Translmod",
         "//parsing:Asttypes_cmi",
-    ]
+        "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Sys",
+        "//toplevel:Topcommon",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Includemod",
+        "//typing:Outcometree_cmi",
+        "//typing:Persistent_env",
+        "//typing:Predef",
+        "//typing:Printtyp",
+        "//typing:Printtyped",
+        "//typing:Typecore",
+        "//typing:Typedtree",
+        "//typing:Typemod",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        #### (LongString)
+    ],
+    visibility = ["//toplevel:__pkg__"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Topmain",
     struct = "topmain.ml",
+    sig    = "//toplevel:Topmain_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Byte", ## (Toplevel Byte Trace)
-        ":Byte", ## (Toplevel Byte Topeval)
-        ":Toploop", ## (Toplevel Toploop)
-        ":Topdirs", ## (Toplevel Topdirs)
-        ":Topcommon", ## (Toplevel Topcommon)
+        ":Trace",
+        ":Topeval",
+        "//toplevel:Toploop",
+        "//toplevel:Topdirs",
+        "//toplevel:Topcommon",
         "//typing:Types",
         "//stdlib:Stdlib.Sys",
-        ## (Printtyp)
+        "//typing:Printtyp",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Printexc",
-        ## (Path)
+        "//typing:Path",
         "//stdlib:Stdlib.Obj",
         "//utils:Misc",
-        ## (Main_args)
+        "//driver:Main_args",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        ## (Env)
-        ## (Ctype)
-        ## (Compmisc)
-        ## (Compenv)
+        "//typing:Env",
+        "//typing:Ctype",
+        "//driver:Compmisc",
+        "//driver:Compenv",
         "//utils:Clflags",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
-    ]
+    ],
+    visibility = ["//toplevel:__pkg__"]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Trace",
     struct = "trace.ml",
+    sig    = "//toplevel:Trace_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Byte", ## (Toplevel Byte Topeval)
-        ":Topcommon", ## (Toplevel Topcommon)
+        ":Topeval",
+        "//toplevel:Topcommon", ## (Toplevel Topcommon)
         "//typing:Types",
-        ## (Printtyp)
+        "//typing:Printtyp",
         "//typing:Predef",
-        ## (Path)
+        "//typing:Path",
         "//stdlib:Stdlib.Obj",
         "//utils:Misc",
-        ## (Meta)
+        "//bytecomp:Meta",
         "//parsing:Longident",
         "//stdlib:Stdlib.Format",
-        ## (Ctype)
+        "//typing:Ctype",
         "//parsing:Asttypes_cmi",
-    ]
+    ],
+    visibility = ["//toplevel:__pkg__"]
 )
 

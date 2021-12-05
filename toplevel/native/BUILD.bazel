@@ -24,37 +24,37 @@ ocaml_module(
         ":Topcommon", ## (Toplevel Topcommon)
         "//utils:Warnings",
         "//typing:Types",
-        ## (Typemod)
-        ## (Typedtree)
-        ## (Typecore)
-        ## (Translmod)
+        "//typing:Typemod",
+        "//typing:Typedtree",
+        "//typing:Typecore",
+        "//lambda:Translmod",
         "//stdlib:Stdlib.Sys",
-        ## (Simplif)
+        "//lambda:Simplif",
         "//asmcomp:Proc",
-        ## (Printtyped)
-        ## (Printtyp)
+        "//typing:Printtyped",
+        "//typing:Printtyp",
         "//lambda:Printlambda",
         "//stdlib:Stdlib.Printf",
         "//typing:Predef",
         "//parsing:Parsetree_cmi",
-        ## (Outcometree)
+        "//typing:Outcometree_cmi",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Obj",
         "//utils:Misc",
         "//parsing:Location",
         "//utils:Load_path",
-        ## (Includemod)
+        "//typing:Includemod",
         ## (Import_approx)
         "//typing:Ident",
         "//stdlib:Stdlib.Gc",
-        ## (Fun)
+        "//stdlib:Stdlib.Fun",
         "//stdlib:Stdlib.Format",
         ## (Flambda_middle_end)
         "//stdlib:Stdlib.Filename",
-        ## (Env)
+        "//typing:Env",
         ## (Dynlink)
         "//utils:Config",
-        ## (Compmisc)
+        "//driver:Compmisc",
         "//middle_end:Compilenv",
         ## (Closure_middle_end)
         "//utils:Clflags",
@@ -81,13 +81,13 @@ ocaml_module(
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.Obj",
         "//utils:Misc",
-        ## (Main_args)
+        "//driver:Main_args",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        ## (Compmisc)
-        ## (Compenv)
+        "//driver:Compmisc",
+        "//driver:Compenv",
         "//utils:Clflags",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
@@ -99,7 +99,7 @@ ocaml_module(
     struct = "trace.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Path)
+        "//typing:Path",
         "//stdlib:Stdlib.Obj",
     ]
 )

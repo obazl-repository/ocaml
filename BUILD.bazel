@@ -331,20 +331,6 @@ OCAMLOPTCOMP_DEPS = [
     # "//.:ocamlmiddleend",
 ]
 
-## root Makefile:
-# The bytecode compiler
-# ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
-#               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
-# 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
-bootstrap_executable(
-    name = "ocamlc",
-    opts = ["-compat-32"],
-    deps = [
-        "//compilerlibs:ocamlcommon",
-        "//compilerlibs:ocamlbytecomp"
-    ]
-)
-
 # The bytecode compiler compiled with the native-code compiler
 # ocamlc.opt$(EXE): compilerlibs/ocamlcommon.cmxa \
 #                   compilerlibs/ocamlbytecomp.cmxa $(BYTESTART:.cmo=.cmx)

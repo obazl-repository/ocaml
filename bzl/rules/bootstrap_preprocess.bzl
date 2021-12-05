@@ -7,7 +7,7 @@ load("//bzl:providers.bzl",
 load("//bzl/rules:impl_ns_resolver.bzl", "impl_ns_resolver")
 
 ###############################
-def _bootstrap_ns_resolver(ctx):
+def _bootstrap_preprocess_impl(ctx):
 
     tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
 
@@ -25,22 +25,17 @@ def _bootstrap_ns_resolver(ctx):
     return impl_ns_resolver(ctx, mode, tool, tool_args)
 
 #########################
-rule_options = options("ocaml")
-rule_options.update(options_ns_resolver("ocaml"))
-
-bootstrap_ns_resolver = rule(
-  implementation = _bootstrap_ns_resolver,
-    doc = "NS Resolver for bootstrapping the OCaml compiler",
+bootstrap_preprocess = rule(
+  implementation = _bootstrap_preprocess_impl,
+    doc = "Preprocess",
     attrs = dict(
-        rule_options,
-
-        _warnings  = attr.label(default = "@ocaml//ns:warnings"),
-
-        _rule = attr.string(default = "bootstrap_ns_resolver")
+        srcs = attr.label_list(),
+        out  = attr.output(),
+        outs = attr.output_list(),
+        cmd  = attr.string()
     ),
-    provides = [OcamlNsResolverProvider],
-    executable = False,
+    executable = True,
     toolchains = [
-        "//bzl/toolchain:bootstrap",
+        # "//bzl/toolchain:bootstrap",
     ],
 )

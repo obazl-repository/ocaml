@@ -15,6 +15,10 @@ load("//bzl:providers.bzl",
 
 load("//bzl:functions.bzl",
      "capitalize_initial_char",
+     # "compile_mode_in_transition",
+     # "compile_mode_out_transition",
+     # "ocamlc_out_transition",
+     "config_tc",
      "get_fs_prefix",
      "get_module_name",
      # "get_sdkpath",
@@ -35,22 +39,18 @@ load(":impl_common.bzl",
      "opam_lib_prefix",
      "tmpdir")
 
-scope = tmpdir
+# scope = tmpdir
 
 ########## RULE:  BOOTSTRAP_SIGNATURE  ################
 def _bootstrap_signature_impl(ctx):
 
     debug = False
-    # if ctx.label.name in ["Config_cmi", "Emit_cmi"]:
+    # if ctx.label.name in ["Pervasives"]
     #     debug = True
 
-    # env = {"PATH": get_sdkpath(ctx)}
+    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    # mode = ctx.attr._mode[CompilationModeSettingProvider].value
-
-    mode = "bytecode"
-
-    tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
     # if mode == "native":
     #     exe = tc.ocamlopt.basename
     # else:
@@ -59,8 +59,8 @@ def _bootstrap_signature_impl(ctx):
     ## FIXME:
     ## if mode == bc, run 'ocamlrun boot/ocamlc',
     ## if native, run 'boot/ocamlc.opt'
-    tool = tc.ocamlrun
-    tool_args = [tc.ocamlc]
+    # tool = tc.ocamlrun
+    # tool_args = [tc.ocamlc]
 
     ################
     indirect_adjunct_depsets      = []
@@ -341,6 +341,18 @@ bootstrap_signature = rule(
     doc = "Sig rule for bootstrapping ocaml compilers",
     attrs = dict(
         # rule_options,
+
+        # _boot       = attr.label(
+        #     default = "//bzl/toolchain:boot",
+        # ),
+
+        _mode       = attr.label(
+            default = "//bzl/toolchain",
+        ),
+        mode       = attr.string(
+            doc     = "Overrides global mode build setting.",
+        ),
+
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
         ),
@@ -358,10 +370,6 @@ bootstrap_signature = rule(
         # _mode       = attr.label(
         #     default = "@ocaml//mode",
         # ),
-        mode       = attr.string(
-            doc     = "Compile mode, bytecode or native.",
-            default = "bytecode"
-        ),
 
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath") # ppx also uses this
@@ -384,6 +392,7 @@ bootstrap_signature = rule(
 
         deps = attr.label_list(
             doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",
+            # cfg = compile_mode_out_transition,
             providers = [
                 [OcamlProvider],
                 [OcamlArchiveProvider],
@@ -393,7 +402,6 @@ bootstrap_signature = rule(
                 # [OcamlSigMarker],
                 # [OcamlNsMarker],
             ],
-            # cfg = ocaml_signature_deps_out_transition
         ),
 
         data = attr.label_list(
@@ -491,12 +499,24 @@ bootstrap_signature = rule(
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath")
         # ),
+
+        _toolchain = attr.label(
+            default = "//bzl/toolchain:tc"
+        ),
+
+        ocamlc = attr.label(
+            # cfg = ocamlc_out_transition,
+            allow_single_file = True,
+            default = "//bzl/toolchain:ocamlc"
+        ),
+
+        _rule = attr.string( default = "ocaml_signature" ),
+
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),
-
-        _rule = attr.string( default = "ocaml_signature" ),
     ),
+    # cfg = compile_mode_in_transition,
     incompatible_use_toolchain_transition = True,
     provides = [OcamlSignatureProvider],
     executable = False,

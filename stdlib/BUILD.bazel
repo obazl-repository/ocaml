@@ -2,7 +2,7 @@ load("//bzl:rules.bzl",
      "bootstrap_archive",
      "bootstrap_library",
      "bootstrap_module",
-     "bootstrap_preprocess",
+     # "bootstrap_preprocess",
      "bootstrap_signature")
 
 load("//config:BUILD.bzl",
@@ -31,7 +31,7 @@ COMPFLAGS = [
 ]
 
 MODULE_OPTS = COMPFLAGS
-CAMLINTERNAL_OPTS = COMPFLAGS
+CAMLINTERNAL_OPTS = COMPFLAGS + ["-nostdlib", "-nopervasives"]
 
 # MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS = MODULE_OPTS
@@ -251,6 +251,22 @@ bootstrap_signature(
 bootstrap_module(
     name   = "CamlinternalAtomic",
     struct = "camlinternalAtomic.ml",
+    # mode = "bc_bc",
+    # ocamlc = "//runtime:ocamlc",
+    sig    = "CamlinternalAtomic_cmi",
+    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    # deps   = [],
+    ## dunno if this is the right place for this, but we need to force
+    ## it for now:
+    deps_runtime = [":camlheader"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_module(
+    name   = "boot.CamlinternalAtomic",
+    struct = "camlinternalAtomic.ml",
+    mode = "bc_bc",
+    ocamlc = "//runtime:ocamlc",
     sig    = "CamlinternalAtomic_cmi",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
     # deps   = [],
@@ -272,13 +288,13 @@ bootstrap_module(
     name   = "CamlinternalFormat",
     struct = "camlinternalFormat.ml",
     sig    = "CamlinternalFormat_cmi",
-    opts = CAMLINTERNAL_OPTS + [
+    opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"] + [
         "-w", "+A", "-w", "-fragile-match",
         "-I", "stdlib"
     ],
     deps   = [
         ":CamlinternalFormatBasics",
-        ":Stdlib",
+        # ":Stdlib",
         ":Stdlib.Buffer", ## (Stdlib Buffer)
         ":Stdlib.Bytes", ## (Stdlib Bytes)
         ":Stdlib.Char", ## (Stdlib Char)
@@ -351,9 +367,9 @@ bootstrap_module(
     name   = "CamlinternalLazy",
     struct = "camlinternalLazy.ml",
     sig    = "CamlinternalLazy_cmi",
-    opts = CAMLINTERNAL_OPTS,
+    opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],
     deps   = [
-        ":Stdlib",
+        # ":Stdlib",
         ":Stdlib.Obj",
         ":Stdlib.Sys",
     ],
@@ -367,9 +383,9 @@ bootstrap_signature(
     # does not refer to any modules, but Stdlib is opened
     # automatically, leading to "Error: Unbound module Stdlib".
     # -nopervasives prevents this.
-    opts = CAMLINTERNAL_OPTS, # + ["-open", "Stdlib"],
+    opts = CAMLINTERNAL_OPTS,
     deps   = [
-        ":Stdlib",
+        # ":Stdlib",
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -379,11 +395,10 @@ bootstrap_module(
     name   = "CamlinternalMod",
     struct = "camlinternalMod.ml",
     sig    = "CamlinternalMod_cmi",
-    opts = CAMLINTERNAL_OPTS,
+    opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],
     deps   = [
         ":CamlinternalOO", ## (CamlinternalOO)
         ":CamlinternalLazy", ## (CamlinternalOO)
-        ":Stdlib",
         ":Stdlib.Obj", ## (Stdlib Obj)
         ":Stdlib.Lazy", ## (Stdlib Lazy)
         ":Stdlib.Array", ## (Stdlib Array)
@@ -395,7 +410,7 @@ bootstrap_module(
 bootstrap_signature(
     name = "CamlinternalMod_cmi",
     src  = "camlinternalMod.mli",
-    opts = CAMLINTERNAL_OPTS,
+    opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],
     deps   = [
         # ":Stdlib",
         ":Stdlib.Obj",
@@ -408,7 +423,7 @@ bootstrap_module(
     name   = "CamlinternalOO",
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
-    opts = CAMLINTERNAL_OPTS + ["-no-alias-deps"],
+    opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],# + ["-no-alias-deps"],
     deps   = [
         # ":Stdlib",
         ":Stdlib.Sys", ## (Stdlib Sys)
@@ -426,7 +441,7 @@ bootstrap_module(
 bootstrap_signature(
     name = "CamlinternalOO_cmi",
     src  = "camlinternalOO.mli",
-    opts = CAMLINTERNAL_OPTS + ["-no-alias-deps"],
+    opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"], # + ["-no-alias-deps"],
     deps   = [
         # ":Stdlib",
         ":Stdlib.Obj"
@@ -1457,8 +1472,8 @@ bootstrap_signature(
 )
 
 bootstrap_module(
-    ns    = ":Stdlib",
     name   = "Stdlib.Oo",
+    ns    = ":Stdlib",
     struct = "oo.ml",
     sig    = "Stdlib.Oo_cmi",
     opts = MODULE_OPTS,
@@ -1470,8 +1485,8 @@ bootstrap_module(
 )
 
 bootstrap_signature(
-    ns   = ":Stdlib",
     name = "Stdlib.Oo_cmi",
+    ns   = ":Stdlib",
     src  = "oo.mli",
     opts = SIG_OPTS + ["-no-principal"],
     deps   = [

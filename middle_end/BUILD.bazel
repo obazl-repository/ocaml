@@ -33,9 +33,11 @@ bootstrap_library(
     ],
 )
 
+## defined in compilerlibs/Makefile.compilerlibs
+## used by //compilerlibs:ocamlmiddleend and //compilerlibs:ocamloptcomp
 # bootstrap_archive(
 bootstrap_library(
-    name = "ocamloptcomp",
+    name = "ocamlmiddleend",
     manifest  = [
         ## NB: the makefiles take pains to put stuff in order, across
         ## pkg boundaries in some cases. OBazl doesn't need that, so
@@ -133,7 +135,7 @@ bootstrap_module(
         ":Backend_var", ## (Middle_end Backend_var)
         "//lambda:Debuginfo", ## (Lambda Debuginfo)
         "//stdlib:Stdlib.String",
-        ## (Path)
+        "//typing:Path",
         "//stdlib:Stdlib.Nativeint",
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Int32",
@@ -155,7 +157,7 @@ bootstrap_signature(
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ":Backend_var", ## (Middle_end Backend_var)
         "//lambda:Debuginfo",
-        ## (Path)
+        "//typing:Path",
         "//typing:Ident",
         "//parsing:Asttypes_cmi",
     ],
@@ -245,7 +247,7 @@ bootstrap_module(
         "//stdlib:Stdlib.String",
         ## (Simple_value_approx)
         ## (Set_of_closures_id)
-        ## (Path)
+        "//typing:Path",
         "//utils:Misc",
         "//stdlib:Stdlib.Map",
         "//parsing:Location",
@@ -256,7 +258,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
         "//middle_end/flambda:Export_info",
-        ## (Env)
+        "//typing:Env",
         "//stdlib:Stdlib.Digest",
         "//utils:Config",
         "//file_formats:Cmx_format_cmi",

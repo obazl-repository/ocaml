@@ -34,29 +34,29 @@ bootstrap_library(
     ],
 )
 
-bootstrap_library(
-    name = "ocamlcommon",
-    manifest  = [
-        ":Compenv",
-        ":Compile_common",
-        ":Compmisc",
-        ":Main_args",
-        ":Makedepend",
-        ":Pparse",
-    ],
-    visibility = ["//compilerlibs:__pkg__"]
-)
+# bootstrap_library(
+#     name = "ocamlcommon",
+#     manifest  = [
+#         ":Compenv",
+#         ":Compile_common",
+#         ":Compmisc",
+#         ":Main_args",
+#         ":Makedepend",
+#         ":Pparse",
+#     ],
+#     visibility = ["//compilerlibs:__pkg__"]
+# )
 
 ## compilerlibs/Makefile.compilerlibs
-bootstrap_library(
-    name = "ocamlbytecomp",
-    manifest  = [
-        ":Compile",
-        ":Errors",
-        ":Maindriver",
-    ],
-    visibility = ["//compilerlibs:__pkg__"]
-)
+# bootstrap_library(
+#     name = "ocamlbytecomp",
+#     manifest  = [
+#         ":Compile",
+#         ":Errors",
+#         ":Maindriver",
+#     ],
+#     visibility = ["//compilerlibs:__pkg__"]
+# )
 
 ################################################################
 bootstrap_module(
@@ -85,6 +85,10 @@ bootstrap_module(
         "//utils:Clflags",
         "//utils:Ccomp",
         "//stdlib:Stdlib.Arg",
+    ],
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -106,7 +110,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
-        ## (Typedtree)
+        "//typing:Typedtree",
         "//lambda:Translmod",
         "//lambda:Simplif",
         "//utils:Profile",
@@ -116,7 +120,8 @@ bootstrap_module(
         "//bytecomp:Emitcode",
         "//utils:Clflags",
         "//bytecomp:Bytegen"
-    ]
+    ],
+    visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -125,7 +130,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
-        ## (Typedtree)
+        "//typing:Typedtree",
         "//bytecomp:Instruct_cmi",
         "//typing:Ident",
         "//utils:Clflags",
@@ -142,25 +147,26 @@ bootstrap_module(
         ":Compmisc", ## (Driver Compmisc)
         ":Compenv", ## (Driver Compenv)
         "//utils:Warnings",
-        ## (Typemod)
-        ## (Typedtree)
-        ## (Typecore)
+        "//typing:Typemod",
+        "//typing:Typedtree",
+        "//typing:Typecore",
         "//stdlib:Stdlib.String",
         "//utils:Profile",
         "//typing:Printtyped",
-        ## (Printtyp)
+        "//typing:Printtyp",
         "//parsing:Printast",
         "//parsing:Pprintast",
         "//utils:Misc",
         "//stdlib:Stdlib.List",
-        ## (Includemod)
+        "//typing:Includemod",
         "//stdlib:Stdlib.Format",
-        ## (Env)
+        "//typing:Env",
         "//utils:Config",
         ## (Compiler_pass)
         "//utils:Clflags",
         "//parsing:Builtin_attributes",
-    ]
+    ],
+    visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -193,9 +199,13 @@ bootstrap_module(
         "//stdlib:Stdlib.List",
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
-        ## (Env)
+        "//typing:Env",
         "//utils:Config",
         "//utils:Clflags",
+    ],
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -217,7 +227,8 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//parsing:Location"
-    ]
+    ],
+    visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -263,6 +274,10 @@ bootstrap_module(
         ## (Compiler_pass)
         "//utils:Clflags",
         "//stdlib:Stdlib.Arg",
+    ],
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//toplevel/byte:__pkg__",
     ]
 )
 
@@ -300,7 +315,8 @@ bootstrap_module(
         ## (Bytelink)
         "//bytecomp:Bytelibrarian",
         "//stdlib:Stdlib.Arg",
-    ]
+    ],
+    visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -318,28 +334,29 @@ bootstrap_module(
     sig    = "Makedepend_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Pparse", ## (Driver Pparse)
-        ":Compenv", ## (Driver Compenv)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
-        "//parsing:Parsetree_cmi",
-        ## (Parser)
-        ## (Parse)
-        "//utils:Misc",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        ## (Lexer)
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
         "//parsing:Depend",
-        "//utils:Config",
-        "//utils:Clflags",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Array",
+        "//parsing:Lexer",
+        "//parsing:Location",
+        "//parsing:Parse",
+        "//parsing:Parser",
+        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Arg",
-    ]
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Misc",
+        ":Compenv",
+        ":Pparse",
+    ],
+    visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_signature(
@@ -379,7 +396,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Compile_common", ## (Driver Compile_common)
-        ## (Typedtree)
+        "//typing:Typedtree",
         "//utils:Clflags",
         "//middle_end:Backend_intf_cmi"
     ]
@@ -484,6 +501,10 @@ bootstrap_module(
         "//utils:Ccomp",
         "//parsing:Ast_mapper",
         "//parsing:Ast_invariants"
+    ],
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 

@@ -62,7 +62,7 @@ bootstrap_executable(
         ":Outputbis",
         ":Parser",
         ":Syntax",
-        "//boot:Std_exit",
+        # "//boot:Std_exit",
     ]
 )
 
@@ -250,7 +250,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Printexc",
-        ":Parser"
+        ":Parser",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Arg",

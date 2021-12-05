@@ -63,7 +63,7 @@ bootstrap_module(
         ## (Type)
         ## (Typ)
         ## (Te)
-        ## (Syntaxerr)
+        "//parsing:Syntaxerr",
         "//stdlib:Stdlib.String",
         ## (Str)
         ## (Sig)

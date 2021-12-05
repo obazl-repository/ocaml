@@ -21,5 +21,17 @@ obazl_deps()
 # load("@obazl_rules_ocaml//ocaml:bootstrap.bzl", "ocaml_configure")
 # ocaml_configure(switch = "4.10", bootstrap = True)
 
-load("//bzl/toolchain:BUILD.bzl", "bootstrap_register_toolchains")
-bootstrap_register_toolchains(installation="host")
+# load("//bzl/toolchain:BUILD.bzl", "bootstrap_register_toolchains")
+# bootstrap_register_toolchains(installation="host")
+
+# Tell Bazel about our toolchains so it can resolve them based on values passed
+# in --platform, --host_platform, and --execution_platforms options.
+register_toolchains(
+    "//bzl/toolchain:bootstrap_macos",
+    # "//bzl/toolchain:bootstrap_macos_native"
+)
+
+# register_execution_platforms(
+#     "//bzl/platforms:mac_bytecode",
+#     "//bzl/platforms:mac_native"
+# )
