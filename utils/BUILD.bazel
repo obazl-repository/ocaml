@@ -168,7 +168,8 @@ bootstrap_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Buffer",
-    ]
+    ],
+    visibility = ["//parsing:__pkg__"]
 )
 
 bootstrap_signature(

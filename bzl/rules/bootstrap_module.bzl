@@ -561,8 +561,8 @@ def _bootstrap_module(ctx):
 
     default_depset = depset(
         order = dsorder,
-        direct = default_outputs,
-        transitive = bottomup_ns_files
+        # direct = default_outputs,
+        transitive = bottomup_ns_files + [depset(direct=default_outputs)]
     )
 
     defaultInfo = DefaultInfo(
