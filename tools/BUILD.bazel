@@ -43,28 +43,13 @@ bootstrap_executable(
     main = ":Ocamldep",
     deps = [
         "//compilerlibs:ocamlcommon",
-        "//compilerlibs:ocamlbytecomp",
+        "//bytecomp:ocamlbytecomp",
     ]
 )
 
 ################################################################
 # Profiling: https://ocaml.org/manual/profil.html
-# The OCaml profiling compilers: ocamlcp, ocamloptp
-# Viewer: ocamlprof
-
-# OCAMLPROF=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
-#   numbers.cmo arg_helper.cmo clflags.cmo terminfo.cmo \
-#   warnings.cmo location.cmo longident.cmo docstrings.cmo \
-#   syntaxerr.cmo ast_helper.cmo \
-#   camlinternalMenhirLib.cmo parser.cmo \
-#   pprintast.cmo \
-#   lexer.cmo parse.cmo ocamlprof.cmo
-# ocamlprof$(EXE): $(OCAMLPROF)
-# ocamlcp$(EXE): $(OCAMLCP) ocamlcp.cmo
-# ocamlcp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamlcp.cmo)
-# ocamloptp$(EXE): $(OCAMLCP) ocamloptp.cmo
-# ocamloptp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamloptp.cmo)
-
+# The OCaml profiling compilers: ocamlcp, ocamloptp, ocamlprof
 bootstrap_executable(
     name = "ocamlprof",
     main = ":Ocamlprof",
@@ -91,18 +76,65 @@ bootstrap_executable(
     ]
 )
 
-################################################################
-# other tools
-# OCAMLMKLIB = config.cmo build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo
-# ocamlmklib$(EXE): $(OCAMLMKLIB)
-# ocamlmklib.opt$(EXE): $(call byte2native, $(OCAMLMKLIB))
+bootstrap_executable(
+    name = "ocamlcp",
+    main = ":Ocamlcp",
+    deps = [
+        "//utils:Config",
+        "//utils:Build_path_prefix_map",
+        "//utils:Misc",
+        "//utils:Profile",
+        "//utils:Warnings",
+        "//utils:Identifiable",
+        "//utils:Numbers",
+        "//utils:Arg_helper",
+        "//utils:Clflags",
+        "//utils:Local_store",
+        "//utils:Terminfo",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//utils:Ccomp",
+        "//driver:Compenv",
+        "//driver:Main_args"
+    ]
+)
 
+################################################################
+# To help building mixed-mode libraries (OCaml + C)
+bootstrap_executable(
+    name = "ocamlmklib",
+    main = ":Ocamlmklib",
+    deps = [
+        "//utils:Config",
+        "//utils:Build_path_prefix_map",
+        "//utils:Misc",
+    ]
+)
+
+################################################################
 # To make custom toplevels
 # OCAMLMKTOP=config.cmo build_path_prefix_map.cmo misc.cmo \
 #        identifiable.cmo numbers.cmo arg_helper.cmo clflags.cmo \
 #        local_store.cmo load_path.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
 # ocamlmktop$(EXE): $(OCAMLMKTOP)
 # ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
+bootstrap_executable(
+    name = "ocamlmktop",
+    main = ":Ocamlmktop",
+    deps = [
+        "//utils:Config",
+        "//utils:Build_path_prefix_map",
+        "//utils:Misc",
+        "//utils:Identifiable",
+        "//utils:Numbers",
+        "//utils:Arg_helper",
+        "//utils:Clflags",
+        "//utils:Local_store",
+        "//utils:Load_path",
+        "//utils:Profile",
+        "//utils:Ccomp",
+    ]
+)
 
 ################################################################
 # The preprocessor for asm generators
@@ -139,13 +171,14 @@ bootstrap_ocamllex(
 
 ################################################################
 # Reading cmt files
-# OCAMLCMT = \
-#           $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-#           $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
-#           ocamlcmt.cmo
-# ocamlcmt$(EXE): $(OCAMLCMT)
-# ocamlcmt.opt$(EXE): $(call byte2native, $(OCAMLCMT))
-
+bootstrap_executable(
+    name = "ocamlcmt",
+    main = ":Ocamlcmt",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+    ]
+)
 
 ################################################################
 # The bytecode disassembler
@@ -155,6 +188,70 @@ bootstrap_ocamllex(
 #           opnames.cmo dumpobj.cmo
 # dumpobj$(EXE): $(DUMPOBJ)
 # dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
+bootstrap_executable(
+    name = "dumpobj",
+    main = ":Dumpobj",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+        ":Opnames"
+    ]
+)
+
+################################################################
+## ocamlobjinfo - Display info on compiled files
+bootstrap_executable(
+    name = "ocamlobjinfo",
+    main = ":Objinfo",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+        "//middle_end:ocamlmiddleend",
+    ]
+)
+
+################################################################
+# # Scan object files for required primitives
+# PRIMREQ=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#         primreq.cmo
+# primreq$(EXE): $(PRIMREQ)
+# primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
+bootstrap_executable(
+    name = "primreq",
+    main = ":Primreq",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+    ]
+)
+
+################
+# Copy a bytecode executable, stripping debug info
+bootstrap_executable(
+    name = "stripdebug",
+    main = ":Stripdebug",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+    ]
+)
+
+################
+# Compare two bytecode executables
+# CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#        cmpbyt.cmo
+# cmpbyt$(EXE): $(CMPBYT)
+# cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
+bootstrap_executable(
+    name = "cmpbyt",
+    main = ":Cmpbyt",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+    ]
+)
 
 ################
 # make_opcodes, opnames.ml
@@ -182,38 +279,6 @@ genrule(
     ])
 )
 
-
-################################################################
-## ocamlobjinfo - Display info on compiled files
-# DEF_SYMBOL_PREFIX = '-Dsymbol_prefix=""'
-# ifeq "$(SYSTEM)" "macosx"
-# DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
-# endif
-# ifeq "$(SYSTEM)" "cygwin"
-# DEF_SYMBOL_PREFIX = '-Dsymbol_prefix="_"'
-# endif
-# OCAMLOBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-#              $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
-#              $(ROOTDIR)/compilerlibs/ocamlmiddleend.cma \
-#              objinfo.cmo
-# ocamlobjinfo$(EXE): $(OCAMLOBJINFO)
-# ocamlobjinfo.opt$(EXE): $(call byte2native, $(OCAMLOBJINFO))
-
-bootstrap_executable(
-    name = "ocamlobjinfo",
-    main = ":Objinfo",
-    deps = [
-        "//compilerlibs:ocamlcommon",
-        "//compilerlibs:ocamlbytecomp",
-        "//middle_end:ocamlmiddleend",
-    ]
-)
-
-################################################################
-# # Scan object files for required primitives
-# primreq$(EXE): $(PRIMREQ)
-# primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
-
 ################################################################
 # LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
 #         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cmxa \
@@ -224,22 +289,6 @@ bootstrap_executable(
 # lintapidiff.opt$(EXE): INCLUDES+= -I $(ROOTDIR)/otherlibs/str
 # lintapidiff.opt$(EXE): $(LINTAPIDIFF)
 # 	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
-
-################
-# Copy a bytecode executable, stripping debug info
-# STRIPDEBUG=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-#            $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
-#            stripdebug.cmo
-# stripdebug$(EXE): $(STRIPDEBUG)
-# stripdebug.opt$(EXE): $(call byte2native, $(STRIPDEBUG))
-
-################
-# Compare two bytecode executables
-# CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-#        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
-#        cmpbyt.cmo
-# cmpbyt$(EXE): $(CMPBYT)
-# cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
 
 ################
 # checkstack tool
@@ -300,42 +349,42 @@ bootstrap_library(
     # })
 )
 
-## FIXME: special handling
-bootstrap_module(
-    name   = "Caml_tex",
-    struct = "caml_tex.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
-        "//driver:Compenv",
-        "//driver:Compmisc",
-        "//otherlibs/str:Str",
-        "//parsing:Ast_helper",
-        "//parsing:Ast_iterator",
-        "//parsing:Lexer",
-        "//parsing:Location",
-        "//parsing:Parse",
-        "//parsing:Parsetree_cmi",
-        "//parsing:Syntaxerr",
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Buffer",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.StdLabels",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
-        "//toplevel:Toploop",
-        "//utils:Clflags",
-        "//utils:Misc",
-        ## (Unix)
-        #### (Mtd)
-        #### (Mty)
-    ],
-    data = ["//runtime:primitives"]
-)
+## TODO: get the unix stuff set up
+# bootstrap_module(
+#     name   = "Caml_tex",
+#     struct = "caml_tex.ml",
+#     opts = MODULE_OPTS,
+#     deps   = STDLIB + [
+#         "//driver:Compenv",
+#         "//driver:Compmisc",
+#         "//otherlibs/str:Str",
+#         "//parsing:Ast_helper",
+#         "//parsing:Ast_iterator",
+#         "//parsing:Lexer",
+#         "//parsing:Location",
+#         "//parsing:Parse",
+#         "//parsing:Parsetree_cmi",
+#         "//parsing:Syntaxerr",
+#         "//stdlib:Stdlib.Arg",
+#         "//stdlib:Stdlib.Buffer",
+#         "//stdlib:Stdlib.Bytes",
+#         "//stdlib:Stdlib.Filename",
+#         "//stdlib:Stdlib.Format",
+#         "//stdlib:Stdlib.Lexing",
+#         "//stdlib:Stdlib.List",
+#         "//stdlib:Stdlib.Printexc",
+#         "//stdlib:Stdlib.StdLabels",
+#         "//stdlib:Stdlib.String",
+#         "//stdlib:Stdlib.Sys",
+#         "//toplevel:Toploop",
+#         "//utils:Clflags",
+#         "//utils:Misc",
+#         ## (Unix)
+#         #### (Mtd)
+#         #### (Mty)
+#     ],
+#     data = ["//runtime:primitives"]
+# )
 
 bootstrap_module(
     name   = "Cmpbyt",
@@ -378,45 +427,54 @@ bootstrap_module(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
-    name   = "Eqparsetree",
-    struct = "eqparsetree.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
-        # "//parsing:Asttypes_cmi",
-        "//parsing:Parsetree_cmi",
-        # "//parsing:Longident",
-        # "//parsing:Location",
-    ],
-    data = ["//runtime:primitives"]
-)
+# eqparsetree.ml", line 66, characters 7-22:
+# 66 |     | (Const_string a0, Const_string b0) -> eq_string (a0, b0)
+#             ^^^^^^^^^^^^^^^
+# Error: The constructor Const_string expects 3 argument(s),
+#        but is applied here to 1 argument(s)
+# bootstrap_module(
+#     name   = "Eqparsetree",
+#     struct = "eqparsetree.ml",
+#     opts = MODULE_OPTS,
+#     deps   = STDLIB + [
+#         # "//parsing:Asttypes_cmi",
+#         "//parsing:Parsetree_cmi",
+#         # "//parsing:Longident",
+#         # "//parsing:Location",
+#     ],
+#     data = ["//runtime:primitives"]
+# )
 
-bootstrap_module(
-    name   = "Lintapidiff.opt",
-    mode   = "native",
-    struct = "lintapidiff.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
-        "//driver:Pparse",
-        "//otherlibs/str:Str",
-        "//parsing:Location",
-        "//parsing:Parse",
-        "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Scanf",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
-        "//typing:Ident",
-        "//typing:Path",
-        "//typing:Printtyp",
-        "//utils:Misc",
-    ],
-    data = ["//runtime:primitives"]
-)
+# lintapidiff.ml", line 41, characters 15-29:
+# 41 | module IdMap = Misc.StringMap
+#                     ^^^^^^^^^^^^^^
+# Error: Unbound module Misc.StringMap
+# bootstrap_module(
+#     name   = "Lintapidiff.opt",
+#     mode   = "native",
+#     struct = "lintapidiff.ml",
+#     opts = MODULE_OPTS,
+#     deps   = STDLIB + [
+#         "//driver:Pparse",
+#         "//otherlibs/str:Str",
+#         "//parsing:Location",
+#         "//parsing:Parse",
+#         "//parsing:Parsetree_cmi",
+#         "//stdlib:Stdlib.Array",
+#         "//stdlib:Stdlib.Filename",
+#         "//stdlib:Stdlib.Format",
+#         "//stdlib:Stdlib.List",
+#         "//stdlib:Stdlib.Printf",
+#         "//stdlib:Stdlib.Scanf",
+#         "//stdlib:Stdlib.String",
+#         "//stdlib:Stdlib.Sys",
+#         "//typing:Ident",
+#         "//typing:Path",
+#         "//typing:Printtyp",
+#         "//utils:Misc",
+#     ],
+#     data = ["//runtime:primitives"]
+# )
 
 bootstrap_module(
     name   = "Objinfo",

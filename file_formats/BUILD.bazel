@@ -79,7 +79,7 @@ bootstrap_signature(
     visibility = [
         "//bytecomp:__pkg__",
         "//tools:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 

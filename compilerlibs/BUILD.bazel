@@ -38,6 +38,8 @@ bootstrap_archive(
         "//compilers:__pkg__",
         "//fixpoint:__pkg__",
         "//tools:__pkg__",
+        "//toplevel:__pkg__",
+        "//utils:__pkg__",
     ]
 )
 
@@ -48,26 +50,27 @@ bootstrap_archive(
 # compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
 # 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
 
-bootstrap_archive(
-    ## FIXME: move to //bytecomp:ocamlbytecomp (or :bytecomp.archive?)
-    name = "ocamlbytecomp",
-    opts = select({
-        "//bzl/toolchain:boot": [],
-        "//bzl/toolchain:bc_bc": [],
-        "//bzl/toolchain:n_bc": [],
-        "//bzl/toolchain:bc_n": [],
-        "//bzl/toolchain:n_n": []
-    }),
-    manifest = [
-        "//bytecomp:ocamlbytecomp",
-    ],
-    visibility = [
-        "//boot:__pkg__",
-        "//compilers:__pkg__",
-        "//fixpoint:__pkg__",
-        "//tools:__pkg__",
-    ]
-)
+# bootstrap_archive(
+#     ## FIXME: move to //bytecomp:ocamlbytecomp (or :bytecomp.archive?)
+#     name = "ocamlbytecomp",
+#     opts = select({
+#         "//bzl/toolchain:boot": [],
+#         "//bzl/toolchain:bc_bc": [],
+#         "//bzl/toolchain:n_bc": [],
+#         "//bzl/toolchain:bc_n": [],
+#         "//bzl/toolchain:n_n": []
+#     }),
+#     manifest = [
+#         "//bytecomp:ocamlbytecomp",
+#     ],
+#     visibility = [
+#         "//boot:__pkg__",
+#         "//compilers:__pkg__",
+#         "//fixpoint:__pkg__",
+#         "//tools:__pkg__",
+#         "//utils:__pkg__",
+#     ]
+# )
 
 ##################
 ## ocamlmiddlend.[cma,cmxa]

@@ -1,5 +1,6 @@
 load("//bzl:rules.bzl",
      "bootstrap_archive",
+     "bootstrap_executable",
      "bootstrap_library",
      "bootstrap_module",
      "bootstrap_signature",
@@ -23,6 +24,24 @@ SIG_OPTS = ROOT_SIG_OPTS
 
 STDLIB = ["//stdlib", "//stdlib:Std_exit"]
 
+################################################################
+## expunge utility, defined in root Makefile:
+# The "expunge" utility
+# $(expunge): compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
+#          toplevel/expunge.cmo
+# 	$(CAMLC) $(LINKFLAGS) -o $@ $^
+bootstrap_executable(
+    name = "expunge",
+    main = "//toplevel:Expunge",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+    ],
+    visibility = ["//toplevel:__pkg__"]
+)
+
+################################################################
+## libs
 # COMMON_CMI = $(UTILS_CMI) $(PARSING_CMI) $(TYPING_CMI) $(LAMBDA_CMI) $(COMP_CMI)
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 # compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(COMMON)
@@ -603,7 +622,10 @@ bootstrap_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Fun",
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -741,7 +763,8 @@ bootstrap_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//driver:__pkg__",
-        "//middle_end/flambda:__pkg__"
+        "//middle_end/flambda:__pkg__",
+        "//tools:__pkg__",
     ]
 )
 

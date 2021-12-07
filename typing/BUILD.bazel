@@ -599,7 +599,7 @@ bootstrap_module(
     ],
     visibility = [
         "//driver:__pkg__",
-        "//toplevel/byte:__pkg__"
+        "//toplevel:__pkg__"
     ]
 )
 
@@ -912,7 +912,7 @@ bootstrap_module(
         "//utils:Misc",
         "//utils:Warnings",
     ],
-    visibility = ["//toplevel/byte:__pkg__"]
+    visibility = ["//toplevel:__pkg__"]
 )
 
 bootstrap_signature(
@@ -954,7 +954,7 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//middle_end/flambda:__pkg__",
         "//toplevel:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -1132,7 +1132,7 @@ bootstrap_module(
     ],
     visibility = [
         "//driver:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -1524,7 +1524,7 @@ bootstrap_module(
     visibility = [
         "//driver:__pkg__",
         "//lambda:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -1804,7 +1804,7 @@ bootstrap_module(
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -1887,7 +1887,7 @@ bootstrap_module(
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 

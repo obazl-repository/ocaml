@@ -32,7 +32,7 @@ load("//config:BUILD.bzl",
 #     opts = ["-compat-32"],
 #     deps = [
 #         "//compilerlibs:ocamlcommon",
-#         "//compilerlibs:ocamlbytecomp"
+#         "//bytecomp:ocamlbytecomp"
 #     ],
 #     visibility = ["//visibility:public"]
 # )

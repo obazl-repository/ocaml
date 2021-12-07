@@ -1,4 +1,5 @@
 load("//bzl:rules.bzl",
+     "bootstrap_archive",
      "bootstrap_library",
      "bootstrap_module",
      "bootstrap_signature",
@@ -32,15 +33,22 @@ bootstrap_library(
     ],
 )
 
+################################################################
 ## compilerlibs/Makefile.compilerlibs
 # compilerlibs/ocamlbytecomp.cma: $(BYTECOMP_CMI) $(BYTECOMP)
 # 	$(CAMLC) -a -o $@ $(BYTECOMP)
 # compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
 # 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
 
-##############
-bootstrap_library(
+bootstrap_archive(
     name = "ocamlbytecomp",
+    opts = select({
+        "//bzl/toolchain:boot": [],
+        "//bzl/toolchain:bc_bc": [],
+        "//bzl/toolchain:n_bc": [],
+        "//bzl/toolchain:bc_n": [],
+        "//bzl/toolchain:n_n": []
+    }),
     manifest  = [
         ":Bytegen",
         ":Bytelibrarian",
@@ -54,9 +62,39 @@ bootstrap_library(
         "//driver:Compile",
         "//driver:Maindriver"
     ],
-    visibility = ["//compilerlibs:__pkg__"]
+    # manifest = [
+    #     "//bytecomp:ocamlbytecomp",
+    # ],
+    visibility = [
+        "//boot:__pkg__",
+        "//compilers:__pkg__",
+        "//fixpoint:__pkg__",
+        "//tools:__pkg__",
+        "//toplevel:__pkg__",
+        "//utils:__pkg__",
+    ]
 )
 
+##############
+# bootstrap_library(
+#     name = "ocamlbytecomp",
+#     manifest  = [
+#         ":Bytegen",
+#         ":Bytelibrarian",
+#         ":Bytelink",
+#         ":Bytepackager",
+#         ":Emitcode",
+#         ":Instruct",
+#         ":Printinstr",
+
+#         "//driver:Errors",
+#         "//driver:Compile",
+#         "//driver:Maindriver"
+#     ],
+#     visibility = ["//compilerlibs:__pkg__"]
+# )
+
+################################################################
 ## for ocamlcommmon archive:
 # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
 bootstrap_library(
@@ -108,7 +146,7 @@ bootstrap_module(
     data = ["//runtime:primitives"],
     visibility = [
         "//driver:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -262,7 +300,10 @@ bootstrap_module(
         "//utils:Config"
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//tools:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//toplevel:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -336,7 +377,7 @@ bootstrap_module(
     data = ["//runtime:primitives"],
     visibility = [
         "//driver:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -398,7 +439,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Obj",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//toplevel/byte:__pkg__"]
+    visibility = ["//toplevel:__pkg__"]
 )
 
 bootstrap_signature(
@@ -422,7 +463,7 @@ bootstrap_module(
     data = ["//runtime:primitives"],
     visibility = [
         "//tools:__pkg__",
-        "//toplevel/byte:__pkg__"
+        "//toplevel:__pkg__"
     ]
 )
 
@@ -499,7 +540,7 @@ bootstrap_module(
     data = ["//runtime:primitives"],
     visibility = [
         "//driver:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -548,7 +589,7 @@ bootstrap_module(
     data = ["//runtime:primitives"],
     visibility = [
         "//tools:__pkg__",
-        "//toplevel/byte:__pkg__"
+        "//toplevel:__pkg__"
     ]
 )
 

@@ -1,30 +1,57 @@
 load("//bzl:rules.bzl",
      "bootstrap_archive",
+     "bootstrap_executable",
      "bootstrap_library",
      "bootstrap_module",
      "bootstrap_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl",
+     "ROOT_MODULE_OPTS",
+     "ROOT_SIG_OPTS"
+     )
+
+load("//stdlib:BUILD.bzl", "STDLIB_MODULE_NAMES")
+
+MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS    = ROOT_MODULE_OPTS # + ["-nopervasives"]
 
 ################################################################
-# # root Makefile:
-# ocamlnat_dependencies := \
-#   compilerlibs/ocamlcommon.cmxa \
-#   compilerlibs/ocamloptcomp.cmxa \
-#   compilerlibs/ocamlbytecomp.cmxa \
-#   otherlibs/dynlink/dynlink.cmxa \
-#   compilerlibs/ocamltoplevel.cmxa \
-#   $(TOPLEVELSTART:.cmo=.cmx)
+## the repl command is 'ocaml', which is a target in the root
+## Makefile. OBazl puts it here in //toplevel
+# TOPLEVELSTART=toplevel/topstart.cmo
+# ocaml_dependencies := \
+#   compilerlibs/ocamlcommon.cma \
+#   compilerlibs/ocamlbytecomp.cma \
+#   compilerlibs/ocamltoplevel.cma $(TOPLEVELSTART)
 
-# # compilerlibs/Makefile.compilerlibs:
-# compilerlibs/ocamltoplevel.cmxa: $(OPTTOPLEVEL_CMI) $(OPTTOPLEVEL:.cmo=.cmx)
-# 	$(CAMLOPT) -a -o $@ -I toplevel/native $(OPTTOPLEVEL:.cmo=.cmx)
+# PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
-# ocamlnat$(EXE): $(ocamlnat_dependencies)
-# 	$(CAMLOPT_CMD) $(LINKFLAGS) -linkall -I toplevel/native -o $@ $^
+genrule(
+    name = "gen_ocaml",
+    outs = ["ocaml"],
+    executable = True,
+    srcs = [":ocaml.tmp", "//utils:expunge"],
+    tools = ["//runtime:ocamlrun"],
+    cmd  = " ".join([
+        "$(execpath //runtime:ocamlrun)",
+        "$(location //utils:expunge)",
+        "$(location :ocaml.tmp)",
+        "$(location ocaml)",
+    ] + STDLIB_MODULE_NAMES + ["outcometree", "topdirs", "toploop"]
+    )
+)
 
+bootstrap_executable(
+    name = "ocaml.tmp",
+    main = ":Topstart",
+    opts = ["-linkall"],
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+        ":ocamltoplevel",
+    ]
+)
 
 ################################################################
 ## dev/test, build all
@@ -45,11 +72,28 @@ bootstrap_library(
     # ],
 )
 
+################################################################
+# # root Makefile:
+# ocamlnat_dependencies := \
+#   compilerlibs/ocamlcommon.cmxa \
+#   compilerlibs/ocamloptcomp.cmxa \
+#   compilerlibs/ocamlbytecomp.cmxa \
+#   otherlibs/dynlink/dynlink.cmxa \
+#   compilerlibs/ocamltoplevel.cmxa \
+#   $(TOPLEVELSTART:.cmo=.cmx)
+
+# # compilerlibs/Makefile.compilerlibs:
+# compilerlibs/ocamltoplevel.cmxa: $(OPTTOPLEVEL_CMI) $(OPTTOPLEVEL:.cmo=.cmx)
+# 	$(CAMLOPT) -a -o $@ -I toplevel/native $(OPTTOPLEVEL:.cmo=.cmx)
+
+# ocamlnat$(EXE): $(ocamlnat_dependencies)
+# 	$(CAMLOPT_CMD) $(LINKFLAGS) -linkall -I toplevel/native -o $@ $^
+
 ## defined in compilerlibs/Makefile.compilerlibs:
 TOPLEVEL = [
-    "//toplevel/byte:Topeval",
-    "//toplevel/byte:Topmain",
-    "//toplevel/byte:Trace",
+    ":Topeval",
+    ":Topmain",
+    ":Trace",
     ":Genprintval",
     ":Topcommon",
     ":Topdirs",
@@ -57,16 +101,16 @@ TOPLEVEL = [
 ]
 
 TOPLEVEL_CMI = [
-    "//toplevel/byte:Topeval",
-    "//toplevel/byte:Topmain",
-    "//toplevel/byte:Trace",
-    ":Topcommon",
-    ":Topdirs",
-    ":Toploop",
+    ":Topeval_cmi",
+    ":Topmain_cmi",
+    ":Trace_cmi",
+    ":Topcommon_cmi",
+    ":Topdirs_cmi",
+    ":Toploop_cmi",
 ]
 
 bootstrap_archive(
-    name = "archive", # //toplevel:archive instead of ocamltoplevel
+    name = "ocamltoplevel", # //toplevel:archive instead of ocamltoplevel?
     manifest  = TOPLEVEL,
     # deps      = TOPLEVEL_CMI
 )
@@ -88,7 +132,8 @@ bootstrap_module(
         "//stdlib:Stdlib.Digest",
         "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
-    ]
+    ],
+    visibility = ["//utils:__pkg__"]
 )
 
 bootstrap_module(
@@ -213,7 +258,7 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Toploop",
-        "//toplevel/byte:Topeval",
+        ":Topeval",
         "//utils:Warnings",
         "//typing:Types",
         "//stdlib:Stdlib.Sys",
@@ -255,6 +300,62 @@ bootstrap_signature(
         "//parsing:Longident",
         "//stdlib:Stdlib.Format",
     ]
+)
+
+bootstrap_module(
+    name   = "Topeval",
+    struct = select({
+        # "//toplevel:bytecode": "//toplevel/byte:topeval.ml",
+        # "//toplevel:native"  : "//toplevel/native:topeval.ml",
+        "//conditions:default":  "//toplevel/byte:topeval.ml",
+    }),
+    sig    = ":Topeval_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        "//bytecomp:Bytegen",
+        "//bytecomp:Dll",
+        "//bytecomp:Emitcode",
+        "//bytecomp:Meta",
+        "//bytecomp:Opcodes",
+        "//bytecomp:Printinstr",
+        "//bytecomp:Symtable",
+        "//driver:Compmisc",
+        "//file_formats:Cmo_format_cmi",
+        "//lambda:Printlambda",
+        "//lambda:Simplif",
+        "//lambda:Translmod",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Sys",
+        "//toplevel:Topcommon",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Includemod",
+        "//typing:Outcometree_cmi",
+        "//typing:Persistent_env",
+        "//typing:Predef",
+        "//typing:Printtyp",
+        "//typing:Printtyped",
+        "//typing:Typecore",
+        "//typing:Typedtree",
+        "//typing:Typemod",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        #### (LongString)
+    ],
+    visibility = ["//toplevel:__pkg__"]
 )
 
 bootstrap_signature(
@@ -325,6 +426,45 @@ bootstrap_signature(
     ]
 )
 
+bootstrap_module(
+    name   = "Topmain",
+    struct = select({
+        # "//toplevel:bytecode": "//toplevel/byte:topmain.ml",
+        # "//toplevel:native"  : "//toplevel/native:topmain.ml",
+        "//conditions:default":  "//toplevel/byte:topmain.ml",
+    }),
+    sig    = ":Topmain_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Trace",
+        ":Topeval",
+        "//toplevel:Toploop",
+        "//toplevel:Topdirs",
+        "//toplevel:Topcommon",
+        "//typing:Types",
+        "//stdlib:Stdlib.Sys",
+        "//typing:Printtyp",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Printexc",
+        "//typing:Path",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//driver:Main_args",
+        "//parsing:Location",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Filename",
+        "//typing:Env",
+        "//typing:Ctype",
+        "//driver:Compmisc",
+        "//driver:Compenv",
+        "//utils:Clflags",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Arg",
+    ],
+    visibility = ["//toplevel:__pkg__"]
+)
+
 bootstrap_signature(
     name = "Topmain_cmi",
     src  = "topmain.mli",
@@ -341,6 +481,33 @@ bootstrap_module(
     deps   = [
         ":Topmain",
     ]
+)
+
+bootstrap_module(
+    name   = "Trace",
+    struct = select({
+        # "//toplevel:bytecode": "//toplevel/byte:trace.ml",
+        # "//toplevel:native"  : "//toplevel/native:trace.ml",
+        "//conditions:default":  "//toplevel/byte:trace.ml",
+    }),
+    sig    = ":Trace_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        ":Topeval",
+        "//toplevel:Topcommon", ## (Toplevel Topcommon)
+        "//typing:Types",
+        "//typing:Printtyp",
+        "//typing:Predef",
+        "//typing:Path",
+        "//stdlib:Stdlib.Obj",
+        "//utils:Misc",
+        "//bytecomp:Meta",
+        "//parsing:Longident",
+        "//stdlib:Stdlib.Format",
+        "//typing:Ctype",
+        "//parsing:Asttypes_cmi",
+    ],
+    visibility = ["//toplevel:__pkg__"]
 )
 
 bootstrap_signature(

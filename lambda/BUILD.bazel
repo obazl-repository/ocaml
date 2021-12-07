@@ -218,7 +218,7 @@ bootstrap_module(
         "//driver:__pkg__",
         "//middle_end:__pkg__",
         "//middle_end/flambda:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -238,6 +238,20 @@ bootstrap_signature(
 # lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.h \
 #     runtime/primitives
 # 	$^ > $@
+bootstrap_module(
+    name   = "Runtimedef",
+    struct = "runtimedef.ml",
+    sig    = "Runtimedef_cmi",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+    ],
+    data = ["//runtime:primitives"],
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
+        "//toplevel:__pkg__",
+    ]
+)
 
 genrule(
     name = "runtimedef_ml",
@@ -253,22 +267,6 @@ genrule(
         "$(location //runtime:primitives)",
         " > $@"
     ]),
-)
-
-# ./boot/ocamlrun ./boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66-70 -warn-error +a -bin-annot -safe-string -strict-formats -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c lambda/runtimedef.ml -I lambda
-
-bootstrap_module(
-    name   = "Runtimedef",
-    struct = "runtimedef.ml",
-    sig    = "Runtimedef_cmi",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
-    ],
-    data = ["//runtime:primitives"],
-    visibility = [
-        "//asmcomp:__pkg__",
-        "//bytecomp:__pkg__"
-    ]
 )
 
 bootstrap_signature(
@@ -306,7 +304,7 @@ bootstrap_module(
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
         "//middle_end:__subpackages__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
@@ -542,7 +540,7 @@ bootstrap_module(
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__pkg__",
     ]
 )
 
