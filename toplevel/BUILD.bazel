@@ -3,7 +3,9 @@ load("//bzl:rules.bzl",
      "bootstrap_executable",
      "bootstrap_library",
      "bootstrap_module",
+     "bootstrap_repl",
      "bootstrap_signature",
+     "bootstrap_test",
 )
 
 load("//config:BUILD.bzl",
@@ -27,31 +29,70 @@ SIG_OPTS    = ROOT_MODULE_OPTS # + ["-nopervasives"]
 
 # PERVASIVES=$(STDLIB_MODULES) outcometree topdirs toploop
 
-genrule(
-    name = "gen_ocaml",
-    outs = ["ocaml"],
-    executable = True,
-    srcs = [":ocaml.tmp", "//utils:expunge"],
-    tools = ["//runtime:ocamlrun"],
-    cmd  = " ".join([
-        "$(execpath //runtime:ocamlrun)",
-        "$(location //utils:expunge)",
-        "$(location :ocaml.tmp)",
-        "$(location ocaml)",
-    ] + STDLIB_MODULE_NAMES + ["outcometree", "topdirs", "toploop"]
-    )
-)
+# to run the repl:
+# ifeq "$(UNIX_OR_WIN32)" "unix"
+# EXTRAPATH=
+# RLWRAP detected by ./configure
+# OC_TOPFLAGS = -nostdlib -I stdlib -I toplevel -noinit $(TOPINCLUDES) $(TOPFLAGS)
 
-bootstrap_executable(
-    name = "ocaml.tmp",
+# runtop:
+# 	$(MAKE) coldstart
+# 	$(MAKE) ocamlc
+# 	$(MAKE) otherlibraries
+# 	$(MAKE) ocaml
+# 	@$(EXTRAPATH) $(RLWRAP) $(OCAMLRUN) ./ocaml$(EXE) $(OC_TOPFLAGS)
+
+# bootstrap_executable(
+#     name = "ocaml.tmp",
+#     main = ":Topstart",
+#     opts = ["-linkall"],
+#     args = ["-nostdlib",
+#             "-I", "/Users/gar/ocaml/ocaml/bazel-bin/stdlib/__boot",
+#             "-noinit"],
+#     deps = [
+#         "//compilerlibs:ocamlcommon",
+#         "//bytecomp:ocamlbytecomp",
+#         ":ocamltoplevel",
+#     ]
+# )
+bootstrap_repl(
+    name = "ocaml",
     main = ":Topstart",
     opts = ["-linkall"],
+    ## args to be passed if the exe is run using `bazel run`:
+    args = ["-nostdlib",
+            "-I",
+            ## (I find no better way to put stdlib in srch path):
+            "../../../stdlib/__boot",
+            "-noinit"],
     deps = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         ":ocamltoplevel",
-    ]
+    ],
+    expunge = STDLIB_MODULE_NAMES + ["outcometree", "topdirs", "toploop"]
 )
+
+# genrule(
+#     name = "gen_ocaml",
+#     outs = ["ocaml"],
+#     executable = True,
+#     srcs = [":ocaml.tmp", "//utils:expunge"],
+#     tools = ["//runtime:ocamlrun"],
+#     cmd  = " ".join([
+#         "$(execpath //runtime:ocamlrun)",
+#         "$(location //utils:expunge)",
+#         "$(location :ocaml.tmp)",
+#         "$(location ocaml)",
+#     ] + STDLIB_MODULE_NAMES + ["outcometree", "topdirs", "toploop"]
+#     )
+# )
+
+# bootstrap_test(
+#     name = "ocaml.test",
+#     main = ":ocaml",
+# )
+
 
 ################################################################
 ## dev/test, build all

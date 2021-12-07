@@ -2086,46 +2086,66 @@ bootstrap_signature(
 ## FIXME: default uses sys install locn, e.g. /usr/local/bin/ocamlrun
 ## for dev, use path to internal dev ocamlrun instead
 
+SYSPATHS_CMD = " ".join([
+    "cat bazel-out/stable-status.txt | ",
+    "grep \"STABLE_CAMLHEADER \" | ",
+    "cut -d ' ' -f 2 - ",
+    "> $(location camlheader);",
+
+        "cat bazel-out/stable-status.txt | ",
+    "grep \"STABLE_TARGET_CAMLHEADER \" | ",
+    "cut -d ' ' -f 2 - ",
+    "> $(location target_camlheader);",
+
+        "cat bazel-out/stable-status.txt | ",
+    "grep \"STABLE_CAMLHEADERD \" | ",
+    "cut -d ' ' -f 2 - ",
+    "> $(location camlheaderd);",
+
+        "cat bazel-out/stable-status.txt | ",
+    "grep STABLE_TARGET_CAMLHEADERD | ",
+    "cut -d ' ' -f 2 - ",
+    "> $(location target_camlheaderd);",
+
+        "cat bazel-out/stable-status.txt | ",
+    "grep \"STABLE_CAMLHEADERI \" | ",
+    "cut -d ' ' -f 2 - ",
+    "> $(location camlheaderi);",
+
+        "cat bazel-out/stable-status.txt | ",
+    "grep \"STABLE_TARGET_CAMLHEADERI \" | ",
+    "cut -d ' ' -f 2 - ",
+    "> $(location target_camlheaderi);",
+])
+
+DEVPATHS_CMD = "\n".join([
+    "cat bazel-out/stable-status.txt | ",
+    "while read KEY VAL; do",
+    "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
+    "echo '#!'$$VAL/$(location //runtime:ocamlrun) > $(location camlheader);\n",
+    "echo '#!'$$VAL/$(location //runtime:ocamlrun)d > $(location camlheaderd);\n",
+    "echo '#!'$$VAL/$(location //runtime:ocamlrun)i > $(location camlheaderi);\n",
+    "fi",
+    "done",
+
+    "echo '#!bazel-bin/runtime/ocamlrun' > $(location target_camlheader);",
+    "echo '#!bazel-bin/runtime/ocamlrund' > $(location target_camlheaderd);",
+    "echo '#!bazel-bin/runtime/ocamlruni' > $(location target_camlheaderi);",
+])
+
 genrule(
     name = "headers",
     outs = [
-        "camlheader", "target_camlheader",
+        "camlheader",
+        "camlheaderd",
+        "camlheaderi",
         # "camlheader_ur",
-        "camlheaderd", "target_camlheaderd",
-        "camlheaderi", "target_camlheaderi"
+        "target_camlheader",
+        "target_camlheaderd",
+        "target_camlheaderi"
     ],
-    srcs = [],
-    cmd  = " ".join([
-        "cat bazel-out/stable-status.txt | ",
-        "grep \"STABLE_CAMLHEADER \" | ",
-        "cut -d ' ' -f 2 - ",
-        "> $(location camlheader);",
-
-        "cat bazel-out/stable-status.txt | ",
-        "grep \"STABLE_TARGET_CAMLHEADER \" | ",
-        "cut -d ' ' -f 2 - ",
-        "> $(location target_camlheader);",
-
-        "cat bazel-out/stable-status.txt | ",
-        "grep \"STABLE_CAMLHEADERD \" | ",
-        "cut -d ' ' -f 2 - ",
-        "> $(location camlheaderd);",
-
-        "cat bazel-out/stable-status.txt | ",
-        "grep STABLE_TARGET_CAMLHEADERD | ",
-        "cut -d ' ' -f 2 - ",
-        "> $(location target_camlheaderd);",
-
-        "cat bazel-out/stable-status.txt | ",
-        "grep \"STABLE_CAMLHEADERI \" | ",
-        "cut -d ' ' -f 2 - ",
-        "> $(location camlheaderi);",
-
-        "cat bazel-out/stable-status.txt | ",
-        "grep \"STABLE_TARGET_CAMLHEADERI \" | ",
-        "cut -d ' ' -f 2 - ",
-        "> $(location target_camlheaderi);",
-    ]),
+    srcs = ["//runtime:ocamlrun"],
+    cmd = DEVPATHS_CMD,
     stamp = True,
     visibility = ["//visibility:public"]
 )

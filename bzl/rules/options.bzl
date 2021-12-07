@@ -79,25 +79,55 @@ def options_executable(ws):
     ws = "@" + ws
 
     attrs = dict(
-        _linkall     = attr.label(default = ws + "//executable/linkall"),
-        _threads     = attr.label(default = ws + "//executable/threads"),
-        _warnings  = attr.label(default   = ws + "//executable:warnings"),
-        # _opts = attr.label(
-        #     doc = "Hidden options.",
-        #     default = "@ocaml//executable:opts"
+
+        _toolchain = attr.label(
+            default = "//bzl/toolchain:tc"
+        ),
+
+        ocamlc = attr.label(
+            allow_single_file = True,
+            default = "//bzl/toolchain:ocamlc"
+        ),
+
+        _camlheaders = attr.label_list(
+            allow_files = True,
+            default = [
+                "//stdlib:camlheader", "//stdlib:target_camlheader",
+                "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+                "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+            ]
+        ),
+
+        # _boot       = attr.label(
+        #     default = "//bzl/toolchain:boot",
         # ),
-        # _sdkpath = attr.label(
-        #     default = Label("@ocaml//:sdkpath")
-        # ),
+
+        opts             = attr.string_list(
+            doc          = "List of OCaml options. Will override configurable default options."
+        ),
+
+        use_prims = attr.label(
+            doc = "Undocumented flag, heavily used in bootstrapping",
+            allow_single_file = True
+        ),
+
+        _mode       = attr.label(
+            default = "//bzl/toolchain",
+        ),
+
+        mode       = attr.string(
+            doc     = "Overrides mode build setting.",
+        ),
+
         exe  = attr.string(
             doc = "By default, executable name is derived from 'name' attribute; use this to override."
         ),
         main = attr.label(
             doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
+            # cfg = compile_mode_out_transition,
             allow_single_file = True,
             providers = [[OcamlModuleMarker]],
             default = None,
-            # cfg = ocaml_executable_deps_out_transition
         ),
         data = attr.label_list(
             allow_files = True,
@@ -109,18 +139,20 @@ def options_executable(ws):
         ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
+            # cfg = ocamlc_out_transition,
             providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
                          [OcamlLibraryMarker],
                          [OcamlModuleMarker],
                          [OcamlNsMarker],
                          [CcInfo]],
-            # cfg = ocaml_executable_deps_out_transition
         ),
-        # _deps = attr.label(
-        #     doc = "Dependency to be added last.",
-        #     default = "@ocaml//executable:deps"
-        # ),
+
+        _stdexit = attr.label(
+            # cfg = ocamlc_out_transition,
+            default = "//stdlib:Std_exit",
+            allow_single_file = True
+        ),
 
         ## FIXME: add cc_linkopts?
         cc_deps = attr.label_keyed_string_dict(
@@ -129,12 +161,7 @@ def options_executable(ws):
             ## FIXME: cc libs could come from LSPs that do not support CcInfo, e.g. rules_rust
             # providers = [[CcInfo]]
         ),
-        # _cc_deps = attr.label(
-        #     doc = "Global C/C++ library dependencies. Apply to all instances of ocaml_executable.",
-        #     ## FIXME: cc libs could come from LSPs that do not support CcInfo, e.g. rules_rust
-        #     # providers = [[CcInfo]]
-        #     default = "@ocaml//executable:cc_deps"
-        # ),
+
         cc_linkall = attr.label_list(
             ## equivalent to cc_library's "alwayslink"
             doc     = "True: use `-whole-archive` (GCC toolchain) or `-force_load` (Clang toolchain). Deps in this attribute must also be listed in cc_deps.",
@@ -144,13 +171,15 @@ def options_executable(ws):
             doc = "List of C/C++ link options. E.g. `[\"-lstd++\"]`.",
 
         ),
-        mode = attr.label(
-            default = ws + "//mode"
-        ),
+
+        # _debug           = attr.label(default = "@ocaml//debug"),
+
+        _rule = attr.string( default  = "ocaml_executable" ),
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),
     )
+
     return attrs
 
 #######################

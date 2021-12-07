@@ -1,3 +1,5 @@
+## used by expunge in //toplevel:ocaml
+
 STDLIB_MODULE_NAMES = [
     "CamlinternalAtomic",
     "CamlinternalFormat",
@@ -63,5 +65,5 @@ STDLIB_MODULE_NAMES = [
     "Stdlib__Uchar",
     "Stdlib__Unit",
     "Stdlib__Weak",
-    # ":Std_exit",
+    # "Std_exit",
 ]

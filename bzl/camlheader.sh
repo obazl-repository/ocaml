@@ -1,4 +1,11 @@
 #!/bin/bash
+
+## this script is run by passing
+##  --workspace_status_command=$PWD/bzl/camlheader.sh
+
+## it should probably be in stdlib, where its output is used, but we
+## leave it in bzl/ to avoid polluting the original source tree.
+
 echo "CURRENT_TIME $(date +%s)"
 ## echo "RANDOM_HASH $(cat /proc/sys/kernel/random/uuid)"
 echo "STABLE_GIT_COMMIT $(git rev-parse HEAD)"
@@ -83,3 +90,5 @@ else
 	echo "STABLE_CAMLHEADERI #!${BINDIR}/ocamlruni"
 	echo "STABLE_TARGET_CAMLHEADERI #!${BINDIR}/ocamlruni"
 fi
+
+echo "STABLE_WORKSPACE_ROOT `pwd`"
