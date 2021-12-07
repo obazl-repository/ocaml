@@ -106,7 +106,8 @@ bootstrap_module(
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
-    ]
+    ],
+    visibility = ["//tools:__pkg__"]
 )
 
 bootstrap_signature(
@@ -172,7 +173,10 @@ bootstrap_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Buffer",
     ],
-    visibility = ["//parsing:__pkg__"]
+    visibility = [
+        "//parsing:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -485,6 +489,7 @@ bootstrap_module(
     ],
     visibility = [
         "//middle_end:__subpackages__",
+        "//tools:__pkg__",
         "//typing:__pkg__",
     ]
 )
@@ -695,7 +700,8 @@ bootstrap_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
-        "//middle_end:__subpackages__"
+        "//middle_end:__subpackages__",
+        "//tools:__pkg__",
     ]
 )
 
@@ -817,7 +823,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
     ],
-    visibility = ["//parsing:__pkg__"]
+    visibility = [
+        "//parsing:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(

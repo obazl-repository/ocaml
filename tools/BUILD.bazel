@@ -28,35 +28,6 @@ STDLIB = ["//stdlib", "//stdlib:Std_exit"]
 # $(programs_byte:%=%$(EXE)):
 # 	$(CAMLC) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
 
-# Profiling: https://ocaml.org/manual/profil.html
-# The OCaml profiling compilers: ocamlcp, ocamloptp
-# Viewer: ocamlprof
-
-# OCAMLPROF=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
-#   numbers.cmo arg_helper.cmo clflags.cmo terminfo.cmo \
-#   warnings.cmo location.cmo longident.cmo docstrings.cmo \
-#   syntaxerr.cmo ast_helper.cmo \
-#   camlinternalMenhirLib.cmo parser.cmo \
-#   pprintast.cmo \
-#   lexer.cmo parse.cmo ocamlprof.cmo
-# ocamlprof$(EXE): $(OCAMLPROF)
-# ocamlcp$(EXE): $(OCAMLCP) ocamlcp.cmo
-# ocamlcp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamlcp.cmo)
-# ocamloptp$(EXE): $(OCAMLCP) ocamloptp.cmo
-# ocamloptp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamloptp.cmo)
-
-# other tools
-# OCAMLMKLIB = config.cmo build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo
-# ocamlmklib$(EXE): $(OCAMLMKLIB)
-# ocamlmklib.opt$(EXE): $(call byte2native, $(OCAMLMKLIB))
-
-# To make custom toplevels
-# OCAMLMKTOP=config.cmo build_path_prefix_map.cmo misc.cmo \
-#        identifiable.cmo numbers.cmo arg_helper.cmo clflags.cmo \
-#        local_store.cmo load_path.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
-# ocamlmktop$(EXE): $(OCAMLMKTOP)
-# ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
-
 ################################################################
 # The dependency generator
 # OCAMLDEP = \
@@ -75,6 +46,63 @@ bootstrap_executable(
         "//compilerlibs:ocamlbytecomp",
     ]
 )
+
+################################################################
+# Profiling: https://ocaml.org/manual/profil.html
+# The OCaml profiling compilers: ocamlcp, ocamloptp
+# Viewer: ocamlprof
+
+# OCAMLPROF=config.cmo build_path_prefix_map.cmo misc.cmo identifiable.cmo \
+#   numbers.cmo arg_helper.cmo clflags.cmo terminfo.cmo \
+#   warnings.cmo location.cmo longident.cmo docstrings.cmo \
+#   syntaxerr.cmo ast_helper.cmo \
+#   camlinternalMenhirLib.cmo parser.cmo \
+#   pprintast.cmo \
+#   lexer.cmo parse.cmo ocamlprof.cmo
+# ocamlprof$(EXE): $(OCAMLPROF)
+# ocamlcp$(EXE): $(OCAMLCP) ocamlcp.cmo
+# ocamlcp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamlcp.cmo)
+# ocamloptp$(EXE): $(OCAMLCP) ocamloptp.cmo
+# ocamloptp.opt$(EXE): $(call byte2native, $(OCAMLCP) ocamloptp.cmo)
+
+bootstrap_executable(
+    name = "ocamlprof",
+    main = ":Ocamlprof",
+    deps = [
+        "//utils:Config",
+        "//utils:Build_path_prefix_map",
+        "//utils:Misc",
+        "//utils:Identifiable",
+        "//utils:Numbers",
+        "//utils:Arg_helper",
+        "//utils:Clflags",
+        "//utils:Terminfo",
+        "//utils:Warnings",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Docstrings",
+        "//parsing:Syntaxerr",
+        "//parsing:Ast_helper",
+        "//parsing:CamlinternalMenhirLib",
+        "//parsing:Parser",
+        "//parsing:Pprintast",
+        "//parsing:Lexer",
+        "//parsing:Parse",
+    ]
+)
+
+################################################################
+# other tools
+# OCAMLMKLIB = config.cmo build_path_prefix_map.cmo misc.cmo ocamlmklib.cmo
+# ocamlmklib$(EXE): $(OCAMLMKLIB)
+# ocamlmklib.opt$(EXE): $(call byte2native, $(OCAMLMKLIB))
+
+# To make custom toplevels
+# OCAMLMKTOP=config.cmo build_path_prefix_map.cmo misc.cmo \
+#        identifiable.cmo numbers.cmo arg_helper.cmo clflags.cmo \
+#        local_store.cmo load_path.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
+# ocamlmktop$(EXE): $(OCAMLMKTOP)
+# ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
 
 ################################################################
 # The preprocessor for asm generators

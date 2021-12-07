@@ -348,7 +348,8 @@ bootstrap_module(
         "//utils:Warnings",
         ":Location",
         ":Parsetree_cmi",
-    ]
+    ],
+    visibility = ["//tools:__pkg__"]
 )
 
 bootstrap_signature(
@@ -376,7 +377,8 @@ bootstrap_module(
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
-    ]
+    ],
+    visibility = ["//tools:__pkg__"]
 )
 
 genrule(
@@ -554,14 +556,17 @@ bootstrap_signature(
 
 bootstrap_module(
     name   = "Parser",
-    struct = "parser.ml", ##FIXME: bug in rule
+    struct = "parser.ml",
     sig    = "Parser_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Ast_helper",
         ":CamlinternalMenhirLib",
     ],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 # parsing/parser.ml: boot/menhir/parser.ml parsing/parser.mly \
