@@ -1,0 +1,34 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+
+load("//bzl:rules.bzl",
+     "ocamlc_fixpoint")
+
+load("//bzl:rules.bzl",
+     "bootstrap_module")
+
+load("//config:BUILD.bzl",
+     "ARCH", "MODEL", "SYSTEM",
+     "HOST", "ROOTDIR", "LIBDIR",
+     "OC_CFLAGS", "CFLAGS",
+     "OC_CPPFLAGS", "CPPFLAGS",
+     "OC_LDFLAGS", "LDFLAGS",
+
+     "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+     "OUTPUTEXE", "MKEXE_FLAGS",
+     "BYTECCLIBS"
+     )
+
+## root Makefile:
+# The bytecode compiler
+# ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
+#               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+# 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+ocamlc_fixpoint(
+    name = "ocamlc",
+    opts = ["-compat-32"],
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//compilerlibs:ocamlbytecomp"
+    ],
+    visibility = ["//visibility:public"]
+)
