@@ -22,6 +22,12 @@ STDLIB = []
 ## on the archive stdlib.cma built by //stdlib:
 ## STDLIB = ["//stdlib"]
 
+# Menhir: the makefiles rename the menhir sources to avoid name
+# clashes in case users also use menhir. we use genrules to do the
+# same here. an alternative is to put them in a namespace, so instead
+# of //parsing:CamlinternalMenhirLib we would have something like
+# //boot/menhir:Ocaml.MenhirLib
+
 bootstrap_library(
     name = "parsing",
     manifest  = [
@@ -97,6 +103,7 @@ bootstrap_module(
         ":Syntaxerr",
     ],
     visibility = [
+        "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//typing:__pkg__"
     ]
@@ -155,7 +162,10 @@ bootstrap_module(
         ":Location",
         ":Parsetree_cmi",
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -223,6 +233,7 @@ bootstrap_signature(
         "//bytecomp:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
@@ -409,6 +420,7 @@ bootstrap_module(
     visibility = [
         "//driver:__pkg__",
         "//file_formats:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__pkg__",
     ]
 )
@@ -457,6 +469,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ],
@@ -487,6 +500,7 @@ bootstrap_module(
     ],
     visibility = [
         "//lambda:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//toplevel/byte:__pkg__",
         "//typing:__pkg__"
@@ -519,6 +533,7 @@ bootstrap_module(
     ],
     visibility = [
         "//driver:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//typing:__pkg__"
     ]
@@ -606,6 +621,7 @@ bootstrap_signature(
     visibility = [
         "//driver:__pkg__",
         "//lambda:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
@@ -629,6 +645,7 @@ bootstrap_module(
     ],
     visibility = [
         "//driver:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//typing:__pkg__"
     ]
@@ -693,7 +710,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Format",
         ":Location",
     ],
-    visibility = ["//toplevel:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//toplevel:__pkg__"
+    ]
 )
 
 bootstrap_signature(

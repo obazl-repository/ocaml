@@ -24,7 +24,7 @@ def _bootstrap_ocamllex_impl(ctx):
   tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
 
   tool = tc.ocamlrun
-  tool_args = [tc.ocamllex]
+  tool_args = [tc.boot_ocamllex]
 
   # env = {"PATH": get_sdkpath(ctx)}
 

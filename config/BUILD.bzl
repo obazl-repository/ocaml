@@ -1,8 +1,5 @@
-## main dune file:
-# (env
-#  (dev     (flags (:standard -w +a-4-9-40-41-42-44-45-48)))
-#  (release (flags (:standard -w +a-4-9-40-41-42-44-45-48))))
-
+## This Bazel extension file consolidates commonly used variables like
+## `OC_CFLAGS` etc.  To be loaded by BUILD.bazel files.
 
 ################################
 ## Makefile.config:
@@ -218,7 +215,7 @@ OC_LDFLAGS = []
 NATIVECCLIBS = ["-lm"]
 
 ## Makefile.config
-# BYTECCLIBS= "-lm  -lpthread
+# BYTECCLIBS used to build runtime/ocamlrun
 BYTECCLIBS = ["-lm", "-lpthread"]
 
 ################################################################
@@ -264,18 +261,21 @@ DATA_PRIMITIVES = ["//runtime:primitives"]
 
 # CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
 ROOT_CAMLC_OPTS = [
-    "-g", "-nostdlib",
+    "-g", "-nostdlib",  ## prevent searching sys stdlib dir
     "-I", "boot",
 ] + USE_PRIMS
 
+OTHERLIBS_CAMLC_OPTS = ROOT_CAMLC_OPTS
 TOOLS_CAMLC_OPTS = ROOT_CAMLC_OPTS
 
+################
 ROOT_CAMLOPT_OPTS = [
     "-g", "-nostdlib",
     "-I", "stdlib",
     "-I", "otherlibs/dynlink"
 ]
 
+################
 ## stdlib/Makefile:
 # COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 \
 #           -g -warn-error +A -bin-annot -nostdlib -principal \
@@ -288,6 +288,16 @@ ROOT_COMPFLAGS = [
     "-warn-error", "+a",
     "-bin-annot",
     "-safe-string", "-strict-formats"
+]
+
+OTHERLIBS_COMPFLAGS = [
+    "-absname",
+    "-w", "+a-4-9-41-42-44-45-48",
+    "-warn-error", "+A",
+    "-bin-annot",
+    "-g",
+    "-safe-string", "-strict-sequence", "-strict-formats"
+    ## $(EXTRACAMLFLAGS)
 ]
 
 TOOLS_COMPFLAGS = [  # tools/Makefile
@@ -312,6 +322,9 @@ ROOT_MODULE_OPTS = ROOT_CAMLC_OPTS + ROOT_COMPFLAGS
 # %.cmi: %.mli
 # 	$(CAMLC) $(COMPFLAGS) -c $<
 ROOT_SIG_OPTS = ROOT_MODULE_OPTS
+
+OTHERLIBS_MODULE_OPTS = OTHERLIBS_CAMLC_OPTS + OTHERLIBS_COMPFLAGS
+OTHERLIBS_SIG_OPTS    = OTHERLIBS_MODULE_OPTS
 
 TOOLS_MODULE_OPTS = TOOLS_CAMLC_OPTS + TOOLS_COMPFLAGS
 TOOLS_SIG_OPTS = TOOLS_MODULE_OPTS

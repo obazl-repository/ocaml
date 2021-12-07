@@ -460,7 +460,10 @@ bootstrap_module(
         "//middle_end/flambda/base_types:Closure_id",
         "//stdlib:Stdlib.Array",
     ],
-    visibility = ["//middle_end:__pkg__"]
+    visibility = [
+        "//middle_end:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(

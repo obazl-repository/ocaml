@@ -45,7 +45,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Digest",
         "//utils:Config",
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -75,6 +78,7 @@ bootstrap_signature(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//tools:__pkg__",
         "//toplevel/byte:__pkg__",
     ]
 )
@@ -103,7 +107,10 @@ bootstrap_module(
         "//utils:Clflags",
         "//stdlib:Stdlib.Array",
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -133,7 +140,8 @@ bootstrap_signature(
     ],
     visibility = [
         "//asmcomp:__pkg__",
-        "//middle_end:__pkg__"
+        "//middle_end:__pkg__",
+        "//tools:__pkg__",
     ]
 )
 
@@ -145,7 +153,10 @@ bootstrap_signature(
         "//utils:Misc_cmi",
         "//stdlib:Stdlib.Digest"
     ],
-    visibility = ["//asmcomp:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_module(

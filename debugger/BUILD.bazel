@@ -67,7 +67,7 @@ ocaml_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int",
-        ## (Instruct)
+        "//bytecomp:Instruct",
         "//stdlib:Stdlib.Fun",
     ]
 )
@@ -149,7 +149,7 @@ ocaml_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Int",
-        ## (Instruct)
+        "//bytecomp:Instruct",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Fun",
         "//stdlib:Stdlib.Format",
@@ -186,7 +186,7 @@ ocaml_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int64",
-        ## (Instruct)
+        "//bytecomp:Instruct",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Array",
     ]
@@ -198,7 +198,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Primitives", ## (Debugger Primitives)
-        ## (Instruct)
+        "//bytecomp:Instruct",
     ]
 )
 
@@ -254,7 +254,7 @@ ocaml_module(
         "//utils:Misc",
         "//parsing:Longident",
         "//stdlib:Stdlib.List",
-        ## (Instruct)
+        "//bytecomp:Instruct",
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
         "//typing:Env",
@@ -288,7 +288,7 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         "//parsing:Location",
-        ## (Instruct)
+        "//bytecomp:Instruct",
     ]
 )
 
@@ -298,7 +298,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         "//stdlib:Stdlib.Lexing",
-        ## (Instruct)
+        "//bytecomp:Instruct",
     ]
 )
 
@@ -331,7 +331,7 @@ ocaml_module(
         ":Debugcom", ## (Debugger Debugcom)
         "//utils:Misc",
         "//stdlib:Stdlib.Lexing",
-        ## (Instruct)
+        "//bytecomp:Instruct",
     ]
 )
 
@@ -565,7 +565,7 @@ ocaml_module(
         "//stdlib:Stdlib.Printf",
         "//parsing:Location",
         "//stdlib:Stdlib.Lexing",
-        ## (Instruct)
+        "//bytecomp:Instruct",
     ]
 )
 
@@ -743,7 +743,7 @@ ocaml_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Lexing",
-        ## (Instruct)
+        "//bytecomp:Instruct",
         "//stdlib:Stdlib.Format",
     ]
 )
@@ -773,7 +773,7 @@ ocaml_module(
         "//stdlib:Stdlib.Printf",
         "//parsing:Location",
         "//stdlib:Stdlib.Lexing",
-        ## (Instruct)
+        "//bytecomp:Instruct",
     ]
 )
 
@@ -783,7 +783,7 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         "//stdlib:Stdlib.Lexing",
-        ## (Instruct)
+        "//bytecomp:Instruct",
     ]
 )
 
@@ -830,7 +830,7 @@ ocaml_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Lexing",
-        ## (Instruct)
+        "//bytecomp:Instruct",
         "//stdlib:Stdlib.Hashtbl",
         "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
@@ -844,7 +844,7 @@ ocaml_signature(
     deps   = [
         ":Events", ## (Debugger Events)
         ":Debugcom", ## (Debugger Debugcom)
-        ## (Instruct)
+        "//bytecomp:Instruct",
     ]
 )
 
@@ -873,7 +873,7 @@ ocaml_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Int",
-        ## (Instruct)
+        "//bytecomp:Instruct",
         "//stdlib:Stdlib.Array",
     ]
 )

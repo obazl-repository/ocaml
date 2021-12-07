@@ -74,8 +74,8 @@ LABEL_SIGOPTS = [
 ## module. Each submodule includes itself by attribution ns=":Stdlib".
 ## This library target just aggregates the resolver and submodules.
 ## They can be listed in any order.
-bootstrap_archive(
 # bootstrap_library(
+bootstrap_archive(
     name       = "stdlib",
     opts       = USE_PRIMS,
     # data       = ["//runtime:primitives"],
@@ -1583,6 +1583,11 @@ bootstrap_module(
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
 )
+# bootstrap_implicit_signature(
+#     name    = "Stdlib.Parsing_cmi",
+#     module  = "parsing.ml",
+#     visibility = ["//visibility:public"]
+# )
 
 bootstrap_module(
     ns    = ":Stdlib",
@@ -2075,17 +2080,126 @@ bootstrap_signature(
 ## it into the deps list we add it to deps_runtime of stdlib.ml, until we
 ## figure out how best to do this.
 
-## use --stamp and --workspace_status_command (see .bazelrc)
+## use --stamp and --workspace_status_command
+## see .bazelrc, bzl/camlheader.sh
+
+## FIXME: default uses sys install locn, e.g. /usr/local/bin/ocamlrun
+## for dev, use path to internal dev ocamlrun instead
+
 genrule(
-    name = "header",
-    outs = ["camlheader"],
+    name = "headers",
+    outs = [
+        "camlheader", "target_camlheader",
+        # "camlheader_ur",
+        "camlheaderd", "target_camlheaderd",
+        "camlheaderi", "target_camlheaderi"
+    ],
     srcs = [],
     cmd  = " ".join([
         "cat bazel-out/stable-status.txt | ",
-        "grep STABLE_OCAMLRUN | ",
+        "grep \"STABLE_CAMLHEADER \" | ",
         "cut -d ' ' -f 2 - ",
-        "> $@"
+        "> $(location camlheader);",
+
+        "cat bazel-out/stable-status.txt | ",
+        "grep \"STABLE_TARGET_CAMLHEADER \" | ",
+        "cut -d ' ' -f 2 - ",
+        "> $(location target_camlheader);",
+
+        "cat bazel-out/stable-status.txt | ",
+        "grep \"STABLE_CAMLHEADERD \" | ",
+        "cut -d ' ' -f 2 - ",
+        "> $(location camlheaderd);",
+
+        "cat bazel-out/stable-status.txt | ",
+        "grep STABLE_TARGET_CAMLHEADERD | ",
+        "cut -d ' ' -f 2 - ",
+        "> $(location target_camlheaderd);",
+
+        "cat bazel-out/stable-status.txt | ",
+        "grep \"STABLE_CAMLHEADERI \" | ",
+        "cut -d ' ' -f 2 - ",
+        "> $(location camlheaderi);",
+
+        "cat bazel-out/stable-status.txt | ",
+        "grep \"STABLE_TARGET_CAMLHEADERI \" | ",
+        "cut -d ' ' -f 2 - ",
+        "> $(location target_camlheaderi);",
     ]),
     stamp = True,
-    visibility = ["//tools:__pkg__"]
+    visibility = ["//visibility:public"]
+)
+
+################################################################
+## cmigroup used by `//promote` targets
+filegroup(
+    name = "cmigroup",
+    srcs = [
+        ":Stdlib.Arg_cmi",
+        ":Stdlib.ArrayLabels_cmi",
+        ":Stdlib.Array_cmi",
+        ":Stdlib.Atomic_cmi",
+        ":Stdlib.Bigarray_cmi",
+        ":Stdlib.Bool_cmi",
+        ":Stdlib.Buffer_cmi",
+        ":Stdlib.BytesLabels_cmi",
+        ":Stdlib.Bytes_cmi",
+        ":Stdlib.Callback_cmi",
+        ":CamlinternalAtomic_cmi",
+        ":CamlinternalFormatBasics_cmi",
+        ":CamlinternalFormat_cmi",
+        ":CamlinternalLazy_cmi",
+        ":CamlinternalMod_cmi",
+        ":CamlinternalOO_cmi",
+        ":Stdlib.Char_cmi",
+        ":Stdlib.Complex_cmi",
+        ":Stdlib.Digest_cmi",
+        ":Stdlib.Either_cmi",
+        ":Stdlib.Ephemeron_cmi",
+        ":Stdlib.Filename_cmi",
+        ":Stdlib.Float_cmi",
+        ":Stdlib.Format_cmi",
+        ":Stdlib.Fun_cmi",
+        ":Stdlib.Gc_cmi",
+        ":Stdlib.Genlex_cmi",
+        ":Stdlib.Hashtbl_cmi",
+        ":Stdlib.In_channel_cmi",
+        ":Stdlib.Int32_cmi",
+        ":Stdlib.Int64_cmi",
+        ":Stdlib.Int_cmi",
+        ":Stdlib.Lazy_cmi",
+        ":Stdlib.Lexing_cmi",
+        ":Stdlib.ListLabels_cmi",
+        ":Stdlib.List_cmi",
+        ":Stdlib.Map_cmi",
+        ":Stdlib.Marshal_cmi",
+        ":Stdlib.MoreLabels_cmi",
+        ":Stdlib.Nativeint_cmi",
+        ":Stdlib.Obj_cmi",
+        ":Stdlib.Oo_cmi",
+        ":Stdlib.Option_cmi",
+        ":Stdlib.Out_channel_cmi",
+        ":Stdlib.Parsing_cmi",
+        ## pervasives cmi is implicit - how to reference?
+        # ":Stdlib.Pervasives.cmi",
+        ":Stdlib.Printexc_cmi",
+        ":Stdlib.Printf_cmi",
+        ":Stdlib.Queue_cmi",
+        ":Stdlib.Random_cmi",
+        ":Stdlib.Result_cmi",
+        ":Stdlib.Scanf_cmi",
+        ":Stdlib.Seq_cmi",
+        ":Stdlib.Set_cmi",
+        ":Stdlib.Stack_cmi",
+        ":Stdlib.StdLabels_cmi",
+        # ":Stdlib.Stdlib",
+        ":Stdlib.Stream_cmi",
+        ":Stdlib.StringLabels_cmi",
+        ":Stdlib.String_cmi",
+        ":Stdlib.Sys_cmi",
+        ":Stdlib.Uchar_cmi",
+        ":Stdlib.Unit_cmi",
+        ":Stdlib.Weak_cmi",
+    ],
+    visibility = ["//promote:__pkg__"]
 )

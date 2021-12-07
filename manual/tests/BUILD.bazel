@@ -20,14 +20,14 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         "//stdlib:Stdlib.String",
-        ## (Scanf)
+        "//stdlib:Stdlib.Scanf",
         "//driver:Pparse",
         "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Map",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Format",
-        ## (Ast_iterator)
+        "//parsing:Ast_iterator",
         "//stdlib:Stdlib.Arg",
     ]
 )

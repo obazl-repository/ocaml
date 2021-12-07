@@ -35,7 +35,9 @@ bootstrap_archive(
     ],
     visibility = [
         "//boot:__pkg__",
-        "//runtime:__pkg__"
+        "//compilers:__pkg__",
+        "//fixpoint:__pkg__",
+        "//tools:__pkg__",
     ]
 )
 
@@ -61,7 +63,9 @@ bootstrap_archive(
     ],
     visibility = [
         "//boot:__pkg__",
-        "//runtime:__pkg__"
+        "//compilers:__pkg__",
+        "//fixpoint:__pkg__",
+        "//tools:__pkg__",
     ]
 )
 
@@ -74,14 +78,17 @@ bootstrap_archive(
 # 	$(CAMLC) -a -o $@ $(MIDDLE_END)
 # compilerlibs/ocamlmiddleend.cmxa: $(MIDDLE_END_CMI) $(MIDDLE_END:%.cmo=%.cmx)
 # 	$(CAMLOPT) -a -o $@ $(MIDDLE_END:%.cmo=%.cmx)
-bootstrap_archive( # FIXME: move to //middle_end:ocamlmiddleend
-    name    = "ocamlmiddlend",
-    visibility = ["//visibility:public"],
-    opts = ["-linkall"],
-    manifest = [
-        "//middle_end:ocamlmiddleend",
-    ],
-)
+
+## NOTE: moved to //middle_end:ocamlmiddleend
+
+# bootstrap_archive(
+#     name    = "ocamlmiddlend",
+#     visibility = ["//visibility:public"],
+#     opts = ["-linkall"],
+#     manifest = [
+#         "//middle_end:ocamlmiddleend",
+#     ],
+# )
 
 ################
 ## ocamloptcomp.[cma,cmxa]

@@ -35,35 +35,35 @@ SIG_OPTS = ROOT_SIG_OPTS
 
 STDLIB = ["//stdlib"]
 
+# ../boot/ocamlrun ../boot/ocamlc -strict-sequence -nostdlib -I ../boot -use-prims ../runtime/primitives  -compat-32 -o ocamllex cset.cmo syntax.cmo parser.cmo lexer.cmo table.cmo lexgen.cmo compact.cmo common.cmo output.cmo outputbis.cmo main.cmo
+
 bootstrap_executable(
     name = "ocamllex",
     main = ":Main",
     opts = [
-        # "-verbose",
-        "-g", "-nostdlib",
-        # "-I", "boot",      ## home of std_exit.cmo?
-        # "-use-prims", "runtime/primitives",
-        # "-I", "stdlib",
-        # "-I", "runtime",
+        "-strict-sequence", "-nostdlib",
+        # "-I", "../boot",
         "-compat-32",
         # "-ccopt", "-Wno-error=ignored-optimization-argument",
         # "-ccopt", "-Wl,-export_dynamic",
         # "-ccopt", "-Wno-error=unknown-argument"
     ],
+    use_prims = "//runtime:primitives",
     data = ["//runtime:primitives"],
     deps = [
-        ":Table",
-        ":Common",
-        ":Compact",
-        ":Cset",
-        ":Lexer",
-        ":Lexgen",
-        ":Output",
-        ":Outputbis",
-        ":Parser",
-        ":Syntax",
-        # "//boot:Std_exit",
-    ]
+        ":lex"
+        # ":Common",
+        # ":Compact",
+        # ":Cset",
+        # ":Lexer",
+        # ":Lexgen",
+        # ":Output",
+        # ":Outputbis",
+        # ":Parser",
+        # ":Syntax",
+        # ":Table",
+    ],
+    visibility = ["//promote:__pkg__"]
 )
 
 # bootstrap_executable(
@@ -140,8 +140,8 @@ bootstrap_module(
     sig    = "Compact_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Table", ## (Lex Table)
         ":Lexgen", ## (Lex Lexgen)
+        ":Table", ## (Lex Table)
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Array",
@@ -153,8 +153,8 @@ bootstrap_signature(
     src  = "compact.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Syntax", ## (Lex Syntax)
-        ":Lexgen", ## (Lex Lexgen)
+        ":Syntax_cmi", ## (Lex Syntax)
+        ":Lexgen_cmi", ## (Lex Lexgen)
     ]
 )
 
@@ -214,13 +214,13 @@ bootstrap_module(
         ":Syntax", ## (Lex Syntax)
         ":Cset", ## (Lex Cset)
         "//stdlib:Stdlib.String",
-        ## (Stack)
+        "//stdlib:Stdlib.Stack",
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Hashtbl",
-        ## (Bool)
+        "//stdlib:Stdlib.Bool",
         "//stdlib:Stdlib.Array",
     ]
 )
@@ -230,7 +230,7 @@ bootstrap_signature(
     src  = "lexgen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Syntax", ## (Lex Syntax)
+        ":Syntax_cmi", ## (Lex Syntax)
     ]
 )
 
@@ -279,10 +279,10 @@ bootstrap_signature(
     src  = "output.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Syntax", ## (Lex Syntax)
-        ":Lexgen", ## (Lex Lexgen)
-        ":Compact", ## (Lex Compact)
-        ":Common", ## (Lex Common)
+        ":Syntax_cmi", ## (Lex Syntax)
+        ":Lexgen_cmi", ## (Lex Lexgen)
+        ":Compact_cmi", ## (Lex Compact)
+        ":Common_cmi", ## (Lex Common)
     ]
 )
 
@@ -308,9 +308,9 @@ bootstrap_signature(
     src  = "outputbis.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Syntax", ## (Lex Syntax)
-        ":Lexgen", ## (Lex Lexgen)
-        ":Common", ## (Lex Common)
+        ":Syntax_cmi", ## (Lex Syntax)
+        ":Lexgen_cmi", ## (Lex Lexgen)
+        ":Common_cmi", ## (Lex Common)
     ]
 )
 
@@ -345,7 +345,7 @@ bootstrap_signature(
     src  = "syntax.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cset", ## (Lex Cset)
+        ":Cset_cmi", ## (Lex Cset)
     ]
 )
 

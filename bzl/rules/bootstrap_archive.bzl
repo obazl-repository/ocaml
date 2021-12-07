@@ -1,3 +1,5 @@
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
 load("//bzl:providers.bzl",
      "OcamlProvider",
      "OcamlArchiveProvider",
@@ -165,6 +167,31 @@ def _bootstrap_archive(ctx):
 
     # print("manifest: %s" % manifest)
 
+    if ctx.attr.cc_deps:
+        for (dep, linkmode) in ctx.attr.cc_deps.items():
+            print("CCDEP: {dep}, mode: {mode}".format(
+                dep = dep, mode = linkmode))
+            for dep in dep.files.to_list():
+                print("DEP: %s" % dep)
+                if dep.extension == "so":
+                    if linkmode in ["shared", "dynamic"]:
+                        (bn, ext) = paths.split_extension(dep.basename)
+                        # NB -dllib for shared libs, -cclib for static?
+                        args.add("-dllib", "-l" + bn[3:])
+                        args.add("-dllpath", dep.dirname)
+                ## FIXME: .a is expected with cmx, in bc it means cclib
+                elif dep.extension == "a":
+                    if linkmode == "static":
+                        if mode in ["boot", "bc_bc", "bc_n"]:
+                            (bn, extn) = paths.split_extension(dep.basename)
+                            # args.add(dep)
+                            ## or:
+                            args.add("-cclib", "l" + bn[3:])
+                            args.add("-ccopt", "-L" + dep.dirname)
+                else:
+                    fail("cc_deps files must be .a, .so, or .dylib")
+
+
     # NB: ns lib linkargs not same as ns archive linkargs
     # the former contains resolver and submodules, which we add to the
     # cmd for building archive;
@@ -214,8 +241,9 @@ def _bootstrap_archive(ctx):
     includes = []
     manifest_list = []
     for dep in ctx.attr.manifest:
-        if hasattr(dep[OcamlProvider], "archive_manifests"):
-            manifest_list.append(dep[OcamlProvider].archive_manifests)
+        if OcamlProvider in dep:
+            if hasattr(dep[OcamlProvider], "archive_manifests"):
+                manifest_list.append(dep[OcamlProvider].archive_manifests)
         # else sig?
 
     merged_manifests = depset(transitive = manifest_list)
@@ -257,8 +285,8 @@ def _bootstrap_archive(ctx):
         if dep not in manifest:
             if dep not in archive_filter_list:
                 linkargs_list.append(dep)
-            else:
-                print("removing double link: %s" % dep)
+            # else:
+            #     print("removing double link: %s" % dep)
 
     # for dep in libOcamlProvider.inputs.to_list():
     #     # print("inputs dep: %s" % dep)
@@ -294,15 +322,31 @@ def _bootstrap_archive(ctx):
         # print("inputs dep: %s" % dep)
         # print("ns_resolver: %s" % ns_resolver)
         if dep in submod_arglist:
-            includes.append(dep.dirname)
-            args.add(dep)
+            if dep.extension == "so":
+                if tc.linkmode in ["shared", "dynamic"]:
+                    (bn, ext) = paths.split_extension(dep.basename)
+                    # NB -dllib for shared libs, -cclib for static?
+                    args.add("-dllib", "l" + bn[3:])
+                    args.add("-ccopt", "-L" + dep.dirname)
+            ## FIXME: .a is expected with cmx, in bc it means cclib
+            elif dep.extension == "a":
+                if tc.linkmode == "static":
+                    if mode in ["boot", "bc_bc", "bc_n"]:
+                        (bn, ext) = paths.split_extension(dep.basename)
+                        # args.add(dep)
+                        ## or:
+                        args.add("-cclib", "l" + bn[3:])
+                        args.add("-ccopt", "-L" + dep.dirname)
+            else:
+                includes.append(dep.dirname)
+                args.add(dep)
         elif dep == ns_resolver:
             includes.append(dep.dirname)
             args.add(dep)
         elif dep not in archive_filter_list:
             linkargs_list.append(dep)
-        else:
-            print("removing double link: %s" % dep)
+        # else:
+        #     print("removing double link: %s" % dep)
 
 
     args.add_all(includes, before_each="-I", uniquify=True)
@@ -494,7 +538,8 @@ bootstrap_archive = rule(
                          [OcamlLibraryMarker],
                          [OcamlModuleMarker],
                          [OcamlNsMarker],
-                         [OcamlSignatureMarker]],
+                         [OcamlSignatureMarker],
+                         [CcInfo]],
         ),
 
         data = attr.label_list(
@@ -507,6 +552,7 @@ bootstrap_archive = rule(
         ## OTOH, if the ocaml wrapper on a cc_dep consists of multiple modules
         ## it makes sense to aggregate them into an archive or library
         ## and attach the cc_dep to the latter.
+        ## mklib too attaches to archive
         cc_deps = attr.label_keyed_string_dict(
             doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
             """,

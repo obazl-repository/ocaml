@@ -1,7 +1,5 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "bootstrap_library",
+     "bootstrap_archive",
      "bootstrap_module",
      "bootstrap_signature",
 )
@@ -13,12 +11,19 @@ SIG_OPTS = ROOT_SIG_OPTS
 
 STDLIB = ["//stdlib"]
 
-# bootstrap_library(
-#     name = "otherlibs_str_lib",
-#       = [
-#         ":Str",
-#     ],
-# )
+# LIBNAME=str
+# COBJS=strstubs.$(O)
+# CLIBNAME=camlstr
+# CAMLOBJS=str.cmo
+
+bootstrap_archive(  ## mklib -o
+    name = "str",
+    opts = ["-linkall"],
+    manifest = [
+        ":Str",
+    ],
+    cc_deps = {":camlstr" : "shared"}
+)
 
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.ml
 
@@ -54,8 +59,10 @@ bootstrap_signature(
 # gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g    -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -I../../runtime   \
 # 	  -o strstubs.o strstubs.c
 
+## WARN: for shared lib, ocaml wants 'dllcamlstr.so' but bazel only
+## does 'libcamlstr.so.
 cc_library(
-    name = "strstubs",
+    name = "camlstr",
     srcs = [
         "strstubs.c",
         "//runtime/caml:alloc.h",

@@ -35,8 +35,8 @@ bootstrap_library(
 
 ## defined in compilerlibs/Makefile.compilerlibs
 ## used by //compilerlibs:ocamlmiddleend and //compilerlibs:ocamloptcomp
-# bootstrap_archive(
-bootstrap_library(
+# bootstrap_library(
+bootstrap_archive(
     name = "ocamlmiddleend",
     manifest  = [
         ## NB: the makefiles take pains to put stuff in order, across
@@ -70,7 +70,10 @@ bootstrap_library(
 
         # ":Backend_intf_cmi",
     ],
-    visibility = ["//compilerlibs:__pkg__"]
+    visibility = [
+        "//compilerlibs:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 ################################################################
@@ -214,7 +217,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__subpackages__"]
+    visibility = [
+        "//middle_end/flambda:__subpackages__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -287,7 +293,7 @@ bootstrap_signature(
         ## (Set_of_closures_id)
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
-        ## (Export_info)
+        "//middle_end/flambda:Export_info",
         "//stdlib:Stdlib.Digest",
         "//file_formats:Cmx_format_cmi",
         "//middle_end/flambda/base_types:Closure_id",
@@ -364,7 +370,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = [
+        "//middle_end/flambda:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -395,7 +404,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end:__subpackages__"]
+    visibility = [
+        "//middle_end:__subpackages__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -479,7 +491,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = [
+        "//middle_end/flambda:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(

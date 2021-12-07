@@ -24,7 +24,7 @@ ocaml_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         ## (Soup)
-        ## (Scanf)
+        "//stdlib:Stdlib.Scanf",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.List",

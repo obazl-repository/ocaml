@@ -12,13 +12,21 @@ exports_files([
 MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
+################
+## root Makefile.menhir:
+# 'promote-menhir:' target writes to source tree.
+# we can do this with `bazel run`
+# https://dev.to/bazel/bazel-can-write-to-the-source-folder-b9b
+
 bootstrap_library(
-    name = "boot_menhir_lib",
+    name = "menhir",
     manifest= [
         ":MenhirLib",
         ":Parser",
     ],
 )
+
+## FIXME: convert to namespace Ocaml (or Menhir or something)
 
 bootstrap_module(
     name   = "MenhirLib",
@@ -65,7 +73,7 @@ bootstrap_module(
         ## (Te)
         "//parsing:Syntaxerr",
         "//stdlib:Stdlib.String",
-        ## (Str)
+        "//otherlibs/str:Str",
         ## (Sig)
         ## (Rf)
         ## (Pat)

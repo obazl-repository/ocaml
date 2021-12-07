@@ -86,6 +86,10 @@ def _bootstrap_executable(ctx):
     # do not uniquify options, it collapses all -I
     args.add_all(_options)
 
+    ## -use-prims: undocumented, heavily used for bootstrapping
+    if ctx.attr.use_prims:
+        args.add("-use-prims", ctx.file.use_prims.path)
+
     if "-g" in _options:
         args.add("-runtime-variant", "d") # FIXME: verify compile built for debugging
 
@@ -116,6 +120,7 @@ def _bootstrap_executable(ctx):
 
     ccInfo_list = []
 
+    ## FIXME: merge all deps correctly
     for dep in ctx.attr.deps:
         # print("DEP: %s" % dep[OcamlProvider])
         if CcInfo in dep:
@@ -238,6 +243,8 @@ def _bootstrap_executable(ctx):
 
     # args.add("external/ounit2/oUnit.cmx")
 
+    args.add("-I", ctx.files._camlheaders[0].dirname)
+
     ## this exposes stdlib, camlheader, etc.
     args.add("-I", ctx.file._stdexit.dirname)
 
@@ -247,6 +254,8 @@ def _bootstrap_executable(ctx):
     if ctx.attr.data:
         # print("DATA: %s" % ctx.files.data)
         data_inputs = [depset(direct = ctx.files.data)]
+        for f in ctx.files.data:
+            args.add("-I", f.dirname)
     # data_inputs.append(depset(direct = [tc.camlheader]))
     # if tc.bootstrap_std_exit:
     #     std_exit = tc.bootstrap_std_exit.files
@@ -256,7 +265,7 @@ def _bootstrap_executable(ctx):
     # print("LINKARGS: %s" % linkargs_depset)
 
     inputs_depset = depset(
-        direct = [ctx.file._stdexit],
+        direct = [ctx.file._stdexit] + ctx.files._camlheaders,
         transitive = [direct_inputs_depset]
         + [linkargs_depset]
         + data_inputs
@@ -350,12 +359,26 @@ bootstrap_executable = rule(
             default = "//bzl/toolchain:ocamlc"
         ),
 
+        _camlheaders = attr.label_list(
+            allow_files = True,
+            default = [
+                "//stdlib:camlheader", "//stdlib:target_camlheader",
+                "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+                "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+            ]
+        ),
+
         # _boot       = attr.label(
         #     default = "//bzl/toolchain:boot",
         # ),
 
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
+        ),
+
+        use_prims = attr.label(
+            doc = "Undocumented flag, heavily used in bootstrapping",
+            allow_single_file = True
         ),
 
         _mode       = attr.label(

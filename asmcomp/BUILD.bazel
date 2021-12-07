@@ -342,10 +342,10 @@ bootstrap_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        ## (Export_info)
+        "//middle_end/flambda:Export_info",
         "//utils:Config",
         "//middle_end:Compilenv",
-        ## (Cmx_format)
+        "//file_formats:Cmx_format",
         "//utils:Clflags",
         "//middle_end:Clambda",
         ## (Ccomp)
@@ -390,7 +390,7 @@ bootstrap_module(
         ## (Consistbl)
         "//utils:Config",
         "//middle_end:Compilenv",
-        ## (Cmx_format)
+        "//file_formats:Cmx_format",
         "//utils:Clflags",
         "//middle_end:Clambda",
         ## (Ccomp)
@@ -436,12 +436,12 @@ bootstrap_module(
         "//middle_end/flambda:Flambda_middle_end",
         "//stdlib:Stdlib.Filename",
         "//middle_end/flambda:Export_info_for_pack",
-        ## (Export_info)
+        "//middle_end/flambda:Export_info",
         "//typing:Env",
         "//utils:Config",
         "//middle_end:Compilenv",
-        ## (Compilation_unit)
-        ## (Cmx_format)
+        "//middle_end:Compilation_unit",
+        "//file_formats:Cmx_format",
         "//middle_end/closure:Closure_middle_end",
         "//utils:Clflags",
         "//middle_end:Clambda",
@@ -602,7 +602,7 @@ bootstrap_signature(
         "//stdlib:Stdlib.Nativeint",
         "//stdlib:Stdlib.Digest",
         "//lambda:Debuginfo",
-        ## (Cmx_format)
+        "//file_formats:Cmx_format",
         ## (Clambda_primitives)
         "//middle_end:Clambda",
         "//parsing:Asttypes_cmi",

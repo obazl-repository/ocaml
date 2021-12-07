@@ -1,4 +1,4 @@
-load("//bzl:functions.bzl",
+load("//bzl:transitions.bzl",
      "ocamlrun_out_transition")
 
 # load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
@@ -54,7 +54,7 @@ _bootstrap_tools_attrs = {
     #     # cfg = "exec",
     # ),
 
-    "ocamllex": attr.label(
+    "boot_ocamllex": attr.label(
         default    = "//boot:ocamllex",
         executable = True,
         allow_single_file = True,
@@ -129,7 +129,7 @@ def _bootstrap_toolchain_impl(ctx):
 
         ocamlc     = ctx.file.ocamlc, #.files.to_list()[0],
 
-        ocamllex   = ctx.attr.ocamllex.files.to_list()[0],
+        boot_ocamllex   = ctx.attr.boot_ocamllex.files.to_list()[0],
         ocamlyacc  = ctx.attr.ocamlyacc.files.to_list()[0],
 
         # cc_toolchain = the_cc_toolchain,

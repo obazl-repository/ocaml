@@ -133,7 +133,8 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         "//parsing:Location"
-    ]
+    ],
+    visibility = ["//tools:__pkg__"]
 )
 
 bootstrap_module(
@@ -202,7 +203,8 @@ bootstrap_module(
         "//file_formats:Cmt_format",
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
-    ]
+    ],
+    visibility = ["//tools:__pkg__"]
 )
 
 bootstrap_module(
@@ -343,6 +345,8 @@ bootstrap_module(
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
+        "//middle_end:__pkg__",
+        "//middle_end/closure:__pkg__",
         "//toplevel:__subpackages__",
     ]
 )
@@ -391,7 +395,8 @@ bootstrap_module(
         ":Printtyp",
         ":Subst",
         ":Types",
-    ]
+    ],
+    visibility = ["//tools:__pkg__"]
 )
 
 bootstrap_signature(
@@ -454,6 +459,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__"
     ]
 )
@@ -831,6 +837,8 @@ bootstrap_module(
         "//bytecomp:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__pkg__",
+        "//middle_end/closure:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
     ]
 )
@@ -1075,6 +1083,7 @@ bootstrap_module(
     visibility = [
         "//driver:__pkg__",
         "//lambda:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
     ]
 )
@@ -1236,6 +1245,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Format",
         "//utils:Clflags",
     ],
+    visibility = ["//tools:__pkg__"]
 )
 
 bootstrap_signature(
@@ -2089,13 +2099,14 @@ bootstrap_module(
         #### (Pat)
         #### (Rf)
         #### (Sig)
-        #### (Str)
+        ##"//otherlibs/str:Str",
         #### (Te)
         #### (Typ)
         #### (Type)
         #### (Val)
         #### (Vb)
-    ]
+    ],
+    visibility = ["//tools:__pkg__"]
 )
 
 bootstrap_signature(

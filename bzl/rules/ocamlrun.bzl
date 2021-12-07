@@ -1,4 +1,4 @@
-load("//bzl:functions.bzl",
+load("//bzl:transitions.bzl",
      "ocamlrun_in_transition",
      "ocamlrun_out_transition")
 

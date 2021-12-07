@@ -1,12 +1,10 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 load("//bzl:rules.bzl",
-     "ocamlrun",
      "bootstrap_executable",
-     "runtime_ocamlc")
-
-load("//bzl:rules.bzl",
-     "bootstrap_module")
+     "bootstrap_module",
+     "ocamlc_runtime",
+     "ocamlrun")
 
 load("//config:BUILD.bzl",
      "ARCH", "MODEL", "SYSTEM",
@@ -20,20 +18,24 @@ load("//config:BUILD.bzl",
      "BYTECCLIBS"
      )
 
+### //runtime:ocamlc moved to //compilers:ocamlc
 ## root Makefile:
 # The bytecode compiler
 # ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
 #               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 # 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
-runtime_ocamlc(
-    name = "ocamlc",
-    opts = ["-compat-32"],
-    deps = [
-        "//compilerlibs:ocamlcommon",
-        "//compilerlibs:ocamlbytecomp"
-    ],
-    visibility = ["//visibility:public"]
-)
+## level 0 - uses //boot:ocamlc
+# ocamlc_runtime(
+# bootstrap_executable(
+#     name = "ocamlc",
+#     # exe  = "ocamlc",
+#     opts = ["-compat-32"],
+#     deps = [
+#         "//compilerlibs:ocamlcommon",
+#         "//compilerlibs:ocamlbytecomp"
+#     ],
+#     visibility = ["//visibility:public"]
+# )
 
 # ifeq "$(TOOLCHAIN)" "msvc"
 # ASM_EXT := asm
@@ -230,24 +232,4 @@ cc_binary(
     linkopts = OC_LDFLAGS + LDFLAGS,
     deps= ["//runtime/caml:hdrs"],
     visibility = ["//runtime/caml:__pkg__"]
-)
-
-###########
-write_file( ## from dune file
-    name     = "runtime_ml",
-    out      = "runtime.ml",
-    content  = ["let linkme = ()"]
-)
-
-bootstrap_module(  ## from dune file
-    name   = "Runtime",
-    struct = "runtime.ml",
-    opts   = [
-        "-nostdlib", "-nopervasives",
-        "-cclib", "-I runtime"
-    ],
-    deps = [":camlrun"]
-    # cc_deps = {
-    #     ":camlrun": "static",
-    # },
 )

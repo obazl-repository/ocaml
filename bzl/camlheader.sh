@@ -60,9 +60,26 @@ fi
 # echo "long_shebang: " $long_shebang
 # echo "BINDIR: " $BINDIR
 
+## from make log:
+# echo '#!/usr/local/bin/ocamlrun' > camlheader
+# echo '#!/usr/local/bin/ocamlrun' > target_camlheader
+## \012 == LF (x0A)
+# echo '#!' | tr -d '\012' > camlheader_ur
+# echo '#!/usr/local/bin/ocamlrund' > camlheaderd
+# echo '#!/usr/local/bin/ocamlrund' > target_camlheaderd
+# echo '#!/usr/local/bin/ocamlruni' > camlheaderi
+# echo '#!/usr/local/bin/ocamlruni' > target_camlheaderi
+
+
 ## stdlib/Makefile:
 if test "x$long_shebang" = "xtrue"; then :
-	echo "STABLE_OCAMLRUN #!/bin/sh\nexec $(BINDIR)/ocamlrun $$0 $$@"
+	echo "STABLE_CAMLHEADER #!/bin/sh\nexec $(BINDIR)/ocamlrun $$0 $$@"
 else
-	echo "STABLE_OCAMLRUN #!${BINDIR}/ocamlrun"
+	echo "STABLE_CAMLHEADER #!${BINDIR}/ocamlrun"
+	echo "STABLE_TARGET_CAMLHEADER #!${BINDIR}/ocamlrun"
+	# echo "STABLE_CAMLHEADER_UR `'#!' | tr -d '\012'`"
+	echo "STABLE_CAMLHEADERD #!${BINDIR}/ocamlrund"
+	echo "STABLE_TARGET_CAMLHEADERD #!${BINDIR}/ocamlrund"
+	echo "STABLE_CAMLHEADERI #!${BINDIR}/ocamlruni"
+	echo "STABLE_TARGET_CAMLHEADERI #!${BINDIR}/ocamlruni"
 fi

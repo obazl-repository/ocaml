@@ -176,7 +176,7 @@ bootstrap_module(
         ":Genprintval",
         "//driver:Pparse",
         "//parsing:Printast",
-        #### (Str)
+        ##"//otherlibs/str:Str",
         #### (Mb)
         #### (Mod)
     ],
@@ -299,7 +299,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Buffer",
         "//typing:Btype",
     ],
-    visibility = ["//toplevel/byte:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//toplevel/byte:__pkg__"
+    ]
 )
 
 bootstrap_signature(

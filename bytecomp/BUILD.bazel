@@ -367,7 +367,8 @@ bootstrap_module(
         "//typing:Ident",
         "//typing:Env",
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = ["//tools:__pkg__"]
 )
 
 bootstrap_signature(
@@ -419,23 +420,26 @@ bootstrap_module(
     deps   = STDLIB + [
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//toplevel/byte:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//toplevel/byte:__pkg__"
+    ]
 )
 
 ## root Makefile:
 # bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
 ## NEW_OCAMLRUN = //runtime:ocamlrun, we call it RUNTIME_OCAMLRUN
-## make_opcodes is //tools:make_opcodes.bc
+## make_opcodes is //tools:make_opcodes
 genrule(
     name  = "opcodes_ml",
-    srcs  = ["//runtime/caml:instruct.h", "//tools:opcodes.bc"],
+    srcs  = ["//runtime/caml:instruct.h", "//tools:make_opcodes"],
     tools = [RUNTIME_OCAMLRUN],
     outs  = ["opcodes.ml"],
     cmd   = " ".join([
         "$(execpath {NEW_OCAMLRUN})".format(
             NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
-        "$(location //tools:opcodes.bc)",
+        "$(location //tools:make_opcodes)",
         "-opcodes",
         "< $(location //runtime/caml:instruct.h)",
         "> $@"
@@ -542,7 +546,10 @@ bootstrap_module(
         #### (LongString)
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//toplevel/byte:__pkg__"]
+    visibility = [
+        "//tools:__pkg__",
+        "//toplevel/byte:__pkg__"
+    ]
 )
 
 bootstrap_signature(

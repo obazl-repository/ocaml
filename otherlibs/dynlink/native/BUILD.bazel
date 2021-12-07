@@ -28,7 +28,7 @@ ocaml_module(
         ## (Dynlink_compilerlibs)
         "//stdlib:Stdlib.Digest",
         "//utils:Config",
-        ## (Cmxs_format)
+        "//file_formats:Cmxs_format",
     ]
 )
 

@@ -11,12 +11,13 @@ package(default_visibility = ["//visibility:public"])
 # config_setting(name = "boot-mode-enabled",
 #                flag_values = {":boot": str(True)})
 
-label_flag(
-    name = "ocamlc.boot",
-    build_setting_default = "//boot:ocamlc"
-    # build_setting_default = "//runtime:ocamlc"
-)
+# label_flag(
+#     name = "boot.ocamlc",
+#     build_setting_default = "//boot:ocamlc"
+#     # build_setting_default = "//runtime:ocamlc"
+# )
 
+## may be changed by transition
 label_flag(
     name = "ocamlc",
     build_setting_default = "//boot:ocamlc"

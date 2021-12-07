@@ -1,5 +1,7 @@
 load("//bzl/rules:ocamlrun.bzl", _ocamlrun = "ocamlrun")
 
+load("//bzl/rules:promote.bzl", _promote = "promote")
+
 load("//bzl/rules:bootstrap_archive.bzl",
      _bootstrap_archive = "bootstrap_archive")
 
@@ -18,11 +20,11 @@ load("//bzl/rules:bootstrap_library.bzl",
 # load("//bzl/rules:bootstrap_preprocess.bzl",
 #      _bootstrap_preprocess = "bootstrap_preprocess")
 
-load("//bzl/rules:bootstrap_ocamlc.bzl",
-     _bootstrap_ocamlc = "bootstrap_ocamlc")
+load("//bzl/rules:ocamlc_fixpoint.bzl",
+     _ocamlc_fixpoint = "ocamlc_fixpoint")
 
-load("//bzl/rules:runtime_ocamlc.bzl",
-     _runtime_ocamlc = "runtime_ocamlc")
+load("//bzl/rules:ocamlc_runtime.bzl",
+     _ocamlc_runtime = "ocamlc_runtime")
 
 load("//bzl/rules:bootstrap_ocamllex.bzl",
      _bootstrap_ocamllex = "bootstrap_ocamllex")
@@ -35,6 +37,7 @@ load("//bzl/rules:bootstrap_signature.bzl",
 
 
 ocamlrun = _ocamlrun
+promote  = _promote
 
 bootstrap_archive      = _bootstrap_archive
 bootstrap_executable      = _bootstrap_executable
@@ -42,8 +45,8 @@ bootstrap_library  = _bootstrap_library
 bootstrap_module      = _bootstrap_module
 # bootstrap_ns_resolver = _bootstrap_ns_resolver
 # bootstrap_preprocess  = _bootstrap_preprocess
-runtime_ocamlc    = _runtime_ocamlc
-bootstrap_ocamlc    = _bootstrap_ocamlc
+ocamlc_runtime    = _ocamlc_runtime
+ocamlc_fixpoint    = _ocamlc_fixpoint
 bootstrap_ocamllex    = _bootstrap_ocamllex
 bootstrap_ocamlyacc   = _bootstrap_ocamlyacc
 bootstrap_signature   = _bootstrap_signature

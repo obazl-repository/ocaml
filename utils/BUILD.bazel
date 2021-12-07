@@ -145,7 +145,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Array"
     ],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -201,7 +204,8 @@ bootstrap_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
-        "//driver:__pkg__"
+        "//driver:__pkg__",
+        "//tools:__pkg__",
     ],
 )
 
@@ -239,6 +243,7 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//parsing:__pkg__",
         "//middle_end:__subpackages__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
@@ -277,6 +282,7 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
         "//parsing:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
@@ -568,6 +574,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//middle_end:__pkg__",
         "//parsing:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
@@ -847,6 +854,7 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//parsing:__pkg__",
         "//middle_end:__subpackages__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__",
     ]

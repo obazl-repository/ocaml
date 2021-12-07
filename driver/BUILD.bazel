@@ -68,7 +68,7 @@ bootstrap_module(
         "//utils:Warnings",
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
-        ## (Scanf)
+        "//stdlib:Stdlib.Scanf",
         "//utils:Profile",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Printexc",
@@ -88,6 +88,7 @@ bootstrap_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
     ]
 )
@@ -205,6 +206,7 @@ bootstrap_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__subpackages__",
     ]
 )
@@ -277,6 +279,7 @@ bootstrap_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//tools:__pkg__",
         "//toplevel/byte:__pkg__",
     ]
 )
@@ -356,7 +359,10 @@ bootstrap_module(
         ":Compenv",
         ":Pparse",
     ],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//tools:__pkg__",
+    ]
 )
 
 bootstrap_signature(
@@ -504,6 +510,7 @@ bootstrap_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//tools:__pkg__",
         "//toplevel:__pkg__",
     ]
 )

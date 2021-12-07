@@ -1,37 +1,53 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "bootstrap_archive",
+     "bootstrap_module",
+     "bootstrap_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl",
+     "OTHERLIBS_MODULE_OPTS",
+     "OTHERLIBS_SIG_OPTS"
+     )
 
-ocaml_library(
-    name = "otherlibs_bigarray_lib",
-    modules  = [
+MODULE_OPTS = OTHERLIBS_MODULE_OPTS
+SIG_OPTS    = OTHERLIBS_MODULE_OPTS
+
+STDLIB = ["//stdlib"]
+
+bootstrap_archive(
+    name = "bigarray",
+    manifest  = [
         ":Bigarray",
     ],
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Bigarray",
     struct = "bigarray.ml",
     sig    = "Bigarray_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Bigarray)
+        "//stdlib:Stdlib.Bigarray"
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Bigarray_cmi",
     src  = "bigarray.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Bigarray)
+        "//stdlib:Stdlib.Bigarray"
     ]
 )
 
+################################################################
+## otherlibs/Makefile.otherlibs.common:
+# LIBNAME=bigarray
+# CAMLOBJS=bigarray.cmo
+# CLIBNAME ?= $(LIBNAME)
+# STUBSLIB=lib$(CLIBNAME).$(A)
+
+# cc_library(
+#     name = "bigarray",
+#     srcs = ["empty.c"]
+# )
