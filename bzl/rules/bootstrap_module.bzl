@@ -289,6 +289,16 @@ def _bootstrap_module(ctx):
     # if ctx.label.name in ["CamlinternalAtomic"]:
     #     debug = True
 
+    # print("ns: '{ns}' for {m}".format(
+    #     ns = ctx.attr._pack_ns[BuildSettingInfo].value,
+    #     m = ctx.label))
+
+    if ctx.attr._pack_ns[BuildSettingInfo].value:
+        pack_ns = ctx.attr._pack_ns[BuildSettingInfo].value
+        print("GOT PACK NS: %s" % pack_ns)
+    else:
+        pack_ns = False
+
     ################
     includes   = []
     default_outputs    = [] # just the cmx/cmo files, for efaultInfo
@@ -534,6 +544,8 @@ def _bootstrap_module(ctx):
     #     print("inputs_depset: %s" % inputs_depset)
 
     args.add("-c")
+    if pack_ns:
+        args.add("-for-pack", pack_ns)
 
     if sig_src:
         args.add("-I", sig_src.dirname)
@@ -629,7 +641,7 @@ def _bootstrap_module(ctx):
 
     ocamlProvider = OcamlProvider(
         # files = ocamlProvider_files_depset,
-        cmi      = cmi_depset, # depset(direct = [cmifile]),
+        cmi      = cmi_depset,
         fileset  = fileset_depset,
         inputs   = closure_depset,
         linkargs = linkset,
@@ -774,8 +786,10 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
             allow_single_file = True # no constraints on extension
         ),
 
-        pack = attr.string(
-            doc = "Experimental.  Name of pack lib module for which this module is to be compiled using -for-pack"
+        _pack_ns = attr.label(
+            doc = """Namepace name for use with -for-pack. Set by transition function.
+""",
+            default = "//config/pack:ns"
         ),
 
         sig = attr.label(

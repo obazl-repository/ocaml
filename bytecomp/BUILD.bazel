@@ -422,7 +422,10 @@ bootstrap_module(
         "//typing:Env",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//tools:__pkg__"]
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//tools:__pkg__"
+    ]
 )
 
 bootstrap_signature(

@@ -147,7 +147,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
     ],
-    visibility = ["//tools:__pkg__"]
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//tools:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -189,6 +192,7 @@ bootstrap_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
     ]
 )
@@ -253,6 +257,7 @@ bootstrap_module(
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
     ],
 )
@@ -382,6 +387,7 @@ bootstrap_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//typing:__pkg__"
     ]
 )
@@ -550,6 +556,7 @@ bootstrap_module(
     ],
     visibility = [
         "//middle_end:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//typing:__pkg__",
     ]
@@ -584,7 +591,8 @@ bootstrap_module(
     visibility = [
         "//lambda:__pkg__",
         "//middle_end:__pkg__",
-        "//middle_end/flambda:__subpackages__"
+        "//middle_end/flambda:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
     ]
 )
 
@@ -606,7 +614,10 @@ bootstrap_module(
     deps   = STDLIB + [
         "//stdlib:Stdlib.Either",
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -642,6 +653,7 @@ bootstrap_module(
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//middle_end:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
@@ -669,6 +681,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Fun",
     ],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//typing:__pkg__"
     ]
@@ -771,6 +784,7 @@ bootstrap_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//middle_end:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
     ]
 )
@@ -813,6 +827,7 @@ bootstrap_module(
         "//asmcomp:__pkg__",
         "//driver:__pkg__",
         "//middle_end/flambda:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
     ]
 )
@@ -899,6 +914,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Printf",
     ],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
     ]
@@ -939,6 +955,7 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//parsing:__pkg__",
         "//middle_end:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__",

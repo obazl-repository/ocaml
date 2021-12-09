@@ -160,12 +160,14 @@ def impl_library(ctx, mode, tool): # , tool_args):
         # ignore DefaultInfo, its just for printing, not propagation
 
         if OcamlProvider in dep: # should always be True
-            # if ctx.label.name == 'tezos-base':
-            #     print("directdep: %s" % dep[OcamlProvider])
-
+            # print("LBL: %s" % ctx.label)
+            # print("OcamlProv: %s" % dep[OcamlProvider])
             indirect_fileset_depsets.append(dep[OcamlProvider].fileset)
 
-            indirect_cmi_depsets.append(dep[OcamlProvider].cmi)
+            if hasattr(dep[OcamlProvider], "cmi"):
+                indirect_cmi_depsets.append(dep[OcamlProvider].cmi)
+            else:
+                print("NO CMI: %s" % dep)
 
             # linkargs: what goes on cmd line to build archive or
             # executable FIXME: __excluding__ sibling modules! Why?
@@ -249,12 +251,17 @@ def impl_library(ctx, mode, tool): # , tool_args):
         if dep in direct_deps_files:
             new_linkargs.append(dep)
 
-    #######################
-    ## Do we need to do this? Why?
-    ctx.actions.do_nothing(
-        mnemonic = "NS_LIB",
-        inputs = inputs_depset
-    )
+    ## archives share this impl but do not have attrib 'pack_ns'
+    if hasattr(ctx.attr, "pack_ns"):
+        if ctx.attr.pack_ns:
+            print("PACKING")
+            # ctx.actions.run(
+            # )
+        else:
+            ctx.actions.do_nothing(
+                mnemonic = "NS_LIB",
+                inputs = inputs_depset
+            )
     #######################
     # print("INPUTS_DEPSET: %s" % inputs_depset)
 

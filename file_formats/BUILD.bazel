@@ -53,6 +53,7 @@ bootstrap_module(
         "//utils:Config",
     ],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//typing:__pkg__"
     ]
@@ -163,6 +164,7 @@ bootstrap_signature(
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
     ]
 )

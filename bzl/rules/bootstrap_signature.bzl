@@ -298,8 +298,15 @@ def _bootstrap_signature_impl(ctx):
         transitive = indirect_linkargs_depsets
     )
 
+    cmi_depset = depset(
+        direct = [out_cmi],
+        transitive = bottomup_ns_cmi if bottomup_ns_cmi else []
+    )
+
+
     ocamlProvider = OcamlProvider(
         fileset  = fileset_depset,
+        cmi      = cmi_depset,
         inputs   = closure_depset,
         linkargs = linkargs_depset,
         paths    = paths_depset,
@@ -402,9 +409,15 @@ bootstrap_signature = rule(
             mandatory = False
         ),
 
-        pack = attr.string(
-            doc = "Experimental",
+        _pack_ns = attr.label(
+            doc = """Namepace name for use with -for-pack. Set by transition function.
+""",
+            default = "//config/pack:ns"
         ),
+
+        # pack = attr.string(
+        #     doc = "Experimental",
+        # ),
 
         deps = attr.label_list(
             doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",

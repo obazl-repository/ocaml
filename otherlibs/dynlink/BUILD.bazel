@@ -1729,3 +1729,70 @@ bootstrap_signature(
         "//stdlib:Stdlib.Lazy",
     ]
 )
+
+#########################################################
+################  packed module version  ################
+bootstrap_library(
+    pack_ns    = "Dynlink_compilerlibs",
+
+    visibility = ["//visibility:private"],
+    name       = "ns_compilerlibs",
+    manifest   = [
+        "//bytecomp:Bytesections",
+        "//bytecomp:Dll",
+        "//bytecomp:Instruct",
+        "//bytecomp:Meta",
+        "//bytecomp:Opcodes",
+        "//bytecomp:Symtable",
+
+        "//file_formats:Cmi_format",
+        "//file_formats:Cmo_format_cmi",
+        "//file_formats:Cmxs_format_cmi",
+
+        "//lambda:Debuginfo",
+        "//lambda:Lambda",
+        "//lambda:Runtimedef",
+
+        "//parsing:Ast_helper",
+        "//parsing:Ast_mapper",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Attr_helper",
+        "//parsing:Builtin_attributes",
+        "//parsing:Docstrings",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//parsing:Syntaxerr",
+
+        "//typing:Btype",
+        "//typing:Datarepr",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Outcometree_cmi",
+        "//typing:Path",
+        "//typing:Persistent_env",
+        "//typing:Predef",
+        "//typing:Primitive",
+        "//typing:Shape",
+        "//typing:Subst",
+        "//typing:Type_immediacy",
+        "//typing:Types",
+
+        "//utils:Arg_helper",
+        "//utils:Binutils",
+        "//utils:Build_path_prefix_map",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Consistbl",
+        "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Lazy_backtrack",
+        "//utils:Load_path",
+        "//utils:Local_store",
+        "//utils:Misc",
+        "//utils:Numbers",
+        "//utils:Profile",
+        "//utils:Terminfo",
+        "//utils:Warnings",
+    ]
+)

@@ -116,6 +116,7 @@ bootstrap_module(
         ":Syntaxerr",
     ],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//typing:__pkg__"
@@ -223,6 +224,7 @@ bootstrap_module(
     ],
     visibility = [
         "//driver:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//typing:__pkg__"
     ]
 )
@@ -274,7 +276,10 @@ bootstrap_module(
         ":Location",
         ":Parsetree_cmi",
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -312,6 +317,7 @@ bootstrap_module(
     ],
     visibility = [
         "//driver:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//typing:__pkg__"
     ]
 )
@@ -378,7 +384,10 @@ bootstrap_module(
         ":Location",
         ":Parsetree_cmi",
     ],
-    visibility = ["//tools:__pkg__"]
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//tools:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -540,6 +549,7 @@ bootstrap_module(
     ],
     visibility = [
         "//lambda:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//toplevel/byte:__pkg__",
@@ -670,6 +680,7 @@ bootstrap_signature(
     visibility = [
         "//driver:__pkg__",
         "//lambda:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
@@ -765,6 +776,7 @@ bootstrap_module(
         ":Location",
     ],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__"
     ]
