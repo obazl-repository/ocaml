@@ -1,41 +1,43 @@
-load("//bzl:rules.bzl",
-     "bootstrap_library",
-     "bootstrap_module",
-)
+exports_files(["dynlink.ml"])
 
-MODULE_OPTS = ["-nostdlib"]
+# load("//bzl:rules.bzl",
+#      "bootstrap_library",
+#      "bootstrap_module",
+# )
 
-bootstrap_library(
-    name = "otherlibs_dynlink_byte_lib",
-    modules  = [
-        ":Dynlink",
-    ],
-)
+# MODULE_OPTS = ["-nostdlib"]
 
-bootstrap_module(
-    name   = "Dynlink",
-    struct = "dynlink.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
-        ":Dynlink", ## (Otherlibs Dynlink Dynlink_common)
-        "//stdlib:Stdlib.Sys",
-        "//bytecomp:Symtable",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printexc",
-        "//bytecomp:Opcodes",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//bytecomp:Meta",
-        ## (LongString)
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        ## (Dynlink_compilerlibs)
-        "//bytecomp:Dll",
-        "//stdlib:Stdlib.Digest",
-        "//utils:Config",
-        "//file_formats:Cmo_format_cmi",
-        "//stdlib:Stdlib.Char",
-    ]
-)
+# bootstrap_library(
+#     name = "otherlibs_dynlink_byte_lib",
+#     modules  = [
+#         ":Dynlink",
+#     ],
+# )
+
+# bootstrap_module(
+#     name   = "Dynlink",
+#     struct = "dynlink.ml",
+#     opts = MODULE_OPTS,
+#     deps   = [
+#         ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
+#         ":Dynlink", ## (Otherlibs Dynlink Dynlink_common)
+#         "//stdlib:Stdlib.Sys",
+#         "//bytecomp:Symtable",
+#         "//stdlib:Stdlib.String",
+#         "//stdlib:Stdlib.Printexc",
+#         "//bytecomp:Opcodes",
+#         "//stdlib:Stdlib.Obj",
+#         "//utils:Misc",
+#         "//bytecomp:Meta",
+#         ## (LongString)
+#         "//stdlib:Stdlib.List",
+#         "//typing:Ident",
+#         ## (Dynlink_compilerlibs)
+#         "//bytecomp:Dll",
+#         "//stdlib:Stdlib.Digest",
+#         "//utils:Config",
+#         "//file_formats:Cmo_format_cmi",
+#         "//stdlib:Stdlib.Char",
+#     ]
+# )
 

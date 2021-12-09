@@ -478,6 +478,7 @@ bootstrap_module(
     ],
     data = ["//runtime:primitives"],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__"
     ]

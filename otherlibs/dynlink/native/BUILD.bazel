@@ -1,34 +1,34 @@
-## GENERATED FILE ##
+exports_files(["dynlink.ml"])
 
-load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-)
+# load("//bzl:rules.bzl",
+#      "ocaml_library",
+#      "ocaml_module",
+# )
 
-MODULE_OPTS = ["-nostdlib"]
+# MODULE_OPTS = ["-nostdlib"]
 
-ocaml_library(
-    name = "otherlibs_dynlink_native_lib",
-    modules  = [
-        ":Dynlink",
-    ],
-)
+# ocaml_library(
+#     name = "otherlibs_dynlink_native_lib",
+#     modules  = [
+#         ":Dynlink",
+#     ],
+# )
 
-ocaml_module(
-    name   = "Dynlink",
-    struct = "dynlink.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
-        ":Dynlink", ## (Otherlibs Dynlink Dynlink_common)
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Obj",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
-        ## (Dynlink_compilerlibs)
-        "//stdlib:Stdlib.Digest",
-        "//utils:Config",
-        "//file_formats:Cmxs_format",
-    ]
-)
+# ocaml_module(
+#     name   = "Dynlink",
+#     struct = "dynlink.ml",
+#     opts = MODULE_OPTS,
+#     deps   = [
+#         "//file_formats:Cmxs_format",
+#         "//stdlib:Stdlib.Digest", #
+#         "//stdlib:Stdlib.Filename",
+#         "//stdlib:Stdlib.List", #
+#         "//stdlib:Stdlib.Obj", #
+#         "//stdlib:Stdlib.Printexc", #
+#         "//utils:Config", #
+#         ":Dynlink", ## (Otherlibs Dynlink Dynlink_common)
+#         ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
+#         ## (Dynlink_compilerlibs)
+#     ]
+# )
 

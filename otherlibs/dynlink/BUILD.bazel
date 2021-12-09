@@ -1,8 +1,9 @@
 load("//bzl:rules.bzl",
      "bootstrap_archive",
+     "bootstrap_executable",
      "bootstrap_library",
      "bootstrap_module",
-     "bootstrap_ns",
+     # "bootstrap_ns",
      "bootstrap_signature",
 )
 
@@ -26,7 +27,6 @@ STDLIB = []
 # byte/dynlink_compilerlibs.cmo: $(COMPILERLIBS_CMO)
 # 	$(OCAMLC) $(COMPFLAGS) -pack -o $@ $(COMPILERLIBS_CMO)
 # byte/dynlink_compilerlibs.cmi: byte/dynlink_compilerlibs.cmo
-
 # dynlink.cma: $(OBJS)
 # 	$(OCAMLC) $(COMPFLAGS) -ccopt "$(NATDYNLINKOPTS)" -a -I byte -o $@ $^
 # %.cmi: %.mli
@@ -34,17 +34,73 @@ STDLIB = []
 # %.cmo: %.ml
 # 	$(OCAMLC) -c $(COMPFLAGS) $<
 
-bootstrap_library(
+# OBJS=byte/dynlink_compilerlibs.cmo dynlink_types.cmo \
+#   dynlink_platform_intf.cmo dynlink_common.cmo byte/dynlink.cmo
+
+## OBazl build strategy
+# We build dynlink_compilerlibs as an OBazl bottom-up namespace
+# library, aggregating it using bootstrap_library.
+# This is passed to bootstrap_archive along with the other modules.
+
+# :Dynlink binds dynlink/dynlink.mli to either dynlink/byte/dynlink.ml
+# or dynlink/native/dynlink.ml.
+
+bootstrap_archive(
     name = "dynlink",
     manifest  = [
+        ":Dynlink",
         ":Dynlink_common",
         ":Dynlink_platform_intf",
         ":Dynlink_types",
-        ":Extract_crc",
+        ":compilerlibs",
     ],
-    # signatures  = [
-    #     ":Dynlink_cmi",
-    # ],
+)
+
+##########################################################
+################  non-namespaced modules  ################
+
+# dynamically configured module binding
+bootstrap_module(
+    name   = "Dynlink",
+    struct = select({
+        "//toolchain/selection:bytecode"  : "//otherlibs/dynlink/byte:dynlink.ml",
+        "//toolchain/selection:native": "//otherlibs/dynlink/native:dynlink.ml",
+    }),
+    sig    = "Dynlink_cmi",
+    opts = MODULE_OPTS,
+    ## NB: ambiguity. should e.g. Symtable be resolved to
+    ## //bytecomp:Symtable or Dynlink_compilerlibs.Symtable? For the
+    ## makefiles it's the former(?), but since they're the same file
+    ## in different namespaces we could also resolve against
+    ## Dynlink_compilerlibs.
+    deps   = [
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+        "//utils:Config",
+        ":Dynlink_common",
+        ":Dynlink_types",
+        ":compilerlibs"
+    ] + select({
+        "//toolchain/selection:bytecode": [
+            "//bytecomp:Dll",
+            "//bytecomp:Meta",
+            "//bytecomp:Opcodes",
+            "//bytecomp:Symtable",
+            "//file_formats:Cmo_format_cmi",
+            "//stdlib:Stdlib.Char",
+            "//stdlib:Stdlib.String",
+            "//stdlib:Stdlib.Sys",
+            "//typing:Ident",
+            "//utils:Misc",
+            ## (LongString)
+        ],
+        "//toolchain/selection:native"  : [
+            "//file_formats:Cmxs_format",
+            "//stdlib:Stdlib.Filename",
+        ]
+    })
 )
 
 bootstrap_signature(
@@ -56,25 +112,26 @@ bootstrap_signature(
     ]
 )
 
+#################
 bootstrap_module(
     name   = "Dynlink_common",
     struct = "dynlink_common.ml",
     sig    = "Dynlink_common_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Dynlink_types", ## (Otherlibs Dynlink Dynlink_types)
-        ":Dynlink_platform_intf", ## (Otherlibs Dynlink Dynlink_platform_intf)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Printf",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lazy",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        ## (Dynlink_compilerlibs)
         "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Sys",
+        "//utils:Misc",
+        ":Dynlink_platform_intf",
+        ":Dynlink_types",
+        ":compilerlibs",
     ]
 )
 
@@ -88,6 +145,7 @@ bootstrap_signature(
     ]
 )
 
+#################
 bootstrap_module(
     name   = "Dynlink_platform_intf",
     struct = "dynlink_platform_intf.ml",
@@ -99,6 +157,7 @@ bootstrap_module(
     ]
 )
 
+#################
 bootstrap_module(
     name   = "Dynlink_types",
     struct = "dynlink_types.ml",
@@ -116,147 +175,86 @@ bootstrap_signature(
     opts = SIG_OPTS + ["-nopervasives"],
 )
 
+#################
+# $(extract_crc): dynlink.cma byte/dynlink_compilerlibs.cmo extract_crc.cmo
+# 	$(OCAMLC) -o $@ $^
+## NB: dynlink.cma already contains byte/dynlink_compilerlibs.cmo??
+
+bootstrap_executable(
+    name = "extract_crc",
+    main = ":Extract_crc",
+    opts = ["-nostdlib"],
+    deps   = [":dynlink"]
+)
+
 bootstrap_module(
     name   = "Extract_crc",
     struct = "extract_crc.ml",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Printexc",
-        "//utils:Misc",
-        ## (Dynlink_compilerlibs)
-        "//utils:Config",
-        "//file_formats:Cmi_format",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Arg",
+        # makefile exposes this via '-I byte'
+        ":compilerlibs",
     ]
 )
 
 #########################################################
-################  dynlink_compiler_libs  ################
+################  dynlink_compilerlibs  ################
 
-COMPILERLIBS_INTFS = [
-    "//parsing:Asttypes_cmi",
-    "//parsing:Parsetree_cmi",
-    "//typing:Outcometree_cmi",
-    "//file_formats:Cmo_format_cmi",
-    "//file_formats:Cmxs_format_cmi"
-]
-
-COMPILERLIBS_SOURCES = [
-    # "//utils:Binutils",
-    # "//utils:Config",
-    # "//utils:Build_path_prefix_map",
-    # "//utils:Misc",
-    # "//utils:Identifiable",
-    # "//utils:Numbers",
-    # "//utils:Arg_helper",
-    # "//utils:Clflags",
-    # "//utils:Profile",
-    # "//utils:Consistbl",
-    # "//utils:Terminfo",
-    # "//utils:Warnings",
-    # "//utils:Local_store",
-    # "//utils:Load_path",
-    # "//utils:Int_replace_polymorphic_compare",
-    # "//utils:Lazy_backtrack",
-    # "//parsing:Location",
-    # "//parsing:Longident",
-    # "//parsing:Docstrings",
-    # "//parsing:Syntaxerr",
-    # "//parsing:Ast_helper",
-    # "//parsing:Ast_mapper",
-    # "//parsing:Attr_helper",
-    # "//parsing:Builtin_attributes",
-    # "//typing:Ident",
-    # "//typing:Path",
-    # "//typing:Primitive",
-    # "//typing:Type_immediacy",
-    # "//typing:Shape",
-    # "//typing:Types",
-    # "//typing:Btype",
-    # "//typing:Subst",
-    # "//typing:Predef",
-    # "//typing:Datarepr",
-    # "//file_formats:Cmi_format",
-    # "//typing:Persistent_env",
-    # "//typing:Env",
-    # "//lambda:Debuginfo",
-    # "//lambda:Lambda",
-    # "//lambda:Runtimedef",
-    # "//bytecomp:Instruct",
-    # "//bytecomp:Opcodes",
-    # "//bytecomp:Bytesections",
-    "//bytecomp:Dll",
-    "//bytecomp:Meta",
-    "//bytecomp:Symtable"
-]
-
-# bootstrap_synthetic_module(
-#     name = "Dynlink_compilerlibs",
-#     # ns   = "Other_ns_name",
-#     # resolver = "//user/provided/resolve",
-#     opts = MODULE_OPTS + [
-#         "-nopervasives",
-#     ],
-#     submodules = COMPILERLIBS_SOURCES
-# )
-
-################################################################
-####    Dynlink Archive    ####
-bootstrap_archive(
+## since we're in pkg dynlink, "dynlink_compilerlibs" would be
+## redundant. This gives us "//otherlibs/dynlink:compilerlibs"
+## (private).
+bootstrap_library(
+    visibility = ["//visibility:private"],
     name       = "compilerlibs",
     manifest   = [
-
-    ":Dynlink_compilerlibs.Arg_helper",
-    ":Dynlink_compilerlibs.Ast_helper",
-    ":Dynlink_compilerlibs.Ast_mapper",
-    ":Dynlink_compilerlibs.Attr_helper",
-    ":Dynlink_compilerlibs.Binutils",
-    ":Dynlink_compilerlibs.Btype",
-    ":Dynlink_compilerlibs.Build_path_prefix_map",
-    ":Dynlink_compilerlibs.Builtin_attributes",
-    ":Dynlink_compilerlibs.Bytesections",
-    ":Dynlink_compilerlibs.Clflags",
-    ":Dynlink_compilerlibs.Cmi_format",
-    ":Dynlink_compilerlibs.Config",
-    ":Dynlink_compilerlibs.Consistbl",
-    ":Dynlink_compilerlibs.Datarepr",
-    ":Dynlink_compilerlibs.Debuginfo",
-    ":Dynlink_compilerlibs.Dll",
-    ":Dynlink_compilerlibs.Docstrings",
-    ":Dynlink_compilerlibs.Env",
-    ":Dynlink_compilerlibs.Ident",
-    ":Dynlink_compilerlibs.Identifiable",
-    ":Dynlink_compilerlibs.Instruct",
-    ":Dynlink_compilerlibs.Int_replace_polymorphic_compare",
-    ":Dynlink_compilerlibs.Lambda",
-    ":Dynlink_compilerlibs.Lazy_backtrack",
-    ":Dynlink_compilerlibs.Load_path",
-    ":Dynlink_compilerlibs.Local_store",
-    ":Dynlink_compilerlibs.Location",
-    ":Dynlink_compilerlibs.Longident",
-    ":Dynlink_compilerlibs.Meta",
-    ":Dynlink_compilerlibs.Misc",
-    ":Dynlink_compilerlibs.Numbers",
-    ":Dynlink_compilerlibs.Opcodes",
-    ":Dynlink_compilerlibs.Path",
-    ":Dynlink_compilerlibs.Persistent_env",
-    ":Dynlink_compilerlibs.Predef",
-    ":Dynlink_compilerlibs.Primitive",
-    ":Dynlink_compilerlibs.Profile",
-    ":Dynlink_compilerlibs.Runtimedef",
-    ":Dynlink_compilerlibs.Shape",
-    ":Dynlink_compilerlibs.Subst",
-    ":Dynlink_compilerlibs.Symtable",
-    ":Dynlink_compilerlibs.Syntaxerr",
-    ":Dynlink_compilerlibs.Terminfo",
-    ":Dynlink_compilerlibs.Type_immediacy",
-    ":Dynlink_compilerlibs.Types",
-    ":Dynlink_compilerlibs.Warnings",
+        ":Dynlink_compilerlibs",
+        ":Dynlink_compilerlibs.Arg_helper",
+        ":Dynlink_compilerlibs.Ast_helper",
+        ":Dynlink_compilerlibs.Ast_mapper",
+        ":Dynlink_compilerlibs.Attr_helper",
+        ":Dynlink_compilerlibs.Binutils",
+        ":Dynlink_compilerlibs.Btype",
+        ":Dynlink_compilerlibs.Build_path_prefix_map",
+        ":Dynlink_compilerlibs.Builtin_attributes",
+        ":Dynlink_compilerlibs.Bytesections",
+        ":Dynlink_compilerlibs.Clflags",
+        ":Dynlink_compilerlibs.Cmi_format",
+        ":Dynlink_compilerlibs.Config",
+        ":Dynlink_compilerlibs.Consistbl",
+        ":Dynlink_compilerlibs.Datarepr",
+        ":Dynlink_compilerlibs.Debuginfo",
+        ":Dynlink_compilerlibs.Dll",
+        ":Dynlink_compilerlibs.Docstrings",
+        ":Dynlink_compilerlibs.Env",
+        ":Dynlink_compilerlibs.Ident",
+        ":Dynlink_compilerlibs.Identifiable",
+        ":Dynlink_compilerlibs.Instruct",
+        ":Dynlink_compilerlibs.Int_replace_polymorphic_compare",
+        ":Dynlink_compilerlibs.Lambda",
+        ":Dynlink_compilerlibs.Lazy_backtrack",
+        ":Dynlink_compilerlibs.Load_path",
+        ":Dynlink_compilerlibs.Local_store",
+        ":Dynlink_compilerlibs.Location",
+        ":Dynlink_compilerlibs.Longident",
+        ":Dynlink_compilerlibs.Meta",
+        ":Dynlink_compilerlibs.Misc",
+        ":Dynlink_compilerlibs.Numbers",
+        ":Dynlink_compilerlibs.Opcodes",
+        ":Dynlink_compilerlibs.Path",
+        ":Dynlink_compilerlibs.Persistent_env",
+        ":Dynlink_compilerlibs.Predef",
+        ":Dynlink_compilerlibs.Primitive",
+        ":Dynlink_compilerlibs.Profile",
+        ":Dynlink_compilerlibs.Runtimedef",
+        ":Dynlink_compilerlibs.Shape",
+        ":Dynlink_compilerlibs.Subst",
+        ":Dynlink_compilerlibs.Symtable",
+        ":Dynlink_compilerlibs.Syntaxerr",
+        ":Dynlink_compilerlibs.Terminfo",
+        ":Dynlink_compilerlibs.Type_immediacy",
+        ":Dynlink_compilerlibs.Types",
+        ":Dynlink_compilerlibs.Warnings",
     ],
-    visibility = ["//visibility:public"],
 )
 
 ## resolver
