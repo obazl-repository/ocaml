@@ -9,11 +9,7 @@ load("//bzl:providers.bzl",
      "OcamlNsMarker",
      "OcamlSignatureMarker")
 
-load("//bzl:functions.bzl",
-     # "compile_mode_in_transition",
-     # "compile_mode_out_transition",
-     # "ocamlc_out_transition",
-     "config_tc")
+load("//bzl:functions.bzl", "config_tc")
 
 load(":options.bzl", "options")
 
@@ -49,7 +45,7 @@ def _bootstrap_archive(ctx):
     #########################################
     # FIXME: improve the return vals handling
     # print("CALL IMPL_LIB %s" % ctx.label)
-    lib_providers = impl_library(ctx, mode, tool, tool_args)
+    lib_providers = impl_library(ctx, mode, tool) # , tool_args)
 
     libDefaultInfo = lib_providers[0]
     # print("libDefaultInfo: %s" % libDefaultInfo.files.to_list())
@@ -141,6 +137,12 @@ def _bootstrap_archive(ctx):
     for arg in ctx.attr.opts:
         if arg not in NEGATION_OPTS:
             args.add(arg)
+
+    primitives = []
+    if hasattr(ctx.attr, "primitives"):
+        if ctx.attr.primitives:
+            primitives.append(ctx.file.primitives)
+            args.add("-use-prims", ctx.file.primitives.path)
 
     ## Submodules can be listed in ctx.files.submodules in any order,
     ## so we need to put them in correct order on the command line.
@@ -486,6 +488,15 @@ bootstrap_archive = rule(
 
         _toolchain = attr.label(
             default = "//bzl/toolchain:tc"
+        ),
+
+        primitives = attr.label(
+            allow_single_file = True,
+        ),
+
+        _stage = attr.label(
+            doc = "bootstrap stage",
+            default = "//bzl:stage"
         ),
 
         ocamlc = attr.label(

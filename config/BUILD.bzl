@@ -252,25 +252,29 @@ ROOT_MKEXE_FLAGS = ["-Wl,-no_compact_unwind"]
 #         -I $(ROOTDIR)/boot -use-prims $(ROOTDIR)/runtime/primitives
 # CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) -nostdlib -I $(ROOTDIR)/stdlib
 
+
+## NB: -use-prims implemented by rules, using 'primitives' attr
+
 USE_PRIMS = ["-use-prims", "runtime/primitives"]
 ## NB: rules must add attr: data = ["//runtime:primitives"],
-DATA_PRIMITIVES = ["//runtime:primitives"]
+PRIMITIVES = "//runtime:primitives"
+DATA_PRIMS = [PRIMITIVES]
 
 ## CAMLC - bytecode
 ## CAMLOPT - native
 
-# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
-ROOT_CAMLC_OPTS = [
-    "-g", "-nostdlib",  ## prevent searching sys stdlib dir
-    "-I", "boot",
-] + USE_PRIMS
+# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot
+ROOT_CAMLC_OPTS = ["-nostdlib"]
+# for some targets: -use-prims runtime/primitives
+#     for them, pass 'primitives = "//runtime/primitives"'
 
 OTHERLIBS_CAMLC_OPTS = ROOT_CAMLC_OPTS
 TOOLS_CAMLC_OPTS = ROOT_CAMLC_OPTS
 
 ################
 ROOT_CAMLOPT_OPTS = [
-    "-g", "-nostdlib",
+    ## "-g",
+    "-nostdlib",
     "-I", "stdlib",
     "-I", "otherlibs/dynlink"
 ]
@@ -285,17 +289,32 @@ ROOT_CAMLOPT_OPTS = [
 ROOT_COMPFLAGS = [
     "-strict-sequence", "-principal", "-absname",
     "-w", "+a-4-9-40-41-42-44-45-48-66-70",
-    "-warn-error", "+a",
+    "-warn-error", "+A",
     "-bin-annot",
     "-safe-string", "-strict-formats"
 ]
+
+## otherlibs/Makefile.otherlibs.common:
+# COMPFLAGS=-absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g \
+#           -safe-string -strict-sequence -strict-formats $(EXTRACAMLFLAGS)
+
+## otherlibs/dynlink/Makefile:
+# # COMPFLAGS should be in sync with the toplevel Makefile's COMPFLAGS.
+# COMPFLAGS=-strict-sequence -principal -absname \
+#           -w +a-4-9-40-41-42-44-45-48-66-70 \
+#           -warn-error +A \
+#           -bin-annot -safe-string -strict-formats
+
+## otherlibs/systhreads/Makefile:
+# COMPFLAGS=-w +33..39 -warn-error +A -g -bin-annot -safe-string
+
 
 OTHERLIBS_COMPFLAGS = [
     "-absname",
     "-w", "+a-4-9-41-42-44-45-48",
     "-warn-error", "+A",
     "-bin-annot",
-    "-g",
+    # "-g",
     "-safe-string", "-strict-sequence", "-strict-formats"
     ## $(EXTRACAMLFLAGS)
 ]
@@ -325,6 +344,7 @@ ROOT_SIG_OPTS = ROOT_MODULE_OPTS
 
 OTHERLIBS_MODULE_OPTS = OTHERLIBS_CAMLC_OPTS + OTHERLIBS_COMPFLAGS
 OTHERLIBS_SIG_OPTS    = OTHERLIBS_MODULE_OPTS
+OTHERLIBS_ARCHIVE_OPTS = ["-linkall"]
 
 TOOLS_MODULE_OPTS = TOOLS_CAMLC_OPTS + TOOLS_COMPFLAGS
 TOOLS_SIG_OPTS = TOOLS_MODULE_OPTS

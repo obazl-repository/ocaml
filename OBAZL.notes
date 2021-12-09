@@ -1,3 +1,7 @@
+Menhir: the makefiles rename the menhir sources to avoid name clashes
+in case users also use menhir. alternative: put them in a namespace,
+so instead of //parsing:CamlinternalMenhirLib we would have something
+like //boot/menhir:Ocaml.MenhirLib
 
 NOTE:  '-I boot' means depend on //stdlib:Std_exit and //stdlib:camlheader
 

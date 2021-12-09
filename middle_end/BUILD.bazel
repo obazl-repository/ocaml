@@ -353,7 +353,8 @@ bootstrap_signature(
     ],
     data = ["//runtime:primitives"],
     visibility = [
-        "//middle_end/flambda:__subpackages__"
+        "//middle_end/flambda:__subpackages__",
+        # "//otherlibs/dynlink:__pkg__"
     ]
 )
 

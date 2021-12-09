@@ -11,6 +11,13 @@ SIG_OPTS = ROOT_SIG_OPTS
 
 STDLIB = ["//stdlib"]
 
+exports_files([
+    "cmi_format.mli", "cmi_format.ml",
+    "cmo_format.mli",
+    "cmxs_format.mli"
+])
+
+################################################################
 bootstrap_library(
     name = "file_formats",
     manifest  = [
@@ -78,6 +85,7 @@ bootstrap_signature(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
     ]

@@ -15,22 +15,13 @@ load("//bzl:providers.bzl",
 
 load("//bzl:functions.bzl",
      "capitalize_initial_char",
-     # "compile_mode_in_transition",
-     # "compile_mode_out_transition",
-     # "ocamlc_out_transition",
      "config_tc",
      "get_fs_prefix",
      "get_module_name",
-     # "get_sdkpath",
      "normalize_module_label"
 )
 
-load(":options.bzl",
-     # "options",
-     # "options_ns_opts",
-     # # "options_ppx",
-     # "options_signature",
-     "NEGATION_OPTS")
+load(":options.bzl", "NEGATION_OPTS")
 
 load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
 
@@ -38,8 +29,6 @@ load(":impl_common.bzl",
      "dsorder",
      "opam_lib_prefix",
      "tmpdir")
-
-# scope = tmpdir
 
 ########## RULE:  BOOTSTRAP_SIGNATURE  ################
 def _bootstrap_signature_impl(ctx):
@@ -141,6 +130,12 @@ def _bootstrap_signature_impl(ctx):
         if arg not in NEGATION_OPTS:
             args.add(arg)
 
+    primitives = []
+    if hasattr(ctx.attr, "primitives"):
+        if ctx.attr.primitives:
+            primitives.append(ctx.file.primitives)
+            args.add("-use-prims", ctx.file.primitives.path)
+
     # if "-for-pack" in _options:
     #     for_pack = True
     #     _options.remove("-for-pack")
@@ -155,8 +150,6 @@ def _bootstrap_signature_impl(ctx):
 
 
     includes.append(out_cmi.dirname)
-
-    args.add_all(includes, before_each="-I", uniquify = True)
 
     # paths_direct   = []
     # paths_indirect = []
@@ -195,8 +188,6 @@ def _bootstrap_signature_impl(ctx):
         transitive = indirect_paths_depsets
     )
 
-    args.add_all(paths_depset.to_list(), before_each="-I")
-
     ## FIXME: do we need the resolver for sigfiles?
     # for f in ctx.files._ns_resolver:
     #     if f.extension == "cmx":
@@ -211,11 +202,16 @@ def _bootstrap_signature_impl(ctx):
                 ns_resolver_depset = [ctx.attr.ns[OcamlProvider].inputs]
 
                 for f in ctx.attr.ns[DefaultInfo].files.to_list():
-                    args.add("-I", f.dirname)
+                    # args.add("-I", f.dirname)
+                    includes.append(f.dirname)
                     # args.add(f)
 
             args.add("-no-alias-deps")
             args.add("-open", ns)
+
+    # args.add_all(paths_depset.to_list(), before_each="-I")
+    includes.extend(paths_depset.to_list())
+    args.add_all(includes, before_each="-I", uniquify = True)
 
     if sig_src.extension == "ml":
         args.add("-i")
@@ -345,6 +341,26 @@ bootstrap_signature = rule(
         # _boot       = attr.label(
         #     default = "//bzl/toolchain:boot",
         # ),
+
+        primitives = attr.label(
+            # default = "//runtime:primitives",
+            allow_single_file = True,
+        ),
+
+        _toolchain = attr.label(
+            default = "//bzl/toolchain:tc"
+        ),
+
+        _stage = attr.label(
+            doc = "bootstrap stage",
+            default = "//bzl:stage"
+        ),
+
+        ocamlc = attr.label(
+            # cfg = ocamlc_out_transition,
+            allow_single_file = True,
+            default = "//bzl/toolchain:ocamlc"
+        ),
 
         _mode       = attr.label(
             default = "//bzl/toolchain",
@@ -499,16 +515,6 @@ bootstrap_signature = rule(
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath")
         # ),
-
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
-
-        ocamlc = attr.label(
-            # cfg = ocamlc_out_transition,
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
 
         _rule = attr.string( default = "ocaml_signature" ),
 

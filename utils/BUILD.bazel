@@ -7,11 +7,31 @@ load("//bzl:rules.bzl",
 )
 
 load("//config:BUILD.bzl",
-     "DATA_PRIMITIVES",
+     "USE_PRIMS", "DATA_PRIMS",
      "ROOT_MODULE_OPTS",
      "ROOT_SIG_OPTS")
 
 load(":BUILD.bzl", "CONFIG_MAP", "write_config")
+
+exports_files([ ## for //otherlibs/dynlink:Dynlink_compilerlibs
+    "arg_helper.mli", "arg_helper.ml",
+    "binutils.mli", "binutils.ml",
+    "build_path_prefix_map.mli", "build_path_prefix_map.ml",
+    "clflags.mli", "clflags.ml",
+    "config.mli",
+    "consistbl.mli", "consistbl.ml",
+    "identifiable.mli", "identifiable.ml",
+    "int_replace_polymorphic_compare.mli",
+    "int_replace_polymorphic_compare.ml",
+    "lazy_backtrack.mli", "lazy_backtrack.ml",
+    "load_path.mli", "load_path.ml",
+    "local_store.mli", "local_store.ml",
+    "misc.mli", "misc.ml",
+    "numbers.mli", "numbers.ml",
+    "profile.mli", "profile.ml",
+    "terminfo.mli", "terminfo.ml",
+    "warnings.mli", "warnings.ml"
+])
 
 ## root Makefile
 # CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
@@ -41,7 +61,8 @@ bootstrap_executable(
 )
 
 ################################################################
-## libs
+## compilerlibs/Makefile.compilerlibs
+
 # COMMON_CMI = $(UTILS_CMI) $(PARSING_CMI) $(TYPING_CMI) $(LAMBDA_CMI) $(COMP_CMI)
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 # compilerlibs/ocamlcommon.cma: $(COMMON_CMI) $(COMMON)
@@ -118,7 +139,7 @@ bootstrap_module(
     struct = "arg_helper.ml",
     sig    = "Arg_helper_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -133,6 +154,7 @@ bootstrap_signature(
     name = "Arg_helper_cmi",
     src  = "arg_helper.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Map",
     ]
@@ -143,7 +165,7 @@ bootstrap_module(
     struct = "binutils.ml",
     sig    = "Binutils_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     ## DEMO: we can depend on individual submodules instead of the entire lib
     deps   = [
         ## "//stdlib" ## depend on entire Stdlib
@@ -175,6 +197,7 @@ bootstrap_signature(
     name = "Binutils_cmi",
     src  = "binutils.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Result",
     ]
@@ -185,7 +208,7 @@ bootstrap_module(
     struct = "build_path_prefix_map.ml",
     sig    = "Build_path_prefix_map_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -193,6 +216,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Buffer",
     ],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
     ]
@@ -202,6 +226,7 @@ bootstrap_signature(
     name = "Build_path_prefix_map_cmi",
     src  = "build_path_prefix_map.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ]
 )
@@ -211,7 +236,7 @@ bootstrap_module(
     struct = "ccomp.ml",
     sig    = "Ccomp_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Profile", ## (Utils Profile)
         ":Misc", ## (Utils Misc)
@@ -236,6 +261,7 @@ bootstrap_signature(
     name = "Ccomp_cmi",
     src  = "ccomp.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ]
 )
@@ -245,7 +271,7 @@ bootstrap_module(
     struct = "clflags.ml",
     sig    = "Clflags_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Profile", ## (Utils Profile)
         ":Numbers", ## (Utils Numbers)
@@ -266,6 +292,7 @@ bootstrap_module(
         "//lambda:__pkg__",
         "//parsing:__pkg__",
         "//middle_end:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
@@ -276,6 +303,7 @@ bootstrap_signature(
     name = "Clflags_cmi",
     src  = "clflags.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Profile", ## (Utils Profile)
         ":Misc", ## (Utils Misc)
@@ -290,7 +318,7 @@ bootstrap_module(
     struct = "config.ml",
     sig    = "Config_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = [ # STDLIB + [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
@@ -304,6 +332,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
@@ -315,20 +344,26 @@ write_config(
     name     = "config_ml",
     output   = "config.ml",
     template = "config.mlp",
-    data     = CONFIG_MAP
+    data     = CONFIG_MAP,
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+    ]
 )
 
 bootstrap_signature(
     name = "Config_cmi",
     src  = "config.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = [ # STDLIB + [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys"
     ],
-    data = ["//runtime:primitives"],
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+    ]
 )
 
 bootstrap_module(
@@ -336,7 +371,7 @@ bootstrap_module(
     struct = "consistbl.ml",
     sig    = "Consistbl_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Set",
@@ -345,13 +380,17 @@ bootstrap_module(
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Digest",
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//typing:__pkg__"
+    ]
 )
 
 bootstrap_signature(
     name = "Consistbl_cmi",
     src  = "consistbl.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Set",
@@ -366,7 +405,7 @@ bootstrap_module(
     struct = "diffing.ml",
     sig    = "Diffing_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Option",
@@ -381,6 +420,7 @@ bootstrap_signature(
     name = "Diffing_cmi",
     src  = "diffing.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Format",
@@ -393,7 +433,7 @@ bootstrap_module(
     struct = "diffing_with_keys.ml",
     sig    = "Diffing_with_keys_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ":Diffing", ## (Utils Diffing)
@@ -410,6 +450,7 @@ bootstrap_signature(
     name = "Diffing_with_keys_cmi",
     src  = "diffing_with_keys.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Diffing", ## (Utils Diffing)
         "//stdlib:Stdlib.Format",
@@ -422,7 +463,7 @@ bootstrap_module(
     struct = "domainstate.ml",
     sig    = "Domainstate_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ],
     visibility = ["//asmcomp:__subpackages__"]
@@ -464,6 +505,7 @@ bootstrap_signature(
     name = "Domainstate_cmi",
     src  = "domainstate.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ]
 )
@@ -496,7 +538,7 @@ bootstrap_module(
     struct = "identifiable.ml",
     sig    = "Identifiable_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Set",
@@ -517,6 +559,7 @@ bootstrap_signature(
     name = "Identifiable_cmi",
     src  = "identifiable.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.Map",
@@ -535,7 +578,7 @@ bootstrap_module(
     struct = "int_replace_polymorphic_compare.ml",
     sig    = "Int_replace_polymorphic_compare_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ],
     visibility = [
@@ -549,6 +592,7 @@ bootstrap_signature(
     name = "Int_replace_polymorphic_compare_cmi",
     src  = "int_replace_polymorphic_compare.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ]
 )
@@ -558,7 +602,7 @@ bootstrap_module(
     struct = "lazy_backtrack.ml",
     sig    = "Lazy_backtrack_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Either",
     ],
@@ -569,6 +613,7 @@ bootstrap_signature(
     name = "Lazy_backtrack_cmi",
     src  = "lazy_backtrack.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Either",
     ],
@@ -580,7 +625,7 @@ bootstrap_module(
     struct = "load_path.ml",
     sig    = "Load_path_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc", ## (Utils Misc)
         ":Local_store", ## (Utils Local_store)
@@ -608,6 +653,7 @@ bootstrap_signature(
     name = "Load_path_cmi",
     src  = "load_path.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ]
 )
@@ -617,7 +663,7 @@ bootstrap_module(
     struct = "local_store.ml",
     sig    = "Local_store_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Fun",
@@ -632,6 +678,7 @@ bootstrap_signature(
     name = "Local_store_cmi",
     src  = "local_store.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ]
 )
@@ -641,7 +688,7 @@ bootstrap_module(
     struct = "misc.ml",
     sig    = "Misc_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Config", ## (Utils Config)
         ":Build_path_prefix_map", ## (Utils Build_path_prefix_map)
@@ -673,6 +720,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
@@ -685,6 +733,7 @@ bootstrap_signature(
     name = "Misc_cmi",
     src  = "misc.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Config_cmi",
         ":Build_path_prefix_map",
@@ -695,7 +744,6 @@ bootstrap_signature(
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Digest",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__pkg__",
         "//file_formats:__pkg__"
@@ -707,7 +755,7 @@ bootstrap_module(
     struct = "numbers.ml",
     sig    = "Numbers_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc",
         ":Identifiable",
@@ -731,6 +779,7 @@ bootstrap_signature(
     name = "Numbers_cmi",
     src  = "numbers.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Identifiable",
         "//stdlib:Stdlib.Set",
@@ -745,7 +794,7 @@ bootstrap_module(
     struct = "profile.ml",
     sig    = "Profile_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc",
         "//stdlib:Stdlib.Sys",
@@ -772,6 +821,7 @@ bootstrap_signature(
     name = "Profile_cmi",
     src  = "profile.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
     ]
@@ -782,7 +832,7 @@ bootstrap_module(
     struct = "strongly_connected_components.ml",
     sig    = "Strongly_connected_components_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Numbers",
         ":Misc",
@@ -801,6 +851,7 @@ bootstrap_signature(
     name = "Strongly_connected_components_cmi",
     src  = "strongly_connected_components.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Identifiable",
         "//stdlib:Stdlib.Set",
@@ -814,7 +865,7 @@ bootstrap_module(
     struct = "targetint.ml",
     sig    = "Targetint_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc",
         "//stdlib:Stdlib.Sys",
@@ -830,6 +881,7 @@ bootstrap_signature(
     name = "Targetint_cmi",
     src  = "targetint.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
     ],
@@ -841,7 +893,7 @@ bootstrap_module(
     struct = "terminfo.ml",
     sig    = "Terminfo_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
@@ -856,6 +908,7 @@ bootstrap_signature(
     name = "Terminfo_cmi",
     src  = "terminfo.mli",
     opts = SIG_OPTS,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
     ]
 )
@@ -865,7 +918,7 @@ bootstrap_module(
     struct = "warnings.ml",
     sig    = "Warnings_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         ":Misc",
         "//stdlib:Stdlib.String",
@@ -896,7 +949,7 @@ bootstrap_signature(
     name = "Warnings_cmi",
     src  = "warnings.mli",
     opts = SIG_OPTS,
-    data = DATA_PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Lazy",

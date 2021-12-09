@@ -12,9 +12,6 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker")
 
 load("//bzl:functions.bzl",
-     # "compile_mode_in_transition",
-     # "compile_mode_out_transition",
-     # "ocamlc_out_transition",
      "config_tc")
 
 load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
@@ -154,17 +151,17 @@ def impl_executable(ctx):
             if hasattr(main[OcamlProvider], "archive_manifests"):
                 manifest_list.append(main[OcamlProvider].archive_manifests)
 
-        direct_inputs_depsets.append(main[OcamlProvider].inputs)
-        direct_linkargs_depsets.append(main[OcamlProvider].linkargs)
-        direct_paths_depsets.append(main[OcamlProvider].paths)
+        direct_inputs_depsets.append(main[0][OcamlProvider].inputs)
+        direct_linkargs_depsets.append(main[0][OcamlProvider].linkargs)
+        direct_paths_depsets.append(main[0][OcamlProvider].paths)
 
-        direct_linkargs_depsets.append(main[DefaultInfo].files)
+        direct_linkargs_depsets.append(main[0][DefaultInfo].files)
 
-        paths_indirect.append(main[OcamlProvider].paths)
+        paths_indirect.append(main[0][OcamlProvider].paths)
 
         if CcInfo in main: # :
-            # print("CcInfo main: %s" % main[CcInfo])
-            ccInfo_list.append(main[CcInfo]) # [CcInfo])
+            # print("CcInfo main: %s" % main[0][CcInfo])
+            ccInfo_list.append(main[0][CcInfo]) # [CcInfo])
 
         ccInfo = cc_common.merge_cc_infos(cc_infos = ccInfo_list)
         [
@@ -225,6 +222,11 @@ def impl_executable(ctx):
         # else:
         #     print("removing double link: %s" % dep)
 
+    primitives = []
+    if hasattr(ctx.attr, "primitives"):
+        if ctx.attr.primitives:
+            primitives.append(ctx.file.primitives)
+            args.add("-use-prims", ctx.file.primitives.path)
 
     ## all direct deps must be on cmd line:
     for dep in ctx.files.deps:
@@ -243,13 +245,11 @@ def impl_executable(ctx):
     ## this exposes stdlib, camlheader, etc.
     args.add("-I", ctx.file._stdexit.dirname)
 
-    args.add("-o", out_exe)
-
     data_inputs = []
     if ctx.attr.data:
-        # print("DATA: %s" % ctx.files.data)
         data_inputs = [depset(direct = ctx.files.data)]
         for f in ctx.files.data:
+            print("DATAFILE: %s" % f.path)
             args.add("-I", f.dirname)
     # data_inputs.append(depset(direct = [tc.camlheader]))
     # if tc.bootstrap_std_exit:
@@ -259,8 +259,12 @@ def impl_executable(ctx):
 
     # print("LINKARGS: %s" % linkargs_depset)
 
+    args.add("-o", out_exe)
+
     inputs_depset = depset(
-        direct = [ctx.file._stdexit] + ctx.files._camlheaders,
+        direct = [ctx.file._stdexit]
+        + primitives
+        + ctx.files._camlheaders,
         transitive = [direct_inputs_depset]
         + [linkargs_depset]
         + data_inputs
@@ -276,10 +280,12 @@ def impl_executable(ctx):
         mnemonic = "CompileToplevel"
     elif ctx.attr._rule == "bootstrap_test":
         mnemonic = "CompileBootstrapTest"
+
+    elif ctx.attr._rule == "ocamlc_boot":
+        mnemonic = "CompileOcamlcBoot"
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
 
-    print("RUNNING ACTION")
     ################
     ctx.actions.run(
       # env = env,
@@ -322,7 +328,9 @@ def impl_executable(ctx):
     #     exe_provider = PpxExecutableMarker(
     #         args = ctx.attr.args
     #     )
-    if ctx.attr._rule == "bootstrap_executable":
+    if ctx.attr._rule == "ocamlc_boot":
+        exe_provider = OcamlExecutableMarker()
+    elif ctx.attr._rule == "bootstrap_executable":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()

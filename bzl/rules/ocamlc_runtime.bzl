@@ -13,7 +13,7 @@ load("//bzl:providers.bzl",
 
 load("//bzl:functions.bzl", "config_tc")
 
-load("//bzl:transitions.bzl",
+load("//bzl/transitions:ocamlc_runtime.bzl",
      "ocamlc_runtime_in_transition",
      "ocamlc_runtime_out_transition")
 
@@ -334,39 +334,10 @@ ocamlc_runtime = rule(
     implementation = _ocamlc_runtime,
 
     doc = "Generates an OCaml executable binary using the bootstrap toolchain",
+
     attrs = dict(
+        rule_options,
 
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
-
-        ocamlc = attr.label(
-            allow_single_file = True,
-            ## this rule only ever uses //boot:ocamlc so we do not
-            ## need redirection. for std rules transitions may config
-            ## so they need to depend on //bzl/toolchain:ocamlc
-            default = "//boot:ocamlc"
-        ),
-
-        # _boot       = attr.label(
-        #     default = "//bzl/toolchain:boot",
-        # ),
-
-        opts             = attr.string_list(
-            doc          = "List of OCaml options. Will override configurable default options."
-        ),
-
-        _mode       = attr.label(
-            default = "//bzl/toolchain",
-        ),
-
-        mode       = attr.string(
-            doc     = "Overrides mode build setting.",
-        ),
-
-        exe  = attr.string(
-            doc = "By default, executable name is derived from 'name' attribute; use this to override."
-        ),
         main = attr.label(
             doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
             cfg = ocamlc_runtime_out_transition,
@@ -374,14 +345,7 @@ ocamlc_runtime = rule(
             providers = [[OcamlModuleMarker]],
             default = None,
         ),
-        data = attr.label_list(
-            allow_files = True,
-            doc = "Runtime dependencies: list of labels of data files needed by this executable at runtime."
-        ),
-        strip_data_prefixes = attr.bool(
-            doc = "Symlink each data file to the basename part in the runfiles root directory. E.g. test/foo.data -> foo.data.",
-            default = False
-        ),
+
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
             cfg = ocamlc_runtime_out_transition,
@@ -399,35 +363,12 @@ ocamlc_runtime = rule(
             allow_single_file = True
         ),
 
-        ## FIXME: add cc_linkopts?
-        cc_deps = attr.label_keyed_string_dict(
-            doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
-            """,
-            ## FIXME: cc libs could come from LSPs that do not support CcInfo, e.g. rules_rust
-            # providers = [[CcInfo]]
-        ),
-
-        cc_linkall = attr.label_list(
-            ## equivalent to cc_library's "alwayslink"
-            doc     = "True: use `-whole-archive` (GCC toolchain) or `-force_load` (Clang toolchain). Deps in this attribute must also be listed in cc_deps.",
-            # providers = [CcInfo],
-        ),
-        cc_linkopts = attr.string_list(
-            doc = "List of C/C++ link options. E.g. `[\"-lstd++\"]`.",
-
-        ),
-
-        # _debug           = attr.label(default = "@ocaml//debug"),
-
-        _rule = attr.string( default  = "ocamlc_runtime" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-    ),
-    ## this is not an ns archive, and it does not use ns ConfigState,
-    ## but we need to reset the ConfigState anyway, so the deps are
-    ## not affected if this is a dependency of an ns aggregator.
 
+        _rule = attr.string( default = "ocamlc_boot" ),
+    ),
     cfg = ocamlc_runtime_in_transition,
     executable = True,
     toolchains = ["//bzl/toolchain:bootstrap"],

@@ -25,6 +25,11 @@ label_flag(
 )
 
 label_flag(
+    name = "ocamlrun",
+    build_setting_default = "//runtime:ocamlrun"
+)
+
+label_flag(
     name = "tc",
     build_setting_default = ":toolchain"
 )

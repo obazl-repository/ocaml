@@ -20,12 +20,12 @@ def _bootstrap_library(ctx):
 
     # if mode == "bytecode":
     tool = tc.ocamlrun
-    tool_args = [tc.ocamlc]
+    # tool_args = [tc.ocamlc]
     # else:
     #     tool = tc.ocamlrun.opt
     #     tool_args = []
 
-    return impl_library(ctx, mode, tool, tool_args)
+    return impl_library(ctx, mode, tool) #, tool_args)
 
 ###############################
 # rule_options = options("ocaml")
@@ -80,6 +80,11 @@ Packages](../ug/collections.md).
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath") # ppx also uses this
         # ),
+
+        _stage = attr.label(
+            doc = "bootstrap stage",
+            default = "//bzl:stage"
+        ),
 
         manifest = attr.label_list(
             doc = "List of elements of library, which may be compiled modules, signatures, or other libraries.",

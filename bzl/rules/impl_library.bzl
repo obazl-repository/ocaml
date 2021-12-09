@@ -23,7 +23,7 @@ load(":impl_ccdeps.bzl", "dump_CcInfo")
 ## deps.
 
 #################
-def impl_library(ctx, mode, tool, tool_args):
+def impl_library(ctx, mode, tool): # , tool_args):
 
     debug = False
     # print("**** NS_LIB {} ****************".format(ctx.label))

@@ -1,20 +1,18 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
+     "bootstrap_library",
+     "bootstrap_module",
 )
 
 MODULE_OPTS = ["-nostdlib"]
 
-ocaml_library(
+bootstrap_library(
     name = "otherlibs_dynlink_byte_lib",
     modules  = [
         ":Dynlink",
     ],
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Dynlink",
     struct = "dynlink.ml",
     opts = MODULE_OPTS,

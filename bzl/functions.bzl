@@ -32,38 +32,57 @@ def config_tc(ctx):
 
     mode = ctx.attr._toolchain[BuildSettingInfo].value
     # print("MODE: %s" % mode)
+    # print("ocamlc: %s" % ctx.file.ocamlc)
 
-    if mode == "boot":
-        tool = tc.ocamlrun
-        tool_args = [ctx.file.ocamlc]
-        # tool_args = [tc.ocamlc] # FIXME: rename tc.boot_ocamlc
-        ext       = ".cmo"
-        scope     = "__boot/"
-    elif mode == "bc_bc":
-        tool = tc.ocamlrun
-        tool_args = [ctx.file.ocamlc]
-        ext       = ".cmo"
-        scope     = "__bc/"
-    elif mode == "bc_n":
-        tool = tc.ocamlrun
-        tool_args = [ctx.file.ocamlc]
-        # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
-        ext  = ".cmx"
-        scope     = "__n/"
-    elif mode == "n_bc":  # FIXME
-        tool = tc.ocamlrun
-        tool_args = [ctx.file.ocamlc]
-        # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
-        ext  = ".cmo"
-        scope     = "__bc/"
-    elif mode == "n_n":  # FIXME
-        tool = tc.ocamlrun
-        tool_args = [ctx.file.ocamlc]
-        # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
-        ext  = ".cmx"
-        scope     = "__n/"
-    else:
-        fail("Unsupported mode: %s" % mode)
+    tool = tc.ocamlrun
+    tool_args = [ctx.file.ocamlc]
+    ext       = ".cmo"
+
+    stage = ctx.attr._stage[BuildSettingInfo].value
+    scope     = "__stage{stage}/".format(stage = stage)
+
+    # if stage == 0:
+    #     scope     = "__stage0/"
+    # elif stage == 1:
+    #     scope     = "__stage1/"
+    # elif stage == 2:
+    #     scope     = "__stage2/"
+    # else:
+    #     s = stage - 1
+    #     scope     = "__stage{stage}/".format(stage = s)
+
+    # if mode == "boot":
+    #     tool = tc.ocamlrun
+    #     tool_args = [ctx.file.ocamlc]
+    #     # tool_args = [tc.ocamlc] # FIXME: rename tc.boot_ocamlc
+    #     ext       = ".cmo"
+    #     scope     = "__boot/"
+
+    # elif mode == "bc_bc":
+    #     tool = tc.ocamlrun
+    #     tool_args = [ctx.file.ocamlc]
+    #     ext       = ".cmo"
+    #     scope     = "__bc/"
+    # elif mode == "bc_n":
+    #     tool = tc.ocamlrun
+    #     tool_args = [ctx.file.ocamlc]
+    #     # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+    #     ext  = ".cmx"
+    #     scope     = "__n/"
+    # elif mode == "n_bc":  # FIXME
+    #     tool = tc.ocamlrun
+    #     tool_args = [ctx.file.ocamlc]
+    #     # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+    #     ext  = ".cmo"
+    #     scope     = "__bc/"
+    # elif mode == "n_n":  # FIXME
+    #     tool = tc.ocamlrun
+    #     tool_args = [ctx.file.ocamlc]
+    #     # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+    #     ext  = ".cmx"
+    #     scope     = "__n/"
+    # else:
+    #     fail("Unsupported mode: %s" % mode)
 
     # print("tool_args: %s" % tool_args)
 

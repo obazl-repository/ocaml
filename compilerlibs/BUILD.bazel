@@ -35,7 +35,7 @@ bootstrap_archive(
     ],
     visibility = [
         "//boot:__pkg__",
-        "//compilers:__pkg__",
+        "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
@@ -109,7 +109,6 @@ bootstrap_archive(
 bootstrap_archive(
     name    = "ocamloptcomp",
     visibility = ["//visibility:public"],
-    opts = ["-linkall"],
     manifest = [
         "//asmcomp:ocamloptcomp",
         "//middle_end:ocamloptcomp",

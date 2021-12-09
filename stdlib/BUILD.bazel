@@ -9,8 +9,8 @@ load("//config:BUILD.bzl",
      ## stdlib overrides OCAMLC, does not use ROOT_OCAMLC_OPTS
      ## "ROOT_CAMLC_OPTS",
 
-     ## make log indictates USE_PRIMS is inserted, no idea how
-     "USE_PRIMS", "DATA_PRIMITIVES"
+     "USE_PRIMS", "DATA_PRIMS",
+     "PRIMITIVES"
      )
 
 package(default_visibility = ["//visibility:public"])
@@ -23,7 +23,7 @@ exports_files(["expand_module_aliases.awk"])
 COMPFLAGS = [
     "-strict-sequence", "-absname",
     "-w", "+a-4-9-41-42-44-45-48-70",
-    "-g",
+    # "-g",
     "-warn-error", "+A",
     "-bin-annot",
     "-nostdlib", "-principal",
@@ -77,8 +77,9 @@ LABEL_SIGOPTS = [
 # bootstrap_library(
 bootstrap_archive(
     name       = "stdlib",
-    opts       = USE_PRIMS,
+    # opts       = USE_PRIMS,
     # data       = ["//runtime:primitives"],
+    primitives = PRIMITIVES,
     manifest   = [
         ":Stdlib", ## functions as the ns_resolver module
         ## Namespace submodules:
@@ -164,15 +165,12 @@ bootstrap_module(
         "-w", "-49",
         # "-pp", "awk -f expand_module_aliases.awk",
     ],
+    primitives = PRIMITIVES,
     deps = [
         ":CamlinternalFormatBasics",
         ":CamlinternalAtomic",
     ],
     # pp_deps = ["//stdlib:expand_module_aliases.awk"],
-
-    ## executables need camlheader. works here, dunno if this is the
-    ## right place though
-    deps_runtime = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
 )
 
@@ -203,6 +201,21 @@ genrule(
     ]),
 )
 
+bootstrap_signature(
+    name = "Stdlib_cmi",
+    src  = "x/stdlib.mli",
+    opts = SIG_OPTS + [
+        "-nopervasives",
+        "-no-alias-deps", "-w", "-49",
+    ],
+    primitives = PRIMITIVES,
+    deps   = [
+        ":CamlinternalFormatBasics",
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
 # bootstrap_preprocess(
 #     name = "stdlib_ml_awk",
 #     outs = ["stdlib.ml"],
@@ -223,20 +236,6 @@ genrule(
     ]),
 )
 
-bootstrap_signature(
-    name = "Stdlib_cmi",
-    src  = "x/stdlib.mli",
-    opts = SIG_OPTS + [
-        "-nopervasives",
-        "-no-alias-deps", "-w", "-49",
-    ],
-    deps   = [
-        ":CamlinternalFormatBasics",
-    ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
-)
-
 ################################################################
 ############  Non-namespaced Components of Stdlib ##############
 
@@ -255,6 +254,7 @@ bootstrap_module(
     # ocamlc = "//runtime:ocamlc",
     sig    = "CamlinternalAtomic_cmi",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    primitives = PRIMITIVES,
     # deps   = [],
     ## dunno if this is the right place for this, but we need to force
     ## it for now:
@@ -269,6 +269,7 @@ bootstrap_module(
     ocamlc = "//runtime:ocamlc",
     sig    = "CamlinternalAtomic_cmi",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    primitives = PRIMITIVES,
     # deps   = [],
     ## dunno if this is the right place for this, but we need to force
     ## it for now:
@@ -280,6 +281,7 @@ bootstrap_signature(
     name = "CamlinternalAtomic_cmi",
     src  = "camlinternalAtomic.mli",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    primitives = PRIMITIVES,
     # deps   = [],
     # visibility = ["//visibility:public"]
 )
@@ -290,8 +292,8 @@ bootstrap_module(
     sig    = "CamlinternalFormat_cmi",
     opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"] + [
         "-w", "+A", "-w", "-fragile-match",
-        "-I", "stdlib"
     ],
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalFormatBasics",
         # ":Stdlib",
@@ -313,6 +315,7 @@ bootstrap_signature(
         "-open", "Stdlib",
         "-w", "+A", "-w", "-fragile-match"
     ],
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalFormatBasics", ## (CamlinternalFormatBasics)
 
@@ -351,6 +354,7 @@ bootstrap_module(
     struct = "camlinternalFormatBasics.ml",
     sig    = "CamlinternalFormatBasics_cmi",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    primitives = PRIMITIVES,
     # deps   = [],
     # visibility = ["//visibility:public"]
 )
@@ -359,6 +363,7 @@ bootstrap_signature(
     name = "CamlinternalFormatBasics_cmi",
     src  = "camlinternalFormatBasics.mli",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    primitives = PRIMITIVES,
     # deps   = [],
     # visibility = ["//visibility:public"]
 )
@@ -368,6 +373,7 @@ bootstrap_module(
     struct = "camlinternalLazy.ml",
     sig    = "CamlinternalLazy_cmi",
     opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib",
         ":Stdlib.Obj",
@@ -384,6 +390,7 @@ bootstrap_signature(
     # automatically, leading to "Error: Unbound module Stdlib".
     # -nopervasives prevents this.
     opts = CAMLINTERNAL_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib",
     ],
@@ -396,6 +403,7 @@ bootstrap_module(
     struct = "camlinternalMod.ml",
     sig    = "CamlinternalMod_cmi",
     opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalOO", ## (CamlinternalOO)
         ":CamlinternalLazy", ## (CamlinternalOO)
@@ -411,6 +419,7 @@ bootstrap_signature(
     name = "CamlinternalMod_cmi",
     src  = "camlinternalMod.mli",
     opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib",
         ":Stdlib.Obj",
@@ -424,6 +433,7 @@ bootstrap_module(
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
     opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],# + ["-no-alias-deps"],
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib",
         ":Stdlib.Sys", ## (Stdlib Sys)
@@ -442,6 +452,7 @@ bootstrap_signature(
     name = "CamlinternalOO_cmi",
     src  = "camlinternalOO.mli",
     opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"], # + ["-no-alias-deps"],
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib",
         ":Stdlib.Obj"
@@ -453,8 +464,9 @@ bootstrap_signature(
 bootstrap_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
-    opts = USE_PRIMS + MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    opts = MODULE_OPTS,
+    ## NB: no -use-prims
+    data = DATA_PRIMS,
     deps   = [
         ## NB: this depends on Stdlib module, which is the resolver.
         ## Does not depend on entire stdlib archive (//stdlib).
@@ -472,7 +484,8 @@ bootstrap_module(
     struct = "arg.ml",
     sig    = "Stdlib.Arg_cmi",
     opts = MODULE_OPTS,
-    data = DATA_PRIMITIVES,
+    primitives = PRIMITIVES,
+    data = DATA_PRIMS,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -490,6 +503,7 @@ bootstrap_signature(
     name = "Stdlib.Arg_cmi",
     src  = "arg.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -509,6 +523,7 @@ bootstrap_module(
     struct = "array.ml",
     sig    = "Stdlib.Array_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ":Stdlib"
@@ -522,6 +537,7 @@ bootstrap_signature(
     name = "Stdlib.Array_cmi",
     src  = "array.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
     ],
@@ -560,6 +576,7 @@ bootstrap_signature(
     name = "Stdlib.ArrayLabels_cmi",
     src  = "x/arrayLabels.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
     ],
@@ -568,11 +585,12 @@ bootstrap_signature(
 )
 
 bootstrap_module(
-    ns    = ":Stdlib",
-    name   = "Stdlib.Atomic",
     struct = "atomic.ml",
+    name   = "Stdlib.Atomic",
+    ns    = ":Stdlib",
     sig    = "Stdlib.Atomic_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalAtomic"
     ],
@@ -585,6 +603,7 @@ bootstrap_signature(
     name = "Stdlib.Atomic_cmi",
     src  = "atomic.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib_cmi"
     ],
@@ -598,6 +617,7 @@ bootstrap_module(
     struct = "bigarray.ml",
     sig    = "Stdlib.Bigarray_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.Complex",
@@ -617,6 +637,7 @@ bootstrap_signature(
     name = "Stdlib.Bigarray_cmi",
     src  = "bigarray.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Complex", ## (Stdlib Complex)
         ## (Genarray)
@@ -635,6 +656,7 @@ bootstrap_module(
     struct = "bool.ml",
     sig    = "Stdlib.Bool_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -646,6 +668,7 @@ bootstrap_signature(
     name = "Stdlib.Bool_cmi",
     src  = "bool.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -679,6 +702,7 @@ bootstrap_signature(
     name = "Stdlib.Buffer_cmi",
     src  = "buffer.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Uchar",
         ":Stdlib.Seq",
@@ -693,6 +717,7 @@ bootstrap_module(
     struct = "bytes.ml",
     sig    = "Stdlib.Bytes_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Char",
         ":Stdlib.Int",
@@ -709,6 +734,7 @@ bootstrap_signature(
     name = "Stdlib.Bytes_cmi",
     src  = "bytes.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Int_cmi",
         ":Stdlib.Seq_cmi",
@@ -736,6 +762,7 @@ bootstrap_signature(
     name = "Stdlib.BytesLabels_cmi",
     src  = "bytesLabels.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
@@ -750,6 +777,7 @@ bootstrap_module(
     struct = "callback.ml",
     sig    = "Stdlib.Callback_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Obj"
     ],
@@ -762,6 +790,7 @@ bootstrap_signature(
     name = "Stdlib.Callback_cmi",
     src  = "callback.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.In_channel"
     ],
@@ -775,6 +804,7 @@ bootstrap_module(
     struct = "char.ml",
     sig    = "Stdlib.Char_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [":Stdlib"],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -785,6 +815,7 @@ bootstrap_signature(
     name = "Stdlib.Char_cmi",
     src  = "char.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib_cmi"
     ],
@@ -798,6 +829,7 @@ bootstrap_module(
     struct = "complex.ml",
     sig    = "Stdlib.Complex_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [":Stdlib"],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -808,6 +840,7 @@ bootstrap_signature(
     name = "Stdlib.Complex_cmi",
     src  = "complex.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib_cmi"
     ],
@@ -821,6 +854,7 @@ bootstrap_module(
     struct = "digest.ml",
     sig    = "Stdlib.Digest_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.String",
         ":Stdlib.Char",
@@ -835,6 +869,7 @@ bootstrap_signature(
     name = "Stdlib.Digest_cmi",
     src  = "digest.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.In_channel_cmi"
         # ":Stdlib"
@@ -849,6 +884,7 @@ bootstrap_module(
     struct = "either.ml",
     sig    = "Stdlib.Either_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -860,6 +896,7 @@ bootstrap_signature(
     name = "Stdlib.Either_cmi",
     src  = "either.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib"
     ],
@@ -873,6 +910,7 @@ bootstrap_module(
     struct = "ephemeron.ml",
     sig    = "Stdlib.Ephemeron_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Array",
         ":Stdlib.Hashtbl",
@@ -893,6 +931,7 @@ bootstrap_signature(
     name = "Stdlib.Ephemeron_cmi",
     src  = "ephemeron.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Hashtbl_cmi",
     ],
@@ -906,6 +945,7 @@ bootstrap_module(
     struct = "filename.ml",
     sig    = "Stdlib.Filename_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -924,6 +964,7 @@ bootstrap_signature(
     name = "Stdlib.Filename_cmi",
     src  = "filename.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib_cmi"
     ],
@@ -951,6 +992,7 @@ bootstrap_signature(
     name = "Stdlib.Float_cmi",
     src  = "float.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ":Stdlib"
@@ -1004,6 +1046,7 @@ bootstrap_module(
     struct = "fun.ml",
     sig    = "Stdlib.Fun_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Printexc",
     ],
@@ -1016,6 +1059,7 @@ bootstrap_signature(
     name = "Stdlib.Fun_cmi",
     src  = "fun.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -1028,6 +1072,7 @@ bootstrap_module(
     struct = "gc.ml",
     sig    = "Stdlib.Gc_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -1043,6 +1088,7 @@ bootstrap_signature(
     name = "Stdlib.Gc_cmi",
     src  = "gc.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Printexc",
     ],
@@ -1056,6 +1102,7 @@ bootstrap_module(
     struct = "genlex.ml",
     sig    = "Stdlib.Genlex_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Bytes",
         ":Stdlib.Char",
@@ -1073,6 +1120,7 @@ bootstrap_signature(
     name = "Stdlib.Genlex_cmi",
     src  = "genlex.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib",
         ":Stdlib.Stream"
@@ -1087,6 +1135,7 @@ bootstrap_module(
     struct = "hashtbl.ml",
     sig    = "Stdlib.Hashtbl_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Array",
         ":Stdlib.Int",
@@ -1109,6 +1158,7 @@ bootstrap_signature(
     name = "Stdlib.Hashtbl_cmi",
     src  = "hashtbl.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ## (H)
@@ -1123,6 +1173,7 @@ bootstrap_module(
     struct = "in_channel.ml",
     sig    = "Stdlib.In_channel_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Fun"
     ],
@@ -1135,6 +1186,7 @@ bootstrap_signature(
     name = "Stdlib.In_channel_cmi",
     src  = "in_channel.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib"
     ],
@@ -1148,6 +1200,7 @@ bootstrap_module(
     struct = "int.ml",
     sig    = "Stdlib.Int_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib"
     ],
@@ -1160,6 +1213,7 @@ bootstrap_signature(
     name = "Stdlib.Int_cmi",
     src  = "int.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib"
     ],
@@ -1200,6 +1254,7 @@ bootstrap_module(
     struct = "int64.ml",
     sig    = "Stdlib.Int64_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib",
     ],
@@ -1212,6 +1267,7 @@ bootstrap_signature(
     name = "Stdlib.Int64_cmi",
     src  = "int64.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib"
     ],
@@ -1225,6 +1281,7 @@ bootstrap_module(
     struct = "lazy.ml",
     sig    = "Stdlib.Lazy_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     # + select({
     #     mode:native : ["-afl-inst-ratio 0"]
     # })
@@ -1241,6 +1298,7 @@ bootstrap_signature(
     name = "Stdlib.Lazy_cmi",
     src  = "lazy.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalLazy",
     ],
@@ -1254,6 +1312,7 @@ bootstrap_module(
     struct = "lexing.ml",
     sig    = "Stdlib.Lexing_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -1270,6 +1329,7 @@ bootstrap_signature(
     name = "Stdlib.Lexing_cmi",
     src  = "lexing.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib"
     ],
@@ -1283,6 +1343,7 @@ bootstrap_module(
     struct = "list.ml",
     sig    = "Stdlib.List_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.Seq",
@@ -1297,6 +1358,7 @@ bootstrap_signature(
     name = "Stdlib.List_cmi",
     src  = "list.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ":Stdlib.Either",
@@ -1323,6 +1385,7 @@ bootstrap_signature(
     name = "Stdlib.ListLabels_cmi",
     src  = "listLabels.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ":Stdlib.Either",
@@ -1337,6 +1400,7 @@ bootstrap_module(
     struct = "map.ml",
     sig    = "Stdlib.Map_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ":Stdlib"
@@ -1351,6 +1415,7 @@ bootstrap_signature(
     name = "Stdlib.Map_cmi",
     src  = "map.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ## (Ord)
@@ -1365,6 +1430,7 @@ bootstrap_module(
     struct = "marshal.ml",
     sig    = "Stdlib.Marshal_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Bytes",
     ],
@@ -1377,6 +1443,7 @@ bootstrap_signature(
     name = "Stdlib.Marshal_cmi",
     src  = "marshal.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib"
     ],
@@ -1404,6 +1471,7 @@ bootstrap_signature(
     name = "Stdlib.MoreLabels_cmi",
     src  = "moreLabels.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Set",
         ":Stdlib.Seq",
@@ -1422,6 +1490,7 @@ bootstrap_module(
     struct = "nativeint.ml",
     sig    = "Stdlib.Nativeint_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib_cmi",
         ":Stdlib.Sys",
@@ -1435,6 +1504,7 @@ bootstrap_signature(
     name = "Stdlib.Nativeint_cmi",
     src  = "nativeint.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib_cmi",
         ":Stdlib.Sys",
@@ -1449,6 +1519,7 @@ bootstrap_module(
     struct = "obj.ml",
     sig    = "Stdlib.Obj_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.Nativeint",
@@ -1463,6 +1534,7 @@ bootstrap_signature(
     name = "Stdlib.Obj_cmi",
     src  = "obj.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib_cmi",
         ":Stdlib.Int32",
@@ -1477,6 +1549,7 @@ bootstrap_module(
     struct = "oo.ml",
     sig    = "Stdlib.Oo_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalOO",
     ],
@@ -1488,7 +1561,10 @@ bootstrap_signature(
     name = "Stdlib.Oo_cmi",
     ns   = ":Stdlib",
     src  = "oo.mli",
-    opts = SIG_OPTS + ["-no-principal"],
+    opts = SIG_OPTS + [
+        "-no-principal" ## Only place this flag is used
+    ],
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalOO",
     ],
@@ -1502,6 +1578,7 @@ bootstrap_module(
     struct = "option.ml",
     sig    = "Stdlib.Option_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
     ],
@@ -1514,6 +1591,7 @@ bootstrap_signature(
     name = "Stdlib.Option_cmi",
     src  = "option.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
     ],
@@ -1527,6 +1605,7 @@ bootstrap_module(
     struct = "out_channel.ml",
     sig    = "Stdlib.Out_channel_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [":Stdlib.Fun"],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1537,6 +1616,7 @@ bootstrap_signature(
     name = "Stdlib.Out_channel_cmi",
     src  = "out_channel.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -1549,6 +1629,7 @@ bootstrap_module(
     struct = "parsing.ml",
     sig    = "Stdlib.Parsing_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Obj",
         ":Stdlib.Lexing",
@@ -1563,6 +1644,7 @@ bootstrap_signature(
     name = "Stdlib.Parsing_cmi",
     src  = "parsing.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Obj",
         ":Stdlib.Lexing",
@@ -1576,6 +1658,7 @@ bootstrap_module(
     name   = "Stdlib.Pervasives",
     struct = "pervasives.ml",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalFormatBasics",
         ## (LargeFile)
@@ -1595,6 +1678,7 @@ bootstrap_module(
     struct = "printexc.ml",
     sig    = "Stdlib.Printexc_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib",
         ":Stdlib.Printf",
@@ -1612,6 +1696,7 @@ bootstrap_signature(
     name = "Stdlib.Printexc_cmi",
     src  = "printexc.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib"
     ],
@@ -1652,6 +1737,7 @@ bootstrap_module(
     struct = "queue.ml",
     sig    = "Stdlib.Queue_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib",
         ":Stdlib.Seq",
@@ -1665,6 +1751,7 @@ bootstrap_signature(
     name = "Stdlib.Queue_cmi",
     src  = "queue.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         # ":Stdlib",
@@ -1679,6 +1766,7 @@ bootstrap_module(
     struct = "random.ml",
     sig    = "Stdlib.Random_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.String",
         ## ":Stdlib",
@@ -1699,6 +1787,7 @@ bootstrap_signature(
     name = "Stdlib.Random_cmi",
     src  = "random.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Nativeint",
         ":Stdlib.Int64",
@@ -1714,6 +1803,7 @@ bootstrap_module(
     struct = "result.ml",
     sig    = "Stdlib.Result_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         # ":Stdlib"
@@ -1727,6 +1817,7 @@ bootstrap_signature(
     name = "Stdlib.Result_cmi",
     src  = "result.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib",
         ":Stdlib.Seq"
@@ -1780,6 +1871,7 @@ bootstrap_module(
     name   = "Stdlib.Seq",
     sig    = "Stdlib.Seq_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Either",
         ":Stdlib.Lazy"
@@ -1792,6 +1884,7 @@ bootstrap_signature(
     name = "Stdlib.Seq_cmi",
     src  = "seq.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [":Stdlib.Either_cmi"],
     # visibility = ["//visibility:public"]
 )
@@ -1802,6 +1895,7 @@ bootstrap_module(
     struct = "set.ml",
     sig    = "Stdlib.Set_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ":Stdlib.List",
@@ -1815,6 +1909,7 @@ bootstrap_signature(
     name = "Stdlib.Set_cmi",
     src  = "set.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
     ],
@@ -1828,6 +1923,7 @@ bootstrap_module(
     struct = "stack.ml",
     sig    = "Stdlib.Stack_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
         ":Stdlib.List",
@@ -1841,6 +1937,7 @@ bootstrap_signature(
     name = "Stdlib.Stack_cmi",
     src  = "stack.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
     ],
@@ -1869,6 +1966,7 @@ bootstrap_signature(
     name = "Stdlib.StdLabels_cmi",
     src  = "stdLabels.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.StringLabels",
         ":Stdlib.ListLabels",
@@ -1885,6 +1983,7 @@ bootstrap_module(
     struct = "stream.ml",
     sig    = "Stdlib.Stream_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":CamlinternalLazy",
         ":Stdlib.String",
@@ -1901,6 +2000,7 @@ bootstrap_signature(
     name = "Stdlib.Stream_cmi",
     src  = "stream.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -1913,6 +2013,7 @@ bootstrap_module(
     struct = "string.ml",
     sig    = "Stdlib.String_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Bytes",
     ],
@@ -1925,6 +2026,7 @@ bootstrap_signature(
     name = "Stdlib.String_cmi",
     src  = "string.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
@@ -1939,6 +2041,7 @@ bootstrap_module(
     struct = "stringLabels.ml",
     sig    = "Stdlib.StringLabels_cmi",
     opts = MODULE_OPTS + LABEL_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.String",
     ],
@@ -1951,6 +2054,7 @@ bootstrap_signature(
     name = "Stdlib.StringLabels_cmi",
     src  = "stringLabels.mli",
     opts = SIG_OPTS + LABEL_SIGOPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
@@ -1965,6 +2069,7 @@ bootstrap_module(
     struct = "sys.ml",
     sig    = "Stdlib.Sys_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -1976,6 +2081,7 @@ bootstrap_signature(
     name = "Stdlib.Sys_cmi",
     src  = "sys.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -1988,6 +2094,7 @@ bootstrap_module(
     struct = "uchar.ml",
     sig    = "Stdlib.Uchar_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Char",
     ],
@@ -2000,6 +2107,7 @@ bootstrap_signature(
     name = "Stdlib.Uchar_cmi",
     src  = "uchar.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Char",
     ],
@@ -2013,6 +2121,7 @@ bootstrap_module(
     struct = "unit.ml",
     sig    = "Stdlib.Unit_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -2024,6 +2133,7 @@ bootstrap_signature(
     name = "Stdlib.Unit_cmi",
     src  = "unit.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
     ],
     data = ["//runtime:primitives"],
@@ -2036,6 +2146,7 @@ bootstrap_module(
     struct = "weak.ml",
     sig    = "Stdlib.Weak_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.Obj",
@@ -2053,6 +2164,7 @@ bootstrap_signature(
     name = "Stdlib.Weak_cmi",
     src  = "weak.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Hashtbl",
         ## (H)
@@ -2122,9 +2234,9 @@ DEVPATHS_CMD = "\n".join([
     "cat bazel-out/stable-status.txt | ",
     "while read KEY VAL; do",
     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
-    "echo '#!'$$VAL/$(location //runtime:ocamlrun) > $(location camlheader);\n",
-    "echo '#!'$$VAL/$(location //runtime:ocamlrun)d > $(location camlheaderd);\n",
-    "echo '#!'$$VAL/$(location //runtime:ocamlrun)i > $(location camlheaderi);\n",
+    "echo '#!'$$VAL/$(location //bzl/toolchain:ocamlrun) > $(location camlheader);\n",
+    "echo '#!'$$VAL/$(location //bzl/toolchain:ocamlrun)d > $(location camlheaderd);\n",
+    "echo '#!'$$VAL/$(location //bzl/toolchain:ocamlrun)i > $(location camlheaderi);\n",
     "fi",
     "done",
 
@@ -2134,7 +2246,7 @@ DEVPATHS_CMD = "\n".join([
 ])
 
 genrule(
-    name = "headers",
+    name = "camlheaders",
     outs = [
         "camlheader",
         "camlheaderd",
@@ -2144,7 +2256,7 @@ genrule(
         "target_camlheaderd",
         "target_camlheaderi"
     ],
-    srcs = ["//runtime:ocamlrun"],
+    srcs = ["//runtime:ocamlrun", "//bzl/toolchain:ocamlrun"],
     cmd = DEVPATHS_CMD,
     stamp = True,
     visibility = ["//visibility:public"]

@@ -250,7 +250,8 @@ bootstrap_module(
         ":Maindriver", ## (Driver Maindriver)
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Format",
-    ]
+    ],
+    visibility = ["//compilers:__subpackages__"]
 )
 
 bootstrap_module(

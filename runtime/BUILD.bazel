@@ -18,6 +18,10 @@ load("//config:BUILD.bzl",
      "BYTECCLIBS"
      )
 
+# load("//bzl/transitions:ocamlc_boot.bzl",
+#      "cc_in_transition",
+#      "cc_out_transition")
+
 ### //runtime:ocamlc moved to //compilers:ocamlc
 ## root Makefile:
 # The bytecode compiler
@@ -107,6 +111,8 @@ genrule(
             libdir = LIBDIR),
         "echo OSD: $$OSD;",
 	    "echo '/* This file is generated from {ROOTDIR}/Makefile.config */' > $@;".format(ROOTDIR = ROOTDIR),
+
+        ## FIXME: may stdlib locn stage-dependend
 	    "echo \"#define OCAML_STDLIB_DIR $$OSD\" >> $@;",
 	    "echo '#define HOST \"{HOST}\"' >> $@".format(HOST=HOST)
     ])
@@ -175,10 +181,14 @@ cc_library(
         ":build_config.h",
     ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
     copts = [
-        "-I$(GENDIR)/runtime" # to pick up build_config.h
-    ] + OC_CPPFLAGS,
+        "-I$(GENDIR)/runtime", # pick up build_config.h
+    ] + OC_CPPFLAGS + select({
+        "//config/debug:ocamlrun-debug": ["-g"],
+        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+        "//conditions:default": ["-UDEBUG"]
+    }),
     defines = OC_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"]
+    deps = ["//runtime/caml:hdrs"],
 )
 
 ocamlrun(
@@ -189,7 +199,11 @@ ocamlrun(
 cc_binary(
     name = "ocamlrun",
     srcs = ["prims.c", "instrtrace.c"],
-    copts = OC_CFLAGS + CFLAGS, # + ["-v"],
+    copts = OC_CFLAGS + CFLAGS + select({
+        "//config/debug:ocamlrun-debug": ["-g"],
+        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+        "//conditions:default": ["-UDEBUG"]
+    }),
     linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS, # + ["-v"],
     deps= [":camlrun"],
     visibility = ["//visibility:public"]

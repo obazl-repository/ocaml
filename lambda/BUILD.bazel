@@ -9,6 +9,13 @@ load("//config:BUILD.bzl",
      "ROOT_SIG_OPTS"
      )
 
+exports_files([
+    "debuginfo.mli", "debuginfo.ml",
+    "lambda.mli", "lambda.ml",
+    "runtimedef.mli",
+    ## this is exported by genrule: "runtimedef.ml"
+])
+
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS    = ROOT_MODULE_OPTS
 
@@ -74,6 +81,7 @@ bootstrap_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//bytecomp:__pkg__",
         "//middle_end:__subpackages__",
     ]
 )
@@ -249,6 +257,7 @@ bootstrap_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//toplevel:__pkg__",
     ]
 )
@@ -267,6 +276,7 @@ genrule(
         "$(location //runtime:primitives)",
         " > $@"
     ]),
+    visibility = ["//visibility:public"]
 )
 
 bootstrap_signature(

@@ -386,6 +386,12 @@ def _bootstrap_module(ctx):
 
     args.add_all(_options)
 
+    primitives = []
+    if hasattr(ctx.attr, "primitives"):
+        if ctx.attr.primitives:
+            primitives.append(ctx.file.primitives)
+            args.add("-use-prims", ctx.file.primitives.path)
+
     ## FIXME: support -bin-annot
     # if "-bin-annot" in _options: ## Issue #17
     #     out_cmt = ctx.actions.declare_file(scope + paths.replace_extension(module_name, ".cmt"))
@@ -616,7 +622,8 @@ def _bootstrap_module(ctx):
     # print("bottomup_ns_cmi: %s" % bottomup_ns_cmi)
 
     cmi_depset = depset(
-        direct = ([provider_output_cmi] if provider_output_cmi else [action_output_cmi]),
+        direct = sig_inputs,
+        # direct = ([provider_output_cmi] if provider_output_cmi else [action_output_cmi]),
         transitive = bottomup_ns_cmi if bottomup_ns_cmi else []
     )
 
@@ -722,6 +729,25 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
         #     default = "//bzl/toolchain:boot",
         # ),
 
+        primitives = attr.label(
+            allow_single_file = True,
+        ),
+
+        _toolchain = attr.label(
+            default = "//bzl/toolchain:tc"
+        ),
+
+        _stage = attr.label(
+            doc = "bootstrap stage",
+            default = "//bzl:stage"
+        ),
+
+        ocamlc = attr.label(
+            # cfg = ocamlc_out_transition,
+            allow_single_file = True,
+            default = "//bzl/toolchain:ocamlc"
+        ),
+
         _mode       = attr.label(
             default = "//bzl/toolchain",
         ),
@@ -809,16 +835,6 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
 
         # _warnings = attr.label(
         # ),
-
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
-
-        ocamlc = attr.label(
-            # cfg = ocamlc_out_transition,
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
 
         _rule = attr.string( default = "bootstrap_module" ),
         # _allowlist_function_transition = attr.label(

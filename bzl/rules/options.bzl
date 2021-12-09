@@ -84,10 +84,10 @@ def options_executable(ws):
             default = "//bzl/toolchain:tc"
         ),
 
-        ocamlc = attr.label(
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     allow_single_file = True,
+        #     default = "//bzl/toolchain:ocamlc"
+        # ),
 
         _camlheaders = attr.label_list(
             allow_files = True,
@@ -122,13 +122,7 @@ def options_executable(ws):
         exe  = attr.string(
             doc = "By default, executable name is derived from 'name' attribute; use this to override."
         ),
-        main = attr.label(
-            doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
-            # cfg = compile_mode_out_transition,
-            allow_single_file = True,
-            providers = [[OcamlModuleMarker]],
-            default = None,
-        ),
+
         data = attr.label_list(
             allow_files = True,
             doc = "Runtime dependencies: list of labels of data files needed by this executable at runtime."

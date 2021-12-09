@@ -13,9 +13,7 @@ load("//bzl:providers.bzl",
 
 load("//bzl:functions.bzl", "config_tc")
 
-load("//bzl:transitions.bzl",
-     "compile_mode_in_transition",
-     "compile_mode_out_transition",
+load("//bzl/transitions:ocamlc_fixpoint.bzl",
      "ocamlc_fixpoint_in_transition",
      "ocamlc_fixpoint_out_transition")
 
@@ -35,6 +33,8 @@ load(":options.bzl",
 
 ###############################
 def _ocamlc_fixpoint(ctx):
+
+    ## FIXME: use impl_executable
 
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
@@ -88,8 +88,16 @@ def _ocamlc_fixpoint(ctx):
     # do not uniquify options, it collapses all -I
     args.add_all(_options)
 
-    if "-g" in _options:
-        args.add("-runtime-variant", "d") # FIXME: verify compile built for debugging
+    # if "-g" in _options:
+    #     args.add("-runtime-variant", "d") # FIXME: verify compile built for debugging
+
+    primitives = []
+    if hasattr(ctx.attr, "primitives"):
+        if ctx.attr.primitives:
+            primitives.append(ctx.file.primitives)
+            args.add("-use-prims", ctx.file.primitives.path)
+
+    args.add("-I", ctx.files._camlheaders[0].dirname)
 
     ################################################################
     ## deps mgmt
@@ -153,20 +161,20 @@ def _ocamlc_fixpoint(ctx):
         main = ctx.attr.main
 
         if OcamlProvider in main:
-            if hasattr(main[OcamlProvider], "archive_manifests"):
-                manifest_list.append(main[OcamlProvider].archive_manifests)
+            if hasattr(main[0][OcamlProvider], "archive_manifests"):
+                manifest_list.append(main[0][OcamlProvider].archive_manifests)
 
-        direct_inputs_depsets.append(main[OcamlProvider].inputs)
-        direct_linkargs_depsets.append(main[OcamlProvider].linkargs)
-        direct_paths_depsets.append(main[OcamlProvider].paths)
+        direct_inputs_depsets.append(main[0][OcamlProvider].inputs)
+        direct_linkargs_depsets.append(main[0][OcamlProvider].linkargs)
+        direct_paths_depsets.append(main[0][OcamlProvider].paths)
 
-        direct_linkargs_depsets.append(main[DefaultInfo].files)
+        direct_linkargs_depsets.append(main[0][DefaultInfo].files)
 
-        paths_indirect.append(main[OcamlProvider].paths)
+        paths_indirect.append(main[0][OcamlProvider].paths)
 
         if CcInfo in main: # :
-            # print("CcInfo main: %s" % main[CcInfo])
-            ccInfo_list.append(main[CcInfo]) # [CcInfo])
+            # print("CcInfo main: %s" % main[0][CcInfo])
+            ccInfo_list.append(main[0][CcInfo]) # [CcInfo])
 
         ccInfo = cc_common.merge_cc_infos(cc_infos = ccInfo_list)
         [
@@ -256,9 +264,11 @@ def _ocamlc_fixpoint(ctx):
     #     std_exit = []
 
     # print("LINKARGS: %s" % linkargs_depset)
-
     inputs_depset = depset(
-        direct = [ctx.file._stdexit],
+        direct = [ctx.file._stdexit]
+        + primitives
+        + ctx.files._camlheaders,
+
         transitive = [direct_inputs_depset]
         + [linkargs_depset]
         + data_inputs
@@ -346,14 +356,27 @@ ocamlc_fixpoint = rule(
 
     doc = "Generates an OCaml executable binary using the bootstrap toolchain",
     attrs = dict(
+        rule_options,
 
         _toolchain = attr.label(
             default = "//bzl/toolchain:tc"
         ),
 
+        primitives = attr.label(
+            default = "//runtime:primitives",
+            allow_single_file = True,
+            cfg = ocamlc_fixpoint_out_transition,
+        ),
+
+        _stage = attr.label(
+            doc = "bootstrap stage",
+            default = "//bzl:stage1"
+        ),
+
         ocamlc = attr.label(
             allow_single_file = True,
-            default = "//runtime:ocamlc"
+            default = "//compilers/stage1:ocamlc"
+            # default = "//runtime:ocamlc"
             # default = "//bzl/toolchain:ocamlc"
         ),
 
@@ -378,7 +401,7 @@ ocamlc_fixpoint = rule(
         ),
         main = attr.label(
             doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
-            cfg = compile_mode_out_transition,
+            cfg = ocamlc_fixpoint_out_transition,
             allow_single_file = True,
             providers = [[OcamlModuleMarker]],
             default = None,

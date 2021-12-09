@@ -1,5 +1,211 @@
 # Building OCaml with OBazl
 
+## bootstrapping
+
+We build bytecode compiler and tools only, Ignoring flexdll and docs.
+Targets generate `.depends` are also ignored; all dependencies are
+explicitly enumerated in the BUILD.bazel files.
+
+### make world
+
+.root Makefile
+```
+world: coldstart
+	$(MAKE) all
+
+all: coreall
+	$(MAKE) ocaml
+	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
+         $(WITH_OCAMLTEST)
+
+ocaml$(EXE): $(expunge) ocaml.tmp
+	- $(OCAMLRUN) $^ $@ $(PERVASIVES)
+
+otherlibraries: ocamltools
+	$(MAKE) -C otherlibs all
+
+ocamltools: ocamlc ocamllex compilerlibs/ocamlmiddleend.cma
+	$(MAKE) -C tools all
+
+```
+
+NOTE: `compilerlibs` is an empty pseudo-package, just used
+quasi-namespacing; OBazl does not need it. So e.g. the target to build
+`compilerlibs/ocamlmiddleend.cma` is `//middle_end:ocamlmiddleend`
+
+### make coldstart
+
+Builds `runtime/ocamlrun`(Bazel target: `//runtime:ocamlrun`) and stdlib (Bazel: `//stdlib`)
+
+.root Makefile
+```
+USE_RUNTIME_PRIMS = -use-prims ../runtime/primitives
+
+  COLDSTART_DEPS =
+  BOOT_FLEXLINK_CMD =
+
+OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)  (Makefile.common)
+BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc (Makefile.common)
+
+coldstart: $(COLDSTART_DEPS)
+	$(MAKE) -C runtime all
+	$(MAKE) -C stdlib \
+	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
+	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+
+## NB: `make -C runtime all` builds `runtime/ocamlrun` using MKEXE;
+## then `make -C stdlib all` uses `runtime/ocamlrun boot/ocamlc` to build stdlib.
+## later `runtime/ocamlrun` gets copied to `boot/ocamlrun`
+```
+
+### make coreall
+
+`make world` builds `make coldstart` then `make coreall`, which:
+
+* builds `runtime/libcamlrun` and copies it to `stdlib/libcamlrun`
+* builds `ocamlc`, `ocamllex`, etc.
+
+WARNING: With OBazl we do not need to copy `libocamlrun` into `stdlib`
+directory, since our dependency manager will ensure that everything
+needed for each target will always be in the right place. Makefiles
+control accessibility using ordered search paths. With Bazel we
+control inputs before we even get constructing the command line, and
+then we put those input dirs on the search path. So if we need
+`libocamlrun` we just list it as a dependency, and it does not matter
+where it is located.
+
+.root Makefile
+```
+coreall: runtime
+	$(MAKE) ocamlc
+	$(MAKE) ocamllex ocamltools library
+
+makeruntime:
+	$(MAKE) -C runtime $(BOOT_FLEXLINK_CMD) all
+runtime/libcamlrun.$(A): makeruntime ;
+stdlib/libcamlrun.$(A): runtime/libcamlrun.$(A)
+	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
+
+runtime: stdlib/libcamlrun.$(A)  # already built by `make -C runtime all` run by `make coldstart`
+
+ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
+              compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+ocamllex: ocamlyacc
+	$(MAKE) -C lex all
+ocamlyacc:
+	$(MAKE) -C yacc $(BOOT_FLEXLINK_CMD) all
+ocamltools: ocamlc ocamllex compilerlibs/ocamlmiddleend.cma
+	$(MAKE) -C tools all
+library: ocamlc
+	$(MAKE) -C stdlib $(BOOT_FLEXLINK_CMD) all
+```
+
+
+`MKLIB` is set by `configure`; for unix:
+
+`mklib="rm -f \$(1) && ${AR} rc \$(1) \$(2) && ${RANLIB} \$(1)"`
+
+OBazl can ignore MKLIB, since `rules_cc` automatically handles such stuff.
+
+`MKEXE` is set in `Makefile.config`, included via Makefile.common -> Makefile.config_if_required -> Makefile.build_config -> Makefile.config:
+
+
+.Makefile.config
+```
+MKEXE=$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_LDFLAGS) $(LDFLAGS) -Wl,-no_compact_unwind
+```
+
+`OC_CFLAGS` etc. - see `config/BUILD.bzl`
+
+### make runtime
+
+.runtime/Makefile (make -C runtime all)
+```
+LIBDIR=${exec_prefix}/lib/ocaml
+STUBLIBDIR=${exec_prefix}/lib/ocaml/stublibs
+ld.conf: $(ROOTDIR)/Makefile.config
+	echo "$(STUBLIBDIR)" > $@
+	echo "$(LIBDIR)" >> $@
+
+build_config.h: $(ROOTDIR)/Makefile.config sak$(EXE)
+	echo '/* This file is generated from $(ROOTDIR)/Makefile.config */' > $@
+	echo '#define OCAML_STDLIB_DIR $(call C_LITERAL,$(LIBDIR))' >> $@
+	echo '#define HOST "$(HOST)"' >> $@
+
+PROGRAMS := ocamlrun$(EXE)
+BYTECODE_STATIC_LIBRARIES := ld.conf libcamlrun.$(A)
+BYTECODE_SHARED_LIBRARIES :=
+
+all: $(BYTECODE_STATIC_LIBRARIES) $(BYTECODE_SHARED_LIBRARIES) $(PROGRAMS) \
+     sak$(EXE)
+
+primitives: $(shell ./gen_primitives.sh > primitives.new; \
+                    cmp -s primitives primitives.new || echo primitives.new)
+	cp $^ $@
+
+prims.c : primitives
+	(echo '#define CAML_INTERNALS'; \
+         echo '#include "caml/mlvalues.h"'; \
+         ... etc., more shell cmds ...
+
+BYTECODE_C_SOURCES := ... the c files in `runtime`
+libcamlrun_OBJECTS := $(BYTECODE_C_SOURCES:.c=.b.$(O))
+
+libcamlrun.$(A): $(libcamlrun_OBJECTS)
+	$(call MKLIB,$@, $^)
+
+BYTECCLIBS= -lm  -lpthread (in Makefile.config)
+LIBS := $(BYTECCLIBS)
+
+ocamlrun$(EXE): prims.$(O) libcamlrun.$(A)
+	$(MKEXE) -o $@ $^ $(LIBS)
+
+SAK_LINK ?= $(MKEXE_USING_COMPILER)
+sak$(EXE): sak.$(O)
+	$(call SAK_LINK,$@,$^)
+
+```
+
+### make -C tools all
+
+all: $(programs_byte)
+
+programs_byte := \
+  ocamldep ocamlprof ocamlcp ocamloptp ocamlmklib  \
+  ocamlmktop ocamlcmt dumpobj ocamlobjinfo \
+  primreq stripdebug cmpbyt
+
+
+### make ocaml
+
+`ocaml` is the command to start a repl. The makefiles make it a
+root-level target; OBazl puts it in the `toplevel` package, so the
+build command is `bazel build toplevel:ocaml`
+
+
+
+##  Corresponding OBazl build targets:
+
+* `build_config.h` => `//runtime:build_config_h` (`genrule`)
+* `ld.conf`- not needed for Bazel bootstrapping, only for deployment? STUBLIBDIR (ocaml/stublibs) to contain `dll*.so` files from `otherlibs`
+* `make -C runtime all` builds `ocamlrun`, `libcamlrun`, `sak`:
+  ** `//runtime:camlrun` (`cc_library`)
+  ** `//runtime:ocamlrun` (`cc_binary`)
+  ** `//runtime:sak.exe` (`cc_binary`)
+  ** `//runtime:primitives_dat` (`genrule`) => `primitives`
+* `make -C stdlib ... all` => `//stdlib` (`bootstrap_archive`)
+* `//middle_end:ocamlmiddleend` - archive, instead of `//compilerlibs:ocamlmiddleend`
+
+For root targets like `make ocamlc` we use a pseudo-package
+`//compilers`, to make the naming nicer.
+
+* `make ocamlc` => `//compilers:ocamlc`
+* `make ocamllex` => `//lex:ocamllex`
+* `make ocamltools` =>
+* `make library`
+
+
 ## structuring
 
 Its easy to make the OBazl build structure mimic the Makefile-based
@@ -15,10 +221,11 @@ Bazel alias in `//compilerlibs:ocamltoplevel` redirecting to
 Furthermore the decoupling of target names from output names allows us
 to use more felicitous names. For example, for archive targets the PoC
 uses `archive`, and removes some otiose info. Example: for
-`//compilerlibs:ocamltoplevel` we have `//toplevel:archive`. We could
+`//compilerlibs:ocamltoplevel` we have `//toplevel:ocamltoplevel`. We could
 also just use the package name, `//toplevel:toplevel`, which shortens
 to `//toplevel`. Or `toplevel.archive`, or any other legal Bazel name.
 
+Since `expunge` is a utility, we put it in utils: `//utils:expunge`
 
 ## Inspecting build cmds
 

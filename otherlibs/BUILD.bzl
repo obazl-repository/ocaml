@@ -1,0 +1,2 @@
+
+OTHERLIBS_OPTS = ["-nostdlib"]

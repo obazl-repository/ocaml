@@ -5,8 +5,25 @@ load("//bzl:rules.bzl",
 
 load("//config:BUILD.bzl",
      "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS"
+     "ROOT_SIG_OPTS",
+     "PRIMITIVES"
      )
+
+exports_files([
+    "btype.mli", "btype.ml",
+    "datarepr.mli", "datarepr.ml",
+    "env.mli", "env.ml",
+    "ident.mli", "ident.ml",
+    "outcometree.mli", "outcometree.ml",
+    "path.ml", "path.mli",
+    "persistent_env.mli", "persistent_env.ml",
+    "predef.mli", "predef.ml",
+    "primitive.mli", "primitive.ml",
+    "shape.mli", "shape.ml",
+    "subst.mli", "subst.ml",
+    "type_immediacy.mli", "type_immediacy.ml",
+    "types.mli", "types.ml",
+])
 
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS    = ROOT_MODULE_OPTS
@@ -142,6 +159,7 @@ bootstrap_module(
     struct = "btype.ml",
     sig    = "Btype_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Char",
@@ -174,6 +192,7 @@ bootstrap_signature(
     name = "Btype_cmi",
     src  = "btype.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Path",
@@ -184,6 +203,7 @@ bootstrap_module(
     name   = "Cmt2annot",
     struct = "cmt2annot.ml",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -212,6 +232,7 @@ bootstrap_module(
     struct = "ctype.ml",
     sig    = "Ctype_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -258,6 +279,7 @@ bootstrap_signature(
     name = "Ctype_cmi",
     src  = "ctype.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -277,6 +299,7 @@ bootstrap_module(
     struct = "datarepr.ml",
     sig    = "Datarepr_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -297,6 +320,7 @@ bootstrap_signature(
     name = "Datarepr_cmi",
     src  = "datarepr.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Path",
@@ -309,6 +333,7 @@ bootstrap_module(
     struct = "env.ml",
     sig    = "Env_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//file_formats:Cmi_format",
         "//parsing:Asttypes_cmi",
@@ -355,6 +380,7 @@ bootstrap_signature(
     name = "Env_cmi",
     src  = "env.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//file_formats:Cmi_format_cmi",
         "//parsing:Asttypes_cmi",
@@ -383,6 +409,7 @@ bootstrap_module(
     struct = "envaux.ml",
     sig    = "Envaux_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -403,6 +430,7 @@ bootstrap_signature(
     name = "Envaux_cmi",
     src  = "envaux.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Env",
@@ -416,6 +444,7 @@ bootstrap_module(
     struct = "errortrace.ml",
     sig    = "Errortrace_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
@@ -429,6 +458,7 @@ bootstrap_signature(
     name = "Errortrace_cmi",
     src  = "errortrace.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
@@ -442,6 +472,7 @@ bootstrap_module(
     struct = "ident.ml",
     sig    = "Ident_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
@@ -459,6 +490,7 @@ bootstrap_module(
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__"
     ]
@@ -468,6 +500,7 @@ bootstrap_signature(
     name = "Ident_cmi",
     src  = "ident.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//utils:Identifiable",
@@ -483,6 +516,7 @@ bootstrap_module(
     struct = "includeclass.ml",
     sig    = "Includeclass_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Builtin_attributes",
         "//stdlib:Stdlib.Format",
@@ -498,6 +532,7 @@ bootstrap_signature(
     name = "Includeclass_cmi",
     src  = "includeclass.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Location",
         "//stdlib:Stdlib.Format",
@@ -513,6 +548,7 @@ bootstrap_module(
     struct = "includecore.ml",
     sig    = "Includecore_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Builtin_attributes",
@@ -545,6 +581,7 @@ bootstrap_signature(
     name = "Includecore_cmi",
     src  = "includecore.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Location",
         "//parsing:Longident",
@@ -566,6 +603,7 @@ bootstrap_module(
     struct = "includemod.ml",
     sig    = "Includemod_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//file_formats:Cmt_format",
         "//parsing:Builtin_attributes",
@@ -607,6 +645,7 @@ bootstrap_signature(
     name = "Includemod_cmi",
     src  = "includemod.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Location",
         "//parsing:Longident",
@@ -630,6 +669,7 @@ bootstrap_module(
     struct = "includemod_errorprinter.ml",
     sig    = "Includemod_errorprinter_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Location",
         "//stdlib:Stdlib.Bytes",
@@ -660,6 +700,7 @@ bootstrap_signature(
     name = "Includemod_errorprinter_cmi",
     src  = "includemod_errorprinter.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Longident",
         "//parsing:Parsetree_cmi",
@@ -678,6 +719,7 @@ bootstrap_module(
     struct = "mtype.ml",
     sig    = "Mtype_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -699,6 +741,7 @@ bootstrap_signature(
     name = "Mtype_cmi",
     src  = "mtype.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Env",
         ":Ident",
@@ -712,6 +755,7 @@ bootstrap_module(
     struct = "oprint.ml",
     sig    = "Oprint_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Pprintast",
@@ -735,6 +779,7 @@ bootstrap_signature(
     name = "Oprint_cmi",
     src  = "oprint.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
@@ -748,6 +793,7 @@ bootstrap_signature(
     name = "Outcometree_cmi",
     src  = "outcometree.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
@@ -761,6 +807,7 @@ bootstrap_module(
     struct = "parmatch.ml",
     sig    = "Parmatch_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Ast_helper",
         "//parsing:Asttypes_cmi",
@@ -806,6 +853,7 @@ bootstrap_signature(
     name = "Parmatch_cmi",
     src  = "parmatch.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -824,6 +872,7 @@ bootstrap_module(
     struct = "path.ml",
     sig    = "Path_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Int",
@@ -847,6 +896,7 @@ bootstrap_signature(
     name = "Path_cmi",
     src  = "path.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Map",
@@ -861,6 +911,7 @@ bootstrap_module(
     struct = "patterns.ml",
     sig    = "Patterns_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -880,6 +931,7 @@ bootstrap_signature(
     name = "Patterns_cmi",
     src  = "patterns.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Longident",
@@ -896,6 +948,7 @@ bootstrap_module(
     struct = "persistent_env.ml",
     sig    = "Persistent_env_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//file_formats:Cmi_format",
         "//parsing:Location",
@@ -919,6 +972,7 @@ bootstrap_signature(
     name = "Persistent_env_cmi",
     src  = "persistent_env.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//file_formats:Cmi_format_cmi",
         "//parsing:Location",
@@ -936,6 +990,7 @@ bootstrap_module(
     struct = "predef.ml",
     sig    = "Predef_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Ast_helper",
         "//parsing:Asttypes_cmi",
@@ -953,6 +1008,7 @@ bootstrap_module(
         "//bytecomp:__pkg__",
         "//lambda:__pkg__",
         "//middle_end/flambda:__pkg__",
+        "//otherlibs/dynlink:__pkg__",
         "//toplevel:__pkg__",
         "//toplevel:__pkg__",
     ]
@@ -962,6 +1018,7 @@ bootstrap_signature(
     name = "Predef_cmi",
     src  = "predef.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Ident",
         ":Path",
@@ -974,6 +1031,7 @@ bootstrap_module(
     struct = "primitive.ml",
     sig    = "Primitive_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Attr_helper",
         "//parsing:Location",
@@ -996,6 +1054,7 @@ bootstrap_signature(
     name = "Primitive_cmi",
     src  = "primitive.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -1009,6 +1068,7 @@ bootstrap_module(
     struct = "printpat.ml",
     sig    = "Printpat_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
@@ -1026,6 +1086,7 @@ bootstrap_signature(
     name = "Printpat_cmi",
     src  = "printpat.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Longident",
@@ -1041,6 +1102,7 @@ bootstrap_module(
     struct = "printtyp.ml",
     sig    = "Printtyp_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -1092,6 +1154,7 @@ bootstrap_signature(
     name = "Printtyp_cmi",
     src  = "printtyp.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Path",
@@ -1111,6 +1174,7 @@ bootstrap_module(
     struct = "printtyped.ml",
     sig    = "Printtyped_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1140,6 +1204,7 @@ bootstrap_signature(
     name = "Printtyped_cmi",
     src  = "printtyped.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Typedtree",
         ":Path",
@@ -1154,6 +1219,7 @@ bootstrap_module(
     struct = "rec_check.ml",
     sig    = "Rec_check_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typeopt",
@@ -1172,6 +1238,7 @@ bootstrap_signature(
     name = "Rec_check_cmi",
     src  = "rec_check.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Typedtree",
         ":Path",
@@ -1186,6 +1253,7 @@ bootstrap_module(
     struct = "shape.ml",
     sig    = "Shape_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Ident",
         "//typing:Path",
@@ -1197,6 +1265,7 @@ bootstrap_signature(
     name = "Shape_cmi",
     src  = "shape.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Ident_cmi",
         ":Path_cmi"
@@ -1208,6 +1277,7 @@ bootstrap_module(
     struct = "signature_group.ml",
     sig    = "Signature_group_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Ident",
@@ -1221,6 +1291,7 @@ bootstrap_signature(
     name = "Signature_group_cmi",
     src  = "signature_group.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         "//stdlib:Stdlib.Seq",
@@ -1232,6 +1303,7 @@ bootstrap_module(
     struct = "stypes.ml",
     sig    = "Stypes_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Typedtree",
         ":Printtyp",
@@ -1252,6 +1324,7 @@ bootstrap_signature(
     name = "Stypes_cmi",
     src  = "stypes.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Typedtree",
         ":Path",
@@ -1267,6 +1340,7 @@ bootstrap_module(
     struct = "subst.ml",
     sig    = "Subst_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Ast_mapper",
         "//parsing:Location",
@@ -1287,13 +1361,15 @@ bootstrap_module(
         #### (Transient_expr)
         #### (Uid)
         #### (Vars)
-    ]
+    ],
+    visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_signature(
     name = "Subst_cmi",
     src  = "subst.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Path",
@@ -1308,6 +1384,7 @@ bootstrap_module(
     struct = "tast_iterator.ml",
     sig    = "Tast_iterator_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1325,6 +1402,7 @@ bootstrap_signature(
     name = "Tast_iterator_cmi",
     src  = "tast_iterator.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Typedtree",
         ":Path",
@@ -1340,6 +1418,7 @@ bootstrap_module(
     struct = "tast_mapper.ml",
     sig    = "Tast_mapper_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1358,6 +1437,7 @@ bootstrap_signature(
     name = "Tast_mapper_cmi",
     src  = "tast_mapper.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Typedtree",
         ":Path",
@@ -1373,6 +1453,7 @@ bootstrap_module(
     struct = "type_immediacy.ml",
     sig    = "Type_immediacy_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Builtin_attributes"
     ]
@@ -1382,6 +1463,7 @@ bootstrap_signature(
     name = "Type_immediacy_cmi",
     src  = "type_immediacy.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Parsetree_cmi"
     ]
@@ -1392,6 +1474,7 @@ bootstrap_module(
     struct = "typeclass.ml",
     sig    = "Typeclass_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
@@ -1445,6 +1528,7 @@ bootstrap_signature(
     name = "Typeclass_cmi",
     src  = "typeclass.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1466,6 +1550,7 @@ bootstrap_module(
     struct = "typecore.ml",
     sig    = "Typecore_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
@@ -1532,6 +1617,7 @@ bootstrap_signature(
     name = "Typecore_cmi",
     src  = "typecore.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1551,6 +1637,7 @@ bootstrap_module(
     struct = "typedecl.ml",
     sig    = "Typedecl_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
 
         "//parsing:Ast_helper",
@@ -1601,6 +1688,7 @@ bootstrap_signature(
     name = "Typedecl_cmi",
     src  = "typedecl.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -1626,6 +1714,7 @@ bootstrap_module(
     struct = "typedecl_immediacy.ml",
     sig    = "Typedecl_immediacy_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedecl_unboxed",
@@ -1641,6 +1730,7 @@ bootstrap_signature(
     name = "Typedecl_immediacy_cmi",
     src  = "typedecl_immediacy.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedecl_properties",
@@ -1656,6 +1746,7 @@ bootstrap_module(
     struct = "typedecl_properties.ml",
     sig    = "Typedecl_properties_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Subst",
@@ -1671,6 +1762,7 @@ bootstrap_signature(
     name = "Typedecl_properties_cmi",
     src  = "typedecl_properties.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Ident",
@@ -1683,6 +1775,7 @@ bootstrap_module(
     struct = "typedecl_separability.ml",
     sig    = "Typedecl_separability_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedecl_properties",
@@ -1703,6 +1796,7 @@ bootstrap_signature(
     name = "Typedecl_separability_cmi",
     src  = "typedecl_separability.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedecl_properties",
@@ -1717,6 +1811,7 @@ bootstrap_module(
     struct = "typedecl_unboxed.ml",
     sig    = "Typedecl_unboxed_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Subst",
@@ -1730,6 +1825,7 @@ bootstrap_signature(
     name = "Typedecl_unboxed_cmi",
     src  = "typedecl_unboxed.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Env",
@@ -1741,6 +1837,7 @@ bootstrap_module(
     struct = "typedecl_variance.ml",
     sig    = "Typedecl_variance_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -1764,6 +1861,7 @@ bootstrap_signature(
     name = "Typedecl_variance_cmi",
     src  = "typedecl_variance.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1783,6 +1881,7 @@ bootstrap_module(
     struct = "typedtree.ml",
     sig    = "Typedtree_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -1812,6 +1911,7 @@ bootstrap_signature(
     name = "Typedtree_cmi",
     src  = "typedtree.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Primitive",
@@ -1835,6 +1935,7 @@ bootstrap_module(
     struct = "typemod.ml",
     sig    = "Typemod_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//file_formats:Cmi_format",
         "//file_formats:Cmt_format",
@@ -1895,6 +1996,7 @@ bootstrap_signature(
     name = "Typemod_cmi",
     src  = "typemod.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1915,6 +2017,7 @@ bootstrap_module(
     struct = "typeopt.ml",
     sig    = "Typeopt_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1943,6 +2046,7 @@ bootstrap_signature(
     name = "Typeopt_cmi",
     src  = "typeopt.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -1959,6 +2063,7 @@ bootstrap_module(
     struct = "types.ml",
     sig    = "Types_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Type_immediacy",
         ":Primitive",
@@ -1992,6 +2097,7 @@ bootstrap_signature(
     name = "Types_cmi",
     src  = "types.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Ident",
         ":Path",
@@ -2007,6 +2113,7 @@ bootstrap_module(
     struct = "typetexp.ml",
     sig    = "Typetexp_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -2041,6 +2148,7 @@ bootstrap_signature(
     name = "Typetexp_cmi",
     src  = "typetexp.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -2060,6 +2168,7 @@ bootstrap_module(
     struct = "untypeast.ml",
     sig    = "Untypeast_cmi",
     opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//parsing:Ast_helper",
         "//parsing:Asttypes_cmi",
@@ -2113,6 +2222,7 @@ bootstrap_signature(
     name = "Untypeast_cmi",
     src  = "untypeast.mli",
     opts = SIG_OPTS,
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Typedtree",
         ":Path",

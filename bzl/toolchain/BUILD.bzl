@@ -1,4 +1,5 @@
-load("//bzl:transitions.bzl",
+load("//bzl/transitions:toolchain.bzl",
+     "toolchain_in_transition",
      "ocamlrun_out_transition")
 
 # load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
@@ -21,23 +22,23 @@ _bootstrap_tools_attrs = {
     ),
 
     "ocamlrun": attr.label(
-        default    = "//runtime:ocamlrun",
+        default    = "//bzl/toolchain:ocamlrun",
         executable = True,
         allow_single_file = True,
-        # cfg = ocamlrun_out_transition,
-        cfg = "exec",
-    ),
-    # "_allowlist_function_transition" : attr.label(
-    #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-    # ),
-
-    # rebuilt bc compiler emits bytecode
-    "ocamlc": attr.label(
-        default   = "//boot:ocamlc",
-        executable = False,
-        allow_single_file = True,
+        cfg = ocamlrun_out_transition,
         # cfg = "exec",
     ),
+    "_allowlist_function_transition" : attr.label(
+        default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+    ),
+
+    # rebuilt bc compiler emits bytecode
+    # "ocamlc": attr.label(
+    #     default   = "//boot:ocamlc",
+    #     executable = False,
+    #     allow_single_file = True,
+    #     # cfg = "exec",
+    # ),
 
     ## native compiler, built by byte-compiler
     # "ocamlopt": attr.label(
@@ -127,7 +128,7 @@ def _bootstrap_toolchain_impl(ctx):
         ocamlrun   = ctx.file.ocamlrun,
         # ocamlrun   = ctx.attr.ocamlrun.files.to_list()[0],
 
-        ocamlc     = ctx.file.ocamlc, #.files.to_list()[0],
+        # ocamlc     = ctx.file.ocamlc, #.files.to_list()[0],
 
         boot_ocamllex   = ctx.attr.boot_ocamllex.files.to_list()[0],
         ocamlyacc  = ctx.attr.ocamlyacc.files.to_list()[0],
@@ -154,4 +155,6 @@ bootstrap_toolchain_impl = rule(
     # fragments = ["cpp", "apple", "platform"],
     # host_fragments = ["apple", "platform"],
     # toolchains = ["@bazel_tools//tools/cpp:toolchain_type"]
+
+    cfg = toolchain_in_transition,
 )

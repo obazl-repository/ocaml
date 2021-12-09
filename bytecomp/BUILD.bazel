@@ -10,6 +10,15 @@ load("//config:BUILD.bzl",
      "ROOT_MODULE_OPTS",
      "ROOT_SIG_OPTS")
 
+exports_files([
+    "bytesections.mli", "bytesections.ml",
+    "dll.mli", "dll.ml",
+    "instruct.mli", "instruct.ml",
+    "meta.mli", "meta.ml",
+    ## genrule: "opcodes.ml"
+    "symtable.mli", "symtable.ml"
+])
+
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS = ROOT_SIG_OPTS
 
@@ -67,7 +76,7 @@ bootstrap_archive(
     # ],
     visibility = [
         "//boot:__pkg__",
-        "//compilers:__pkg__",
+        "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
@@ -122,26 +131,26 @@ bootstrap_module(
     sig    = "Bytegen_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//lambda:Switch",
+        "//lambda:Debuginfo",
+        "//lambda:Lambda",
         "//lambda:Matching",
-        # ":Lambda",
-        # ":Debuginfo",
-        "//stdlib:Stdlib",
-        ":Instruct",
-        "//typing:Types",
-        ## (Subst)
-        ## (Stack)
-        "//stdlib:Stdlib.Printf",
-        "//typing:Primitive",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//typing:Ident",
-        "//typing:Env",
-        "//utils:Config",
-        "//utils:Clflags",
+        "//lambda:Switch",
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Stack",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Primitive",
+        "//typing:Subst",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Config",
+        "//utils:Misc",
+        ":Instruct",
+        # "//stdlib:Stdlib",
     ],
     data = ["//runtime:primitives"],
     visibility = [
@@ -219,7 +228,7 @@ bootstrap_module(
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        ## (Consistbl)
+        "//utils:Consistbl",
         "//utils:Config",
         "//file_formats:Cmo_format_cmi",
         "//utils:Clflags",
@@ -257,7 +266,7 @@ bootstrap_module(
         ":Bytegen",
         "//typing:Typemod",
         "//lambda:Translmod",
-        ## (Subst)
+        "//typing:Subst",
         "//lambda:Simplif",
         "//lambda:Printlambda",
         "//typing:Path",
@@ -301,6 +310,7 @@ bootstrap_module(
     ],
     data = ["//runtime:primitives"],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
     ]
@@ -332,7 +342,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//toplevel:__subpackages__"]
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//toplevel:__subpackages__"
+    ]
 )
 
 bootstrap_signature(
@@ -401,9 +414,9 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//lambda:Lambda",
-        "//stdlib:Stdlib",
+        # "//stdlib:Stdlib",
         "//typing:Types",
-        ## (Subst)
+        "//typing:Subst",
         "//parsing:Location",
         "//typing:Ident",
         "//typing:Env",
@@ -417,10 +430,10 @@ bootstrap_signature(
     src  = "instruct.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//stdlib:Stdlib",
+        # "//stdlib:Stdlib",
         "//lambda:Lambda_cmi",
         "//typing:Types",
-        ## (Subst)
+        "//typing:Subst",
         "//parsing:Location",
         "//typing:Ident",
         "//typing:Env",
@@ -439,7 +452,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Obj",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//toplevel:__pkg__"]
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//toplevel:__pkg__"
+    ]
 )
 
 bootstrap_signature(
@@ -484,7 +500,8 @@ genrule(
         "-opcodes",
         "< $(location //runtime/caml:instruct.h)",
         "> $@"
-    ])
+    ]),
+    visibility = ["//visibility:public"]
 )
 
 ## NB: the makefile extracts the mli file using ocamlc -i
@@ -588,6 +605,7 @@ bootstrap_module(
     ],
     data = ["//runtime:primitives"],
     visibility = [
+        "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__"
     ]

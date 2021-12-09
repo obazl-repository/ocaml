@@ -6,16 +6,16 @@ load("//bzl:rules.bzl",
 
 load("//config:BUILD.bzl",
      "OTHERLIBS_MODULE_OPTS",
-     "OTHERLIBS_SIG_OPTS"
+     "OTHERLIBS_SIG_OPTS",
+     "OTHERLIBS_ARCHIVE_OPTS"
      )
 
 MODULE_OPTS = OTHERLIBS_MODULE_OPTS
 SIG_OPTS    = OTHERLIBS_MODULE_OPTS
 
-STDLIB = ["//stdlib"]
-
 bootstrap_archive(
     name = "bigarray",
+    opts = OTHERLIBS_ARCHIVE_OPTS,
     manifest  = [
         ":Bigarray",
     ],
