@@ -13,7 +13,9 @@ load(":impl_common.bzl", "dsorder", "module_sep", "resolver_suffix")
 
 load(":impl_ccdeps.bzl", "dump_CcInfo")
 
-# load("//bzl/functions:utils.bzl", "get_sdkpath")
+load("//bzl:functions.bzl", "config_tc")
+
+load(":options.bzl", "get_options")
 
 ## Library targets do not produce anything, they just pass on their deps.
 
@@ -22,93 +24,81 @@ load(":impl_ccdeps.bzl", "dump_CcInfo")
 ## functions, which set the ConfigState that controls build actions of
 ## deps.
 
+################
+def build_packed_module(ctx, ordered_manifest, inputs_depset):
+    print("BUILDING PACKED MODULE: %s" % ctx.attr.pack_ns)
+
+    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+
+    module_name = ctx.attr.pack_ns[:1].capitalize() + ctx.attr.pack_ns[1:]
+
+    out_cm_ = ctx.actions.declare_file(scope + module_name + ".cmo")
+
+    out_cmi = ctx.actions.declare_file(scope + module_name + ".cmi")
+
+    args = ctx.actions.args()
+    args.add_all(tool_args)
+
+    _options = get_options(ctx.attr._rule, ctx)
+    args.add_all(_options)
+
+    args.add("-pack")
+
+    for dep in ordered_manifest:
+        # print("LINKING: %s" % dep)
+        args.add(dep)
+
+    if ctx.attr.stdlib:
+        inputs = depset(
+            transitive = [ctx.attr.stdlib[0][DefaultInfo].files,
+                          inputs_depset]
+        )
+        args.add("-I", ctx.file.stdlib.dirname)
+    else:
+        inputs = inputs_depset
+
+    args.add("-o", out_cm_)
+
+    ctx.actions.run(
+        # env = env,
+        executable = tool,
+        arguments = [args],
+        inputs    = inputs,
+        outputs   = [out_cm_, out_cmi],
+        tools = [tool] + tool_args,
+        mnemonic = "CompilePackedModule",
+        progress_message = "{mode} packing {rule}: {ws}//{pkg}:{tgt}".format(
+            mode = mode,
+            rule=ctx.attr._rule,
+            ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
+            pkg = ctx.label.package,
+            tgt=ctx.label.name,
+        )
+    )
+
+    default_depset = depset(
+        order = dsorder,
+        # direct = default_outputs,
+        transitive = [depset(direct=[out_cm_, out_cmi])]
+    )
+
+    defaultInfo = DefaultInfo(
+        files = default_depset
+    )
+
+    return [defaultInfo]
+
 #################
-def impl_library(ctx, mode, tool): # , tool_args):
+def impl_library(ctx): # , mode, tool): # , tool_args):
 
     debug = False
     # print("**** NS_LIB {} ****************".format(ctx.label))
-
-    # env = {"PATH": get_sdkpath(ctx)}
-
-    # tc = ctx.toolchains["@obazl_rules_ocaml//ocaml:toolchain"]
-
-    # mode = ctx.attr._mode[CompilationModeSettingProvider].value
 
     ns_resolver_depset = None
     ns_resolver_module = None
     ns_resolver = []
     ns_resolver_files = []
     the_ns_resolvers = []
-
-    # WARNING: due to transition processing, ns_resolver providers
-    # must be indexed by [0]
-
-    # if ctx.attr._rule.startswith("ocaml_ns"):
-    #     print("tgt: %s" % ctx.label)
-    #     print("rule: %s" % ctx.attr._rule)
-
-    #     if hasattr(ctx.attr, "resolver"):
-    #         if ctx.attr.resolver:
-    #             # user-provided
-    #             ns_resolver = ctx.attr.resolver
-    #             ns_resolver_module = ctx.file.resolver
-    #             ns_name = ctx.attr.ns
-    #     else:
-    #         if len(ctx.files._ns_resolver) > 0:
-    #             ns_resolver = ctx.attr._ns_resolver[0] # index by int
-    #             ns_resolver_module = ctx.files._ns_resolver[0]
-
-    #     print("ns_resolver: %s" % ns_resolver)
-    #     print("ns_resolver_module: %s" % ns_resolver_module)
-
-    #     if OcamlNsResolverProvider in ns_resolver:
-    #         # print("LBL: %s" % ctx.label)
-    #         # print("ns_resolver: %s" % ns_resolver[OcamlNsResolverProvider])
-    #         if hasattr(ns_resolver[OcamlNsResolverProvider], "ns_name"):
-    #             ns_name = ns_resolver[OcamlNsResolverProvider].ns_name
-    #         else:
-    #             # FIXME: when does this happen?
-    #             ns_name = ""
-
-    #     ## if ns_resolver ends in __0Resolver, then we know that one
-    #     ## of the submodules is a user-provided resolver; the
-    #     ## __0Resolver was just used to compile the submodules. So we
-    #     ## need to find the user-provided resolver (its name matches
-    #     ## the ns name), and make all the other submodules depend on
-    #     ## it.
-
-    #     ## pathological case: ns contains a single user-provided
-    #     ## resolver. in that case we have no aliases so no resolver.
-    #     ## there would be no point in such an ns but its possible.
-    #     if ns_resolver_module:
-    #         print("LBL: %s" % ctx.label)
-    #         (ns_resolver_mname, ext) = paths.split_extension(ns_resolver_module.basename)
-    #         print("ns_resolver_mname: %s" % ns_resolver_mname)
-    #         if ns_resolver_mname == ns_name + resolver_suffix:
-    #             print("Resolver is user-provided")
-    #             user_provided_resolver = True
-    #         else:
-    #             user_provided_resolver = False
-    #     else:
-    #         user_provided_resolver = False
-
-    #     if user_provided_resolver:
-    #         ##FIXME: efficiency
-    #         for submodule in ctx.files.submodules:
-    #             (bname, ext) = paths.split_extension(submodule.basename)
-    #             if bname == ns_name:
-    #                 print("Found user-provided resolver submodule")
-    #                 the_ns_resolvers.append(submodule)
-    #     # else:
-    #     if OcamlProvider in ns_resolver: ##ctx.attr._ns_resolver[0]:
-    #         # print("ns_resolver provider: %s" % ns_resolver[OcamlProvider])
-    #         ns_resolver_files = ns_resolver[OcamlProvider].inputs
-    #         ns_resolver_depset = ns_resolver[OcamlProvider].inputs
-
-        # the_ns_resolvers.append(ns_resolver_module[0])
-
-    # print("ns_resolver_depset: %s" % ns_resolver_depset)
-    # print("ns_name: %s" % ns_name)
 
     ################
     ## FIXME: does lib need to handle adjunct deps? they're carried by
@@ -121,24 +111,20 @@ def impl_library(ctx, mode, tool): # , tool_args):
     # resolver_depsets_list = []
 
     #######################
-    direct_deps_attr = None
-    if ctx.attr._rule in ["bootstrap_archive", "bootstrap_library"]:
-        direct_deps_files = ctx.files.manifest
-        direct_deps_attr = ctx.attr.manifest
-    else:
-        fail("impl_library called by non-aggregator: %s" % ctx.attr._rule)
+    # direct_deps_attr = None
+    # if ctx.attr._rule in ["bootstrap_archive", "bootstrap_library"]:
+    #     direct_deps_files = ctx.files.manifest
+    #     direct_deps_attr = ctx.attr.manifest
+    # else:
+    #     fail("impl_library called by non-aggregator: %s" % ctx.attr._rule)
 
-    ## FIXME: direct_deps_files (and direct_deps_attr) are in the order
-    ## set by the submodule/modules attribute; they must be put in
+    ## FIXME: manifest list is in the order set by the
+    ## submodule/modules attribute; they must be put in
     ## dependency-order.
 
-    for f in direct_deps_files:
+    ## FIXME: don't need this? we get paths depset for each dep below
+    for f in ctx.files.manifest:
         paths_direct.append(f.dirname)
-
-    # if ctx.label.name == "tezos-shell":
-    #     print("LBL: %s" % ctx.label)
-    #     for dep in direct_deps_attr:
-    #         print("DEP: %s" % dep[OcamlProvider].fileset)
 
     #### INDIRECT DEPS first ####
     # these are "indirect" from the perspective of the consumer
@@ -150,27 +136,22 @@ def impl_library(ctx, mode, tool): # , tool_args):
 
     ccInfo_list = []
 
-    # direct_module_deps_files = ctx.files.submodules if ctx.attr._rule.startswith("ocaml_ns") else ctx.files.manifest
-
-    # direct_module_deps = ctx.attr.submodules if ctx.attr._rule.startswith("ocaml_ns") else ctx.attr.manifest
-
-    for dep in direct_deps_attr:
-        # if ctx.label.name == 'tezos-base':
-        #     print("DEPPP: %s" % dep)
-        # ignore DefaultInfo, its just for printing, not propagation
+    for dep in ctx.attr.manifest:
 
         if OcamlProvider in dep: # should always be True
             # print("LBL: %s" % ctx.label)
             # print("OcamlProv: %s" % dep[OcamlProvider])
             indirect_fileset_depsets.append(dep[OcamlProvider].fileset)
 
-            if hasattr(dep[OcamlProvider], "cmi"):
-                indirect_cmi_depsets.append(dep[OcamlProvider].cmi)
-            else:
-                print("NO CMI: %s" % dep)
+            # if hasattr(dep[OcamlProvider], "cmi"):
+            indirect_cmi_depsets.append(dep[OcamlProvider].cmi)
+            # else:
+            #     print("NO CMI: %s" % dep)
 
             # linkargs: what goes on cmd line to build archive or
-            # executable FIXME: __excluding__ sibling modules! Why?
+            # executable.
+
+            # FIXME: __excluding__ sibling modules! Why?
             # because even if we put only indirect deps in linkargs,
             # the head (direct) dep could still appear anywhere in the
             # dep closure; in particular, we may have sibling deps, in
@@ -181,11 +162,7 @@ def impl_library(ctx, mode, tool): # , tool_args):
             # if linkarg not in direct_module_deps_files:
             indirect_linkargs_depsets.append(dep[OcamlProvider].linkargs)
 
-            # if ctx.label.name == "tezos-base":
-            #     print("LIBDEP LINKARGS: %s" % dep[OcamlProvider].linkargs)
-            # indirect_linkargs_depsets.append(dep[OcamlProvider].files)
-
-            ## inputs == all deps
+            ## inputs == closure (all deps)
             indirect_inputs_depsets.append(dep[OcamlProvider].inputs)
 
             indirect_paths_depsets.append(dep[OcamlProvider].paths)
@@ -199,27 +176,18 @@ def impl_library(ctx, mode, tool): # , tool_args):
             #     dump_CcInfo(ctx, dep)
             ccInfo_list.append(dep[CcInfo])
 
-    ## end: for dep in direct_deps_attr:
+    ## end: for dep in ctx.attr.manifest
 
     # print("indirect_inputs_depsets: %s" % indirect_inputs_depsets)
 
-    # normalized_direct_deps_files = []
-    # for dep in direct_deps_files:
-    #     print("direct dep: %s" % dep)
-    #     print("the_ns_resolvers: %s" % the_ns_resolvers)
-    #     # (bname, ext) = paths.split_extension(dep.basename)
-    #     if dep.basename not in the_ns_resolvers: ## [0].basename:
-    #         normalized_direct_deps_files.append(dep)
-    #     else:
-    #         print("removing %s" % dep)
-
     inputs_depset = depset(
         order = dsorder,
-        direct = direct_deps_files,
+        ## FIXME: no need for direct manifest, already in indirect_inputs_depsets?
+        direct = ctx.files.manifest,
         transitive = ([ns_resolver_depset] if ns_resolver_depset else [])
         + indirect_inputs_depsets
         + indirect_cmi_depsets
-        # + [depset(direct_deps_files)]
+        # + [depset(ctx.files.manifest)]
     )
 
     ## use inputs closure to put manifest deps in dependency order
@@ -234,12 +202,6 @@ def impl_library(ctx, mode, tool): # , tool_args):
     ## To put direct deps in dep-order, we need to merge the linkargs
     ## deps and iterate over them:
     new_linkargs = []
-    ## start with ns_resolver:
-    # if ctx.attr._rule.startswith("ocaml_ns"):
-    #     if ns_resolver:
-    #         for f in ns_resolver[DefaultInfo].files.to_list():
-    #             paths_direct.append(f.dirname)
-    #             new_linkargs.append(f)
 
     linkargs_depset = depset(
         order = dsorder,
@@ -248,15 +210,16 @@ def impl_library(ctx, mode, tool): # , tool_args):
         # transitive = ([ns_resolver_depset] if ns_resolver_depset else []) + indirect_linkargs_depsets
     )
     for dep in inputs_depset.to_list():
-        if dep in direct_deps_files:
+        if dep in ctx.files.manifest:
             new_linkargs.append(dep)
+
+    ## FIXME: new_linkargs should be same as ordered_manifest
 
     ## archives share this impl but do not have attrib 'pack_ns'
     if hasattr(ctx.attr, "pack_ns"):
         if ctx.attr.pack_ns:
             print("PACKING")
-            # ctx.actions.run(
-            # )
+            return build_packed_module(ctx, ordered_manifest, inputs_depset)
         else:
             ctx.actions.do_nothing(
                 mnemonic = "NS_LIB",
@@ -270,12 +233,12 @@ def impl_library(ctx, mode, tool): # , tool_args):
     #### PROVIDERS ####
     default_depset = depset(
         order = dsorder,
-        # direct = normalized_direct_deps_files, # ns_resolver_module,
+        # direct = normalized_ctx.files.manifest, # ns_resolver_module,
         # transitive = [depset(direct = the_ns_resolvers)]
 
         direct = the_ns_resolvers + [ns_resolver_module] if ns_resolver_module else [],
-        # transitive = [depset(direct_deps_files)]
-        # transitive = [depset(normalized_direct_deps_files)]
+        # transitive = [depset(ctx.files.manifest)]
+        # transitive = [depset(normalized_ctx.files.manifest)]
         transitive = [depset(ordered_manifest)]
     )
 
@@ -305,8 +268,9 @@ def impl_library(ctx, mode, tool): # , tool_args):
     )
 
     # print("new_linkargs: %s" % new_linkargs)
+    ## FIXME: new_linkargs or ordered_manifest?
     ocamlProvider = OcamlProvider(
-        files   = depset(direct=new_linkargs),
+        files   = default_depset, # depset(direct=new_linkargs),
         fileset = fileset_depset,
         cmi     = cmi_depset,
         inputs   = closure_depset,

@@ -281,7 +281,7 @@ def handle_sig(ctx, scope, debug):
 ###############################
 def _bootstrap_module(ctx):
 
-    tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
 
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
@@ -295,7 +295,7 @@ def _bootstrap_module(ctx):
 
     if ctx.attr._pack_ns[BuildSettingInfo].value:
         pack_ns = ctx.attr._pack_ns[BuildSettingInfo].value
-        print("GOT PACK NS: %s" % pack_ns)
+        # print("GOT PACK NS: %s" % pack_ns)
     else:
         pack_ns = False
 
@@ -385,15 +385,6 @@ def _bootstrap_module(ctx):
     args.add_all(tool_args)
 
     _options = get_options(ctx.attr._rule, ctx)
-    # if "-for-pack" in _options:
-    #     for_pack = True
-    #     _options.remove("-for-pack")
-    # else:
-    #     for_pack = False
-
-    # if ctx.attr.pack:
-    #     args.add("-for-pack", ctx.attr.pack)
-
     args.add_all(_options)
 
     primitives = []

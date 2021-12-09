@@ -22,6 +22,7 @@ load(":options.bzl", "NEGATION_OPTS")
 ###############################
 def _bootstrap_archive(ctx):
 
+    ## NB: impl_library also calls this, but we need it here too
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
@@ -42,10 +43,9 @@ def _bootstrap_archive(ctx):
 
     # env = {"PATH": get_sdkpath(ctx)}
 
-    #########################################
+    ###   CALL THE LIB IMPLEMENTATION
+    lib_providers = impl_library(ctx) #, mode, tool) # , tool_args)
     # FIXME: improve the return vals handling
-    # print("CALL IMPL_LIB %s" % ctx.label)
-    lib_providers = impl_library(ctx, mode, tool) # , tool_args)
 
     libDefaultInfo = lib_providers[0]
     # print("libDefaultInfo: %s" % libDefaultInfo.files.to_list())
@@ -490,15 +490,12 @@ bootstrap_archive = rule(
             default = "//bzl/toolchain:tc"
         ),
 
-        primitives = attr.label(
-            allow_single_file = True,
-        ),
-
         _stage = attr.label(
             doc = "bootstrap stage",
             default = "//bzl:stage"
         ),
 
+        #FIXME: underscore
         ocamlc = attr.label(
             # cfg = ocamlc_out_transition,
             allow_single_file = True,
@@ -516,6 +513,10 @@ bootstrap_archive = rule(
         mode       = attr.string(
             doc     = "Overrides mode build setting.",
             # default = ""
+        ),
+
+        primitives = attr.label(
+            allow_single_file = True,
         ),
 
         opts             = attr.string_list(

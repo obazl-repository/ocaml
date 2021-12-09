@@ -36,7 +36,7 @@ def _bootstrap_library(ctx):
 
 #####################
 bootstrap_library = rule(
-    implementation = _bootstrap_library,
+    implementation = impl_library, ## _bootstrap_library,
     doc = """Aggregates a collection of OCaml modules. [User Guide](../ug/bootstrap_library.md). Provides: [OcamlLibraryMarker](providers_ocaml.md#ocamllibraryprovider).
 
 **WARNING** Not yet fully supported - subject to change. Use with caution.
@@ -57,6 +57,10 @@ Packages](../ug/collections.md).
     attrs = dict(
         # rule_options,
 
+        cm_name = attr.string(
+            doc = "Override rule name for packed module output"
+        ),
+
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
         ),
@@ -72,9 +76,10 @@ Packages](../ug/collections.md).
         # _strict_sequence = attr.label(default = ws + "//strict-sequence"),
         # _verbose         = attr.label(default = ws + "//verbose"),
 
-        # _mode       = attr.label(
-        #     default = ws + "//mode",
-        # ),
+        _mode       = attr.label(
+            default = "//bzl/toolchain",
+        ),
+
         mode       = attr.string(
             doc     = "Overrides mode build setting.",
             # default = ""
@@ -84,9 +89,26 @@ Packages](../ug/collections.md).
         #     default = Label("@ocaml//:sdkpath") # ppx also uses this
         # ),
 
+        _toolchain = attr.label(
+            default = "//bzl/toolchain:tc"
+        ),
+
         _stage = attr.label(
             doc = "bootstrap stage",
             default = "//bzl:stage"
+        ),
+
+        #FIXME: underscore
+        ocamlc = attr.label(
+            # cfg = ocamlc_out_transition,
+            allow_single_file = True,
+            default = "//bzl/toolchain:ocamlc"
+        ),
+
+        stdlib = attr.label(
+            doc = "For building the compiler, if -nostdlib passed.",
+            allow_single_file = True,
+            cfg = manifest_out_transition,
         ),
 
         manifest = attr.label_list(
@@ -116,7 +138,7 @@ Packages](../ug/collections.md).
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
     ),
-    provides = [OcamlLibraryMarker],
+    # provides = [OcamlLibraryMarker],
     executable = False,
     toolchains = ["//bzl/toolchain:bootstrap"]
 )

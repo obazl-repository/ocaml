@@ -1,0 +1,43 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+
+load("//bzl:rules.bzl", "ocamlc_fixpoint")
+
+load("//bzl:rules.bzl",
+     "bootstrap_module")
+
+load("//config:BUILD.bzl",
+     "ARCH", "MODEL", "SYSTEM",
+     "HOST", "ROOTDIR", "LIBDIR",
+     "OC_CFLAGS", "CFLAGS",
+     "OC_CPPFLAGS", "CPPFLAGS",
+     "OC_LDFLAGS", "LDFLAGS",
+
+     "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+     "OUTPUTEXE", "MKEXE_FLAGS",
+     "BYTECCLIBS",
+
+     "USE_PRIMS", "DATA_PRIMS",
+     "PRIMITIVES"
+     )
+
+## root Makefile:
+# The bytecode compiler
+# CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
+# LINKFLAGS=
+# ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
+#               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+# 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+
+# ./boot/ocamlrun ./boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives  -compat-32 -o ocamlc compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma driver/main.cmo
+
+ocamlc_fixpoint(
+    name = "ocamlc",
+    opts = ["-nostdlib", "-compat-32"],
+    primitives = PRIMITIVES,
+    main = "//driver:Main",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp"
+    ],
+    visibility = ["//visibility:public"]
+)

@@ -205,7 +205,9 @@ bootstrap_module(
 ## (private).
 bootstrap_library(
     visibility = ["//visibility:private"],
-    name       = "compilerlibs",
+    name       = "compilerlibs_ns",
+    ## cm_name not needed for std lib, it does not compile anything
+    ## cm_name    = "compilerlibs",
     manifest   = [
         ":Dynlink_compilerlibs",
         ":Dynlink_compilerlibs.Arg_helper",
@@ -1732,11 +1734,15 @@ bootstrap_signature(
 
 #########################################################
 ################  packed module version  ################
-bootstrap_library(
-    pack_ns    = "Dynlink_compilerlibs",
+# ../../ocamlc.opt -g -nostdlib -I ../../stdlib -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66-70 -warn-error +A -bin-annot -safe-string -strict-formats -I byte -pack -o byte/dynlink_compilerlibs.cmo
 
+bootstrap_library(
+    name       = "compilerlibs_packed",
+    cm_name    = "compilerlibs",
+    pack_ns    = "Dynlink_compilerlibs",
     visibility = ["//visibility:private"],
-    name       = "ns_compilerlibs",
+    opts       = MODULE_OPTS,
+    stdlib     = "//stdlib",
     manifest   = [
         "//bytecomp:Bytesections",
         "//bytecomp:Dll",

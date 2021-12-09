@@ -1,0 +1,16 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "string_flag", "string_setting")
+
+# package(default_visibility = ["//visibility:public"])
+
+string_flag(
+    name = "toolchain",
+    values = ["bytecode", "native"],
+    build_setting_default = "bytecode",
+    visibility = [
+        # "//otherlibs/dynlink:__pkg__",
+        "//toolchain/selection:__pkg__"
+    ]
+)
+
+

@@ -1,0 +1,14 @@
+# load("@bazel_skylib//rules:common_settings.bzl",
+#      "bool_flag", "bool_setting",
+#      "string_flag", "string_setting")
+
+# load(":BUILD.bzl", "bootstrap_toolchain_impl")
+
+package(default_visibility = ["//visibility:public"])
+
+## not needed?
+label_flag(
+    name = "ocamlc",
+    build_setting_default = "//boot:ocamlc"
+    # build_setting_default = "//runtime:ocamlc"
+)

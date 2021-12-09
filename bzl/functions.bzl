@@ -31,8 +31,6 @@ def config_tc(ctx):
     #     mode = ctx.attr._mode[BuildSettingInfo].value
 
     mode = ctx.attr._toolchain[BuildSettingInfo].value
-    # print("MODE: %s" % mode)
-    # print("ocamlc: %s" % ctx.file.ocamlc)
 
     tool = tc.ocamlrun
     tool_args = [ctx.file.ocamlc]
