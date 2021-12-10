@@ -1,6 +1,15 @@
 ## This Bazel extension file consolidates commonly used variables like
 ## `OC_CFLAGS` etc.  To be loaded by BUILD.bazel files.
 
+################################################################
+## Platform configuration
+## For now we just hardcode the platform stuff. For a real
+## implementation, we could use the --stamp,
+## --workspace_status_command technique to run some kind of
+## configuration shell script to obtain ARCH, etc. See .bazelrc for an
+## example, where we use the technique to parameterize the camlheader
+## files.
+
 ################################
 ## Makefile.config:
 TARGET = "x86_64-apple-darwin20.6.0"  ## FIXME

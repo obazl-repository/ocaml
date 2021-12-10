@@ -8,7 +8,7 @@ MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
 bootstrap_library(
-    name = "otherlibs_unix_lib",
+    name = "unix_cma",
     manifest  = [
         ":Unix",
         ":UnixLabels",
@@ -21,18 +21,18 @@ bootstrap_module(
     sig    = "Unix_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Fun",
-        ## (Callback)
-        "//stdlib:Stdlib.Bytes",
-        ## (Bigarray)
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Bigarray",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Callback",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
@@ -41,7 +41,7 @@ bootstrap_signature(
     src  = "unix.mli",
     opts = SIG_OPTS,
     deps   = [
-        ## (Bigarray)
+        "//stdlib:Stdlib.Bigarray"
     ]
 )
 
@@ -57,12 +57,29 @@ bootstrap_module(
 
 bootstrap_signature(
     name = "UnixLabels_cmi",
-    src  = "unixLabels.mli",
-    opts = SIG_OPTS,
+    src  = "xx/unixLabels.mli",
+    opts = SIG_OPTS + [
+        "-nolabels"
+    ],
     deps   = [
         ":Unix", ## (Otherlibs Unix Unix)
-        ## (Bigarray)
+        # "//stdlib:Stdlib.Bigarray"
     ]
+)
+
+# unixLabels.cmi: \
+#   EXTRACAMLFLAGS += -pp "$(AWK) -f $(ROOTDIR)/stdlib/expand_module_aliases.awk"
+
+genrule(
+    name = "unixlabels_mli_awk",
+    outs = ["xx/unixLabels.mli"],
+    srcs = ["unixLabels.mli",
+            "//stdlib:expand_module_aliases.awk"],
+    cmd_bash  = " ".join([
+        "awk -f $(location //stdlib:expand_module_aliases.awk)",
+        "$(location :unixLabels.mli)",
+        "> $@"
+    ]),
 )
 
 ################################################################

@@ -571,7 +571,7 @@ bootstrap_archive = rule(
             providers = [[CcInfo]]
         ),
         cc_linkopts = attr.string_list(
-            doc = "List of C/C++ link options. E.g. `[\"-lstd++\"]`.",
+            doc = "List of C/C++ link options. E.g. `[\"-lstd++\", \"lunix\"]`.",
         ),
         # cc_linkall = attr.label_list( ## FIXME: not needed
         #     doc     = "True: use `-whole-archive` (GCC toolchain) or `-force_load` (Clang toolchain). Deps in this attribute must also be listed in cc_deps.",
