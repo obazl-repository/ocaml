@@ -1,17 +1,45 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "bootstrap_archive",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+load("//config:BUILD.bzl",
+     "ARCH", "MODEL", "SYSTEM",
+     "HOST", "ROOTDIR", "LIBDIR",
+     "OC_CFLAGS", "CFLAGS",
+     "OC_CPPFLAGS", "CPPFLAGS",
+     "OC_LDFLAGS", "LDFLAGS",
 
-ocaml_library(
-    name = "otherlibs_systhreads_lib",
-    modules  = [
+     "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+     "OUTPUTEXE", "MKEXE_FLAGS",
+     "BYTECCLIBS"
+     )
+
+COMPFLAGS = [
+    "-w", "+33..39",
+    "-warn-error", "+A",
+    ## -g
+    "-bin-annot",
+    "-safe-string"
+]
+
+MODULE_OPTS = ["-nostdlib"] + COMPFLAGS
+SIG_OPTS = ["-nostdlib"] + COMPFLAGS
+
+################################################################
+# $(LIBNAME).cma: $(THREADS_BCOBJS)
+# ifeq "$(UNIX_OR_WIN32)" "unix"
+# 	$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -cclib -lunix -linkall \
+# 	  $(PTHREAD_CAML_LIBS) $^
+
+bootstrap_archive(
+    name = "threads_lib",
+    # cm_name = "threads",
+    opts = ["-linkall"],
+    cc_linkopts = ["-lunix"],
+    manifest  = [
         ":Condition",
         ":Event",
         ":Mutex",
@@ -21,41 +49,51 @@ ocaml_library(
     ],
 )
 
-ocaml_module(
+# ../../boot/ocamlrun ../../tools/ocamlmklib -o threads -ocamlc '../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix' -cclib -lunix -linkall \
+# 	  -cclib -lpthread thread.cmo mutex.cmo condition.cmo event.cmo threadUnix.cmo semaphore.cmo
+
+# LIBS = -nostdlib -I $(ROOTDIR)/stdlib -I $(ROOTDIR)/otherlibs/$(UNIXLIB)
+# CAMLC=$(BEST_OCAMLC) $(LIBS)
+# ../../ocamlopt.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot -safe-string  thread.ml
+
+# ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot -safe-string mutex.mli
+
+
+bootstrap_module(
     name   = "Condition",
     struct = "condition.ml",
     sig    = "Condition_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Systhreads", ## (Otherlibs Systhreads Mutex)
+        ":Mutex", ## (Otherlibs Systhreads Mutex)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Condition_cmi",
     src  = "condition.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Systhreads", ## (Otherlibs Systhreads Mutex)
+        ":Mutex", ## (Otherlibs Systhreads Mutex)
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Event",
     struct = "event.ml",
     sig    = "Event_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Systhreads", ## (Otherlibs Systhreads Mutex)
-        ":Systhreads", ## (Otherlibs Systhreads Condition)
-        ## (Random)
+        ":Mutex", ## (Otherlibs Systhreads Mutex)
+        ":Condition", ## (Otherlibs Systhreads Condition)
+        "//stdlib:Stdlib.Random",
         "//stdlib:Stdlib.Queue",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Array",
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Event_cmi",
     src  = "event.mli",
     opts = SIG_OPTS,
@@ -63,7 +101,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Mutex",
     struct = "mutex.ml",
     sig    = "Mutex_cmi",
@@ -72,7 +110,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Mutex_cmi",
     src  = "mutex.mli",
     opts = SIG_OPTS,
@@ -80,18 +118,18 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Semaphore",
     struct = "semaphore.ml",
     sig    = "Semaphore_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Systhreads", ## (Otherlibs Systhreads Mutex)
-        ":Systhreads", ## (Otherlibs Systhreads Condition)
+        ":Mutex", ## (Otherlibs Systhreads Mutex)
+        ":Condition", ## (Otherlibs Systhreads Condition)
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Semaphore_cmi",
     src  = "semaphore.mli",
     opts = SIG_OPTS,
@@ -99,7 +137,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Thread",
     struct = "thread.ml",
     sig    = "Thread_cmi",
@@ -108,11 +146,11 @@ ocaml_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Printexc",
-        ## (Callback)
+        "//stdlib:Stdlib.Callback"
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Thread_cmi",
     src  = "thread.mli",
     opts = SIG_OPTS,
@@ -120,19 +158,19 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "ThreadUnix",
     struct = "threadUnix.ml",
     sig    = "ThreadUnix_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":Unix", ## (Otherlibs Unix Unix)
-        ":Systhreads", ## (Otherlibs Systhreads Thread)
+        "//otherlibs/systhreads:Thread", ## (Otherlibs Systhreads Thread)
         "//stdlib:Stdlib.Bytes",
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "ThreadUnix_cmi",
     src  = "threadUnix.mli",
     opts = SIG_OPTS,
@@ -140,3 +178,68 @@ ocaml_signature(
     ]
 )
 
+################################################################
+# gcc -MM -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -I../../runtime -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_macosx  st_stubs.c -MT 'st_stubs.n.o' -MF .dep/st_stubs.n.d
+
+# gcc -MM -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -I../../runtime  st_stubs.c -MT 'st_stubs.b.o' -MF .dep/st_stubs.b.d
+
+# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g   -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -I../../runtime  \
+# 	  -o st_stubs.b.o st_stubs.c
+
+# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g   -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -I../../runtime -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_macosx -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_macosx  \
+# 	  -o st_stubs.n.o st_stubs.c
+
+# NATIVE_CPPFLAGS = \
+#   -DNATIVE_CODE -DTARGET_$(ARCH) -DMODEL_$(MODEL) -DSYS_$(SYSTEM)
+
+## Makefile.config:
+# TARGET = "x86_64-apple-darwin20.6.0"
+# HOST   = "x86_64-apple-darwin20.6.0"
+# ARCH       = "amd64"
+# ARCH64     = True
+# ENDIANNESS = "le"
+# MODEL      = "default"
+# SYSTEM     = "macosx"
+
+## ifdefs: NATIVE_CODE, _WIN32
+
+# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common -g   -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE  -I../../runtime  \
+# 	  -o st_stubs.b.o st_stubs.c
+
+## this builds the c lib:
+# ../../boot/ocamlrun ../../tools/ocamlmklib -o threads st_stubs.b.o -lpthread
+
+cc_library(
+    name = "threads",
+    srcs = [
+        "st_posix.h",
+        "st_stubs.c"
+    ] + select({
+        "//config/host:windows_x86_64": ["st_win32.h"],
+        "//conditions:default":         []
+    }),
+    copts = [
+        ## "-O2", # set by --compilation_mode opt
+        ## "-g",  # set by --compilation_mode dbg
+        ## "-Wall", # always(?) set by bazel
+        "-fno-strict-aliasing", "-fwrapv",
+        "-pthread",
+        "-Wdeclaration-after-statement",
+        "-Werror",
+        "-fno-common",
+    ],
+    linkopts = ["-lpthread"],
+    deps = ["//runtime/caml:hdrs"],
+    defines = OC_CPPDEFINES + [
+        ## for now, just hardcode it
+        # "TARGET_" + ARCH,
+        # "MODEL_"  + MODEL,
+        # "SYS_"    + SYSTEM
+    ] +select({
+        "//config/mode:native": ["NATIVE_CODE"],
+        "//conditions:default": []
+    # }) + select({
+    #     "//config/arch:amd64": ["TARGET_amd64"],
+    #     "//conditions:default": []
+    })
+)

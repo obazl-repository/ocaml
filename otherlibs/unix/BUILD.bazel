@@ -1,23 +1,21 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "bootstrap_library",
+     "bootstrap_module",
+     "bootstrap_signature",
 )
 
 MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
-ocaml_library(
+bootstrap_library(
     name = "otherlibs_unix_lib",
-    modules  = [
+    manifest  = [
         ":Unix",
         ":UnixLabels",
     ],
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "Unix",
     struct = "unix.ml",
     sig    = "Unix_cmi",
@@ -38,7 +36,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "Unix_cmi",
     src  = "unix.mli",
     opts = SIG_OPTS,
@@ -47,7 +45,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+bootstrap_module(
     name   = "UnixLabels",
     struct = "unixLabels.ml",
     sig    = "UnixLabels_cmi",
@@ -57,7 +55,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+bootstrap_signature(
     name = "UnixLabels_cmi",
     src  = "unixLabels.mli",
     opts = SIG_OPTS,
@@ -67,3 +65,11 @@ ocaml_signature(
     ]
 )
 
+################################################################
+cc_library(
+    name = "unix",
+    srcs = glob(["*.c", "*.h"]),
+    hdrs = ["unixsupport.h", "socketaddr.h"],
+    linkopts = ["-lm"],
+    deps = ["//runtime/caml:hdrs"]
+)

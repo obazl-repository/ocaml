@@ -61,6 +61,11 @@ cc_library(
     include_prefix = "caml",
     # hdrs = ["domain_state.tbl"],
     # static_library = ...,
-    visibility = ["//runtime:__pkg__", "//yacc:__pkg__"],
+    visibility = [
+        "//runtime:__pkg__",
+        "//otherlibs/systhreads:__pkg__",
+        "//otherlibs/unix:__pkg__",
+        "//yacc:__pkg__"
+    ],
 )
 
