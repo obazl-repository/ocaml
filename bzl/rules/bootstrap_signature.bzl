@@ -213,12 +213,23 @@ def _bootstrap_signature_impl(ctx):
     includes.extend(paths_depset.to_list())
     args.add_all(includes, before_each="-I", uniquify = True)
 
+
+
     if sig_src.extension == "ml":
         args.add("-i")
         args.add("-o", out_cmi)
     else:
         args.add("-c")
         args.add("-o", out_cmi)
+
+    pack_ns = False
+    if hasattr(ctx.attr, "_pack_ns"):
+        if ctx.attr._pack_ns:
+            if ctx.attr._pack_ns[BuildSettingInfo].value:
+                pack_ns = ctx.attr._pack_ns[BuildSettingInfo].value
+                # print("GOT PACK NS: %s" % pack_ns)
+    if pack_ns:
+        args.add("-for-pack", pack_ns)
 
     args.add("-intf", mlifile)
 

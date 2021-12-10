@@ -52,8 +52,15 @@ bootstrap_archive(
         ":Dynlink_common",
         ":Dynlink_platform_intf",
         ":Dynlink_types",
-        ":compilerlibs",
-    ],
+    ] + select({
+        ":pack_dynlink":  [":compilerlibs_packed"],
+        "//conditions:default"   :  [":compilerlibs"],
+    }),
+)
+
+config_setting(
+    name = "pack_dynlink",
+    flag_values = {"//config/pack:dynlink" : "True"},
 )
 
 ##########################################################
@@ -81,7 +88,6 @@ bootstrap_module(
         "//utils:Config",
         ":Dynlink_common",
         ":Dynlink_types",
-        ":compilerlibs"
     ] + select({
         "//toolchain/selection:bytecode": [
             "//bytecomp:Dll",
@@ -100,7 +106,10 @@ bootstrap_module(
             "//file_formats:Cmxs_format",
             "//stdlib:Stdlib.Filename",
         ]
-    })
+    }) + select({
+        ":pack_dynlink":  [":compilerlibs_packed"],
+        "//conditions:default"   :  [":compilerlibs"],
+    }),
 )
 
 bootstrap_signature(
@@ -119,20 +128,22 @@ bootstrap_module(
     sig    = "Dynlink_common_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Lazy",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Sys",
+        # "//stdlib:Stdlib.Digest",
+        # "//stdlib:Stdlib.Filename",
+        # "//stdlib:Stdlib.Format",
+        # "//stdlib:Stdlib.Lazy",
+        # "//stdlib:Stdlib.List",
+        # "//stdlib:Stdlib.Map",
+        # "//stdlib:Stdlib.Printf",
+        # "//stdlib:Stdlib.Set",
+        # "//stdlib:Stdlib.Sys",
         "//utils:Misc",
         ":Dynlink_platform_intf",
         ":Dynlink_types",
-        ":compilerlibs",
-    ]
+    ] + select({
+        ":pack_dynlink"        :  [":compilerlibs_packed"],
+        "//conditions:default" :  [":compilerlibs"],
+    }),
 )
 
 bootstrap_signature(
@@ -193,8 +204,10 @@ bootstrap_module(
     opts = MODULE_OPTS,
     deps   = [
         # makefile exposes this via '-I byte'
-        ":compilerlibs",
-    ]
+    ] + select({
+        ":pack_dynlink":  [":compilerlibs_packed"],
+        "//conditions:default"   :  [":compilerlibs"],
+    }),
 )
 
 #########################################################
@@ -205,7 +218,7 @@ bootstrap_module(
 ## (private).
 bootstrap_library(
     visibility = ["//visibility:private"],
-    name       = "compilerlibs_ns",
+    name       = "compilerlibs",
     ## cm_name not needed for std lib, it does not compile anything
     ## cm_name    = "compilerlibs",
     manifest   = [
@@ -1736,20 +1749,26 @@ bootstrap_signature(
 ################  packed module version  ################
 # ../../ocamlc.opt -g -nostdlib -I ../../stdlib -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66-70 -warn-error +A -bin-annot -safe-string -strict-formats -I byte -pack -o byte/dynlink_compilerlibs.cmo
 
+## Status: builds, but won't link into dynlink.cma
+
 bootstrap_library(
     name       = "compilerlibs_packed",
-    cm_name    = "compilerlibs",
-    pack_ns    = "Dynlink_compilerlibs",
+    pack_ns    = "Dynlink_compilerlibs_packed",
     visibility = ["//visibility:private"],
-    opts       = MODULE_OPTS,
-    stdlib     = "//stdlib",
+    opts       = MODULE_OPTS + ["-nopervasives"],
+    # stdlib     = "//stdlib",
     manifest   = [
+        "//bytecomp:Bytesections_cmi",
         "//bytecomp:Bytesections",
         "//bytecomp:Dll",
+        "//bytecomp:Dll_cmi",
         "//bytecomp:Instruct",
+        "//bytecomp:Instruct_cmi",
         "//bytecomp:Meta",
+        "//bytecomp:Meta_cmi",
         "//bytecomp:Opcodes",
         "//bytecomp:Symtable",
+        "//bytecomp:Symtable_cmi",
 
         "//file_formats:Cmi_format",
         "//file_formats:Cmo_format_cmi",

@@ -25,7 +25,10 @@ load(":options.bzl", "get_options")
 ## deps.
 
 ################
-def build_packed_module(ctx, ordered_manifest, inputs_depset):
+def build_packed_module(
+    ctx, ordered_manifest, inputs_depset,
+    linkargs_depset, paths_depset, cmi_depset, ccInfo_list):
+
     print("BUILDING PACKED MODULE: %s" % ctx.attr.pack_ns)
 
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
@@ -45,12 +48,12 @@ def build_packed_module(ctx, ordered_manifest, inputs_depset):
     args.add("-pack")
 
     for dep in ordered_manifest:
-        # print("LINKING: %s" % dep)
-        args.add(dep)
+        if dep.extension != "cmi":
+            args.add(dep)
 
     if ctx.attr.stdlib:
         inputs = depset(
-            transitive = [ctx.attr.stdlib[0][DefaultInfo].files,
+            transitive = [ctx.attr.stdlib[0][OcamlProvider].inputs,
                           inputs_depset]
         )
         args.add("-I", ctx.file.stdlib.dirname)
@@ -76,6 +79,8 @@ def build_packed_module(ctx, ordered_manifest, inputs_depset):
         )
     )
 
+    providers = []
+
     default_depset = depset(
         order = dsorder,
         # direct = default_outputs,
@@ -85,8 +90,27 @@ def build_packed_module(ctx, ordered_manifest, inputs_depset):
     defaultInfo = DefaultInfo(
         files = default_depset
     )
+    providers.append(defaultInfo)
 
-    return [defaultInfo]
+    providers.append(OcamlModuleMarker(marker="OcamlModule"))
+
+    ocamlProvider = OcamlProvider(
+        # files = ocamlProvider_files_depset,
+        cmi      = cmi_depset,
+        fileset  = defaultInfo, # fileset_depset,
+        inputs   = depset(direct = [out_cm_, out_cmi],
+                          transitive = [inputs_depset]),
+        linkargs = linkargs_depset,
+        paths    = paths_depset,
+        # archive_manifests = archiveManifestDepset
+    )
+    providers.append(ocamlProvider)
+
+    if ccInfo_list:
+        ccInfo_merged = cc_common.merge_cc_infos(cc_infos = ccInfo_list)
+        providers.append(ccInfo_merged)
+
+    return providers
 
 #################
 def impl_library(ctx): # , mode, tool): # , tool_args):
@@ -180,6 +204,10 @@ def impl_library(ctx): # , mode, tool): # , tool_args):
 
     # print("indirect_inputs_depsets: %s" % indirect_inputs_depsets)
 
+    cmi_depset = depset(
+        transitive = indirect_cmi_depsets
+    )
+
     inputs_depset = depset(
         order = dsorder,
         ## FIXME: no need for direct manifest, already in indirect_inputs_depsets?
@@ -201,7 +229,7 @@ def impl_library(ctx): # , mode, tool): # , tool_args):
 
     ## To put direct deps in dep-order, we need to merge the linkargs
     ## deps and iterate over them:
-    new_linkargs = []
+    # new_linkargs = []
 
     linkargs_depset = depset(
         order = dsorder,
@@ -209,17 +237,27 @@ def impl_library(ctx): # , mode, tool): # , tool_args):
         transitive = indirect_linkargs_depsets
         # transitive = ([ns_resolver_depset] if ns_resolver_depset else []) + indirect_linkargs_depsets
     )
-    for dep in inputs_depset.to_list():
-        if dep in ctx.files.manifest:
-            new_linkargs.append(dep)
+    # for dep in inputs_depset.to_list():
+    #     if dep in ctx.files.manifest:
+    #         new_linkargs.append(dep)
 
     ## FIXME: new_linkargs should be same as ordered_manifest
 
+    paths_depset  = depset(
+        order = dsorder,
+        direct = paths_direct,
+        transitive = indirect_paths_depsets
+    )
+
+    ################################################################
+    ##    ACTION
     ## archives share this impl but do not have attrib 'pack_ns'
     if hasattr(ctx.attr, "pack_ns"):
         if ctx.attr.pack_ns:
             print("PACKING")
-            return build_packed_module(ctx, ordered_manifest, inputs_depset)
+            return build_packed_module(
+                ctx, ordered_manifest, inputs_depset,
+                linkargs_depset, paths_depset, cmi_depset, ccInfo_list)
         else:
             ctx.actions.do_nothing(
                 mnemonic = "NS_LIB",
@@ -253,19 +291,9 @@ def impl_library(ctx): # , mode, tool): # , tool_args):
         # + indirect_inputs_depsets
     )
 
-    paths_depset  = depset(
-        order = dsorder,
-        direct = paths_direct,
-        transitive = indirect_paths_depsets
-    )
-
-    fileset_depset = depset(
-        transitive=([ns_resolver_depset] if ns_resolver_depset else []) + indirect_fileset_depsets
-    )
-
-    cmi_depset = depset(
-        transitive = indirect_cmi_depsets
-    )
+    fileset_depset = depset()
+    #     transitive=([ns_resolver_depset] if ns_resolver_depset else []) + indirect_fileset_depsets
+    # )
 
     # print("new_linkargs: %s" % new_linkargs)
     ## FIXME: new_linkargs or ordered_manifest?
@@ -312,12 +340,8 @@ def impl_library(ctx): # , mode, tool): # , tool_args):
     #         ),
     #     )
 
-    # if ctx.label.name == "tezos-legacy-store":
-    #     print("ccInfo_list ct: %s" % len(ccInfo_list))
-    ccInfo_merged = cc_common.merge_cc_infos(cc_infos = ccInfo_list)
-    # if ctx.label.name == "tezos-legacy-store":
-    #     print("ccInfo_merged: %s" % ccInfo_merged)
     if ccInfo_list:
+        ccInfo_merged = cc_common.merge_cc_infos(cc_infos = ccInfo_list)
         providers.append(ccInfo_merged)
 
     return providers

@@ -57,10 +57,6 @@ Packages](../ug/collections.md).
     attrs = dict(
         # rule_options,
 
-        cm_name = attr.string(
-            doc = "Override rule name for packed module output"
-        ),
-
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
         ),

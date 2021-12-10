@@ -293,11 +293,12 @@ def _bootstrap_module(ctx):
     #     ns = ctx.attr._pack_ns[BuildSettingInfo].value,
     #     m = ctx.label))
 
-    if ctx.attr._pack_ns[BuildSettingInfo].value:
-        pack_ns = ctx.attr._pack_ns[BuildSettingInfo].value
-        # print("GOT PACK NS: %s" % pack_ns)
-    else:
-        pack_ns = False
+    pack_ns = False
+    if hasattr(ctx.attr, "_pack_ns"):
+        if ctx.attr._pack_ns:
+            if ctx.attr._pack_ns[BuildSettingInfo].value:
+                pack_ns = ctx.attr._pack_ns[BuildSettingInfo].value
+                # print("GOT PACK NS: %s" % pack_ns)
 
     ################
     includes   = []
@@ -414,6 +415,7 @@ def _bootstrap_module(ctx):
     archive_manifest_depsets = []
 
     for dep in the_deps:
+        # print("DEP: %s" % dep)
         if OcamlArchiveProvider in dep:
             # print("Found OcamlArchiveProvider in %s" % ctx.label)
             archive_manifest_depsets.append(dep[OcamlArchiveProvider].manifest)
@@ -427,6 +429,7 @@ def _bootstrap_module(ctx):
         ## so add the latter before the former
 
         if OcamlProvider in dep:
+            # print("DEP OP: %s" % dep[OcamlProvider])
 
             # if ctx.label.name == "Mempool":
             #     print("DEP: %s" % dep[DefaultInfo].files)
@@ -780,7 +783,7 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
         _pack_ns = attr.label(
             doc = """Namepace name for use with -for-pack. Set by transition function.
 """,
-            default = "//config/pack:ns"
+            # default = "//config/pack:ns"
         ),
 
         sig = attr.label(

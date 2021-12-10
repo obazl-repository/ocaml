@@ -322,7 +322,10 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = [
+        "//otherlibs/dynlink:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -354,7 +357,10 @@ bootstrap_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = [
+        "//otherlibs/dynlink:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -442,7 +448,10 @@ bootstrap_signature(
         "//typing:Env",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//driver:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -469,7 +478,10 @@ bootstrap_signature(
         ":Instruct",
         "//stdlib:Stdlib.Obj",
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = [
+        "//otherlibs/dynlink:__pkg__"
+    ]
 )
 
 bootstrap_module(
@@ -627,6 +639,9 @@ bootstrap_signature(
         "//stdlib:Stdlib.Digest",
         "//file_formats:Cmo_format_cmi"
     ],
-    data = ["//runtime:primitives"]
+    data = ["//runtime:primitives"],
+    visibility = [
+        "//otherlibs/dynlink:__pkg__"
+    ]
 )
 
