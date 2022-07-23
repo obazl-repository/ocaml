@@ -1,0 +1,16 @@
+= notes on bootstrapping
+
+
+coldstart target:
+
+1. build runtime - all c code, -> runtime/ocamlrun
+
+2. build stdlib, with runtime:ocamlrun and BOOT_OCAMLC = boot/ocamlrun and boot/ocamlc
+
+boot/ocamlrun is just runtime/ocamlrun copied to boot dir
+
+'make stdlib all' builds stdlib.cma using $(CAMLC), CAMLC=$(OCAMLRUN) $(COMPILER)
+
+where OCAMLRUN == runtime/ocamlrun and COMPILER = ./ocamlc (?)
+
+
