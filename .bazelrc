@@ -28,4 +28,4 @@ build:stage2 --//bzl:stage=1
 build:bytecode --@ocaml//mode=bytecode
 build:bytecode --@ppx//mode=bytecode
 
-try-import .private/user.bazelrc
+try-import private/bazelrc
