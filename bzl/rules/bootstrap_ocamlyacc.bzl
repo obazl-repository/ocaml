@@ -14,7 +14,7 @@ def _bootstrap_ocamlyacc_impl(ctx):
   if debug:
       print("OCAML YACC TARGET: %s" % ctx.label.name)
 
-  tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+  tc = ctx.toolchains["//toolchain/type:bootstrap"]
   tool = tc.ocamlyacc
 
   # env = {"PATH": get_sdkpath(ctx)}
@@ -72,5 +72,5 @@ bootstrap_ocamlyacc = rule(
     ),
     # provides = [],
     executable = False,
-    toolchains = ["//bzl/toolchain:bootstrap"]
+    toolchains = ["//toolchain/type:bootstrap"]
 )

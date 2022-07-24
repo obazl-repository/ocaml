@@ -41,8 +41,8 @@ ROOTDIR = "/Users/gar/ocaml/ocaml" ## FIXME
 # include Makefile.common
 
 ################  BOOTSTRAP TOOLS  ################
-# BOOT_OCAMLC is defined in //bzl/toolchain:bootstrap as tc.ocamlc => //boot:ocamlc
-# OCAMLRUN is defined in //bzl/toolchain:bootstrap as tc.ocamlrun => //runtime:ocamlrun
+# BOOT_OCAMLC is defined in //toolchain/type:bootstrap as tc.ocamlc => //boot:ocamlc
+# OCAMLRUN is defined in //toolchain/type:bootstrap as tc.ocamlrun => //runtime:ocamlrun
 # OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 # NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 

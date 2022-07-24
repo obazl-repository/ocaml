@@ -281,9 +281,6 @@ def handle_sig(ctx, scope, debug):
 ###############################
 def _bootstrap_module(ctx):
 
-    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
-
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     debug = False
     # if ctx.label.name in ["CamlinternalAtomic"]:
@@ -292,6 +289,14 @@ def _bootstrap_module(ctx):
     # print("ns: '{ns}' for {m}".format(
     #     ns = ctx.attr._pack_ns[BuildSettingInfo].value,
     #     m = ctx.label))
+
+    # (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+
+    if tc.target_vm:
+        ext = ".cmo"
+    else:
+        ext = ".cmx"
 
     pack_ns = False
     if hasattr(ctx.attr, "_pack_ns"):
@@ -330,6 +335,9 @@ def _bootstrap_module(ctx):
 
     # ns = None
 
+    stage = ctx.attr._stage[BuildSettingInfo].value
+    scope     = "__stage{stage}/".format(stage = stage)
+
     (provider_output_mli, # None if no sig passed
      ## one of the following two returned:
      provider_output_cmi, # None if no sig passed
@@ -356,7 +364,7 @@ def _bootstrap_module(ctx):
     # direct_linkargs.append(out_cm_)
     default_outputs.append(out_cm_)
 
-    if mode == "native":
+    if not tc.target_vm:
         # if not ctx.attr._rule.startswith("bootstrap"):
         out_o = ctx.actions.declare_file(scope + module_name + ".o",
                                          sibling = out_cm_)
@@ -383,7 +391,9 @@ def _bootstrap_module(ctx):
     #########################
     args = ctx.actions.args()
 
-    args.add_all(tool_args)
+    if tc.target_vm:
+        args.add(tc.ocamlc)
+    # args.add_all(tool_args)
 
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
@@ -555,14 +565,15 @@ def _bootstrap_module(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tool,
+        executable = tc.ocamlrun, # tool,
         arguments = [args],
         inputs    = inputs_depset,
         outputs   = action_outputs,
-        tools = [tool] + tool_args,
+        tools = [tc.ocamlrun, tc.ocamlc],
+        # tools = [tool] + tool_args,
         mnemonic = "CompileBootstrapModule",
         progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
-            mode = mode,
+            mode = "vm" if tc.target_vm else "sys",
             rule=ctx.attr._rule,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
             pkg = ctx.label.package,
@@ -852,5 +863,5 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
     # cfg = compile_mode_in_transition,
     provides = [OcamlModuleMarker],
     executable = False,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

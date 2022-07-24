@@ -1,0 +1,27 @@
+## toolchain selectors
+
+toolchain(
+    name = "bootstrap",
+    toolchain = "//toolchain/bootstrap/adapters:macos",
+    toolchain_type = "//toolchain/type:bootstrap",
+    exec_compatible_with = [
+        "@platforms//os:macos",
+    ],
+    target_compatible_with = [
+        "@platforms//os:macos",
+    ],
+    visibility = ["//visibility:public"]
+)
+
+toolchain(
+    name = "macos",
+    toolchain = "//toolchain/bootstrap/adapters:macos",
+    toolchain_type = "//toolchain/type:bootstrap",
+    exec_compatible_with = [
+        "@platforms//os:macos",
+    ],
+    target_compatible_with = [
+        "@platforms//os:macos",
+    ],
+    visibility = ["//visibility:public"]
+)

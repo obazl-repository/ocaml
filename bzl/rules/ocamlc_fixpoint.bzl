@@ -38,7 +38,7 @@ def _ocamlc_fixpoint(ctx):
 
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
     # mode = "bytecode"
     # if mode == "bytecode":
@@ -459,5 +459,5 @@ ocamlc_fixpoint = rule(
     ),
     cfg = ocamlc_fixpoint_in_transition,
     executable = True,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

@@ -39,7 +39,7 @@ def _bootstrap_signature_impl(ctx):
 
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # if mode == "native":
     #     exe = tc.ocamlopt.basename
     # else:
@@ -550,5 +550,5 @@ bootstrap_signature = rule(
     incompatible_use_toolchain_transition = True,
     provides = [OcamlSignatureProvider],
     executable = False,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

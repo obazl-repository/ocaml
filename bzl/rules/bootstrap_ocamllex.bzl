@@ -21,7 +21,7 @@ def _bootstrap_ocamllex_impl(ctx):
 
   mode = ctx.attr.mode
 
-  tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+  tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
   tool = tc.ocamlrun
   tool_args = [tc.boot_ocamllex]
@@ -92,5 +92,5 @@ bootstrap_ocamllex = rule(
     ),
     # provides = [],
     executable = False,
-    toolchains = ["//bzl/toolchain:bootstrap"]
+    toolchains = ["//toolchain/type:bootstrap"]
 )

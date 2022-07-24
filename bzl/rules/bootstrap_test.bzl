@@ -21,5 +21,5 @@ bootstrap_test = rule(
     ),
     # cfg = executable_in_transition,
     test = True,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

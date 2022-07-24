@@ -1,4 +1,5 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl:providers.bzl",
      "OcamlProvider",
@@ -23,9 +24,10 @@ load(":options.bzl", "NEGATION_OPTS")
 def _bootstrap_archive(ctx):
 
     ## NB: impl_library also calls this, but we need it here too
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
     # mode = "bytecode"
     # if mode == "bytecode":
@@ -97,13 +99,13 @@ def _bootstrap_archive(ctx):
     #         if "-shared" in ctx.attr.opts:
     #             _options.remove("-shared") ## avoid dup
 
-    if mode == "native":
+    if tc.target_vm:
+        ext = ".cma"
         # if shared:
         #     ext = ".cmxs"
         # else:
-        ext = ".cmxa"
     else:
-        ext = ".cma"
+        ext = ".cmxa"
 
     #### declare output files ####
     ## same for plain and ns archives
@@ -118,12 +120,15 @@ def _bootstrap_archive(ctx):
     if debug:
         print("archive_name: %s" % archive_name)
 
+    stage = ctx.attr._stage[BuildSettingInfo].value
+    scope     = "__stage{stage}/".format(stage = stage)
+
     archive_filename = tmpdir + archive_name + ext
     archive_file = ctx.actions.declare_file(scope + archive_filename)
     paths_direct.append(archive_file.dirname)
     action_outputs.append(archive_file)
 
-    if mode == "native":
+    if not tc.target_vm:
         archive_a_filename = tmpdir + archive_name + ".a"
         archive_a_file = ctx.actions.declare_file(scope + archive_a_filename)
         paths_direct.append(archive_a_file.dirname)
@@ -132,7 +137,9 @@ def _bootstrap_archive(ctx):
     #########################
     args = ctx.actions.args()
 
-    args.add_all(tool_args)
+    if tc.target_vm:
+        args.add(tc.ocamlc)
+    # args.add_all(tool_args)
 
     for arg in ctx.attr.opts:
         if arg not in NEGATION_OPTS:
@@ -184,7 +191,8 @@ def _bootstrap_archive(ctx):
                 ## FIXME: .a is expected with cmx, in bc it means cclib
                 elif dep.extension == "a":
                     if linkmode == "static":
-                        if mode in ["boot", "bc_bc", "bc_n"]:
+                        # if mode in ["boot", "bc_bc", "bc_n"]:
+                        if tc.target_vm:
                             (bn, extn) = paths.split_extension(dep.basename)
                             # args.add(dep)
                             ## or:
@@ -333,7 +341,8 @@ def _bootstrap_archive(ctx):
             ## FIXME: .a is expected with cmx, in bc it means cclib
             elif dep.extension == "a":
                 if tc.linkmode == "static":
-                    if mode in ["boot", "bc_bc", "bc_n"]:
+                    # if mode in ["boot", "bc_bc", "bc_n"]:
+                    if tc.target_vm:
                         (bn, ext) = paths.split_extension(dep.basename)
                         # args.add(dep)
                         ## or:
@@ -373,14 +382,15 @@ def _bootstrap_archive(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tool,
+        executable = tc.ocamlrun,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
-        tools = [tool] + tool_args, # [tc.ocamlopt, tc.ocamlc],
+        tools = [tc.ocamlrun, tc.ocamlc],
+        # tools = [tool] + tool_args, # [tc.ocamlopt, tc.ocamlc],
         mnemonic = mnemonic,
         progress_message = "{mode} compiling {rule}: @{ws}//{pkg}:{tgt}".format(
-            mode = mode,
+            mode = "vm" if tc.target_vm else "sys",
             rule = ctx.attr._rule,
             ws  = ctx.label.workspace_name,
             pkg = ctx.label.package,
@@ -486,9 +496,9 @@ bootstrap_archive = rule(
     attrs = dict(
         # options("ocaml"),
 
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
+        # _toolchain = attr.label(
+        #     default = "//bzl/toolchain:tc"
+        # ),
 
         _stage = attr.label(
             doc = "bootstrap stage",
@@ -496,24 +506,24 @@ bootstrap_archive = rule(
         ),
 
         #FIXME: underscore
-        ocamlc = attr.label(
-            # cfg = ocamlc_out_transition,
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     # cfg = ocamlc_out_transition,
+        #     allow_single_file = True,
+        #     default = "//bzl/toolchain:ocamlc"
+        # ),
 
         # _boot       = attr.label(
         #     default = "//bzl/toolchain:boot",
         # ),
 
-        _mode       = attr.label(
-            default = "//bzl/toolchain",
-        ),
+        # _mode       = attr.label(
+        #     default = "//bzl/toolchain",
+        # ),
 
-        mode       = attr.string(
-            doc     = "Overrides mode build setting.",
-            # default = ""
-        ),
+        # mode       = attr.string(
+        #     doc     = "Overrides mode build setting.",
+        #     # default = ""
+        # ),
 
         primitives = attr.label(
             allow_single_file = True,
@@ -602,5 +612,5 @@ bootstrap_archive = rule(
     # cfg = compile_mode_in_transition,
     provides = [OcamlArchiveProvider, OcamlProvider],
     executable = False,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

@@ -86,5 +86,5 @@ ocamlc_boot = rule(
     ),
     # cfg = "exec", ## ocamlc_boot_in_transition,
     executable = True,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

@@ -86,5 +86,5 @@ bootstrap_executable = rule(
         ),
     ),
     executable = True,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

@@ -1,0 +1,14 @@
+toolchain_type(
+    name = "bootstrap",
+    visibility = ["//visibility:public"],
+)
+
+toolchain_type(
+    name = "bytecode",
+    visibility = ["//visibility:public"],
+)
+
+toolchain_type(
+    name = "native",
+    visibility = ["//visibility:public"],
+)

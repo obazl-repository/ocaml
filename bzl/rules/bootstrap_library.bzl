@@ -15,7 +15,7 @@ load(":impl_library.bzl", "impl_library")
 ###############################
 def _bootstrap_library(ctx):
 
-    tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
 
@@ -136,5 +136,5 @@ Packages](../ug/collections.md).
     ),
     # provides = [OcamlLibraryMarker],
     executable = False,
-    toolchains = ["//bzl/toolchain:bootstrap"]
+    toolchains = ["//toolchain/type:bootstrap"]
 )

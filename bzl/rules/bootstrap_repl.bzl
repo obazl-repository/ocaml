@@ -81,5 +81,5 @@ bootstrap_repl = rule(
     ),
     # cfg = executable_in_transition,
     executable = True,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

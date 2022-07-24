@@ -2,7 +2,7 @@ load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag", "bool_setting",
      "string_flag", "string_setting")
 
-load(":BUILD.bzl", "bootstrap_toolchain_impl")
+# load(":BUILD.bzl", "bootstrap_toolchain_impl")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -52,10 +52,10 @@ toolchain_type(
 )
 
 ################
-bootstrap_toolchain_impl(
-    name = "bootstrap_tc_macos",
-    linkmode = "dynamic",
-)
+# bootstrap_toolchain_impl(  ## adapter
+#     name = "bootstrap_tc_macos",
+#     linkmode = "dynamic",
+# )
 
 # bootstrap_toolchain_impl(
 #     name = "bootstrap_tc_macos_native",
@@ -64,7 +64,7 @@ bootstrap_toolchain_impl(
 # )
 
 ################################################################
-toolchain(
+toolchain(  ##selector
     name = "bootstrap_macos",
     toolchain_type = ":bootstrap",
     exec_compatible_with = [
@@ -73,7 +73,8 @@ toolchain(
     target_compatible_with = [
         "@platforms//os:macos",
     ],
-    toolchain = ":bootstrap_tc_macos",
+    # toolchain = ":bootstrap_tc_macos",
+    toolchain = "//bzl/toolchain/adapters/bootstrap",
     visibility = ["//visibility:public"]
 )
 

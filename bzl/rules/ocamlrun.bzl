@@ -47,5 +47,5 @@ ocamlrun = rule(
     # cfg = ocamlrun_in_transition,
     provides = [CcInfo],
     executable = True,
-    # toolchains = ["//bzl/toolchain:bootstrap"]
+    # toolchains = ["//toolchain/type:bootstrap"]
 )

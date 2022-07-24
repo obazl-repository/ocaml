@@ -38,7 +38,7 @@ def _ocamlc_runtime(ctx):
 
     # tool_args = ["//boot:ocamlc"]
 
-    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
     # mode = "bytecode"
     # if mode == "bytecode":
@@ -371,5 +371,5 @@ ocamlc_runtime = rule(
     ),
     cfg = ocamlc_runtime_in_transition,
     executable = True,
-    toolchains = ["//bzl/toolchain:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap"],
 )

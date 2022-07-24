@@ -9,7 +9,7 @@ load("//bzl/rules:impl_ns_resolver.bzl", "impl_ns_resolver")
 ###############################
 def _bootstrap_preprocess_impl(ctx):
 
-    tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
 
@@ -36,6 +36,6 @@ bootstrap_preprocess = rule(
     ),
     executable = True,
     toolchains = [
-        # "//bzl/toolchain:bootstrap",
+        # "//toolchain/type:bootstrap",
     ],
 )

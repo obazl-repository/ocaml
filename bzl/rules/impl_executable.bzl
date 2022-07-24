@@ -28,7 +28,7 @@ def impl_executable(ctx):
 
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    # tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
     # mode = "bytecode"
     # if mode == "bytecode":

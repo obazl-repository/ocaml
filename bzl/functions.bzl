@@ -23,7 +23,7 @@ WARNING_FLAGS = "@1..3@5..28@30..39@43@46..47@49..57@61..62-40"
 ################
 def config_tc(ctx):
 
-    tc = ctx.toolchains["//bzl/toolchain:bootstrap"]
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     # if ctx.attr.mode:
     #     mode = ctx.attr.mode
