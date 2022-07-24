@@ -1,0 +1,13 @@
+exports_files(["BUILD.bazel"])
+
+## toolchains where buildhost == bootstrap
+
+load("//toolchain/bootstrap:adapter.bzl", "bootstrap_toolchain_adapter")
+
+######## toolchain adapters ########
+
+bootstrap_toolchain_adapter(
+    name     = "bootstrap",
+    linkmode = "dynamic"
+)
+
