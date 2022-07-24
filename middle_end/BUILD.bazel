@@ -218,6 +218,7 @@ bootstrap_module(
     ],
     data = ["//runtime:primitives"],
     visibility = [
+        "//asmcomp:__pkg__",
         "//middle_end/flambda:__subpackages__",
         "//tools:__pkg__",
     ]

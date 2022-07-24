@@ -175,7 +175,7 @@ genrule(
 
 ################  Libraries and Programs  ################
 ###########
-cc_library(
+cc_library(  ## produces libcamlrun
     name = "camlrun",
     srcs = [
         ":build_config.h",
@@ -191,11 +191,12 @@ cc_library(
     deps = ["//runtime/caml:hdrs"],
 )
 
-ocamlrun(
-    name = "ocamlrun.X",
-    visibility = ["//visibility:public"]
-)
+# ocamlrun(
+#     name = "ocamlrun.X",
+#     visibility = ["//visibility:public"]
+# )
 
+# the runtime
 cc_binary(
     name = "ocamlrun",
     srcs = ["prims.c", "instrtrace.c"],
@@ -210,7 +211,7 @@ cc_binary(
 )
 
 ################ instrumented
-cc_library(
+cc_library(  ## produces libcamlruni
     name = "camlruni",
     srcs = [
         ":build_config.h",

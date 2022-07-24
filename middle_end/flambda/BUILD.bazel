@@ -461,6 +461,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Array",
     ],
     visibility = [
+        "//asmcomp:__pkg__",
         "//middle_end:__pkg__",
         "//tools:__pkg__",
     ]

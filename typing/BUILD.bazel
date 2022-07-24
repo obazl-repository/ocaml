@@ -364,6 +364,7 @@ bootstrap_module(
         #### (Uid)
     ],
     visibility = [
+        "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",

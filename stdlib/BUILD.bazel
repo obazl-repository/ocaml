@@ -253,7 +253,7 @@ bootstrap_module(
     # mode = "bc_bc",
     # ocamlc = "//runtime:ocamlc",
     sig    = "CamlinternalAtomic_cmi",
-    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    opts = CAMLINTERNAL_OPTS,
     primitives = PRIMITIVES,
     # deps   = [],
     ## dunno if this is the right place for this, but we need to force
@@ -268,7 +268,7 @@ bootstrap_module(
     mode = "bc_bc",
     ocamlc = "//runtime:ocamlc",
     sig    = "CamlinternalAtomic_cmi",
-    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    opts = CAMLINTERNAL_OPTS,
     primitives = PRIMITIVES,
     # deps   = [],
     ## dunno if this is the right place for this, but we need to force
@@ -280,7 +280,7 @@ bootstrap_module(
 bootstrap_signature(
     name = "CamlinternalAtomic_cmi",
     src  = "camlinternalAtomic.mli",
-    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    opts = CAMLINTERNAL_OPTS,
     primitives = PRIMITIVES,
     # deps   = [],
     # visibility = ["//visibility:public"]
@@ -353,7 +353,7 @@ bootstrap_module(
     name   = "CamlinternalFormatBasics",
     struct = "camlinternalFormatBasics.ml",
     sig    = "CamlinternalFormatBasics_cmi",
-    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    opts = CAMLINTERNAL_OPTS,
     primitives = PRIMITIVES,
     # deps   = [],
     # visibility = ["//visibility:public"]
@@ -362,7 +362,7 @@ bootstrap_module(
 bootstrap_signature(
     name = "CamlinternalFormatBasics_cmi",
     src  = "camlinternalFormatBasics.mli",
-    opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
+    opts = CAMLINTERNAL_OPTS,
     primitives = PRIMITIVES,
     # deps   = [],
     # visibility = ["//visibility:public"]
