@@ -27,6 +27,8 @@ solely for the purpose of bootstrapping the OCaml compilers and tools,
 it is included in this repository (i.e. is not downloaded as an
 external repository.)
 
+More detailed documentation is in link:bzl/docs[bzl/docs].
+
 Why use a minimal ruleset? Several reasons. Bootstrapping requires
 some special support that is never needed for ordinary OCaml builds,
 so we do not want to add that overhead to the standard ruleset. The
