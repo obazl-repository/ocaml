@@ -27,9 +27,12 @@ obazl_deps()
 # Tell Bazel about our toolchains so it can resolve them based on values passed
 # in --platform, --host_platform, and --execution_platforms options.
 
+# register_toolchains("@ocaml//toolchain/selectors/local:vmvm")
 register_toolchains(
-    "//toolchain/bootstrap",
-    # "//toolchain/type:bootstrap_macos_native"
+    "//toolchain/selectors:bootstrap",
+    "//toolchain/selectors:std",
+    "//toolchain/selectors:dbg",
+    "//toolchain/selectors:instrumented",
 )
 
 # register_execution_platforms(

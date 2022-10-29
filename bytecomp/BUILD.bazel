@@ -40,6 +40,10 @@ bootstrap_library(
         ":Printinstr",
         ":Symtable",
     ],
+    visibility = [
+        "//visibility:public",
+        # "//toolsuite:__pkg__",
+    ]
 )
 
 ################################################################
@@ -75,12 +79,14 @@ bootstrap_archive(
     #     "//bytecomp:ocamlbytecomp",
     # ],
     visibility = [
+        # "//visibility:public",
         "//boot:__pkg__",
         "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",
+        "//testsuite:__pkg__",
     ]
 )
 
@@ -121,7 +127,11 @@ bootstrap_library(
         ":Opcodes",
         ":Symtable",
     ],
-    visibility = ["//compilerlibs:__pkg__"]
+    visibility = [
+        "//visibility:public",
+        # "//toolsuite:__pkg__",
+        # "//compilerlibs:__pkg__"
+    ]
 )
 
 ################################################################

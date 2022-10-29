@@ -863,5 +863,10 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
     # cfg = compile_mode_in_transition,
     provides = [OcamlModuleMarker],
     executable = False,
-    toolchains = ["//toolchain/type:bootstrap"],
+    fragments = ["platform", "cpp"],
+    host_fragments = ["platform",  "cpp"],
+    incompatible_use_toolchain_transition = True,
+    toolchains = ["//toolchain/type:bootstrap",
+                  # "//toolchain/type:profile",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )

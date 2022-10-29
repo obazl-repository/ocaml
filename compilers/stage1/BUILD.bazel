@@ -54,7 +54,7 @@ MAIN_DEPS = [
 
 ## root Makefile:
 
-# bytecode compiled, emits bytecode (OBazl default mode "bc_bc")
+# bytecode compiled, emits bytecode (OBazl toolchain vm>vm)
 # ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
 #               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 # 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
@@ -70,7 +70,10 @@ ocamlc_boot(
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp"
     ],
-    visibility = ["//compilers/stage2:__pkg__"]
+    visibility = [
+        "//compilers/stage2:__pkg__",
+        "//testsuite:__pkg__"
+    ]
 )
 
 # native compiled, emits bytecode (Obazl mode "n_bc"_)
@@ -87,7 +90,7 @@ ocamlc_boot(
 #     ]
 # )
 
-# bytecode compiler, emits native code (Obazl mode "bc_n")
+# bytecode compiler, emits native code (Obazl toolchain vm>sys)
 # OPTSTART=driver/optmain.cmo
 # ocamlopt$(EXE): compilerlibs/ocamlcommon.cma compilerlibs/ocamloptcomp.cma \
 #           $(OPTSTART)
@@ -100,6 +103,9 @@ bootstrap_executable(
         "//compilerlibs:ocamloptcomp",
         # "//stdlib",
         "//driver:Optmain"
+    ],
+    visibility = [
+        "//testsuite:__pkg__"
     ]
 )
 

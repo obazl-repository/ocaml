@@ -222,8 +222,10 @@ def impl_executable(ctx):
         # else:
         #     print("removing double link: %s" % dep)
 
+    ##FIXME: primitives go in runfiles?
     primitives = []
     if hasattr(ctx.attr, "primitives"):
+        ## rules: ocamlc_boot
         if ctx.attr.primitives:
             primitives.append(ctx.file.primitives)
             args.add("-use-prims", ctx.file.primitives.path)

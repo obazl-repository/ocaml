@@ -1,14 +1,14 @@
-toolchain_type(
-    name = "bootstrap",
-    visibility = ["//visibility:public"],
-)
+toolchain_type(name = "bootstrap", visibility = ["//visibility:public"])
+toolchain_type(name = "std", visibility = ["//visibility:public"])
 
-toolchain_type(
-    name = "bytecode",
-    visibility = ["//visibility:public"],
-)
+toolchain_type(name = "profile", visibility = ["//visibility:public"])
 
-toolchain_type(
-    name = "native",
-    visibility = ["//visibility:public"],
-)
+# toolchain_type(
+#     name = "bytecode",
+#     visibility = ["//visibility:public"],
+# )
+
+# toolchain_type(
+#     name = "native",
+#     visibility = ["//visibility:public"],
+# )

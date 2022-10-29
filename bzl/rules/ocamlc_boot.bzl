@@ -38,7 +38,7 @@ ocamlc_boot = rule(
         rule_options,
 
         primitives = attr.label(
-            default = "//runtime:primitives",
+            default = "//runtime:primitives", # file produced by genrule
             allow_single_file = True,
             cfg = ocamlc_boot_out_transition,
         ),

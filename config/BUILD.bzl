@@ -167,9 +167,11 @@ OC_CPPDEFINES = [
  #    # "//config/host:win32": ["CAMLDLLIMPORT"]
  #    "//conditions:default": []
 ] + select({
+    #FIXME: debug controlled by build target, not flag?
         "//config:debug_enabled": ["DEBUG"], # runtime/Makefile
         "//conditions:default": []
 }) + select({
+    #FIXME: instrumented controlled by build target or flag?
         "//config:instrumented": ["CAML_INSTR"],
         "//conditions:default": []
 # }) + select({
@@ -180,6 +182,8 @@ OC_CPPDEFINES = [
     #     "//conditions:default": []
 })
 
+OC_DEBUG_CPPDEFINES = ["DEBUG"]
+OC_INSTR_CPPDEFINES = ["CAML_INSTR"]
 
 ## Makefile.config
 OCAMLC_CPPFLAGS = ["-D_FILE_OFFSET_BITS=64"] #  + CPPFLAGS
@@ -236,7 +240,8 @@ RANLIBCMD = "ranlib"
 ################
 OUTPUTEXE = ["-o"]
 
-ROOT_MKEXE_FLAGS = ["-Wl,-no_compact_unwind"]
+## see LDFLAGS:
+## ROOT_MKEXE_FLAGS = ["-Wl,-no_compact_unwind"]
 
 ## Makefile.config:
 # MKEXE_USING_COMPILER=$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_LDFLAGS) $(LDFLAGS) \

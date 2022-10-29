@@ -32,6 +32,7 @@ bootstrap_library(
         ":Optmaindriver",
         ":Pparse",
     ],
+    visibility = ["//testsuite:__pkg__"]
 )
 
 # bootstrap_library(
@@ -436,7 +437,10 @@ bootstrap_module(
     deps   = STDLIB + [
         ":Optmaindriver",
     ],
-    visibility = ["//:__pkg__"]
+    visibility = [
+        "//compilers/stage1:__pkg__",
+        "//:__pkg__"
+    ]
 )
 
 bootstrap_module(

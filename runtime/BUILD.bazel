@@ -12,11 +12,27 @@ load("//config:BUILD.bzl",
      "OC_CFLAGS", "CFLAGS",
      "OC_CPPFLAGS", "CPPFLAGS",
      "OC_LDFLAGS", "LDFLAGS",
-
+     "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
      "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
      "OUTPUTEXE", "MKEXE_FLAGS",
      "BYTECCLIBS"
      )
+
+load("@bazel_skylib//rules:common_settings.bzl",
+     "string_flag", "string_setting")
+
+string_flag(
+    name = "runtime",
+    build_setting_default = "s",
+    values = [
+        "s", # standard
+        "d", # debug
+        "i"  # instrumented
+    ],
+    visibility = ["//visibility:public"]
+)
+
+## NB: BYTECCLIBS == syslibs needed, e.g. -lm, -lpthread
 
 # load("//bzl/transitions:ocamlc_boot.bzl",
 #      "cc_in_transition",
@@ -173,10 +189,45 @@ genrule(
     ])
 )
 
-################  Libraries and Programs  ################
-###########
-cc_library(  ## produces libcamlrun
+## FIXME: to build multiple "versions" (e.g. libcamlrun, libcamlrund,
+## etc.) we can either support multiple targets, or one target
+## parameterized by build settings.
+
+## Either way, we will have to build each separately, one build cmd
+## per output.
+
+################  standard  ################
+cc_binary(
+    name = "ocamlrun",
+    srcs = ["prims.c"], # , "instrtrace.c"],
+    copts = OC_CFLAGS + CFLAGS + select({
+        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+        "//conditions:default": ["-UDEBUG"]
+    }),
+    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS, # + ["-v"],
+    deps= [":camlrun"],
+    visibility = ["//visibility:public"]
+)
+
+cc_library(
     name = "camlrun",
+    srcs = [
+        ":build_config.h",
+    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    copts = [
+        "-I$(GENDIR)/runtime", # pick up build_config.h
+    ] + OC_CPPFLAGS + select({
+        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+        "//conditions:default": ["-UDEBUG"]
+    }),
+    defines = OC_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"],
+)
+
+################  PIC  ################
+## if unix and SUPPORTS_SHARED_LIBRARIES (i.e. has dlopen)
+cc_library(
+    name = "camlrun_pic",
     srcs = [
         ":build_config.h",
     ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
@@ -191,26 +242,77 @@ cc_library(  ## produces libcamlrun
     deps = ["//runtime/caml:hdrs"],
 )
 
-# ocamlrun(
-#     name = "ocamlrun.X",
-#     visibility = ["//visibility:public"]
-# )
-
-# the runtime
+################ shared
 cc_binary(
-    name = "ocamlrun",
-    srcs = ["prims.c", "instrtrace.c"],
+    name       = "camlrun_shared",
+    linkshared = True,
+    srcs = [
+        ":build_config.h",
+    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    copts = [
+        "-I$(GENDIR)/runtime", # pick up build_config.h
+    ] + OC_CPPFLAGS + select({
+        "//config/debug:ocamlrun-debug": ["-g"],
+        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+        "//conditions:default": ["-UDEBUG"]
+    }),
+    defines = OC_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"],
+)
+
+################ debug
+cc_binary(
+    name = "ocamlrund",
+    srcs = ["prims.c"],
+    copts = OC_CFLAGS + CFLAGS + ["-g"],
+    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS,
+    deps= [":camlrun"],
+    visibility = ["//visibility:public"]
+)
+
+cc_library(
+    name = "camlrund",
+    srcs = [
+        ":build_config.h",
+        "instrtrace.c"
+    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    copts = [
+        "-I$(GENDIR)/runtime" # to pick up build_config.h
+    ] + OC_CPPFLAGS,
+    defines = OC_CPPDEFINES + OC_DEBUG_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"]
+)
+
+################ vm cmd, instrumented
+## configure.ac says:
+# The instrumented runtime is built by default
+# if the proper clock source is found.
+# If asked via --enable-instrumented-runtime, configuration fails if the proper
+# clock source is missing.
+
+# macos: has_monotonic_clock is true if:
+# macos: HAS_MACH_ABSOLUTE_TIME if has mach_timebase_info, mach_absolute_time
+# macos: HAS_POSIX_MONOTONIC_CLOCK if _POSIX_TIMERS etc. - see configure.ac
+
+# linux: clock_gettime etc. - complicated, see configure.ac
+
+cc_binary(
+    name = "ocamlruni",
+    srcs = ["prims.c"],
     copts = OC_CFLAGS + CFLAGS + select({
         "//config/debug:ocamlrun-debug": ["-g"],
         #FIXME: on mac bazel always adds -DDEBUG for fastbuild
         "//conditions:default": ["-UDEBUG"]
     }),
-    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS, # + ["-v"],
+    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS + select({
+        # Makefile adds INSTRUMENTED_RUNTIME_LIBS, found by ./configure
+        #FIXME: use this select to fail this target if no monnotonic clock
+        "//conditions:default": []
+    }),
     deps= [":camlrun"],
     visibility = ["//visibility:public"]
 )
 
-################ instrumented
 cc_library(  ## produces libcamlruni
     name = "camlruni",
     srcs = [
@@ -223,6 +325,8 @@ cc_library(  ## produces libcamlruni
     deps = ["//runtime/caml:hdrs"]
 )
 
+################################################################
+################  NATIVE  ################
 ###########
 cc_library(
     name = "asmrun",

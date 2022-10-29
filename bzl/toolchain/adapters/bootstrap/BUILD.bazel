@@ -2,7 +2,7 @@ exports_files(["BUILD.bazel"])
 
 ## toolchains where buildhost == bootstrap
 
-load("//toolchain/bootstrap:adapter.bzl", "bootstrap_toolchain_adapter")
+load("//toolchain/bootstrap:BUILD.bzl", "bootstrap_toolchain_adapter")
 
 ######## toolchain adapters ########
 

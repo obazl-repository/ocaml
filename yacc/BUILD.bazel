@@ -23,7 +23,7 @@ cc_binary(
         "//conditions:default": []
     }),
     deps = ["//runtime/caml:hdrs"],
-    visibility = ["//toolchain/bootstrap/adapters:__pkg__"]
+    visibility = ["//toolchain/adapters:__pkg__"]
 )
 
 genrule(

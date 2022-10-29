@@ -4,7 +4,7 @@ common --color=yes
 # https://docs.bazel.build/versions/main/user-manual.html#flag--workspace_status_command
 build --stamp --workspace_status_command=$PWD/bzl/camlheader.sh
 
-build --config=verbose
+# build --config=verbose
 build:verbose --subcommands=pretty_print
 build:verbose --verbose_failures
 
@@ -24,8 +24,20 @@ build:stage1 --//bzl:stage=0
 build:stage2 --//bzl/toolchain:ocamlc=//compilers/stage2:ocamlc
 build:stage2 --//bzl:stage=1
 
+## toolchains
 
-build:bytecode --@ocaml//mode=bytecode
-build:bytecode --@ppx//mode=bytecode
+build:vm --platforms=@ocaml//platforms:vm
 
-try-import private/bazelrc
+build:vmvm --host_platform=@ocaml//platforms:vm
+build:vmvm --platforms=@ocaml//platforms:vm
+
+build:sysvm --host_platform=@ocaml//platforms:sys
+build:sysvm --platforms=@ocaml//platforms:vm
+
+build:vmsys --host_platform=@ocaml//platforms:vm
+build:vmsys --platforms=@ocaml//platforms:sys
+
+build:syssys --host_platform=@ocaml//platforms:sys
+build:syssys --platforms=@ocaml//platforms:sys
+
+try-import .config/user.bazelrc

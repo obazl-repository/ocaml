@@ -70,12 +70,16 @@ bootstrap_archive(
     #     ":Emitenv_cmi",
     #     ":X86_ast_cmi",
     # ],
+    visibility = ["//testsuite:__pkg__"],
 )
 
 # bootstrap_archive(
 bootstrap_library(
     name = "ocamloptcomp",
-    visibility = ["//compilerlibs:__pkg__"],
+    visibility = [
+        "//compilerlibs:__pkg__",
+        "//testsuite:__pkg__",
+    ],
     manifest  = [
         ":Afl_instrument",
         ":Asmgen",
@@ -1448,6 +1452,7 @@ bootstrap_module(
         "//config/arch:riscv64"   : "//asmcomp/riscv:scheduling.ml",
         "//config/arch:s390x"   : "//asmcomp/s390x:scheduling.ml",
     }, no_match_error = "unknown arch"),
+    sig = "Scheduling_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//asmcomp:Schedgen",
@@ -1478,6 +1483,7 @@ bootstrap_module(
         "//config/arch:riscv64"   : "//asmcomp/riscv:selection.ml",
         "//config/arch:s390x"   : "//asmcomp/s390x:selection.ml",
     }, no_match_error = "unknown arch"),
+    sig = "Selection_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Cmm",
