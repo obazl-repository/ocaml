@@ -9,6 +9,7 @@ load("//config:BUILD.bzl",
      ## stdlib overrides OCAMLC, does not use ROOT_OCAMLC_OPTS
      ## "ROOT_CAMLC_OPTS",
 
+     "OPTCOMPFLAGS",
      "USE_PRIMS", "DATA_PRIMS",
      "PRIMITIVES"
      )
@@ -22,16 +23,16 @@ exports_files(["expand_module_aliases.awk"])
 # to match the makefile log:
 COMPFLAGS = [
     "-strict-sequence", "-absname",
-    "-w", "+a-4-9-41-42-44-45-48-70",
+    "-w", "+a-4-9-41-42-44-45-48",
     # "-g",
     "-warn-error", "+A",
     "-bin-annot",
     "-nostdlib", "-principal",
-    "-safe-string", "-strict-formats"
+    # "-safe-string", "-strict-formats"
 ]
 
 MODULE_OPTS = COMPFLAGS
-CAMLINTERNAL_OPTS = COMPFLAGS + ["-nostdlib", "-nopervasives"]
+CAMLINTERNAL_OPTS = COMPFLAGS + ["-nopervasives"]
 
 # MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS = MODULE_OPTS
@@ -63,8 +64,8 @@ LABEL_SIGOPTS = [
 # 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
 # 	         -o $@ -c $(filter %.ml, $^)
 
-# %.cmx: %.ml
-# 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
+# %.cmo: %.ml
+# 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
 
 # %.cmx: %.ml
 # 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
@@ -82,72 +83,71 @@ bootstrap_archive(
     primitives = PRIMITIVES,
     manifest   = [
         ":Stdlib", ## functions as the ns_resolver module
-        ## Namespace submodules:
-        ":CamlinternalFormatBasics",
-        ":CamlinternalAtomic",
-        ":Stdlib.Pervasives",
-        ":Stdlib.Seq",
-        ":Stdlib.Option",
-        ":Stdlib.Either",
-        ":Stdlib.Result",
-        ":Stdlib.Bool",
-        ":Stdlib.Char",
-        ":Stdlib.Uchar",
-        ":Stdlib.Sys",
-        ":Stdlib.List",
-        ":Stdlib.Int",
-        ":Stdlib.Bytes",
-        ":Stdlib.String",
-        ":Stdlib.Unit",
-        ":Stdlib.Marshal",
-        ":Stdlib.Obj",
-        ":Stdlib.Array",
-        ":Stdlib.Float",
-        ":Stdlib.Int32",
-        ":Stdlib.Int64",
-        ":Stdlib.Nativeint",
-        ":Stdlib.Lexing",
-        ":Stdlib.Parsing",
-        ":Stdlib.Set",
-        ":Stdlib.Map",
-        ":Stdlib.Stack",
-        ":Stdlib.Queue",
-        ":CamlinternalLazy",
-        ":Stdlib.Lazy",
-        ":Stdlib.Stream",
-        ":Stdlib.Buffer",
-        ":CamlinternalFormat",
-        ":Stdlib.Printf",
-        ":Stdlib.Arg",
-        ":Stdlib.Atomic",
-        ":Stdlib.Printexc",
-        ":Stdlib.Fun",
-        ":Stdlib.Gc",
-        ":Stdlib.Digest",
-        ":Stdlib.Random",
-        ":Stdlib.Hashtbl",
-        ":Stdlib.Weak",
-        ":Stdlib.Format",
-        ":Stdlib.Scanf",
-        ":Stdlib.Callback",
-        ":CamlinternalOO",
-        ":Stdlib.Oo",
-        ":CamlinternalMod",
-        ":Stdlib.Genlex",
-        ":Stdlib.Ephemeron",
-        ":Stdlib.Filename",
-        ":Stdlib.Complex",
-        ":Stdlib.ArrayLabels",
-        ":Stdlib.ListLabels",
-        ":Stdlib.BytesLabels",
-        ":Stdlib.StringLabels",
-        ":Stdlib.MoreLabels",
-        ":Stdlib.StdLabels",
-        ":Stdlib.Bigarray",
-        ":Stdlib.In_channel",
-        ":Stdlib.Out_channel",
-
         # ":Std_exit",
+        "CamlinternalFormat",
+        "CamlinternalFormatBasics",
+        "CamlinternalLazy",
+        "CamlinternalMod",
+        "CamlinternalOO",
+        "Stdlib.Arg",
+        "Stdlib.Array",
+        "Stdlib.ArrayLabels",
+        "Stdlib.Atomic",
+        "Stdlib.Bigarray",
+        "Stdlib.Bool",
+        "Stdlib.Buffer",
+        "Stdlib.Bytes",
+        "Stdlib.BytesLabels",
+        "Stdlib.Callback",
+        "Stdlib.Char",
+        "Stdlib.Complex",
+        "Stdlib.Condition",
+        "Stdlib.Digest",
+        "Stdlib.Domain",
+        "Stdlib.Effect",
+        "Stdlib.Either",
+        "Stdlib.Ephemeron",
+        "Stdlib.Filename",
+        "Stdlib.Float",
+        "Stdlib.Format",
+        "Stdlib.Fun",
+        "Stdlib.Gc",
+        "Stdlib.Hashtbl",
+        "Stdlib.In_channel",
+        "Stdlib.Int",
+        "Stdlib.Int32",
+        "Stdlib.Int64",
+        "Stdlib.Lazy",
+        "Stdlib.Lexing",
+        "Stdlib.List",
+        "Stdlib.ListLabels",
+        "Stdlib.Map",
+        "Stdlib.Marshal",
+        "Stdlib.MoreLabels",
+        "Stdlib.Mutex",
+        "Stdlib.Nativeint",
+        "Stdlib.Obj",
+        "Stdlib.Oo",
+        "Stdlib.Option",
+        "Stdlib.Out_channel",
+        "Stdlib.Parsing",
+        "Stdlib.Printexc",
+        "Stdlib.Printf",
+        "Stdlib.Queue",
+        "Stdlib.Random",
+        "Stdlib.Result",
+        "Stdlib.Scanf",
+        "Stdlib.Semaphore",
+        "Stdlib.Seq",
+        "Stdlib.Set",
+        "Stdlib.Stack",
+        "Stdlib.StdLabels",
+        "Stdlib.String",
+        "Stdlib.StringLabels",
+        "Stdlib.Sys",
+        "Stdlib.Uchar",
+        "Stdlib.Unit",
+        "Stdlib.Weak",
     ],
     # visibility = ["//visibility:public"],
 )
@@ -168,7 +168,6 @@ bootstrap_module(
     primitives = PRIMITIVES,
     deps = [
         ":CamlinternalFormatBasics",
-        ":CamlinternalAtomic",
     ],
     # pp_deps = ["//stdlib:expand_module_aliases.awk"],
     # visibility = ["//visibility:public"]
@@ -246,45 +245,6 @@ genrule(
 # The other camlinternal* are submodules but they are not renamed.
 # They depend on other subcomponents, but since they are not renamed
 # such deps must not be listed; instead just list :Stdlib.
-
-bootstrap_module(
-    name   = "CamlinternalAtomic",
-    struct = "camlinternalAtomic.ml",
-    # mode = "bc_bc",
-    # ocamlc = "//runtime:ocamlc",
-    sig    = "CamlinternalAtomic_cmi",
-    opts = CAMLINTERNAL_OPTS,
-    primitives = PRIMITIVES,
-    # deps   = [],
-    ## dunno if this is the right place for this, but we need to force
-    ## it for now:
-    deps_runtime = [":camlheader"],
-    # visibility = ["//visibility:public"]
-)
-
-bootstrap_module(
-    name   = "boot.CamlinternalAtomic",
-    struct = "camlinternalAtomic.ml",
-    mode = "bc_bc",
-    ocamlc = "//runtime:ocamlc",
-    sig    = "CamlinternalAtomic_cmi",
-    opts = CAMLINTERNAL_OPTS,
-    primitives = PRIMITIVES,
-    # deps   = [],
-    ## dunno if this is the right place for this, but we need to force
-    ## it for now:
-    deps_runtime = [":camlheader"],
-    # visibility = ["//visibility:public"]
-)
-
-bootstrap_signature(
-    name = "CamlinternalAtomic_cmi",
-    src  = "camlinternalAtomic.mli",
-    opts = CAMLINTERNAL_OPTS,
-    primitives = PRIMITIVES,
-    # deps   = [],
-    # visibility = ["//visibility:public"]
-)
 
 bootstrap_module(
     name   = "CamlinternalFormat",
@@ -591,9 +551,7 @@ bootstrap_module(
     sig    = "Stdlib.Atomic_cmi",
     opts = MODULE_OPTS,
     primitives = PRIMITIVES,
-    deps   = [
-        ":CamlinternalAtomic"
-    ],
+    deps   = [],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
 )
@@ -830,7 +788,7 @@ bootstrap_module(
     sig    = "Stdlib.Complex_cmi",
     opts = MODULE_OPTS,
     primitives = PRIMITIVES,
-    deps   = [":Stdlib"],
+    deps   = ["Stdlib.Float"],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
 )
@@ -841,9 +799,30 @@ bootstrap_signature(
     src  = "complex.mli",
     opts = SIG_OPTS,
     primitives = PRIMITIVES,
-    deps   = [
-        # ":Stdlib_cmi"
-    ],
+    deps   = [ ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_module(
+    ns    = ":Stdlib",
+    name   = "Stdlib.Condition",
+    struct = "condition.ml",
+    sig    = "Stdlib.Condition_cmi",
+    opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
+    deps   = [":Stdlib.Mutex"],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_signature(
+    ns   = ":Stdlib",
+    name = "Stdlib.Condition_cmi",
+    src  = "condition.mli",
+    opts = SIG_OPTS,
+    primitives = PRIMITIVES,
+    deps   = [":Stdlib.Mutex_cmi"],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
 )
@@ -874,6 +853,66 @@ bootstrap_signature(
         ":Stdlib.In_channel_cmi"
         # ":Stdlib"
     ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_module(
+    ns    = ":Stdlib",
+    name   = "Stdlib.Domain",
+    struct = "domain.ml",
+    sig    = "Stdlib.Domain_cmi",
+    opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
+    deps   = [
+        "Stdlib",
+        "Stdlib.Array",
+        "Stdlib.Atomic",
+        "Stdlib.Condition",
+        "Stdlib.List",
+        "Stdlib.Mutex",
+        "Stdlib.Obj",
+        "Stdlib.Sys",
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_signature(
+    ns   = ":Stdlib",
+    name = "Stdlib.Domain_cmi",
+    src  = "domain.mli",
+    opts = SIG_OPTS,
+    primitives = PRIMITIVES,
+    deps   = [ ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_module(
+    ns    = ":Stdlib",
+    name   = "Stdlib.Effect",
+    struct = "effect.ml",
+    sig    = "Stdlib.Effect_cmi",
+    opts = MODULE_OPTS,
+    primitives = PRIMITIVES,
+    deps   = [
+        "Stdlib.Callback",
+        "Stdlib.Obj",
+        "Stdlib.Printexc",
+        "Stdlib.Printf",
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_signature(
+    ns   = ":Stdlib",
+    name = "Stdlib.Effect_cmi",
+    src  = "effect.mli",
+    opts = SIG_OPTS,
+    primitives = PRIMITIVES,
+    deps   = [":Stdlib.Printexc_cmi"],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
 )
@@ -947,13 +986,14 @@ bootstrap_module(
     opts = MODULE_OPTS,
     primitives = PRIMITIVES,
     deps   = [
-        ":Stdlib.Sys",
-        ":Stdlib.String",
-        ":Stdlib.Random",
-        ":Stdlib.Printf",
-        ":Stdlib.List",
-        ":Stdlib.Lazy",
         ":Stdlib.Buffer",
+        ":Stdlib.Domain",
+        ":Stdlib.Fun",
+        ":Stdlib.List",
+        ":Stdlib.Printf",
+        ":Stdlib.Random",
+        ":Stdlib.String",
+        ":Stdlib.Sys",
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -965,9 +1005,7 @@ bootstrap_signature(
     src  = "filename.mli",
     opts = SIG_OPTS,
     primitives = PRIMITIVES,
-    deps   = [
-        ":Stdlib_cmi"
-    ],
+    deps   = [ ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
 )
@@ -1008,18 +1046,20 @@ bootstrap_module(
     sig    = "Stdlib.Format_cmi",
     opts = MODULE_OPTS + ["-w", "+A", "-w", "-fragile-match"],
     deps   = [
-        ":Stdlib.String",
-        ## ":Stdlib",
-        ":Stdlib.Seq",
-        ":Stdlib.List",
-        ":Stdlib.Int",
-        ":Stdlib.Either",
-        ":CamlinternalFormatBasics",
         ":CamlinternalFormat",
-        ":Stdlib.Bytes",
+        ":CamlinternalFormatBasics",
+        ":Stdlib",
+        ":Stdlib.Array",
         ":Stdlib.Buffer",
+        ":Stdlib.Bytes",
+        ":Stdlib.Domain",
+        ":Stdlib.Either",
+        ":Stdlib.Int",
+        ":Stdlib.List",
+        ":Stdlib.Queue",
+        ":Stdlib.Seq",
         ":Stdlib.Stack",
-        ":Stdlib.Queue"
+        ":Stdlib.String",
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1031,10 +1071,11 @@ bootstrap_signature(
     src  = "format.mli",
     opts = SIG_OPTS + ["-w", "+A", "-w", "-fragile-match"],
     deps   = [
-        ":Stdlib.Seq",
-        ":Stdlib.Either",
-        ":Stdlib.Buffer",
-        ## (Stdlib)
+        ":Stdlib_cmi",
+        ":Stdlib.Buffer_cmi",
+        ":Stdlib.Domain_cmi",
+        ":Stdlib.Either_cmi",
+        ":Stdlib.Seq_cmi",
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1402,9 +1443,8 @@ bootstrap_module(
     opts = MODULE_OPTS,
     primitives = PRIMITIVES,
     deps   = [
+        ":Stdlib.List",
         ":Stdlib.Seq",
-        ":Stdlib"
-        ## (Ord)
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1418,7 +1458,6 @@ bootstrap_signature(
     primitives = PRIMITIVES,
     deps   = [
         ":Stdlib.Seq",
-        ## (Ord)
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1479,6 +1518,39 @@ bootstrap_signature(
         ":Stdlib.Map",
         ":Stdlib.Hashtbl"
         # H
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_module(
+    ns    = ":Stdlib",
+    name   = "Stdlib.Mutex",
+    struct = "mutex.ml",
+    sig    = "Stdlib.Mutex_cmi",
+    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
+    deps   = [
+        # ":Stdlib.Set",
+        # ":Stdlib.Map",
+        # ":Stdlib.Hashtbl"
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_signature(
+    ns   = ":Stdlib",
+    name = "Stdlib.Mutex_cmi",
+    src  = "mutex.mli",
+    opts = SIG_OPTS,
+    primitives = PRIMITIVES,
+    deps   = [
+        # ":Stdlib.Set",
+        # ":Stdlib.Seq",
+        # # ":Stdlib.Ord",
+        # ":Stdlib.Map",
+        # ":Stdlib.Hashtbl"
+        # # H
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1680,12 +1752,12 @@ bootstrap_module(
     opts = MODULE_OPTS,
     primitives = PRIMITIVES,
     deps   = [
-        # ":Stdlib",
-        ":Stdlib.Printf",
-        ":Stdlib.Obj",
-        ":Stdlib.Buffer",
-        ":Stdlib.Atomic",
+        ":Stdlib",
         ":Stdlib.Array",
+        ":Stdlib.Atomic",
+        ":Stdlib.Buffer",
+        ":Stdlib.Obj",
+        ":Stdlib.Printf",
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1698,7 +1770,7 @@ bootstrap_signature(
     opts = SIG_OPTS,
     primitives = PRIMITIVES,
     deps   = [
-        ":Stdlib"
+        ":Stdlib.Obj_cmi"
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1768,15 +1840,18 @@ bootstrap_module(
     opts = MODULE_OPTS,
     primitives = PRIMITIVES,
     deps   = [
-        ":Stdlib.String",
-        ## ":Stdlib",
-        ":Stdlib.Nativeint",
-        ":Stdlib.Int64",
-        ":Stdlib.Int32",
-        ":Stdlib.Int",
-        ":Stdlib.Digest",
-        ":Stdlib.Char",
+        ":Stdlib",
         ":Stdlib.Array",
+        ":Stdlib.Bytes",
+        ":Stdlib.Bigarray",
+        # ":Stdlib.Char",
+        ":Stdlib.Digest",
+        ":Stdlib.Domain",
+        ":Stdlib.Int",
+        ":Stdlib.Int32",
+        ":Stdlib.Int64",
+        ":Stdlib.Nativeint",
+        ":Stdlib.String",
     ],
     data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
@@ -1867,12 +1942,43 @@ bootstrap_signature(
 
 bootstrap_module(
     ns    = ":Stdlib",
+    name   = "Stdlib.Semaphore",
+    struct = "semaphore.ml",
+    sig    = "Stdlib.Semaphore_cmi",
+    opts   = MODULE_OPTS + ["-w", "+A", "-w", "-fragile-match"],
+    # + select({
+    #     mode:native  ["-inline", 9]
+    # })
+    deps   = [
+        ":Stdlib.Condition",
+        ":Stdlib.Mutex",
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_signature(
+    ns   = ":Stdlib",
+    name  = "Stdlib.Semaphore_cmi",
+    src   = "semaphore.mli",
+    opts  = SIG_OPTS + [
+        "-w", "+A", "-w", "-fragile-match"
+    ],
+    deps  = [
+    ],
+    data = ["//runtime:primitives"],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_module(
+    ns    = ":Stdlib",
     struct = "seq.ml",
     name   = "Stdlib.Seq",
     sig    = "Stdlib.Seq_cmi",
     opts = MODULE_OPTS,
     primitives = PRIMITIVES,
     deps   = [
+        ":Stdlib.Atomic",
         ":Stdlib.Either",
         ":Stdlib.Lazy"
     ],
@@ -2277,7 +2383,6 @@ filegroup(
         ":Stdlib.BytesLabels_cmi",
         ":Stdlib.Bytes_cmi",
         ":Stdlib.Callback_cmi",
-        ":CamlinternalAtomic_cmi",
         ":CamlinternalFormatBasics_cmi",
         ":CamlinternalFormat_cmi",
         ":CamlinternalLazy_cmi",
@@ -2285,6 +2390,7 @@ filegroup(
         ":CamlinternalOO_cmi",
         ":Stdlib.Char_cmi",
         ":Stdlib.Complex_cmi",
+        ":Stdlib.Condition_cmi",
         ":Stdlib.Digest_cmi",
         ":Stdlib.Either_cmi",
         ":Stdlib.Ephemeron_cmi",
@@ -2293,7 +2399,6 @@ filegroup(
         ":Stdlib.Format_cmi",
         ":Stdlib.Fun_cmi",
         ":Stdlib.Gc_cmi",
-        ":Stdlib.Genlex_cmi",
         ":Stdlib.Hashtbl_cmi",
         ":Stdlib.In_channel_cmi",
         ":Stdlib.Int32_cmi",
@@ -2306,26 +2411,24 @@ filegroup(
         ":Stdlib.Map_cmi",
         ":Stdlib.Marshal_cmi",
         ":Stdlib.MoreLabels_cmi",
+        ":Stdlib.Mutex_cmi",
         ":Stdlib.Nativeint_cmi",
         ":Stdlib.Obj_cmi",
         ":Stdlib.Oo_cmi",
         ":Stdlib.Option_cmi",
         ":Stdlib.Out_channel_cmi",
         ":Stdlib.Parsing_cmi",
-        ## pervasives cmi is implicit - how to reference?
-        # ":Stdlib.Pervasives.cmi",
         ":Stdlib.Printexc_cmi",
         ":Stdlib.Printf_cmi",
         ":Stdlib.Queue_cmi",
         ":Stdlib.Random_cmi",
         ":Stdlib.Result_cmi",
         ":Stdlib.Scanf_cmi",
+        ":Stdlib.Semaphore_cmi",
         ":Stdlib.Seq_cmi",
         ":Stdlib.Set_cmi",
         ":Stdlib.Stack_cmi",
         ":Stdlib.StdLabels_cmi",
-        # ":Stdlib.Stdlib",
-        ":Stdlib.Stream_cmi",
         ":Stdlib.StringLabels_cmi",
         ":Stdlib.String_cmi",
         ":Stdlib.Sys_cmi",

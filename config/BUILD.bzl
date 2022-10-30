@@ -251,7 +251,7 @@ OUTPUTEXE = ["-o"]
 
 ################################################################
 ################  OCAML BUILD FLAGS  ################
-## root Makefile:
+## //Makefile:
 # CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
 # CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) -g -nostdlib -I stdlib -I otherlibs/dynlink
 
@@ -381,9 +381,22 @@ TOOLS_SIG_OPTS = TOOLS_MODULE_OPTS
 
 # LINKFLAGS=
 
-OPTCOMPFLAGS = []
 ## Makefile.common
-# ifeq "$(FUNCTION_SECTIONS)" "true"  OPTCOMPFLAGS += -function-sections
+# OPTCOMPFLAGS=
+# ifeq "$(FUNCTION_SECTIONS)" "true"
+# OPTCOMPFLAGS += -function-sections
+# endif
+# in various makefiles:
+# ifeq "$(FLAMBDA)" "true"
+# OPTCOMPFLAGS += -O3
+# endif
+OPTCOMPFLAGS = select({
+    "//config/cc:function-sections?": ["-function-sections"],
+    "//conditions:default": []
+}) + select({
+    ":flambda?": ["-O3"],
+    "//conditions:default": []
+})
 
 ## stdlib/Makefile
 # ifeq "$(FLAMBDA)" "true" OPTCOMPFLAGS += -O3
