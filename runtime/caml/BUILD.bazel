@@ -20,11 +20,11 @@ exports_files([
 # GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h build_config.h
 
 genrule(
-    name = "opnames_h",
     outs = ["opnames.h"],
+    name = "opnames_h",
     srcs = ["//runtime/caml:instruct.h"],
     cmd  = " ".join([
-	    # tr is for window only?
+	    # tr is for windows only?
         # 	tr -d '\r' < $< | \
         "cat $(location //runtime/caml:instruct.h) | ",
 	    "sed -e '/\\/\\*/d' ",

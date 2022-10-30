@@ -65,64 +65,122 @@ string_flag(
 # ASM_SOURCES := $(ARCH).$(ASM_EXT)
 # endif
 
-ASM_SOURCES = select({
-    # "//config/host:win": [$(ARCH)nt.$(ASM_EXT)]
+## Makefile.build_config.in:
+## Platform-dependent assembler files to use to build the runtime
+# runtime_ASM_OBJECTS = $(addprefix runtime/,@runtime_asm_objects@)
+
+## configure.ac:
+# AS_CASE([$ccomptype],
+#   [msvc],
+#     [runtime_asm_objects=${arch}nt.${OBJEXT}],
+#   [runtime_asm_objects=${arch}.${OBJEXT}])
+
+## configure:
+# case $ccomptype in #(
+#   msvc) :
+#     runtime_asm_objects=${arch}nt.${OBJEXT} ;; #(
+#   *) :
+#     runtime_asm_objects=${arch}.${OBJEXT} ;;
+# esac
+
+## OBJEXT: set by configure, but only 2 possibilities: .S or .asm
+## ARCH: arm | arm64 | i386 | amd64 | power | riscv | s390x
+## Bazel: arch must be set, by config setting to be determined.
+## For now it's hardcoded as amd64 since I'm using a legacy Mac for dev.
+RUNTIME_ASM_OBJECTS = select({
+    "//config/host:windows_x86_32": [ARCH + "nt.asm"],
     "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
 })
 
 COMMON_C_SOURCES = [
-    "misc.c",
-    "startup_aux.c",
-    "freelist.c",
-    "major_gc.c",
-    "minor_gc.c",
-    "memory.c",
-    "alloc.c",
-    "globroots.c",
-    "signals.c",
-    "printexc.c",
-    "backtrace.c",
-    "compare.c",
-    "ints.c",
-    "floats.c",
-    "str.c",
-    "eventlog.c",
-    "array.c", "io.c", "extern.c", "intern.c", "hash.c", "sys.c",
-    "meta.c",
-    "parsing.c",
-    "gc_ctrl.c",
-    "md5.c", "obj.c",
-    "lexing.c",
-    "callback.c",
-    "debugger.c",
-    "weak.c", "compact.c", "finalise.c", "custom.c",
-    "dynlink.c",
-    "afl.c",
-    "bigarray.c", "memprof.c", "domain.c", "skiplist.c", "codefrag.c"
+  "addrmap.c",
+  "afl.c",
+  "alloc.c",
+  "array.c",
+  "backtrace.c",
+  "bigarray.c",
+  "callback.c",
+  "codefrag.c",
+  "compare.c",
+  "custom.c",
+  "debugger.c",
+  "domain.c",
+  "dynlink.c",
+  "extern.c",
+  "fiber.c",
+  "finalise.c",
+  "floats.c",
+  "gc_ctrl.c",
+  "gc_stats.c",
+  "globroots.c",
+  "hash.c",
+  "intern.c",
+  "ints.c",
+  "io.c",
+  "lexing.c",
+  "lf_skiplist.c",
+  "main.c",
+  "major_gc.c",
+  "md5.c",
+  "memory.c",
+  "memprof.c",
+  "meta.c",
+  "minor_gc.c",
+  "misc.c",
+  "obj.c",
+  "parsing.c",
+  "platform.c",
+  "printexc.c",
+  "prng.c",
+  "roots.c",
+  "runtime_events.c",
+  "shared_heap.c",
+  "signals.c",
+  "skiplist.c",
+  "startup_aux.c",
+  "str.c",
+  "sync.c", "sync_posix.h",
+  "sys.c",
+  "weak.c"
 ] + select({
+    ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
     "//config/host:linux": ["unix.c"],
     "//config/host:macos": ["unix.c"],
-    # "//config/host:win32": ["win32.c"],
+    "//config/host:windows_x86_32": ["win32.c"], # using bazel naming
+    # "//config/host:windows_x86_64": [???]
     "//conditions:default": []
 })
 
-BYTECODE_C_SOURCES = [
-    "interp.c", "stacks.c", "fix_code.c", "startup_byt.c", "roots_byt.c",
-    "fail_byt.c", "signals_byt.c", "backtrace_byt.c", "main.c",
+BYTECODE_ONLY_C_SOURCES = [
+  "backtrace_byt.c",
+  "fail_byt.c",
+  "fix_code.c",
+  "interp.c",
+  "startup_byt.c"
 ]
 
-NATIVE_C_SOURCES = [
-    "startup_nat.c", "main.c", "fail_nat.c", "roots_nat.c", "signals_nat.c",
-    "backtrace_nat.c", "dynlink_nat.c", "clambda_checks.c",
+RUNTIME_BYTECODE_C_SOURCES = COMMON_C_SOURCES + BYTECODE_ONLY_C_SOURCES
+
+NATIVE_ONLY_C_SOURCES = [
+  "backtrace_nat.c",
+  "clambda_checks.c",
+  "dynlink_nat.c",
+  "fail_nat.c",
+  "frame_descriptors.c",
+  "startup_nat.c",
+  "signals_nat.c"
 ]
+
+RUNTIME_NATIVE_C_SOURCES = COMMON_C_SOURCES + NATIVE_ONLY_C_SOURCES
 
 ########
 genrule(
+    outs = ["build_config.h"],
     name = "build_config_h",
     tools = ["//runtime:sak.exe"],
-    outs = ["build_config.h"],
     srcs = ["//:Makefile.config"],
     cmd  = " ".join([
+        ## $(call C_LITERAL,$(LIBDIR)) ==
         "OSD=`$(location //runtime:sak.exe) encode-C-literal {libdir}`;".format(
             libdir = LIBDIR),
         "echo OSD: $$OSD;",
@@ -134,29 +192,33 @@ genrule(
     ])
 )
 
-# primitives: $(shell ./gen_primitives.sh > primitives.new; \
-#                     cmp -s primitives primitives.new || echo primitives.new)
-# 	cp $^ $@
+##//Makefile:
+  # $(shell runtime/gen_primitives.sh > runtime/primitives.new; \
+  #                   cmp -s runtime/primitives runtime/primitives.new || \
+  #                   echo runtime/primitives.new)
+  #   cp $^ $@
+
 ## FIXME: do the cmp
 genrule(
+    outs  = ["primitives"],
     name  = "primitives_dat",
     visibility = ["//visibility:public"],
     tools = [":gen_primitives.sh"],
-    outs  = ["primitives"],
     ## cwd is proj root, but the script assumes it is runtime
     cmd   = " ".join([
-        "echo PWD: $$(PWD);",
-        "cd runtime && ",
-        "../$(location :gen_primitives.sh) > ../$@;"
+        # "echo PWD: $$(PWD);",
+        # "cd runtime && ",
+        "$(location :gen_primitives.sh) > $@;"
     ]),
-    ## script depends on these:
+    ## script depends on these (Bazel: runfiles):
     srcs  = [
         "alloc.c", "array.c", "compare.c", "extern.c", "floats.c",
         "gc_ctrl.c", "hash.c", "intern.c", "interp.c", "ints.c", "io.c",
         "lexing.c", "md5.c", "meta.c", "memprof.c", "obj.c", "parsing.c",
         "signals.c", "str.c", "sys.c", "callback.c", "weak.c",
-        "finalise.c", "stacks.c", "dynlink.c", "backtrace_byt.c",
-        "backtrace.c", "afl.c", "bigarray.c", "eventlog.c",
+        "finalise.c", "domain.c", "platform.c", "fiber.c", "memory.c",
+        "startup_aux.c", "runtime_events.c", "sync.c", "dynlink.c",
+        "backtrace_byt.c", "backtrace.c", "afl.c", "bigarray.c", "prng.c",
     ]
 )
 
@@ -170,8 +232,8 @@ genrule(
 
 # prims.c : primitives
 genrule(
-    name  = "prims_c",
     outs  = ["prims.c"],
+    name  = "prims_c",
     srcs  = [":primitives"],
     cmd   = "\n".join([
         "PRIMS=`cat $(location primitives)`;",
@@ -213,7 +275,7 @@ cc_library(
     name = "camlrun",
     srcs = [
         ":build_config.h",
-    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    ] + RUNTIME_BYTECODE_C_SOURCES,
     copts = [
         "-I$(GENDIR)/runtime", # pick up build_config.h
     ] + OC_CPPFLAGS + select({
@@ -230,7 +292,7 @@ cc_library(
     name = "camlrun_pic",
     srcs = [
         ":build_config.h",
-    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    ] + RUNTIME_BYTECODE_C_SOURCES,
     copts = [
         "-I$(GENDIR)/runtime", # pick up build_config.h
     ] + OC_CPPFLAGS + select({
@@ -248,7 +310,7 @@ cc_binary(
     linkshared = True,
     srcs = [
         ":build_config.h",
-    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    ] + RUNTIME_BYTECODE_C_SOURCES,
     copts = [
         "-I$(GENDIR)/runtime", # pick up build_config.h
     ] + OC_CPPFLAGS + select({
@@ -275,7 +337,7 @@ cc_library(
     srcs = [
         ":build_config.h",
         "instrtrace.c"
-    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    ] + RUNTIME_BYTECODE_C_SOURCES,
     copts = [
         "-I$(GENDIR)/runtime" # to pick up build_config.h
     ] + OC_CPPFLAGS,
@@ -317,7 +379,7 @@ cc_library(  ## produces libcamlruni
     name = "camlruni",
     srcs = [
         ":build_config.h",
-    ] + COMMON_C_SOURCES + BYTECODE_C_SOURCES,
+    ] + RUNTIME_BYTECODE_C_SOURCES,
     copts = [
         "-I$(GENDIR)/runtime" # to pick up build_config.h
     ] + OC_CPPFLAGS,
@@ -332,8 +394,8 @@ cc_library(
     name = "asmrun",
     srcs = [
         ":build_config.h",
-        "signals_osdep.h"
-    ] + COMMON_C_SOURCES + NATIVE_C_SOURCES + ASM_SOURCES,
+        # "signals_osdep.h"
+    ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
     copts = [
         "-I$(GENDIR)/runtime" # to pick up build_config.h
     ] + OC_CPPFLAGS,
@@ -341,6 +403,41 @@ cc_library(
     defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
     deps = ["//runtime/caml:hdrs"]
 )
+
+## debug native runtime:
+# runtime/%.nd.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS) $(ocamlrund_CPPFLAGS)
+# $(DEPDIR)/runtime/%.nd.$(D): \
+#   OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS) $(ocamlrund_CPPFLAGS)
+
+cc_library(
+    name = "asmrund",
+    srcs = [
+        ":build_config.h",
+        # "signals_osdep.h"
+    ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
+    copts = [
+        "-I$(GENDIR)/runtime" # to pick up build_config.h
+    ] + OC_CPPFLAGS,
+    linkopts = LDFLAGS + OC_LDFLAGS,
+    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES + OC_DEBUG_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"]
+)
+
+## instrumented native runtime
+cc_library(
+    name = "asmruni",
+    srcs = [
+        ":build_config.h",
+        # "signals_osdep.h"
+    ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
+    copts = [
+        "-I$(GENDIR)/runtime" # to pick up build_config.h
+    ] + OC_CPPFLAGS,
+    linkopts = LDFLAGS + OC_LDFLAGS,
+    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
+    deps = ["//runtime/caml:hdrs"]
+)
+
 
 ##########
 cc_binary(
