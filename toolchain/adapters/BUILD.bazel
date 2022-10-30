@@ -1,0 +1,37 @@
+exports_files(["BUILD.bazel"])
+
+## toolchains where buildhost == bootstrap
+
+load("//toolchain:BUILD.bzl", "bootstrap_toolchain_adapter")
+
+######## toolchain adapters ########
+
+bootstrap_toolchain_adapter(
+    name     = "bootstrap",
+    ocamlrun = "//runtime:ocamlrun",
+    ocamlc   = "//boot:ocamlc", # the precompiled vm>vm bootstrap compiler
+    linkmode = "dynamic"
+)
+
+bootstrap_toolchain_adapter(
+    name     = "standard",
+    ocamlrun = "//runtime:ocamlrun",
+    ocamlc   = "//compilers/stage1:ocamlc",
+    # ocamlc   = "//runtime:ocamlc",
+    linkmode = "dynamic"
+)
+
+bootstrap_toolchain_adapter(
+    name     = "debug",
+    ocamlrun = "//runtime:ocamlrund",
+    ocamlc   = "//compilers/stage1:ocamlc",
+    linkmode = "dynamic"
+)
+
+bootstrap_toolchain_adapter(
+    name     = "instrumented",
+    ocamlrun = "//runtime:ocamlruni",
+    ocamlc   = "//runtime:ocamlc",
+    linkmode = "dynamic"
+)
+

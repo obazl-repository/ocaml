@@ -1,0 +1,61 @@
+# generated file - DO NOT EDIT
+
+load("//toolchain:BUILD.bzl", "toolchain_selector")
+
+exports_files(glob(["*.bazel"]))
+
+##########
+toolchain_selector(
+    name           = "bootstrap",
+    toolchain = "//toolchain/adapters:bootstrap",
+    visibility     = ["//visibility:public"],
+)
+
+##########
+toolchain_selector(
+    name           = "std",
+    toolchain = "//toolchain/adapters:standard",
+    # toolchain      = "@ocaml//toolchain/adapters/local:sysvm",
+    build_host_constraints  = [
+        # "@ocaml//platforms:vm?"
+        "@platforms//os:macos",
+    ],
+    target_host_constraints  = [
+        # "@ocaml//platforms:vm?"
+        "@platforms//os:macos",
+    ],
+    toolchain_constraints = ["//config/runtime:standard"],
+    visibility     = ["//visibility:public"],
+)
+
+##########
+toolchain_selector(
+    name           = "dbg",
+    toolchain = "//toolchain/adapters:debug",
+    build_host_constraints  = [
+        # "@ocaml//platforms:sys?"
+        "@platforms//os:macos"
+    ],
+    target_host_constraints  = [
+        # "@ocaml//platforms:sys?"
+        "@platforms//os:macos"
+    ],
+    toolchain_constraints = ["//config/runtime:debug"],
+    visibility     = ["//visibility:public"],
+)
+
+##########
+toolchain_selector(
+    name                    = "instrumented",
+    toolchain = "//toolchain/adapters:instrumented",
+    build_host_constraints  = [
+        # "@ocaml//platforms:sys?"
+        "@platforms//os:macos",
+    ],
+    target_host_constraints  = [
+        # "@ocaml//platforms:vm?"
+        "@platforms//os:macos",
+    ],
+    toolchain_constraints = ["//config/runtime:instrumented"],
+    visibility              = ["//visibility:public"],
+)
