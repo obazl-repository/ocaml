@@ -4,19 +4,8 @@ common --color=yes
 # https://docs.bazel.build/versions/main/user-manual.html#flag--workspace_status_command
 build --stamp --workspace_status_command=$PWD/bzl/camlheader.sh
 
-# build --config=verbose
-build:verbose --subcommands=pretty_print
-build:verbose --verbose_failures
-
-# build --config=dbg
-
 ## enable debug for ocamlrun:
 ## build --//config/debug:ocamlrun
-
-build:dbg --subcommands=pretty_print
-build:dbg --verbose_failures
-# build:dbg --sandbox_debug
-build:dbg --//config/debug:ocamlrun
 
 build:stage1 --//bzl/toolchain:ocamlc=//compilers/stage1:ocamlc
 build:stage1 --//bzl:stage=0
@@ -40,4 +29,5 @@ build:vmsys --platforms=@ocaml//platforms:sys
 build:syssys --host_platform=@ocaml//platforms:sys
 build:syssys --platforms=@ocaml//platforms:sys
 
+try-import .config/dev.bazelrc
 try-import .config/user.bazelrc
