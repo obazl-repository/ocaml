@@ -86,7 +86,8 @@ val pred : int32 -> int32
 (** Predecessor.  [Int32.pred x] is [Int32.sub x Int32.one]. *)
 
 val abs : int32 -> int32
-(** Return the absolute value of its argument. *)
+(** [abs x] is the absolute value of [x]. On [min_int] this
+   is [min_int] itself and thus remains negative. *)
 
 val max_int : int32
 (** The greatest representable 32-bit integer, 2{^31} - 1. *)
@@ -226,11 +227,16 @@ val max: t -> t -> t
     @since 4.13.0
  *)
 
+val seeded_hash : int -> t -> int
+(** A seeded hash function for 32-bit ints, with the same output value as
+    {!Hashtbl.seeded_hash}. This function allows this module to be passed as
+    argument to the functor {!Hashtbl.MakeSeeded}.
 
-(**/**)
+    @since 5.1.0 *)
 
-(** {1 Deprecated functions} *)
+val hash : t -> int
+(** An unseeded hash function for 32-bit ints, with the same output value as
+    {!Hashtbl.hash}. This function allows this module to be passed as argument
+    to the functor {!Hashtbl.Make}.
 
-external format : string -> int32 -> string = "caml_int32_format"
-(** Do not use this deprecated function.  Instead,
-   used {!Printf.sprintf} with a [%l...] format. *)
+    @since 5.1.0 *)

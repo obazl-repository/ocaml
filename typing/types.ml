@@ -128,39 +128,77 @@ and class_signature =
   { csig_self: type_expr;
     mutable csig_self_row: type_expr;
     mutable csig_vars: (mutable_flag * virtual_flag * type_expr) Vars.t;
-    mutable csig_meths: (private_flag * virtual_flag * type_expr) Meths.t; }
+    mutable csig_meths: (method_privacy * virtual_flag * type_expr) Meths.t; }
+
+and method_privacy =
+  | Mpublic
+  | Mprivate of field_kind
 
 (* Variance *)
+(* Variance forms a product lattice of the following partial orders:
+     0 <= may_pos <= pos
+     0 <= may_weak <= may_neg <= neg
+     0 <= inj
+   Additionally, the following implications are valid
+     pos => inj
+     neg => inj
+   Examples:
+     type 'a t        : may_pos + may_neg + may_weak
+     type 'a t = 'a   : pos
+     type 'a t = 'a -> unit : neg
+     type 'a t = ('a -> unit) -> unit : pos + may_weak
+     type 'a t = A of (('a -> unit) -> unit) : pos
+     type +'a p = ..  : may_pos + inj
+     type +!'a t      : may_pos + inj
+     type -!'a t      : may_neg + inj
+     type 'a t = A    : inj
+ *)
 
 module Variance = struct
   type t = int
   type f = May_pos | May_neg | May_weak | Inj | Pos | Neg | Inv
   let single = function
     | May_pos -> 1
-    | May_neg -> 2
+    | May_neg -> 2 + 4
     | May_weak -> 4
     | Inj -> 8
-    | Pos -> 16
-    | Neg -> 32
-    | Inv -> 64
+    | Pos -> 16 + 8 + 1
+    | Neg -> 32 + 8 + 4 + 2
+    | Inv -> 63
   let union v1 v2 = v1 lor v2
   let inter v1 v2 = v1 land v2
   let subset v1 v2 = (v1 land v2 = v1)
   let eq (v1 : t) v2 = (v1 = v2)
-  let set x b v =
-    if b then v lor single x else  v land (lnot (single x))
+  let set x v = union v (single x)
+  let set_if b x v = if b then set x v else v
   let mem x = subset (single x)
   let null = 0
   let unknown = 7
-  let full = 127
-  let covariant = single May_pos lor single Pos lor single Inj
-  let swap f1 f2 v =
-    let v' = set f1 (mem f2 v) v in set f2 (mem f1 v) v'
-  let conjugate v = swap May_pos May_neg (swap Pos Neg v)
+  let full = single Inv
+  let covariant = single Pos
+  let swap f1 f2 v v' =
+    set_if (mem f2 v) f1 (set_if (mem f1 v) f2 v')
+  let conjugate v =
+    let v' = inter v (union (single Inj) (single May_weak)) in
+    swap Pos Neg v (swap May_pos May_neg v v')
+  let compose v1 v2 =
+    if mem Inv v1 && mem Inj v2 then full else
+    let mp =
+      mem May_pos v1 && mem May_pos v2 || mem May_neg v1 && mem May_neg v2
+    and mn =
+      mem May_pos v1 && mem May_neg v2 || mem May_pos v1 && mem May_neg v2
+    and mw = mem May_weak v1 && v2 <> null || v1 <> null && mem May_weak v2
+    and inj = mem Inj v1 && mem Inj v2
+    and pos = mem Pos v1 && mem Pos v2 || mem Neg v1 && mem Neg v2
+    and neg = mem Pos v1 && mem Neg v2 || mem Neg v1 && mem Pos v2 in
+    List.fold_left (fun v (b,f) -> set_if b f v) null
+      [mp, May_pos; mn, May_neg; mw, May_weak; inj, Inj; pos, Pos; neg, Neg]
+  let strengthen v =
+    if mem May_neg v then v else v land (full - single May_weak)
   let get_upper v = (mem May_pos v, mem May_neg v)
-  let get_lower v = (mem Pos v, mem Neg v, mem Inv v, mem Inj v)
+  let get_lower v = (mem Pos v, mem Neg v, mem Inj v)
   let unknown_signature ~injective ~arity =
-    let v = if injective then set Inj true unknown else unknown in
+    let v = if injective then set Inj unknown else unknown in
     Misc.replicate_list v arity
 end
 
@@ -399,6 +437,15 @@ let may_equal_constr c1 c2 =
          true
      | tag1, tag2 ->
          equal_tag tag1 tag2)
+
+let item_visibility = function
+  | Sig_value (_, _, vis)
+  | Sig_type (_, _, _, vis)
+  | Sig_typext (_, _, _, vis)
+  | Sig_module (_, _, _, _, vis)
+  | Sig_modtype (_, _, vis)
+  | Sig_class (_, _, _, vis)
+  | Sig_class_type (_, _, _, vis) -> vis
 
 type label_description =
   { lbl_name: string;                   (* Short name *)
@@ -707,6 +754,7 @@ let log_type ty =
 let link_type ty ty' =
   let ty = repr ty in
   let ty' = repr ty' in
+  if ty == ty' then () else begin
   log_type ty;
   let desc = ty.desc in
   Transient_expr.set_desc ty (Tlink ty');
@@ -723,6 +771,7 @@ let link_type ty ty' =
       | None, None   -> ()
       end
   | _ -> ()
+  end
   (* ; assert (check_memorized_abbrevs ()) *)
   (*  ; check_expans [] ty' *)
 (* TODO: consider eliminating set_type_desc, replacing it with link types *)

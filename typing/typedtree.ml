@@ -133,7 +133,7 @@ and expression_desc =
       Ident.t option * string option loc * Types.module_presence * module_expr *
         expression
   | Texp_letexception of extension_constructor * expression
-  | Texp_assert of expression
+  | Texp_assert of expression * Location.t
   | Texp_lazy of expression
   | Texp_object of class_structure * string list
   | Texp_pack of module_expr
@@ -161,7 +161,7 @@ and 'k case =
     }
 
 and record_label_definition =
-  | Kept of Types.type_expr
+  | Kept of Types.type_expr * mutable_flag
   | Overridden of Longident.t loc * expression
 
 and binding_op =

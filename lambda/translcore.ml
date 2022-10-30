@@ -186,12 +186,11 @@ let event_function ~scopes exp lam =
 
 (* Assertions *)
 
-let assert_failed ~scopes exp =
+let assert_failed loc ~scopes exp =
   let slot =
     transl_extension_path Loc_unknown
-      Env.initial_safe_string Predef.path_assert_failure
+      Env.initial Predef.path_assert_failure
   in
-  let loc = exp.exp_loc in
   let (fname, line, char) =
     Location.get_pos_info loc.Location.loc_start
   in
@@ -203,7 +202,6 @@ let assert_failed ~scopes exp =
               [Const_base(Const_string (fname, exp.exp_loc, None));
                Const_base(Const_int line);
                Const_base(Const_int char)]))], loc))], loc)
-;;
 
 let rec cut n l =
   if n = 0 then ([],l) else
@@ -373,14 +371,14 @@ and transl_exp0 ~in_new_scope ~scopes e =
       let targ = transl_exp ~scopes arg in
       begin match lbl.lbl_repres with
           Record_regular | Record_inlined _ ->
-          Lprim (Pfield lbl.lbl_pos, [targ],
+          Lprim (Pfield (lbl.lbl_pos, maybe_pointer e, lbl.lbl_mut), [targ],
                  of_location ~scopes e.exp_loc)
         | Record_unboxed _ -> targ
         | Record_float ->
           Lprim (Pfloatfield lbl.lbl_pos, [targ],
                  of_location ~scopes e.exp_loc)
         | Record_extension _ ->
-          Lprim (Pfield (lbl.lbl_pos + 1), [targ],
+          Lprim (Pfield (lbl.lbl_pos + 1, maybe_pointer e, lbl.lbl_mut), [targ],
                  of_location ~scopes e.exp_loc)
       end
   | Texp_setfield(arg, _, lbl, newval) ->
@@ -489,7 +487,8 @@ and transl_exp0 ~in_new_scope ~scopes e =
       Lapply{
         ap_loc=loc;
         ap_func=
-          Lprim(Pfield 0, [transl_class_path loc e.exp_env cl], loc);
+          Lprim(Pfield (0, Pointer, Mutable),
+                [transl_class_path loc e.exp_env cl], loc);
         ap_args=[lambda_unit];
         ap_tailcall=Default_tailcall;
         ap_inlined=Default_inline;
@@ -547,13 +546,13 @@ and transl_exp0 ~in_new_scope ~scopes e =
            transl_exp ~scopes body)
   | Texp_pack modl ->
       !transl_module ~scopes Tcoerce_none None modl
-  | Texp_assert {exp_desc=Texp_construct(_, {cstr_name="false"}, _)} ->
-      assert_failed ~scopes e
-  | Texp_assert (cond) ->
+  | Texp_assert ({exp_desc=Texp_construct(_, {cstr_name="false"}, _)}, loc) ->
+      assert_failed loc ~scopes e
+  | Texp_assert (cond, loc) ->
       if !Clflags.noassert
       then lambda_unit
       else Lifthenelse (transl_exp ~scopes cond, lambda_unit,
-                        assert_failed ~scopes e)
+                        assert_failed loc ~scopes e)
   | Texp_lazy e ->
       (* when e needs no computation (constants, identifiers, ...), we
          optimize the translation just as Lazy.lazy_from_val would
@@ -585,12 +584,12 @@ and transl_exp0 ~in_new_scope ~scopes e =
          transl_exp ~scopes e
       | `Other ->
          (* other cases compile to a lazy block holding a function *)
-         let fn = Lfunction {kind = Curried;
-                             params= [Ident.create_local "param", Pgenval];
-                             return = Pgenval;
-                             attr = default_function_attribute;
-                             loc = of_location ~scopes e.exp_loc;
-                             body = transl_exp ~scopes e} in
+         let fn = lfunction ~kind:Curried
+                            ~params:[Ident.create_local "param", Pgenval]
+                            ~return:Pgenval
+                            ~attr:default_function_attribute
+                            ~loc:(of_location ~scopes e.exp_loc)
+                            ~body:(transl_exp ~scopes e) in
           Lprim(Pmakeblock(Config.lazy_tag, Mutable, None), [fn],
                 of_location ~scopes e.exp_loc)
       end
@@ -622,7 +621,7 @@ and transl_exp0 ~in_new_scope ~scopes e =
           let body, _ =
             List.fold_left (fun (body, pos) id ->
               Llet(Alias, Pgenval, id,
-                   Lprim(Pfield pos, [Lvar oid],
+                   Lprim(Pfield (pos, Pointer, Mutable), [Lvar oid],
                          of_location ~scopes od.open_loc), body),
               pos + 1
             ) (transl_exp ~scopes e, 0)
@@ -657,7 +656,7 @@ and transl_guard ~scopes guard rhs =
         (Lifthenelse(transl_exp ~scopes cond, expr, staticfail))
 
 and transl_case ~scopes {c_lhs; c_guard; c_rhs} =
-  c_lhs, transl_guard ~scopes c_guard c_rhs
+  (c_lhs, transl_guard ~scopes c_guard c_rhs)
 
 and transl_cases ~scopes cases =
   let cases =
@@ -733,22 +732,17 @@ and transl_apply ~scopes
         let body =
           match build_apply handle ((Lvar id_arg, optional)::args') l with
             Lfunction{kind = Curried; params = ids; return;
-                      body = lam; attr; loc} ->
-              Lfunction{kind = Curried;
-                        params = (id_arg, Pgenval)::ids;
-                        return;
-                        body = lam; attr;
-                        loc}
-          | Levent(Lfunction{kind = Curried; params = ids; return;
-                             body = lam; attr; loc}, _) ->
-              Lfunction{kind = Curried; params = (id_arg, Pgenval)::ids;
-                        return;
-                        body = lam; attr;
-                        loc}
+                      body = lam; attr; loc}
+               when List.length ids < Lambda.max_arity () ->
+              lfunction ~kind:Curried
+                        ~params:((id_arg, Pgenval)::ids)
+                        ~return
+                        ~body:lam ~attr
+                        ~loc
           | lam ->
-              Lfunction{kind = Curried; params = [id_arg, Pgenval];
-                        return = Pgenval; body = lam;
-                        attr = default_stub_attribute; loc = loc}
+              lfunction ~kind:Curried ~params:[id_arg, Pgenval]
+                        ~return:Pgenval ~body:lam
+                        ~attr:default_stub_attribute ~loc
         in
         List.fold_left
           (fun body (id, lam) -> Llet(Strict, Pgenval, id, lam, body))
@@ -878,7 +872,7 @@ and transl_function ~scopes e param cases partial =
   in
   let attr = default_function_attribute in
   let loc = of_location ~scopes e.exp_loc in
-  let lam = Lfunction{kind; params; return; body; attr; loc} in
+  let lam = lfunction ~kind ~params ~return ~body ~attr ~loc in
   Translattribute.add_function_attributes lam e.exp_loc e.exp_attributes
 
 (* Like transl_exp, but used when a new scope was just introduced. *)
@@ -951,13 +945,15 @@ and transl_record ~scopes loc env fields repres opt_init_expr =
       Array.mapi
         (fun i (_, definition) ->
            match definition with
-           | Kept typ ->
+           | Kept (typ, mut) ->
                let field_kind = value_kind env typ in
                let access =
                  match repres with
-                   Record_regular | Record_inlined _ -> Pfield i
+                   Record_regular | Record_inlined _ ->
+                     Pfield (i, maybe_pointer_type env typ, mut)
                  | Record_unboxed _ -> assert false
-                 | Record_extension _ -> Pfield (i + 1)
+                 | Record_extension _ ->
+                     Pfield (i + 1, maybe_pointer_type env typ, mut)
                  | Record_float -> Pfloatfield i in
                Lprim(access, [Lvar init_id],
                      of_location ~scopes loc),
@@ -1009,7 +1005,7 @@ and transl_record ~scopes loc env fields repres opt_init_expr =
     let copy_id = Ident.create_local "newrecord" in
     let update_field cont (lbl, definition) =
       match definition with
-      | Kept _type -> cont
+      | Kept _ -> cont
       | Overridden (_lid, expr) ->
           let upd =
             match repres with
@@ -1182,7 +1178,7 @@ and transl_letop ~scopes loc env let_ ands param case partial =
     in
     let attr = default_function_attribute in
     let loc = of_location ~scopes case.c_rhs.exp_loc in
-    Lfunction{kind; params; return; body; attr; loc}
+    lfunction ~kind ~params ~return ~body ~attr ~loc
   in
   Lapply{
     ap_loc = of_location ~scopes loc;

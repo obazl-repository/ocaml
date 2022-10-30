@@ -15,6 +15,8 @@
 
 (** Pretty-printing.
 
+   If you are new to this module, see the {{!examples} examples} below.
+
    This module implements a pretty-printing facility to format values
    within {{!boxes}'pretty-printing boxes'} and {{!tags}'semantic tags'}
    combined with a set of {{!fpp}printf-like functions}.
@@ -30,15 +32,27 @@
    - {!std_formatter} outputs to {{!Stdlib.stdout}stdout}
    - {!err_formatter} outputs to {{!Stdlib.stderr}stderr}
 
-   Most functions in the {!Format} module come in two variants:
-   a short version that operates on {!std_formatter} and the
-   generic version prefixed by [pp_] that takes a formatter
-   as its first argument.
+   Most functions in the {!Format} module come in two variants: a short version
+   that operates on the current domain's standard formatter as obtained using
+   {!get_std_formatter} and the generic version prefixed by [pp_] that takes a
+   formatter as its first argument. For the version that operates on the
+   current domain's standard formatter, the call to {!get_std_formatter} is
+   delayed until the last argument is received.
 
    More formatters can be created with {!formatter_of_out_channel},
-   {!formatter_of_buffer}, {!formatter_of_symbolic_output_buffer}
-   or using {{!section:formatter}custom formatters}.
+   {!formatter_of_buffer}, {!formatter_of_symbolic_output_buffer} or using
+   {{!section:formatter}custom formatters}.
 
+   {b Warning}: Since {{!section:formatter}formatters} contain
+   mutable state, it is not thread-safe to use the same formatter on multiple
+   domains in parallel without synchronization.
+
+   If multiple domains write to the same output channel using the
+   predefined formatters (as obtained by {!get_std_formatter} or
+   {!get_err_formatter}), the output from the domains will be interleaved with
+   each other at points where the formatters are flushed, such as with
+   {!print_flush}. This synchronization is not performed by formatters obtained
+   from {!formatter_of_out_channel} (on the standard out channels or others).
 *)
 
 (** {1 Introduction}
@@ -320,7 +334,7 @@ val pp_print_custom_break :
 
    The custom break is useful if you want to change which visible
    (non-whitespace) characters are printed in case of break or no break. For
-   example, when printing a list {[ [a; b; c] ]}, you might want to add a
+   example, when printing a list [ [a; b; c] ], you might want to add a
    trailing semicolon when it is printed vertically:
 
    {[
@@ -474,7 +488,7 @@ val get_max_indent : unit -> int
 (** {1 Geometry }
 
 Geometric functions can be used to manipulate simultaneously the
-coupled variables, margin and maxixum indentation limit.
+coupled variables, margin and maximum indentation limit.
 
 *)
 
@@ -944,19 +958,41 @@ val get_formatter_stag_functions : unit -> formatter_stag_functions
 
 val formatter_of_out_channel : out_channel -> formatter
 (** [formatter_of_out_channel oc] returns a new formatter writing
-  to the corresponding output channel [oc].
+    to the corresponding output channel [oc].
 *)
 
+val synchronized_formatter_of_out_channel :
+  out_channel -> formatter Domain.DLS.key
+(** [synchronized_formatter_of_out_channel oc] returns the key to the
+    domain-local state that holds the domain-local formatter for writing to the
+    corresponding output channel [oc].
+
+    When the formatter is used with multiple domains, the output from the
+    domains will be interleaved with each other at points where the formatter
+    is flushed, such as with {!print_flush}.
+*)
+
+
 val std_formatter : formatter
-(** The standard formatter to write to standard output.
+(** The initial domain's standard formatter to write to standard output.
 
   It is defined as {!formatter_of_out_channel} {!Stdlib.stdout}.
 *)
 
+val get_std_formatter : unit -> formatter
+(** [get_std_formatter ()] returns the current domain's standard formatter used
+    to write to standard output.
+*)
+
 val err_formatter : formatter
-(** A formatter to write to standard error.
+(** The initial domain's formatter to write to standard error.
 
   It is defined as {!formatter_of_out_channel} {!Stdlib.stderr}.
+*)
+
+val get_err_formatter : unit -> formatter
+(* [get_err_formatter ()] returns the current domain's formatter used to write
+   to standard error.
 *)
 
 val formatter_of_buffer : Buffer.t -> formatter
@@ -967,17 +1003,26 @@ val formatter_of_buffer : Buffer.t -> formatter
 *)
 
 val stdbuf : Buffer.t
-(** The string buffer in which [str_formatter] writes. *)
+(** The initial domain's string buffer in which [str_formatter] writes. *)
+
+val get_stdbuf : unit -> Buffer.t
+(** [get_stdbuf ()] returns the current domain's string buffer in which the
+    current domain's string formatter writes. *)
 
 val str_formatter : formatter
-(** A formatter to output to the {!stdbuf} string buffer.
+(** The initial domain's formatter to output to the {!stdbuf} string buffer.
 
   [str_formatter] is defined as {!formatter_of_buffer} {!stdbuf}.
 *)
 
+val get_str_formatter : unit -> formatter
+(** The current domain's formatter to output to the current domains string
+    buffer.
+*)
+
 val flush_str_formatter : unit -> string
-(** Returns the material printed with [str_formatter], flushes
-  the formatter and resets the corresponding buffer.
+(** Returns the material printed with [str_formatter] of the current domain,
+    flushes the formatter and resets the corresponding buffer.
 *)
 
 val make_formatter :
@@ -985,11 +1030,24 @@ val make_formatter :
 (** [make_formatter out flush] returns a new formatter that outputs with
   function [out], and flushes with function [flush].
 
-  For instance, {[
+  For instance,
+  {[
     make_formatter
       (Stdlib.output oc)
-      (fun () -> Stdlib.flush oc) ]}
+      (fun () -> Stdlib.flush oc)
+  ]}
   returns a formatter to the {!Stdlib.out_channel} [oc].
+*)
+
+val make_synchronized_formatter :
+  (string -> int -> int -> unit) -> (unit -> unit) -> formatter Domain.DLS.key
+(** [make_synchronized_formatter out flush] returns the key to the domain-local
+    state that holds the domain-local formatter that outputs with function
+    [out], and flushes with function [flush].
+
+    When the formatter is used with multiple domains, the output from the
+    domains will be interleaved with each other at points where the formatter
+    is flushed, such as with {!print_flush}.
 *)
 
 val formatter_of_out_functions :
@@ -1002,6 +1060,8 @@ val formatter_of_out_functions :
 
   @since 4.06.0
 *)
+
+
 
 (** {2:symbolic Symbolic pretty-printing} *)
 
@@ -1092,15 +1152,41 @@ val formatter_of_symbolic_output_buffer : symbolic_output_buffer -> formatter
 
 (** {1 Convenience formatting functions.} *)
 
+val pp_print_iter :
+  ?pp_sep:(formatter -> unit -> unit) ->
+  (('a -> unit) -> 'b -> unit) ->
+  (formatter -> 'a -> unit) -> formatter -> 'b -> unit
+(** [pp_print_iter ~pp_sep iter pp_v ppf v] formats on [ppf] the iterations of
+  [iter] over a collection [v] of values using [pp_v]. Iterations are
+  separated by [pp_sep] (defaults to {!pp_print_cut}).
+
+  @since 5.1.0
+*)
+
 val pp_print_list:
   ?pp_sep:(formatter -> unit -> unit) ->
   (formatter -> 'a -> unit) -> (formatter -> 'a list -> unit)
 (** [pp_print_list ?pp_sep pp_v ppf l] prints items of list [l],
   using [pp_v] to print each item, and calling [pp_sep]
-  between items ([pp_sep] defaults to {!pp_print_cut}.
+  between items ([pp_sep] defaults to {!pp_print_cut}).
   Does nothing on empty lists.
 
   @since 4.02.0
+*)
+
+val pp_print_array:
+  ?pp_sep:(formatter -> unit -> unit) ->
+  (formatter -> 'a -> unit) -> (formatter -> 'a array -> unit)
+(** [pp_print_array ?pp_sep pp_v ppf a] prints items of array [a],
+  using [pp_v] to print each item, and calling [pp_sep]
+  between items ([pp_sep] defaults to {!pp_print_cut}).
+  Does nothing on empty arrays.
+
+  If [a] is mutated after [pp_print_array] is called, the printed values
+  may not be what is expected because [Format] can delay the printing.
+  This can be avoided by flushing [ppf].
+
+  @since 5.1.0
 *)
 
 val pp_print_seq:
@@ -1199,7 +1285,7 @@ val fprintf : formatter -> ('a, formatter, unit) format -> 'a
     optionally specified with the following syntax:
     the [<] character, followed by an integer [nspaces] value,
     then an integer [offset], and a closing [>] character.
-    If no parameters are provided, the good break defaults to a
+    If no parameters are provided, the full break defaults to a
     'space' break hint.
   - [@.]: flush the pretty-printer and split the line, as with
     [print_newline ()].
@@ -1237,10 +1323,24 @@ val fprintf : formatter -> ('a, formatter, unit) format -> 'a
 *)
 
 val printf : ('a, formatter, unit) format -> 'a
-(** Same as [fprintf] above, but output on [std_formatter]. *)
+(** Same as [fprintf] above, but output on [get_std_formatter ()].
+
+    It is defined similarly to [fun fmt -> fprintf (get_std_formatter ()) fmt]
+    but delays calling [get_std_formatter] until after the final argument
+    required by the [format] is received. When used with multiple domains, the
+    output from the domains will be interleaved with each other at points where
+    the formatter is flushed, such as with {!print_flush}.
+*)
 
 val eprintf : ('a, formatter, unit) format -> 'a
-(** Same as [fprintf] above, but output on [err_formatter]. *)
+(** Same as [fprintf] above, but output on [get_err_formatter ()].
+
+    It is defined similarly to [fun fmt -> fprintf (get_err_formatter ()) fmt]
+    but delays calling [get_err_formatter] until after the final argument
+    required by the [format] is received. When used with multiple domains, the
+    output from the domains will be interleaved with each other at points where
+    the formatter is flushed, such as with {!print_flush}.
+*)
 
 val sprintf : ('a, unit, string) format -> 'a
 (** Same as [printf] above, but instead of printing on a formatter,
@@ -1334,102 +1434,141 @@ val kasprintf : (string -> 'a) -> ('b, formatter, unit, 'a) format4 -> 'b
   @since 4.03
 *)
 
-(** {1 Deprecated} *)
+(** {1:examples Examples}
 
-val bprintf : Buffer.t -> ('a, formatter, unit) format -> 'a
-  [@@ocaml.deprecated]
-(** @deprecated This function is error prone. Do not use it.
-  This function is neither compositional nor incremental, since it flushes
-  the pretty-printer queue at each call.
+  A few warmup examples to get an idea of how Format is used.
 
-  If you need to print to some buffer [b], you must first define a
-  formatter writing to [b], using [let to_b = formatter_of_buffer b]; then
-  use regular calls to [Format.fprintf] with formatter [to_b].
+  We have a list [l] of pairs [(int * bool)], which the toplevel prints for us:
+
+  {[# let l = List.init 20 (fun n -> n, n mod 2 = 0)
+  val l : (int * bool) list =
+  [(0, true); (1, false); (2, true); (3, false); (4, true); (5, false);
+   (6, true); (7, false); (8, true); (9, false); (10, true); (11, false);
+   (12, true); (13, false); (14, true); (15, false); (16, true); (17, false);
+   (18, true); (19, false)]
+ ]}
+
+  If we want to print it ourself without the toplevel magic, we can try this:
+
+  {[
+  # let pp_pair out (x,y) = Format.fprintf out "(%d, %b)" x y
+  val pp_pair : Format.formatter -> int * bool -> unit = <fun>
+  # Format.printf "l: [@[<hov>%a@]]@."
+    Format.(pp_print_list ~pp_sep:(fun out () -> fprintf out ";@ ") pp_pair) l
+    l: [(0, true); (1, false); (2, true); (3, false); (4, true); (5, false);
+        (6, true); (7, false); (8, true); (9, false); (10, true); (11, false);
+        (12, true); (13, false); (14, true); (15, false); (16, true);
+        (17, false); (18, true); (19, false)]
+
+  ]}
+
+
+  What this does, briefly, is:
+
+    - [pp_pair] prints a pair [bool*int] surrounded in "(" ")". It takes
+      a formatter (into which formatting happens), and the pair itself.
+      When printing is done it returns [()].
+
+    - [Format.printf "l = [@[<hov>%a@]]@." ... l] is like [printf], but
+      with additional formatting instructions (denoted with "@"). The pair
+      "@[<hov>" and "@]" is a "horizontal-or-vertical box".
+
+    - "@." ends formatting with a newline. It is similar to "\n" but is also
+      aware of the [Format.formatter]'s state. Do not use "\n" with [Format].
+
+    - "%a" is a formatting instruction, like "%d" or "%s" for [printf].
+      However, where "%d" prints an integer and "%s" prints a string,
+      "%a" takes a printer (of type [Format.formatter -> 'a -> unit])
+      and a value (of type ['a]) and applies the printer to the value.
+      This is key to compositionality of printers.
+
+    - We build a list printer using
+      [Format.pp_print_list ~pp_sep:(...) pp_pair].
+      [pp_print_list] takes an element printer and returns a list printer.
+      The [?pp_sep] optional argument, if provided, is called in between
+      each element to print a separator.
+
+    - Here, for a separator, we use [(fun out () -> Format.fprintf out ";@ ")].
+      It prints ";", and then "@ " which is a breaking space
+      (either it prints " ", or it prints a newline if the box is about to
+      overflow).
+      This "@ " is responsible for the list printing splitting into several
+      lines.
+
+  If we omit "@ ", we get an ugly single-line print:
+
+  {[# Format.printf "l: [@[<hov>%a@]]@."
+      Format.(pp_print_list ~pp_sep:(fun out () -> fprintf out "; ") pp_pair) l
+  l: [(0, true); (1, false); (2, true); (* ... *); (18, true); (19, false)]
+- : unit = ()
+    ]}
+
+  Generally, it is good practice to define custom printers for important types
+  in your program. If, for example, you were to define basic geometry
+  types like so:
+
+  {[
+  type point = {
+    x: float;
+    y: float;
+  }
+
+  type rectangle = {
+    ll: point; (* lower left *)
+    ur: point; (* upper right *)
+  }
+  ]}
+
+  For debugging purpose, or to display information in logs, or on the console,
+  it would be convenient to define printers for these types.
+  Here is an example of to do it.
+  Note that "%.3f" is a [float] printer up to 3 digits of precision
+  after the dot; "%f" would print as many digits as required, which is
+  somewhat verbose; "%h" is an hexadecimal float printer.
+
+  {[
+  let pp_point out (p:point) =
+    Format.fprintf out "{ @[x=%.3f;@ y=%.3f@] }" p.x p.y
+
+  let pp_rectangle out (r:rectangle) =
+    Format.fprintf out "{ @[ll=%a;@ ur=%a@] }"
+      pp_point r.ll pp_point r.ur
+  ]}
+
+  In the [.mli] file, we could have:
+
+  {[
+    val pp_point : Format.formatter -> point -> unit
+
+    val pp_rectangle : Format.formatter -> rectangle -> unit
+  ]}
+
+  These printers can now be used with "%a" inside other printers.
+
+  {[ # Format.printf "some rectangle: %a@."
+        (Format.pp_print_option pp_rectangle)
+        (Some {ll={x=1.; y=2.}; ur={x=42.; y=500.12345}})
+  some rectangle: { l={ x=1.000; y=2.000 }; ur={ x=42.000; y=500.123 } }
+
+  # Format.printf "no rectangle: %a@."
+        (Format.pp_option pp_rectangle)
+        None
+  no rectangle:
+  ]}
+
+  See how we combine [pp_print_option] (option printer) and our newly defined
+  rectangle printer, like we did with [pp_print_list] earlier.
+
+  For a more extensive tutorial, see
+  {{: https://caml.inria.fr/resources/doc/guides/format.en.html}
+    "Using the Format module"}.
+
+  A final note: the [Format] module is a starting point.
+  The OCaml ecosystem has libraries that makes formatting easier
+  and more expressive, with more combinators, more concise names, etc.
+  An example of such a library is {{: https://erratique.ch/software/fmt} Fmt}.
+
+  Automatic deriving of pretty-printers from type definitions is also possible,
+  using {{: ppx_deriving.show} https://github.com/ocaml-ppx/ppx_deriving}
+  or similar ppx derivers.
 *)
-
-val kprintf : (string -> 'a) -> ('b, unit, string, 'a) format4 -> 'b
-  [@@ocaml.deprecated "Use Format.ksprintf instead."]
-(** @deprecated An alias for [ksprintf]. *)
-
-val set_all_formatter_output_functions :
-  out:(string -> int -> int -> unit) ->
-  flush:(unit -> unit) ->
-  newline:(unit -> unit) ->
-  spaces:(int -> unit) ->
-  unit
-[@@ocaml.deprecated "Use Format.set_formatter_out_functions instead."]
-(** @deprecated Subsumed by [set_formatter_out_functions]. *)
-
-val get_all_formatter_output_functions :
-  unit ->
-  (string -> int -> int -> unit) *
-  (unit -> unit) *
-  (unit -> unit) *
-  (int -> unit)
-[@@ocaml.deprecated "Use Format.get_formatter_out_functions instead."]
-(** @deprecated Subsumed by [get_formatter_out_functions]. *)
-
-val pp_set_all_formatter_output_functions :
-  formatter -> out:(string -> int -> int -> unit) -> flush:(unit -> unit) ->
-  newline:(unit -> unit) -> spaces:(int -> unit) -> unit
-[@@ocaml.deprecated "Use Format.pp_set_formatter_out_functions instead."]
-(** @deprecated Subsumed by [pp_set_formatter_out_functions]. *)
-
-val pp_get_all_formatter_output_functions :
-  formatter -> unit ->
-  (string -> int -> int -> unit) * (unit -> unit) * (unit -> unit) *
-  (int -> unit)
-[@@ocaml.deprecated "Use Format.pp_get_formatter_out_functions instead."]
-(** @deprecated Subsumed by [pp_get_formatter_out_functions]. *)
-
-(** {2 String tags} *)
-
-val pp_open_tag : formatter -> tag -> unit
-[@@ocaml.deprecated "Use Format.pp_open_stag."]
-(** @deprecated Subsumed by {!pp_open_stag}. *)
-
-val open_tag : tag -> unit
-[@@ocaml.deprecated "Use Format.open_stag."]
-(** @deprecated Subsumed by {!open_stag}. *)
-
-val pp_close_tag : formatter -> unit -> unit
-[@@ocaml.deprecated "Use Format.pp_close_stag."]
-(** @deprecated Subsumed by {!pp_close_stag}. *)
-
-val close_tag : unit -> unit
-[@@ocaml.deprecated "Use Format.close_stag."]
-(** @deprecated Subsumed by {!close_stag}. *)
-
-type formatter_tag_functions = {
-  mark_open_tag : tag -> string;
-  mark_close_tag : tag -> string;
-  print_open_tag : tag -> unit;
-  print_close_tag : tag -> unit;
-}
-[@@ocaml.deprecated "Use formatter_stag_functions."]
-(** @deprecated Subsumed by {!formatter_stag_functions}. *)
-
-val pp_set_formatter_tag_functions :
-  formatter -> formatter_tag_functions -> unit
-[@@ocaml.deprecated
-  "This function will erase non-string tag formatting functions. \
-   Use Format.pp_set_formatter_stag_functions."]
-[@@warning "-3"]
-(** This function will erase non-string tag formatting functions.
-    @deprecated Subsumed by {!pp_set_formatter_stag_functions}. *)
-
-val set_formatter_tag_functions : formatter_tag_functions -> unit
-[@@ocaml.deprecated "Use Format.set_formatter_stag_functions."]
-[@@warning "-3"]
-(** @deprecated Subsumed by {!set_formatter_stag_functions}. *)
-
-val pp_get_formatter_tag_functions :
-  formatter -> unit -> formatter_tag_functions
-[@@ocaml.deprecated "Use Format.pp_get_formatter_stag_functions."]
-[@@warning "-3"]
-(** @deprecated Subsumed by {!pp_get_formatter_stag_functions}. *)
-
-val get_formatter_tag_functions : unit -> formatter_tag_functions
-[@@ocaml.deprecated "Use Format.get_formatter_stag_functions."]
-[@@warning "-3"]
-(** @deprecated Subsumed by {!get_formatter_stag_functions}. *)

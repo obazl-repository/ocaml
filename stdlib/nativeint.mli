@@ -94,7 +94,8 @@ val pred : nativeint -> nativeint
    [Nativeint.pred x] is [Nativeint.sub x Nativeint.one]. *)
 
 val abs : nativeint -> nativeint
-(** Return the absolute value of its argument. *)
+(** [abs x] is the absolute value of [x]. On [min_int] this
+   is [min_int] itself and thus remains negative. *)
 
 val size : int
 (** The size in bits of a native integer.  This is equal to [32]
@@ -235,15 +236,16 @@ val max: t -> t -> t
     @since 4.13.0
  *)
 
+val seeded_hash : int -> t -> int
+(** A seeded hash function for native ints, with the same output value as
+    {!Hashtbl.seeded_hash}. This function allows this module to be passed as
+    argument to the functor {!Hashtbl.MakeSeeded}.
 
-(**/**)
+    @since 5.1.0 *)
 
-(** {1 Deprecated functions} *)
+val hash : t -> int
+(** An unseeded hash function for native ints, with the same output value as
+    {!Hashtbl.hash}. This function allows this module to be passed as argument
+    to the functor {!Hashtbl.Make}.
 
-external format : string -> nativeint -> string = "caml_nativeint_format"
-(** [Nativeint.format fmt n] return the string representation of the
-   native integer [n] in the format specified by [fmt].
-   [fmt] is a [Printf]-style format consisting of exactly
-   one [%d], [%i], [%u], [%x], [%X] or [%o] conversion specification.
-   This function is deprecated; use {!Printf.sprintf} with a [%nx] format
-   instead. *)
+    @since 5.1.0 *)

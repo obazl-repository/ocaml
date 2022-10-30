@@ -226,7 +226,7 @@ method class_of_operation op =
   | Icall_ind | Icall_imm _ | Itailcall_ind | Itailcall_imm _
   | Iextcall _ | Iopaque -> assert false       (* treated specially *)
   | Istackoffset _ -> Op_other
-  | Iload(_,_,mut) -> Op_load mut
+  | Iload { mutability } -> Op_load mutability
   | Istore(_,_,asg) -> Op_store asg
   | Ialloc _ | Ipoll _ -> assert false     (* treated specially *)
   | Iintop(Icheckbound) -> Op_checkbound
@@ -236,9 +236,9 @@ method class_of_operation op =
   | Inegf | Iabsf | Iaddf | Isubf | Imulf | Idivf
   | Ifloatofint | Iintoffloat -> Op_pure
   | Ispecific _ -> Op_other
+  | Idls_get -> Op_load Mutable
 
 (* Operations that are so cheap that it isn't worth factoring them. *)
-
 method is_cheap_operation op =
   match op with
   | Iconst_int _ -> true

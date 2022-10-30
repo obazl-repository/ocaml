@@ -49,6 +49,8 @@
 #include "caml/signals.h"
 #include "caml/sys.h"
 #include "caml/winsupport.h"
+#include "caml/startup_aux.h"
+#include "caml/platform.h"
 
 #include "caml/config.h"
 
@@ -95,7 +97,7 @@ int caml_read_fd(int fd, int flags, void * buf, int n)
 {
   int retcode;
   if ((flags & CHANNEL_FLAG_FROM_SOCKET) == 0) {
-    caml_enter_blocking_section_no_pending();
+    caml_enter_blocking_section();
     retcode = read(fd, buf, n);
     /* Large reads from console can fail with ENOMEM.  Reduce requested size
        and try again. */
@@ -105,7 +107,7 @@ int caml_read_fd(int fd, int flags, void * buf, int n)
     caml_leave_blocking_section();
     if (retcode == -1) caml_sys_io_error(NO_ARG);
   } else {
-    caml_enter_blocking_section_no_pending();
+    caml_enter_blocking_section();
     retcode = recv((SOCKET) _get_osfhandle(fd), buf, n, 0);
     caml_leave_blocking_section();
     if (retcode == -1) caml_win32_sys_error(WSAGetLastError());
@@ -117,12 +119,12 @@ int caml_write_fd(int fd, int flags, void * buf, int n)
 {
   int retcode;
   if ((flags & CHANNEL_FLAG_FROM_SOCKET) == 0) {
-    caml_enter_blocking_section_no_pending();
+    caml_enter_blocking_section();
     retcode = write(fd, buf, n);
     caml_leave_blocking_section();
     if (retcode == -1) caml_sys_io_error(NO_ARG);
   } else {
-    caml_enter_blocking_section_no_pending();
+    caml_enter_blocking_section();
     retcode = send((SOCKET) _get_osfhandle(fd), buf, n, 0);
     caml_leave_blocking_section();
     if (retcode == -1) caml_win32_sys_error(WSAGetLastError());
@@ -224,13 +226,12 @@ wchar_t * caml_search_dll_in_path(struct ext_table * path, const wchar_t * name)
 
 #ifdef WITH_DYNAMIC_LINKING
 
-void * caml_dlopen(wchar_t * libname, int for_execution, int global)
+void * caml_dlopen(wchar_t * libname, int global)
 {
   void *handle;
   int flags = (global ? FLEXDLL_RTLD_GLOBAL : 0);
-  if (!for_execution) flags |= FLEXDLL_RTLD_NOEXEC;
   handle = flexdll_wdlopen(libname, flags);
-  if ((handle != NULL) && ((caml_verb_gc & 0x100) != 0)) {
+  if ((handle != NULL) && ((caml_params->verb_gc & 0x100) != 0)) {
     flexdll_dump_exports(handle);
     fflush(stdout);
   }
@@ -259,7 +260,7 @@ char * caml_dlerror(void)
 
 #else
 
-void * caml_dlopen(wchar_t * libname, int for_execution, int global)
+void * caml_dlopen(wchar_t * libname, int global)
 {
   return NULL;
 }
@@ -633,7 +634,7 @@ int caml_win32_random_seed (intnat data[16])
 }
 
 
-#if defined(_MSC_VER) && __STDC_SECURE_LIB__ >= 200411L
+#ifdef _MSC_VER
 
 static void invalid_parameter_handler(const wchar_t* expression,
    const wchar_t* function,
@@ -645,7 +646,7 @@ static void invalid_parameter_handler(const wchar_t* expression,
 }
 
 
-void caml_install_invalid_parameter_handler()
+void caml_install_invalid_parameter_handler(void)
 {
   _set_invalid_parameter_handler(invalid_parameter_handler);
 }
@@ -859,8 +860,8 @@ static uintnat windows_unicode_strict = 1;
    the argument string is encoded in the local codepage. */
 static uintnat windows_unicode_fallback = 1;
 
-CAMLexport int win_multi_byte_to_wide_char(const char *s, int slen,
-                                           wchar_t *out, int outlen)
+CAMLexport int caml_win32_multi_byte_to_wide_char(const char *s, int slen,
+                                                  wchar_t *out, int outlen)
 {
   int retcode;
 
@@ -891,8 +892,8 @@ CAMLexport int win_multi_byte_to_wide_char(const char *s, int slen,
 #define WC_ERR_INVALID_CHARS 0
 #endif
 
-CAMLexport int win_wide_char_to_multi_byte(const wchar_t *s, int slen,
-                                           char *out, int outlen)
+CAMLexport int caml_win32_wide_char_to_multi_byte(const wchar_t *s, int slen,
+                                                  char *out, int outlen)
 {
   int retcode;
 
@@ -923,9 +924,9 @@ CAMLexport value caml_copy_string_of_utf16(const wchar_t *s)
 
   slen = wcslen(s);
   /* Do not include final NULL */
-  retcode = win_wide_char_to_multi_byte(s, slen, NULL, 0);
+  retcode = caml_win32_wide_char_to_multi_byte(s, slen, NULL, 0);
   v = caml_alloc_string(retcode);
-  win_wide_char_to_multi_byte(s, slen, (char *)String_val(v), retcode);
+  caml_win32_wide_char_to_multi_byte(s, slen, (char *)String_val(v), retcode);
 
   return v;
 }
@@ -935,9 +936,9 @@ CAMLexport wchar_t* caml_stat_strdup_to_utf16(const char *s)
   wchar_t * ws;
   int retcode;
 
-  retcode = win_multi_byte_to_wide_char(s, -1, NULL, 0);
+  retcode = caml_win32_multi_byte_to_wide_char(s, -1, NULL, 0);
   ws = caml_stat_alloc_noexc(retcode * sizeof(*ws));
-  win_multi_byte_to_wide_char(s, -1, ws, retcode);
+  caml_win32_multi_byte_to_wide_char(s, -1, ws, retcode);
 
   return ws;
 }
@@ -947,9 +948,9 @@ CAMLexport caml_stat_string caml_stat_strdup_of_utf16(const wchar_t *s)
   caml_stat_string out;
   int retcode;
 
-  retcode = win_wide_char_to_multi_byte(s, -1, NULL, 0);
+  retcode = caml_win32_wide_char_to_multi_byte(s, -1, NULL, 0);
   out = caml_stat_alloc(retcode);
-  win_wide_char_to_multi_byte(s, -1, out, retcode);
+  caml_win32_wide_char_to_multi_byte(s, -1, out, retcode);
 
   return out;
 }
@@ -1068,22 +1069,41 @@ int caml_num_rows_fd(int fd)
 /* UCRT clock function returns wall-clock time */
 CAMLexport clock_t caml_win32_clock(void)
 {
-  FILETIME c, e, stime, utime;
+  FILETIME _creation, _exit;
+  CAML_ULONGLONG_FILETIME stime, utime;
   ULARGE_INTEGER tmp;
-  ULONGLONG total, clocks_per_sec;
+  ULONGLONG clocks_per_sec;
 
-  if (!(GetProcessTimes(GetCurrentProcess(), &c, &e, &stime, &utime))) {
+  if (!(GetProcessTimes(GetCurrentProcess(), &_creation, &_exit,
+                        &stime.ft, &utime.ft))) {
     return (clock_t)(-1);
   }
 
-  tmp.u.LowPart = stime.dwLowDateTime;
-  tmp.u.HighPart = stime.dwHighDateTime;
-  total = tmp.QuadPart;
-  tmp.u.LowPart = utime.dwLowDateTime;
-  tmp.u.HighPart = utime.dwHighDateTime;
-  total += tmp.QuadPart;
-
   /* total in 100-nanosecond intervals (1e7 / CLOCKS_PER_SEC) */
-  clocks_per_sec = INT64_LITERAL(10000000U) / (ULONGLONG)CLOCKS_PER_SEC;
-  return (clock_t)(total / clocks_per_sec);
+  clocks_per_sec = 10000000ULL / (ULONGLONG)CLOCKS_PER_SEC;
+  return (clock_t)((stime.ul + utime.ul) / clocks_per_sec);
+}
+
+static double clock_period = 0;
+
+void caml_init_os_params(void)
+{
+  SYSTEM_INFO si;
+  LARGE_INTEGER frequency;
+
+  /* Get the system page size */
+  GetSystemInfo(&si);
+  caml_sys_pagesize = si.dwPageSize;
+
+  /* Get the number of nanoseconds for each tick in QueryPerformanceCounter */
+  QueryPerformanceFrequency(&frequency);
+  clock_period = (1000000000.0 / frequency.QuadPart);
+}
+
+int64_t caml_time_counter(void)
+{
+  LARGE_INTEGER now;
+
+  QueryPerformanceCounter(&now);
+  return (int64_t)(now.QuadPart * clock_period);
 }

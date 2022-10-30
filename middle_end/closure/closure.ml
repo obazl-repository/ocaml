@@ -54,7 +54,8 @@ let rec build_closure_env env_param pos = function
     [] -> V.Map.empty
   | id :: rem ->
       V.Map.add id
-        (Uprim(P.Pfield pos, [Uvar env_param], Debuginfo.none))
+        (Uprim(P.Pfield(pos, Pointer, Immutable),
+              [Uvar env_param], Debuginfo.none))
           (build_closure_env env_param (pos+1) rem)
 
 (* Auxiliary for accessing globals.  We change the name of the global
@@ -479,10 +480,11 @@ let simplif_prim_pure ~backend fpc p (args, approxs) dbg =
         (Uprim(p, args, dbg), Value_tuple (Array.of_list approxs))
       end
   (* Field access *)
-  | Pfield n, _, [ Value_const(Uconst_ref(_, Some (Uconst_block(_, l)))) ]
+  | Pfield (n, _, _), _,
+            [ Value_const(Uconst_ref(_, Some (Uconst_block(_, l)))) ]
     when n < List.length l ->
       make_const (List.nth l n)
-  | Pfield n, [ Uprim(P.Pmakeblock _, ul, _) ], [approx]
+  | Pfield(n, _, _), [ Uprim(P.Pmakeblock _, ul, _) ], [approx]
     when n < List.length ul ->
       (* This case is particularly useful for removing allocations
          for optional parameters *)
@@ -849,7 +851,7 @@ let check_constant_result ulam approx =
           let glb =
             Uprim(P.Pread_symbol id, [], Debuginfo.none)
           in
-          Uprim(P.Pfield i, [glb], Debuginfo.none), approx
+          Uprim(P.Pfield(i, Pointer, Immutable), [glb], Debuginfo.none), approx
       end
   | _ -> (ulam, approx)
 
@@ -895,9 +897,9 @@ let rec close ({ backend; fenv; cenv ; mutable_vars } as env) lam =
      close_approx_var env id
   | Lmutvar id -> (Uvar id, Value_unknown)
   | Lconst cst ->
-      let str ?(shared = true) cst =
+      let str cst =
         let name =
-          Compilenv.new_structured_constant cst ~shared
+          Compilenv.new_structured_constant cst ~shared:true
         in
         Uconst_ref (name, Some cst)
       in
@@ -912,13 +914,7 @@ let rec close ({ backend; fenv; cenv ; mutable_vars } as env) lam =
         | Const_immstring s ->
             str (Uconst_string s)
         | Const_base (Const_string (s, _, _)) ->
-              (* Strings (even literal ones) must be assumed to be mutable...
-                 except when OCaml has been configured with
-                 -safe-string.  Passing -safe-string at compilation
-                 time is not enough, since the unit could be linked
-                 with another one compiled without -safe-string, and
-                 that one could modify our string literal.  *)
-            str ~shared:Config.safe_string (Uconst_string s)
+            str (Uconst_string s)
         | Const_base(Const_float x) -> str (Uconst_float (float_of_string x))
         | Const_base(Const_int32 x) -> str (Uconst_int32 x)
         | Const_base(Const_int64 x) -> str (Uconst_int64 x)
@@ -967,20 +963,20 @@ let rec close ({ backend; fenv; cenv ; mutable_vars } as env) lam =
         let funct_var = V.create_local "funct" in
         let fenv = V.Map.add funct_var fapprox fenv in
         let (new_fun, approx) = close { backend; fenv; cenv; mutable_vars }
-          (Lfunction{
-               kind = Curried;
-               return = Pgenval;
-               params = List.map (fun v -> v, Pgenval) final_args;
-               body = Lapply{
-                 ap_loc=loc;
-                 ap_func=(Lvar funct_var);
-                 ap_args=internal_args;
-                 ap_tailcall=Default_tailcall;
-                 ap_inlined=Default_inline;
-                 ap_specialised=Default_specialise;
-               };
-               loc;
-               attr = default_function_attribute})
+          (lfunction
+             ~kind:Curried
+             ~return:Pgenval
+             ~params:(List.map (fun v -> v, Pgenval) final_args)
+             ~body:(Lapply{
+                ap_loc=loc;
+                ap_func=(Lvar funct_var);
+                ap_args=internal_args;
+                ap_tailcall=Default_tailcall;
+                ap_inlined=Default_inline;
+                ap_specialised=Default_specialise;
+              })
+             ~loc
+             ~attr:default_function_attribute)
         in
         let new_fun =
           iter first_args
@@ -1102,10 +1098,10 @@ let rec close ({ backend; fenv; cenv ; mutable_vars } as env) lam =
       let dbg = Debuginfo.from_location loc in
       check_constant_result (getglobal dbg id)
                             (Compilenv.global_approx id)
-  | Lprim(Pfield n, [lam], loc) ->
+  | Lprim(Pfield (n, ptr, mut), [lam], loc) ->
       let (ulam, approx) = close env lam in
       let dbg = Debuginfo.from_location loc in
-      check_constant_result (Uprim(P.Pfield n, [ulam], dbg))
+      check_constant_result (Uprim(P.Pfield (n, ptr, mut), [ulam], dbg))
                             (field_approx n approx)
   | Lprim(Psetfield(n, is_ptr, init), [Lprim(Pgetglobal id, [], _); lam], loc)->
       let (ulam, approx) = close env lam in

@@ -19,7 +19,7 @@
     compilation. All components of this module can therefore be
     referred by their short name, without prefixing them by [Stdlib].
 
-    It particular, it provides the basic operations over the built-in
+    In particular, it provides the basic operations over the built-in
     types (numbers, booleans, byte sequences, strings, exceptions,
     references, lists, arrays, input-output channels, ...) and the
     {{!modules}standard library modules}.
@@ -218,23 +218,11 @@ external ( && ) : bool -> bool -> bool = "%sequand"
    Right-associative operator,  see {!Ocaml_operators} for more information.
 *)
 
-external ( & ) : bool -> bool -> bool = "%sequand"
-  [@@ocaml.deprecated "Use (&&) instead."]
-(** @deprecated {!Stdlib.( && )} should be used instead.
-    Right-associative operator, see {!Ocaml_operators} for more information.
-*)
-
 external ( || ) : bool -> bool -> bool = "%sequor"
 (** The boolean 'or'. Evaluation is sequential, left-to-right:
    in [e1 || e2], [e1] is evaluated first, and if it returns [true],
    [e2] is not evaluated at all.
    Right-associative operator,  see {!Ocaml_operators} for more information.
-*)
-
-external ( or ) : bool -> bool -> bool = "%sequor"
-  [@@ocaml.deprecated "Use (||) instead."]
-(** @deprecated {!Stdlib.( || )} should be used instead.
-    Right-associative operator, see {!Ocaml_operators} for more information.
 *)
 
 (** {1 Debugging} *)
@@ -383,8 +371,8 @@ external ( mod ) : int -> int -> int = "%modint"
 *)
 
 val abs : int -> int
-(** Return the absolute value of the argument.  Note that this may be
-  negative if the argument is [min_int]. *)
+(** [abs x] is the absolute value of [x]. On [min_int] this
+   is [min_int] itself and thus remains negative. *)
 
 val max_int : int
 (** The greatest representable integer. *)
@@ -660,11 +648,14 @@ val neg_infinity : float
 
 val nan : float
 (** A special floating-point value denoting the result of an
-   undefined operation such as [0.0 /. 0.0].  Stands for
-   'not a number'.  Any floating-point operation with [nan] as
-   argument returns [nan] as result.  As for floating-point comparisons,
-   [=], [<], [<=], [>] and [>=] return [false] and [<>] returns [true]
-   if one or both of their arguments is [nan]. *)
+    undefined operation such as [0.0 /. 0.0].  Stands for
+    'not a number'.  Any floating-point operation with [nan] as
+    argument returns [nan] as result, unless otherwise specified in
+    IEEE 754 standard.  As for floating-point comparisons,
+    [=], [<], [<=], [>] and [>=] return [false] and [<>] returns [true]
+    if one or both of their arguments is [nan].
+
+    [nan] is a quiet NaN since 5.1;  it was a signaling NaN before. *)
 
 val max_float : float
 (** The largest positive finite value of type [float]. *)
@@ -776,7 +767,10 @@ external int_of_string : string -> int = "caml_int_of_string"
    [Failure "int_of_string"] instead of returning [None]. *)
 
 val string_of_float : float -> string
-(** Return the string representation of a floating-point number. *)
+(** Return a string representation of a floating-point number.
+
+    This conversion can involve a loss of precision. For greater control over
+    the manner in which the number is printed, see {!Printf}. *)
 
 val float_of_string_opt: string -> float option
 (** Convert the given string to a float.  The string is read in decimal
@@ -861,7 +855,10 @@ val print_int : int -> unit
 (** Print an integer, in decimal, on standard output. *)
 
 val print_float : float -> unit
-(** Print a floating-point number, in decimal, on standard output. *)
+(** Print a floating-point number, in decimal, on standard output.
+
+    The conversion of the number to a string uses {!string_of_float} and
+    can involve a loss of precision. *)
 
 val print_endline : string -> unit
 (** Print a string, followed by a newline character, on
@@ -889,7 +886,10 @@ val prerr_int : int -> unit
 (** Print an integer, in decimal, on standard error. *)
 
 val prerr_float : float -> unit
-(** Print a floating-point number, in decimal, on standard error. *)
+(** Print a floating-point number, in decimal, on standard error.
+
+    The conversion of the number to a string uses {!string_of_float} and
+    can involve a loss of precision. *)
 
 val prerr_endline : string -> unit
 (** Print a string, followed by a newline character on standard
@@ -904,8 +904,14 @@ val prerr_newline : unit -> unit
 
 val read_line : unit -> string
 (** Flush standard output, then read characters from standard input
-   until a newline character is encountered. Return the string of
-   all characters read, without the newline character at the end. *)
+   until a newline character is encountered.
+
+   Return the string of all characters read, without the newline character
+   at the end.
+
+   @raise End_of_file if the end of the file is reached at the beginning of
+   line.
+*)
 
 val read_int_opt: unit -> int option
 (** Flush standard output, then read one line from standard input
@@ -1284,7 +1290,7 @@ type ('a,'b) result = Ok of 'a | Error of 'b
       For [printf]-style functions from module {!Printf}, ['b] is typically
       [out_channel];
       for [printf]-style functions from module {!Format}, ['b] is typically
-      {!Format.formatter};
+      {!type:Format.formatter};
       for [scanf]-style functions from module {!Scanf}, ['b] is typically
       {!Scanf.Scanning.in_channel}.
 
@@ -1342,13 +1348,15 @@ val ( ^^ ) :
 (** {1 Program termination} *)
 
 val exit : int -> 'a
-(** Terminate the process, returning the given status code
-   to the operating system: usually 0 to indicate no errors,
-   and a small positive integer to indicate failure.
-   All open output channels are flushed with [flush_all].
-   An implicit [exit 0] is performed each time a program
-   terminates normally.  An implicit [exit 2] is performed if the program
-   terminates early because of an uncaught exception. *)
+(** Terminate the process, returning the given status code to the operating
+    system: usually 0 to indicate no errors, and a small positive integer to
+    indicate failure. All open output channels are flushed with [flush_all].
+    The callbacks registered with {!Domain.at_exit} are called followed by
+    those registed with {!Stdlib.at_exit}.
+
+    An implicit [exit 0] is performed each time a program terminates normally.
+    An implicit [exit 2] is performed if the program terminates early because
+    of an uncaught exception. *)
 
 val at_exit : (unit -> unit) -> unit
 (** Register the given function to be called at program termination
@@ -1371,71 +1379,69 @@ val unsafe_really_input : in_channel -> bytes -> int -> int -> unit
 
 val do_at_exit : unit -> unit
 
+val do_domain_local_at_exit : (unit -> unit) ref
+
 (**/**)
 
 (** {1:modules Standard library modules } *)
 
 (*MODULE_ALIASES*)
-module Arg          = Arg
-module Array        = Array
-module ArrayLabels  = ArrayLabels
-module Atomic       = Atomic
-module Bigarray     = Bigarray
-module Bool         = Bool
-module Buffer       = Buffer
-module Bytes        = Bytes
-module BytesLabels  = BytesLabels
-module Callback     = Callback
-module Char         = Char
-module Complex      = Complex
-module Digest       = Digest
-module Either       = Either
-module Ephemeron    = Ephemeron
-module Filename     = Filename
-module Float        = Float
-module Format       = Format
-module Fun          = Fun
-module Gc           = Gc
-module Genlex       = Genlex
-[@@deprecated "Use the camlp-streams library instead."]
-module Hashtbl      = Hashtbl
-module In_channel   = In_channel
-module Int          = Int
-module Int32        = Int32
-module Int64        = Int64
-module Lazy         = Lazy
-module Lexing       = Lexing
-module List         = List
-module ListLabels   = ListLabels
-module Map          = Map
-module Marshal      = Marshal
-module MoreLabels   = MoreLabels
-module Nativeint    = Nativeint
-module Obj          = Obj
-module Oo           = Oo
-module Option       = Option
-module Out_channel  = Out_channel
-module Parsing      = Parsing
-module Pervasives   = Pervasives
-[@@deprecated "Use Stdlib instead.\n\
-\n\
-If you need to stay compatible with OCaml < 4.07, you can use the \n\
-stdlib-shims library: https://github.com/ocaml/stdlib-shims"]
-module Printexc     = Printexc
-module Printf       = Printf
-module Queue        = Queue
-module Random       = Random
-module Result       = Result
-module Scanf        = Scanf
-module Seq          = Seq
-module Set          = Set
-module Stack        = Stack
-module StdLabels    = StdLabels
-module Stream       = Stream
-[@@deprecated "Use the camlp-streams library instead."]
-module String       = String
-module StringLabels = StringLabels
-module Sys          = Sys
-module Uchar        = Uchar
-module Unit         = Unit
-module Weak         = Weak
+module Arg            = Arg
+module Array          = Array
+module ArrayLabels    = ArrayLabels
+module Atomic         = Atomic
+module Bigarray       = Bigarray
+module Bool           = Bool
+module Buffer         = Buffer
+module Bytes          = Bytes
+module BytesLabels    = BytesLabels
+module Callback       = Callback
+module Char           = Char
+module Complex        = Complex
+module Condition      = Condition
+module Digest         = Digest
+module Domain         = Domain
+module Effect         = Effect
+module Either         = Either
+module Ephemeron      = Ephemeron
+module Filename       = Filename
+module Float          = Float
+module Format         = Format
+module Fun            = Fun
+module Gc             = Gc
+module Hashtbl        = Hashtbl
+module In_channel     = In_channel
+module Int            = Int
+module Int32          = Int32
+module Int64          = Int64
+module Lazy           = Lazy
+module Lexing         = Lexing
+module List           = List
+module ListLabels     = ListLabels
+module Map            = Map
+module Marshal        = Marshal
+module MoreLabels     = MoreLabels
+module Mutex          = Mutex
+module Nativeint      = Nativeint
+module Obj            = Obj
+module Oo             = Oo
+module Option         = Option
+module Out_channel    = Out_channel
+module Parsing        = Parsing
+module Printexc       = Printexc
+module Printf         = Printf
+module Queue          = Queue
+module Random         = Random
+module Result         = Result
+module Scanf          = Scanf
+module Semaphore      = Semaphore
+module Seq            = Seq
+module Set            = Set
+module Stack          = Stack
+module StdLabels      = StdLabels
+module String         = String
+module StringLabels   = StringLabels
+module Sys            = Sys
+module Uchar          = Uchar
+module Unit           = Unit
+module Weak           = Weak

@@ -1,3 +1,4 @@
+# 2 "asmcomp/arm/selection.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*                                 OCaml                                  *)
@@ -187,7 +188,7 @@ method select_shift_arith op dbg arithop arithrevop args =
       end
 
 method private iextcall func ty_res ty_args =
-  Iextcall { func; ty_res; ty_args; alloc = false; }
+  Iextcall { func; ty_res; ty_args; alloc = false; stack_ofs = 0 }
 
 method! select_operation op args dbg =
   match (op, args) with
@@ -267,9 +268,11 @@ method private select_operation_softfp op args dbg =
        [Cop(Cextcall(func, typ_int, [XFloat;XFloat], false),
             args, dbg)])
   (* Add coercions around loads and stores of 32-bit floats *)
-  | (Cload (Single, mut), args) ->
+  | (Cload {memory_chunk=Single; mutability; is_atomic=false}, args) ->
       (self#iextcall "__aeabi_f2d" typ_float [XInt],
-        [Cop(Cload (Word_int, mut), args, dbg)])
+        [Cop(Cload {memory_chunk=Word_int;
+                    mutability;
+                    is_atomic=false}, args, dbg)])
   | (Cstore (Single, init), [arg1; arg2]) ->
       let arg2' =
         Cop(Cextcall("__aeabi_d2f", typ_int, [XFloat], false),

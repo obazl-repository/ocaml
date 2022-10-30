@@ -275,7 +275,7 @@ let expr sub x =
         Texp_variant (l, Option.map (sub.expr sub) expo)
     | Texp_record { fields; representation; extended_expression } ->
         let fields = Array.map (function
-            | label, Kept t -> label, Kept t
+            | label, Kept (t, mut) -> label, Kept (t, mut)
             | label, Overridden (lid, exp) ->
                 label, Overridden (lid, sub.expr sub exp))
             fields
@@ -353,8 +353,8 @@ let expr sub x =
           sub.extension_constructor sub cd,
           sub.expr sub exp
         )
-    | Texp_assert exp ->
-        Texp_assert (sub.expr sub exp)
+    | Texp_assert (exp, loc) ->
+        Texp_assert (sub.expr sub exp, loc)
     | Texp_lazy exp ->
         Texp_lazy (sub.expr sub exp)
     | Texp_object (cl, sl) ->
@@ -458,10 +458,10 @@ let module_type sub x =
 let with_constraint sub = function
   | Twith_type decl -> Twith_type (sub.type_declaration sub decl)
   | Twith_typesubst decl -> Twith_typesubst (sub.type_declaration sub decl)
+  | Twith_modtype mty -> Twith_modtype (sub.module_type sub mty)
+  | Twith_modtypesubst mty -> Twith_modtypesubst (sub.module_type sub mty)
   | Twith_module _
-  | Twith_modsubst _
-  | Twith_modtype _
-  | Twith_modtypesubst _ as d -> d
+  | Twith_modsubst _ as d -> d
 
 let open_description sub od =
   {od with open_env = sub.env sub od.open_env}

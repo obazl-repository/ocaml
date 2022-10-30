@@ -23,7 +23,9 @@ val parent_dir_name : string
    (e.g. [..] in Unix). *)
 
 val dir_sep : string
-(** The directory separator (e.g. [/] in Unix). @since 3.11.2 *)
+(** The directory separator (e.g. [/] in Unix).
+
+    @since 3.11.2 *)
 
 val concat : string -> string -> string
 (** [concat dir file] returns a file name that designates file
@@ -170,18 +172,9 @@ val get_temp_dir_name : unit -> string
 val set_temp_dir_name : string -> unit
 (** Change the temporary directory returned by {!Filename.get_temp_dir_name}
     and used by {!Filename.temp_file} and {!Filename.open_temp_file}.
+    The temporary directory is a domain-local value which is inherited
+    by child domains.
     @since 4.00.0
-*)
-
-val temp_dir_name : string
-  [@@ocaml.deprecated "Use Filename.get_temp_dir_name instead"]
-(** The name of the initial temporary directory:
-    Under Unix, the value of the [TMPDIR] environment variable, or "/tmp"
-    if the variable is not set.
-    Under Windows, the value of the [TEMP] environment variable, or "."
-    if the variable is not set.
-    @deprecated You should use {!Filename.get_temp_dir_name} instead.
-    @since 3.09.1
 *)
 
 val quote : string -> string

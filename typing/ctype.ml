@@ -281,7 +281,7 @@ let in_current_module = function
 
 let in_pervasives p =
   in_current_module p &&
-  try ignore (Env.find_type p Env.initial_safe_string); true
+  try ignore (Env.find_type p Env.initial); true
   with Not_found -> false
 
 let is_datatype decl=
@@ -550,7 +550,7 @@ let closed_class params sign =
   try
     Meths.iter
       (fun lab (priv, _, ty) ->
-        if priv = Public then begin
+        if priv = Mpublic then begin
           try closed_type ty with Non_closed (ty0, real) ->
             raise (CCFailure (ty0, real, lab, ty))
         end)
@@ -852,6 +852,10 @@ let rec lower_contravariant env var_level visited contra ty =
     | _ ->
         iter_type_expr (lower_rec contra) ty
   end
+
+let lower_variables_only env level ty =
+  simple_abbrevs := Mnil;
+  lower_contravariant env level (Hashtbl.create 7) true ty
 
 let lower_contravariant env ty =
   simple_abbrevs := Mnil;
@@ -1189,28 +1193,32 @@ let existential_name cstr ty =
   | Tvar (Some name) -> "$" ^ cstr.cstr_name ^ "_'" ^ name
   | _ -> "$" ^ cstr.cstr_name
 
-let instance_constructor ?in_pattern cstr =
+type existential_treatment =
+  | Keep_existentials_flexible
+  | Make_existentials_abstract of { env: Env.t ref; scope: int }
+
+let instance_constructor existential_treatment cstr =
   For_copy.with_scope (fun scope ->
-    begin match in_pattern with
-    | None -> ()
-    | Some (env, fresh_constr_scope) ->
-        let process existential =
-          let decl = new_local_type () in
-          let name = existential_name cstr existential in
-          let (id, new_env) =
-            Env.enter_type (get_new_abstract_name name) decl !env
-              ~scope:fresh_constr_scope in
-          env := new_env;
-          let to_unify = newty (Tconstr (Path.Pident id,[],ref Mnil)) in
-          let tv = copy scope existential in
-          assert (is_Tvar tv);
-          link_type tv to_unify
-        in
-        List.iter process cstr.cstr_existentials
-    end;
+    let copy_existential =
+      match existential_treatment with
+      | Keep_existentials_flexible -> copy scope
+      | Make_existentials_abstract {env; scope = fresh_constr_scope} ->
+          fun existential ->
+            let decl = new_local_type () in
+            let name = existential_name cstr existential in
+            let (id, new_env) =
+              Env.enter_type (get_new_abstract_name name) decl !env
+                ~scope:fresh_constr_scope in
+            env := new_env;
+            let to_unify = newty (Tconstr (Path.Pident id,[],ref Mnil)) in
+            let tv = copy scope existential in
+            assert (is_Tvar tv);
+            link_type tv to_unify;
+            tv
+    in
+    let ty_ex = List.map copy_existential cstr.cstr_existentials in
     let ty_res = copy scope cstr.cstr_res in
     let ty_args = List.map (copy scope) cstr.cstr_args in
-    let ty_ex = List.map (copy scope) cstr.cstr_existentials in
     (ty_args, ty_res, ty_ex)
   )
 
@@ -1768,7 +1776,8 @@ let occur env ty0 ty =
   try
     while
       type_changed := false;
-      occur_rec env allow_recursive TypeSet.empty ty0 ty;
+      if not (eq_type ty0 ty) then
+        occur_rec env allow_recursive TypeSet.empty ty0 ty;
       !type_changed
     do () (* prerr_endline "changed" *) done;
     merge type_changed old
@@ -2153,13 +2162,10 @@ let reify env t =
   in
   iterator t
 
-let is_newtype env p =
-  try
-    let decl = Env.find_type p env in
-    decl.type_expansion_scope <> Btype.lowest_level &&
-    decl.type_kind = Type_abstract &&
-    decl.type_private = Public
-  with Not_found -> false
+let find_expansion_scope env path =
+  match Env.find_type path env with
+  | { type_manifest = None ; _ } | exception Not_found -> generic_level
+  | decl -> decl.type_expansion_scope
 
 let non_aliasable p decl =
   (* in_pervasives p ||  (subsumed by in_current_module) *)
@@ -2176,7 +2182,6 @@ let is_instantiable env p =
   with Not_found -> false
 
 
-(* PR#7113: -safe-string should be a global property *)
 let compatible_paths p1 p2 =
   let open Predef in
   Path.same p1 p2 ||
@@ -2418,9 +2423,6 @@ let find_lowest_level ty =
     end
   in find ty; unmark_type ty; !lowest
 
-let find_expansion_scope env path =
-  (Env.find_type path env).type_expansion_scope
-
 let add_gadt_equation env source destination =
   (* Format.eprintf "@[add_gadt_equation %s %a@]@."
     (Path.name source) !Btype.print_raw destination; *)
@@ -2627,18 +2629,8 @@ let rec unify (env:Env.t ref) t1 t2 =
         update_level_for Unify !env (get_level t1) t2;
         update_scope_for Unify (get_scope t1) t2;
         link_type t1 t2
-    | (Tconstr (p1, [], _), Tconstr (p2, [], _))
-      when Env.has_local_constraints !env
-      && is_newtype !env p1 && is_newtype !env p2 ->
-        (* Do not use local constraints more than necessary *)
-        begin try
-          if find_expansion_scope !env p1 > find_expansion_scope !env p2 then
-            unify env t1 (try_expand_safe !env t2)
-          else
-            unify env (try_expand_safe !env t1) t2
-        with Cannot_expand ->
-          unify2 env t1 t2
-        end
+    | (Tconstr _, Tconstr _) when Env.has_local_constraints !env ->
+        unify2_rec env t1 t1 t2 t2
     | _ ->
         unify2 env t1 t2
     end;
@@ -2647,13 +2639,34 @@ let rec unify (env:Env.t ref) t1 t2 =
     reset_trace_gadt_instances reset_tracing;
     raise_trace_for Unify (Diff {got = t1; expected = t2} :: trace)
 
-and unify2 env t1 t2 =
+and unify2 env t1 t2 = unify2_expand env t1 t1 t2 t2
+
+and unify2_rec env t10 t1 t20 t2 =
+  if unify_eq t1 t2 then () else
+  try match (get_desc t1, get_desc t2) with
+  | (Tconstr (p1, tl1, a1), Tconstr (p2, tl2, a2)) ->
+      if Path.same p1 p2 && tl1 = [] && tl2 = []
+      && not (has_cached_expansion p1 !a1 || has_cached_expansion p2 !a2)
+      then begin
+        update_level_for Unify !env (get_level t1) t2;
+        update_scope_for Unify (get_scope t1) t2;
+        link_type t1 t2
+      end else
+        if find_expansion_scope !env p1 > find_expansion_scope !env p2
+        then unify2_rec env t10 t1 t20 (try_expand_safe !env t2)
+        else unify2_rec env t10 (try_expand_safe !env t1) t20 t2
+  | _ ->
+      raise Cannot_expand
+  with Cannot_expand ->
+    unify2_expand env t10 t1 t20 t2
+
+and unify2_expand env t1 t1' t2 t2' =
   (* Second step: expansion of abbreviations *)
   (* Expansion may change the representative of the types. *)
-  ignore (expand_head_unif !env t1);
-  ignore (expand_head_unif !env t2);
-  let t1' = expand_head_unif !env t1 in
-  let t2' = expand_head_unif !env t2 in
+  ignore (expand_head_unif !env t1');
+  ignore (expand_head_unif !env t2');
+  let t1' = expand_head_unif !env t1' in
+  let t2' = expand_head_unif !env t2' in
   let lv = Int.min (get_level t1') (get_level t2') in
   let scope = Int.max (get_scope t1') (get_scope t2') in
   update_level_for Unify !env lv t2;
@@ -2698,7 +2711,7 @@ and unify3 env t1 t1' t2 t2' =
   | _ ->
     begin match !umode with
     | Expression ->
-        occur_for Unify !env t1' t2';
+        occur_for Unify !env t1' t2;
         link_type t1' t2
     | Pattern ->
         add_type_equality t1' t2'
@@ -3308,24 +3321,32 @@ let rec filter_method_row env name priv ty =
       let level = get_level ty in
       let field = newvar2 level in
       let row = newvar2 level in
-      let kind =
+      let kind, priv =
         match priv with
-        | Private -> field_private ()
-        | Public  -> field_public
+        | Private ->
+            let kind = field_private () in
+            kind, Mprivate kind
+        | Public ->
+            field_public, Mpublic
       in
       let ty' = newty2 ~level (Tfield (name, kind, field, row)) in
       link_type ty ty';
-      field, row
+      priv, field, row
   | Tfield(n, kind, ty1, ty2) ->
       if n = name then begin
-        if priv = Public then
-          unify_kind kind field_public;
-        ty1, ty2
+        let priv =
+          match priv with
+          | Public ->
+              unify_kind kind field_public;
+              Mpublic
+          | Private -> Mprivate kind
+        in
+        priv, ty1, ty2
       end else begin
         let level = get_level ty in
-        let field, row = filter_method_row env name priv ty2 in
+        let priv, field, row = filter_method_row env name priv ty2 in
         let row = newty2 ~level (Tfield (n, kind, ty1, row)) in
-        field, row
+        priv, field, row
       end
   | Tnil ->
       if name = Btype.dummy_method then raise Filter_method_row_failed
@@ -3334,7 +3355,8 @@ let rec filter_method_row env name priv ty =
         | Public -> raise Filter_method_row_failed
         | Private ->
           let level = get_level ty in
-          newvar2 level, ty
+          let kind = field_absent in
+          Mprivate kind, newvar2 level, ty
       end
   | _ ->
       raise Filter_method_row_failed
@@ -3350,7 +3372,7 @@ let new_class_signature () =
     csig_meths = Meths.empty; }
 
 let add_dummy_method env ~scope sign =
-  let ty, row =
+  let _, ty, row =
     filter_method_row env dummy_method Private sign.csig_self_row
   in
   unify env ty (new_scoped_ty scope (Ttuple []));
@@ -3369,8 +3391,17 @@ let add_method env label priv virt ty sign =
     | (priv', virt', ty') -> begin
         let priv =
           match priv' with
-          | Public -> Public
-          | Private -> priv
+          | Mpublic -> Mpublic
+          | Mprivate k ->
+            match priv with
+            | Public ->
+                begin match field_kind_repr k with
+                | Fpublic -> ()
+                | Fprivate -> link_kind ~inside:k field_public
+                | Fabsent -> assert false
+                end;
+                Mpublic
+            | Private -> priv'
         in
         let virt =
           match virt' with
@@ -3383,10 +3414,10 @@ let add_method env label priv virt ty sign =
             raise (Add_method_failed (Type_mismatch trace))
       end
     | exception Not_found -> begin
-        let ty', row =
+        let priv, ty', row =
           match filter_method_row env label priv sign.csig_self_row with
-          | ty', row ->
-              ty', row
+          | priv, ty', row ->
+              priv, ty', row
           | exception Filter_method_row_failed ->
               raise (Add_method_failed Unexpected_method)
         in
@@ -3464,6 +3495,13 @@ let inherit_class_signature ~strict env sign1 sign2 =
   unify_self_types env sign1 sign2;
   Meths.iter
     (fun label (priv, virt, ty) ->
+       let priv =
+         match priv with
+         | Mpublic -> Public
+         | Mprivate kind ->
+             assert (field_kind_repr kind = Fabsent);
+             Private
+       in
        match add_method env label priv virt ty sign1 with
        | () -> ()
        | exception Add_method_failed failure ->
@@ -3492,23 +3530,25 @@ let update_class_signature env sign =
            | priv, virt, ty' ->
                let meths, implicitly_public =
                  match priv, field_kind_repr k with
-                 | Public, _ -> meths, implicitly_public
-                 | Private, Fpublic ->
-                     let meths = Meths.add lab (Public, virt, ty') meths in
+                 | Mpublic, _ -> meths, implicitly_public
+                 | Mprivate _, Fpublic ->
+                     let meths = Meths.add lab (Mpublic, virt, ty') meths in
                      let implicitly_public = lab :: implicitly_public in
                      meths, implicitly_public
-                 | Private, _ -> meths, implicitly_public
+                 | Mprivate _, _ -> meths, implicitly_public
                in
                meths, implicitly_public, implicitly_declared
            | exception Not_found ->
                let meths, implicitly_declared =
                  match field_kind_repr k with
                  | Fpublic ->
-                     let meths = Meths.add lab (Public, Virtual, ty) meths in
+                     let meths = Meths.add lab (Mpublic, Virtual, ty) meths in
                      let implicitly_declared = lab :: implicitly_declared in
                      meths, implicitly_declared
                  | Fprivate ->
-                     let meths = Meths.add lab (Private, Virtual, ty) meths in
+                     let meths =
+                       Meths.add lab (Mprivate k, Virtual, ty) meths
+                     in
                      let implicitly_declared = lab :: implicitly_declared in
                      meths, implicitly_declared
                  | Fabsent -> meths, implicitly_declared
@@ -4193,8 +4233,8 @@ let match_class_sig_shape ~strict sign1 sign2 =
          | exception Not_found -> CM_Missing_method lab::err
          | (priv', vr', _) ->
              match priv', priv with
-             | Public, Private -> CM_Public_method lab::err
-             | Private, Public when strict -> CM_Private_method lab::err
+             | Mpublic, Mprivate _ -> CM_Public_method lab::err
+             | Mprivate _, Mpublic when strict -> CM_Private_method lab::err
              | _, _ ->
                match vr', vr with
                | Virtual, Concrete -> CM_Virtual_method lab::err
@@ -4208,8 +4248,8 @@ let match_class_sig_shape ~strict sign1 sign2 =
          else begin
            let err =
              match priv with
-             | Public -> CM_Hide_public lab :: err
-             | Private -> err
+             | Mpublic -> CM_Hide_public lab :: err
+             | Mprivate _ -> err
            in
            match vr with
            | Virtual -> CM_Hide_virtual ("method", lab) :: err

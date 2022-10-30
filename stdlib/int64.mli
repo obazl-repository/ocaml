@@ -86,7 +86,8 @@ val pred : int64 -> int64
 (** Predecessor.  [Int64.pred x] is [Int64.sub x Int64.one]. *)
 
 val abs : int64 -> int64
-(** Return the absolute value of its argument. *)
+(** [abs x] is the absolute value of [x]. On [min_int] this
+   is [min_int] itself and thus remains negative. *)
 
 val max_int : int64
 (** The greatest representable 64-bit integer, 2{^63} - 1. *)
@@ -245,10 +246,16 @@ val max: t -> t -> t
     @since 4.13.0
  *)
 
-(**/**)
+val seeded_hash : int -> t -> int
+(** A seeded hash function for 64-bit ints, with the same output value as
+    {!Hashtbl.seeded_hash}. This function allows this module to be passed as
+    argument to the functor {!Hashtbl.MakeSeeded}.
 
-(** {1 Deprecated functions} *)
+    @since 5.1.0 *)
 
-external format : string -> int64 -> string = "caml_int64_format"
-(** Do not use this deprecated function.  Instead,
-   used {!Printf.sprintf} with a [%L...] format. *)
+val hash : t -> int
+(** An unseeded hash function for 64-bit ints, with the same output value as
+    {!Hashtbl.hash}. This function allows this module to be passed as argument
+    to the functor {!Hashtbl.Make}.
+
+    @since 5.1.0 *)

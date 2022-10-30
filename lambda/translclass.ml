@@ -32,15 +32,16 @@ let lfunction params body =
   match body with
   | Lfunction {kind = Curried; params = params'; body = body'; attr; loc}
     when List.length params + List.length params' <= Lambda.max_arity() ->
-      Lfunction {kind = Curried; params = params @ params';
-                 return = Pgenval;
-                 body = body'; attr;
-                 loc}
+      lfunction ~kind:Curried ~params:(params @ params')
+                ~return:Pgenval
+                ~body:body'
+                ~attr
+                ~loc
   |  _ ->
-      Lfunction {kind = Curried; params; return = Pgenval;
-                 body;
-                 attr = default_function_attribute;
-                 loc = Loc_unknown}
+      lfunction ~kind:Curried ~params ~return:Pgenval
+                ~body
+                ~attr:default_function_attribute
+                ~loc:Loc_unknown
 
 let lapply ap =
   match ap.ap_func with
@@ -57,12 +58,13 @@ let mkappl (func, args) =
     ap_tailcall=Default_tailcall;
     ap_inlined=Default_inline;
     ap_specialised=Default_specialise;
-  };;
+  }
 
 let lsequence l1 l2 =
   if l2 = lambda_unit then l1 else Lsequence(l1, l2)
 
-let lfield v i = Lprim(Pfield i, [Lvar v], Loc_unknown)
+let lfield v i = Lprim(Pfield (i, Pointer, Mutable),
+                       [Lvar v], Loc_unknown)
 
 let transl_label l = share (Const_immstring l)
 
@@ -133,7 +135,7 @@ let rec build_object_init ~scopes cl_table obj params inh_init obj_init cl =
       let env =
         match envs with None -> []
         | Some envs ->
-            [Lprim(Pfield (List.length inh_init + 1),
+            [Lprim(Pfield (List.length inh_init + 1, Pointer, Mutable),
                    [Lvar envs],
                    Loc_unknown)]
       in
@@ -179,12 +181,13 @@ let rec build_object_init ~scopes cl_table obj params inh_init obj_init cl =
       (inh_init,
        let build params rem =
          let param = name_pattern "param" pat in
-         Lfunction {kind = Curried; params = (param, Pgenval)::params;
-                    return = Pgenval;
-                    attr = default_function_attribute;
-                    loc = of_location ~scopes pat.pat_loc;
-                    body = Matching.for_function ~scopes pat.pat_loc
-                             None (Lvar param) [pat, rem] partial}
+         Lambda.lfunction
+                   ~kind:Curried ~params:((param, Pgenval)::params)
+                   ~return:Pgenval
+                   ~attr:default_function_attribute
+                   ~loc:(of_location ~scopes pat.pat_loc)
+                   ~body:(Matching.for_function ~scopes pat.pat_loc
+                             None (Lvar param) [pat, rem] partial)
        in
        begin match obj_init with
          Lfunction {kind = Curried; params; body = rem} -> build params rem
@@ -278,8 +281,10 @@ let rec build_class_init ~scopes cla cstr super inh_init cl_init msubst top cl =
       | (_, path_lam, obj_init)::inh_init ->
           (inh_init,
            Llet (Strict, Pgenval, obj_init,
-                 mkappl(Lprim(Pfield 1, [path_lam], Loc_unknown), Lvar cla ::
-                        if top then [Lprim(Pfield 3, [path_lam], Loc_unknown)]
+                 mkappl(Lprim(Pfield (1, Pointer, Mutable),
+                              [path_lam], Loc_unknown), Lvar cla ::
+                        if top then [Lprim(Pfield (3, Pointer, Mutable),
+                                     [path_lam], Loc_unknown)]
                         else []),
                  bind_super cla super cl_init))
       | _ ->
@@ -440,12 +445,13 @@ let rec transl_class_rebind ~scopes obj_init cl vf =
         transl_class_rebind ~scopes obj_init cl vf in
       let build params rem =
         let param = name_pattern "param" pat in
-        Lfunction {kind = Curried; params = (param, Pgenval)::params;
-                   return = Pgenval;
-                   attr = default_function_attribute;
-                   loc = of_location ~scopes pat.pat_loc;
-                   body = Matching.for_function ~scopes pat.pat_loc
-                            None (Lvar param) [pat, rem] partial}
+        Lambda.lfunction
+                  ~kind:Curried ~params:((param, Pgenval)::params)
+                  ~return:Pgenval
+                  ~attr:default_function_attribute
+                  ~loc:(of_location ~scopes pat.pat_loc)
+                  ~body:(Matching.for_function ~scopes pat.pat_loc
+                            None (Lvar param) [pat, rem] partial)
       in
       (path, path_lam,
        match obj_init with
@@ -544,7 +550,7 @@ let rec builtin_meths self env env2 body =
     | p when const_path p -> "const", [p]
     | Lprim(Parrayrefu _, [Lvar s; Lvar n], _) when List.mem s self ->
         "var", [Lvar n]
-    | Lprim(Pfield n, [Lvar e], _) when Ident.same e env ->
+    | Lprim(Pfield(n, _, _), [Lvar e], _) when Ident.same e env ->
         "env", [Lvar env2; Lconst(const_int n)]
     | Lsend(Self, met, Lvar s, [], _) when List.mem s self ->
         "meth", [met]
@@ -788,11 +794,12 @@ let transl_class ~scopes ids cl_id pub_meths cl vflag =
 
   let concrete = (vflag = Concrete)
   and lclass lam =
-    let cl_init = llets (Lfunction{kind = Curried;
-                                   attr = default_function_attribute;
-                                   loc = Loc_unknown;
-                                   return = Pgenval;
-                                   params = [cla, Pgenval]; body = cl_init}) in
+    let cl_init = llets (Lambda.lfunction
+                           ~kind:Curried
+                           ~attr:default_function_attribute
+                           ~loc:Loc_unknown
+                           ~return:Pgenval
+                           ~params:[cla, Pgenval] ~body:cl_init) in
     Llet(Strict, Pgenval, class_init, cl_init, lam (free_variables cl_init))
   and lbody fv =
     if List.for_all (fun id -> not (Ident.Set.mem id fv)) ids then
@@ -810,11 +817,12 @@ let transl_class ~scopes ids cl_id pub_meths cl vflag =
             Loc_unknown))))
   and lbody_virt lenvs =
     Lprim(Pmakeblock(0, Immutable, None),
-          [lambda_unit; Lfunction{kind = Curried;
-                                  attr = default_function_attribute;
-                                  loc = Loc_unknown;
-                                  return = Pgenval;
-                                  params = [cla, Pgenval]; body = cl_init};
+          [lambda_unit; Lambda.lfunction
+                          ~kind:Curried
+                          ~attr:default_function_attribute
+                          ~loc:Loc_unknown
+                          ~return:Pgenval
+                          ~params:[cla, Pgenval] ~body:cl_init;
            lambda_unit; lenvs],
          Loc_unknown)
   in
@@ -841,7 +849,8 @@ let transl_class ~scopes ids cl_id pub_meths cl vflag =
           Loc_unknown)
   and linh_envs =
     List.map
-      (fun (_, path_lam, _) -> Lprim(Pfield 3, [path_lam], Loc_unknown))
+      (fun (_, path_lam, _) ->
+        Lprim(Pfield (3, Pointer, Mutable), [path_lam], Loc_unknown))
       (List.rev inh_init)
   in
   let make_envs lam =
@@ -861,16 +870,18 @@ let transl_class ~scopes ids cl_id pub_meths cl vflag =
   in
   let inh_keys =
     List.map
-      (fun (_, path_lam, _) -> Lprim(Pfield 1, [path_lam], Loc_unknown))
+      (fun (_, path_lam, _) ->
+        Lprim(Pfield (1, Pointer, Mutable), [path_lam], Loc_unknown))
       inh_paths
   in
   let lclass lam =
     Llet(Strict, Pgenval, class_init,
-         Lfunction{kind = Curried; params = [cla, Pgenval];
-                   return = Pgenval;
-                   attr = default_function_attribute;
-                   loc = Loc_unknown;
-                   body = def_ids cla cl_init}, lam)
+         Lambda.lfunction
+                   ~kind:Curried ~params:[cla, Pgenval]
+                   ~return:Pgenval
+                   ~attr:default_function_attribute
+                   ~loc:Loc_unknown
+                   ~body:(def_ids cla cl_init), lam)
   and lcache lam =
     if inh_keys = [] then Llet(Alias, Pgenval, cached, Lvar tables, lam) else
     Llet(Strict, Pgenval, cached,
@@ -889,16 +900,13 @@ let transl_class ~scopes ids cl_id pub_meths cl vflag =
                       lset cached 0 (Lvar env_init))))
   and lclass_virt () =
     lset cached 0
-      (Lfunction
-         {
-           kind = Curried;
-           attr = default_function_attribute;
-           loc = Loc_unknown;
-           return = Pgenval;
-           params = [cla, Pgenval];
-           body = def_ids cla cl_init;
-         }
-      )
+      (Lambda.lfunction
+         ~kind:Curried
+         ~attr:default_function_attribute
+         ~loc:Loc_unknown
+         ~return:Pgenval
+         ~params:[cla, Pgenval]
+         ~body:(def_ids cla cl_init))
   in
   let lupdate_cache =
     if ids = [] then ldirect () else

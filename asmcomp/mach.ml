@@ -49,9 +49,13 @@ type operation =
   | Itailcall_imm of { func : string; }
   | Iextcall of { func : string;
                   ty_res : Cmm.machtype; ty_args : Cmm.exttype list;
-                  alloc : bool; }
+                  alloc : bool;
+                  stack_ofs : int; }
   | Istackoffset of int
-  | Iload of Cmm.memory_chunk * Arch.addressing_mode * Asttypes.mutable_flag
+  | Iload of { memory_chunk : Cmm.memory_chunk;
+               addressing_mode : Arch.addressing_mode;
+               mutability : Asttypes.mutable_flag;
+               is_atomic : bool }
   | Istore of Cmm.memory_chunk * Arch.addressing_mode * bool
   | Ialloc of { bytes : int; dbginfo : Debuginfo.alloc_dbginfo; }
   | Iintop of integer_operation
@@ -61,6 +65,7 @@ type operation =
   | Iopaque
   | Ispecific of Arch.specific_operation
   | Ipoll of { return_label: Cmm.label option }
+  | Idls_get
 
 type instruction =
   { desc: instruction_desc;
@@ -148,6 +153,7 @@ let rec instr_iter f i =
 let operation_is_pure = function
   | Icall_ind | Icall_imm _ | Itailcall_ind | Itailcall_imm _
   | Iextcall _ | Istackoffset _ | Istore _ | Ialloc _ | Ipoll _
+  | Idls_get
   | Iintop(Icheckbound) | Iintop_imm(Icheckbound, _) | Iopaque -> false
   | Ispecific sop -> Arch.operation_is_pure sop
   | _ -> true

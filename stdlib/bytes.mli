@@ -281,36 +281,6 @@ val rcontains_from : bytes -> int -> char -> bool
     @raise Invalid_argument if [stop < 0] or [stop+1] is not a valid
     position in [s]. *)
 
-val uppercase : bytes -> bytes
-  [@@ocaml.deprecated
-    "Use Bytes.uppercase_ascii/BytesLabels.uppercase_ascii instead."]
-(** Return a copy of the argument, with all lowercase letters
-   translated to uppercase, including accented letters of the ISO
-   Latin-1 (8859-1) character set.
-   @deprecated Functions operating on Latin-1 character set are deprecated. *)
-
-val lowercase : bytes -> bytes
-  [@@ocaml.deprecated
-    "Use Bytes.lowercase_ascii/BytesLabels.lowercase_ascii instead."]
-(** Return a copy of the argument, with all uppercase letters
-   translated to lowercase, including accented letters of the ISO
-   Latin-1 (8859-1) character set.
-   @deprecated Functions operating on Latin-1 character set are deprecated. *)
-
-val capitalize : bytes -> bytes
-  [@@ocaml.deprecated
-    "Use Bytes.capitalize_ascii/BytesLabels.capitalize_ascii instead."]
-(** Return a copy of the argument, with the first character set to uppercase,
-   using the ISO Latin-1 (8859-1) character set.
-   @deprecated Functions operating on Latin-1 character set are deprecated. *)
-
-val uncapitalize : bytes -> bytes
-  [@@ocaml.deprecated
-    "Use Bytes.uncapitalize_ascii/BytesLabels.uncapitalize_ascii instead."]
-(** Return a copy of the argument, with the first character set to lowercase,
-   using the ISO Latin-1 (8859-1) character set.
-   @deprecated Functions operating on Latin-1 character set are deprecated. *)
-
 val uppercase_ascii : bytes -> bytes
 (** Return a copy of the argument, with all lowercase letters
    translated to uppercase, using the US-ASCII character set.
@@ -346,14 +316,14 @@ val equal: t -> t -> bool
 
 val starts_with :
   prefix (* comment thwarts tools/sync_stdlib_docs *) :bytes -> bytes -> bool
-(** [starts_with ][~][prefix s] is [true] if and only if [s] starts with
+(** [starts_with ][~prefix s] is [true] if and only if [s] starts with
     [prefix].
 
     @since 4.13.0 *)
 
 val ends_with :
   suffix (* comment thwarts tools/sync_stdlib_docs *) :bytes -> bytes -> bool
-(** [ends_with suffix s] is [true] if and only if [s] ends with [suffix].
+(** [ends_with ][~suffix s] is [true] if and only if [s] ends with [suffix].
 
     @since 4.13.0 *)
 
@@ -592,13 +562,14 @@ val is_valid_utf_16le : t -> bool
 
     8-bit and 16-bit integers are represented by the [int] type,
     which has more bits than the binary encoding.  These extra bits
-    are handled as follows: {ul
+    are handled as follows:
+    {ul
     {- Functions that decode signed (resp. unsigned) 8-bit or 16-bit
-    integers represented by [int] values sign-extend
-    (resp. zero-extend) their result.}
+       integers represented by [int] values sign-extend
+       (resp. zero-extend) their result.}
     {- Functions that encode 8-bit or 16-bit integers represented by
-    [int] values truncate their input to their least significant
-    bytes.}}
+       [int] values truncate their input to their least significant
+       bytes.}}
 *)
 
 val get_uint8 : bytes -> int -> int
@@ -782,3 +753,5 @@ external unsafe_blit_string :
   = "caml_blit_string" [@@noalloc]
 external unsafe_fill :
   bytes -> int -> int -> char -> unit = "caml_fill_bytes" [@@noalloc]
+
+val unsafe_escape : bytes -> bytes

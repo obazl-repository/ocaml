@@ -391,7 +391,12 @@ and class_signature =
   { csig_self: type_expr;
     mutable csig_self_row: type_expr;
     mutable csig_vars: (mutable_flag * virtual_flag * type_expr) Vars.t;
-    mutable csig_meths: (private_flag * virtual_flag * type_expr) Meths.t; }
+    mutable csig_meths: (method_privacy * virtual_flag * type_expr) Meths.t; }
+
+and method_privacy =
+  | Mpublic
+  | Mprivate of field_kind
+    (* The [field_kind] is always [Fabsent] in a complete class type. *)
 
 (* Variance *)
 
@@ -413,11 +418,14 @@ module Variance : sig
   val inter  : t -> t -> t
   val subset : t -> t -> bool
   val eq : t -> t -> bool
-  val set : f -> bool -> t -> t
+  val set : f -> t -> t
+  val set_if : bool -> f -> t -> t
   val mem : f -> t -> bool
   val conjugate : t -> t                (* exchange positive and negative *)
-  val get_upper : t -> bool * bool                  (* may_pos, may_neg   *)
-  val get_lower : t -> bool * bool * bool * bool    (* pos, neg, inv, inj *)
+  val compose : t -> t -> t
+  val strengthen : t -> t                (* remove May_weak when possible *)
+  val get_upper : t -> bool * bool                    (* may_pos, may_neg *)
+  val get_lower : t -> bool * bool * bool                (* pos, neg, inj *)
   val unknown_signature : injective:bool -> arity:int -> t list
   (** The most pessimistic variance for a completely unknown type. *)
 end
@@ -621,6 +629,7 @@ and ext_status =
   | Text_next                      (* not first constructor in an extension *)
   | Text_exception
 
+val item_visibility : signature_item -> visibility
 
 (* Constructor and record label descriptions inserted held in typing
    environments *)

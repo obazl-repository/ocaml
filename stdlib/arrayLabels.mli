@@ -63,25 +63,16 @@ external make : int -> 'a -> 'a array = "caml_make_vect"
    If the value of [x] is a floating-point number, then the maximum
    size is only [Sys.max_array_length / 2].*)
 
-external create : int -> 'a -> 'a array = "caml_make_vect"
-  [@@ocaml.deprecated "Use Array.make/ArrayLabels.make instead."]
-(** @deprecated [create] is an alias for {!make}. *)
-
 external create_float: int -> float array = "caml_make_float_vect"
 (** [create_float n] returns a fresh float array of length [n],
     with uninitialized data.
     @since 4.03 *)
 
-val make_float: int -> float array
-  [@@ocaml.deprecated
-    "Use Array.create_float/ArrayLabels.create_float instead."]
-(** @deprecated [make_float] is an alias for {!create_float}. *)
-
 val init : int -> f:(int -> 'a) -> 'a array
 (** [init n ~f] returns a fresh array of length [n],
    with element number [i] initialized to the result of [f i].
    In other terms, [init n ~f] tabulates the results of [f]
-   applied to the integers [0] to [n-1].
+   applied in order to the integers [0] to [n-1].
 
    @raise Invalid_argument if [n < 0] or [n > Sys.max_array_length].
    If the return type of [f] is [float], then the maximum
@@ -99,11 +90,6 @@ val make_matrix : dimx:int -> dimy:int -> 'a -> 'a array array
    greater than {!Sys.max_array_length}.
    If the value of [e] is a floating-point number, then the maximum
    size is only [Sys.max_array_length / 2]. *)
-
-val create_matrix : dimx:int -> dimy:int -> 'a -> 'a array array
-  [@@ocaml.deprecated
-    "Use Array.make_matrix/ArrayLabels.make_matrix instead."]
-(** @deprecated [create_matrix] is an alias for {!make_matrix}. *)
 
 val append : 'a array -> 'a array -> 'a array
 (** [append v1 v2] returns a fresh array containing the

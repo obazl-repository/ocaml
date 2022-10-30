@@ -104,6 +104,7 @@ module Error = struct
     missings: signature_item list;
     incompatibles: (Ident.t * sigitem_symptom) list;
     oks: (int * module_coercion) list;
+    leftovers: (signature_item * signature_item * int) list;
   }
   and sigitem_symptom =
     | Core of core_sigitem_symptom
@@ -361,6 +362,47 @@ let retrieve_functor_params env mty =
    Return the restriction that transforms a value of the smaller type
    into a value of the bigger type. *)
 
+(* When computing a signature difference, we need to distinguish between
+   recoverable errors at the value level and unrecoverable errors at the type
+   level that require us to stop the computation of the difference due to
+   incoherent types.
+*)
+type 'a recoverable_error = { error: 'a; recoverable:bool }
+let mark_error_as_recoverable r =
+  Result.map_error (fun error -> { error; recoverable=true}) r
+let mark_error_as_unrecoverable r =
+  Result.map_error (fun error -> { error; recoverable=false}) r
+
+
+module Sign_diff = struct
+  type t = {
+    runtime_coercions: (int * Typedtree.module_coercion) list;
+    shape_map: Shape.Map.t;
+    deep_modifications:bool;
+    errors: (Ident.t * Error.sigitem_symptom) list;
+    leftovers: ((Types.signature_item as 'it) * 'it * int) list
+  }
+
+  let empty = {
+    runtime_coercions = [];
+    shape_map = Shape.Map.empty;
+    deep_modifications = false;
+    errors = [];
+    leftovers = []
+  }
+
+  let merge x y =
+    {
+      runtime_coercions = x.runtime_coercions @ y.runtime_coercions;
+      shape_map = y.shape_map;
+      (* the shape map is threaded the map during the difference computation,
+          the last shape map contains all previous elements. *)
+      deep_modifications = x.deep_modifications || y.deep_modifications;
+      errors = x.errors @ y.errors;
+      leftovers = x.leftovers @ y.leftovers
+    }
+end
+
 (**
    In the group of mutual functions below, the [~in_eq] argument is [true] when
    we are in fact checking equality of module types.
@@ -451,21 +493,35 @@ and try_modtypes ~in_eq ~loc env ~mark subst mty1 mty2 orig_shape =
         functor_param ~in_eq ~loc env ~mark:(negate_mark mark)
           subst param1 param2
       in
-      (* Using a fresh variable with a placeholder uid here is fine: users will
-         never try to jump to the definition of that variable.
-         If they try to jump to the parameter from inside the functor, they will
-         use the variable shape that is stored in the local environment.  *)
-      let var, shape_var = Shape.fresh_var Uid.internal_not_actually_unique in
-      let cc_res =
-        let res_shape = Shape.app orig_shape ~arg:shape_var in
-        modtypes ~in_eq ~loc env ~mark subst res1 res2 res_shape
+      let var, res_shape =
+        match Shape.decompose_abs orig_shape with
+        | Some (var, res_shape) -> var, res_shape
+        | None ->
+            (* Using a fresh variable with a placeholder uid here is fine: users
+               will never try to jump to the definition of that variable.
+               If they try to jump to the parameter from inside the functor,
+               they will use the variable shape that is stored in the local
+               environment.  *)
+            let var, shape_var =
+              Shape.fresh_var Uid.internal_not_actually_unique
+            in
+            var, Shape.app orig_shape ~arg:shape_var
       in
+      let cc_res = modtypes ~in_eq ~loc env ~mark subst res1 res2 res_shape in
       begin match cc_arg, cc_res with
-      | Ok Tcoerce_none, Ok (Tcoerce_none, res_shape) ->
-          let final_shape = Shape.abs var res_shape in
+      | Ok Tcoerce_none, Ok (Tcoerce_none, final_res_shape) ->
+          let final_shape =
+            if final_res_shape == res_shape
+            then orig_shape
+            else Shape.abs var final_res_shape
+          in
           Ok (Tcoerce_none, final_shape)
-      | Ok cc_arg, Ok (cc_res, res_shape) ->
-          let final_shape = Shape.abs var res_shape in
+      | Ok cc_arg, Ok (cc_res, final_res_shape) ->
+          let final_shape =
+            if final_res_shape == res_shape
+            then orig_shape
+            else Shape.abs var final_res_shape
+          in
           Ok (Tcoerce_functor(cc_arg, cc_res), final_shape)
       | _, Error {Error.symptom = Error.Functor Error.Params res; _} ->
           let got_params, got_res = res.got in
@@ -559,33 +615,31 @@ and signatures  ~in_eq ~loc env ~mark subst sig1 sig2 mod_shape =
       ([], 0) sig1 in
   (* Build a table of the components of sig1, along with their positions.
      The table is indexed by kind and name of component *)
-  let rec build_component_table pos tbl = function
-      [] -> pos, tbl
-    | (Sig_value (_, _, Hidden)
-      |Sig_type (_, _, _, Hidden)
-      |Sig_typext (_, _, _, Hidden)
-      |Sig_module (_, _, _, _, Hidden)
-      |Sig_modtype (_, _, Hidden)
-      |Sig_class (_, _, _, Hidden)
-      |Sig_class_type (_, _, _, Hidden)
-      ) as item :: rem ->
-        let pos = if is_runtime_component item then pos + 1 else pos in
-        build_component_table pos tbl rem (* do not pair private items. *)
+  let rec build_component_table nb_exported pos tbl = function
+      [] -> nb_exported, pos, tbl
     | item :: rem ->
-        let (id, _loc, name) = item_ident_name item in
         let pos, nextpos =
           if is_runtime_component item then pos, pos + 1
           else -1, pos
         in
-        build_component_table nextpos
-                              (FieldMap.add name (id, item, pos) tbl) rem in
-  let len1, comps1 =
-    build_component_table 0 FieldMap.empty sig1 in
-  let len2 =
-    List.fold_left
-      (fun n i -> if is_runtime_component i then n + 1 else n)
-      0
-      sig2
+        match item_visibility item with
+        | Hidden ->
+            (* do not pair private items. *)
+            build_component_table nb_exported nextpos tbl rem
+        | Exported ->
+            let (id, _loc, name) = item_ident_name item in
+            build_component_table (nb_exported + 1) nextpos
+              (FieldMap.add name (id, item, pos) tbl) rem
+  in
+  let exported_len1, runtime_len1, comps1 =
+    build_component_table 0 0 FieldMap.empty sig1
+  in
+  let exported_len2, runtime_len2 =
+    List.fold_left (fun (el, rl) i ->
+      let el = match item_visibility i with Hidden -> el | Exported -> el + 1 in
+      let rl = if is_runtime_component i then rl + 1 else rl in
+      el, rl
+    ) (0, 0) sig2
   in
   (* Pair each component of sig2 with a component of sig1,
      identifying the names along the way.
@@ -594,20 +648,31 @@ and signatures  ~in_eq ~loc env ~mark subst sig1 sig2 mod_shape =
      and the coercion to be applied to it. *)
   let rec pair_components subst paired unpaired = function
       [] ->
-        let oks, shape_map, errors =
+        let open Sign_diff in
+        let d =
           signature_components ~in_eq ~loc env ~mark new_env subst mod_shape
             Shape.Map.empty
             (List.rev paired)
         in
-        begin match unpaired, errors, oks with
-            | [], [], cc ->
-                let shape = Shape.str ?uid:mod_shape.Shape.uid shape_map in
-                if len1 = len2 then (* see PR#5098 *)
+        begin match unpaired, d.errors, d.runtime_coercions, d.leftovers with
+            | [], [], cc, [] ->
+                let shape =
+                  if not d.deep_modifications && exported_len1 = exported_len2
+                  then mod_shape
+                  else Shape.str ?uid:mod_shape.Shape.uid d.shape_map
+                in
+                if runtime_len1 = runtime_len2 then (* see PR#5098 *)
                   Ok (simplify_structure_coercion cc id_pos_list, shape)
                 else
                   Ok (Tcoerce_structure (cc, id_pos_list), shape)
-            | missings, incompatibles, cc ->
-                Error { env=new_env; Error.missings; incompatibles; oks=cc }
+            | missings, incompatibles, runtime_coercions, leftovers ->
+                Error {
+                  Error.env=new_env;
+                  missings;
+                  incompatibles;
+                  oks=runtime_coercions;
+                  leftovers;
+                }
         end
     | item2 :: rem ->
         let (id2, _loc, name2) = item_ident_name item2 in
@@ -652,14 +717,16 @@ and signatures  ~in_eq ~loc env ~mark subst sig1 sig2 mod_shape =
 and signature_components  ~in_eq ~loc old_env ~mark env subst
     orig_shape shape_map paired =
   match paired with
-  | [] -> [], shape_map, []
+  | [] -> Sign_diff.{ empty with shape_map }
   | (sigi1, sigi2, pos) :: rem ->
+      let shape_modified = ref false in
       let id, item, shape_map, present_at_runtime =
         match sigi1, sigi2 with
         | Sig_value(id1, valdecl1, _) ,Sig_value(_id2, valdecl2, _) ->
             let item =
               value_descriptions ~loc env ~mark subst id1 valdecl1 valdecl2
             in
+            let item = mark_error_as_recoverable item in
             let present_at_runtime = match valdecl2.val_kind with
               | Val_prim _ -> false
               | _ -> true
@@ -670,12 +737,14 @@ and signature_components  ~in_eq ~loc old_env ~mark env subst
             let item =
               type_declarations ~loc ~old_env env ~mark subst id1 tydec1 tydec2
             in
+            let item = mark_error_as_unrecoverable item in
             let shape_map = Shape.Map.add_type_proj shape_map id1 orig_shape in
             id1, item, shape_map, false
         | Sig_typext(id1, ext1, _, _), Sig_typext(_id2, ext2, _, _) ->
             let item =
               extension_constructors ~loc env ~mark  subst id1 ext1 ext2
             in
+            let item = mark_error_as_unrecoverable item in
             let shape_map =
               Shape.Map.add_extcons_proj shape_map id1 orig_shape
             in
@@ -692,6 +761,7 @@ and signature_components  ~in_eq ~loc old_env ~mark env subst
               let item, shape_map =
                 match item with
                 | Ok (cc, shape) ->
+                    if shape != orig_shape then shape_modified := true;
                     let mod_shape = Shape.set_uid_if_none shape mty1.md_uid in
                     Ok cc, Shape.Map.add_module shape_map id1 mod_shape
                 | Error diff ->
@@ -709,6 +779,7 @@ and signature_components  ~in_eq ~loc old_env ~mark env subst
                     true, Result.map (fun i -> Tcoerce_alias (env, p1, i)) item
                 | Mp_absent, Mp_present, _ -> assert false
               in
+              let item = mark_error_as_unrecoverable item in
               id1, item, shape_map, present_at_runtime
             end
         | Sig_modtype(id1, info1, _), Sig_modtype(_id2, info2, _) ->
@@ -718,6 +789,7 @@ and signature_components  ~in_eq ~loc old_env ~mark env subst
             let shape_map =
               Shape.Map.add_module_type_proj shape_map id1 orig_shape
             in
+            let item = mark_error_as_unrecoverable item in
             id1, item, shape_map, false
         | Sig_class(id1, decl1, _, _), Sig_class(_id2, decl2, _, _) ->
             let item =
@@ -726,11 +798,13 @@ and signature_components  ~in_eq ~loc old_env ~mark env subst
             let shape_map =
               Shape.Map.add_class_proj shape_map id1 orig_shape
             in
+            let item = mark_error_as_unrecoverable item in
             id1, item, shape_map, true
         | Sig_class_type(id1, info1, _, _), Sig_class_type(_id2, info2, _, _) ->
             let item =
               class_type_declarations ~loc ~old_env env subst info1 info2
             in
+            let item = mark_error_as_unrecoverable item in
             let shape_map =
               Shape.Map.add_class_type_proj shape_map id1 orig_shape
             in
@@ -738,14 +812,28 @@ and signature_components  ~in_eq ~loc old_env ~mark env subst
         | _ ->
             assert false
       in
-      let oks, final_map, errors =
-        signature_components ~in_eq ~loc old_env ~mark env subst
-          orig_shape shape_map rem
+      let deep_modifications = !shape_modified in
+      let first =
+        match item with
+        | Ok x ->
+            let runtime_coercions =
+              if present_at_runtime then [pos,x] else []
+            in
+            Sign_diff.{ empty with deep_modifications; runtime_coercions }
+        | Error { error; recoverable=_ } ->
+            Sign_diff.{ empty with errors=[id,error]; deep_modifications }
       in
-      match item with
-      | Ok x when present_at_runtime -> (pos,x) :: oks, final_map, errors
-      | Ok _ -> oks, final_map, errors
-      | Error y -> oks , final_map, (id,y) :: errors
+      let continue = match item with
+        | Ok _ -> true
+        | Error x -> x.recoverable
+      in
+      let rest =
+        if continue then
+          signature_components ~in_eq ~loc old_env ~mark env subst
+            orig_shape shape_map rem
+        else Sign_diff.{ empty with leftovers=rem }
+       in
+       Sign_diff.merge first rest
 
 and module_declarations  ~in_eq ~loc env ~mark  subst id1 md1 md2 orig_shape =
   Builtin_attributes.check_alerts_inclusion

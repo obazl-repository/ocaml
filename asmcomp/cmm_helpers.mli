@@ -189,6 +189,12 @@ val remove_unit : expression -> expression
 
 (** Blocks *)
 
+(** Non-atomic load of a mutable field *)
+val mk_load_mut : memory_chunk -> operation
+
+(** Atomic load. All atomic fields are mutable. *)
+val mk_load_atomic : memory_chunk -> operation
+
 (** [field_address ptr n dbg] returns an expression for the address of the
     [n]th field of the block pointed to by [ptr] *)
 val field_address : expression -> int -> Debuginfo.t -> expression
