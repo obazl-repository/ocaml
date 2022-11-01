@@ -1,0 +1,10 @@
+alias(
+    name = "camlrun",
+    actual = "//boot:camlrun"
+)
+
+alias(
+    name = "asmrun",
+    actual = "//boot:asmrun"
+)
+

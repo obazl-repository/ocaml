@@ -79,6 +79,7 @@ cc_library(
     deps = [
         "//runtime/caml:hdrs"
     ],
+    visibility = ["//ocaml:__subpackages__"]
 )
 
 ###########
@@ -94,7 +95,8 @@ cc_library(
     + OC_CPPFLAGS,
     linkopts = LDFLAGS + OC_LDFLAGS,
     defines = CC_DEFINES + CC_NATIVE_DEFINES,
-    deps = ["//runtime/caml:hdrs"]
+    deps = ["//runtime/caml:hdrs"],
+    visibility = ["//ocaml:__subpackages__"]
 )
 
 ################################################################

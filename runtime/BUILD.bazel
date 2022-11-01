@@ -155,7 +155,10 @@ filegroup(
     # "//config/host:windows_x86_64": [???]
     "//conditions:default": []
     }),
-    visibility = ["//boot:__pkg__"]
+    visibility = [
+        "//boot:__pkg__",
+        "//ocaml/bin:__pkg__"
+    ]
 )
 
 COMMON_C_SOURCES = [
@@ -236,7 +239,10 @@ filegroup(
             "main.c",
             "startup_byt.c",
         ],
-    visibility = ["//boot:__pkg__"]
+    visibility = [
+        "//boot:__pkg__",
+        "//ocaml/bin:__pkg__"
+    ]
 )
 
 BYTECODE_ONLY_C_SOURCES = [
@@ -261,7 +267,10 @@ filegroup(
         "startup_nat.c",
         "signals_nat.c"
     ],
-    visibility = ["//boot:__pkg__"]
+    visibility = [
+        "//boot:__pkg__",
+        "//ocaml/bin:__pkg__"
+    ]
 )
 
 NATIVE_ONLY_C_SOURCES = [
@@ -354,7 +363,10 @@ genrule(
         "sed -e 's/.*/  \"&\",/' $(location :primitives) >> $@;",
         "echo '  0 };' >> $@"
     ]),
-    visibility = ["//boot:__pkg__"]
+    visibility = [
+        "//boot:__pkg__",
+        "//ocaml/bin:__pkg__"
+    ]
 )
 
 ## FIXME: to build multiple "versions" (e.g. libcamlrun, libcamlrund,

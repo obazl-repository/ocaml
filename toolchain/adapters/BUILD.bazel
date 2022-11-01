@@ -9,31 +9,33 @@ load("//toolchain:BUILD.bzl", "bootstrap_toolchain_adapter")
 ## The bootstrap compiler is a precompiled vm>vm tool that comes with
 ## the distribution.
 bootstrap_toolchain_adapter(
-    name     = "bootstrap",
-    ocamlrun = "//boot:ocamlrun", # the vm, implemented in C
-    ocamlc   = "//boot:ocamlc", # the precompiled vm>vm bootstrap compiler
+    name      = "bootstrap",
+    ocamlrun  = "//boot:ocamlrun", # the vm, implemented in C
+    ocamlc    = "//boot:ocamlc", # the precompiled vm>vm bootstrap compiler
+    vmruntime = "//boot:camlrun", # do we need this?
     linkmode = "dynamic"
 )
 
 bootstrap_toolchain_adapter(
-    name     = "standard",
-    ocamlrun = "//boot:ocamlrun",
-    ocamlc   = "//compilers/stage1:ocamlc",
-    # ocamlc   = "//runtime:ocamlc",
+    name     = "local",
+    ocamlrun = "//ocaml/bin:ocamlrun",
+    ocamlc   = "//ocaml/bin:ocamlc",
     linkmode = "dynamic"
 )
 
-bootstrap_toolchain_adapter(
-    name     = "debug",
-    ocamlrun = "//boot:ocamlrund",
-    ocamlc   = "//compilers/stage1:ocamlc",
-    linkmode = "dynamic"
-)
+## we don't need separate debug and instrumented adapters
+## if we use platforms to select the build variant.
+# bootstrap_toolchain_adapter(
+#     name     = "debug",
+#     ocamlrun = "//boot:ocamlrund",
+#     ocamlc   = "//compilers/stage1:ocamlc",
+#     linkmode = "dynamic"
+# )
 
-bootstrap_toolchain_adapter(
-    name     = "instrumented",
-    ocamlrun = "//boot:ocamlruni",
-    ocamlc   = "//runtime:ocamlc",
-    linkmode = "dynamic"
-)
+# bootstrap_toolchain_adapter(
+#     name     = "instrumented",
+#     ocamlrun = "//boot:ocamlruni",
+#     ocamlc   = "//runtime:ocamlc",
+#     linkmode = "dynamic"
+# )
 
