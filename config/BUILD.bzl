@@ -206,16 +206,16 @@ CC_DEFINES = [
 # }) + select({
 #     ## CAMLDLLIMPORT - in runtime_CPPFLAGS
 #     ## always used for tgt //boot:ocamlrun?
-#     #    "//config/host:linux": [],
-#     #    "//config/host:macos?": [],
-#     #    # "//config/host:win32": ["CAMLDLLIMPORT"]
+#     #    "//platforms/os:linux?": [],
+#     #    "//platforms/os:macos?": [],
+#     #    # "//platforms/os:win32": ["CAMLDLLIMPORT"]
 #     "//conditions:default": []
 # }) + select({
 #     ## IN_CAML_RUNTIME - in runtime_CPPFLAGS
 #     ## always used for tgt //boot:ocamlrun?
-#     #    "//config/host:linux": [],
-#     #    "//config/host:macos?": [],
-#     #    # "//config/host:win32": ["CAMLDLLIMPORT"]
+#     #    "//platforms/os:linux?": [],
+#     #    "//platforms/os:macos?": [],
+#     #    # "//platforms/os:win32": ["CAMLDLLIMPORT"]
 #     "//conditions:default": []
 }) + select({
     "//config/compilation_mode:dbg?": ["DEBUG"],
@@ -282,8 +282,8 @@ OCAMLC_CPPDEFINES = []
 # OC_NATIVE_CPPDEFINES = [
 #     "NATIVE_CODE", "TARGET_"+ ARCH, "SYS_" + SYSTEM
 # ] + select({
-#     "//config/host:linux": ["MODEL_" + MODEL],
-#     "//config/host:macos?": ["MODEL_" + MODEL],
+#     "//platforms/os:linux?": ["MODEL_" + MODEL],
+#     "//platforms/os:macos?": ["MODEL_" + MODEL],
 #     "//conditions:default": []
 # })
 
@@ -307,14 +307,15 @@ OCAMLC_CFLAGS = [
 ]
 
 ##################
-# LDFLAGS = select({
-#     ## zig: avoid warning: unsupported linker arg: -no_compact_unwind
-#     ## (zig uses LLD on macos, not ld)
-#     "//config/toolchain:macos_zig?": [],
-#     "//config/host:macos?":  ["-Wl,-no_compact_unwind"],
-#     "//conditions:default": []
-# })
-LDFLAGS = ["-Wl,-no_compact_unwind"]
+LDFLAGS = select({
+    ## zig: avoid warning: unsupported linker arg: -no_compact_unwind
+    ## (zig uses LLD on macos, not ld)
+    # "//config/toolchain:macos_zig?": [],
+    "//platforms/os:macos?":  ["-Wl,-no_compact_unwind"],
+    "//conditions:default": []
+})
+
+CPP = ["gcc", "-E", "-P"]  # Makefile.config
 
 OC_LDFLAGS = []
 
@@ -514,7 +515,7 @@ OPTCOMPFLAGS = select({
 # MKEXE=$(CC) $(OC_CFLAGS) $(CFLAGS) $(OC_LDFLAGS) $(LDFLAGS) -Wl,-no_compact_unwind
 ## Do not edit these MK vars, they are passed to preprocessors.
 ## (adding spaces, to match what the makefile generates:)
-MKEXE = [CC] + OC_CFLAGS + CFLAGS + OC_LDFLAGS + ["  "] + LDFLAGS
+MKEXE = [CC] + OC_CFLAGS + CFLAGS + OC_LDFLAGS + ["  "] ##  + LDFLAGS
 
 ## Makefile.config:
 MKDLL = "gcc -shared                    -flat_namespace -undefined suppress -Wl,-no_compact_unwind                    "  #  + " ".join(LDFLAGS)

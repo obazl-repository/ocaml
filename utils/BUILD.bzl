@@ -29,76 +29,76 @@ load("//config:BUILD.bzl",
 #  -e 's!%%$1%%!$(if $2,$(call SED_ESCAPE,"$(call OCAML_ESCAPE,$2)"))!'
 #SUBST_QUOTE=$(call SUBST_QUOTE2,$1,$($1))
 
-CONFIG_MAP = {
-    "%%AFL_INSTRUMENT%%" : "false",
-    "%%ARCH%%" : "amd64",
-    "%%ARCMD%%" : "ar",
-    "%%ASM%%" : "gcc -c -Wno-trigraphs",
-    "%%ASM_CFI_SUPPORTED%%" : "true",
-    "%%BYTECCLIBS%%" : "{BYTECCLIBS}".format(
-        BYTECCLIBS=" ".join(BYTECCLIBS)
-    ),
-    "%%CC%%" : "gcc",
-    "%%CCOMPTYPE%%" : "cc",
-    "%%OUTPUTOBJ%%" : "-o ",
-    "%%EXT_ASM%%" : ".s",
-    "%%EXT_DLL%%" : ".so",
-    "%%EXE%%" : "",
-    "%%EXT_LIB%%" : ".a",
-    "%%EXT_OBJ%%" : ".o",
-    "%%FLAMBDA%%" : "false",
-    "%%WITH_FLAMBDA_INVARIANTS%%" : "false",
-    "%%WITH_CMM_INVARIANTS%%" : "false",
-    "%%FLEXLINK_FLAGS%%" : "",
-    "%%FLEXDLL_DIR%%" : "",
-    "%%HOST%%" : "x86_64-apple-darwin20.6.0",
-    "%%BINDIR%%" : "/usr/local/bin",
-    "%%LIBDIR%%" : "/usr/local/lib/ocaml",
-    "%%MKDLL%%" : "{MKDLL}".format(MKDLL=MKDLL),
-    "%%MKEXE%%" : "{MKEXE}".format(
-        MKEXE=" ".join(MKEXE)
-    ),
-    "%%FLEXLINK_LDFLAGS%%" : "",
-    "%%FLEXLINK_DLL_LDFLAGS%%" : "",
-    "%%MKMAINDLL%%" : "{MKMAINDLL}".format(
-        MKMAINDLL = MKMAINDLL
-    ),
-    "%%MODEL%%" : "default",
-    "%%NATIVECCLIBS%%" : "{NATIVECCLIBS} ".format(
-        NATIVECCLIBS=" ".join(NATIVECCLIBS)
-    ),
-    "%%OCAMLC_CFLAGS%%" : "{OCAMLC_CFLAGS}  ".format(
-        OCAMLC_CFLAGS=" ".join(OCAMLC_CFLAGS)
-    ),
-    "%%OCAMLC_CPPFLAGS%%" : "{OCAMLC_CPPFLAGS} ".format(
-        OCAMLC_CPPFLAGS=" ".join(OCAMLC_CPPFLAGS)
-    ),
-    "%%OCAMLOPT_CFLAGS%%" : "{OCAMLC_CFLAGS} ".format(
-        OCAMLC_CFLAGS=" ".join(OCAMLC_CFLAGS)
-    ),
-    "%%OCAMLOPT_CPPFLAGS%%" : "{OCAMLC_CPPFLAGS} ".format(
-        OCAMLC_CPPFLAGS=" ".join(OCAMLC_CPPFLAGS)
-    ),
-    "%%PACKLD%%" : "ld -r -arch x86_64 -o {EMPTY}".format(EMPTY=EMPTY),
-    "%%PROFINFO_WIDTH%%" : "0",
-    "%%RANLIBCMD%%" : "{RANLIBCMD}".format(RANLIBCMD=RANLIBCMD),
-    "%%RPATH%%" : "",
-    "%%MKSHAREDLIBRPATH%%" : "",
-    "%%FORCE_SAFE_STRING%%" : "true",
-    "%%DEFAULT_SAFE_STRING%%" : "true",
-    "%%WINDOWS_UNICODE%%" : "0",
-    "%%NAKED_POINTERS%%" : "true",
-    "%%SUPPORTS_SHARED_LIBRARIES%%" : "true",
-    "%%SYSTEM%%" : "macosx",
-    "%%SYSTHREAD_SUPPORT%%" : "true",
-    "%%TARGET%%" : "x86_64-apple-darwin20.6.0",
-    "%%WITH_FRAME_POINTERS%%" : "false",
-    "%%WITH_PROFINFO%%" : "false",
-    "%%FLAT_FLOAT_ARRAY%%" : "true",
-    "%%FUNCTION_SECTIONS%%" : "false",
-    "%%CC_HAS_DEBUG_PREFIX_MAP%%" : "true",
-    "%%AS_HAS_DEBUG_PREFIX_MAP%%" : "false"
-}
+# CONFIG_MAP = {
+#     "%%AFL_INSTRUMENT%%" : "false",
+#     "%%ARCH%%" : "amd64",
+#     "%%ARCMD%%" : "ar",
+#     "%%ASM%%" : "gcc -c -Wno-trigraphs",
+#     "%%ASM_CFI_SUPPORTED%%" : "true",
+#     "%%BYTECCLIBS%%" : "{BYTECCLIBS}".format(
+#         BYTECCLIBS=" ".join(BYTECCLIBS)
+#     ),
+#     "%%CC%%" : "gcc",
+#     "%%CCOMPTYPE%%" : "cc",
+#     "%%OUTPUTOBJ%%" : "-o ",
+#     "%%EXT_ASM%%" : ".s",
+#     "%%EXT_DLL%%" : ".so",
+#     "%%EXE%%" : "",
+#     "%%EXT_LIB%%" : ".a",
+#     "%%EXT_OBJ%%" : ".o",
+#     "%%FLAMBDA%%" : "false",
+#     "%%WITH_FLAMBDA_INVARIANTS%%" : "false",
+#     "%%WITH_CMM_INVARIANTS%%" : "false",
+#     "%%FLEXLINK_FLAGS%%" : "",
+#     "%%FLEXDLL_DIR%%" : "",
+#     "%%HOST%%" : "x86_64-apple-darwin20.6.0",
+#     "%%BINDIR%%" : "/usr/local/bin",
+#     "%%LIBDIR%%" : "/usr/local/lib/ocaml",
+#     "%%MKDLL%%" : "{MKDLL}".format(MKDLL=MKDLL),
+#     "%%MKEXE%%" : "{MKEXE}".format(
+#         MKEXE=" ".join(MKEXE)
+#     ),
+#     "%%FLEXLINK_LDFLAGS%%" : "",
+#     "%%FLEXLINK_DLL_LDFLAGS%%" : "",
+#     "%%MKMAINDLL%%" : "{MKMAINDLL}".format(
+#         MKMAINDLL = MKMAINDLL
+#     ),
+#     "%%MODEL%%" : "default",
+#     "%%NATIVECCLIBS%%" : "{NATIVECCLIBS} ".format(
+#         NATIVECCLIBS=" ".join(NATIVECCLIBS)
+#     ),
+#     "%%OCAMLC_CFLAGS%%" : "{OCAMLC_CFLAGS}  ".format(
+#         OCAMLC_CFLAGS=" ".join(OCAMLC_CFLAGS)
+#     ),
+#     "%%OCAMLC_CPPFLAGS%%" : "{OCAMLC_CPPFLAGS} ".format(
+#         OCAMLC_CPPFLAGS=" ".join(OCAMLC_CPPFLAGS)
+#     ),
+#     "%%OCAMLOPT_CFLAGS%%" : "{OCAMLC_CFLAGS} ".format(
+#         OCAMLC_CFLAGS=" ".join(OCAMLC_CFLAGS)
+#     ),
+#     "%%OCAMLOPT_CPPFLAGS%%" : "{OCAMLC_CPPFLAGS} ".format(
+#         OCAMLC_CPPFLAGS=" ".join(OCAMLC_CPPFLAGS)
+#     ),
+#     "%%PACKLD%%" : "ld -r -arch x86_64 -o {EMPTY}".format(EMPTY=EMPTY),
+#     "%%PROFINFO_WIDTH%%" : "0",
+#     "%%RANLIBCMD%%" : "{RANLIBCMD}".format(RANLIBCMD=RANLIBCMD),
+#     "%%RPATH%%" : "",
+#     "%%MKSHAREDLIBRPATH%%" : "",
+#     "%%FORCE_SAFE_STRING%%" : "true",
+#     "%%DEFAULT_SAFE_STRING%%" : "true",
+#     "%%WINDOWS_UNICODE%%" : "0",
+#     "%%NAKED_POINTERS%%" : "true",
+#     "%%SUPPORTS_SHARED_LIBRARIES%%" : "true",
+#     "%%SYSTEM%%" : "macosx",
+#     "%%SYSTHREAD_SUPPORT%%" : "true",
+#     "%%TARGET%%" : "x86_64-apple-darwin20.6.0",
+#     "%%WITH_FRAME_POINTERS%%" : "false",
+#     "%%WITH_PROFINFO%%" : "false",
+#     "%%FLAT_FLOAT_ARRAY%%" : "true",
+#     "%%FUNCTION_SECTIONS%%" : "false",
+#     "%%CC_HAS_DEBUG_PREFIX_MAP%%" : "true",
+#     "%%AS_HAS_DEBUG_PREFIX_MAP%%" : "false"
+# }
 
 def _write_config_impl(ctx):
     ctx.actions.expand_template(
