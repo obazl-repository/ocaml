@@ -18,12 +18,12 @@ build:dbgv --@rules_ocaml//cfg/verbose
 test:dbg --test_output=errors
 
 build --incompatible_enable_cc_toolchain_resolution
-build --incompatible_use_cc_configure_from_rules_cc
+# build --incompatible_use_cc_configure_from_rules_cc
 
+#build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@rules_ocaml//toolchain/type:std
 #build --toolchain_resolution_debug=@rules_ocaml//toolchain/type:profile
 #build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
-# build --toolchain_resolution_debug=.*
 
 # to eliminate warning
 # ld: warning: object file (bazel-out/darwin-fastbuild/bin/interop/ffi/case110/cclibs/liblibalpha.a(alpha.o)) was built for newer macOS version (12.3) than being linked (12.0)

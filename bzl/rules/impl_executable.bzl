@@ -236,6 +236,8 @@ def impl_executable(ctx):
         includes.append(dep.dirname)
         args.add(dep)
 
+    args.add_all(includes, before_each="-I", uniquify=True)
+
     ## 'main' dep must come last on cmd line
     if ctx.file.main:
         args.add(ctx.file.main)
@@ -297,10 +299,10 @@ def impl_executable(ctx):
       outputs = [out_exe],
       tools = [tool] + tool_args,  # [tc.ocamlopt],
       mnemonic = mnemonic,
-      progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
+      progress_message = "{mode} linking {rule}: {ws}//{pkg}:{tgt}".format(
           mode = mode,
           rule = ctx.attr._rule,
-          ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
+          ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
           pkg = ctx.label.package,
           tgt = ctx.label.name,
         )

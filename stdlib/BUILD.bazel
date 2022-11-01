@@ -16,7 +16,7 @@ load("//config:BUILD.bzl",
 
 package(default_visibility = ["//visibility:public"])
 
-exports_files(["expand_module_aliases.awk"])
+exports_files(["expand_module_aliases.awk", "weak.ml", "weak.mli"])
 
 # load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
 
@@ -60,6 +60,12 @@ LABEL_SIGOPTS = [
 # Atomic, FormatBasics:  ["-nopervasives"]
 #Format: ["-w", "+A", "-w", "-fragile-match"]
 
+# OCAMLRUN = boot/ocamlrun
+# COMPILER = ocamlc built in root dir (i.e. stage1?)
+# CAMLC=$(OCAMLRUN) $(COMPILER)
+# %.cmi: %.mli
+# 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
+
 # stdlib__%.cmo:
 # 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
 # 	         -o $@ -c $(filter %.ml, $^)
@@ -76,81 +82,81 @@ LABEL_SIGOPTS = [
 ## This library target just aggregates the resolver and submodules.
 ## They can be listed in any order.
 # bootstrap_library(
-bootstrap_archive(
-    name       = "stdlib",
-    # opts       = USE_PRIMS,
-    # data       = ["//runtime:primitives"],
-    primitives = PRIMITIVES,
-    manifest   = [
-        ":Stdlib", ## functions as the ns_resolver module
-        # ":Std_exit",
-        "CamlinternalFormat",
-        "CamlinternalFormatBasics",
-        "CamlinternalLazy",
-        "CamlinternalMod",
-        "CamlinternalOO",
-        "Stdlib.Arg",
-        "Stdlib.Array",
-        "Stdlib.ArrayLabels",
-        "Stdlib.Atomic",
-        "Stdlib.Bigarray",
-        "Stdlib.Bool",
-        "Stdlib.Buffer",
-        "Stdlib.Bytes",
-        "Stdlib.BytesLabels",
-        "Stdlib.Callback",
-        "Stdlib.Char",
-        "Stdlib.Complex",
-        "Stdlib.Condition",
-        "Stdlib.Digest",
-        "Stdlib.Domain",
-        "Stdlib.Effect",
-        "Stdlib.Either",
-        "Stdlib.Ephemeron",
-        "Stdlib.Filename",
-        "Stdlib.Float",
-        "Stdlib.Format",
-        "Stdlib.Fun",
-        "Stdlib.Gc",
-        "Stdlib.Hashtbl",
-        "Stdlib.In_channel",
-        "Stdlib.Int",
-        "Stdlib.Int32",
-        "Stdlib.Int64",
-        "Stdlib.Lazy",
-        "Stdlib.Lexing",
-        "Stdlib.List",
-        "Stdlib.ListLabels",
-        "Stdlib.Map",
-        "Stdlib.Marshal",
-        "Stdlib.MoreLabels",
-        "Stdlib.Mutex",
-        "Stdlib.Nativeint",
-        "Stdlib.Obj",
-        "Stdlib.Oo",
-        "Stdlib.Option",
-        "Stdlib.Out_channel",
-        "Stdlib.Parsing",
-        "Stdlib.Printexc",
-        "Stdlib.Printf",
-        "Stdlib.Queue",
-        "Stdlib.Random",
-        "Stdlib.Result",
-        "Stdlib.Scanf",
-        "Stdlib.Semaphore",
-        "Stdlib.Seq",
-        "Stdlib.Set",
-        "Stdlib.Stack",
-        "Stdlib.StdLabels",
-        "Stdlib.String",
-        "Stdlib.StringLabels",
-        "Stdlib.Sys",
-        "Stdlib.Uchar",
-        "Stdlib.Unit",
-        "Stdlib.Weak",
-    ],
-    # visibility = ["//visibility:public"],
-)
+# bootstrap_archive(
+#     name       = "stdlib",
+#     # opts       = USE_PRIMS,
+#     # data       = ["//runtime:primitives"],
+#     primitives = PRIMITIVES,
+#     manifest   = [
+#         ":Stdlib", ## functions as the ns_resolver module
+#         # ":Std_exit",
+#         "CamlinternalFormat",
+#         "CamlinternalFormatBasics",
+#         "CamlinternalLazy",
+#         "CamlinternalMod",
+#         "CamlinternalOO",
+#         "Stdlib.Arg",
+#         "Stdlib.Array",
+#         "Stdlib.ArrayLabels",
+#         "Stdlib.Atomic",
+#         "Stdlib.Bigarray",
+#         "Stdlib.Bool",
+#         "Stdlib.Buffer",
+#         "Stdlib.Bytes",
+#         "Stdlib.BytesLabels",
+#         "Stdlib.Callback",
+#         "Stdlib.Char",
+#         "Stdlib.Complex",
+#         "Stdlib.Condition",
+#         "Stdlib.Digest",
+#         "Stdlib.Domain",
+#         "Stdlib.Effect",
+#         "Stdlib.Either",
+#         "Stdlib.Ephemeron",
+#         "Stdlib.Filename",
+#         "Stdlib.Float",
+#         "Stdlib.Format",
+#         "Stdlib.Fun",
+#         "Stdlib.Gc",
+#         "Stdlib.Hashtbl",
+#         "Stdlib.In_channel",
+#         "Stdlib.Int",
+#         "Stdlib.Int32",
+#         "Stdlib.Int64",
+#         "Stdlib.Lazy",
+#         "Stdlib.Lexing",
+#         "Stdlib.List",
+#         "Stdlib.ListLabels",
+#         "Stdlib.Map",
+#         "Stdlib.Marshal",
+#         "Stdlib.MoreLabels",
+#         "Stdlib.Mutex",
+#         "Stdlib.Nativeint",
+#         "Stdlib.Obj",
+#         "Stdlib.Oo",
+#         "Stdlib.Option",
+#         "Stdlib.Out_channel",
+#         "Stdlib.Parsing",
+#         "Stdlib.Printexc",
+#         "Stdlib.Printf",
+#         "Stdlib.Queue",
+#         "Stdlib.Random",
+#         "Stdlib.Result",
+#         "Stdlib.Scanf",
+#         "Stdlib.Semaphore",
+#         "Stdlib.Seq",
+#         "Stdlib.Set",
+#         "Stdlib.Stack",
+#         "Stdlib.StdLabels",
+#         "Stdlib.String",
+#         "Stdlib.StringLabels",
+#         "Stdlib.Sys",
+#         "Stdlib.Uchar",
+#         "Stdlib.Unit",
+#         "Stdlib.Weak",
+#     ],
+#     # visibility = ["//visibility:public"],
+# )
 
 ##################################################################
 ##############  Main Resolver Module: Stdlib  ####################
@@ -392,7 +398,16 @@ bootstrap_module(
     name   = "CamlinternalOO",
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
-    opts = CAMLINTERNAL_OPTS + ["-open", "Stdlib"],# + ["-no-alias-deps"],
+    opts = CAMLINTERNAL_OPTS + [
+        "-open", "Stdlib",
+    ] + select({
+        # "//platforms/target:vm?": [],
+        # "//platforms/target:sys?": [
+        #     "-inline", "0",
+        #     "-afl-inst-ratio", "0"
+        # ],
+        "//conditions:default": []
+    }),
     primitives = PRIMITIVES,
     deps   = [
         # ":Stdlib",
@@ -424,6 +439,7 @@ bootstrap_signature(
 bootstrap_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
+    sig    = "Std_exit_cmi",
     opts = MODULE_OPTS,
     ## NB: no -use-prims
     data = DATA_PRIMS,
@@ -432,6 +448,19 @@ bootstrap_module(
         ## Does not depend on entire stdlib archive (//stdlib).
         ":Stdlib"
     ],
+    # visibility = ["//visibility:public"]
+)
+
+bootstrap_signature(
+    name = "Std_exit_cmi",
+    src  = "Std_exit.mli",
+    opts = CAMLINTERNAL_OPTS,
+    # primitives = PRIMITIVES,
+    deps   = [
+        # ":Stdlib",
+        # ":Stdlib.Obj"
+    ],
+    # data = ["//runtime:primitives"],
     # visibility = ["//visibility:public"]
 )
 
@@ -2304,6 +2333,11 @@ bootstrap_signature(
 ## FIXME: default uses sys install locn, e.g. /usr/local/bin/ocamlrun
 ## for dev, use path to internal dev ocamlrun instead
 
+# stdlib/Makefile:
+# $(HEADERPROGRAM)%$(O): \
+#   OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
+
+
 SYSPATHS_CMD = " ".join([
     "cat bazel-out/stable-status.txt | ",
     "grep \"STABLE_CAMLHEADER \" | ",
@@ -2340,15 +2374,15 @@ DEVPATHS_CMD = "\n".join([
     "cat bazel-out/stable-status.txt | ",
     "while read KEY VAL; do",
     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
-    "echo '#!'$$VAL/$(location //bzl/toolchain:ocamlrun) > $(location camlheader);\n",
-    "echo '#!'$$VAL/$(location //bzl/toolchain:ocamlrun)d > $(location camlheaderd);\n",
-    "echo '#!'$$VAL/$(location //bzl/toolchain:ocamlrun)i > $(location camlheaderi);\n",
+    "echo '#!'$$VAL/$(execpath //bzl/toolchain:ocamlrun) > $(location camlheader);\n",
+    "echo '#!'$$VAL/$(execpath //bzl/toolchain:ocamlrun)d > $(location camlheaderd);\n",
+    "echo '#!'$$VAL/$(execpath //bzl/toolchain:ocamlrun)i > $(location camlheaderi);\n",
     "fi",
     "done",
 
-    "echo '#!bazel-bin/runtime/ocamlrun' > $(location target_camlheader);",
-    "echo '#!bazel-bin/runtime/ocamlrund' > $(location target_camlheaderd);",
-    "echo '#!bazel-bin/runtime/ocamlruni' > $(location target_camlheaderi);",
+    "echo '#!$(execpath //boot:ocamlrun)' > $(location target_camlheader);",
+    "echo '#!$(execpath //boot:ocamlrun)d' > $(location target_camlheaderd);",
+    "echo '#!$(execpath //boot:ocamlrun)i' > $(location target_camlheaderi);",
 ])
 
 genrule(
@@ -2362,7 +2396,14 @@ genrule(
         "target_camlheaderd",
         "target_camlheaderi"
     ],
-    srcs = ["//runtime:ocamlrun", "//bzl/toolchain:ocamlrun"],
+    # srcs = [
+    #     "//boot:ocamlrun",
+    #     "//bzl/toolchain:ocamlrun"
+    # ],
+    srcs = [
+        "//boot:ocamlrun",
+        "//bzl/toolchain:ocamlrun"
+    ],
     cmd = DEVPATHS_CMD,
     stamp = True,
     visibility = ["//visibility:public"]

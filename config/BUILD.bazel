@@ -4,8 +4,25 @@ load("@bazel_skylib//rules:common_settings.bzl",
 package(default_visibility = ["//visibility:public"])
 
 bool_flag( name = "debug", build_setting_default = False)
+config_setting(name = "debug?", flag_values = {":debug": "True"})
+
+bool_flag( name = "instrumented", build_setting_default = False)
+config_setting(name = "instrumented?", flag_values = {":instrumented": "True"})
+
+config_setting(
+    name = "macos_fastbuild?",
+    values = {"compilation_mode": "fastbuild"},
+    constraint_values = [
+        "@platforms//os:macos",
+    ]
+)
 
 bool_flag( name = "verbose", build_setting_default = False)
+
+bool_flag( name = "bootstrapping", build_setting_default = True)
+config_setting(name = "bootstrapping?",
+               flag_values = {":bootstrapping": "True"})
+
 
 ################################################################
 ##FIXME: what is the optimal way to select for flambda?
@@ -20,21 +37,6 @@ config_setting(
 )
 
 ################################################################
-bool_flag( name = "instrument", build_setting_default = False)
-
-config_setting(
-    name = "instrumented",
-    flag_values = {":instrument": "True"}
-    # constraint_values = [
-    #     "@platforms//os:linux",
-    # ]
-)
-
-config_setting(
-    name = "debug_enabled",
-    flag_values = {":debug": "True"}
-)
-
 config_setting(
     name = "pic",
     constraint_values = [

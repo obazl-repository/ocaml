@@ -1,6 +1,6 @@
-# generated file - DO NOT EDIT
-
 load("//toolchain:BUILD.bzl", "toolchain_selector")
+
+package(default_visibility=["//visibility:public"])
 
 exports_files(glob(["*.bazel"]))
 
@@ -8,7 +8,6 @@ exports_files(glob(["*.bazel"]))
 toolchain_selector(
     name           = "bootstrap",
     toolchain = "//toolchain/adapters:bootstrap",
-    visibility     = ["//visibility:public"],
 )
 
 ##########
@@ -24,8 +23,7 @@ toolchain_selector(
         # "@ocaml//platforms:vm?"
         "@platforms//os:macos",
     ],
-    toolchain_constraints = ["//config/runtime:standard"],
-    visibility     = ["//visibility:public"],
+    toolchain_constraints = ["//runtime:standard?"],
 )
 
 ##########
@@ -40,8 +38,7 @@ toolchain_selector(
         # "@ocaml//platforms:sys?"
         "@platforms//os:macos"
     ],
-    toolchain_constraints = ["//config/runtime:debug"],
-    visibility     = ["//visibility:public"],
+    toolchain_constraints = ["//runtime:debug?"],
 )
 
 ##########
@@ -56,6 +53,5 @@ toolchain_selector(
         # "@ocaml//platforms:vm?"
         "@platforms//os:macos",
     ],
-    toolchain_constraints = ["//config/runtime:instrumented"],
-    visibility              = ["//visibility:public"],
+    toolchain_constraints = ["//runtime:instrumented?"],
 )

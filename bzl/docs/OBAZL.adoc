@@ -35,7 +35,7 @@ quasi-namespacing; OBazl does not need it. So e.g. the target to build
 
 === make coldstart
 
-Builds `runtime/ocamlrun`(Bazel target: `//runtime:ocamlrun`) and stdlib (Bazel: `//stdlib`)
+Builds `runtime/ocamlrun`(Bazel target: `//boot:ocamlrun`) and stdlib (Bazel: `//stdlib`)
 
 .root Makefile
 ```
@@ -191,7 +191,7 @@ build command is `bazel build toplevel:ocaml`
 * `ld.conf`- not needed for Bazel bootstrapping, only for deployment? STUBLIBDIR (ocaml/stublibs) to contain `dll*.so` files from `otherlibs`
 * `make -C runtime all` builds `ocamlrun`, `libcamlrun`, `sak`:
   ** `//runtime:camlrun` (`cc_library`)
-  ** `//runtime:ocamlrun` (`cc_binary`)
+  ** `//boot:ocamlrun` (`cc_binary`)
   ** `//runtime:sak.exe` (`cc_binary`)
   ** `//runtime:primitives_dat` (`genrule`) => `primitives`
 * `make -C stdlib ... all` => `//stdlib` (`bootstrap_archive`)
@@ -258,6 +258,32 @@ Uses a custom rule demonstrating use of Bazel's built-in templating support.
 Data is hard-coded.
 
 ===  utils/domainstate.ml
+
+*UPDATE* this logic has change in 5.1.x.  The `domainstate.ml.c` file includes:
+
+```
+#define CAML_CONFIG_H_NO_TYPEDEFS
+#include "config.h"
+let stack_ctx_words = Stack_ctx_words
+```
+
+which means a simple sed won't work, due to inclusion of config.h.
+
+The makefile is simple:
+
+```
+utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
+	$(CPP) -I runtime/caml $< > $@
+
+utils/domainstate.mli: utils/domainstate.mli.c runtime/caml/domain_state.tbl
+	$(CPP) -I runtime/caml $< > $@
+```
+
+CPP is set by ./configure.  On macos, 'clang', apparently.  'cpp' doesn't work.
+
+==== 4.14.0
+
+This is outdated, won't work for 5.1.x.
 
 The Makefile uses CPP to generate `utils/domainstate.ml` from
 `utils/domainstate.ml.c` and `runtime/caml/domain_state.tbl` Nutty.

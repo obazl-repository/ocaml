@@ -1,0 +1,17 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "string_flag", "string_setting")
+
+string_flag(
+    name = "toolchain",
+    values = ["sys", "zig"],
+    build_setting_default = "sys",
+    visibility = ["//visibility:public"]
+)
+
+config_setting(name = "macos_zig?",
+               flag_values = {":toolchain": "zig"},
+               constraint_values = ["@platforms//os:macos"],
+               visibility = ["//visibility:public"])
+
+config_setting(name = "sys?", flag_values = {":toolchain": "sys"},
+               visibility = ["//visibility:public"])

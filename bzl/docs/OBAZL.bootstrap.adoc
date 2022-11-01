@@ -1,5 +1,224 @@
 = notes on bootstrapping
 
+== general considerations
+
+=== entry point
+
+ocamlrun `main`: For unicode support Windows uses a windows-specific
+ `main` function, `wmain` (i.e. wide main). OCaml uses a macro,
+ `main_os`, for the main entry point; for `ocamlrun` this is in
+ `runtime/main.c`. The macro is defined in `runtime/caml/misc.h`:
+
+```
+#ifdef _WIN32
+
+#ifdef CAML_INTERNALS
+...
+#define main_os wmain
+#endif
+...
+#else /* _WIN32 */
+
+#ifdef CAML_INTERNALS
+...
+#define main_os main
+#endif
+
+```
+
+The entry point `main_os` (in `runtime/main.c`) then calls
+`caml_main`, which is in `runtime/startup_byt.c` and
+`runtime/startup_nat.c`.
+
+=== Order of Building
+
+Ignoring the FLEXDLL stuff, which is for windows
+
+Comments in root makefile say Order of Building is:
+
+1. runtime/ocamlrun
+2. stdlib (using runtime built in step 1)
+3. copy
+  a. runtime/ocamlrun to boot/ocamlrun
+  b. stdlib to boot/
+
+Make targets in dep order:
+
+Bootstrap targets: world and world.opt
+
+world: coldstart
+	$(MAKE) all
+
+COLDSTART:
+	$(MAKE) runtime-all
+	$(MAKE) -C stdlib \
+	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
+	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+	rm -f boot/ocamlrun$(EXE)
+	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+	cd boot; rm -f $(LIBFILES)
+	cd stdlib; cp $(LIBFILES) ../boot
+	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
+
+runtime-all: builds rt lib variants (libcamlrunX), vm runtime variants (ocamlrunX) and SAK
+
+I.e. vm coldstart:
+* builds all vm runtime variants and all stdlib targets (using newly build ocamlrun and boot/ocamlc)
+* deletes prior `boot/ocamlrun`
+* copies runtime/ocamlrun to boot/ocamlrun
+* copies stdlib to `boot/`
+* links vm runtime lib variant into `boot/` (to go with the binary ocamlrun)
+
+ALL
+* deps:
+  ** COREALL
+* actions:
+  ** make ocaml, otherlibraries, othertools
+
+otherlibraries: ocamltools
+	$(MAKE) -C otherlibs all
+
+oherlibs:  ???
+
+COREALL
+* deps:
+  ** RUNTIME
+* actions:
+  ** make ocamlc, ocamllex, ocamltools, library
+
+RUNTIME:
+* deps:
+  ** stdlib/libcamlrun.$(A)
+
+stdlib/libcamlrun.$(A): runtime-all
+	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
+
+NB: runtime-all was built by target coldstart
+
+ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
+              compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+ocamllex: ocamlyacc
+ocamltools: ocamlc ocamllex compilerlibs/ocamlmiddleend.cma
+	$(MAKE) -C tools all
+
+library: ocamlc        ## compare tgt library-cross:
+	$(MAKE) -C stdlib all
+
+NB: ocamlc is built before stdlib
+
+Giving us the following build order:
+
+
+1. stdlib/libcamlrun.a
+2. ocamlc | ocamllex>ocamlyacc | ocamltools | library (=stdlib)
+3. ocaml | otherlibraries | othertools
+
+ocamlopt?
+
+== OBazl
+
+=== Platforms
+
+==== VM (bytecode)
+
+The VM is composed of the bytecode interpreter and a runtime
+implemented in C. OCaml terminology usually conflates vm and runtime:
+`ocamlrun` is often referred to as the runtime. But conceptually
+the runtime is only a component of the VM, which also contains the
+interpreter.
+
+In practice the interpreter is not compiled separately; rather it is
+compiled and linked into the "runtime libraries", along with the
+runtime proper (primitives).
+
+Here we use the term "vm" to refer to the executables the launch the
+virtual machine (`ocamlrun`, `ocamlrund`, etc.) and "vm runtime
+library" (or just "vm runtime") to refer to `libocamlrun.a` etc. We
+will not use the term "runtime" to refer to the VM executables
+(`ocamlrun`, `ocamlrund`, `ocamlruni`).
+
+==== primitives and runtimes
+
+Primitives are functional units required to support the language, that
+are implemented in C.
+
+A runtime is a library of primitives.
+
+Many of the primitives are shared by the VM and native runtimes; in
+both cases the common primitives are linked into the runtime libraries
+(`libcamlrun.a`, `libasmrun.a`, etc.).
+
+Furthermore each has an additional collection of platform-specific
+primitive implementations. For example, `startup_byt.c` v.
+`startup_nat.c`.
+
+In addition each runtime library contains a small number of C files
+specific to the platform; for example, the vm runtimes include
+`fix_code.c`; the native runtimes include `clambda_checks.c`.
+
+The vm runtimes also include `interp.c`: the bytecode interpreter.
+
+==== runtime
+
+Both the vm and native runtime libraries contain implementation code
+for all the primitives. For the native runtime that is enough, but for
+the runtime needs an intermediary to integrate those implementations
+into the bytecode system.
+
+The runtime is composed of a collection of adapters that import
+primitives implemented in C into the VM.
+
+The primitives are `alloc`, `array`, etc.; the complete list is in
+`runtimes/gen_primitives.sh`. For each primitive there is one C source
+file, e.g. `array.c`.
+
+The build generates a file `prims.c` containing the adapter code
+needed to mediate between the VM and the native implementations.
+
+The vms are composed by linking a vm runtime library (e.g.
+`libocamlrun.a`) and `prims.o`
+
+
+==== Sys (native)
+
+
+
+=== Toolchains
+
+=== Toolchain adapter fields
+
+Bazel rule: `bootstrap_toolchain_adapter`
+
+* compiler:
+  ** precompiled (comes with distribution)
+     *** bootstrap compiler: `boot/ocamlc`, vm>vm
+  ** built:
+    *** ocamlc.byte:  vm>vm
+    *** ocamlc.opt:  sys>vm
+    *** ocamlopt.byte: vm>sys
+    *** ocamlopt.opt:  sys>sys
+
+* runtime: bytecode or native, std, debug, or instrumented, static or shared
+  ** bytecode
+    *** `libcamlrun.a` - std
+    *** `libcamlrund.a` - debug
+    *** `libcamlruni.a` - instrumented
+    *** `libcamlrun_shared.a` - ?
+    *** `libcamlrun_pic.a` - for unix with dlopen support
+  ** native
+    *** `libasmrun.a` - std
+    *** `libasmrund.a` - debug
+    *** `libasmruni.a` - instrumented
+
+* vm:
+  ** `ocamlrun` - interpreter plus std runtime (`libcamlrun.a`)
+  ** `ocamlrund` - interpreter plus debug runtime (`libcamlrund.a`)
+  ** `ocamlruni` - interpreter plus intstrumented runtime (`libcamlruni.a`)
+
+
+
+
+== Legacy
 
 coldstart target:
 
@@ -14,3 +233,95 @@ boot/ocamlrun is just runtime/ocamlrun copied to boot dir
 where OCAMLRUN == runtime/ocamlrun and COMPILER = ./ocamlc (?)
 
 
+Default make target is 'world'.  //Makefile:
+
+world: coldstart
+	$(MAKE) all
+...
+
+# Recompile the system using the bootstrap compiler
+
+all: coreall
+	$(MAKE) ocaml
+	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
+         $(WITH_OCAMLTEST)
+	$(MAKE) othertools
+ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
+	$(MAKE) manpages
+endif
+
+coreall: runtime
+	$(MAKE) ocamlc
+	$(MAKE) ocamllex ocamltools library
+
+runtime: stdlib/libcamlrun.$(A)
+
+make targets coldstart, bootstrap, coreboot
+
+== coldstart
+
+## Makefile:
+
+# Start up the system from the distribution compiler
+# The process depends on whether FlexDLL is also being bootstrapped.
+# Normal procedure:
+#   - Build the runtime
+#   - Build the standard library using runtime/ocamlrun
+# FlexDLL procedure:
+#   - Build ocamlruns
+#   - Build the standard library using boot/ocamlruns
+#   - Build flexlink and FlexDLL support objects
+#   - Build the runtime
+# runtime/ocamlrun is then installed to boot/ocamlrun and the stdlib artefacts
+# are copied to boot/
+
+In more detail:
+
+1. build runtime/ocamlrun - this is a cc_binary executable target
+2. use runtime/ocamlrun to build stdlib
+
+Flexlink and FlexDLL are windows-only?
+
+In short, "coldstart" just means building the C kernel (vm/runtime)
+and standard library using the precompile bootstrap compiler.
+
+== promotion
+
+Initially, //boot contains precompiled `ocamlc` and `ocamllex`, plus a
+`menhir` subdirectory containing sources `menhirLib.ml[i]` and
+`parser.ml[i]`.
+
+
+The standard makefiles "promote" - i.e. copy - outputs to //boot,
+overwriting whatever was there.
+
+OBazl does things differently. It has no concept of "promotion" and it
+never overwrites files. Instead it divides the build process into
+phases, each with its own directories.
+
+Makefile.common:
+
+```
+# Use boot/ocamlc.opt if available
+TEST_BOOT_OCAMLC_OPT = $(shell \
+  test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
+  echo $$?)
+
+NOTE: shell test compare opt `-nt` == newer than
+
+ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
+  BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
+else
+  BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
+endif
+```
+
+OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
+NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
+
+
+Makefile:
+
+```
+CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
+```

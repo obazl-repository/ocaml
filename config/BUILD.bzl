@@ -42,12 +42,12 @@ ROOTDIR = "/Users/gar/ocaml/ocaml" ## FIXME
 
 ################  BOOTSTRAP TOOLS  ################
 # BOOT_OCAMLC is defined in //toolchain/type:bootstrap as tc.ocamlc => //boot:ocamlc
-# OCAMLRUN is defined in //toolchain/type:bootstrap as tc.ocamlrun => //runtime:ocamlrun
+# OCAMLRUN is defined in //toolchain/type:bootstrap as tc.ocamlrun => //boot:ocamlrun
 # OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 # NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 
 BOOT_OCAMLRUN = "//boot:ocamlrun"
-RUNTIME_OCAMLRUN = "//runtime:ocamlrun"
+RUNTIME_OCAMLRUN = "//boot:ocamlrun"
 
 
 # Use boot/ocamlc.opt if available
@@ -103,6 +103,7 @@ EMPTY = ""
 
 #### CPPFLAGS & DEFINES ####
 CPPFLAGS = []
+
 ## Makefile.config
 #OC_CPPFLAGS= -D_FILE_OFFSET_BITS=64 -DCAML_NAME_SPACE
 ## ocamltest/Makefile:
@@ -157,71 +158,123 @@ CPPFLAGS = []
 # %.n.$(O): OC_CPPFLAGS += $(NATIVE_CPPFLAGS)
 # %.n.$(D): OC_CPPFLAGS += $(NATIVE_CPPFLAGS)
 
-OC_CPPFLAGS = []
-
-OC_CPPDEFINES = [
-    "_FILE_OFFSET_BITS=64", "CAML_NAME_SPACE"
-## ] # + select({
- #    "//config/host:linux": [],
- #    "//config/host:macos": [],
- #    # "//config/host:win32": ["CAMLDLLIMPORT"]
- #    "//conditions:default": []
-] + select({
-    #FIXME: debug controlled by build target, not flag?
-        "//config:debug_enabled": ["DEBUG"], # runtime/Makefile
-        "//conditions:default": []
-}) + select({
-    #FIXME: instrumented controlled by build target or flag?
-        "//config:instrumented": ["CAML_INSTR"],
-        "//conditions:default": []
-# }) + select({
-#         "//config:pic": SHAREDLIB_DEFINES,
-#         "//conditions:default": []
-    # }) + select({
-    #     "//config/mode:native": OC_NATIVE_CPPFLAGS,
-    #     "//conditions:default": []
-})
-
-OC_DEBUG_CPPDEFINES = ["DEBUG"]
-OC_INSTR_CPPDEFINES = ["CAML_INSTR"]
-
-## Makefile.config
-OCAMLC_CPPFLAGS = ["-D_FILE_OFFSET_BITS=64"] #  + CPPFLAGS
-OCAMLC_CPPDEFINES = ["_FILE_OFFSET_BITS=64"]
-
-# OC_DEBUG_CPPFLAGS=-DDEBUG
-OC_DEBUG_CPPFLAGS = ["DEBUG"] # use select on OC_CPPFLAGS
-# OC_INSTR_CPPFLAGS=-DCAML_INSTR
-OC_INSTR_CPPFLAGS = ["CAML_INSTR"] # use select on OC_CPPFLAGS
-
-OC_NATIVE_CPPFLAGS = []
-OC_NATIVE_CPPDEFINES = [
-    "NATIVE_CODE", "TARGET_"+ ARCH, "SYS_" + SYSTEM
-] + select({
-    "//config/host:linux": ["MODEL_" + MODEL],
-    "//config/host:macos": ["MODEL_" + MODEL],
+OC_CPPFLAGS = select({
+    "//config:macos_fastbuild?": ["-UDEBUG"],
     "//conditions:default": []
 })
 
+# OC_CPPDEFINES = [
+CC_DEFINES = [
+] + select({
+    # "//config/host/cpu:x86_64": ["_FILE_OFFSET_BITS=64"],
+    "//conditions:default": ["_FILE_OFFSET_BITS=64"],
+}) + select({
+    ## "CAML_NAME_SPACE",
+    ## default as of 5.0 - see runtime/caml/config.h
+    ## previously was used to control compatibility macros
+    "//conditions:default": []
+# }) + select({
+#     ## CAMLDLLIMPORT - in runtime_CPPFLAGS
+#     ## always used for tgt //boot:ocamlrun?
+#     #    "//config/host:linux": [],
+#     #    "//config/host:macos?": [],
+#     #    # "//config/host:win32": ["CAMLDLLIMPORT"]
+#     "//conditions:default": []
+# }) + select({
+#     ## IN_CAML_RUNTIME - in runtime_CPPFLAGS
+#     ## always used for tgt //boot:ocamlrun?
+#     #    "//config/host:linux": [],
+#     #    "//config/host:macos?": [],
+#     #    # "//config/host:win32": ["CAMLDLLIMPORT"]
+#     "//conditions:default": []
+}) + select({
+    "//config/compilation_mode:dbg?": ["DEBUG"],
+    "//conditions:default": []
+}) + select({
+    "//config:instrumented?": ["CAML_INSTR"],
+    "//conditions:default": []
+}) + select({
+    ## BUILDING_LIBCAMLRUNS - windows flexdll only?
+    # "//config:non_shared": "BUILDING_LIBCAMLRUNS",
+    "//conditions:default": []
+}) + select({
+#         "//config:pic": SHAREDLIB_DEFINES,
+        "//conditions:default": []
+}) + select({
+    #     "//config/mode:native": OC_NATIVE_CPPFLAGS,
+        "//conditions:default": []
+})
+
+## Native defines to be passed when targeting native platform, in
+## addition to CC_DEFINES.
+## FIXME: these can be controlled by selecting on target platform, e.g.
+ # select({
+ #     "//platform/target:vm": []
+ #     "//conditions:default": [
+ #         "NATIVE_CODE", "TARGET_"+ ARCH,
+ #         "SYS_" + SYSTEM, "MODEL_" + MODEL
+ #     ]
+ # })
+CC_NATIVE_DEFINES = [
+    "NATIVE_CODE", "TARGET_"+ ARCH, "SYS_" + SYSTEM
+] + select({
+    "//config/host:linux": ["MODEL_" + MODEL],
+    "//config/host:macos?": ["MODEL_" + MODEL],
+    "//conditions:default": []
+})
+
+
+# OC_DEBUG_CPPDEFINES = ["DEBUG"] ##FIXME: not needed
+# OC_INSTR_CPPDEFINES = ["CAML_INSTR"] ##FIXME: not needed
+
+## Makefile.config
+# OCAMLC_CPPFLAGS = ["-D_FILE_OFFSET_BITS=64"] #  + CPPFLAGS
+OCAMLC_CPPFLAGS = []
+# OCAMLC_CPPDEFINES = ["_FILE_OFFSET_BITS=64"]
+OCAMLC_CPPDEFINES = []
+
+# OC_DEBUG_CPPFLAGS=-DDEBUG
+# OC_DEBUG_CPPFLAGS = ["DEBUG"] # use select on OC_CPPFLAGS
+# # OC_INSTR_CPPFLAGS=-DCAML_INSTR
+# OC_INSTR_CPPFLAGS = ["CAML_INSTR"] # use select on OC_CPPFLAGS
+
+# OC_NATIVE_CPPFLAGS = []
+# OC_NATIVE_CPPDEFINES = [
+#     "NATIVE_CODE", "TARGET_"+ ARCH, "SYS_" + SYSTEM
+# ] + select({
+#     "//config/host:linux": ["MODEL_" + MODEL],
+#     "//config/host:macos?": ["MODEL_" + MODEL],
+#     "//conditions:default": []
+# })
+
 #### CFLAGS & DEFINES ####
+## different toolchains do things differently. the std sys clang
+## toolchain sets -g for debug, and -g0, -O3 for opt. The zig
+## toolchain does neither.
+## TODO: configure for both
 CFLAGS = []
 OC_CFLAGS = [
-    "-O2", "-fno-strict-aliasing",
+    ## "-O2",  ## only if compilation_mode == opt
+    "-fno-strict-aliasing",
     "-fwrapv", "-pthread",
     "-Wall", "-Wdeclaration-after-statement", "-Werror",
     "-fno-common"
 ]
 
 OCAMLC_CFLAGS = [
-    "-O2", "-fno-strict-aliasing", "-fwrapv", "-pthread"
+    ## "-O2",  ## only if compilation_mode == opt
+    "-fno-strict-aliasing", "-fwrapv", "-pthread"
 ]
 
-#### LDFLAGS ####
-LDFLAGS = ["-Wl,-no_compact_unwind"]
+##################
 # LDFLAGS = select({
-#     "//config/host:macos": ["-Wl,-no_compact_unwind"],
+#     ## zig: avoid warning: unsupported linker arg: -no_compact_unwind
+#     ## (zig uses LLD on macos, not ld)
+#     "//config/toolchain:macos_zig?": [],
+#     "//config/host:macos?":  ["-Wl,-no_compact_unwind"],
 #     "//conditions:default": []
 # })
+LDFLAGS = ["-Wl,-no_compact_unwind"]
 
 OC_LDFLAGS = []
 
@@ -231,7 +284,7 @@ NATIVECCLIBS = ["-lm"]
 
 ## Makefile.config
 # BYTECCLIBS used to build runtime/ocamlrun
-BYTECCLIBS = ["-lm", "-lpthread"]
+BYTECCLIBS = [] # ["-lm", "-lpthread"]
 
 ################################################################
 ################  OTHER TOOLS ################

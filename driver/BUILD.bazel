@@ -12,7 +12,7 @@ load("//config:BUILD.bzl",
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS    = ROOT_MODULE_OPTS
 
-STDLIB = ["//stdlib"]
+STDLIB = ["//boot:stdlib"]
 
 bootstrap_library(
     name = "driver",
@@ -252,7 +252,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Format",
     ],
-    visibility = ["//compilers:__subpackages__"]
+    visibility = ["//ocaml/bin:__pkg__"] # the new compiler
 )
 
 bootstrap_module(

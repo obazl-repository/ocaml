@@ -8,7 +8,7 @@ load("//bzl:rules.bzl",
 ## //toplevel:ocamltoplevel? More felicitous.
 
 ## The exception is ocamlcommon, which depends on multiple packages,
-## and mybeocamloptcomp.
+## and maybe ocamloptcomp.
 
 ## libraries in this pkg defined in compilerlibs/Makefile.compilerlibs
 ## ocamlcommon.[cma,cmxa]
@@ -37,6 +37,7 @@ bootstrap_archive(
         "//boot:__pkg__",
         "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
+        "//ocaml/bin:__pkg__",  # the new compiler
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",

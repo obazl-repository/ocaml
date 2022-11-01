@@ -42,7 +42,7 @@ MODULE_OPTS = ROOT_MODULE_OPTS
 
 SIG_OPTS = ROOT_SIG_OPTS
 
-STDLIB = ["//stdlib", "//stdlib:Std_exit"]
+STDLIB = ["//boot:stdlib", "//stdlib:Std_exit"]
 
 ################################################################
 ## expunge utility, defined in root Makefile:
@@ -345,14 +345,48 @@ bootstrap_module(
     ]
 )
 
-write_config(
-    name     = "config_ml",
-    output   = "config.ml",
-    template = "config.mlp",
-    data     = CONFIG_MAP,
-    visibility = [
-        "//otherlibs/dynlink:__pkg__",
-    ]
+## //Makefile
+# utils/config.ml: \
+#   utils/config_$(if $(filter true,$(IN_COREBOOT_CYCLE)),boot,main).ml
+# 	cp $< $@
+genrule(
+    outs   = ["config.ml"],
+    name   = "config_ml__",
+    srcs   = select({
+        "//config:bootstrapping?": [":config_boot.ml"],
+        "//conditions:default": [":config_main.ml"]
+    }),
+    cmd    = " ".join([
+        "cp $(SRCS) $@"
+    ])
+)
+
+# utils/config_boot.ml: utils/config.fixed.ml utils/config.common.ml
+# 	cat $^ > $@
+genrule(
+    outs   = ["config_boot.ml"],
+    name   = "config_boot_ml",
+    srcs   = [
+        ":config.fixed.ml",
+        ":config.common.ml"
+    ],
+    cmd    = " ".join([
+        "cat $(SRCS) > $@"
+    ])
+)
+
+# utils/config_main.ml: utils/config.generated.ml utils/config.common.ml
+# 	cat $^ > $@
+genrule(
+    outs   = ["config_main.ml"],
+    name   = "config_main_ml",
+    srcs   = [
+        ":config.generated.ml",
+        ":config.common.ml"
+    ],
+    cmd    = " ".join([
+        "cat $(SRCS) > $@"
+    ])
 )
 
 bootstrap_signature(
@@ -478,32 +512,17 @@ bootstrap_module(
 genrule(
     name = "domainstate_ml",
     outs = ["domainstate.ml"],
-    srcs = ["//runtime/caml:domain_state.tbl"],
-    cmd  = "\n".join([
-
-        ## FIXME: next to last entry 'checking_pointer_pc is conditional
-
-        "echo \"type t =\" > domain_state.ml.tmp;",
-        "sed -n -e 's/DOMAIN_STATE[^,]*, *\\([^)]*\\)).*/| Domain_\\1/p' $(location //runtime/caml:domain_state.tbl) >> domain_state.ml.tmp;",
-        "echo >> domain_state.ml.tmp",
-
-        "echo \"let idx_of_field =\" >> domain_state.ml.tmp;",
-        "echo \"  let curr = 0 in\" >> domain_state.ml.tmp;",
-        "sed -n -e 's/DOMAIN_STATE[^,]*, *\\([^)]*\\)).*/" +
-        "let idx__\\1 = curr in let curr = curr + 1 in/p' $(location //runtime/caml:domain_state.tbl) >> domain_state.ml.tmp;",
-        "echo >> domain_state.ml.tmp;",
-
-        "echo \"let _ = curr in\" >> domain_state.ml.tmp;",
-        "echo \"function\" >> domain_state.ml.tmp;",
-
-        "sed -n -e 's/DOMAIN_STATE[^,]*, *\\([^)]*\\)).*/" +
-        "| Domain_\\1 -> idx__\\1/p' $(location //runtime/caml:domain_state.tbl) >> domain_state.ml.tmp;",
-
-        # if NAKED_POINTERS_CHECKER config option set && !defined(_WIN32)
-        # "cp domain_state.ml.tmp $@;",
-        # else remove
-        "sed -n -e '/checking_pointer_pc/!p' domain_state.ml.tmp > $@;"
-        # "rm domain_state.ml.tmp"
+    srcs = [
+        ":domainstate.ml.c",
+        "//runtime/caml:config.h",
+        "//runtime/caml:m.h",
+        "//runtime/caml:s.h",
+        "//runtime/caml:domain_state.tbl"
+    ],
+    cmd = " ".join([
+        "HDRS=`dirname $(location //runtime/caml:config.h)`",
+        "&&",
+        "clang -E -I $$HDRS $(location :domainstate.ml.c) > $@"
     ])
 )
 
@@ -519,24 +538,25 @@ bootstrap_signature(
 genrule(
     name = "domainstate_mli",
     outs = ["domainstate.mli"],
-    srcs = ["//runtime/caml:domain_state.tbl"],
-    cmd  = "\n".join([
-
-        ## FIXME: next to last entry 'checking_pointer_pc is conditional
-
-        "echo \"type t =\" > domain_state.mli.tmp;",
-        "sed -n -e 's/DOMAIN_STATE[^,]*, *\\([^)]*\\)).*/" +
-        "| Domain_\\1/p' $(location //runtime/caml:domain_state.tbl) >> domain_state.mli.tmp;",
-        "echo >> domain_state.mli.tmp",
-
-        "echo \"val idx_of_field : t -> int\" >> domain_state.mli.tmp;",
-
-        # if NAKED_POINTERS_CHECKER config option set && !defined(_WIN32)
-        ## "mv domain_state.tmp $@;"
-        # else remove
-        "sed -n -e '/checking_pointer_pc/!p' domain_state.mli.tmp >> $@;"
+    srcs = [
+        ":domainstate.mli.c",
+        "//runtime/caml:config.h",
+        "//runtime/caml:m.h",
+        "//runtime/caml:s.h",
+        "//runtime/caml:domain_state.tbl"
+    ],
+    cmd = " ".join([
+        "HDRS=`dirname $(location //runtime/caml:config.h)`",
+        "&&",
+        "clang -E -I $$HDRS $(location :domainstate.mli.c) > $@"
     ])
 )
+
+## //Makefile
+# utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
+# 	$(CPP) -I runtime/caml $< > $@
+# utils/domainstate.mli: utils/domainstate.mli.c runtime/caml/domain_state.tbl
+# 	$(CPP) -I runtime/caml $< > $@
 
 
 bootstrap_module(

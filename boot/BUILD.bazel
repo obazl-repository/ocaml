@@ -1,9 +1,28 @@
+load("//bzl:rules.bzl",
+     "bootstrap_archive",
+     # "bootstrap_library",
+     "bootstrap_module",
+     # # "bootstrap_preprocess",
+     "bootstrap_signature"
+     )
+
+load("//config:BUILD.bzl",
+     "ARCH", "MODEL", "SYSTEM",
+     "HOST", "ROOTDIR", "LIBDIR",
+     # flags
+     "OC_CFLAGS", "CFLAGS",
+     "OC_CPPFLAGS", "CPPFLAGS",
+     "OC_LDFLAGS", "LDFLAGS",
+     # defines - replace by CC_DEFINES with selects
+     # "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
+     # "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+     "CC_DEFINES", "CC_NATIVE_DEFINES",
+     # other
+     "OUTPUTEXE", "MKEXE_FLAGS",
+     )
+
 exports_files(["ocamlc", "ocamllex"])
 
-# alias(
-#     name = "boot.ocamlc",
-#     actual = "ocamlc"
-# )
 
 ## The makefiles copy stuff into boot and make it accessible to build
 ## targets by passing '-I boot'. OBazl does not (need to) do that.
@@ -11,4 +30,207 @@ exports_files(["ocamlc", "ocamllex"])
 ## resources by label, so targets can depend on '//boot:stdlib'. NB:
 ## the only difference between //stdlib and //boot:stdlib is that the
 ## latter includes //stdlib:Std_exit and //stdlib:camlheader.
+
+# target: runtime
+## initial build of the runtime, using the bootstrap compiler. the
+## legacy build system builds runtime/ocamlrun, then copies it to
+## boot/ocamlrun, so that the boot compiler and the runtime needed to
+## interpret the code it admits are in the same place.
+
+## under bazel we can build boot/ocamlrun etc. directly.
+
+################################################################
+cc_binary(
+    name = "ocamlrun",
+    srcs = [
+        "//runtime:prims.c",
+    ] + select({
+        "//runtime:instrumented?": ["instrtrace.c"],
+        "//conditions:default": []
+    }),
+    copts = ["-I$(GENDIR)/runtime"] # build_config.h
+    + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+    defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
+    linkopts = [
+        "-lm", "-lpthread",
+    ] + MKEXE_FLAGS,
+    deps= [":camlrun"],
+    visibility = ["//visibility:public"]
+)
+
+## TODO: we only need one runtime lib target if we select on build
+## target to decide which to build.  Call it "runtime" or "ocaml_runtime".
+cc_library(
+    name = "camlrun",
+    alwayslink = True, linkstatic = True,
+    srcs = [
+        "//runtime:build_config.h",
+        "//runtime:common_c_sources",
+        ## select target platform:
+        "//runtime:bytecode_only_c_sources"
+    ] + select({
+    # "//platforms/target:vm?": ["//runtime:bytecode_only_c_sources"],
+    # "//conditions:default": ["//runtime:native_only_c_sources"],
+    "//conditions:default": []
+    }),
+    copts = ["-I$(GENDIR)/runtime"] # build_config.h
+    + OC_CPPFLAGS,
+    defines = CC_DEFINES,
+    deps = [
+        "//runtime/caml:hdrs"
+    ],
+)
+
+###########
+cc_library(
+    name = "asmrun",
+    alwayslink = True, linkstatic = True,
+    srcs = [
+        "//runtime:build_config.h",
+        "//runtime:common_c_sources",
+        "//runtime:native_only_c_sources"
+    ],
+    copts = ["-I$(GENDIR)/runtime"] # build_config.h
+    + OC_CPPFLAGS,
+    linkopts = LDFLAGS + OC_LDFLAGS,
+    defines = CC_DEFINES + CC_NATIVE_DEFINES,
+    deps = ["//runtime/caml:hdrs"]
+)
+
+################################################################
+load("//config:BUILD.bzl",
+     ## stdlib overrides OCAMLC, does not use ROOT_OCAMLC_OPTS
+     ## "ROOT_CAMLC_OPTS",
+
+     "OPTCOMPFLAGS",
+     "USE_PRIMS", "DATA_PRIMS",
+     "PRIMITIVES"
+     )
+
+COMPFLAGS = [
+    "-strict-sequence", "-absname",
+    "-w", "+a-4-9-41-42-44-45-48",
+    # "-g",
+    "-warn-error", "+A",
+    "-bin-annot",
+    "-nostdlib", "-principal",
+    # "-safe-string", "-strict-formats"
+]
+
+MODULE_OPTS = COMPFLAGS
+CAMLINTERNAL_OPTS = COMPFLAGS + ["-nopervasives"]
+
+# MODULE_OPTS = ROOT_MODULE_OPTS
+SIG_OPTS = MODULE_OPTS
+
+bootstrap_archive(
+    name       = "stdlib",
+    # opts       = USE_PRIMS,
+    # data       = ["//runtime:primitives"],
+    primitives = "//runtime:primitives",
+    manifest   = [
+        "//stdlib:Stdlib", ## functions as the ns_resolver module
+        # ":Std_exit",
+        "//stdlib:CamlinternalFormat",
+        "//stdlib:CamlinternalFormatBasics",
+        "//stdlib:CamlinternalLazy",
+        "//stdlib:CamlinternalMod",
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.ArrayLabels",
+        "//stdlib:Stdlib.Atomic",
+        "//stdlib:Stdlib.Bigarray",
+        "//stdlib:Stdlib.Bool",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.BytesLabels",
+        "//stdlib:Stdlib.Callback",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Complex",
+        "//stdlib:Stdlib.Condition",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Domain",
+        "//stdlib:Stdlib.Effect",
+        "//stdlib:Stdlib.Either",
+        "//stdlib:Stdlib.Ephemeron",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Float",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.In_channel",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.ListLabels",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Marshal",
+        "//stdlib:Stdlib.MoreLabels",
+        "//stdlib:Stdlib.Mutex",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Oo",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Out_channel",
+        "//stdlib:Stdlib.Parsing",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Queue",
+        "//stdlib:Stdlib.Random",
+        "//stdlib:Stdlib.Result",
+        "//stdlib:Stdlib.Scanf",
+        "//stdlib:Stdlib.Semaphore",
+        "//stdlib:Stdlib.Seq",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Stack",
+        "//stdlib:Stdlib.StdLabels",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.StringLabels",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Uchar",
+        "//stdlib:Stdlib.Unit",
+        "//stdlib:Stdlib.Weak",
+        # ":Stdlib.Weak",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# bootstrap_module(
+#     ns    = "//stdlib:Stdlib",
+#     name   = "Stdlib.Weak",
+#     struct = "//stdlib:weak.ml",
+#     sig    = ":Stdlib.Weak_cmi",
+#     opts = MODULE_OPTS,
+#     primitives = PRIMITIVES,
+#     deps   = [
+#         "//stdlib:Stdlib.Sys",
+#         "//stdlib:Stdlib.Obj",
+#         "//stdlib:Stdlib.Int",
+#         "//stdlib:Stdlib.Array",
+#         "//stdlib:Stdlib.Hashtbl",
+#         ## (H)
+#     ],
+#     data = ["//runtime:primitives"],
+#     # visibility = ["//visibility:public"]
+# )
+
+# bootstrap_signature(
+#     ns   = "//stdlib:Stdlib",
+#     name = "Stdlib.Weak_cmi",
+#     src  = "//stdlib:weak.mli",
+#     opts = SIG_OPTS,
+#     primitives = PRIMITIVES,
+#     deps   = [
+#         "//stdlib:Stdlib",
+#         "//stdlib:Stdlib.Hashtbl",
+#         ## (H)
+#     ],
+#     data = ["//runtime:primitives"],
+#     # visibility = ["//visibility:public"]
+# )
 

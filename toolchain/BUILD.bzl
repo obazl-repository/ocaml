@@ -116,7 +116,7 @@ def _toolchain_in_transition_impl(settings, attr):
     ## trying to make sure ocamlrun is only built once
 
     return {
-        "//bzl/toolchain:ocamlrun" : "//runtime:ocamlrun"
+        "//bzl/toolchain:ocamlrun" : "//boot:ocamlrun"
     }
 
 #######################
@@ -145,7 +145,7 @@ bootstrap_toolchain_adapter = rule(
         ),
 
         "ocamlrun": attr.label(
-            default    = "//runtime:ocamlrun",
+            default    = "//boot:ocamlrun",
             # default    = "//bzl/toolchain:ocamlrun",
             executable = True,
             allow_single_file = True,

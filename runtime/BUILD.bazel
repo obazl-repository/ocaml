@@ -9,30 +9,49 @@ load("//bzl:rules.bzl",
 load("//config:BUILD.bzl",
      "ARCH", "MODEL", "SYSTEM",
      "HOST", "ROOTDIR", "LIBDIR",
+     # flags
      "OC_CFLAGS", "CFLAGS",
      "OC_CPPFLAGS", "CPPFLAGS",
      "OC_LDFLAGS", "LDFLAGS",
-     "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
-     "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+     # defines - replace by CC_DEFINES with selects
+     # "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
+     # "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+     "CC_DEFINES", "CC_NATIVE_DEFINES",
+     # other
      "OUTPUTEXE", "MKEXE_FLAGS",
-     "BYTECCLIBS"
      )
 
 load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag", "string_setting")
 
-string_flag(
-    name = "runtime",
-    build_setting_default = "s",
-    values = [
-        "s", # standard
-        "d", # debug
-        "i"  # instrumented
-    ],
-    visibility = ["//visibility:public"]
-)
+string_flag(name = "runtime",
+            build_setting_default = "std",
+            values = [
+                "std", # standard
+                "dbg", # debug
+                "instr"  # instrumented
+            ],
+            visibility = ["//visibility:public"]
+            )
+config_setting(name = "standard?", flag_values = {":runtime": "std"},
+            visibility = ["//visibility:public"])
+config_setting(name = "debug?", flag_values = {":runtime": "dbg"},
+            visibility = ["//visibility:public"])
+config_setting(name = "instrumented?", flag_values = {":runtime": "instr"},
+            visibility = ["//visibility:public"])
 
-## NB: BYTECCLIBS == syslibs needed, e.g. -lm, -lpthread
+BYTECCLIBS = ["-lm", "-lpthread"]
+
+##########
+cc_binary(
+    name = "sak.exe",
+    srcs = ["sak.c"],
+    copts = OC_CFLAGS + CFLAGS + CPPFLAGS,
+    defines = CC_DEFINES + CC_NATIVE_DEFINES,
+    linkopts = OC_LDFLAGS + LDFLAGS,
+    deps= ["//runtime/caml:hdrs"],
+    visibility = ["//runtime/caml:__pkg__"]
+)
 
 # load("//bzl/transitions:ocamlc_boot.bzl",
 #      "cc_in_transition",
@@ -83,6 +102,17 @@ string_flag(
 #     runtime_asm_objects=${arch}.${OBJEXT} ;;
 # esac
 
+##  ASPP: assembler w/preprocessor, default "$CC -c"
+# runtime/%.o: runtime/%.S
+# 	$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+# runtime/%.d.o: runtime/%.S
+# 	$(ASPP) $(OC_ASPPFLAGS) $(OC_DEBUG_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+# runtime/%.i.o: runtime/%.S
+# 	$(ASPP) $(OC_ASPPFLAGS) $(OC_INSTR_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+# runtime/%_libasmrunpic.o: runtime/%.S
+# 	$(ASPP) $(OC_ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
+
+
 ## OBJEXT: set by configure, but only 2 possibilities: .S or .asm
 ## ARCH: arm | arm64 | i386 | amd64 | power | riscv | s390x
 ## Bazel: arch must be set, by config setting to be determined.
@@ -92,74 +122,147 @@ RUNTIME_ASM_OBJECTS = select({
     "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
 })
 
+## WARNING: on windows the build for asm files is different, see //Makefile
+
+filegroup(
+    name = "common_c_sources",
+    srcs = ["sync_posix.h"] + glob(
+        include = ["*.c"],
+        exclude = [
+            "backtrace_byt.c",
+            "backtrace_nat.c",
+            "clambda_checks.c",
+            "dynlink_nat.c",
+            "fail_byt.c",
+            "fail_nat.c",
+            "fix_code.c",
+            "frame_descriptors.c",
+            "instrtrace.c",
+            "interp.c",
+            "main.c",
+            "sak.c",
+            "signals_nat.c",
+            "startup_byt.c",
+            "startup_nat.c",
+            "unix.c",
+            "win32.c"
+        ]
+    ) + select({
+    ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
+    "//config/host:linux": ["unix.c"],
+    "//config/host:macos?": ["unix.c"],
+    "//config/host:windows_x86_32": ["win32.c"], # using bazel naming
+    # "//config/host:windows_x86_64": [???]
+    "//conditions:default": []
+    }),
+    visibility = ["//boot:__pkg__"]
+)
+
 COMMON_C_SOURCES = [
-  "addrmap.c",
-  "afl.c",
-  "alloc.c",
-  "array.c",
-  "backtrace.c",
-  "bigarray.c",
-  "callback.c",
-  "codefrag.c",
-  "compare.c",
-  "custom.c",
-  "debugger.c",
-  "domain.c",
-  "dynlink.c",
-  "extern.c",
-  "fiber.c",
-  "finalise.c",
-  "floats.c",
-  "gc_ctrl.c",
-  "gc_stats.c",
-  "globroots.c",
-  "hash.c",
-  "intern.c",
-  "ints.c",
-  "io.c",
-  "lexing.c",
-  "lf_skiplist.c",
-  "main.c",
-  "major_gc.c",
-  "md5.c",
-  "memory.c",
-  "memprof.c",
-  "meta.c",
-  "minor_gc.c",
-  "misc.c",
-  "obj.c",
-  "parsing.c",
-  "platform.c",
-  "printexc.c",
-  "prng.c",
-  "roots.c",
-  "runtime_events.c",
-  "shared_heap.c",
-  "signals.c",
-  "skiplist.c",
-  "startup_aux.c",
-  "str.c",
-  "sync.c", "sync_posix.h",
-  "sys.c",
-  "weak.c"
+    "addrmap.c",
+    "afl.c",
+    "alloc.c",
+    "array.c",
+    "backtrace.c",
+    "bigarray.c",
+    "callback.c",
+    "codefrag.c",
+    "compare.c",
+    "custom.c",
+    "debugger.c",
+    "domain.c",
+    "dynlink.c",
+    "extern.c",
+    "fiber.c",
+    "finalise.c",
+    "floats.c",
+    "gc_ctrl.c",
+    "gc_stats.c",
+    "globroots.c",
+    "hash.c",
+    "intern.c",
+    "ints.c",
+    "io.c",
+    "lexing.c",
+    "lf_skiplist.c",
+
+    ## if we compile main.c into libcamlrun.a zig will fail to find main
+    ## entry point.
+
+    ## but main is not really appropriate for a library anyway. but
+    ## then why is it shared with both bc and native? why does the
+    ## latter need it?
+
+    # "main.c",
+
+    "major_gc.c",
+    "md5.c",
+    "memory.c",
+    "memprof.c",
+    "meta.c",
+    "minor_gc.c",
+    "misc.c",
+    "obj.c",
+    "parsing.c",
+    "platform.c",
+    "printexc.c",
+    "prng.c",
+    "roots.c",
+    "runtime_events.c",
+    "shared_heap.c",
+    "signals.c",
+    "skiplist.c",
+    "startup_aux.c",
+    "str.c",
+    "sync.c", "sync_posix.h",
+    "sys.c",
+    "weak.c"
 ] + select({
     ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
     "//config/host:linux": ["unix.c"],
-    "//config/host:macos": ["unix.c"],
+    "//config/host:macos?": ["unix.c"],
     "//config/host:windows_x86_32": ["win32.c"], # using bazel naming
     # "//config/host:windows_x86_64": [???]
     "//conditions:default": []
 })
 
+filegroup(
+    name = "bytecode_only_c_sources",
+    srcs = [
+            "backtrace_byt.c",
+            "fail_byt.c",
+            "fix_code.c",
+            "interp.c",
+            "main.c",
+            "startup_byt.c",
+        ],
+    visibility = ["//boot:__pkg__"]
+)
+
 BYTECODE_ONLY_C_SOURCES = [
-  "backtrace_byt.c",
-  "fail_byt.c",
-  "fix_code.c",
-  "interp.c",
-  "startup_byt.c"
+    "backtrace_byt.c",
+    "fail_byt.c",
+    "fix_code.c",
+    "interp.c",
+    "main.c",
+    "startup_byt.c"
 ]
 
-RUNTIME_BYTECODE_C_SOURCES = COMMON_C_SOURCES + BYTECODE_ONLY_C_SOURCES
+# RUNTIME_BYTECODE_C_SOURCES = COMMON_C_SOURCES + BYTECODE_ONLY_C_SOURCES
+
+filegroup(
+    name = "native_only_c_sources",
+    srcs = [
+        "backtrace_nat.c",
+        "clambda_checks.c",
+        "dynlink_nat.c",
+        "fail_nat.c",
+        "frame_descriptors.c",
+        "startup_nat.c",
+        "signals_nat.c"
+    ],
+    visibility = ["//boot:__pkg__"]
+)
 
 NATIVE_ONLY_C_SOURCES = [
   "backtrace_nat.c",
@@ -171,7 +274,7 @@ NATIVE_ONLY_C_SOURCES = [
   "signals_nat.c"
 ]
 
-RUNTIME_NATIVE_C_SOURCES = COMMON_C_SOURCES + NATIVE_ONLY_C_SOURCES
+# RUNTIME_NATIVE_C_SOURCES = COMMON_C_SOURCES + NATIVE_ONLY_C_SOURCES
 
 ########
 genrule(
@@ -189,7 +292,8 @@ genrule(
         ## FIXME: may stdlib locn stage-dependend
 	    "echo \"#define OCAML_STDLIB_DIR $$OSD\" >> $@;",
 	    "echo '#define HOST \"{HOST}\"' >> $@".format(HOST=HOST)
-    ])
+    ]),
+    visibility = ["//boot:__pkg__"]
 )
 
 ##//Makefile:
@@ -211,6 +315,7 @@ genrule(
         "$(location :gen_primitives.sh) > $@;"
     ]),
     ## script depends on these (Bazel: runfiles):
+    ##FIXME: use filegroups above?
     srcs  = [
         "alloc.c", "array.c", "compare.c", "extern.c", "floats.c",
         "gc_ctrl.c", "hash.c", "intern.c", "interp.c", "ints.c", "io.c",
@@ -248,7 +353,8 @@ genrule(
         "echo 'char * caml_names_of_builtin_cprim[] = {' >> $@;",
         "sed -e 's/.*/  \"&\",/' $(location :primitives) >> $@;",
         "echo '  0 };' >> $@"
-    ])
+    ]),
+    visibility = ["//boot:__pkg__"]
 )
 
 ## FIXME: to build multiple "versions" (e.g. libcamlrun, libcamlrund,
@@ -258,92 +364,140 @@ genrule(
 ## Either way, we will have to build each separately, one build cmd
 ## per output.
 
-################  standard  ################
-cc_binary(
-    name = "ocamlrun",
-    srcs = ["prims.c"], # , "instrtrace.c"],
-    copts = OC_CFLAGS + CFLAGS + select({
-        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
-        "//conditions:default": ["-UDEBUG"]
-    }),
-    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS, # + ["-v"],
-    deps= [":camlrun"],
-    visibility = ["//visibility:public"]
-)
+## what is ocamlruns? windows only? (with flexdll?)
+# runtime/ocamlruns$(EXE): runtime/prims.$(O) runtime/libcamlrun_non_shared.$(A)
+# 	$(call MKEXE_VIA_CC,$@,$^ $(BYTECCLIBS))
 
-cc_library(
-    name = "camlrun",
-    srcs = [
-        ":build_config.h",
-    ] + RUNTIME_BYTECODE_C_SOURCES,
-    copts = [
-        "-I$(GENDIR)/runtime", # pick up build_config.h
-    ] + OC_CPPFLAGS + select({
-        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
-        "//conditions:default": ["-UDEBUG"]
-    }),
-    defines = OC_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"],
-)
+# MKEXE_VIA_CC=\
+#   $(CC) $(OC_EXE_LDFLAGS) $(OC_CFLAGS) $(CFLAGS) $(OC_LDFLAGS) $(LDFLAGS) $(OUTPUTEXE)$(1) $(2)
+# OUTPUTEXE=-o $(EMPTY)
+
+################################################################
+## compile flags: OC_CPPFLAGS, runtime_CPPFLAGS
+# Makefile.config:
+#   OC_CFLAGS=-O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common
+## these are configured in //config:
+#   OC_CPPFLAGS=-I$(ROOTDIR)/runtime  -D_FILE_OFFSET_BITS=64
+#   runtime_CPPFLAGS = -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME
+#   ocamlrund_CPPFLAGS = -DDEBUG
+#   ocamlruni_CPPFLAGS = -DCAML_INSTR
+
+# ################  standard  ################
+# cc_binary(
+#     name = "ocamlrun",
+#     srcs = BYTECODE_ONLY_C_SOURCES + [
+#         "prims.c",
+#         ":build_config.h",
+#     ] + select({
+#         ":instrumented?": ["instrtrace.c"],
+#         "//conditions:default": []
+#     }),
+#     copts = ["-I$(GENDIR)/runtime"] # build_config.h
+#     + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+#     # + select({
+#     #     #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+#     #     "//config/host:macos_fastbuild?": ["-UDEBUG"],
+#     #     "//conditions:default": []
+#     # }),
+#     defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
+#     linkopts = ["-lm", "-lpthread"] + MKEXE_FLAGS,
+#     deps= [
+#         # ":camlrun",
+#         ":commonrun"
+#     ],
+#     visibility = ["//visibility:public"]
+# )
+
+################################################################
+## problem: makefiles set different options for bytecode and native
+## runtimes, meaning commonrun would have to be built twice. the
+## legacy build pgm always does this, compiling srcs to different
+## outputs (named with a type suffix, e.g. .bd for bytecode debug.)
+## but with bazel we need not do this. instead of multiple targets
+## building the same code, we have one target and we parameterize the
+## builds. so instead of distinguishing between e.g. vm and native
+## builds we select on features. after all the vm/runtime is c code
+## compiled to the native sys target, just like the native runtime.
+# cc_library(
+#     name = "commonrun",
+#     alwayslink = True,
+#     linkstatic = True,
+#     srcs = [":build_config.h", ##] + COMMON_C_SOURCES,
+#             ":common_c_sources"
+#     ],
+#     # srcs = COMMON_C_SOURCES,
+#     copts = [
+#         "-I$(GENDIR)/runtime", # pick up build_config.h
+#     ] + OC_CPPFLAGS,
+#     # + select({
+#     #     #FIXME: macos with compilation_mode == fastbuild
+#     #     "//config/host:macos_fastbuild?": ["-UDEBUG"],
+#     #     "//conditions:default": []
+#     # }),
+#     defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
+#     # defines = CC_DEFINES,
+#     deps = ["//runtime/caml:hdrs"],
+#     visibility = ["//visibility:public"]
+# )
 
 ################  PIC  ################
 ## if unix and SUPPORTS_SHARED_LIBRARIES (i.e. has dlopen)
-cc_library(
-    name = "camlrun_pic",
-    srcs = [
-        ":build_config.h",
-    ] + RUNTIME_BYTECODE_C_SOURCES,
-    copts = [
-        "-I$(GENDIR)/runtime", # pick up build_config.h
-    ] + OC_CPPFLAGS + select({
-        "//config/debug:ocamlrun-debug": ["-g"],
-        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
-        "//conditions:default": ["-UDEBUG"]
-    }),
-    defines = OC_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"],
-)
+# cc_library(
+#     name = "camlrun_pic",
+#     srcs = [
+#         ":build_config.h",
+#     ] + RUNTIME_BYTECODE_C_SOURCES,
+#     copts = [
+#         "-I$(GENDIR)/runtime", # pick up build_config.h
+#     ] + OC_CPPFLAGS + select({
+#         "//config/debug:ocamlrun-debug": ["-g"],
+#         #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+#         "//conditions:default": ["-UDEBUG"]
+#     }),
+#     defines = CC_DEFINES,
+#     deps = ["//runtime/caml:hdrs"],
+# )
 
 ################ shared
-cc_binary(
-    name       = "camlrun_shared",
-    linkshared = True,
-    srcs = [
-        ":build_config.h",
-    ] + RUNTIME_BYTECODE_C_SOURCES,
-    copts = [
-        "-I$(GENDIR)/runtime", # pick up build_config.h
-    ] + OC_CPPFLAGS + select({
-        "//config/debug:ocamlrun-debug": ["-g"],
-        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
-        "//conditions:default": ["-UDEBUG"]
-    }),
-    defines = OC_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"],
-)
+# cc_binary(
+#     name       = "camlrun_shared",
+#     linkshared = True,
+#     srcs = [
+#         ":build_config.h",
+#     ] + RUNTIME_BYTECODE_C_SOURCES,
+#     copts = [
+#         "-I$(GENDIR)/runtime", # pick up build_config.h
+#     ] + OC_CPPFLAGS + select({
+#         "//config/debug:ocamlrun-debug": ["-g"],
+#         #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+#         "//conditions:default": ["-UDEBUG"]
+#     }),
+#     defines = CC_DEFINES,
+#     deps = ["//runtime/caml:hdrs"],
+# )
 
 ################ debug
-cc_binary(
-    name = "ocamlrund",
-    srcs = ["prims.c"],
-    copts = OC_CFLAGS + CFLAGS + ["-g"],
-    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS,
-    deps= [":camlrun"],
-    visibility = ["//visibility:public"]
-)
+# cc_binary(
+#     name = "ocamlrund",
+#     srcs = ["prims.c"],
+#     copts = OC_CFLAGS + CFLAGS + ["-g"],
+#     linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS,
+#     deps= [":camlrund"],
+#     visibility = ["//visibility:public"]
+# )
 
-cc_library(
-    name = "camlrund",
-    srcs = [
-        ":build_config.h",
-        "instrtrace.c"
-    ] + RUNTIME_BYTECODE_C_SOURCES,
-    copts = [
-        "-I$(GENDIR)/runtime" # to pick up build_config.h
-    ] + OC_CPPFLAGS,
-    defines = OC_CPPDEFINES + OC_DEBUG_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"]
-)
+# cc_library(
+#     name = "camlrund",
+#     srcs = [
+#         ":build_config.h",
+#         "instrtrace.c"
+#     ] + RUNTIME_BYTECODE_C_SOURCES,
+#     copts = [
+#         "-I$(GENDIR)/runtime" # to pick up build_config.h
+#     ] + OC_CPPFLAGS,
+#     defines = CC_DEFINES, ##  + OC_DEBUG_CPPDEFINES,
+#     deps = ["//runtime/caml:hdrs"]
+# )
 
 ################ vm cmd, instrumented
 ## configure.ac says:
@@ -358,94 +512,88 @@ cc_library(
 
 # linux: clock_gettime etc. - complicated, see configure.ac
 
-cc_binary(
-    name = "ocamlruni",
-    srcs = ["prims.c"],
-    copts = OC_CFLAGS + CFLAGS + select({
-        "//config/debug:ocamlrun-debug": ["-g"],
-        #FIXME: on mac bazel always adds -DDEBUG for fastbuild
-        "//conditions:default": ["-UDEBUG"]
-    }),
-    linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS + select({
-        # Makefile adds INSTRUMENTED_RUNTIME_LIBS, found by ./configure
-        #FIXME: use this select to fail this target if no monnotonic clock
-        "//conditions:default": []
-    }),
-    deps= [":camlrun"],
-    visibility = ["//visibility:public"]
-)
+# cc_binary(
+#     name = "ocamlruni",
+#     srcs = ["prims.c"],
+#     copts = OC_CFLAGS + CFLAGS + select({
+#         "//config/debug:ocamlrun-debug": ["-g"],
+#         #FIXME: on mac bazel always adds -DDEBUG for fastbuild
+#         "//conditions:default": ["-UDEBUG"]
+#     }),
+#     linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS + select({
+#         # Makefile adds INSTRUMENTED_RUNTIME_LIBS, found by ./configure
+#         #FIXME: use this select to fail this target if no monnotonic clock
+#         "//conditions:default": []
+#     }),
+#     deps= [":camlrun"],
+#     visibility = ["//visibility:public"]
+# )
 
-cc_library(  ## produces libcamlruni
-    name = "camlruni",
-    srcs = [
-        ":build_config.h",
-    ] + RUNTIME_BYTECODE_C_SOURCES,
-    copts = [
-        "-I$(GENDIR)/runtime" # to pick up build_config.h
-    ] + OC_CPPFLAGS,
-    defines = OC_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"]
-)
+# cc_library(  ## produces libcamlruni
+#     name = "camlruni",
+#     srcs = [
+#         ":build_config.h",
+#     ] + RUNTIME_BYTECODE_C_SOURCES,
+#     copts = [
+#         "-I$(GENDIR)/runtime" # to pick up build_config.h
+#     ] + OC_CPPFLAGS,
+#     defines = CC_DEFINES,
+#     deps = ["//runtime/caml:hdrs"]
+# )
 
 ################################################################
 ################  NATIVE  ################
-###########
-cc_library(
-    name = "asmrun",
-    srcs = [
-        ":build_config.h",
-        # "signals_osdep.h"
-    ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
-    copts = [
-        "-I$(GENDIR)/runtime" # to pick up build_config.h
-    ] + OC_CPPFLAGS,
-    linkopts = LDFLAGS + OC_LDFLAGS,
-    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"]
-)
+# ###########
+# cc_library(
+#     name = "asmrun",
+#     srcs = [
+#         ":build_config.h",
+#         # "signals_osdep.h"
+#     ] + NATIVE_ONLY_C_SOURCES + RUNTIME_ASM_OBJECTS,
+#     # ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
+
+# # RUNTIME_NATIVE_C_SOURCES = COMMON_C_SOURCES + NATIVE_ONLY_C_SOURCES
+
+#     copts = [
+#         "-I$(GENDIR)/runtime" # to pick up build_config.h
+#     ] + OC_CPPFLAGS,
+#     linkopts = LDFLAGS + OC_LDFLAGS,
+#     defines = CC_DEFINES + CC_NATIVE_DEFINES,
+#     deps = ["//runtime/caml:hdrs"]
+# )
 
 ## debug native runtime:
 # runtime/%.nd.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS) $(ocamlrund_CPPFLAGS)
 # $(DEPDIR)/runtime/%.nd.$(D): \
 #   OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS) $(ocamlrund_CPPFLAGS)
 
-cc_library(
-    name = "asmrund",
-    srcs = [
-        ":build_config.h",
-        # "signals_osdep.h"
-    ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
-    copts = [
-        "-I$(GENDIR)/runtime" # to pick up build_config.h
-    ] + OC_CPPFLAGS,
-    linkopts = LDFLAGS + OC_LDFLAGS,
-    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES + OC_DEBUG_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"]
-)
+# cc_library(
+#     name = "asmrund",
+#     srcs = [
+#         ":build_config.h",
+#         # "signals_osdep.h"
+#     ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
+#     copts = [
+#         "-I$(GENDIR)/runtime" # to pick up build_config.h
+#     ] + OC_CPPFLAGS,
+#     linkopts = LDFLAGS + OC_LDFLAGS,
+#     defines = CC_DEFINES + CC_NATIVE_DEFINES, # + OC_DEBUG_CPPDEFINES,
+#     deps = ["//runtime/caml:hdrs"]
+# )
 
-## instrumented native runtime
-cc_library(
-    name = "asmruni",
-    srcs = [
-        ":build_config.h",
-        # "signals_osdep.h"
-    ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
-    copts = [
-        "-I$(GENDIR)/runtime" # to pick up build_config.h
-    ] + OC_CPPFLAGS,
-    linkopts = LDFLAGS + OC_LDFLAGS,
-    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
-    deps = ["//runtime/caml:hdrs"]
-)
+# ## instrumented native runtime
+# cc_library(
+#     name = "asmruni",
+#     srcs = [
+#         ":build_config.h",
+#         # "signals_osdep.h"
+#     ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
+#     copts = [
+#         "-I$(GENDIR)/runtime" # to pick up build_config.h
+#     ] + OC_CPPFLAGS,
+#     linkopts = LDFLAGS + OC_LDFLAGS,
+#     defines = CC_DEFINES + CC_NATIVE_DEFINES,
+#     deps = ["//runtime/caml:hdrs"]
+# )
 
 
-##########
-cc_binary(
-    name = "sak.exe",
-    srcs = ["sak.c"],
-    copts = OC_CFLAGS + CFLAGS + CPPFLAGS,
-    defines = OC_CPPDEFINES + OC_NATIVE_CPPDEFINES,
-    linkopts = OC_LDFLAGS + LDFLAGS,
-    deps= ["//runtime/caml:hdrs"],
-    visibility = ["//runtime/caml:__pkg__"]
-)

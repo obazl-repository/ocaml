@@ -19,7 +19,7 @@ exports_files([
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS    = ROOT_MODULE_OPTS
 
-STDLIB = ["//stdlib"]
+STDLIB = ["//boot:stdlib"]
 
 bootstrap_library(
     name = "lambda",

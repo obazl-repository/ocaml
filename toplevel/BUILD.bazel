@@ -78,9 +78,9 @@ bootstrap_repl(
 #     outs = ["ocaml"],
 #     executable = True,
 #     srcs = [":ocaml.tmp", "//utils:expunge"],
-#     tools = ["//runtime:ocamlrun"],
+#     tools = ["//boot:ocamlrun"],
 #     cmd  = " ".join([
-#         "$(execpath //runtime:ocamlrun)",
+#         "$(execpath //boot:ocamlrun)",
 #         "$(location //utils:expunge)",
 #         "$(location :ocaml.tmp)",
 #         "$(location ocaml)",

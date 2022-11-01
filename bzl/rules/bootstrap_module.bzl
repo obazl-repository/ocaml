@@ -290,7 +290,7 @@ def _bootstrap_module(ctx):
     #     ns = ctx.attr._pack_ns[BuildSettingInfo].value,
     #     m = ctx.label))
 
-    # (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     if tc.target_vm:
@@ -335,8 +335,8 @@ def _bootstrap_module(ctx):
 
     # ns = None
 
-    stage = ctx.attr._stage[BuildSettingInfo].value
-    scope     = "__stage{stage}/".format(stage = stage)
+    # stage = ctx.attr._stage[BuildSettingInfo].value
+    # scope     = "__stage{stage}/".format(stage = stage)
 
     (provider_output_mli, # None if no sig passed
      ## one of the following two returned:
@@ -575,7 +575,7 @@ def _bootstrap_module(ctx):
         progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
             mode = "vm" if tc.target_vm else "sys",
             rule=ctx.attr._rule,
-            ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
+            ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
             tgt=ctx.label.name,
         )

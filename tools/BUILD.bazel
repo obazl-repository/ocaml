@@ -18,7 +18,7 @@ load("//config:BUILD.bzl",
 MODULE_OPTS = TOOLS_MODULE_OPTS
 SIG_OPTS    = TOOLS_SIG_OPTS
 
-STDLIB = ["//stdlib", "//stdlib:Std_exit"]
+STDLIB = ["//boot:stdlib", "//stdlib:Std_exit"]
 
 ## first the executables. modules and sigs below.
 # programs_byte := \
@@ -271,9 +271,9 @@ genrule(
     name = "gen_opnames",
     outs = ["opnames.ml"],
     srcs = ["//runtime/caml:instruct.h", ":make_opcodes"],
-    tools = ["//runtime:ocamlrun"],
+    tools = ["//boot:ocamlrun"],
     cmd   = " ".join([
-        "$(execpath //runtime:ocamlrun) $(location :make_opcodes)",
+        "$(execpath //boot:ocamlrun) $(location :make_opcodes)",
         "-opnames < $(location //runtime/caml:instruct.h)",
         "> $@"
     ])
@@ -716,7 +716,7 @@ bootstrap_module(
 bootstrap_executable(
     name = "make_opcodes",
     main = ":Make_opcodes",
-    # deps = ["//stdlib:Std_exit"],
+    deps = ["//boot:stdlib"],
     # opts = ["-w", "-31"],
     # data = ["//stdlib:header"],
     visibility = ["//bytecomp:__pkg__"]

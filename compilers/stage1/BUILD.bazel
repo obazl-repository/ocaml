@@ -62,13 +62,19 @@ MAIN_DEPS = [
 # ./boot/ocamlrun ./boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives  -compat-32 -o ocamlc compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma driver/main.cmo
 
 ocamlc_boot(
+# compiler(
     name = "ocamlc",
+    # compile_target = "//platform/cpu:arm",  ## ??
+    exec_compatible_with = [
+        ## *>vm ???
+    ],
     opts = ["-nostdlib", "-compat-32"],
     # primitives = PRIMITIVES,
     main = "//driver:Main",
     deps = [
         "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp"
+        "//bytecomp:ocamlbytecomp",
+        # "//boot:stdlib"
     ],
     visibility = [
         "//compilers/stage2:__pkg__",

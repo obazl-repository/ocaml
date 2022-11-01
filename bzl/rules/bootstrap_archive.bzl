@@ -120,8 +120,9 @@ def _bootstrap_archive(ctx):
     if debug:
         print("archive_name: %s" % archive_name)
 
-    stage = ctx.attr._stage[BuildSettingInfo].value
-    scope     = "__stage{stage}/".format(stage = stage)
+    # stage = ctx.attr._stage[BuildSettingInfo].value
+    # scope     = "__stage{stage}/".format(stage = stage)
+    scope = ""
 
     archive_filename = tmpdir + archive_name + ext
     archive_file = ctx.actions.declare_file(scope + archive_filename)

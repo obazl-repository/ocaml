@@ -273,7 +273,7 @@ def _bootstrap_signature_impl(ctx):
         mnemonic = "CompileOcamlSignature",
         progress_message = "{mode} compiling bootstrap_signature: {ws}//{pkg}:{tgt}".format(
             mode = mode,
-            ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
+            ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
             tgt=ctx.label.name
         )
@@ -423,7 +423,7 @@ bootstrap_signature = rule(
         _pack_ns = attr.label(
             doc = """Namepace name for use with -for-pack. Set by transition function.
 """,
-            default = "//config/pack:ns"
+            # default = "//config/pack:ns"
         ),
 
         # pack = attr.string(

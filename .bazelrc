@@ -1,3 +1,13 @@
+build --incompatible_enable_cc_toolchain_resolution
+
+# build --//config/toolchain=zig
+# build --extra_toolchains="@zig_sdk//toolchain:darwin_amd64"
+# build --action_env BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+# build --action_env ZIG_SYSTEM_LINKER_HACK=1
+
+# build --toolchain_resolution_debug=.*
+# build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
+
 common --color=yes
 
 ## always stamp, it injects the absolute path of the workspace root
@@ -15,19 +25,19 @@ build:stage2 --//bzl:stage=1
 
 ## toolchains
 
-build:vm --platforms=@ocaml//platforms:vm
+# build:vm --platforms=@ocaml//platforms:vm
 
-build:vmvm --host_platform=@ocaml//platforms:vm
-build:vmvm --platforms=@ocaml//platforms:vm
+# build:vmvm --host_platform=@ocaml//platforms:vm
+# build:vmvm --platforms=@ocaml//platforms:vm
 
-build:sysvm --host_platform=@ocaml//platforms:sys
-build:sysvm --platforms=@ocaml//platforms:vm
+# build:sysvm --host_platform=@ocaml//platforms:sys
+# build:sysvm --platforms=@ocaml//platforms:vm
 
-build:vmsys --host_platform=@ocaml//platforms:vm
-build:vmsys --platforms=@ocaml//platforms:sys
+# build:vmsys --host_platform=@ocaml//platforms:vm
+# build:vmsys --platforms=@ocaml//platforms:sys
 
-build:syssys --host_platform=@ocaml//platforms:sys
-build:syssys --platforms=@ocaml//platforms:sys
+# build:syssys --host_platform=@ocaml//platforms:sys
+# build:syssys --platforms=@ocaml//platforms:sys
 
 try-import .config/dev.bazelrc
 try-import .config/user.bazelrc

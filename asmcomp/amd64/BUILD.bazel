@@ -13,10 +13,10 @@ genrule(
     name = "emit_ml",
     srcs = ["emit.mlp", "//tools:cvt_emit.exe"],
     outs = ["emit.ml"],
-    tools = ["//runtime:ocamlrun"], ## fixme: find a way to use the toolchain
+    tools = ["//boot:ocamlrun"], ## fixme: find a way to use the toolchain
     cmd  = "\n".join([
 	    "echo '# 1 \"amd64/emit.mlp\"' > $@;",
-        "$(execpath //runtime:ocamlrun) $(location //tools:cvt_emit.exe) < $(location :emit.mlp) >> $@"
+        "$(execpath //boot:ocamlrun) $(location //tools:cvt_emit.exe) < $(location :emit.mlp) >> $@"
     ]),
     visibility = ["//asmcomp:__pkg__"]
 )

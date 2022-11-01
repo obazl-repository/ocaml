@@ -9,14 +9,17 @@ bool_flag(
 )
 
 config_setting(
-    name = "debug",
+    name = "dbg?",
     values = {"compilation_mode": "dbg"}
 )
 
 config_setting(
-    name = "ocamlrun-debug",
-    flag_values = {":ocamlrun": "True"},
+    name = "debug?",
     values = {"compilation_mode": "dbg"}
 )
 
-
+config_setting(
+    name = "ocamlrun-debug?",
+    flag_values = {":ocamlrun": "True"},
+    values = {"compilation_mode": "dbg"}
+)

@@ -36,8 +36,9 @@ def config_tc(ctx):
     tool_args = [ctx.file.ocamlc]
     ext       = ".cmo"
 
-    stage = ctx.attr._stage[BuildSettingInfo].value
-    scope     = "__stage{stage}/".format(stage = stage)
+    # stage = ctx.attr._stage[BuildSettingInfo].value
+    # scope     = "__stage{stage}/".format(stage = stage)
+    scope = ""
 
     # if stage == 0:
     #     scope     = "__stage0/"

@@ -22,7 +22,7 @@ exports_files([
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS = ROOT_SIG_OPTS
 
-STDLIB = ["//stdlib"]
+STDLIB = ["//boot:stdlib"]
 
 ## dev/test: build everthing
 bootstrap_library(
@@ -83,6 +83,7 @@ bootstrap_archive(
         "//boot:__pkg__",
         "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
+        "//ocaml/bin:__pkg__",  # the new compiler
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",
@@ -512,7 +513,7 @@ bootstrap_module(
 ## root Makefile:
 # bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
-## NEW_OCAMLRUN = //runtime:ocamlrun, we call it RUNTIME_OCAMLRUN
+## NEW_OCAMLRUN = //boot:ocamlrun, we call it RUNTIME_OCAMLRUN
 ## make_opcodes is //tools:make_opcodes
 genrule(
     name  = "opcodes_ml",
@@ -552,10 +553,10 @@ genrule(
 #     name  = "opcodes_mli",
 #     srcs  = ["opcodes.ml", "//boot:ocamlc", "//stdlib"],
 #     outs  = ["opcodes.mli"],
-#     tools = ["//runtime:ocamlrun"],
+#     tools = ["//boot:ocamlrun"],
 #     cmd   = " ".join([
 #         # "STDLIB=echo `dirname $(location //stdlib)` &&",
-#         "$(execpath //runtime:ocamlrun)",
+#         "$(execpath //boot:ocamlrun)",
 #         "$(location //boot:ocamlc)",
 #         "-g -nostdlib -I boot -use-prims runtime/primitives",
 #         "-I bazel-out/darwin-fastbuild/bin/stdlib",

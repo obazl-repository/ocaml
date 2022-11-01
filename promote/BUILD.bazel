@@ -2,7 +2,7 @@ load("//bzl:rules.bzl", "promote")
 
 promote(
     name = "promote",
-    srcs  = ["//runtime:ocamlc", "//runtime:ocamlrun"],
+    srcs  = ["//runtime:ocamlc", "//boot:ocamlrun"],
     dst  = "tmp/boot",
     # deps = [":common"]
 )
@@ -33,6 +33,6 @@ promote(
 
 promote(
     name = "ocamlrun",
-    srcs  = ["//runtime:ocamlrun"],
+    srcs  = ["//boot:ocamlrun"],
     dst  = "tmp/boot",
 )

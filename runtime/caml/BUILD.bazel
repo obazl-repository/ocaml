@@ -62,6 +62,7 @@ cc_library(
     # hdrs = ["domain_state.tbl"],
     # static_library = ...,
     visibility = [
+        "//boot:__pkg__",
         "//runtime:__pkg__",
         "//otherlibs/systhreads:__pkg__",
         "//otherlibs/unix:__pkg__",

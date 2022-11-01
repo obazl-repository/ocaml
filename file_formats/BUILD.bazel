@@ -9,7 +9,7 @@ load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS = ROOT_SIG_OPTS
 
-STDLIB = ["//stdlib"]
+STDLIB = ["//boot:stdlib"]
 
 exports_files([
     "cmi_format.mli", "cmi_format.ml",

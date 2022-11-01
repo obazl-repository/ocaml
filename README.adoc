@@ -1,4 +1,6 @@
 = OCaml: Proof-of-Concept OBazl Build
+:toc: auto
+:toclevels: 3
 
 See the link:https://github.com/ocaml/ocaml[upstream repository] for the original OCaml README.
 
@@ -21,7 +23,8 @@ These targets can be built on Macos and Linux.
 The OBazl ruleset used is a stripped-down, minimal version of the
 standard ruleset called the `bootstrap` ruleset. It includes only the
 functionality required to build the compiler. This means it contains
-no direct support for PPX processing or for generalized namespaces,
+no direct support for PPX processing or for generalized namespaces
+(automatic renaming of subcomponents, generation of resolver module),
 for example. Furthermore, since the bootstrap ruleset is intended
 solely for the purpose of bootstrapping the OCaml compilers and tools,
 it is included in this repository (i.e. is not downloaded as an
@@ -47,8 +50,486 @@ point for people interested in learning how to build OCaml software
 using Obazl.
 
 
-link:https://obazl.github.io/docs_obazl/[OBazl Version 1 documentation] - outdated but still useful.
-
-link:https://github.com/obazl/rules_ocaml[obazl_rules_ocaml] - Branch obazl2
+link:https://obazl.github.io/docs_obazl/[The OBazl Toolsuite] - outdated but still useful.
 
 
+== Goals
+
+=== Baseline version
+
+The minimal Bazel build program needed to produce usable versions of the core compilers and tools.
+
+Core compilers: `ocamlc.byte`, `ocamlc.opt`, `ocamlopt.byte`, `ocamlopt.opt`.
+
+Core tools: bytecode and native versions of: `ocamllex`, `ocamlyacc`, `ocamlobjinfo`, etc.
+
+=== Minimal configuration
+
+Configuration is the most complex part of the build. The legacy build
+system (Makefiles) supports many configuration options. The initial
+goal is to support the minimum configuration options required to build
+baseline versions of the compilers and tools.
+
+Configuration involves:
+
+* Auto-detected feature options set by `./configure` by interrogating
+  the system. This usually results in setting `#define` macros or `-D`
+  build flags in source files or headers; e.g.
++
+    #define HAS_MACH_ABSOLUTE_TIME 1      #  in runtime/caml/s.h
+    let ocamlc_cppflags = "-D_FILE_OFFSET_BITS=64 "  # in utils/config_ml.generated
++
+* User-controllable configuration options exposed by `./configure`, e.g.
++
+    --disable-debug-runtime
++
+* User-controllable build options - arguments or env variables passed
+  to `make`; e.g. `CC`, `CFLAGS`, etc. Many such make/compiler/linker
+  variables are set to default values by `./configure`.
+
+The OBazl rules always set such configuration items to default values.
+
+In general configuration management under Bazel is very different (and
+much easier) than it is with configure/make. I don't have detailed
+documentation yet, but you can find lots of notes in link:bzl/docs[bzl/docs].
+
+=== Cross-compilers
+
+Bazel has excellent support for cross-compilation via link:https://bazel.build/extending/platforms[platforms] and link:https://bazel.build/extending/toolchains[toolchains]; for an overview see link:https://bazel.build/concepts/platforms[Building with platforms].
+
+Goal: cross-compile non-cross-compilers. For example, to build, on an
+x86 Mac, an arm Mac compiler, an x86 Linux compiler, an arm Linux compiler, etc.
+
+Goal: cross-compile cross-compilers. For example, to build,
+on an x86 Mac, a Linux x86 -> Linux arm OCaml compiler.
+
+== Non-Goals
+
+* Additional compilers: flambda; profiling compilers (`ocamcp`, `ocamloptp`).
+
+* Complete configuration: it is not a goal to support all configuration
+settings supported by the legacy build system. That is, it is not a
+goal to expose such settings as user-controllable build options.
++
+For example, here are some settings supported by `./configure` that will not be exposed:
++
+** `--disable-str-lib`
+** `--disable-unix-lib`* `
+** `--enable-frame-pointers`
+** `--disable-cfi`
+** etc.
++
+Bazel is certainly capable of supporting such options, but for the
+baseline version it is not a goal to do so.
++
+
+* Simultaneous builds of multiple variants. The legacy build system
+  builds `ocamlrun`, `ocamlrund`, as well as bytecode and native
+  variants of the compilers and tools.  OBazl builds one thing at a time.  See below, <<parameterized_build_targets>>.
+
+* Distribution: packaging builds for distribution is not a goal. Such
+packaging logic is generally not included in Bazel language rules,
+whose job is solely to build things. Instead it is provided by
+separate rulesets such as:
++
+** link:https://github.com/bazelbuild/rules_pkg[rules_pkg]
+** link:https://github.com/vaticle/bazel-distribution[bazel-distribution]
+
+== Status  (2022/10/31)
+
+The OBazl code suffices to build some earlier versions, e.g. 4.14.0,
+5.0. Work is underway to upgrade it to support the latest version
+(5.1.x).
+
+IMPORTANT: The code does not yet support the "fixpoint" build
+expressed by the Makefiles. Instead it uses "stages": the bootstrap
+compiler (the precompiled `ocamlc` that comes with the distribution)
+is used to build the stage1 `ocamlc`, which is used to build the
+stage2 `ocamlc`.  This mechanism is still under development.
+
+=== Trunk
+
+The main branch of this repository is `bazel/trunk`; it tracks the
+`trunk` branch of the upstream repository (and so may be outdated at
+any given point in time).
+
+The bazel code in this branch is derived from the code in branch
+`bazel/4.14.0`; some work remains to be done to upgrade it to support
+trunk (OCaml 5.1.x).
+
+The following targets should build successfully:
+
+* all targets in `runtime`: `//boot:ocamlrun`, `//runtime:camlrun`,
+  `//runtime:asmrun`, etc.
+
+* `//stdlib`
+
+
+=== branch: bazel/4.14.0
+
+All the compilers and tools build.
+
+== The OBazl Build: concepts and structure
+
+Just some notes to help the reader of the code:
+
+=== Notation and Terminology
+
+* *bootstrap compiler* (aka boot compiler) - the precompiled `ocamlc`
+  compiler that comes with the distribution, or one produced by the
+  bootstrap build described below. A bootstrap compiler is "vanilla",
+  with a fixed, minimal configuration. Bootstrap compilers are used to
+   compile local compilers.
+
+* *local compiler* - a compiler produced by the bootstrap compiler. May have a custom configuration.
++
+NOTE: the distinction between bootstrap and local compilers gives us
+two distinct build protocols.
++
+* *baseline environment* - the bootstrap compiler plus the initial
+   build of the (unedited sources of) the runtime libs and programs
+   (e.g. ocamlrun, ocamllex), plus the initial build of the stdlib.
+   The legacy build system keeps all this sequestered by copying it
+   into `boot/`. Everything except the bootstrap compiler, is built by
+   the bootstrap compiler, so its bytecode is interpretable by the
+   initial build of the runtime. I.e anything the bootstrap compiler
+   builds must be interpreted by the initial build of `ocamlrun`.
+
+* *compiler types* - notation: `(platform>platform)`
+
+  ** platforms: `vm`, `sys` (native arch of the local machine), or a
+     specific architecture name, e.g. `amd64`, `arm`.
+
+  ** OCaml provides four compiler types:
+
+    *** `(vm>vm)` - `ocamlc.byte`
+    *** `(sys>vm)` - `ocamlc.opt`
+    *** `(sys>sys)` - `ocamlopt.opt`
+    *** `(vm>sys)`     - `ocamlopt.byte`
+
+
+=== Parameterized build targets [[parameterized_build_targets]]
+
+The legacy build system defines a number of build targets that are in
+effect variants of a single target. In such cases OBazl instead
+defines a single build target with parameters controlling which
+variant to build. In general this results in much simpler code.
+
+A consequence of this approach is that different variants are not
+distinguished by name; for example the debug runtime would be
+`ocamlrun` built with debugging enabled, not `ocamlrund`. This should
+be fine during development, where there is no point in building a
+variant you do not plan to use. For distribution, this would require
+that the distribution build include logic to build and rename all
+required variants. Since Bazel is designed for scriptability this
+should not be a problem.
+
+Simultaneous building of multiple variants can be done, but it is not
+a goal for the baseline build program.
+
+
+For example:
+
+* `runtime/libcamlrun.a`
+* `runtime/libcamlrund.a`
+* `runtime/libcamlruni.a`
+* `runtime/libcamlrun_pic.a`
+* `runtime/libcamlrun_shared.a`
+
+NOTE: below we use `libcamlrun*.a` to indicate any of the variants.
+
+In this case OBazl instead defines a single target,
+`//runtime:camlrun`, controlled by a set of build arguments. For
+example, to build a debug version of `libocamlrun.a`:
+
+```
+    $ bazel build runtime:camlrun -c dbg
+```
+
+To build an instrumented version:
+
+```
+    $ bazel build runtime:camlrun --//runtime=instr
+```
+
+NOTE: the pic and shared versions are not supported in the baseline OBazl version.
+
+=== Bootstrapping a Bootstrap Compiler [[bootstrapp]]
+
+==== The Bootstrapping Problem
+
+
+
+To build a new bootstrap compiler.
+
+In a nutshell:
+
+1. Use the old bootstrap compiler to:
+  ** build a new vm runtime lib (`libcamlrun*.a`) and link it into `boot/`
+  ** build a new runtime pgm (ocamlrun) and copy it to `boot/`
+  ** build a new stdlib copy the files to `boot/`
++
+This gives us a `boot` directory containing the "old" compiler, runtime, and stdlib.
++
+2. Then build all the other stuff, using the old runtime, compiler and stdlib
++
+The new compiler is `./ocamlc`. It was emitted by the bootstrap
+  compiler, so it must be run by `boot/ocamlrun`. But it emits
+  bytecode for `runtime/ocamlrun`, so any program it compiles must be
+  run by `runtime/ocamlrun`.
++
+The distinction between `boot/ocamlrun` and `runtime/ocamlrun` is
+essential, since the new boot compiler may involve changes to the
+runtime. This might involve changes in the way the interpreter works,
+so there would be changes in the C code in `runtime` as well as
+changes in the OCaml sources of the compiler - for example, in the OCaml
+code in `bytecomp` responsible for emitting bytecode.
+
+The initial (coldstart) build of `ocamlrun` interprets bytecode
+emitted by `boot/ocamlc`. If we change the runtime we do not want to
+copy it into `boot/` since we need that "old" runtime to interpret
+what the boot compiler emits - and we'll need that to run the new
+`ocamlc`, which will be built by the old bootstrap compiler. So we
+leave it in `runtime`. We then use the boot compiler to build a
+new version of `ocamlc`. This version, presumably, is designed to emit
+bytecode for the new runtime.  Obviously we do not want to copy it into `boot`.
+
+ So `boot/ocamlrun` was built by the
+bootstrap compiler, and interprets bytecode emitted by
++
+2. Edit the code, building `coreall`to rebuild the runtime, compiler, tools, etc.
+3. Once the code is good, build a new bootstrap compile by
+  * 
+
+But once we're sure our new version of `ocamlc` works, we will copy it into
+`boot`, overwriting the old version.
+
+==== Legacy bootstrapping
+
+===== coldstart
+
+Targets are `world` and `world.opt`.  Here we address only the former.
+
+```
+world: coldstart
+	$(MAKE) all
+```
+
+```
+COLDSTART:
+	$(MAKE) runtime-all
+	$(MAKE) -C stdlib \
+	  OCAMLRUN='$$(ROOTDIR)/runtime/ocamlrun$(EXE)' \
+	  CAMLC='$$(BOOT_OCAMLC) $(USE_RUNTIME_PRIMS)' all
+	rm -f boot/ocamlrun$(EXE)
+	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+	cd boot; rm -f $(LIBFILES)
+	cd stdlib; cp $(LIBFILES) ../boot
+	cd boot; $(LN) ../runtime/libcamlrun.$(A) .
+```
+
+Target `coldstart` expresses the initial step of any build (bootstrap or local):
+
+1. Build all vm runtime variants (libocamlrun*.a, ocamlrun*.a plus a few other pieces)
+2. Build all stdlib targets (using newly build runtime/ocamlrun and boot/ocamlc)
+3. Delete any previously built `boot/ocamlrun`
+4. Copy `runtime/ocamlrun` to `boot/ocamlrun`
+5. Copy the stdlib files to `boot/`
+6. link newly built vm runtime lib variant (`libcamlrun*.a`) into `boot/`
+
+The result is a `boot` directory containing the "old" (i.e. bootstrap)
+compiler `boot/ocamlc` plus newly a built vm runtime and stdlib.
+
+The build then proceeds with `make all`, which builds the following:
+
+1. Link `runtime/libcamlrun*.a` into  `stlib/`  (why?)
+  ** NB: `stdlib/header.c` is "The launcher for bytecode executables
+     (if #! is not working)", which presumably needs libocamlrun.a.
+2. Build `ocamlc`
+3. `ocamlyacc`
+4. `ocamllex`
+5. etc.
+
+The dev can now edit, then `make coreall`. Note that target `all`
+depends on `coreall`. Target `coreall` builds the "core" system - the
+minimal parts needed for a functioning compiler. Since we're assuming
+that the developer is working on a new bootstrap compiler (and not,
+say the toplevel program `ocaml`) `make coreall` should suffice. It builds:
+
+* vm runtime libs and programs in `runtime/`
+  ** recall that `coldstart` also did this, but it then linked `runtime/libcamlrun*.a` into `boot/`
+  ** also links `runtime/libcamlrun*.a` into `stdlib/`
+* ocamlc
+* ocamllex
+* ocamltools
+  ** ocamlc
+  ** ocamllex
+  ** compilerlibs/ocamlmiddleend.cma
+  ** target `all` in `tools/Makefile`: ocamldep, ocamlprof, ocamlcp, ocamloptp,
+     ocamlmklib, ocamlmktop, ocamlcmt, dumpobj, ocamlobjinfo, primreq,
+     stripdebug, cmpbyt
+* the stdlib - note that this was also built by target `coldstart`
+
+The remaining targets built by `make all` are not essential to working with the compiler:
+
+* `ocaml` - toplevel (repl)
+* otherlibraries: dynlink, str, systhreads, unix, runtime_events (in `otherlibs/`)
+* othertools: target `othertools` in `tools/Makefile`,  builds `ocamlmktop_init.cmo`, ocamltex
+* manpages
+
+Once everything is hunky-dory the bootstrap
+target will build the new bootstrap compiler.
+
+===== The bootstrap step
+
+
+```
+bootstrap: coreboot
+# utils/config.ml must be restored to config.status's configuration
+# lex/ocamllex$(EXE) was stripped in order to compare it
+	rm -f utils/config.ml lex/ocamllex$(EXE)
+	$(MAKE) all
+```
+
+Target `coreboot` is the "Core bootstrapping cycle". Bootstrapping
+here involves the notion of "promoting" (i.e. copying) newly built
+stuff into the `boot/` subdir, and recursively (kinda) using the
+compiler to build itself until it reaches a fixed point (where the
+build output is equal to its input).
+
+First step of coreboot is to "promote" the new compiler and runtime -
+copy (not link) them into `boot`, overwriting the original `ocamlc` (and
+`ocamllex`). It also copies stdlib files into `boot`. (Why?)
+
+Then it rebuilds ocamlc, ocamllex, ocamltools, using the newly
+installed boot compiler, and using the "fixed" config.ml file. Then
+the stdlib is rebuilt with the new compiler and runtime, and these new
+new versions are promoted again. Then the whole shmear (target core)
+is rebuilt.
+
+Note that `bootstrap` depends on `coreboot`, then runs `make all`, and
+target `all` depends on `coreall`.
+
+What's the difference between `coreboot` and `coreall`? The former
+makes target `partialclean`, which deletes a bunch of stuff, then
+rebuilds things and "promotes" them. Both build `ocamlc`, `ocamllex`,
+and `ocamltools`, but `coreboot` does this with flag
+`IN_COREBOOT_CYCLE` enabled. They also both build the stdlib, but
+`coreboot` does this using `runtime/ocamlrun`, whereas `coreall` does
+it using `boot/ocamlrun`. Why? Remember that the `coldstart` target
+built `runtime/ocamlrun` and then linked it into `boot/`. But
+`bootstrap` then (by running `make all`) rebuilds `runtime/ocamlrun`
+_without_ copying it into `boot`.
+
+(IOW: `boot/ocamlrun` was built with the old bootstrap compiler;
+`runtime/ocamlrun` is built by the new bootstrap compiler?)
+
+(Only `coldstart` copies `runtime/ocamlrun` into `boot/ocamlrun`)
+
+Note that target `bootstrap`, like target `world`, runs `$(MAKE) all`.
+But it depends on `coreboot` instead of `coldstart`. The former is
+responsible for "promoting" stuff
+
+IMPORTANT: the result of target coreboot is a new bootstrap compiler,
+not a local compiler.
+
+in the root Makefile:
+
+```
+coreboot:
+# Promote the new compiler but keep the old runtime
+# This compiler runs on boot/ocamlrun and produces bytecode for
+# runtime/ocamlrun
+	$(MAKE) promote-cross
+
+# Rebuild ocamlc and ocamllex (run on runtime/ocamlrun)
+# utils/config.ml will have the fixed bootstrap configuration
+	$(MAKE) partialclean
+	$(MAKE) IN_COREBOOT_CYCLE=true ocamlc ocamllex ocamltools  # almost same as coreall: actions
+
+	$(MAKE) library-cross   # Rebuild the library (using runtime/ocamlrun ./ocamlc)
+
+        # Promote the new compiler and the new runtime (??? runtime only?)
+	$(MAKE) OCAMLRUN=runtime/ocamlrun$(EXE) promote
+
+# Rebuild the core system
+# utils/config.ml must still have the fixed bootstrap configuration
+	$(MAKE) partialclean
+	$(MAKE) IN_COREBOOT_CYCLE=true core
+# Check if fixpoint reached
+	$(MAKE) compare
+```
+
+NB: target core depends on coldstart, then runs coreall
+
+
+```
+promote-cross: promote-common
+# NOTE: promote-common just repeats some of what target coldstart did
+PROMOTE ?= cp
+promote-common:
+	$(PROMOTE) ocamlc$(EXE) boot/ocamlc
+	$(PROMOTE) lex/ocamllex$(EXE) boot/ocamllex
+	cd stdlib; cp $(LIBFILES) ../boot
+```
+
+```
+# NB: library-cross: is same as library:, except the latter has
+# OCAMLRUN = boot/ocamlrun, which is the ocamlrun copied to boot by
+# target coldstart.  Why?
+
+library-cross:
+	$(MAKE) -C stdlib OCAMLRUN=../runtime/ocamlrun$(EXE) all
+```
+
+```
+promote: PROMOTE = $(OCAMLRUN) tools/stripdebug
+promote: promote-common
+	rm -f boot/ocamlrun$(EXE)
+	cp runtime/ocamlrun$(EXE) boot/ocamlrun$(EXE)
+```
+
+```
+\## remove generated files:
+partialclean::
+	rm -f ocamlopt$(EXE)
+partialclean::
+	rm -f ocaml$(EXE)
+partialclean::
+	rm -f parsing/lexer.ml
+partialclean::
+	rm -f utils/config.ml \
+	      utils/config_main.ml utils/config_main.mli \
+	      utils/config_boot.ml utils/config_boot.mli \
+        utils/domainstate.ml utils/domainstate.mli
+etc.
+```
+
+```
+compare:
+# The core system has to be rebuilt after bootstrap anyway, so strip ocamlc
+# and ocamllex, which means the artefacts should be identical.
+```
+
+==== Bootstrapping under OBazl
+
+With Bazel we can dispense with the business of copying and linking
+files into the `boot` subdirectory.
+
+All we need do is get the dependency structure right, and things will
+always be built in the correct order.
+
+VM builds:
+
+In general: all (OCaml) build targets depend on a runtime (VM) and a
+compiler that runs on it (i.e. a vm>vm compiler).
+
+The stdlib build depends only on the runtime and compiler. Other
+builds depend on the stdlib as well as the runtime and compiler.
+
+The first thing built after the runtime and stdlib is a new `ocamlc` compiler.
+
+
+`utils/config.ml` - special role. Dynamically created from either
+`confg_boot.ml` or `config_main.ml`, depending on flag
+`IN_COREBOOT_CYCLE`.

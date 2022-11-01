@@ -14,7 +14,7 @@ def _bootstrap_repl_impl(ctx):
     print("ocaml_tmp: %s" % ocaml_tmp)
 
     ## expunge
-    # "$(execpath //runtime:ocamlrun)",
+    # "$(execpath //boot:ocamlrun)",
     # "$(location //utils:expunge)",
     # "$(location :ocaml.tmp)",
     # "$(location ocaml)",

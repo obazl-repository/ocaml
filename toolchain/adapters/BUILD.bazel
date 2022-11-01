@@ -6,16 +6,18 @@ load("//toolchain:BUILD.bzl", "bootstrap_toolchain_adapter")
 
 ######## toolchain adapters ########
 
+## The bootstrap compiler is a precompiled vm>vm tool that comes with
+## the distribution.
 bootstrap_toolchain_adapter(
     name     = "bootstrap",
-    ocamlrun = "//runtime:ocamlrun",
+    ocamlrun = "//boot:ocamlrun", # the vm, implemented in C
     ocamlc   = "//boot:ocamlc", # the precompiled vm>vm bootstrap compiler
     linkmode = "dynamic"
 )
 
 bootstrap_toolchain_adapter(
     name     = "standard",
-    ocamlrun = "//runtime:ocamlrun",
+    ocamlrun = "//boot:ocamlrun",
     ocamlc   = "//compilers/stage1:ocamlc",
     # ocamlc   = "//runtime:ocamlc",
     linkmode = "dynamic"
@@ -23,14 +25,14 @@ bootstrap_toolchain_adapter(
 
 bootstrap_toolchain_adapter(
     name     = "debug",
-    ocamlrun = "//runtime:ocamlrund",
+    ocamlrun = "//boot:ocamlrund",
     ocamlc   = "//compilers/stage1:ocamlc",
     linkmode = "dynamic"
 )
 
 bootstrap_toolchain_adapter(
     name     = "instrumented",
-    ocamlrun = "//runtime:ocamlruni",
+    ocamlrun = "//boot:ocamlruni",
     ocamlc   = "//runtime:ocamlc",
     linkmode = "dynamic"
 )

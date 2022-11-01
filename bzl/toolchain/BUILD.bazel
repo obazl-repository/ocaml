@@ -26,7 +26,7 @@ label_flag(
 
 label_flag(
     name = "ocamlrun",
-    build_setting_default = "//runtime:ocamlrun"
+    build_setting_default = "//boot:ocamlrun"
 )
 
 label_flag(
