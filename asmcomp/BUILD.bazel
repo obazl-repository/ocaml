@@ -228,13 +228,16 @@ bootstrap_module(
     sig    = "Afl_instrument_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Cmm",
-        ## (Random)
-        "//stdlib:Stdlib.List",
-        "//utils:Clflags",
-        "//middle_end:Backend_var",
+        "//lambda:Lambda",
+        # "//middle_end:Backend_var",
+        #FIXME: bug in deps mgmt, import archive containing Backend_var
+        "//middle_end:ocamlmiddleend",
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Random",
+        "//utils:Clflags",
+        ":Cmm",
     ],
     data = ["//runtime:primitives"]
 )

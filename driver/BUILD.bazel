@@ -439,6 +439,7 @@ bootstrap_module(
     ],
     visibility = [
         "//compilers/stage1:__pkg__",
+        "//ocaml/bin:__pkg__",
         "//:__pkg__"
     ]
 )

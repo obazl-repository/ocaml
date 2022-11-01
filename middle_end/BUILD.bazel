@@ -71,8 +71,9 @@ bootstrap_archive(
         # ":Backend_intf_cmi",
     ],
     visibility = [
-        "//compilerlibs:__pkg__",
-        "//tools:__pkg__",
+        # "//compilerlibs:__pkg__",
+        # "//tools:__pkg__",
+        "//visibility:public"
     ]
 )
 
