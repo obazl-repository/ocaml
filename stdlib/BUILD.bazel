@@ -453,7 +453,7 @@ bootstrap_module(
 
 bootstrap_signature(
     name = "Std_exit_cmi",
-    src  = "Std_exit.mli",
+    src  = "std_exit.mli",
     opts = CAMLINTERNAL_OPTS,
     # primitives = PRIMITIVES,
     deps   = [
