@@ -7,11 +7,14 @@ load("//bzl:rules.bzl",
 )
 
 load("//config:BUILD.bzl",
+     "CPP",
      "USE_PRIMS", "DATA_PRIMS",
      "ROOT_MODULE_OPTS",
      "ROOT_SIG_OPTS")
 
-load(":BUILD.bzl", "CONFIG_MAP", "write_config")
+load(":BUILD.bzl",
+     ## "CONFIG_MAP",
+     "write_config")
 
 exports_files([ ## for //otherlibs/dynlink:Dynlink_compilerlibs
     "arg_helper.mli", "arg_helper.ml",
@@ -522,7 +525,10 @@ genrule(
     cmd = " ".join([
         "HDRS=`dirname $(location //runtime/caml:config.h)`",
         "&&",
-        "clang -E -I $$HDRS $(location :domainstate.ml.c) > $@"
+        ## clang on mac
+        "{} -I $$HDRS $(location :domainstate.ml.c) > $@".format(
+            " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
+        )
     ])
 )
 

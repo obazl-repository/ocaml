@@ -118,7 +118,7 @@ cc_binary(
 ## Bazel: arch must be set, by config setting to be determined.
 ## For now it's hardcoded as amd64 since I'm using a legacy Mac for dev.
 RUNTIME_ASM_OBJECTS = select({
-    "//config/host:windows_x86_32": [ARCH + "nt.asm"],
+    "//platforms:windows_x86_32?": [ARCH + "nt.asm"],
     "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
 })
 
@@ -149,10 +149,10 @@ filegroup(
         ]
     ) + select({
     ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
-    "//config/host:linux": ["unix.c"],
-    "//config/host:macos?": ["unix.c"],
-    "//config/host:windows_x86_32": ["win32.c"], # using bazel naming
-    # "//config/host:windows_x86_64": [???]
+    "//platforms/os:linux?": ["unix.c"],
+    "//platforms/os:macos?": ["unix.c"],
+    "//platforms:windows_x86_32?": ["win32.c"], # using bazel naming
+    # "//platforms:windows_x86_64?": [???]
     "//conditions:default": []
     }),
     visibility = [
@@ -222,10 +222,10 @@ COMMON_C_SOURCES = [
     "weak.c"
 ] + select({
     ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
-    "//config/host:linux": ["unix.c"],
-    "//config/host:macos?": ["unix.c"],
-    "//config/host:windows_x86_32": ["win32.c"], # using bazel naming
-    # "//config/host:windows_x86_64": [???]
+    "//platforms/os:linux?": ["unix.c"],
+    "//platforms/os:macos?": ["unix.c"],
+    "//platforms:windows_x86_32?": ["win32.c"], # using bazel naming
+    # "//platforms:windows_x86_64?": [???]
     "//conditions:default": []
 })
 
@@ -414,7 +414,7 @@ genrule(
 #     + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
 #     # + select({
 #     #     #FIXME: on mac bazel always adds -DDEBUG for fastbuild
-#     #     "//config/host:macos_fastbuild?": ["-UDEBUG"],
+#     #     "//platforms/os:macos_fastbuild?": ["-UDEBUG"],
 #     #     "//conditions:default": []
 #     # }),
 #     defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
@@ -449,7 +449,7 @@ genrule(
 #     ] + OC_CPPFLAGS,
 #     # + select({
 #     #     #FIXME: macos with compilation_mode == fastbuild
-#     #     "//config/host:macos_fastbuild?": ["-UDEBUG"],
+#     #     "//platforms/os:macos_fastbuild?": ["-UDEBUG"],
 #     #     "//conditions:default": []
 #     # }),
 #     defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,

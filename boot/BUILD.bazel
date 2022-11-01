@@ -50,13 +50,19 @@ cc_binary(
     }),
     copts = [
         "-x", "c",
-        "-std=c11",
         "-I$(GENDIR)/runtime" # build_config.h
-    ] + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+    ] + select({
+        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:linux?": [],
+        "//conditions:default":  ["-std=c11"]
+    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
     defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
     linkopts = [
         "-lm", "-lpthread",
-    ] + MKEXE_FLAGS,
+    ] + select({
+        "//platforms/os:linux?": ["-ldl"],
+        "//conditions:default": []
+    }) + OC_LDFLAGS + LDFLAGS,
     deps= [":camlrun"],
     visibility = ["//visibility:public"]
 )
@@ -78,13 +84,14 @@ cc_library(
     }),
     copts = [
         "-x", "c",
-        "-std=c11",
         "-Wall",
         # "-Wpedantic",
         "-I$(GENDIR)/runtime" # build_config.h
     ] + select({
-        "//conditions:default": ["-g"]
-    }) + OC_CPPFLAGS,
+        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:linux?": [],
+        "//conditions:default":  ["-std=c11"]
+    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
     defines = CC_DEFINES,
     deps = [
         "//runtime/caml:hdrs"
@@ -103,10 +110,13 @@ cc_library(
     ],
     copts = [
         "-x", "c",
-        "-std=c11",
         "-I$(GENDIR)/runtime" # build_config.h
-    ] + OC_CPPFLAGS,
-    linkopts = LDFLAGS + OC_LDFLAGS,
+    ] + select({
+        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:linux?": [],
+        "//conditions:default":  ["-std=c11"]
+    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+    linkopts = OC_LDFLAGS + LDFLAGS,
     defines = CC_DEFINES + CC_NATIVE_DEFINES,
     deps = ["//runtime/caml:hdrs"],
     visibility = ["//lib:__pkg__"]

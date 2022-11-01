@@ -215,7 +215,7 @@ cc_library(
         "st_posix.h",
         "st_stubs.c"
     ] + select({
-        "//config/host:windows_x86_64": ["st_win32.h"],
+        "//platforms/os:windows_x86_64": ["st_win32.h"],
         "//conditions:default":         []
     }),
     copts = [

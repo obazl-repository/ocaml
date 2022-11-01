@@ -19,7 +19,7 @@ cc_binary(
     ] + select({
         ## On macos Bazel passes -DDEBUG in fastbuild mode
         ## this breaks closure.c due to the bug mentioned above.
-        "//config/host:macos?": ["-UDEBUG"],
+        "//platforms/os:macos?": ["-UDEBUG"],
         "//conditions:default": []
     }),
     deps = ["//runtime/caml:hdrs"],

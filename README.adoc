@@ -189,6 +189,8 @@ All the compilers and tools build.
 
 == The OBazl Build: concepts and structure
 
+WARNING: You must run `./configure` before running Bazel builds.
+
 Just some notes to help the reader of the code:
 
 === Notation and Terminology
