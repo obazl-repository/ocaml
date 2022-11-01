@@ -555,6 +555,7 @@ genrule(
         "&&",
         "{} -I $$HDRS $(location :domainstate.ml.c) > $@".format(
             " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
+        )
     ])
 )
 
