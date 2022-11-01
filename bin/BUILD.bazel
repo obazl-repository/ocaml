@@ -41,7 +41,9 @@ ocamlc_boot( ##FIXME: do we really need a separate rule?
     exec_compatible_with = [
         ## *>vm ???
     ],
-    opts = ["-nostdlib", "-compat-32"],
+    opts = [
+        "-nostdlib", "-compat-32",
+    ],
     # primitives = PRIMITIVES,
     main = "//driver:Main",
     deps = [
