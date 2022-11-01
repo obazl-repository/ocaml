@@ -553,7 +553,7 @@ genrule(
     cmd = " ".join([
         "HDRS=`dirname $(location //runtime/caml:config.h)`",
         "&&",
-        "{} -I $$HDRS $(location :domainstate.ml.c) > $@".format(
+        "{} -I $$HDRS $(location :domainstate.mli.c) > $@".format(
             " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
         )
     ])
