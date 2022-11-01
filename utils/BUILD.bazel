@@ -525,7 +525,6 @@ genrule(
     cmd = " ".join([
         "HDRS=`dirname $(location //runtime/caml:config.h)`",
         "&&",
-        ## clang on mac
         "{} -I $$HDRS $(location :domainstate.ml.c) > $@".format(
             " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
         )
@@ -554,7 +553,8 @@ genrule(
     cmd = " ".join([
         "HDRS=`dirname $(location //runtime/caml:config.h)`",
         "&&",
-        "clang -E -I $$HDRS $(location :domainstate.mli.c) > $@"
+        "{} -I $$HDRS $(location :domainstate.ml.c) > $@".format(
+            " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
     ])
 )
 
