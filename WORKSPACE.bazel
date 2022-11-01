@@ -30,9 +30,9 @@ obazl_deps()
 # register_toolchains("@ocaml//toolchain/selectors/local:vmvm")
 register_toolchains(
     "//toolchain/selectors:bootstrap",
-    "//toolchain/selectors:std",
-    "//toolchain/selectors:dbg",
-    "//toolchain/selectors:instrumented",
+    "//toolchain/selectors:local",
+    # "//toolchain/selectors:dbg",
+    # "//toolchain/selectors:instrumented",
 )
 
 # register_execution_platforms(

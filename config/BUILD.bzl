@@ -12,15 +12,45 @@
 
 ################################
 ## Makefile.config:
+##FIXME: use Bazel @platform//cpu, os
 TARGET = "x86_64-apple-darwin20.6.0"  ## FIXME
 HOST   = "x86_64-apple-darwin20.6.0"    ## FIXME
 
-## FIXME: convert to select constraints
-ARCH       = "amd64"
-ARCH64     = True
+## FIXME: convert to select constraints, using platforms & toolchains
+# ARCH       = "amd64"
+## priority: xtarget host, target host, build host
+ARCH = select({
+    "@platforms//cpu:x86_64": "amd64",
+    "@platforms//cpu:arm": "arm",
+    "//conditions:default": ""
+})
+
+# runtime/caml/stack.h uses TARGET_$(ARCH) to select some stuff.
+
+# ARCH64     = True
+ARCH64 = select({
+    "@platforms//os:amd64": True,
+    "@platforms//os:arm64": True,
+    "@platforms//os:x86_64": True,
+    "@platforms//os:wasm64": True,
+    "@platforms//os:riscv64": True,
+    "//conditions:default": False
+})
+
+## FIXME: derive endianness from @platforms//os
 ENDIANNESS = "le"
+
 MODEL      = "default"
+## OCaml uses e.g. MODEL_armv6 where Bazel uses @platforms//cpu:armv6
+## the code uses MODEL_ with armv6, armv7, ppc, and ppcle. Everything
+## else gets MODEL_default.
+
+
 SYSTEM     = "macosx"
+
+# Makefile.common:
+# OC_NATIVE_CPPFLAGS=\
+#   -DNATIVE_CODE -DTARGET_$(ARCH) -DMODEL_$(MODEL) -DSYS_$(SYSTEM)
 
 ### Where to install the standard library
 # LIBDIR=${exec_prefix}/lib/ocaml
@@ -189,7 +219,9 @@ CC_DEFINES = [
 #     "//conditions:default": []
 }) + select({
     "//config/compilation_mode:dbg?": ["DEBUG"],
-    "//conditions:default": []
+    "//config/compilation_mode:fastbuild?": ["FASTBUILD"],
+    "//config/compilation_mode:opt?": ["OPT"],
+    "//conditions:default": ["MODE_DEFAULT"]
 }) + select({
     "//config:instrumented?": ["CAML_INSTR"],
     "//conditions:default": []
@@ -216,13 +248,21 @@ CC_DEFINES = [
  #     ]
  # })
 CC_NATIVE_DEFINES = [
-    "NATIVE_CODE", "TARGET_"+ ARCH, "SYS_" + SYSTEM
+    "NATIVE_CODE", "SYS_" + SYSTEM
 ] + select({
-    "//config/host:linux": ["MODEL_" + MODEL],
-    "//config/host:macos?": ["MODEL_" + MODEL],
+    "@platforms//cpu:armv6-m": ["MODEL_armv6"],
+    "@platforms//cpu:armv7": ["MODEL_armv7"],
+    "@platforms//cpu:ppc": ["MODEL_ppc"],
+    "//conditions:default": ["MODEL_default"]
+    # not supported by @platforms//cpu:
+    # "@platforms//cpu:ppc64": ["MODEL_ppc64"],
+    # "@platforms//cpu:ppc64le": ["MODEL_ppc64le"],
+}) + select({
+    ## TARGET_$(ARCH) - only used in runtime/caml/stack.h
+    "@platforms//cpu:x86_64": ["TARGET_amd64"],
+    "@platforms//cpu:arm": ["TARGET_arm"],
     "//conditions:default": []
 })
-
 
 # OC_DEBUG_CPPDEFINES = ["DEBUG"] ##FIXME: not needed
 # OC_INSTR_CPPDEFINES = ["CAML_INSTR"] ##FIXME: not needed

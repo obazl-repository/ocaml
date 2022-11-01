@@ -1,0 +1,12 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag",
+     "string_list_flag")
+
+bool_flag(name = "dbg", build_setting_default = False)
+config_setting(name = "dbg?", flag_values = {":dbg": "True"})
+
+bool_flag(name = "fastbuild", build_setting_default = False)
+config_setting(name = "fastbuild?", flag_values = {":fastbuild": "True"})
+
+string_list_flag(name = "args", build_setting_default = [],
+            visibility = ["//toolchain:__subpackages__"])

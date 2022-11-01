@@ -12,14 +12,14 @@ bootstrap_toolchain_adapter(
     name      = "bootstrap",
     ocamlrun  = "//boot:ocamlrun", # the vm, implemented in C
     ocamlc    = "//boot:ocamlc", # the precompiled vm>vm bootstrap compiler
-    vmruntime = "//boot:camlrun", # do we need this?
+    # vmruntime = "//boot:camlrun", # do we need this?
     linkmode = "dynamic"
 )
 
 bootstrap_toolchain_adapter(
     name     = "local",
-    ocamlrun = "//ocaml/bin:ocamlrun",
-    ocamlc   = "//ocaml/bin:ocamlc",
+    ocamlrun = "//bin:ocamlrun",
+    ocamlc   = "//bin:ocamlc",
     linkmode = "dynamic"
 )
 

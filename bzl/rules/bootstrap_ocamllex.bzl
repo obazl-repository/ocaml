@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
@@ -12,58 +13,61 @@ load(":impl_common.bzl", "tmpdir")
 ########## RULE:  OCAML_INTERFACE  ################
 def _bootstrap_ocamllex_impl(ctx):
 
-  debug = False
-  # if (ctx.label.name == "_Impl"):
-  #     debug = True
+    debug = False
+    if (ctx.label.name == "_Impl"):
+        debug = True
 
-  if debug:
-      print("OCAML LEX TARGET: %s" % ctx.label.name)
+    if debug:
+        print("OCAML LEX TARGET: %s" % ctx.label.name)
 
-  mode = ctx.attr.mode
+    mode = ctx.attr.mode
 
-  tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
-  tool = tc.ocamlrun
-  tool_args = [tc.boot_ocamllex]
+    tool = tc.ocamlrun
+    tool_args = [tc.boot_ocamllex]
 
-  # env = {"PATH": get_sdkpath(ctx)}
+    # env = {"PATH": get_sdkpath(ctx)}
 
-  # lexer_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
+    # lexer_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
 
-  # lexer = ctx.actions.declare_file(lexer_fname)
-  lexer = ctx.outputs.out
+    # lexer = ctx.actions.declare_file(lexer_fname)
+    lexer = ctx.outputs.out
 
-  #########################
-  args = ctx.actions.args()
+    #########################
+    args = ctx.actions.args()
 
-  args.add_all(tool_args)
+    args.add_all(tc.vmargs[BuildSettingInfo].value)
+    args.add_all(ctx.attr.vmargs)
 
-  if mode == "native":
-      args.add("-ml")
+    args.add_all(tool_args)
 
-  args.add_all(ctx.attr.opts)
+    if mode == "native":  ## OBSOLETE? use tc.target_host?
+        args.add("-ml")
 
-  args.add("-o", lexer)
+    args.add_all(ctx.attr.opts)
 
-  args.add(ctx.file.src)
+    args.add("-o", lexer)
 
-  ctx.actions.run(
-      # env = env,
-      executable = tool,
-      arguments = [args],
-      inputs = [ctx.file.src],
-      outputs = [lexer],
-      tools = [tool] + tool_args,
-      mnemonic = "OcamlLex",
-      progress_message = "{mode} ocaml_lex: @{ws}//{pkg}:{tgt}".format(
-          mode = mode,
-          ws  = ctx.label.workspace_name,
-          pkg = ctx.label.package,
-          tgt=ctx.label.name
-      )
-  )
+    args.add(ctx.file.src)
 
-  return [DefaultInfo(files = depset(direct = [lexer]))]
+    ctx.actions.run(
+        # env = env,
+        executable = tool,
+        arguments = [args],
+        inputs = [ctx.file.src],
+        outputs = [lexer],
+        tools = [tool] + tool_args,
+        mnemonic = "OcamlLex",
+        progress_message = "{mode} ocaml_lex: @{ws}//{pkg}:{tgt}".format(
+            mode = mode,
+            ws  = ctx.label.workspace_name,
+            pkg = ctx.label.package,
+            tgt=ctx.label.name
+        )
+    )
+
+    return [DefaultInfo(files = depset(direct = [lexer]))]
 
 #################
 bootstrap_ocamllex = rule(
@@ -77,6 +81,9 @@ bootstrap_ocamllex = rule(
         src = attr.label(
             doc = "A single .mll source file label",
             allow_single_file = [".mll"]
+        ),
+        vmargs = attr.string_list(
+            doc = "Args to pass to ocamlrun when it runs ocamllex.",
         ),
         out = attr.output(
             doc = """Output filename.""",

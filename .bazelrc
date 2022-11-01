@@ -1,14 +1,22 @@
-build --incompatible_enable_cc_toolchain_resolution
+## put this in ~/.bazelrc to enable for all bazel projects
+# build --incompatible_enable_cc_toolchain_resolution
 
 # build --//config/toolchain=zig
 # build --extra_toolchains="@zig_sdk//toolchain:darwin_amd64"
+
+# build --platforms=@zig_sdk//platform:linux_arm64
+
 # build --action_env BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 # build --action_env ZIG_SYSTEM_LINKER_HACK=1
 
 # build --toolchain_resolution_debug=.*
-# build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
+build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 
-common --color=yes
+## set cc opts for specific files:
+# build --per_file_copt=
+
+## put this in ~/.bazelrc to enable for all bazel projects
+# common --color=yes
 
 ## always stamp, it injects the absolute path of the workspace root
 # https://docs.bazel.build/versions/main/user-manual.html#flag--workspace_status_command
@@ -17,11 +25,11 @@ build --stamp --workspace_status_command=$PWD/bzl/camlheader.sh
 ## enable debug for ocamlrun:
 ## build --//config/debug:ocamlrun
 
-build:stage1 --//bzl/toolchain:ocamlc=//compilers/stage1:ocamlc
-build:stage1 --//bzl:stage=0
+# build:stage1 --//bzl/toolchain:ocamlc=//compilers/stage1:ocamlc
+# build:stage1 --//bzl:stage=0
 
-build:stage2 --//bzl/toolchain:ocamlc=//compilers/stage2:ocamlc
-build:stage2 --//bzl:stage=1
+# build:stage2 --//bzl/toolchain:ocamlc=//compilers/stage2:ocamlc
+# build:stage2 --//bzl:stage=1
 
 ## toolchains
 

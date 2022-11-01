@@ -252,7 +252,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Format",
     ],
-    visibility = ["//ocaml/bin:__pkg__"] # the new compiler
+    visibility = ["//bin:__pkg__"] # the new compiler
 )
 
 bootstrap_module(
@@ -439,7 +439,7 @@ bootstrap_module(
     ],
     visibility = [
         "//compilers/stage1:__pkg__",
-        "//ocaml/bin:__pkg__",
+        "//bin:__pkg__",
         "//:__pkg__"
     ]
 )

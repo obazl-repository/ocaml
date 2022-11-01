@@ -2370,13 +2370,16 @@ SYSPATHS_CMD = " ".join([
     "> $(location target_camlheaderi);",
 ])
 
+## IMPORTANT! For this to work, the following cli args must be passed:
+# --stamp
+# --workspace_status_command=$PWD/bzl/camlheader.sh
 DEVPATHS_CMD = "\n".join([
     "cat bazel-out/stable-status.txt | ",
     "while read KEY VAL; do",
     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
-    "echo '#!'$$VAL/$(execpath //bzl/toolchain:ocamlrun) > $(location camlheader);\n",
-    "echo '#!'$$VAL/$(execpath //bzl/toolchain:ocamlrun)d > $(location camlheaderd);\n",
-    "echo '#!'$$VAL/$(execpath //bzl/toolchain:ocamlrun)i > $(location camlheaderi);\n",
+    "echo '#!'$$VAL/$(execpath //boot:ocamlrun) > $(location camlheader);\n",
+    "echo '#!'$$VAL/$(execpath //boot:ocamlrun)d > $(location camlheaderd);\n",
+    "echo '#!'$$VAL/$(execpath //boot:ocamlrun)i > $(location camlheaderi);\n",
     "fi",
     "done",
 

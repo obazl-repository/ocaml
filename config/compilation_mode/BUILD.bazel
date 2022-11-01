@@ -11,7 +11,7 @@ config_setting(
 )
 
 config_setting(
-    name = "dev?",
+    name = "fastbuild?",
     values = {"compilation_mode": "fastbuild"}
 )
 

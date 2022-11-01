@@ -37,7 +37,7 @@ bootstrap_archive(
         "//boot:__pkg__",
         "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
-        "//ocaml/bin:__pkg__",  # the new compiler
+        "//bin:__pkg__",  # the new compiler
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",

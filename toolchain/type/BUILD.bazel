@@ -1,5 +1,5 @@
 toolchain_type(name = "bootstrap", visibility = ["//visibility:public"])
-toolchain_type(name = "std", visibility = ["//visibility:public"])
+toolchain_type(name = "local", visibility = ["//visibility:public"])
 
 toolchain_type(name = "profile", visibility = ["//visibility:public"])
 

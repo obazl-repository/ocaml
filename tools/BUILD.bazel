@@ -734,5 +734,6 @@ bootstrap_module(
 bootstrap_ocamllex(
     name = "make_opcodes_ml",
     out  = "make_opcodes.ml",
-    src  = "make_opcodes.mll"
+    src  = "make_opcodes.mll",
+    # vmargs = ["-t", "-b"]
 )

@@ -12,8 +12,8 @@ toolchain_selector(
 
 ##########
 toolchain_selector(
-    name           = "std",
-    toolchain = "//toolchain/adapters:standard",
+    name           = "local",
+    toolchain = "//toolchain/adapters:local",
     # toolchain      = "@ocaml//toolchain/adapters/local:sysvm",
     build_host_constraints  = [
         # "@ocaml//platforms:vm?"

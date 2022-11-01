@@ -1,6 +1,8 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
 
+load("//toolchain:transitions.bzl", "tool_out_transition")
+
 ## exports:
 ##  toolchain_selector (macro)
 ##  bootstrap_toolchain_adapter (rule)
@@ -94,6 +96,7 @@ def _bootstrap_toolchain_adapter_impl(ctx):
         linkmode       = ctx.attr.linkmode,
         target_vm  = ctx.attr.target_vm,
         ocamlrun   = ctx.file.ocamlrun,
+        vmargs     = ctx.attr._vmargs,
         ocamlc     = ctx.file.ocamlc,
         # ocamlc     = ctx.file.ocamlc, #.files.to_list()[0],
         boot_ocamllex   = ctx.attr.boot_ocamllex.files.to_list()[0],
@@ -149,9 +152,17 @@ bootstrap_toolchain_adapter = rule(
             # default    = "//bzl/toolchain:ocamlrun",
             executable = True,
             allow_single_file = True,
-            # cfg = ocamlrun_out_transition,
-            cfg = "exec",
+            ## By default Bazel will set compilation_mode=opt for
+            ## executable tools. We need a transition to override this
+            ## in case we need a debug version.
+            cfg = tool_out_transition,
+            # cfg = "exec",
         ),
+        "_vmargs": attr.label( ## string list
+            doc = "Args to pass to all invocations of ocamlrun",
+            default = "//boot/vm:args"
+        ),
+
         "_allowlist_function_transition" : attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -169,6 +180,13 @@ bootstrap_toolchain_adapter = rule(
             default    = "//boot:ocamllex",
             executable = True,
             allow_single_file = True,
+            ## WARNING: this cfg transition evidently switches
+            ## compilation_mode to opt. Normally that would be a good
+            ## thing, insofar as it forces build of an optimized
+            ## build. In this case, ocamllex is precompiled. Problem
+            ## is, Bazel seems to want to also run the tool under
+            ## compilation_mode opt. But sometimes we may want to run
+            ## a debug version of the tool.
             cfg = "exec",
         ),
 

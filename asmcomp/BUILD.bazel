@@ -59,11 +59,13 @@ bootstrap_archive(
 
     ] + select(
         {
-        "//config/arch:x86_64":
+        # "//config/arch:x86_64":
+        "@platforms//os:x86_64":
         [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
         # "//config/arch:amd64":
         # [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
-        "//config/arch:i386":
+        # "//config/arch:i386":
+        "@platforms//os:i386":
         ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
     }, no_match_error = "Unsupported arch"),
 
@@ -171,7 +173,12 @@ bootstrap_library(
 bootstrap_module(
     name   = "CSE",
     struct = select({
-        "//config/arch:x86_64": "//asmcomp/amd64:CSE.ml",
+        ## FIXME: select on xtarget or target host
+        # "//platform/target:x86_64": "//asmcomp/amd64:CSE.ml",
+        # "//platform/xtarget:x86_64": "//asmcomp/amd64:CSE.ml",
+        # "//config/arch:x86_64": "//asmcomp/amd64:CSE.ml",
+
+        "@platforms//cpu:x86_64": "//asmcomp/amd64:CSE.ml",
         "//config/arch:arm"   : "//asmcomp/arm:CSE.ml",
         "//config/arch:arm64"   : "//asmcomp/arm64:CSE.ml",
         "//config/arch:i386"   : "//asmcomp/i386:CSE.ml",

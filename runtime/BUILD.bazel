@@ -157,7 +157,7 @@ filegroup(
     }),
     visibility = [
         "//boot:__pkg__",
-        "//ocaml/bin:__pkg__"
+        "//bin:__pkg__"
     ]
 )
 
@@ -230,6 +230,12 @@ COMMON_C_SOURCES = [
 })
 
 filegroup(
+    name = "instrtrace",
+    srcs = ["instrtrace.c"],
+    visibility = ["//boot:__pkg__"]
+)
+
+filegroup(
     name = "bytecode_only_c_sources",
     srcs = [
             "backtrace_byt.c",
@@ -241,7 +247,7 @@ filegroup(
         ],
     visibility = [
         "//boot:__pkg__",
-        "//ocaml/bin:__pkg__"
+        "//bin:__pkg__"
     ]
 )
 
@@ -269,7 +275,7 @@ filegroup(
     ],
     visibility = [
         "//boot:__pkg__",
-        "//ocaml/bin:__pkg__"
+        "//bin:__pkg__"
     ]
 )
 
@@ -365,7 +371,7 @@ genrule(
     ]),
     visibility = [
         "//boot:__pkg__",
-        "//ocaml/bin:__pkg__"
+        "//bin:__pkg__"
     ]
 )
 

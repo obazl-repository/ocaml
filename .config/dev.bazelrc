@@ -6,19 +6,19 @@ common --override_repository=libs7=/Users/gar/obazl/libs7
 
 common --override_repository=rules_jsoo=/Users/gar/obazl/rules_jsoo
 
-common:show --subcommands=pretty_print
-common:show --verbose_failures
-
-common:dbg --subcommands=pretty_print
-common:dbg --verbose_failures
-build:dbg --compilation_mode=dbg
+## put these in ~/.bazelrc to enable for all bazel projects
+# build --incompatible_enable_cc_toolchain_resolution
+# build --incompatible_use_cc_configure_from_rules_cc
+# common:show --subcommands=pretty_print
+# common:show --verbose_failures
+# common:dbg --subcommands=pretty_print
+# common:dbg --verbose_failures
+# build:dbg --compilation_mode=dbg
 build:dbg --//config/debug:ocamlrun
 
 build:dbgv --@rules_ocaml//cfg/verbose
 test:dbg --test_output=errors
 
-build --incompatible_enable_cc_toolchain_resolution
-# build --incompatible_use_cc_configure_from_rules_cc
 
 #build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@rules_ocaml//toolchain/type:std

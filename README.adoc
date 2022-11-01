@@ -139,7 +139,7 @@ separate rulesets such as:
 
 The OBazl code suffices to build some earlier versions, e.g. 4.14.0,
 5.0. Work is underway to upgrade it to support the latest version
-(5.1.x).
+(5.1.x).  The 5.1.x code has a lot of changes that I do not plan to backport.
 
 IMPORTANT: The code does not yet support the "fixpoint" build
 expressed by the Makefiles. Instead it uses "stages": the bootstrap
@@ -157,13 +157,31 @@ The bazel code in this branch is derived from the code in branch
 `bazel/4.14.0`; some work remains to be done to upgrade it to support
 trunk (OCaml 5.1.x).
 
-The following targets should build successfully:
+The main build targets at this point:
 
-* all targets in `runtime`: `//boot:ocamlrun`, `//runtime:camlrun`,
-  `//runtime:asmrun`, etc.
+* the bootstrap stuff:
+ ** `//boot:ocamlrun`
+ ** `//boot:stdlib`
 
-* `//stdlib`
+* also
+ ** `//bin:ocamlc`
+ ** `//bin:ocamlrun`
+ ** `//lib:camlrun`
+ ** `//lib:asmrun`
 
+==== MacOS Clang
+
+The main targets should build successfully.
+
+==== MacOS Zig
+
+The runtime builds but I get errors trying to use it to run the bootstrap compiler, e.g.
+
+```
+(Illegal instruction): ocamlrun failed: error executing command (from target //stdlib:CamlinternalFormatBasics_cmi)
+```
+
+No idea why.  I'm hoping its just a configuration bug.
 
 === branch: bazel/4.14.0
 

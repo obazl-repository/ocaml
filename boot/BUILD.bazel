@@ -45,11 +45,14 @@ cc_binary(
     srcs = [
         "//runtime:prims.c",
     ] + select({
-        "//runtime:instrumented?": ["instrtrace.c"],
+        "//boot/vm:dbg?": ["//runtime:instrtrace"],
         "//conditions:default": []
     }),
-    copts = ["-I$(GENDIR)/runtime"] # build_config.h
-    + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+    copts = [
+        "-x", "c",
+        "-std=c11",
+        "-I$(GENDIR)/runtime" # build_config.h
+    ] + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
     defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
     linkopts = [
         "-lm", "-lpthread",
@@ -73,13 +76,20 @@ cc_library(
     # "//conditions:default": ["//runtime:native_only_c_sources"],
     "//conditions:default": []
     }),
-    copts = ["-I$(GENDIR)/runtime"] # build_config.h
-    + OC_CPPFLAGS,
+    copts = [
+        "-x", "c",
+        "-std=c11",
+        "-Wall",
+        # "-Wpedantic",
+        "-I$(GENDIR)/runtime" # build_config.h
+    ] + select({
+        "//conditions:default": ["-g"]
+    }) + OC_CPPFLAGS,
     defines = CC_DEFINES,
     deps = [
         "//runtime/caml:hdrs"
     ],
-    visibility = ["//ocaml:__subpackages__"]
+    visibility = ["//lib:__pkg__"]
 )
 
 ###########
@@ -91,12 +101,15 @@ cc_library(
         "//runtime:common_c_sources",
         "//runtime:native_only_c_sources"
     ],
-    copts = ["-I$(GENDIR)/runtime"] # build_config.h
-    + OC_CPPFLAGS,
+    copts = [
+        "-x", "c",
+        "-std=c11",
+        "-I$(GENDIR)/runtime" # build_config.h
+    ] + OC_CPPFLAGS,
     linkopts = LDFLAGS + OC_LDFLAGS,
     defines = CC_DEFINES + CC_NATIVE_DEFINES,
     deps = ["//runtime/caml:hdrs"],
-    visibility = ["//ocaml:__subpackages__"]
+    visibility = ["//lib:__pkg__"]
 )
 
 ################################################################

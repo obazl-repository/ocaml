@@ -1,10 +1,55 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "string_flag", "string_setting")
+
 load("//bzl:rules.bzl",
      "bootstrap_archive",
      "bootstrap_executable",
      "bootstrap_module",
 )
 
+package(default_visibility = ["//visibility:public"])
+
 exports_files(["Makefile.config", "VERSION"])
+
+## cross-compiler cross-targets
+string_flag(name = "xtarget", build_setting_default = "sys")
+
+config_setting(name = "vm?", flag_values = {":xtarget": "vm"})
+config_setting(name = "sys?", flag_values = {":xtarget": "sys"})
+# OCaml arch names
+config_setting(name = "amd64?", flag_values = {":xtarget": "amd64"})
+config_setting(name = "arm?", flag_values = {":xtarget": "arm"})
+config_setting(name = "arm64?", flag_values = {":xtarget": "arm64"})
+config_setting(name = "i386?", flag_values = {":xtarget": "i386"})
+config_setting(name = "power?", flag_values = {":xtarget": "power"})
+config_setting(name = "riscv?", flag_values = {":xtarget": "riscv"})
+config_setting(name = "s390x?", flag_values = {":xtarget": "s390x"})
+
+# Bazel-defined arch names
+# see https://github.com/bazelbuild/platforms/blob/main/cpu/BUILD
+alias(name = "aarch64", actual = ":arm64")
+config_setting(name = "aarch64?", flag_values = {":xtarget": "x86_64"})
+# config_setting(name = "arm?", flag_values = {":xtarget": "arm"})
+config_setting(name = "armv6-m?", flag_values = {":xtarget": "armv6-m"})
+config_setting(name = "armv7?", flag_values = {":xtarget": "armv7"})
+config_setting(name = "armv7k?", flag_values = {":xtarget": "armv7k"})
+config_setting(name = "armv7-m?", flag_values = {":xtarget": "armv7-m"})
+config_setting(name = "armv7e-m?", flag_values = {":xtarget": "armv7e-m"})
+config_setting(name = "armv7e-mf?", flag_values = {":xtarget": "armv7e-mf"})
+config_setting(name = "armv8-m?", flag_values = {":xtarget": "armv8-m"})
+# config_setting(name = "arm64?", flag_values = {":xtarget": "arm64"})
+config_setting(name = "arm64_32?", flag_values = {":xtarget": "arm64_32"})
+config_setting(name = "arm64e", flag_values = {":xtarget": "arm64e"})
+alias(name = "ppx", actual = ":power")
+config_setting(name = "x86_32?", flag_values = {":xtarget": "x86_32"})
+config_setting(name = "x86_64?", flag_values = {":xtarget": "x86_64"})
+config_setting(name = "wasm64?", flag_values = {":xtarget": "wasm64"})
+config_setting(name = "mips64?", flag_values = {":xtarget": "mips64"})
+config_setting(name = "riscv32?", flag_values = {":xtarget": "riscv32"})
+config_setting(name = "riscv64?", flag_values = {":xtarget": "riscv64"})
+
+
+## FIXME: most of this stuff is obsolete, moved to other pkgs.
 
 ##############################
 ####  Executable Targets  ####
