@@ -236,7 +236,7 @@ Caml_inline void check_trap_barrier_for_effect
 #endif
 #endif
 
-#ifdef DEBUG
+#ifdef DEBUG_TRACE
 static __thread intnat caml_bcodcount;
 #endif
 
@@ -342,7 +342,7 @@ value caml_interprete(code_t prog, asize_t prog_size)
   accu = Val_int(0);
 
 #ifdef THREADED_CODE
-#ifdef DEBUG
+#ifdef DEBUG_TRACE
  next_instr:
   if (caml_icount-- == 0) caml_stop_here ();
   CAMLassert(Stack_base(domain_state->current_stack) <= sp);
@@ -351,7 +351,7 @@ value caml_interprete(code_t prog, asize_t prog_size)
   goto *(void *)(jumptbl_base + *pc++); /* Jump to the first instruction */
 #else
   while(1) {
-#ifdef DEBUG
+#ifdef DEBUG_TRACE
     caml_bcodcount++;
     if (caml_icount-- == 0) caml_stop_here ();
     if (caml_params->trace_level>1)
