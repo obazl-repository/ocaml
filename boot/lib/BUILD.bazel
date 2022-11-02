@@ -1,0 +1,9 @@
+alias(
+    name   = "camlrun",
+    actual = "//runtime:camlrun"
+)
+
+alias(
+    name   = "asmrun",
+    actual = "//runtime:asmrun"
+)

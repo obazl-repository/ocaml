@@ -6,9 +6,10 @@ load("//bzl:rules.bzl",
      "ocamlc_runtime",
      "ocamlrun")
 
-load("//config:BUILD.bzl",
+load("//config:CONFIG.bzl",
      "ARCH", "MODEL", "SYSTEM",
-     "HOST", "ROOTDIR", "LIBDIR",
+     "HOST",
+     "BYTECCLIBS",
      # flags
      "OC_CFLAGS", "CFLAGS",
      "OC_CPPFLAGS", "CPPFLAGS",
@@ -16,13 +17,34 @@ load("//config:BUILD.bzl",
      # defines - replace by CC_DEFINES with selects
      # "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
      # "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
-     "CC_DEFINES", "CC_NATIVE_DEFINES",
+     # "CC_DEFINES", "CC_NATIVE_DEFINES",
      # other
-     "OUTPUTEXE", "MKEXE_FLAGS",
+     "LIBDIR", "ROOTDIR"
      )
 
 load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag", "string_setting")
+
+RUNTIME_COPTS = select({
+    "//boot/vm:dbg?": ["-g3"],
+    "//conditions:default": []
+})
+
+#DEBUG_FLAGS:  -Wall -Werror -O0 -g3
+
+
+RUNTIME_FLAGS = [
+]
+
+RUNTIME_DEFINES = select({
+    "//boot/vm:instrumented?": ["CAML_INSTR"],
+    "//conditions:default": ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
+}) + select({
+    "//boot/vm:DEBUG?": ["DEBUG"],
+    "//conditions:default": []
+})
+
+RUNTIME_LIBDEPS = BYTECCLIBS
 
 string_flag(name = "runtime",
             build_setting_default = "std",
@@ -47,10 +69,69 @@ cc_binary(
     name = "sak.exe",
     srcs = ["sak.c"],
     copts = OC_CFLAGS + CFLAGS + CPPFLAGS,
-    defines = CC_DEFINES + CC_NATIVE_DEFINES,
+    defines = RUNTIME_DEFINES,
     linkopts = OC_LDFLAGS + LDFLAGS,
     deps= ["//runtime/caml:hdrs"],
     visibility = ["//runtime/caml:__pkg__"]
+)
+
+## TODO: we only need one runtime lib target if we select on build
+## target to decide which to build.  Call it "runtime" or "ocaml_runtime".
+cc_library(
+    name = "camlrun",
+    alwayslink = True, linkstatic = True,
+    srcs = [
+        "//runtime:build_config.h",
+        "//runtime:common_c_sources",
+        ## select target platform:
+        "//runtime:bytecode_only_c_sources"
+    ] + select({
+    # "//platforms/target:vm?": ["//runtime:bytecode_only_c_sources"],
+    # "//conditions:default": ["//runtime:native_only_c_sources"],
+    "//conditions:default": []
+    }),
+    copts = [
+        "-x", "c",
+        "-Wall",
+        # "-Wpedantic",
+        "-I$(GENDIR)/runtime" # build_config.h
+    ] + select({
+        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:linux?": [],
+        "//conditions:default":  ["-std=c11"]
+    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS + RUNTIME_COPTS,
+    defines = RUNTIME_DEFINES,
+    deps = [
+        "//runtime/caml:hdrs"
+    ],
+    visibility = [
+        "//boot:__subpackages__",
+        "//lib:__pkg__"
+    ]
+)
+
+###########
+cc_library(
+    name = "asmrun",
+    alwayslink = True, linkstatic = True,
+    srcs = [
+        "//runtime:build_config.h",
+        "//runtime:common_c_sources",
+        "//runtime:native_only_c_sources"
+    ],
+    copts = [
+        "-x", "c",
+        "-pedantic",
+        "-I$(GENDIR)/runtime" # build_config.h
+    ] + select({
+        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:linux?": [],
+        "//conditions:default":  ["-std=c11"]
+    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+    linkopts = OC_LDFLAGS + LDFLAGS,
+    defines = RUNTIME_DEFINES,
+    deps = ["//runtime/caml:hdrs"],
+    visibility = ["//lib:__pkg__"]
 )
 
 # load("//bzl/transitions:ocamlc_boot.bzl",
@@ -401,30 +482,45 @@ genrule(
 #   ocamlruni_CPPFLAGS = -DCAML_INSTR
 
 # ################  standard  ################
-# cc_binary(
-#     name = "ocamlrun",
-#     srcs = BYTECODE_ONLY_C_SOURCES + [
-#         "prims.c",
-#         ":build_config.h",
-#     ] + select({
-#         ":instrumented?": ["instrtrace.c"],
-#         "//conditions:default": []
-#     }),
-#     copts = ["-I$(GENDIR)/runtime"] # build_config.h
-#     + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
-#     # + select({
-#     #     #FIXME: on mac bazel always adds -DDEBUG for fastbuild
-#     #     "//platforms/os:macos_fastbuild?": ["-UDEBUG"],
-#     #     "//conditions:default": []
-#     # }),
-#     defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
-#     linkopts = ["-lm", "-lpthread"] + MKEXE_FLAGS,
-#     deps= [
-#         # ":camlrun",
-#         ":commonrun"
-#     ],
-#     visibility = ["//visibility:public"]
-# )
+## The makefiles copy stuff into boot and make it accessible to build
+## targets by passing '-I boot'. OBazl does not (need to) do that.
+## Instead we define a library target that aggregates the same
+## resources by label, so targets can depend on '//boot:stdlib'. NB:
+## the only difference between //stdlib and //boot:stdlib is that the
+## latter includes //stdlib:Std_exit and //stdlib:camlheader.
+
+# target: runtime
+## initial build of the runtime, using the bootstrap compiler. the
+## legacy build system builds runtime/ocamlrun, then copies it to
+## boot/ocamlrun, so that the boot compiler and the runtime needed to
+## interpret the code it admits are in the same place.
+
+## under bazel we can build boot/ocamlrun etc. directly.
+
+################################################################
+cc_binary( ##FIXME: move this to //runtime and use an alias here
+    name = "ocamlrun",
+    srcs = [
+        "//runtime:prims.c",
+    ] + select({
+        # add instrtrace if mode is debug on any platform, or
+        # fastbuild on macos (where Bazel adds -DDEBUG)
+        "//boot/vm:trace?": ["//runtime:instrtrace"],
+        "//conditions:default": []
+    }),
+    copts = [
+        "-x", "c",
+        "-I$(GENDIR)/runtime" # build_config.h
+    ] + select({
+        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:linux?": [],
+        "//conditions:default":  ["-std=c11"]
+    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+    defines = RUNTIME_DEFINES,
+    linkopts = RUNTIME_LIBDEPS + OC_LDFLAGS + LDFLAGS,
+    deps= [":camlrun"],
+    visibility = ["//visibility:public"]
+)
 
 ################################################################
 ## problem: makefiles set different options for bytecode and native
@@ -614,4 +710,14 @@ genrule(
 #     deps = ["//runtime/caml:hdrs"]
 # )
 
-
+## Generating an ld.conf is not a build-time task; it can be done as
+## part of a packaging task.
+# genrule(
+#     outs = ["ld.conf"],
+#     name "__ld.conf__",
+#     srcs = ["//:Makefile.config"],
+#     cmd  = "\n".join([
+# 	    echo "$(location STUBLIBDIR)" > $@
+# 	    echo "$(locationn LIBDIR)" >> $@
+#     ])
+# )

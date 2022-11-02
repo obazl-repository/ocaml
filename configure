@@ -3346,7 +3346,7 @@ OCAML_VERSION_SHORT=5.1
 
 ## Generated files
 
-ac_config_files="$ac_config_files BUILD.config.bzl"
+ac_config_files="$ac_config_files config/CONFIG.bzl"
 
 ac_config_files="$ac_config_files Makefile.build_config"
 
@@ -20642,7 +20642,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "BUILD.config.bzl") CONFIG_FILES="$CONFIG_FILES BUILD.config.bzl" ;;
+    "config/CONFIG.bzl") CONFIG_FILES="$CONFIG_FILES config/CONFIG.bzl" ;;
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "stdlib/sys.ml") CONFIG_FILES="$CONFIG_FILES stdlib/sys.ml" ;;

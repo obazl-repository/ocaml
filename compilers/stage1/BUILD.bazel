@@ -7,7 +7,7 @@ load("//bzl:rules.bzl",
 
 exports_files(["Makefile.config", "VERSION"])
 
-load("//config:BUILD.bzl",
+load("//config:CONFIG.bzl",
      "USE_PRIMS", "DATA_PRIMS",
      "PRIMITIVES"
      )

@@ -4,13 +4,18 @@ load("//bzl:rules.bzl",
      "bootstrap_signature",
 )
 
-load("//config:BUILD.bzl",
+load("//config:CONFIG.bzl",
+     "OC_COMMON_CFLAGS",
+     "OC_NATIVE_CFLAGS",
      "ROOT_MODULE_OPTS",
      "ROOT_SIG_OPTS"
      )
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS    = ROOT_MODULE_OPTS
+MODULE_OPTS = OC_COMMON_CFLAGS
+SIG_OPTS    = OC_COMMON_CFLAGS
+
+# MODULE_OPTS = ROOT_MODULE_OPTS
+# SIG_OPTS    = ROOT_MODULE_OPTS
 
 STDLIB = ["//boot:stdlib"]
 

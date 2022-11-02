@@ -5,7 +5,7 @@ load("//bzl:rules.bzl",
      # "bootstrap_preprocess",
      "bootstrap_signature")
 
-load("//config:BUILD.bzl",
+load("//config:CONFIG.bzl",
      ## stdlib overrides OCAMLC, does not use ROOT_OCAMLC_OPTS
      ## "ROOT_CAMLC_OPTS",
 
@@ -18,7 +18,7 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(["expand_module_aliases.awk", "weak.ml", "weak.mli"])
 
-# load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+# load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
 
 # to match the makefile log:
 COMPFLAGS = [

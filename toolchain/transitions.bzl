@@ -1,6 +1,6 @@
 ################################################################
 def _tool_out_transition_impl(settings, attr):
-
+    print("TOOL_OUT_TRANSITION: cmode: %s" %  settings["//command_line_option:compilation_mode"])
     if settings["//boot/vm:dbg"]:
         mode = "dbg"
     elif settings["//boot/vm:fastbuild"]:

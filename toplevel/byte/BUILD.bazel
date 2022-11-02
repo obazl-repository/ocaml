@@ -5,7 +5,7 @@ exports_files(["topeval.ml", "topmain.ml", "trace.ml"])
 #      "bootstrap_module",
 # )
 
-# load("//config:BUILD.bzl",
+# load("//config:CONFIG.bzl",
 #      "ROOT_MODULE_OPTS",
 #      "ROOT_SIG_OPTS"
 #      )

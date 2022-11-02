@@ -5,7 +5,7 @@ load("//bzl:rules.bzl",
      "bootstrap_signature",
 )
 
-load("//config:BUILD.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
 
 MODULE_OPTS = ROOT_MODULE_OPTS
 SIG_OPTS = ROOT_SIG_OPTS

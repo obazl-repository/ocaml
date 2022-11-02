@@ -10,8 +10,8 @@ load("//toolchain:BUILD.bzl", "bootstrap_toolchain_adapter")
 ## the distribution.
 bootstrap_toolchain_adapter(
     name      = "bootstrap",
-    ocamlrun  = "//boot:ocamlrun", # the vm, implemented in C
-    ocamlc    = "//boot:ocamlc", # the precompiled vm>vm bootstrap compiler
+    ocamlrun  = "//boot/bin:ocamlrun", # the vm, implemented in C
+    ocamlc    = "//boot/bin:ocamlc", # the precompiled vm>vm bootstrap compiler
     # vmruntime = "//boot:camlrun", # do we need this?
     linkmode = "dynamic"
 )

@@ -1,4 +1,4 @@
-load("//config:BUILD.bzl",
+load("//config:CONFIG.bzl",
      "CC",
      "CPPFLAGS", "OCAMLC_CPPFLAGS", "OCAMLC_CPPDEFINES",
      "CFLAGS", "OC_CFLAGS", "OCAMLC_CFLAGS",

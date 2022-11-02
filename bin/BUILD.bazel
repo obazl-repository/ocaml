@@ -6,7 +6,7 @@ load("//bzl:rules.bzl",
 )
 
 #FIXME: clean these up!
-load("//config:BUILD.bzl",
+load("//config:CONFIG.bzl",
      "ARCH", "MODEL", "SYSTEM",
      "HOST", "ROOTDIR", "LIBDIR",
      # flags
@@ -23,7 +23,7 @@ load("//config:BUILD.bzl",
 
 exports_files(["Makefile.config", "VERSION"])
 
-load("//config:BUILD.bzl",
+load("//config:CONFIG.bzl",
      "USE_PRIMS", "DATA_PRIMS",
      "PRIMITIVES"
      )

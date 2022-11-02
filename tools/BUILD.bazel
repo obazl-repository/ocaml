@@ -10,7 +10,7 @@ exports_files([
     "check-parser-uptodate-or-warn.sh",
 ])
 
-load("//config:BUILD.bzl",
+load("//config:CONFIG.bzl",
      "TOOLS_MODULE_OPTS",
      "TOOLS_SIG_OPTS"
      )

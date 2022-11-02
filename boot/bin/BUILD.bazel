@@ -1,0 +1,14 @@
+alias(
+    name   = "ocamlrun",
+    actual = "//runtime:ocamlrun"
+)
+
+# alias(
+#     name   = "ocamlc",
+#     actual = "
+# )
+
+# alias(
+#     name   = "ocamlrun",
+#     actual = "//runtime:ocamlrun"
+# )

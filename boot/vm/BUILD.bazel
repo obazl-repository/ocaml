@@ -1,12 +1,48 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag",
      "string_list_flag")
 
+## WARNING: for Bazel, -c dbg means `-g`, not `-DDEBUG`
 bool_flag(name = "dbg", build_setting_default = False)
-config_setting(name = "dbg?", flag_values = {":dbg": "True"})
+##FIXME dbg? true if either :dbg True or //command_line_options:dbg True
+config_setting(name = "vmdbg?", flag_values = {":dbg": "True"})
+
+selects.config_setting_group(
+    name = "dbg?",
+    match_any = [":vmdbg?", "//config/compilation_mode:dbg?"],
+)
+
+bool_flag(name = "trace", build_setting_default = False)
+config_setting(name = "trace?", flag_values = {":trace": "True"})
+
+selects.config_setting_group(
+    name = "DEBUG?",
+    match_any = [
+        ":trace?",
+        ":vmdbg?",
+        "//config/compilation_mode:dbg?"
+    ],
+)
 
 bool_flag(name = "fastbuild", build_setting_default = False)
-config_setting(name = "fastbuild?", flag_values = {":fastbuild": "True"})
+config_setting(name = "vmfastbuild?", flag_values = {":fastbuild": "True"})
+selects.config_setting_group(
+    name = "fastbuild?",
+    match_any = [":vmfastbuild?",
+                 "//config/compilation_mode:fastbuild?"],
+)
+
+config_setting(
+    name = "instrtrace?",
+    values = {"compilation_mode":"fastbuild"},
+    constraint_values = ["@platforms//os:macos"]
+)
+
+
+bool_flag(name = "instrumented", build_setting_default = False)
+config_setting(name = "instrumented?",
+               flag_values = {":instrumented": "True"})
 
 string_list_flag(name = "args", build_setting_default = [],
             visibility = ["//toolchain:__subpackages__"])
