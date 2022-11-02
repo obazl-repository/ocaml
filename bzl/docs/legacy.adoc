@@ -1,0 +1,25 @@
+= legacy build
+
+=== linux
+
+==== vm runtime
+
+gcc -c -O2
+-fno-strict-aliasing
+-fwrapv
+-pthread
+-g
+-Wall -Werror
+-fno-common
+-fexcess-precision=standard
+-fno-tree-vrp
+-ffunction-sections
+-I./runtime
+-D_FILE_OFFSET_BITS=64
+-DCAMLDLLIMPORT=
+-DIN_CAML_RUNTIME -DDEBUG  -o runtime/floats.bd.o runtime/floats.c
+
+
+==== native runtime
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux  -o runtime/floats.n.o runtime/floats.c

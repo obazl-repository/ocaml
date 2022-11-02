@@ -1,0 +1,51 @@
+= ocaml cross-compilers
+
+== Notation
+
+Upper case letters A, B, ... : IAS, e.g. x86_64, arm, etc.
+
+* compiler type:  (A -> B) - runs on A, emits B-code
+* outputs: [ ]
+
+Std:  (A -> A) -> [A]
+
+Cross-compilation:  (A -> B) -> [B]
+
+Compiler outputs:
+
+* Default:  (A -> A) -> [ (A -> A) ]
+
+* Goal:  (A -> A) -> [ (A -> B) ]
+
+* Then: (A -> B) -> [ (B -> B) ]
+
+== zig
+
+bazel build runtime:commonrun --platforms @zig_sdk//platform:linux_arm64
+
+But we get errors, because we started off by running `.configure` on
+our local host (Mac).  So we need to configure for the target platform.
+
+For example, in `runtime/caml/s.h` we had
+
+`#define HAS_MACH_ABSOLUTE_TIME 1`
+
+which results in mach headers not found.
+
+Now the tricky bit is we need the local configuration to build our
+local compiler, which we then will use to build a cross-compiler, and
+for that we will need a different configuration of the same source
+files.
+
+In other words, to cross compile we need target headers for the compiler.
+
+So maybe the first step is to generate those headers.
+
+This applies to any cross compiler, not just zig. It's not a zig issue.
+
+Other misconfigured #define macros:
+
+#define HAS_XLOCALE_H 1
+
+HAS_ISSETUGID
+

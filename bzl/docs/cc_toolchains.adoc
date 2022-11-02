@@ -1,0 +1,58 @@
+= cc toolchains
+
+== gnu extensions
+
+The c sources use `asm` and maybe other GNU extensions. This can cause
+trouble with some C dialects (e.g. c11).
+
+Compiling with `-std=c11` results in this error:
+
+```
+runtime/caml/platform.h:40:3: error: use of undeclared identifier 'asm'
+  asm volatile("pause" ::: "memory");
+  ^
+  ```
+
+The fix is to use `__asm__`.
+
+See link:https://gcc.gnu.org/onlinedocs/gcc-7.2.0/gcc/Alternate-Keywords.html#Alternate-Keywords[Alternate Keywords].
+
+
+
+== zig
+
+=== macos
+
+Zig uses LLD on the mac, not the system ld. So we get warnings like:
+`warning: unsupported linker arg: -no_compact_unwind` when passing
+`"-Wl,-no_compact_unwind"`.
+
+
+link:https://github.com/ziglang/zig/issues/4841:
+
+"The macOS linker /usr/bin/ld is not available on non-macOS systems,
+so relying on it would prevent cross-compiling for macOS. Also
+/usr/bin/ld is not always available on macOS systems, for example if
+xcode command line tools have not been installed. This is why Zig uses
+LLD as the linker, rather than depending on a system linker, and it
+means that zig cc is an alternative to installing the xcode command
+line tools. All of that relies on LLD working well on macOS however,
+which has not yet been the case. But finally, LLD's macos support is
+seeing some love, and I expect this situation to change during this
+release cycle of LLVM."
+
+...
+
+"I can shed some more light on (1):
+
+There is a number of flags passed to the linker using -Wl,my_linker_option. They are important for proper linking of the project. But some of them are not supported yet.
+warning: unsupported linker arg: -search_paths_first
+warning: unsupported linker arg: -headerpad_max_install_names
+warning: unsupported linker arg: -force_load
+warning: unsupported linker arg: -force_load
+
+All of the flags with the exception of force_load are not currently supported by LLD, however, there is an ongoing effort in LLVM to replace now dated Mach-O backend with a new one that supports these options. Having said that, LLVM11 still uses the old backend by default, and while it is technically possible to switch to the new one already, it currently fails to even build Zig on x86_64 (aarch64 support is not even started). FYI currently supported flags by the (old) backend are listed here.
+
+While not a permanent fix, it is now possible to fall back to the system linker on macOS by setting export ZIG_SYSTEM_LINKER_HACK=1 env var before linking."
+
+

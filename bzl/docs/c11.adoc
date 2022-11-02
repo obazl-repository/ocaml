@@ -1,0 +1,37 @@
+= c11 support
+
+`-std=c11` works on MacOS. On linux with `gcc (Ubuntu
+9.4.0-1ubuntu1~20.04.1) 9.4.0` I get:
+
+```
+runtime/caml/fail.h:47:3: error: unknown type name 'sigjmp_buf'
+   47 |   sigjmp_buf buf;
+      |   ^~~~~~~~~~
+```
+
+From https://port70.net/~nsz/c/c11/n1570.html#7.13.1.1p4
+
+"4 An invocation of the setjmp macro shall appear only in one of the following contexts:
+
+* the entire controlling expression of a selection or iteration statement;
+* one operand of a relational or equality operator with the other operand an integer constant expression, with the resulting expression being the entire controlling expression of a selection or iteration statement;
+* the operand of a unary ! operator with the resulting expression being the entire controlling expression of a selection or iteration statement; or
+* the entire expression of an expression statement (possibly cast to void).
+5 If the invocation appears in any other context, the behavior is undefined.
+"
+
+This is a matter of C feature macros.  On my debian, features.h has:
+
+```
+#if (defined _POSIX_SOURCE                                      \
+     || (defined _POSIX_C_SOURCE && _POSIX_C_SOURCE >= 1)       \
+     || defined _XOPEN_SOURCE)
+# define __USE_POSIX    1
+#endif
+```
+
+But gcc evidently does not really support -std=c11. amazing.
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103949
+
+

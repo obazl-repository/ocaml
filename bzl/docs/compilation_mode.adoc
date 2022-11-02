@@ -1,0 +1,54 @@
+= compilation_mode
+
+Bazel predefines a command-line configuration attribute `compilation_mode` that
+takes values dbg, fastbuild, and opt.
+
+Bazel will automatically transition this setting to 'opt' for rules
+that execute tools. The idea is that a rule the runs a build tool will
+want to use an optimized build of that tool. That is fine in most
+cases, but it means that if we want to run a debug version of the tool
+we have to add some special logic.
+
+In the case of OCaml tools like `ocamllex` this is complicated by the
+fact that running the bytecode version of the tool requires also
+running the vm runtime `ocamlc`. To Bazel that's another tool, just
+like `ocamllex`: when it is a dependency of an executable tool that
+runs it, it will be built with compilation_mode set to `opt`.
+
+Scratch that. The rule that uses the tool is not executable. It
+depends on the toolchain, which depends on the tool target. The
+toolchain attribute that expresses this is marked with
+`executable=True` and `cfg="exec"`. That is what forces
+`compilation_mode` to `opt`.
+
+Example: rule `bootstrap_ocamllex`. This rule runs the bootstrap (i.e.
+precompiled) `ocamllex`. To do that it uses the vm runtime `ocamlrun`.
+The rule obtains both `ocamllex` and `ocamlrun` from toolchain
+attributes. Both attributes are marked with `executable=True` and
+`cfg="exec"`, so both deliver optimized builds. Since `ocamllex` is
+precompiled it does not matter, but `ocamlrun` is built, and we may
+want to use a debug rather than an optimized version. So in that case
+we need to override the default compilation_mode.
+
+
+
+old stuff:
+
+
+This runs ocamllex. Since is is an executable rule with
+`cfg="exec"`, it runs on the exec platform. Bazel also transitions
+(evidently) the compilation_mode to opt, forcing an optimized build
+of the tool.
+
+There are two problems with this. One is that we might want to use
+this rule to run a debug version of the tool.
+
+The other is that the transition affects the entire toolchain. In
+this case, that means the ocamlrun tool that we need to run
+ocamllex. Normally we would indeed want to use an optimized version
+of ocamlrun, but sometimes we will need a debug version.
+
+
+
+
+
