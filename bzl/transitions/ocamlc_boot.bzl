@@ -27,7 +27,7 @@ def _ocamlc_boot_in_transition_impl(settings, attr):
 
     return {
         "//bzl:stage": 1,
-        "//bzl/toolchain:ocamlc" : "//boot:ocamlc"
+        "//bzl/toolchain:ocamlc" : "//boot/bin:ocamlc"
     }
 
 ocamlc_boot_in_transition = transition(
@@ -52,7 +52,7 @@ def _ocamlc_boot_out_transition_impl(settings, attr):
 
     return {
         "//bzl:stage": 1,
-        "//bzl/toolchain:ocamlc" : "//boot:ocamlc"
+        "//bzl/toolchain:ocamlc" : "//boot/bin:ocamlc"
     }
 
 #######################

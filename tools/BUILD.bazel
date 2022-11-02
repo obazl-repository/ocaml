@@ -712,7 +712,7 @@ bootstrap_module(
 # $(make_opcodes): make_opcodes.ml
 # 	$(CAMLC) $< -o $@
 
-# toolchain uses //boot:ocamlc ==  BOOT_OCAMLC
+# toolchain uses //boot/bin:ocamlc ==  BOOT_OCAMLC
 bootstrap_executable(
     name = "make_opcodes",
     main = ":Make_opcodes",

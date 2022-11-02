@@ -34,29 +34,6 @@ alias(
     actual = "//boot:ocamlrun"
 )
 
-ocamlc_boot( ##FIXME: do we really need a separate rule?
-# compiler(
-    name = "ocamlc",
-    # compile_target = "//platform/cpu:arm",  ## ??
-    exec_compatible_with = [
-        ## *>vm ???
-    ],
-    opts = [
-        "-nostdlib", "-compat-32",
-    ],
-    # primitives = PRIMITIVES,
-    main = "//driver:Main",
-    deps = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
-        # "//boot:stdlib"
-    ],
-    visibility = [
-        "//compilers/stage2:__pkg__",
-        "//testsuite:__pkg__"
-    ]
-)
-
 bootstrap_executable(
     name = "ocamlopt",
     opts = [],

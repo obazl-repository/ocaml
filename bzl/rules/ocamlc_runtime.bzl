@@ -36,7 +36,7 @@ def _ocamlc_runtime(ctx):
 
     (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    # tool_args = ["//boot:ocamlc"]
+    # tool_args = ["//boot/bin:ocamlc"]
 
     # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value

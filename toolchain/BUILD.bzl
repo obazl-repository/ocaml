@@ -168,7 +168,7 @@ bootstrap_toolchain_adapter = rule(
         ),
 
         "ocamlc": attr.label(
-            default    = "//boot:ocamlc",
+            default    = "//boot/bin:ocamlc",
             # default    = "//bzl/toolchain:ocamlc",
             executable = True,
             allow_single_file = True,
@@ -204,7 +204,7 @@ bootstrap_toolchain_adapter = rule(
 
         # rebuilt bc compiler emits bytecode
         # "ocamlc": attr.label(
-        #     default   = "//boot:ocamlc",
+        #     default   = "//boot/bin:ocamlc",
         #     executable = False,
         #     allow_single_file = True,
         #     # cfg = "exec",

@@ -23,7 +23,7 @@ def _ocamlc_runtime_in_transition_impl(settings, attr):
     print("ocamlc_runtime_in_transition")
 
     return {
-        "//bzl/toolchain:ocamlc" : "//boot:ocamlc"
+        "//bzl/toolchain:ocamlc" : "//boot/bin:ocamlc"
     }
 
 ocamlc_runtime_in_transition = transition(
@@ -41,7 +41,7 @@ def _ocamlc_runtime_out_transition_impl(settings, attr):
     print("ocamlc_runtime_out_transition")
 
     return {
-        "//bzl/toolchain:ocamlc" : "//boot:ocamlc"
+        "//bzl/toolchain:ocamlc" : "//boot/bin:ocamlc"
     }
 
 #######################

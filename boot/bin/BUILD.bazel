@@ -1,14 +1,48 @@
+load("//bzl:rules.bzl",
+     "bootstrap_archive",
+     "bootstrap_executable",
+     "bootstrap_module",
+     "ocamlc_boot"
+)
+
+#FIXME: clean these up!
+load("//config:CONFIG.bzl",
+     "ARCH", "MODEL", "SYSTEM",
+     "HOST", "ROOTDIR", "LIBDIR",
+     # flags
+     "OC_CFLAGS", "CFLAGS",
+     "OC_CPPFLAGS", "CPPFLAGS",
+     "OC_LDFLAGS", "LDFLAGS",
+     # defines - replace by CC_DEFINES with selects
+     # "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
+     # "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+     # other
+     )
+
 alias(
     name   = "ocamlrun",
     actual = "//runtime:ocamlrun"
 )
 
-# alias(
-#     name   = "ocamlc",
-#     actual = "
-# )
-
-# alias(
-#     name   = "ocamlrun",
-#     actual = "//runtime:ocamlrun"
-# )
+ocamlc_boot( ##FIXME: do we really need a separate rule?
+# compiler(
+    name = "ocamlc",
+    # compile_target = "//platform/cpu:arm",  ## ??
+    exec_compatible_with = [
+        ## *>vm ???
+    ],
+    opts = [
+        "-nostdlib", "-compat-32",
+    ],
+    # primitives = PRIMITIVES,
+    main = "//driver:Main",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+        # "//boot:stdlib"
+    ],
+    visibility = [
+        "//compilers/stage2:__pkg__",
+        "//testsuite:__pkg__"
+    ]
+)

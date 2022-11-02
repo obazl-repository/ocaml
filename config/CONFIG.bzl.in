@@ -95,7 +95,8 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 ## An unholy mess. The legacy makefiles use no fewer than nine cmd
 ## variables just for compiling: BOOT_OCAMLC, COMPILER, OPTCOMPILER,
 ## CAMLC, OCAMLC, CAMLOPT, OCAMLOPT, BEST_OCAMLC, and BEST_OCAMLOPT.
-## Not counting vars for the runtime - OCAMLRUN, NEW_OCAMLRUN.
+## Not to mention COMPILE_NATIVE_MODULE and vars for the runtime -
+## OCAMLRUN, NEW_OCAMLRUN.
 
 ## Hopefully OBazl can clean this up. Bazel does not need such
 ## variables, since the build tools are encoded in the toolchains, and
@@ -123,11 +124,16 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 ## OBazl: targets for building new compilers are //bin:ocamlc,
 ## //bin:ocamlopt
 
-# BOOT_OCAMLC: boot/ocamlc.opt (sys>vm) if available (and newer than
+# BOOT_OCAMLC: this is a compile cmd
+# Makefile:
+# boot/ocamlc.opt (sys>vm) if available (and newer than
 #   boot/ocamlc), otherwise boot/ocamlc (vm>vm)
+# Makefile.common, for default OCaml build rules:
+## runs boot/ocamlc.opt (sys>vm compiler) if available
+## otherwise runs boot/ocamlc under OCAMLRUN (boot/ocamlrun)
 #
-## OBazl: no need. Target //boot:ocamlc delivers the vm>vm boot
-## compiler. Build target //boot:ocamlc, with
+## OBazl: no need. Target //boot/bin:ocamlc delivers the vm>vm boot
+## compiler. Build target //boot/bin:ocamlc, with
 ## --host_platform=//platforms/build:sys and
 ## --platforms=//platforms/target:vm delivers the initial sys>vm
 ## compiler.
@@ -170,13 +176,20 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 # CAMLOPT_CMD: for sys>* builds
 # Defined in Makefile.common: CAMLOPT_CMD = $(CAMLOPT)
 
-# CAMLOPT_CMD: Makefile.common:  OCAMLOPT_CMD = $(OCAMLOPT)
+# deciphered: uses the baseline (initial) boot/ocamlrun to run
+# ocamlopt (vm>sys compiler).
 
 # OCAMLOPT:
 ## Makefile: windows only, for flexlink stuff
 ## otherlibs/dynlink/Makefile: OCAMLOPT=$(BEST_OCAMLOPT) $(STDLIBFLAGS) -g
 ## set and used in testsuite subdirs:
 ##   OCAMLOPT ?= $(BEST_OCAMLOPT) $(STDLIBFLAGS)
+
+# COMPILE_NATIVE_MODULE: defined in Makefile
+#   $(CAMLOPT_CMD) $(OC_COMMON_CFLAGS) -I $(@D) $(INCLUDES) $(OC_NATIVE_CFLAGS)
+# used only in the generic rule for .cmx:
+# %.cmx: %.ml
+# 	$(COMPILE_NATIVE_MODULE) -c $<
 
 # BEST_OCAMLC: Makefile.best_binaries
 #   BEST_OCAMLC := $(call choose_best,ocamlc)
@@ -204,6 +217,47 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 # bootstrap_signature: OC_COMMON_CFLAGS for both vm and sys targets
 BOOT_OCAMLRUN = "//boot:ocamlrun"
 RUNTIME_OCAMLRUN = "//boot:ocamlrun"
+
+################################################################
+## Default Build Rules
+#
+## OCaml: defined in Makefile
+
+## compiling to VM uses bootstrap *>vm ocamlc. CAMLC is new
+## boot/ocamlc.opt if available, otherwise boot/ocamlc (bootstrap
+## compiler).
+
+# %.cmo: %.ml
+# 	$(CAMLC) $(OC_COMMON_CFLAGS) -I $(@D) $(INCLUDES) -c $<
+# %.cmi: %.mli
+# 	$(CAMLC) $(OC_COMMON_CFLAGS) -I $(@D) $(INCLUDES) -c $<
+#
+## compiling to sys (native) uses bootstrap vm>sys ocamlc
+# %.cmx: %.ml
+# 	$(COMPILE_NATIVE_MODULE) -c $<
+#
+# COMPILE_NATIVE_MODULE:
+# $(CAMLOPT_CMD) $(OC_COMMON_CFLAGS) -I $(@D) $(INCLUDES) $(OC_NATIVE_CFLAGS)
+# CAMLOPT_CMD expands to "boot/ocamlrun ./ocamlopt"
+
+## OBazl uses toolchains and platforms. The bootstrap toolchain uses
+## boot/ocamlrun and boot/ocamlc. The stage1 toolchain uses outputs of
+## the bootstrap tc: //bin:ocamlrun and //bin:ocamlc.
+
+################################
+## C: defined in Makefile.common
+## NOTE: the build files compute deps; Bazel does not. Deps must be
+## determined ahead of time.
+# RUNTIME_HEADERS := $(wildcard $(ROOTDIR)/runtime/caml/*.tbl) \
+#                    $(wildcard $(ROOTDIR)/runtime/caml/*.h)
+# REQUIRED_HEADERS := $(RUNTIME_HEADERS) $(wildcard *.h)
+# %.$(O): %.c $(REQUIRED_HEADERS)
+# 	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
+# 	  $(OUTPUTOBJ)$@ $<
+#
+## OBazl defines build targets for headers in
+## runtime/caml/BUILD.bazel.
+
 
 ################################################################
 ####  C Builds
@@ -263,11 +317,11 @@ OC_CFLAGS = fix_oc_cflags("@oc_cflags@".split(" "))
 #     "The launcher for bytecode executables (if #! is not working)"
 # - otherlibs/systhreads/Makefile, to compile st_stubs.[b|n].o
 # mac, linux: empty
-CFLAGS = "@CFLAGS@"
+CFLAGS = "@CFLAGS@".split(" ")
 
 # for compiling runtime files to sys target
 # mac: empty; linux: "-function-sections"
-OC_NATIVE_CFLAGS = "@oc_native_cflags@"
+OC_NATIVE_CFLAGS = "@oc_native_cflags@".split(" ")
 
 ## not used in any Makefiles. stored in fld in Config module:
 ## val ocamlc_cflags : string
@@ -286,7 +340,7 @@ OC_NATIVE_CFLAGS = "@oc_native_cflags@"
 # In otherlibs/unix: OC_CPPFLAGS += -DCAML_BUILDING_UNIX
 # mac: oc_ccpflags == -D_FILE_OFFSET_BITS=64
 ## OC_CPPFLAGS = ["-I$(ROOTDIR)/runtime", "@oc_cppflags@"]
-OC_CPPFLAGS = ["@oc_cppflags@"]
+OC_CPPFLAGS = "@oc_cppflags@".split(" ")
 
 # configure:
 # oc_cppflags="$common_cppflags $internal_cppflags"
@@ -300,7 +354,7 @@ OC_CPPFLAGS = ["@oc_cppflags@"]
 # ocamltest/Makefile, summed with OC_CPPFLAGS
 # Also used in otherlibs/systhreads, for st_stubs.[b|n].o
 # mac, linux: empty
-CPPFLAGS = "@CPPFLAGS@"
+CPPFLAGS = "@CPPFLAGS@".split(" ")
 
 # Makefile, for preprocessing %.S sources. Undefined
 # OC_DEBUG_CPPFLAGS
@@ -326,22 +380,17 @@ OC_NATIVE_DEFINES = [
 # Unused:
 # OCAMLC_CPPFLAGS = "@ocamlc_cppflags@"
 
+## OBazl: CAMLDLLIMPORT, IN_CAML_RUNTIME, CAML_INSTR These are only
+## used in //runtime targets, so we do not need to store them in
+## global vars.
+
 # CAMLDLLIMPORT, IN_CAML_RUNTIME - single-use hardcoded defines.
 # Only used for std runtime source code (runtime/caml/domain_state.h)
 # defined in Makefile, not by ./configure.
 # summed with OC_CPPFLAGS for the runtime .o files
 # for native (%.n.o, OC_CPPFLAGS summed with OC_NATIVE_CPPFLAGS
 # runtime_CPPFLAGS = -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME
-runtime_DEFINES = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
-
-
-## in Makefile, summed with OC_CPPFLAGS for .bd.o files
-## for .nd.o files: sum w/OC_NATIVE_CPPFLAGS, OC_CPPFLAGS
-## also used for windows amd64.nt.d.obj, i386.nt.d.obj
-## Bazel does not use this; it uses CLI build settings to
-## control compilation mode.
-# ocamlrund_CPPFLAGS = -DDEBUG
-# ocamlrund_DEFINES = ["DEBUG"]
+# runtime_DEFINES = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 
 # CAML_INSTR - single-used, hardcoded in Makefile.
 ## Summed with OC_CPPFLAGS for .bi.o files
@@ -350,6 +399,17 @@ runtime_DEFINES = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 #ocamlruni_CPPFLAGS = -DCAML_INSTR
 # ocamlruni_DEFINES = ["CAML_INSTR"]
 # Bazel uses build setting --//boot/vm:instrumented
+
+## ocamlrund_CPPFLAGS:
+## in Makefile, summed with OC_CPPFLAGS for .bd.o files
+## for .nd.o files: sum w/OC_NATIVE_CPPFLAGS, OC_CPPFLAGS
+## also used for windows amd64.nt.d.obj, i386.nt.d.obj
+## Bazel does not use this; it uses CLI build settings to
+## control compilation mode.
+# ocamlrund_CPPFLAGS = -DDEBUG
+# ocamlrund_DEFINES = ["DEBUG"]
+#
+## OBazl: selected in where needed. Global var not needed.
 
 ## fld in utils:Config module; not used in makefile
 # ocamlopt_cflags = "@ocamlc_cflags@"
@@ -378,15 +438,15 @@ SHAREDLIB_CFLAGS = "@sharedlib_cflags@"
 # Set in Makefile.config, used in MKEXE, MKDLL, MKEXE_VIA_CC
 # mac: -Wl,-no_compact_unwind
 # linux: -Wl,-E
-OC_LDFLAGS = "@oc_ldflags@"
+OC_LDFLAGS = "@oc_ldflags@".split(" ")
 
 
 # used in Makefile.config
-LDFLAGS = "@LDFLAGS@"
+LDFLAGS = "@LDFLAGS@".split(" ")
 
 ################################################################
 # Platform-dependent assembler files to use to build the runtime
-runtime_ASM_OBJECTS = "@runtime_asm_objects@" ## in dir runtime/
+runtime_ASM_OBJECTS = "@runtime_asm_objects@"
 
 # Platform-dependent module for ocamlyacc
 ocamlyacc_WSTR_MODULE = "@ocamlyacc_wstr_module@"
@@ -400,20 +460,20 @@ ocamlyacc_WSTR_MODULE = "@ocamlyacc_wstr_module@"
 ## Instead of CAMLOPT, VMSYS_COMPILE_CMD or similar.
 
 ################################################################
-## OC_COMMON_[C|LD]FLAGS: for OCaml sources
+## OC_COMMON_[C|LD]FLAGS: for OCaml sources.
+## Hardcoded in makefiles, not derived from ./configure.
 # OC_COMMON_CFLAGS used in Makefile, Makefile.menhir
 # for default rules for .cmo, .cmi
 # for .cmx, COMPILE_NATIVE_MODULE uses OC_COMMON_CFLAGS and
 # OC_NATIVE_CFLAGS (which is empty)
 OC_COMMON_CFLAGS = [  ## OCaml compile flags
-    ## "-g",
+    ## "-g", ## controlled by --//config/ocaml:dbg (?)
     "-strict-sequence", "-principal", "-absname",
     "-w", "+a-4-9-40-41-42-44-45-48", "-warn-error", "+a", "-bin-annot",
     "-strict-formats"
 ]
 ## OC_COMMON_LDFLAGS used in Makefile to build ocamlc
-OC_COMMON_LDFLAGS = ["-g"] ## default is always debug build
-
+OC_COMMON_LDFLAGS = [] # ["-g"] Bazel controls this by a CLI flag
 
 ### Command and flags to use for assembling ocamlopt-generated code
 ASM = "@AS@"

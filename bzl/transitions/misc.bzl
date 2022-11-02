@@ -28,7 +28,7 @@ def _compile_mode_in_transition_impl(settings, attr):
     if attr.mode == "bc_bc":
         ocamlc = "//runtime:ocamlc"
     else:
-        ocamlc = "//boot:ocamlc"
+        ocamlc = "//boot/bin:ocamlc"
 
     return {
         "//bzl/toolchain:ocamlc" : ocamlc
@@ -55,9 +55,9 @@ def _compile_mode_out_transition_impl(settings, attr):
     if attr.mode == "bc_bc":
         ocamlc = "//runtime:ocamlc"
     else:
-        ocamlc = "//boot:ocamlc"
+        ocamlc = "//boot/bin:ocamlc"
 
-    ocamlc = "//boot:ocamlc"
+    ocamlc = "//boot/bin:ocamlc"
     # ocamlc = "//runtime:ocamlc"
 
     return {
@@ -93,10 +93,10 @@ def _ocamlc_fixpoint_in_transition_impl(settings, attr):
     if attr._mode == "bc_bc":
         ocamlc = "//runtime:ocamlc"
     else:
-        ocamlc = "//boot:ocamlc"
+        ocamlc = "//boot/bin:ocamlc"
 
     ocamlc = "//runtime:ocamlc"
-    # ocamlc = "//boot:ocamlc"
+    # ocamlc = "//boot/bin:ocamlc"
 
     return {
         "//bzl/toolchain:ocamlc" : ocamlc
@@ -132,9 +132,9 @@ def _ocamlc_fixpoint_out_transition_impl(settings, attr):
     if attr._mode == "bc_bc":
         ocamlc = "//runtime:ocamlc"
     else:
-        ocamlc = "//boot:ocamlc"
+        ocamlc = "//boot/bin:ocamlc"
 
-    # ocamlc = "//boot:ocamlc"
+    # ocamlc = "//boot/bin:ocamlc"
     ocamlc = "//runtime:ocamlc"
 
     return {
@@ -163,9 +163,9 @@ def _ocamlc_runtime_in_transition_impl(settings, attr):
     # if attr._mode == "bc_bc":
     #     ocamlc = "//runtime:ocamlc"
     # else:
-    #     ocamlc = "//boot:ocamlc"
+    #     ocamlc = "//boot/bin:ocamlc"
 
-    ocamlc = "//boot:ocamlc"
+    ocamlc = "//boot/bin:ocamlc"
 
     return {
         "//bzl/toolchain:ocamlc" : ocamlc
@@ -186,7 +186,7 @@ ocamlc_runtime_in_transition = transition(
 def _ocamlc_runtime_out_transition_impl(settings, attr):
     print("ocamlc_runtime_out_transition")
 
-    ocamlc = "//boot:ocamlc"
+    ocamlc = "//boot/bin:ocamlc"
 
     return {
         "//bzl/toolchain:ocamlc" : ocamlc

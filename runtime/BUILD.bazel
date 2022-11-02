@@ -26,20 +26,15 @@ load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag", "string_setting")
 
 RUNTIME_COPTS = select({
-    "//boot/vm:dbg?": ["-g3"],
+    "//boot/vm:dbg?": ["-O0", "-g3"], # -Wall -Werror
     "//conditions:default": []
 })
-
-#DEBUG_FLAGS:  -Wall -Werror -O0 -g3
-
-
-RUNTIME_FLAGS = [
-]
 
 RUNTIME_DEFINES = select({
     "//boot/vm:instrumented?": ["CAML_INSTR"],
     "//conditions:default": ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 }) + select({
+    ## WARNING: //boot/vm just for -DDEBUG, not debugger mode (-c dbg)
     "//boot/vm:DEBUG?": ["DEBUG"],
     "//conditions:default": []
 })
@@ -144,7 +139,7 @@ cc_library(
 # ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
 #               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 # 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
-## level 0 - uses //boot:ocamlc
+## level 0 - uses //boot/bin:ocamlc
 # ocamlc_runtime(
 # bootstrap_executable(
 #     name = "ocamlc",

@@ -7,8 +7,9 @@ load("//bzl:rules.bzl",
 
 load("//config:CONFIG.bzl",
      "RUNTIME_OCAMLRUN",
-     "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS")
+     "OC_COMMON_CFLAGS",
+     "OC_NATIVE_FLAGS"
+     )
 
 exports_files([
     "bytesections.mli", "bytesections.ml",
@@ -19,8 +20,8 @@ exports_files([
     "symtable.mli", "symtable.ml"
 ])
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS = ROOT_SIG_OPTS
+MODULE_OPTS = OC_COMMON_CFLAGS
+SIG_OPTS    = OC_COMMON_CFLAGS
 
 STDLIB = ["//boot:stdlib"]
 
@@ -551,13 +552,13 @@ genrule(
 
 # genrule(
 #     name  = "opcodes_mli",
-#     srcs  = ["opcodes.ml", "//boot:ocamlc", "//stdlib"],
+#     srcs  = ["opcodes.ml", "//boot/bin:ocamlc", "//stdlib"],
 #     outs  = ["opcodes.mli"],
 #     tools = ["//boot:ocamlrun"],
 #     cmd   = " ".join([
 #         # "STDLIB=echo `dirname $(location //stdlib)` &&",
 #         "$(execpath //boot:ocamlrun)",
-#         "$(location //boot:ocamlc)",
+#         "$(location //boot/bin:ocamlc)",
 #         "-g -nostdlib -I boot -use-prims runtime/primitives",
 #         "-I bazel-out/darwin-fastbuild/bin/stdlib",
 #         "-i $(location opcodes.ml)",

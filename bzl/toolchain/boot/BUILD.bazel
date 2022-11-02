@@ -9,6 +9,6 @@ package(default_visibility = ["//visibility:public"])
 ## not needed?
 label_flag(
     name = "ocamlc",
-    build_setting_default = "//boot:ocamlc"
+    build_setting_default = "//boot/bin:ocamlc"
     # build_setting_default = "//runtime:ocamlc"
 )

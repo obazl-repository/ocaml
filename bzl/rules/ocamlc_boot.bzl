@@ -50,7 +50,7 @@ ocamlc_boot = rule(
 
         ocamlc = attr.label(
             allow_single_file = True,
-            default = "//boot:ocamlc"
+            default = "//boot/bin:ocamlc"
         ),
 
         main = attr.label(
