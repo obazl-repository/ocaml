@@ -35,60 +35,18 @@ OCAML_VERSION_EXTRA = "@OCAML_VERSION_EXTRA@"
 
 # bzl: WARNING - the makefiles may update these vars. For example, in
 # otherlibs/Makefile.otherlibs.common we have "OC_CFLAGS += -g".
+# Furthermore they include additional vars like COMPFLAGS with
+# hardcoded values but do not use OC_COMMON_FLAGS.
 
-OC_COMMON_CFLAGS = [
-    "-g", "-strict-sequence", "-principal", "-absname",
-    "-w", "+a-4-9-40-41-42-44-45-48", "-warn-error", "+a", "-bin-annot",
-    "-strict-formats"
-]
-OC_CFLAGS = "@oc_cflags@"
-ocamlc_cflags = "@ocamlc_cflags@"
-OCAMLC_CFLAGS = "@ocamlc_cflags@"
-CFLAGS = "@CFLAGS@"
+## COMPFLAGS, OPTCOMPFLAGS: for compiling OCaml sources.
+## COMPFLAGS is for targeting both the vm and sys;
+## OPTCOMPFLAGS is for targeting sys.
 
-## CPP == C PreProcessor?
-OC_CPPFLAGS = ["-I$(ROOTDIR)/runtime", "@oc_cppflags@"]
-ocamlc_cppflags = "@ocamlc_cppflags@"
-OCAMLC_CPPFLAGS = "@ocamlc_cppflags@"
-CPPFLAGS = "@CPPFLAGS@"
-
-# bzl: ocamlopt v. native?
-# "module" prefix? but there is no ocamlopt module?
-## bzl: ocamlopt_cflags not found in makefiles
-ocamlopt_cflags = "@ocamlc_cflags@"
-OCAMLOPT_CFLAGS = "@ocamlc_cflags@"
-# #7678: ocamlopt uses these only to compile .c files, and the
-# #behaviour for the two drivers should be identical.
-# bzl: "drivers"?
-## bzl: ocamlopt_cppflags not found in makefiles
-OCAMLOPT_CPPFLAGS = "@ocamlc_cppflags@"
-ocamlopt_cppflags = "@ocamlc_cppflags@"
-OC_NATIVE_CFLAGS = "@oc_native_cflags@"
-## no OC_BYTE_CFLAGS?
-
-## bzl: used to compile *.bpic.$(O) files
-SHAREDLIB_CFLAGS = "@sharedlib_cflags@"
-
-### Additional link-time options
-# To support dynamic loading of shared libraries (they need to look at
-# our own symbols):
-OC_COMMON_LDFLAGS = ["-g"]
-OC_LDFLAGS = "@oc_ldflags@"
-OC_DLL_LDFLAGS = "@oc_dll_ldflags@"
-OC_EXE_LDFLAGS = "@oc_exe_ldflags@"
-# standard env var:
-LDFLAGS = "@LDFLAGS@"
+# The notes below ignore uses of flags etc. to compute dependencies,
+# since they're not need under Bazel.
 
 ################################################################
-# Platform-dependent assembler files to use to build the runtime
-runtime_ASM_OBJECTS = "@runtime_asm_objects@" ## in dir runtime/
-
-# Platform-dependent module for ocamlyacc
-ocamlyacc_WSTR_MODULE = "@ocamlyacc_wstr_module@"
-
-################################################################
-## tools
-### Which C compiler to use
+###  C Builds
 TOOLPREF = "@ac_tool_prefix@"
 CCOMPTYPE = "@ccomptype@"
 ccomp_type = "@ccomptype@"
@@ -107,6 +65,149 @@ CC_HAS_DEBUG_PREFIX_MAP = "@cc_has_debug_prefix_map@" == "true"
 AS_HAS_DEBUG_PREFIX_MAP = "@as_has_debug_prefix_map@" == "true"
 c_has_debug_prefix_map = "@cc_has_debug_prefix_map@" == "true"
 as_has_debug_prefix_map = "@as_has_debug_prefix_map@" == "true"
+
+#################################
+## OC_CFLAGS in Makefile, for both vm and sys targets %.[b|n]pic.o
+## also used to compile runtime/sak.exe
+## Also used in Makefile.common for generic C compile rule:
+# %.$(O): %.c $(REQUIRED_HEADERS)
+# 	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
+# 	  $(OUTPUTOBJ)$@ $<
+# mac: "-O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common"
+# linux:
+OC_CFLAGS = "@oc_cflags@"
+
+# CFLAGS not used in Makefile. Used in Makefile.common, in the
+# generic rule for compiling C sources. Also used in:
+# - stdlib/Makefile to compile "HEADERPROGRAM" (header.c), which is
+#     "The launcher for bytecode executables (if #! is not working)"
+# - otherlibs/systhreads/Makefile, to compile st_stubs.[b|n].o
+# mac: empty
+CFLAGS = "@CFLAGS@"
+
+# for compiling runtime files to sys target
+# mac: empty
+OC_NATIVE_CFLAGS = "@oc_native_cflags@"
+
+## not used in any Makefiles. stored in fld in Config module:
+## val ocamlc_cflags : string
+## (** The flags ocamlc should pass to the C compiler *)
+## IOW, these are not flags for building the compiler, they're flags
+## the compiler uses to compile (e.g. when passed c source?)
+# ocamlc_cflags = "@ocamlc_cflags@"
+
+## Unused:
+# OCAMLC_CFLAGS = "@ocamlc_cflags@"
+
+# OC_CPPFLAGS used wherever OC_CFLAGS and CFLAGS used, in
+# particular in the generic C compile rule in Makefile.common.
+# Also use for all runtimes, summed w/others as noted above
+# Also used in various otherlibs/[systhreads|unix]
+# In otherlibs/unix: OC_CPPFLAGS += -DCAML_BUILDING_UNIX
+# mac: oc_ccpflags == -D_FILE_OFFSET_BITS=64
+OC_CPPFLAGS = ["-I$(ROOTDIR)/runtime", "@oc_cppflags@"]
+
+# Used in generic C compile rule in Makefile.common,
+# also in Makefile for runtime/sak.exe
+# ocamltest/Makefile, summed with OC_CPPFLAGS
+# Also used in otherlibs/systhreads, for st_stubs.[b|n].o
+# mac: empty
+CPPFLAGS = "@CPPFLAGS@"
+
+# Makefile, for preprocessing %.S sources. Undefined
+# OC_DEBUG_CPPFLAGS
+
+# Makefile, for preprocessing %.S sources. Undefined
+# OC_INSTR_CPPFLAGS
+
+# OC_NATIVE_CPPFLAGS defined in Makefile.common (not by ./configure):
+# OC_NATIVE_CPPFLAGS=\
+#   -DNATIVE_CODE -DTARGET_$(ARCH) -DMODEL_$(MODEL) -DSYS_$(SYSTEM)
+# We rename it since it only contains defines, for which Bazel
+# has a dedicated attribute:
+OC_NATIVE_DEFINES = [
+    "NATIVE_CODE",
+    "TARGET_" + ARCH,
+    "MODEL_" + MODEL,
+    "SYS_" + SYSTEM
+]
+
+# a field in the Config module in utils
+# ocamlc_cppflags = "@ocamlc_cppflags@"
+
+# Unused:
+OCAMLC_CPPFLAGS = "@ocamlc_cppflags@"
+
+## in Makefile. summed with OC_CPPFLAGS for the runtime .o files
+## for native (%.n.o, OC_CPPFLAGS summed with OC_NATIVE_CPPFLAGS
+# runtime_CPPFLAGS = -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME
+runtime_DEFINES = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
+
+
+## in Makefile, summed with OC_CPPFLAGS for .bd.o files
+## for .nd.o files: sum w/OC_NATIVE_CPPFLAGS, OC_CPPFLAGS
+## also used for windows amd64.nt.d.obj, i386.nt.d.obj
+ocamlrund_CPPFLAGS = -DDEBUG
+
+## in Makefile, summed with OC_CPPFLAGS for .bi.o files
+## for .ni.o files: sum w/OC_NATIVE_CPPFLAGS, OC_CPPFLAGS
+## also used for windows amd64.nt.i.obj, i386.nt.i.obj
+ocamlruni_CPPFLAGS = -DCAML_INSTR
+
+# bzl: ocamlopt v. native?
+# "module" prefix? but there is no ocamlopt module?
+## bzl: ocamlopt_cflags not found in makefiles
+ocamlopt_cflags = "@ocamlc_cflags@"
+OCAMLOPT_CFLAGS = "@ocamlc_cflags@"
+# #7678: ocamlopt uses these only to compile .c files, and the
+# #behaviour for the two drivers should be identical.
+# bzl: "drivers"?
+## bzl: ocamlopt_cppflags not found in makefiles
+OCAMLOPT_CPPFLAGS = "@ocamlc_cppflags@"
+ocamlopt_cppflags = "@ocamlc_cppflags@"
+## no OC_BYTE_CFLAGS?
+
+## bzl: used to compile *.bpic.$(O) files
+SHAREDLIB_CFLAGS = "@sharedlib_cflags@"
+
+### Additional link-time options
+# To support dynamic loading of shared libraries (they need to look at
+# our own symbols):
+OC_LDFLAGS = "@oc_ldflags@"
+
+
+# standard env var:
+LDFLAGS = "@LDFLAGS@"
+
+################################################################
+# Platform-dependent assembler files to use to build the runtime
+runtime_ASM_OBJECTS = "@runtime_asm_objects@" ## in dir runtime/
+
+# Platform-dependent module for ocamlyacc
+ocamlyacc_WSTR_MODULE = "@ocamlyacc_wstr_module@"
+
+################ ocaml compilers ################
+## OPTCOMPILER=$(ROOTDIR)/ocamlopt
+## CAMLOPT=$(OCAMLRUN) $(OPTCOMPILER)
+
+## So OPTCOMPILER is ocamlopt.byte, of type (vm>sys)
+## i.e. VMSYS_COMPILER.
+## Instead of CAMLOPT, VMSYS_COMPILE_CMD or similar.
+
+################################################################
+## OC_COMMON_[C|LD]FLAGS: for OCaml sources
+# OC_COMMON_CFLAGS used in Makefile, Makefile.menhir
+# for default rules for .cmo, .cmi
+# for .cmx, COMPILE_NATIVE_MODULE uses OC_COMMON_CFLAGS and
+# OC_NATIVE_CFLAGS (which is empty)
+OC_COMMON_CFLAGS = [  ## OCaml compile flags
+    "-g", "-strict-sequence", "-principal", "-absname",
+    "-w", "+a-4-9-40-41-42-44-45-48", "-warn-error", "+a", "-bin-annot",
+    "-strict-formats"
+]
+## OC_COMMON_LDFLAGS used in Makefile to build ocamlc
+OC_COMMON_LDFLAGS = ["-g"] ## default is always debug build
+
 
 ### Command and flags to use for assembling ocamlopt-generated code
 ASM = "@AS@"
@@ -274,9 +375,16 @@ MKLIB = "@mklib@"
 SYSTHREAD_SUPPORT = "@systhread_support@" == "true"
 CMXS = "@cmxs@"
 
+################################################################
+##  Flexlink stuff
 # On Windows, MKDLL, MKEXE and MKMAINDLL must ultimately be equivalent to
 #   flexlink $(FLEXLINK_FLAGS) [-exe|-maindll]
 # or OCAML_FLEXLINK overriding will not work (see utils/config.mlp)
+
+# OC_DLL_LDFLAGS only in testsuite/Makefile, for flexlink
+OC_DLL_LDFLAGS = "@oc_dll_ldflags@"
+# OC_EXE_LDFLAGS only in testsuite/Makefile, for flexlink
+OC_EXE_LDFLAGS = "@oc_exe_ldflags@"
 
 FLEXDLL_CHAIN = "@flexdll_chain@"
 FLEXLINK_FLAGS = "@flexlink_flags@"
