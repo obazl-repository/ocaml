@@ -1,0 +1,372 @@
+OCAML_DEVELOPMENT_VERSION = "@OCAML_DEVELOPMENT_VERSION@" == "true"
+OCAML_VERSION_MAJOR = "@OCAML_VERSION_MAJOR@"
+OCAML_VERSION_MINOR = "@OCAML_VERSION_MINOR@"
+OCAML_VERSION_PATCHLEVEL = "@OCAML_VERSION_PATCHLEVEL@"
+OCAML_VERSION_EXTRA = "@OCAML_VERSION_EXTRA@"
+
+# Flags to use when compiling and linking OCaml programs
+
+# The names of the variables below take the form XXX_YYY_ZZZ where
+#
+# XXX is one of OC, OCAML or the name of a module. The OC prefix
+# is for private variables (i.e. reserved by the compiler's build system),
+# the OCAML prefix is used for variables the user can define to add their
+# own flags and the module-name prefix is for flags that apply only
+# to one module.
+#
+# YYY refers to the backend. At the moment, it can take the values
+# COMMON for the flags shared by all the backends, BYTECODE or NATIVE
+# (other backends may be added in the future).
+#
+# ZZZ is either CFLAGS (compile-time flags) or LDFLAGS (link-time flags).
+# However, contrary to what is done for C compilers, the flags in the
+# CFLAGS category are not passed at link time, so if a flag is needed
+# at both stages, like e.g. -g, it should be added to both XXX_YYY_CFLAGS and
+# XXX_YYY_LDFLAGS.
+
+# Bzl: the above is buried in Makefile.build_config.in. It's seems a
+# little out if sync, not accounting for CFLAGS, CPPFLAGS, and
+# *_CPPFLAGS, or the OCAMLOPT prefix, etc. Or is the OCAMLOPT prefix a
+# "module" prefix?
+# Note there are no OCAML_* flag vars.
+
+# "Backend" evidently means target platform. The "common" flags - used
+# in _every_ C compilation, whether debug or opt, etc.?
+
+# bzl: WARNING - the makefiles may update these vars. For example, in
+# otherlibs/Makefile.otherlibs.common we have "OC_CFLAGS += -g".
+
+OC_COMMON_CFLAGS = [
+    "-g", "-strict-sequence", "-principal", "-absname",
+    "-w", "+a-4-9-40-41-42-44-45-48", "-warn-error", "+a", "-bin-annot",
+    "-strict-formats"
+]
+OC_CFLAGS = "@oc_cflags@"
+ocamlc_cflags = "@ocamlc_cflags@"
+OCAMLC_CFLAGS = "@ocamlc_cflags@"
+CFLAGS = "@CFLAGS@"
+
+## CPP == C PreProcessor?
+OC_CPPFLAGS = ["-I$(ROOTDIR)/runtime", "@oc_cppflags@"]
+ocamlc_cppflags = "@ocamlc_cppflags@"
+OCAMLC_CPPFLAGS = "@ocamlc_cppflags@"
+CPPFLAGS = "@CPPFLAGS@"
+
+# bzl: ocamlopt v. native?
+# "module" prefix? but there is no ocamlopt module?
+## bzl: ocamlopt_cflags not found in makefiles
+ocamlopt_cflags = "@ocamlc_cflags@"
+OCAMLOPT_CFLAGS = "@ocamlc_cflags@"
+# #7678: ocamlopt uses these only to compile .c files, and the
+# #behaviour for the two drivers should be identical.
+# bzl: "drivers"?
+## bzl: ocamlopt_cppflags not found in makefiles
+OCAMLOPT_CPPFLAGS = "@ocamlc_cppflags@"
+ocamlopt_cppflags = "@ocamlc_cppflags@"
+OC_NATIVE_CFLAGS = "@oc_native_cflags@"
+## no OC_BYTE_CFLAGS?
+
+## bzl: used to compile *.bpic.$(O) files
+SHAREDLIB_CFLAGS = "@sharedlib_cflags@"
+
+### Additional link-time options
+# To support dynamic loading of shared libraries (they need to look at
+# our own symbols):
+OC_COMMON_LDFLAGS = ["-g"]
+OC_LDFLAGS = "@oc_ldflags@"
+OC_DLL_LDFLAGS = "@oc_dll_ldflags@"
+OC_EXE_LDFLAGS = "@oc_exe_ldflags@"
+# standard env var:
+LDFLAGS = "@LDFLAGS@"
+
+################################################################
+# Platform-dependent assembler files to use to build the runtime
+runtime_ASM_OBJECTS = "@runtime_asm_objects@" ## in dir runtime/
+
+# Platform-dependent module for ocamlyacc
+ocamlyacc_WSTR_MODULE = "@ocamlyacc_wstr_module@"
+
+################################################################
+## tools
+### Which C compiler to use
+TOOLPREF = "@ac_tool_prefix@"
+CCOMPTYPE = "@ccomptype@"
+ccomp_type = "@ccomptype@"
+CC = "@CC@"
+c_compiler = "@CC@"
+   # bytecomp_c_compiler and native_c_compiler have been supported for a
+   # long time and are retained for backwards compatibility.
+   # For programs that don't need compatibility with older OCaml releases
+   # the recommended approach is to use the constituent variables
+   # c_compiler, ocamlc_cflags, ocamlc_cppflags etc., directly.
+bytecomp_c_compiler = c_compiler + " " + ocamlc_cflags + " " + ocamlc_cppflags
+native_c_compiler = c_compiler + " " + ocamlopt_cflags + " " + ocamlopt_cppflags
+TOOLCHAIN = "@toolchain@"
+
+CC_HAS_DEBUG_PREFIX_MAP = "@cc_has_debug_prefix_map@" == "true"
+AS_HAS_DEBUG_PREFIX_MAP = "@as_has_debug_prefix_map@" == "true"
+c_has_debug_prefix_map = "@cc_has_debug_prefix_map@" == "true"
+as_has_debug_prefix_map = "@as_has_debug_prefix_map@" == "true"
+
+### Command and flags to use for assembling ocamlopt-generated code
+ASM = "@AS@"
+asm = "@AS@"
+### Extension of assembler files
+S = "@S@"
+EXT_ASM= ".@S@"
+ext_asm = "." + "@S@"
+ASM_CFI_SUPPORTED = "@asm_cfi_supported@" == "true"
+asm_cfi_supported = "@asm_cfi_supported@" == "true"
+
+AFL_INSTRUMENT = "@afl@" == "true"
+afl_instrument = "@afl@" == "true"
+FLAT_FLOAT_ARRAY = "@flat_float_array@" == "true"
+FUNCTION_SECTIONS = "@function_sections@" == "true"
+
+SUPPORTS_SHARED_LIBRARIES = "@supports_shared_libraries@" == "true"
+supports_shared_libraries = "@supports_shared_libraries@" == "true"
+
+### Extension for shared libraries
+SO = "@SO@"
+EXT_DLL = ".@SO@"
+
+# Compile-time option to $(CC) to add a directory to be searched
+# at run-time for shared libraries
+RPATH = "@rpath@"
+
+MKSHAREDLIBRPATH = "@mksharedlibrpath@"
+DYNLINKOPTS = "@DLLIBS@"
+NATDYNLINK = "@natdynlink@" == "true"
+NATDYNLINKOPTS = "@natdynlinkopts@"
+
+
+### Command and flags to use for assembling .S files (often with preprocessing)
+ASPP = "@ASPP@"
+
+
+### Path to the libtool script
+LIBTOOL = "@top_builddir@/libtool"
+
+### How to invoke the C preprocessor through the C compiler
+CPP = "@CPP@"
+
+### How to invoke ar
+ARCMD = "@AR@"
+ar = "@AR@"
+
+AWK = "@AWK@"
+
+## native pack linker
+PACKLD = "@PACKLD@$(EMPTY)"
+native_pack_linker = "@PACKLD@"
+
+################################################################
+
+EMPTY=""
+## Arguments passed to the configure script
+CONFIGURE_ARGS = "@CONFIGURE_ARGS@"
+TOP_BUILDDIR = "@top_builddir@"
+## Installation directories
+prefix = "@prefix@"
+exec_prefix = "@exec_prefix@"
+BINDIR = "@bindir@"
+datarootdir = "@datarootdir@"
+### Where to install the standard library
+LIBDIR = "@libdir@"
+### Where to install the stub code for the standard library
+STUBLIBDIR = "@libdir@/stublibs"
+### Where to install the man pages
+# Man pages for commands go in $(MANDIR)/man1
+# Man pages for the library go in $(MANDIR)/man3
+MANDIR = "@mandir@"
+PROGRAMS_MAN_DIR="@mandir@/man1"
+LIBRARIES_MAN_DIR="@mandir@/man3"
+
+### Do #! scripts work on your system?
+### Beware: on some systems (e.g. SunOS 4), this will work only if
+### the string "#!$(BINDIR)/ocamlrun" is less than 32 characters long.
+### In doubt, set HASHBANGSCRIPTS to false.
+SHEBANGSCRIPTS = "@shebangscripts@" == "true"
+LONG_SHEBANG = "@long_shebang@" == "true"
+# For compatibility
+HASHBANGSCRIPTS = SHEBANGSCRIPTS
+
+### Extension of object files
+O = "@OBJEXT@"
+EXT_OBJ = ".@OBJEXT@"
+ext_obj = "." + "@OBJEXT@"
+
+### How to tell the C compiler to output an object file
+OUTPUTOBJ = "@outputobj@ " + EMPTY
+c_output_obj = "@outputobj@"
+
+### Extension of static libraries
+A = "@libext@"
+EXT_LIB= ".@libext@"
+ext_lib = "." + "@libext@"
+
+############# Configuration for the native-code compiler
+
+### Whether the native compiler has been enabled or not
+NATIVE_COMPILER = "@native_compiler@" == "true"
+
+### Name of architecture for the native-code compiler
+### Currently supported:
+###
+### i386        Intel Pentium PCs under Linux, *BSD*, NextStep
+### power       Macintosh under Mac OS X and Linux
+### arm         ARM under Linux
+###
+### Set ARCH=none if your machine is not supported
+ARCH = "@arch@" == "true"
+
+# Whether the architecture has 64 bits
+ARCH64 = "@arch64@"
+
+# Endianness for this architecture
+ENDIANNESS = "@endianness@"
+
+### Name of architecture model for the native-code compiler.
+### Some architectures come in several slightly different flavors
+### that share a common code generator. This variable tailors the
+### behavior of the code generator to the particular flavor used.
+### Currently needed only if ARCH=power; leave MODEL=default for
+### other architectures.
+### If ARCH=power: set MODEL=ppc
+### For other architectures: leave MODEL=default
+###
+MODEL = "@model@"
+
+### Name of operating system family for the native-code compiler.
+SYSTEM = "@system@"
+
+TARGET = "@target@"
+HOST = "@host@"
+
+### Set to "true" to install ".byte" executables (ocamlc.byte, etc.)
+INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
+
+############# Configuration for the contributed libraries
+
+### Which libraries to compile and install
+# Currently available:
+#       dynlink           Dynamic linking (bytecode and native)
+#       (win32)unix       Unix system calls
+#       str               Regular expressions and high-level string processing
+#       systhreads        Same as threads, requires POSIX threads
+OTHERLIBRARIES = "@otherlibraries@"
+
+UNIX_OR_WIN32 = "@unix_or_win32@"
+INSTALL_SOURCE_ARTIFACTS = "@install_source_artifacts@" == "true"
+
+BYTECCLIBS = "@bytecclibs@"
+bytecomp_c_libraries = "@bytecclibs@"
+NATIVECCLIBS = "@nativecclibs@"
+native_c_libraries = "@nativecclibs@"
+
+EXE = "@exeext@"
+ext_exe = "@exeext@"
+
+OUTPUTEXE = "@outputexe@$(EMPTY)"
+
+SYSLIB = "@syslib@"
+MKLIB = "@mklib@"
+SYSTHREAD_SUPPORT = "@systhread_support@" == "true"
+CMXS = "@cmxs@"
+
+# On Windows, MKDLL, MKEXE and MKMAINDLL must ultimately be equivalent to
+#   flexlink $(FLEXLINK_FLAGS) [-exe|-maindll]
+# or OCAML_FLEXLINK overriding will not work (see utils/config.mlp)
+
+FLEXDLL_CHAIN = "@flexdll_chain@"
+FLEXLINK_FLAGS = "@flexlink_flags@"
+
+## Bazel: we don't use these mk* vars. They start with the CC tool;
+## Bazel rules handle that, we only need to construct the args.
+mkdll, mkexe, mkmaindll = (
+    "@mkdll_exp@",
+    "@mkexe_exp@",
+    "@mkmaindll_exp@"
+)
+MKEXE = "@mkexe@"
+MKDLL = "@mkdll@"
+MKMAINDLL = "@mkmaindll@"
+MKEXEDEBUGFLAG = "@mkexedebugflag@"
+MKEXE_VIA_CC= [CC, OC_EXE_LDFLAGS, OC_CFLAGS, CFLAGS]
+MKEXE_VIA_CC_LDFLAGS = "@mkexe_via_cc_ldflags@"
+
+RUNTIMED = "@debug_runtime@" == "true"
+INSTRUMENTED_RUNTIME = "@instrumented_runtime@" == "true"
+INSTRUMENTED_RUNTIME_LIBS = "@instrumented_runtime_libs@"
+WITH_DEBUGGER = "@with_debugger@"
+WITH_OCAMLDOC = "@ocamldoc@"
+WITH_OCAMLTEST = "@ocamltest@"
+WITH_FRAME_POINTERS = "@frame_pointers@" == "true"
+WITH_PROFINFO = "@profinfo@" == "true"
+PROFINFO_WIDTH = "@profinfo_width@"
+
+LIBUNWIND_AVAILABLE = "@libunwind_available@"
+LIBUNWIND_INCLUDE_FLAGS = "@libunwind_include_flags@"
+LIBUNWIND_LINK_FLAGS = "@libunwind_link_flags@"
+
+WITH_FPIC = "@fpic@" == "true"
+
+FLAMBDA = "@flambda@" == "true"
+WITH_FLAMBDA_INVARIANTS = "@flambda_invariants@" == "true"
+flambda = "@flambda@" == "true"
+with_flambda_invariants = "@flambda_invariants@" == "true"
+
+WITH_CMM_INVARIANTS = "@cmm_invariants@" == "true"
+with_cmm_invariants = "@cmm_invariants@" == "true"
+
+FORCE_INSTRUMENTED_RUNTIME = "@force_instrumented_runtime@" == "true"
+FORCE_SAFE_STRING = True
+DEFAULT_SAFE_STRING = True
+
+STDLIB_MANPAGES = "@stdlib_manpages@" == "true"
+NAKED_POINTERS = False
+
+# Deprecated variables
+
+## Variables deprecated since OCaml 5.0
+
+UNIXLIB = "unix"
+
+## Variables renamed in OCaml 4.13
+
+RUNTIMEI = "@instrumented_runtime@" == "true"
+
+################################################################
+
+## from utils/config.generated.ml.in
+OCAML_BINDIR = "@ocaml_bindir@"
+standard_library_default = "@ocaml_libdir@"
+
+default_rpath = "@rpath@"
+mksharedlibrpath = "@mksharedlibrpath@"
+
+force_instrumented_runtime = "@force_instrumented_runtime@" == "true"
+
+flat_float_array = "@flat_float_array@" == "true"
+
+function_sections = "@function_sections@" == "true"
+
+architecture = "@arch@"
+model = "@model@"
+system = "@system@"
+
+with_frame_pointers = "@frame_pointers@" == "true"
+profinfo = "@profinfo@" == "true"
+profinfo_width = "@profinfo_width@"
+
+ext_dll = "." + "@SO@"
+
+host = "@host@"
+target = "@target@"
+
+systhread_supported = "@systhread_support@" == "true"
+
+flexdll_dirs = [@flexdll_dir@]
+
+WINDOWS_UNICODE = "@windows_unicode@" == "1"
+windows_unicode = @windows_unicode@ != 0
