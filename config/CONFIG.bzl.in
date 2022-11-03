@@ -159,7 +159,7 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 #           -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
 ##  Makefile.common: BOOT_STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/boot
 ## NB: for the last to work, BOOT_OCAMLC must be sys>vm (ocamlc.opt)
-BOOT_STDLIBFLAGS ["-nostdlib"]
+BOOT_STDLIBFLAGS = ["-nostdlib"]
 
 # CAMLOPT: runs vm>sys compiler
 # Defined in:
