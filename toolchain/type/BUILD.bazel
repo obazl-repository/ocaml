@@ -1,7 +1,11 @@
 toolchain_type(name = "bootstrap", visibility = ["//visibility:public"])
 toolchain_type(name = "local", visibility = ["//visibility:public"])
 
-toolchain_type(name = "profile", visibility = ["//visibility:public"])
+toolchain_type(name = "ocaml_tc_profile",
+               visibility = ["//visibility:public"])
+
+toolchain_type(name = "cc_tc_profile",
+               visibility = ["//visibility:public"])
 
 # toolchain_type(
 #     name = "bytecode",

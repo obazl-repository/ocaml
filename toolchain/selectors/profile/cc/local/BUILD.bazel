@@ -1,0 +1,19 @@
+load("//toolchain/profiles:BUILD.bzl", "cc_toolchain_profile_selector")
+
+##############################
+cc_toolchain_profile_selector(
+    name                    = "linux",
+    profile                 = "//toolchain/profiles/cc/local",
+    build_host_constraints = ["@platforms//os:linux"],
+    target_host_constraints = ["@platforms//os:linux"],
+)
+
+##############################
+cc_toolchain_profile_selector(
+    name                    = "macos",
+    profile                 = "//toolchain/profiles/cc/local",
+    build_host_constraints = ["@platforms//os:macos"],
+    target_host_constraints = ["@platforms//os:macos"],
+)
+
+

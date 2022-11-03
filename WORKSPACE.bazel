@@ -33,6 +33,12 @@ register_toolchains(
     "//toolchain/selectors:local",
     # "//toolchain/selectors:dbg",
     # "//toolchain/selectors:instrumented",
+
+    ## toolchain profiles - locals must come first
+    "//toolchain/selectors/profile/cc/local:linux",
+    "//toolchain/selectors/profile/cc/local:macos",
+    "//toolchain/selectors/profile/cc/macos",
+    "//toolchain/selectors/profile/cc/linux"
 )
 
 # register_execution_platforms(

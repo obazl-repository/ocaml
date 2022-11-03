@@ -1,1 +1,3 @@
-# do not remove
+load("//toolchain/profiles:BUILD.bzl", "cc_build_profile")
+
+cc_build_profile(name = "profile", visibility = ["//visibility:public"])

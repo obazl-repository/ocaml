@@ -1,0 +1,12 @@
+load("//toolchain/profiles:BUILD.bzl", "cc_toolchain_profile")
+
+#####################
+cc_toolchain_profile(
+    name     = "macos",
+    # for testing, some harmless flags
+    CFLAGS   = ["-pipe"],
+    CPPFLAGS = ["-Rmodule-import"],
+    LDFLAGS  = ["-Rmodule-build"],
+    DEFINES  = ["MACOS_DEF"]
+)
+

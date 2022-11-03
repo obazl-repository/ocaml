@@ -221,6 +221,7 @@ AC_SUBST([QS])
 ## Generated files
 
 AC_CONFIG_FILES([config/CONFIG.bzl])
+AC_CONFIG_FILES([toolchain/profiles/cc/local/BUILD.bazel])
 AC_CONFIG_FILES([Makefile.build_config])
 AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
