@@ -24,9 +24,10 @@ load(":options.bzl", "NEGATION_OPTS")
 def _bootstrap_archive(ctx):
 
     ## NB: impl_library also calls this, but we need it here too
-    # (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode,
+    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
     # mode = "bytecode"
@@ -391,7 +392,7 @@ def _bootstrap_archive(ctx):
         # tools = [tool] + tool_args, # [tc.ocamlopt, tc.ocamlc],
         mnemonic = mnemonic,
         progress_message = "{mode} compiling {rule}: @{ws}//{pkg}:{tgt}".format(
-            mode = "vm" if tc.target_vm else "sys",
+            mode = "TEST", # "vm" if tc.target_vm else "sys",
             rule = ctx.attr._rule,
             ws  = ctx.label.workspace_name,
             pkg = ctx.label.package,

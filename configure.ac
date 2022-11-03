@@ -16,7 +16,8 @@
 # Process this file with autoconf to produce a configure script.
 
 # Require Autoconf 2.71 for repeatability in CI
-AC_PREREQ([2.71])
+# OBazl: test machine is Ubuntu 20.04.5 LTS, autoconf is 2.69
+AC_PREREQ([2.69])
 AC_INIT([OCaml],
         [OCAML__VERSION],
         [caml-list@inria.fr],

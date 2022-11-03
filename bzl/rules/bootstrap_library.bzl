@@ -72,22 +72,18 @@ Packages](../ug/collections.md).
         # _strict_sequence = attr.label(default = ws + "//strict-sequence"),
         # _verbose         = attr.label(default = ws + "//verbose"),
 
-        _mode       = attr.label(
-            default = "//bzl/toolchain",
-        ),
-
-        mode       = attr.string(
-            doc     = "Overrides mode build setting.",
-            # default = ""
-        ),
-
-        # _sdkpath = attr.label(
-        #     default = Label("@ocaml//:sdkpath") # ppx also uses this
+        # _mode       = attr.label(
+        #     default = "//bzl/toolchain",
         # ),
 
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
+        # mode       = attr.string(
+        #     doc     = "Overrides mode build setting.",
+        #     # default = ""
+        # ),
+
+        # _toolchain = attr.label(
+        #     default = "//bzl/toolchain:tc"
+        # ),
 
         _stage = attr.label(
             doc = "bootstrap stage",
@@ -95,17 +91,17 @@ Packages](../ug/collections.md).
         ),
 
         #FIXME: underscore
-        ocamlc = attr.label(
-            # cfg = ocamlc_out_transition,
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     # cfg = ocamlc_out_transition,
+        #     allow_single_file = True,
+        #     default = "//bzl/toolchain:ocamlc"
+        # ),
 
-        stdlib = attr.label(
-            doc = "For building the compiler, if -nostdlib passed.",
-            allow_single_file = True,
-            cfg = manifest_out_transition,
-        ),
+        # stdlib = attr.label(
+        #     doc = "For building the compiler, if -nostdlib passed.",
+        #     allow_single_file = True,
+        #     cfg = manifest_out_transition,
+        # ),
 
         manifest = attr.label_list(
             doc = "List of elements of library, which may be compiled modules, signatures, or other libraries.",

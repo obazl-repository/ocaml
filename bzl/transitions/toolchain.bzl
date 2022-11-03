@@ -25,7 +25,7 @@ def _toolchain_in_transition_impl(settings, attr):
     ## trying to make sure ocamlrun is only built once
 
     return {
-        "//bzl/toolchain:ocamlrun" : "//boot:ocamlrun"
+        "//bzl/toolchain:ocamlrun" : "//boot/bin:ocamlrun"
     }
 
 #######################
@@ -44,7 +44,7 @@ def _ocamlrun_out_transition_impl(settings, attr):
     # print("ocamlrun_out_transition_impl")
 
     return {
-        "//bzl/toolchain:ocamlrun" : "//boot:ocamlrun"
+        "//bzl/toolchain:ocamlrun" : "//boot/bin:ocamlrun"
     }
 
 #######################

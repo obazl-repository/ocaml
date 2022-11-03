@@ -109,7 +109,8 @@ def _bootstrap_ns(ctx):
     # if ctx.label.name == "":
     #     debug = True
 
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode,
+    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     # return impl_ns_resolver(ctx, mode, tool, tool_args)
 
@@ -180,14 +181,14 @@ def _bootstrap_ns(ctx):
     out_cmi = ctx.actions.declare_file(out_cmi_fname)
     action_outputs.append(out_cmi)
 
-    if mode == "native":
+    if tc.target_vm:
+        out_cm__fname = resolver_module_name + ".cmo"
+    else:
         obj_o_fname = resolver_module_name + ".o"
         obj_o = ctx.actions.declare_file(obj_o_fname)
         action_outputs.append(obj_o)
         # rule_outputs.append(obj_o)
         out_cm__fname = resolver_module_name + ".cmx"
-    else:
-        out_cm__fname = resolver_module_name + ".cmo"
 
     out_cm_ = ctx.actions.declare_file(out_cm__fname)
     action_outputs.append(out_cm_)
@@ -241,7 +242,7 @@ def _bootstrap_ns(ctx):
         tools = [tool] + tool_args,
         mnemonic = "OcamlNsResolverAction" if ctx.attr._rule == "ocaml_ns" else "PpxNsResolverAction",
         progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
-            mode = mode,
+            mode = "TEST", # mode,
             rule=ctx.attr._rule,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
             pkg = ctx.label.package,
@@ -320,20 +321,20 @@ bootstrap_ns = rule(
             doc          = "List of OCaml options. Will override configurable default options."
         ),
 
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
+        # _toolchain = attr.label(
+        #     default = "//bzl/toolchain:tc"
+        # ),
 
         _stage = attr.label(
             doc = "bootstrap stage",
             default = "//bzl:stage"
         ),
 
-        ocamlc = attr.label(
-            # cfg = ocamlc_out_transition,
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     # cfg = ocamlc_out_transition,
+        #     allow_single_file = True,
+        #     default = "//bzl/toolchain:ocamlc"
+        # ),
 
         ns = attr.string(),
 
@@ -360,10 +361,10 @@ bootstrap_ns = rule(
         #     default = "//mode",
         # ),
 
-        mode       = attr.string(
-            doc     = "Overrides mode build setting.",
-            # default = ""
-        ),
+        # mode       = attr.string(
+        #     doc     = "Overrides mode build setting.",
+        #     # default = ""
+        # ),
 
         # _warnings  = attr.label(default = "@ocaml//ns:warnings"),
 

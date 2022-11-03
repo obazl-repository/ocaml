@@ -37,7 +37,8 @@ def _bootstrap_signature_impl(ctx):
     # if ctx.label.name in ["Pervasives"]
     #     debug = True
 
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode,
+    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # if mode == "native":
@@ -272,7 +273,7 @@ def _bootstrap_signature_impl(ctx):
         tools = [tool] + tool_args, # tc.ocamlrun, tc.ocamlc],
         mnemonic = "CompileOcamlSignature",
         progress_message = "{mode} compiling bootstrap_signature: {ws}//{pkg}:{tgt}".format(
-            mode = mode,
+            mode = "TEST", # mode,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
             tgt=ctx.label.name
@@ -365,27 +366,27 @@ bootstrap_signature = rule(
             allow_single_file = True,
         ),
 
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
+        # _toolchain = attr.label(
+        #     default = "//bzl/toolchain:tc"
+        # ),
 
         _stage = attr.label(
             doc = "bootstrap stage",
             default = "//bzl:stage"
         ),
 
-        ocamlc = attr.label(
-            # cfg = ocamlc_out_transition,
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     # cfg = ocamlc_out_transition,
+        #     allow_single_file = True,
+        #     default = "//bzl/toolchain:ocamlc"
+        # ),
 
-        _mode       = attr.label(
-            default = "//bzl/toolchain",
-        ),
-        mode       = attr.string(
-            doc     = "Overrides global mode build setting.",
-        ),
+        # _mode       = attr.label(
+        #     default = "//bzl/toolchain",
+        # ),
+        # mode       = attr.string(
+        #     doc     = "Overrides global mode build setting.",
+        # ),
 
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."

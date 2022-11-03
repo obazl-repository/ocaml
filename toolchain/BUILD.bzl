@@ -107,9 +107,9 @@ def _bootstrap_toolchain_adapter_impl(ctx):
 
         # cc_opts = _cc_opts,
 
-        # std_exit = ctx.attr._std_exit.files.to_list()[0],
-        # camlheader = ctx.attr._camlheader.files.to_list()[0],
-
+        stdlib = ctx.attr.stdlib,
+        std_exit = ctx.attr.std_exit, #.files.to_list()[0],
+        camlheaders = ctx.files.camlheaders
         ),
     ]
 
@@ -119,7 +119,7 @@ def _toolchain_in_transition_impl(settings, attr):
     ## trying to make sure ocamlrun is only built once
 
     return {
-        "//bzl/toolchain:ocamlrun" : "//boot:ocamlrun"
+        "//bzl/toolchain:ocamlrun" : "//boot/bin:ocamlrun"
     }
 
 #######################
@@ -148,7 +148,7 @@ bootstrap_toolchain_adapter = rule(
         ),
 
         "ocamlrun": attr.label(
-            default    = "//boot:ocamlrun",
+            default    = "//boot/bin:ocamlrun",
             # default    = "//bzl/toolchain:ocamlrun",
             executable = True,
             allow_single_file = True,
@@ -218,28 +218,31 @@ bootstrap_toolchain_adapter = rule(
         #     # cfg = "exec",
         # ),
 
-        # "stdlib": attr.label(
-        #     default   = "//stdlib",
-        #     executable = False,
-        #     # allow_single_file = True,
-        #     # cfg = "exec",
-        # ),
+        "stdlib": attr.label(
+            # default   = "//stdlib",
+            executable = False,
+            # allow_single_file = True,
+            # cfg = "exec",
+        ),
 
-    # needed to build executables: std_exit, camlheader
-        # "_camlheader": attr.label(
-        #     default    = "//stdlib:camlheader",
-        #     executable = False,
-        #     allow_single_file = True,
-        # ),
+        "std_exit": attr.label(
+            # default = Label("//stdlib:Std_exit"),
+            executable = False,
+            allow_single_file = True,
+            # cfg = "exec",
+        ),
+
+        "camlheaders": attr.label_list(
+            allow_files = True,
+            default = [
+                "//stdlib:camlheader", "//stdlib:target_camlheader",
+                "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+                "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+            ],
+        ),
 
         # "_bootstrap_stdlib": attr.label(
         #     default = Label("//stdlib"),
-        #     executable = False,
-        #     allow_single_file = True,
-        #     cfg = "exec",
-        # ),
-        # "_bootstrap_std_exit": attr.label(
-        #     default = Label("@//stdlib:Std_exit"),
         #     executable = False,
         #     allow_single_file = True,
         #     cfg = "exec",

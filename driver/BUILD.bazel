@@ -5,19 +5,25 @@ load("//bzl:rules.bzl",
 )
 
 load("//config:CONFIG.bzl",
+     "RUNTIME_OCAMLRUN",
      "OC_COMMON_CFLAGS",
-     "OC_NATIVE_CFLAGS",
-     "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS"
+     "NO_MISSING_MLI_ERROR",
+     "PLATFORM_CFLAGS"
+     # "OC_COMMON_CFLAGS",
+     # "OC_NATIVE_CFLAGS",
+     # "ROOT_MODULE_OPTS",
+     # "ROOT_SIG_OPTS"
      )
 
-MODULE_OPTS = OC_COMMON_CFLAGS
-SIG_OPTS    = OC_COMMON_CFLAGS
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+# MODULE_OPTS = OC_COMMON_CFLAGS
+# SIG_OPTS    = OC_COMMON_CFLAGS
 
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # SIG_OPTS    = ROOT_MODULE_OPTS
 
-STDLIB = ["//boot:stdlib"]
+STDLIB = ["//boot/lib:stdlib"]
 
 bootstrap_library(
     name = "driver",
@@ -251,13 +257,13 @@ bootstrap_signature(
 bootstrap_module(
     name   = "Main",
     struct = "main.ml",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "-70"],
     deps   = STDLIB + [
         ":Maindriver", ## (Driver Maindriver)
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Format",
     ],
-    visibility = ["//bin:__pkg__"] # the new compiler
+    visibility = ["//boot:__subpackages__"] # the new compiler
 )
 
 bootstrap_module(
@@ -438,12 +444,12 @@ bootstrap_signature(
 bootstrap_module(
     name   = "Optmain",
     struct = "optmain.ml",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + NO_MISSING_MLI_ERROR,
     deps   = STDLIB + [
         ":Optmaindriver",
     ],
     visibility = [
-        "//compilers/stage1:__pkg__",
+        "//boot:__subpackages__",
         "//bin:__pkg__",
         "//:__pkg__"
     ]

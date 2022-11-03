@@ -48,10 +48,10 @@ ocamlc_boot = rule(
             default = "//bzl:stage0"
         ),
 
-        ocamlc = attr.label(
-            allow_single_file = True,
-            default = "//boot/bin:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     allow_single_file = True,
+        #     default = "//boot/bin:ocamlc"
+        # ),
 
         main = attr.label(
             doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
@@ -72,11 +72,11 @@ ocamlc_boot = rule(
                          [CcInfo]],
         ),
 
-        _stdexit = attr.label(
-            cfg = ocamlc_boot_out_transition,
-            default = "//stdlib:Std_exit",
-            allow_single_file = True
-        ),
+        # _stdexit = attr.label(
+        #     cfg = ocamlc_boot_out_transition,
+        #     default = "//stdlib:Std_exit",
+        #     allow_single_file = True
+        # ),
 
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"

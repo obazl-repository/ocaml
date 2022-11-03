@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 alias(
     name   = "camlrun",
     actual = "//runtime:camlrun"
@@ -6,4 +8,9 @@ alias(
 alias(
     name   = "asmrun",
     actual = "//runtime:asmrun"
+)
+
+alias(
+    name = "stdlib",
+    actual = "//stdlib"
 )

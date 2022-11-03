@@ -14,12 +14,13 @@ def _bootstrap_repl_impl(ctx):
     print("ocaml_tmp: %s" % ocaml_tmp)
 
     ## expunge
-    # "$(execpath //boot:ocamlrun)",
+    # "$(execpath //boot/bin:ocamlrun)",
     # "$(location //utils:expunge)",
     # "$(location :ocaml.tmp)",
     # "$(location ocaml)",
 
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode,
+    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     args = ctx.actions.args()
     args.add(ctx.file._expunger)

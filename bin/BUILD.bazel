@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 load("//bzl:rules.bzl",
      "bootstrap_archive",
      "bootstrap_executable",
@@ -16,34 +18,48 @@ load("//config:CONFIG.bzl",
      # defines - replace by CC_DEFINES with selects
      # "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
      # "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
-     "CC_DEFINES", "CC_NATIVE_DEFINES",
+     # "CC_DEFINES", "CC_NATIVE_DEFINES",
      # other
-     "OUTPUTEXE", "MKEXE_FLAGS",
+     # "OUTPUTEXE", "MKEXE_FLAGS",
      )
 
 exports_files(["Makefile.config", "VERSION"])
 
-load("//config:CONFIG.bzl",
-     "USE_PRIMS", "DATA_PRIMS",
-     "PRIMITIVES"
-     )
+# load("//config:CONFIG.bzl",
+#      # "USE_PRIMS", "DATA_PRIMS",
+#      # "PRIMITIVES"
+#      )
 
 ################################################################
 alias(
     name = "ocamlrun",
-    actual = "//boot:ocamlrun"
+    actual = "//boot/bin:ocamlrun"
 )
 
-bootstrap_executable(
-    name = "ocamlopt",
-    opts = [],
+alias(
+    name = "ocamllex",
+    actual = "//boot:ocamllex"
+)
+
+ocamlc_boot( ##FIXME: do we really need a separate rule?
+# compiler(
+    name = "ocamlc",
+    # compile_target = "//platform/cpu:arm",  ## ??
+    exec_compatible_with = [
+        ## *>vm ???
+    ],
+    opts = [
+        "-nostdlib", "-compat-32",
+    ],
+    # primitives = PRIMITIVES,
+    main = "//driver:Main",
     deps = [
         "//compilerlibs:ocamlcommon",
-        "//compilerlibs:ocamloptcomp",
-        # "//stdlib",
-        "//driver:Optmain"
+        "//bytecomp:ocamlbytecomp",
+        # "//boot:stdlib"
     ],
     visibility = [
+        "//compilers/stage2:__pkg__",
         "//testsuite:__pkg__"
     ]
 )

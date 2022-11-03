@@ -74,7 +74,7 @@ ocamlc_boot(
     deps = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
-        # "//boot:stdlib"
+        # "//boot/lib:stdlib"
     ],
     visibility = [
         "//compilers/stage2:__pkg__",

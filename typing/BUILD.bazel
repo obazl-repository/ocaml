@@ -4,8 +4,10 @@ load("//bzl:rules.bzl",
      "bootstrap_signature")
 
 load("//config:CONFIG.bzl",
-     "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS",
+     # "ROOT_MODULE_OPTS",
+     # "ROOT_SIG_OPTS",
+     "OC_COMMON_CFLAGS",
+     "PLATFORM_CFLAGS",
      "PRIMITIVES"
      )
 
@@ -25,10 +27,15 @@ exports_files([
     "types.mli", "types.ml",
 ])
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS    = ROOT_MODULE_OPTS
+##FIXME: -nostdlib in global
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+    "-nostdlib"
+]
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+    "-nostdlib"
+]
 
-STDLIB = ["//boot:stdlib"]
+STDLIB = ["//boot/lib:stdlib"]
 
 bootstrap_library(
     name = "typing",
@@ -197,7 +204,7 @@ bootstrap_signature(
 bootstrap_module(
     name   = "Cmt2annot",
     struct = "cmt2annot.ml",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "-70"],
     primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Types",

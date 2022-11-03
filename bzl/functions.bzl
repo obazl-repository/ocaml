@@ -30,10 +30,10 @@ def config_tc(ctx):
     # else:
     #     mode = ctx.attr._mode[BuildSettingInfo].value
 
-    mode = ctx.attr._toolchain[BuildSettingInfo].value
+    # mode = ctx.attr._toolchain[BuildSettingInfo].value
 
     tool = tc.ocamlrun
-    tool_args = [ctx.file.ocamlc]
+    tool_args = [tc.ocamlc]
     ext       = ".cmo"
 
     # stage = ctx.attr._stage[BuildSettingInfo].value
@@ -88,7 +88,8 @@ def config_tc(ctx):
     # if ctx.attr._boot:
     #     scope = "__boot/"
 
-    return mode, tc, tool, tool_args, scope, ext
+    return tc, tool, tool_args, scope, ext
+    # return mode, tc, tool, tool_args, scope, ext
 
 ###############################
 def submodule_from_label_string(s):

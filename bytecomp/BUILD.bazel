@@ -8,7 +8,8 @@ load("//bzl:rules.bzl",
 load("//config:CONFIG.bzl",
      "RUNTIME_OCAMLRUN",
      "OC_COMMON_CFLAGS",
-     "OC_NATIVE_FLAGS"
+     "PLATFORM_CFLAGS",
+     "PRIMITIVES"
      )
 
 exports_files([
@@ -20,10 +21,15 @@ exports_files([
     "symtable.mli", "symtable.ml"
 ])
 
-MODULE_OPTS = OC_COMMON_CFLAGS
-SIG_OPTS    = OC_COMMON_CFLAGS
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+    "-nostdlib"
+]
 
-STDLIB = ["//boot:stdlib"]
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+    "-nostdlib"
+]
+
+STDLIB = ["//boot/lib:stdlib"]
 
 ## dev/test: build everthing
 bootstrap_library(
@@ -81,7 +87,7 @@ bootstrap_archive(
     # ],
     visibility = [
         # "//visibility:public",
-        "//boot:__pkg__",
+        "//boot:__subpackages__",
         "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
         "//bin:__pkg__",  # the new compiler
@@ -496,14 +502,22 @@ bootstrap_signature(
     ]
 )
 
+# ./boot/ocamlrun ./boot/ocamlc
+# -nostdlib
+# -use-prims runtime/primitives
+# -g -strict-sequence -principal -absname
+# -w +a-4-9-40-41-42-44-45-48
+# -warn-error +a
+# -bin-annot -strict-formats
 bootstrap_module(
     name   = "Opcodes",
     struct = "opcodes.ml",
     # sig    = ":Opcodes_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "-70"],
     deps   = STDLIB + [
     ],
-    data = ["//runtime:primitives"],
+    # data = ["//runtime:primitives"],
+    primitives = PRIMITIVES,
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -514,12 +528,12 @@ bootstrap_module(
 ## root Makefile:
 # bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
-## NEW_OCAMLRUN = //boot:ocamlrun, we call it RUNTIME_OCAMLRUN
+## NEW_OCAMLRUN = //boot/bin:ocamlrun, we call it RUNTIME_OCAMLRUN
 ## make_opcodes is //tools:make_opcodes
 genrule(
     name  = "opcodes_ml",
     srcs  = ["//runtime/caml:instruct.h", "//tools:make_opcodes"],
-    tools = [RUNTIME_OCAMLRUN],
+    tools = [RUNTIME_OCAMLRUN], # or depend on toolchain?
     outs  = ["opcodes.ml"],
     cmd   = " ".join([
         "$(execpath {NEW_OCAMLRUN})".format(
@@ -554,10 +568,10 @@ genrule(
 #     name  = "opcodes_mli",
 #     srcs  = ["opcodes.ml", "//boot/bin:ocamlc", "//stdlib"],
 #     outs  = ["opcodes.mli"],
-#     tools = ["//boot:ocamlrun"],
+#     tools = ["//boot/bin:ocamlrun"],
 #     cmd   = " ".join([
 #         # "STDLIB=echo `dirname $(location //stdlib)` &&",
-#         "$(execpath //boot:ocamlrun)",
+#         "$(execpath //boot/bin:ocamlrun)",
 #         "$(location //boot/bin:ocamlc)",
 #         "-g -nostdlib -I boot -use-prims runtime/primitives",
 #         "-I bazel-out/darwin-fastbuild/bin/stdlib",

@@ -26,7 +26,8 @@ load(":options.bzl",
 ###############################
 def impl_executable(ctx):
 
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode,
+    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
@@ -236,6 +237,12 @@ def impl_executable(ctx):
         includes.append(dep.dirname)
         args.add(dep)
 
+    for hdr in tc.camlheaders:
+        includes.append(hdr.dirname)
+
+    ## this exposes stdlib, camlheader, etc.
+    # args.add("-I", ctx.file._stdexit.dirname)
+
     args.add_all(includes, before_each="-I", uniquify=True)
 
     ## 'main' dep must come last on cmd line
@@ -243,11 +250,6 @@ def impl_executable(ctx):
         args.add(ctx.file.main)
 
     # args.add("external/ounit2/oUnit.cmx")
-
-    args.add("-I", ctx.files._camlheaders[0].dirname)
-
-    ## this exposes stdlib, camlheader, etc.
-    args.add("-I", ctx.file._stdexit.dirname)
 
     data_inputs = []
     if ctx.attr.data:
@@ -265,10 +267,12 @@ def impl_executable(ctx):
 
     args.add("-o", out_exe)
 
+    print("tc.camlheaders: %s" % tc.camlheaders)
+
     inputs_depset = depset(
-        direct = [ctx.file._stdexit]
+        direct = [] # [ctx.file._stdexit]
         + primitives
-        + ctx.files._camlheaders,
+        + tc.camlheaders,
         transitive = [direct_inputs_depset]
         + [linkargs_depset]
         + data_inputs
@@ -300,7 +304,7 @@ def impl_executable(ctx):
       tools = [tool] + tool_args,  # [tc.ocamlopt],
       mnemonic = mnemonic,
       progress_message = "{mode} linking {rule}: {ws}//{pkg}:{tgt}".format(
-          mode = mode,
+          mode = "TEST", # mode,
           rule = ctx.attr._rule,
           ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
           pkg = ctx.label.package,

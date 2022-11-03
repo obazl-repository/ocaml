@@ -46,7 +46,7 @@ make ocamlc - build //utils etc. with 'boot/ocamlrun boot/ocamlc -I boot'
     root dir)
 
     To get the effect of '-I boot' - access std_exit.cmo and
-    camlheader - we define a target '//boot:stdlib' that exposes them.
+    camlheader - we define a target '//boot/lib:stdlib' that exposes them.
     so the build targets here must depend on that.
 
 6 make lex

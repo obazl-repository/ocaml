@@ -6,14 +6,16 @@ load("//bzl:rules.bzl",
 )
 
 load("//config:CONFIG.bzl",
-     "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS"
-     )
+     "OC_COMMON_CFLAGS",
+     "PLATFORM_CFLAGS")
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS    = ROOT_MODULE_OPTS
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+# + [
+#     "-nostdlib"
+# ]
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
-STDLIB = ["//boot:stdlib"]
+STDLIB = ["//boot/lib:stdlib"]
 
 # obazl testing, build everything
 bootstrap_archive(

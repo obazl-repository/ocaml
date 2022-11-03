@@ -10,7 +10,7 @@
 # build --action_env ZIG_SYSTEM_LINKER_HACK=1
 
 # build --toolchain_resolution_debug=.*
-build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
+# build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 
 ## set cc opts for specific files:
 # build --per_file_copt=

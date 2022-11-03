@@ -290,7 +290,8 @@ def _bootstrap_module(ctx):
     #     ns = ctx.attr._pack_ns[BuildSettingInfo].value,
     #     m = ctx.label))
 
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode,
+    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     if tc.target_vm:
@@ -573,7 +574,7 @@ def _bootstrap_module(ctx):
         # tools = [tool] + tool_args,
         mnemonic = "CompileBootstrapModule",
         progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
-            mode = "vm" if tc.target_vm else "sys",
+            mode = "TEST", ## "vm" if tc.target_vm else "sys",
             rule=ctx.attr._rule,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
@@ -750,28 +751,28 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
             allow_single_file = True,
         ),
 
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
+        # _toolchain = attr.label(
+        #     default = "//bzl/toolchain:tc"
+        # ),
 
         _stage = attr.label(
             doc = "bootstrap stage",
             default = "//bzl:stage"
         ),
 
-        ocamlc = attr.label(
-            # cfg = ocamlc_out_transition,
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     # cfg = ocamlc_out_transition,
+        #     allow_single_file = True,
+        #     default = "//bzl/toolchain:ocamlc"
+        # ),
 
-        _mode       = attr.label(
-            default = "//bzl/toolchain",
-        ),
+        # _mode       = attr.label(
+        #     default = "//bzl/toolchain",
+        # ),
 
-        mode       = attr.string(
-            doc     = "Overrides global mode build setting.",
-        ),
+        # mode       = attr.string(
+        #     doc     = "Overrides global mode build setting.",
+        # ),
 
         ## opts thru _sdkpath pulled from options fn
         opts = attr.string_list(

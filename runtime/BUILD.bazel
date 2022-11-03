@@ -3,7 +3,7 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//bzl:rules.bzl",
      "bootstrap_executable",
      "bootstrap_module",
-     "ocamlc_runtime",
+     # "ocamlc_runtime",
      "ocamlrun")
 
 load("//config:CONFIG.bzl",
@@ -14,7 +14,8 @@ load("//config:CONFIG.bzl",
      "OC_CFLAGS", "CFLAGS",
      "OC_CPPFLAGS", "CPPFLAGS",
      "OC_LDFLAGS", "LDFLAGS",
-     # defines - replace by CC_DEFINES with selects
+     # defines
+     "OC_NATIVE_DEFINES",
      # "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
      # "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
      # "CC_DEFINES", "CC_NATIVE_DEFINES",
@@ -25,13 +26,14 @@ load("//config:CONFIG.bzl",
 load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag", "string_setting")
 
-RUNTIME_COPTS = select({
+OPTIMIZATION_FLAGS = select({
     "//boot/vm:dbg?": ["-O0", "-g3"], # -Wall -Werror
     "//conditions:default": []
 })
 
 RUNTIME_DEFINES = select({
-    "//boot/vm:instrumented?": ["CAML_INSTR"],
+    # for both vm and sys runtimes
+    "//config/mode:instrumented?": ["CAML_INSTR"],
     "//conditions:default": ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 }) + select({
     ## WARNING: //boot/vm just for -DDEBUG, not debugger mode (-c dbg)
@@ -78,7 +80,6 @@ cc_library(
     srcs = [
         "//runtime:build_config.h",
         "//runtime:common_c_sources",
-        ## select target platform:
         "//runtime:bytecode_only_c_sources"
     ] + select({
     # "//platforms/target:vm?": ["//runtime:bytecode_only_c_sources"],
@@ -87,14 +88,17 @@ cc_library(
     }),
     copts = [
         "-x", "c",
-        "-Wall",
-        # "-Wpedantic",
+        # "-Wall",
+        # "-pedantic",
         "-I$(GENDIR)/runtime" # build_config.h
     ] + select({
         "//platforms/os:macos?": ["-std=c11"],
         "//platforms/os:linux?": [],
         "//conditions:default":  ["-std=c11"]
-    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS + RUNTIME_COPTS,
+    }) + select({
+        "//config/mode:pedantic?": ["-pedantic"],
+        "//conditions:default":  []
+    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
     defines = RUNTIME_DEFINES,
     deps = [
         "//runtime/caml:hdrs"
@@ -116,15 +120,17 @@ cc_library(
     ],
     copts = [
         "-x", "c",
-        "-pedantic",
         "-I$(GENDIR)/runtime" # build_config.h
     ] + select({
         "//platforms/os:macos?": ["-std=c11"],
         "//platforms/os:linux?": [],
         "//conditions:default":  ["-std=c11"]
-    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+    }) + select({
+        "//config/mode:pedantic?": ["-pedantic"],
+        "//conditions:default":  []
+    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
     linkopts = OC_LDFLAGS + LDFLAGS,
-    defines = RUNTIME_DEFINES,
+    defines = RUNTIME_DEFINES + OC_NATIVE_DEFINES,
     deps = ["//runtime/caml:hdrs"],
     visibility = ["//lib:__pkg__"]
 )
@@ -480,8 +486,8 @@ genrule(
 ## The makefiles copy stuff into boot and make it accessible to build
 ## targets by passing '-I boot'. OBazl does not (need to) do that.
 ## Instead we define a library target that aggregates the same
-## resources by label, so targets can depend on '//boot:stdlib'. NB:
-## the only difference between //stdlib and //boot:stdlib is that the
+## resources by label, so targets can depend on '//boot/lib:stdlib'. NB:
+## the only difference between //stdlib and //boot/lib:stdlib is that the
 ## latter includes //stdlib:Std_exit and //stdlib:camlheader.
 
 # target: runtime

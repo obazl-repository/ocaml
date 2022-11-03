@@ -7,13 +7,18 @@ load("//bzl:rules.bzl",
 )
 
 load("//config:CONFIG.bzl",
-     "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS",
+     "OC_COMMON_CFLAGS",
+     "PLATFORM_CFLAGS",
+     # "ROOT_MODULE_OPTS",
+     # "ROOT_SIG_OPTS",
      "PRIMITIVES"
      )
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS    = ROOT_MODULE_OPTS # + ["-nopervasives"]
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+
+# MODULE_OPTS = ROOT_MODULE_OPTS
+# SIG_OPTS    = ROOT_MODULE_OPTS # + ["-nopervasives"]
 
 ## in this demo stdlib deps are expressed as direct submodule deps,
 ## e.g. //stdlib:Stdlib.Int, so we do not depend on //stdlib

@@ -1,14 +1,15 @@
 load("//config:CONFIG.bzl",
      "CC",
-     "CPPFLAGS", "OCAMLC_CPPFLAGS", "OCAMLC_CPPDEFINES",
-     "CFLAGS", "OC_CFLAGS", "OCAMLC_CFLAGS",
+     "CPPFLAGS",
+     # "OCAMLC_CPPFLAGS",
+     # "OCAMLC_CPPDEFINES",
+     "CFLAGS", "OC_CFLAGS",
+     # "OCAMLC_CFLAGS",
      "LDFLAGS", "OC_LDFLAGS", "BYTECCLIBS", "NATIVECCLIBS",
      ## cmds:
-     "MKEXE", "MKDLL", "MKMAINDLL", "RANLIBCMD",
+     # "MKEXE", "MKDLL", "MKMAINDLL", "RANLIBCMD",
      "EMPTY",
      )
-
-
 
 ## Makefile.common:
 # Escape special characters in an OCaml string literal "..."

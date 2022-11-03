@@ -46,10 +46,10 @@ bootstrap_executable = rule(
         ),
 
         ## staged bootstrapping
-        ocamlc = attr.label(
-            allow_single_file = True,
-            default = "//bzl/toolchain:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     allow_single_file = True,
+        #     default = "//boot/bin:ocamlc"
+        # ),
 
         ## the special ocamlc_* rules use out transitions, which turn
         ## dep attrs into lists. so we add identity out transitions

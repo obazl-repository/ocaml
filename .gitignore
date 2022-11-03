@@ -331,4 +331,5 @@ META
 /yacc/.gdb_history
 
 ## Bazel
+bazel-*
 config/CONFIG.bzl

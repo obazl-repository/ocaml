@@ -1,4 +1,3 @@
-
 load("//bzl:rules.bzl",
      "bootstrap_archive",
      "bootstrap_library",
@@ -6,12 +5,18 @@ load("//bzl:rules.bzl",
      "bootstrap_signature",
 )
 
-load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+load("//config:CONFIG.bzl",
+     "OC_COMMON_CFLAGS",
+     "NO_MISSING_MLI_ERROR",
+     "PLATFORM_CFLAGS")
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS = ROOT_SIG_OPTS
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+# + [
+#     "-nostdlib"
+# ]
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
-STDLIB = ["//boot:stdlib"]
+STDLIB = ["//boot/lib:stdlib"]
 
 ## dev/test target, builds everything
 bootstrap_archive(
@@ -186,7 +191,7 @@ bootstrap_module(
         "//config/arch:riscv64"   : "//asmcomp/riscv:CSE.ml",
         "//config/arch:s390x"   : "//asmcomp/s390x:CSE.ml",
     }, no_match_error = "unknown arch"),
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + NO_MISSING_MLI_ERROR,
     deps   = STDLIB + [
         ":Cmm",
         ":CSEgen",
@@ -271,7 +276,7 @@ bootstrap_module(
         "//config/arch:riscv64"   : "//asmcomp/riscv:arch.ml",
         "//config/arch:s390x"   : "//asmcomp/s390x:arch.ml",
     }, no_match_error = "unknown arch"),
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + NO_MISSING_MLI_ERROR,
     deps   = STDLIB + [
         "//utils:Clflags"
     ],

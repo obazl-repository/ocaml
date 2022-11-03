@@ -8,9 +8,13 @@ load("//bzl:rules.bzl",
 
 load("//config:CONFIG.bzl",
      "CPP",
-     "USE_PRIMS", "DATA_PRIMS",
-     "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS")
+     # "USE_PRIMS",
+     "DATA_PRIMS",
+     "OC_COMMON_CFLAGS",
+     "PLATFORM_CFLAGS"
+     # "ROOT_MODULE_OPTS",
+     # "ROOT_SIG_OPTS"
+     )
 
 load(":BUILD.bzl",
      ## "CONFIG_MAP",
@@ -39,13 +43,16 @@ exports_files([ ## for //otherlibs/dynlink:Dynlink_compilerlibs
 ## root Makefile
 # CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-##+ ["-I", "boot"]
-# "-use-prims", "runtime/primitives"]
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
-SIG_OPTS = ROOT_SIG_OPTS
+# MODULE_OPTS = ROOT_MODULE_OPTS
+# ##+ ["-I", "boot"]
+# # "-use-prims", "runtime/primitives"]
 
-STDLIB = ["//boot:stdlib", "//stdlib:Std_exit"]
+# SIG_OPTS = ROOT_SIG_OPTS
+
+STDLIB = ["//boot/lib:stdlib", "//stdlib:Std_exit"]
 
 ################################################################
 ## expunge utility, defined in root Makefile:
@@ -75,7 +82,7 @@ bootstrap_executable(
 bootstrap_library(
 # bootstrap_archive(
     name = "utils",
-    mode = "bytecode",
+    # mode = "bytecode",
     manifest  = [
         "Arg_helper",
         "Binutils",
@@ -105,7 +112,7 @@ bootstrap_library(
 
 bootstrap_library(
     name = "ocamlcommon",
-    mode = "bytecode",
+    # mode = "bytecode",
     manifest  = [
         ## list from compilerlibs/Makefile.compilerlibs UTILS
         "Build_path_prefix_map",

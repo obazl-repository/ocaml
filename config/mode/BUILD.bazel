@@ -1,25 +1,33 @@
 load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag",
      "string_flag", "string_setting")
 
-string_flag(
-    name = "mode",
-    values = ["bytecode", "native"],
-    build_setting_default = "bytecode",
-    visibility = ["//visibility:public"]
-)
+bool_flag( name = "pedantic", build_setting_default = False)
+config_setting(name = "pedantic?", flag_values = {":pedantic": "True"})
 
-config_setting(
-    name = "bytecode",
-    flag_values = {
-        ":mode": "bytecode",
-    },
-    visibility = ["//visibility:public"]
-)
-config_setting(
-    name = "native",
-    flag_values = {
-        ":mode": "native",
-    },
-    visibility = ["//visibility:public"]
-)
+bool_flag(name = "instrumented", build_setting_default = False)
+config_setting(name = "instrumented?",
+               flag_values = {":instrumented": "True"})
+
+# string_flag(
+#     name = "mode",
+#     values = ["bytecode", "native"],
+#     build_setting_default = "bytecode",
+#     visibility = ["//visibility:public"]
+# )
+
+# config_setting(
+#     name = "bytecode",
+#     flag_values = {
+#         ":mode": "bytecode",
+#     },
+#     visibility = ["//visibility:public"]
+# )
+# config_setting(
+#     name = "native",
+#     flag_values = {
+#         ":mode": "native",
+#     },
+#     visibility = ["//visibility:public"]
+# )
 

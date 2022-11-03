@@ -4,12 +4,19 @@ load("//bzl:rules.bzl",
      "bootstrap_library",
 )
 
-load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
+load("//config:CONFIG.bzl",
+     "OC_COMMON_CFLAGS",
+     "PLATFORM_CFLAGS"
+     # "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS"
+     )
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS = ROOT_SIG_OPTS
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
-STDLIB = ["//boot:stdlib"]
+# MODULE_OPTS = ROOT_MODULE_OPTS
+# SIG_OPTS = ROOT_SIG_OPTS
+
+STDLIB = ["//boot/lib:stdlib"]
 
 exports_files([
     "cmi_format.mli", "cmi_format.ml",

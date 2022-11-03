@@ -31,7 +31,8 @@ def build_packed_module(
 
     print("BUILDING PACKED MODULE: %s" % ctx.attr.pack_ns)
 
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode,
+    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     module_name = ctx.attr.pack_ns[:1].capitalize() + ctx.attr.pack_ns[1:]
 
@@ -71,7 +72,7 @@ def build_packed_module(
         tools = [tool] + tool_args,
         mnemonic = "CompilePackedModule",
         progress_message = "{mode} packing {rule}: {ws}//{pkg}:{tgt}".format(
-            mode = mode,
+            mode = "TEST", # mode,
             rule=ctx.attr._rule,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
             pkg = ctx.label.package,

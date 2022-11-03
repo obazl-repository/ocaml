@@ -39,10 +39,5 @@ config_setting(
     constraint_values = ["@platforms//os:macos"]
 )
 
-
-bool_flag(name = "instrumented", build_setting_default = False)
-config_setting(name = "instrumented?",
-               flag_values = {":instrumented": "True"})
-
 string_list_flag(name = "args", build_setting_default = [],
             visibility = ["//toolchain:__subpackages__"])

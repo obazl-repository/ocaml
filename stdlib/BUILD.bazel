@@ -10,7 +10,8 @@ load("//config:CONFIG.bzl",
      ## "ROOT_CAMLC_OPTS",
 
      "OPTCOMPFLAGS",
-     "USE_PRIMS", "DATA_PRIMS",
+     # "USE_PRIMS",
+     "DATA_PRIMS",
      "PRIMITIVES"
      )
 
@@ -81,6 +82,83 @@ LABEL_SIGOPTS = [
 ## module. Each submodule includes itself by attribution ns=":Stdlib".
 ## This library target just aggregates the resolver and submodules.
 ## They can be listed in any order.
+bootstrap_archive(
+    name       = "stdlib",
+    # opts       = USE_PRIMS,
+    # data       = ["//runtime:primitives"],
+    primitives = "//runtime:primitives",
+    manifest   = [
+        "//stdlib:Stdlib", ## functions as the ns_resolver module
+        # ":Std_exit",
+        "//stdlib:CamlinternalFormat",
+        "//stdlib:CamlinternalFormatBasics",
+        "//stdlib:CamlinternalLazy",
+        "//stdlib:CamlinternalMod",
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.ArrayLabels",
+        "//stdlib:Stdlib.Atomic",
+        "//stdlib:Stdlib.Bigarray",
+        "//stdlib:Stdlib.Bool",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.BytesLabels",
+        "//stdlib:Stdlib.Callback",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Complex",
+        "//stdlib:Stdlib.Condition",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Domain",
+        "//stdlib:Stdlib.Effect",
+        "//stdlib:Stdlib.Either",
+        "//stdlib:Stdlib.Ephemeron",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Float",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.In_channel",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.ListLabels",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Marshal",
+        "//stdlib:Stdlib.MoreLabels",
+        "//stdlib:Stdlib.Mutex",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Oo",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Out_channel",
+        "//stdlib:Stdlib.Parsing",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Queue",
+        "//stdlib:Stdlib.Random",
+        "//stdlib:Stdlib.Result",
+        "//stdlib:Stdlib.Scanf",
+        "//stdlib:Stdlib.Semaphore",
+        "//stdlib:Stdlib.Seq",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Stack",
+        "//stdlib:Stdlib.StdLabels",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.StringLabels",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Uchar",
+        "//stdlib:Stdlib.Unit",
+        "//stdlib:Stdlib.Weak",
+        # ":Stdlib.Weak",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 # bootstrap_library(
 # bootstrap_archive(
 #     name       = "stdlib",
@@ -2377,15 +2455,15 @@ DEVPATHS_CMD = "\n".join([
     "cat bazel-out/stable-status.txt | ",
     "while read KEY VAL; do",
     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
-    "echo '#!'$$VAL/$(execpath //boot:ocamlrun) > $(location camlheader);\n",
-    "echo '#!'$$VAL/$(execpath //boot:ocamlrun)d > $(location camlheaderd);\n",
-    "echo '#!'$$VAL/$(execpath //boot:ocamlrun)i > $(location camlheaderi);\n",
+    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun) > $(location camlheader);\n",
+    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun)d > $(location camlheaderd);\n",
+    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun)i > $(location camlheaderi);\n",
     "fi",
     "done",
 
-    "echo '#!$(execpath //boot:ocamlrun)' > $(location target_camlheader);",
-    "echo '#!$(execpath //boot:ocamlrun)d' > $(location target_camlheaderd);",
-    "echo '#!$(execpath //boot:ocamlrun)i' > $(location target_camlheaderi);",
+    "echo '#!$(execpath //boot/bin:ocamlrun)' > $(location target_camlheader);",
+    "echo '#!$(execpath //boot/bin:ocamlrun)d' > $(location target_camlheaderd);",
+    "echo '#!$(execpath //boot/bin:ocamlrun)i' > $(location target_camlheaderi);",
 ])
 
 genrule(
@@ -2400,11 +2478,11 @@ genrule(
         "target_camlheaderi"
     ],
     # srcs = [
-    #     "//boot:ocamlrun",
+    #     "//boot/bin:ocamlrun",
     #     "//bzl/toolchain:ocamlrun"
     # ],
     srcs = [
-        "//boot:ocamlrun",
+        "//boot/bin:ocamlrun",
         "//bzl/toolchain:ocamlrun"
     ],
     cmd = DEVPATHS_CMD,

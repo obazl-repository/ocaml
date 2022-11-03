@@ -80,23 +80,23 @@ def options_executable(ws):
 
     attrs = dict(
 
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
+        # _toolchain = attr.label(
+        #     default = "//bzl/toolchain:tc"
+        # ),
 
         # ocamlc = attr.label(
         #     allow_single_file = True,
         #     default = "//bzl/toolchain:ocamlc"
         # ),
 
-        _camlheaders = attr.label_list(
-            allow_files = True,
-            default = [
-                "//stdlib:camlheader", "//stdlib:target_camlheader",
-                "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
-                "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
-            ]
-        ),
+        # _camlheaders = attr.label_list(
+        #     allow_files = True,
+        #     default = [
+        #         "//stdlib:camlheader", "//stdlib:target_camlheader",
+        #         "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+        #         "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+        #     ]
+        # ),
 
         # _boot       = attr.label(
         #     default = "//bzl/toolchain:boot",
@@ -111,13 +111,13 @@ def options_executable(ws):
             allow_single_file = True
         ),
 
-        _mode       = attr.label(
-            default = "//bzl/toolchain",
-        ),
+        # _mode       = attr.label(
+        #     default = "//bzl/toolchain",
+        # ),
 
-        mode       = attr.string(
-            doc     = "Overrides mode build setting.",
-        ),
+        # mode       = attr.string(
+        #     doc     = "Overrides mode build setting.",
+        # ),
 
         exe  = attr.string(
             doc = "By default, executable name is derived from 'name' attribute; use this to override."
@@ -142,11 +142,11 @@ def options_executable(ws):
                          [CcInfo]],
         ),
 
-        _stdexit = attr.label(
-            # cfg = ocamlc_out_transition,
-            default = "//stdlib:Std_exit",
-            allow_single_file = True
-        ),
+        # _stdexit = attr.label(
+        #     # cfg = ocamlc_out_transition,
+        #     default = "//stdlib:Std_exit",
+        #     allow_single_file = True
+        # ),
 
         ## FIXME: add cc_linkopts?
         cc_deps = attr.label_keyed_string_dict(

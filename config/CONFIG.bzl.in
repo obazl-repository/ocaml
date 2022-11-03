@@ -41,6 +41,7 @@ OCAML_VERSION_EXTRA = "@OCAML_VERSION_EXTRA@"
 ## COMPFLAGS, OPTCOMPFLAGS: for compiling OCaml sources.
 ## COMPFLAGS is for targeting both the vm and sys;
 ## OPTCOMPFLAGS is for targeting sys.
+# Hardcoded in Makefile.common
 
 # The notes below ignore uses of flags etc. to compute dependencies,
 # since they're not need under Bazel.
@@ -111,10 +112,10 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 #
 # NEW_OCAMLRUN: constant runtime/ocamlrun
 #
-## OBazl: one build target (//boot:ocamlrun) for the initial
+## OBazl: one build target (//boot/bin:ocamlrun) for the initial
 ## (bootstrap) runtime (boot/ocamlrun, copied from runtime/ocamlrun),
 ## another (//bin:ocamlrun) for any updated runtime (i.e. if runtime
-## sources change). This a bootstrap toolchain using //boot:ocamlrun
+## sources change). This a bootstrap toolchain using //boot/bin:ocamlrun
 ## (the inital runtime), and a separate tool chain using the new
 ## runtime in //bin:ocamlrun.
 
@@ -215,8 +216,8 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 # opts attrib:
 # bootstrap_module: OC_COMMON_CFLAGS, add OC_NATIVE_CFLAGS if target == sys
 # bootstrap_signature: OC_COMMON_CFLAGS for both vm and sys targets
-BOOT_OCAMLRUN = "//boot:ocamlrun"
-RUNTIME_OCAMLRUN = "//boot:ocamlrun"
+BOOT_OCAMLRUN = "//boot/bin:ocamlrun"
+RUNTIME_OCAMLRUN = "//bin:ocamlrun"
 
 ################################################################
 ## Default Build Rules
@@ -321,7 +322,16 @@ CFLAGS = "@CFLAGS@".split(" ")
 
 # for compiling runtime files to sys target
 # mac: empty; linux: "-function-sections"
+# something is off; -function-sections is a C option?
+# well, it's also listed by ocamlopt --help (v. 4.14.0) as
+#  -function-sections  (option not available)
 OC_NATIVE_CFLAGS = "@oc_native_cflags@".split(" ")
+
+OCNCF = "@oc_native_cflags@"
+PLATFORM_CFLAGS = select({
+    "//platforms/target:vm?": [],
+    "//conditions:default": [] if OCNCF == "" else OCNCF.split(" ")
+})
 
 ## not used in any Makefiles. stored in fld in Config module:
 ## val ocamlc_cflags : string
@@ -386,11 +396,11 @@ OC_NATIVE_DEFINES = [
 
 # CAMLDLLIMPORT, IN_CAML_RUNTIME - single-use hardcoded defines.
 # Only used for std runtime source code (runtime/caml/domain_state.h)
+# for both vm and sys runtimes.
 # defined in Makefile, not by ./configure.
 # summed with OC_CPPFLAGS for the runtime .o files
 # for native (%.n.o, OC_CPPFLAGS summed with OC_NATIVE_CPPFLAGS
 # runtime_CPPFLAGS = -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME
-# runtime_DEFINES = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 
 # CAML_INSTR - single-used, hardcoded in Makefile.
 ## Summed with OC_CPPFLAGS for .bi.o files
@@ -398,7 +408,7 @@ OC_NATIVE_DEFINES = [
 ## also used for windows amd64.nt.i.obj, i386.nt.i.obj
 #ocamlruni_CPPFLAGS = -DCAML_INSTR
 # ocamlruni_DEFINES = ["CAML_INSTR"]
-# Bazel uses build setting --//boot/vm:instrumented
+# Bazel uses build setting --//config/mode:instrumented
 
 ## ocamlrund_CPPFLAGS:
 ## in Makefile, summed with OC_CPPFLAGS for .bd.o files
@@ -469,7 +479,8 @@ ocamlyacc_WSTR_MODULE = "@ocamlyacc_wstr_module@"
 OC_COMMON_CFLAGS = [  ## OCaml compile flags
     ## "-g", ## controlled by --//config/ocaml:dbg (?)
     "-strict-sequence", "-principal", "-absname",
-    "-w", "+a-4-9-40-41-42-44-45-48", "-warn-error", "+a", "-bin-annot",
+    "-w", "+a-4-9-40-41-42-44-45-48-70",
+    "-warn-error", "+a", "-bin-annot",
     "-strict-formats"
 ]
 ## OC_COMMON_LDFLAGS used in Makefile to build ocamlc
@@ -489,6 +500,9 @@ AFL_INSTRUMENT = "@afl@" == "true"
 afl_instrument = "@afl@" == "true"
 FLAT_FLOAT_ARRAY = "@flat_float_array@" == "true"
 FUNCTION_SECTIONS = "@function_sections@" == "true"
+
+# Makefile.common:
+OPTCOMPFLAGS = ["-function-sections"] if FUNCTION_SECTIONS else []
 
 SUPPORTS_SHARED_LIBRARIES = "@supports_shared_libraries@" == "true"
 supports_shared_libraries = "@supports_shared_libraries@" == "true"
@@ -515,7 +529,7 @@ ASPP = "@ASPP@"
 LIBTOOL = "@top_builddir@/libtool"
 
 ### How to invoke the C preprocessor through the C compiler
-CPP = "@CPP@"
+CPP = "@CPP@".split(" ")
 
 ### How to invoke ar
 ARCMD = "@AR@"
@@ -543,7 +557,8 @@ TOP_BUILDDIR = "@top_builddir@"
 ## the installation stuff.  It can be provided separately.
 
 ## Exception: OCaml puts some of these paths into bytecode files.
-EXEC_PREFIX = "@exec_prefix@"
+PREFIX = "/usr/local"
+EXEC_PREFIX = PREFIX
 LIBDIR = EXEC_PREFIX + "/lib/ocaml"
 
 ROOTDIR = "." ##FIXME
@@ -601,11 +616,11 @@ OTHERLIBRARIES = "@otherlibraries@"
 UNIX_OR_WIN32 = "@unix_or_win32@"
 INSTALL_SOURCE_ARTIFACTS = "@install_source_artifacts@" == "true"
 
-BYTECCLIBS = "@bytecclibs@"
-VM_LIBDEPS = "@bytecclibs@"
+BYTECCLIBS = "@bytecclibs@".split(" ")
+VM_LIBDEPS = "@bytecclibs@".split(" ")
 # fld in utils:Config - bytecomp_c_libraries = "@bytecclibs@"
-NATIVECCLIBS = "@nativecclibs@"
-SYS_LIBDEPS = "@nativecclibs@"
+NATIVECCLIBS = "@nativecclibs@".split(" ")
+SYS_LIBDEPS = "@nativecclibs@".split(" ")
 # fld in utils:Config - native_c_libraries = "@nativecclibs@"
 
 EXE = "@exeext@"
@@ -737,3 +752,5 @@ flexdll_dirs = [@flexdll_dir@]
 
 WINDOWS_UNICODE = "@windows_unicode@" == "1"
 windows_unicode = @windows_unicode@ != 0
+
+NO_MISSING_MLI_ERROR = ["-w", "-70"]

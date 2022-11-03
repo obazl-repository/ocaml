@@ -160,8 +160,8 @@ trunk (OCaml 5.1.x).
 The main build targets at this point:
 
 * the bootstrap stuff:
- ** `//boot:ocamlrun`
- ** `//boot:stdlib`
+ ** `//boot/bin:ocamlrun`
+ ** `//boot/lib:stdlib`
 
 * also
  ** `//bin:ocamlc`

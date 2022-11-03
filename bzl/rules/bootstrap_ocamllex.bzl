@@ -20,7 +20,7 @@ def _bootstrap_ocamllex_impl(ctx):
     if debug:
         print("OCAML LEX TARGET: %s" % ctx.label.name)
 
-    mode = ctx.attr.mode
+    # mode = ctx.attr.mode
 
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
@@ -42,8 +42,8 @@ def _bootstrap_ocamllex_impl(ctx):
 
     args.add_all(tool_args)
 
-    if mode == "native":  ## OBSOLETE? use tc.target_host?
-        args.add("-ml")
+    # if mode == "native":  ## OBSOLETE? use tc.target_host?
+    #     args.add("-ml")
 
     args.add_all(ctx.attr.opts)
 
@@ -60,7 +60,7 @@ def _bootstrap_ocamllex_impl(ctx):
         tools = [tool] + tool_args,
         mnemonic = "OcamlLex",
         progress_message = "{mode} ocaml_lex: @{ws}//{pkg}:{tgt}".format(
-            mode = mode,
+            mode = "TEST", # mode,
             ws  = ctx.label.workspace_name,
             pkg = ctx.label.package,
             tgt=ctx.label.name
@@ -92,9 +92,9 @@ bootstrap_ocamllex = rule(
         opts = attr.string_list(
             doc = "Options"
         ),
-        mode       = attr.string(
-            default = "bytecode",
-        ),
+        # mode       = attr.string(
+        #     default = "bytecode",
+        # ),
         _rule = attr.string( default = "ocaml_lex" )
     ),
     # provides = [],

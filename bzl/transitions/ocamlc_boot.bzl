@@ -20,14 +20,14 @@ load("//bzl:providers.bzl",
 
 ####################################################
 def _ocamlc_boot_in_transition_impl(settings, attr):
-    # print("ocamlc_boot_in_transition")
+    print("ocamlc_boot_in_transition")
     # print("  stage: %s" % settings["//bzl:stage"])
     # print("//bzl/toolchain:ocamlc: %s" %
     #       settings["//bzl/toolchain:ocamlc"])
 
     return {
         "//bzl:stage": 1,
-        "//bzl/toolchain:ocamlc" : "//boot/bin:ocamlc"
+        "//bzl/toolchain:ocamlc" : "//boot:ocamlc"
     }
 
 ocamlc_boot_in_transition = transition(
@@ -44,7 +44,7 @@ ocamlc_boot_in_transition = transition(
 
 #####################################################
 def _ocamlc_boot_out_transition_impl(settings, attr):
-    # print("ocamlc_boot_out_transition")
+    print("ocamlc_boot_out_transition")
     # print("  stage: %s" % settings["//bzl:stage"])
 
     # print("//bzl/toolchain:ocamlc: %s" %
@@ -52,7 +52,7 @@ def _ocamlc_boot_out_transition_impl(settings, attr):
 
     return {
         "//bzl:stage": 1,
-        "//bzl/toolchain:ocamlc" : "//boot/bin:ocamlc"
+        "//bzl/toolchain:ocamlc" : "//boot:ocamlc"
     }
 
 #######################

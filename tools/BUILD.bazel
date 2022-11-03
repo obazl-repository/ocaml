@@ -11,14 +11,27 @@ exports_files([
 ])
 
 load("//config:CONFIG.bzl",
-     "TOOLS_MODULE_OPTS",
-     "TOOLS_SIG_OPTS"
+     # "TOOLS_MODULE_OPTS",
+     # "TOOLS_SIG_OPTS"
+     "OC_COMMON_CFLAGS",
+     "PLATFORM_CFLAGS",
+     "PRIMITIVES"
      )
 
-MODULE_OPTS = TOOLS_MODULE_OPTS
-SIG_OPTS    = TOOLS_SIG_OPTS
+# MODULE_OPTS/SIG_OPTS should include:
+# -nostdlib -g
+# -use-prims ../runtime /primitives
+# -absname -w +a-4-9-41-42-44-45-48-70
+# -strict-sequence -warn-error
+# +A -principal -strict-formats -bin-annot
 
-STDLIB = ["//boot:stdlib", "//stdlib:Std_exit"]
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+    "-nostdlib",
+    "-w", "-70"
+]
+SIG_OPTS    = ["-nostdlib"] + OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+
+STDLIB = ["//boot/lib:stdlib", "//stdlib:Std_exit"]
 
 ## first the executables. modules and sigs below.
 # programs_byte := \
@@ -267,14 +280,17 @@ bootstrap_module(
     ]
 )
 
+
+# ./runtime/ocamlrun tools/make_opcodes -opcodes < runtime/caml/instruct.h > bytecomp/opcodes.ml
+
 genrule(
     name = "gen_opnames",
     outs = ["opnames.ml"],
     srcs = ["//runtime/caml:instruct.h", ":make_opcodes"],
-    tools = ["//boot:ocamlrun"],
+    tools = ["//boot/bin:ocamlrun"],
     cmd   = " ".join([
-        "$(execpath //boot:ocamlrun) $(location :make_opcodes)",
-        "-opnames < $(location //runtime/caml:instruct.h)",
+        "$(execpath //boot/bin:ocamlrun) $(location :make_opcodes)",
+        "-opcodes < $(location //runtime/caml:instruct.h)",
         "> $@"
     ])
 )
@@ -679,6 +695,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
+# ../boot/ocamlrun ../boot/ocamlc
 bootstrap_module(
     name   = "Stripdebug",
     struct = "stripdebug.ml",
@@ -712,11 +729,12 @@ bootstrap_module(
 # $(make_opcodes): make_opcodes.ml
 # 	$(CAMLC) $< -o $@
 
-# toolchain uses //boot/bin:ocamlc ==  BOOT_OCAMLC
+# ./boot/ocamlrun ../boot/ocamlc -nostdlib -I ../boot -g -use-prims ../runtime/primitives -I .. make_opcodes.ml -o make_opcodes
+
 bootstrap_executable(
     name = "make_opcodes",
     main = ":Make_opcodes",
-    deps = ["//boot:stdlib"],
+    deps = ["//boot/lib:stdlib"],
     # opts = ["-w", "-31"],
     # data = ["//stdlib:header"],
     visibility = ["//bytecomp:__pkg__"]
@@ -725,7 +743,8 @@ bootstrap_executable(
 bootstrap_module(
     name   = "Make_opcodes",
     struct = "make_opcodes.ml",
-    opts = MODULE_OPTS,
+    opts = ["-nostdlib"],
+    primitives = PRIMITIVES,
     deps   = STDLIB + [
     ],
     data = ["//runtime:primitives"]

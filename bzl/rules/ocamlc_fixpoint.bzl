@@ -36,7 +36,8 @@ def _ocamlc_fixpoint(ctx):
 
     ## FIXME: use impl_executable
 
-    (mode, tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (mode,
+    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
     # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
@@ -299,7 +300,7 @@ def _ocamlc_fixpoint(ctx):
       tools = [tool] + tool_args,  # [tc.ocamlopt],
       mnemonic = mnemonic,
       progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
-          mode = mode,
+          mode = "TEST", # mode,
           rule = "ocamlc_fixpoint",
           ws  = ctx.label.workspace_name if ctx.label.workspace_name else ctx.workspace_name,
           pkg = ctx.label.package,
@@ -358,9 +359,9 @@ ocamlc_fixpoint = rule(
     attrs = dict(
         rule_options,
 
-        _toolchain = attr.label(
-            default = "//bzl/toolchain:tc"
-        ),
+        # _toolchain = attr.label(
+        #     default = "//bzl/toolchain:tc"
+        # ),
 
         primitives = attr.label(
             default = "//runtime:primitives",
@@ -373,12 +374,12 @@ ocamlc_fixpoint = rule(
             default = "//bzl:stage1"
         ),
 
-        ocamlc = attr.label(
-            allow_single_file = True,
-            default = "//compilers/stage1:ocamlc"
-            # default = "//runtime:ocamlc"
-            # default = "//bzl/toolchain:ocamlc"
-        ),
+        # ocamlc = attr.label(
+        #     allow_single_file = True,
+        #     default = "//compilers/stage1:ocamlc"
+        #     # default = "//runtime:ocamlc"
+        #     # default = "//bzl/toolchain:ocamlc"
+        # ),
 
         # _boot       = attr.label(
         #     default = "//bzl/toolchain:boot",
@@ -388,13 +389,13 @@ ocamlc_fixpoint = rule(
             doc          = "List of OCaml options. Will override configurable default options."
         ),
 
-        _mode       = attr.label(
-            default = "//bzl/toolchain",
-        ),
+        # _mode       = attr.label(
+        #     default = "//bzl/toolchain",
+        # ),
 
-        mode       = attr.string(
-            doc     = "Overrides mode build setting.",
-        ),
+        # mode       = attr.string(
+        #     doc     = "Overrides mode build setting.",
+        # ),
 
         exe  = attr.string(
             doc = "By default, executable name is derived from 'name' attribute; use this to override."
@@ -425,12 +426,12 @@ ocamlc_fixpoint = rule(
                          [CcInfo]],
         ),
 
-        _stdexit = attr.label(
-            cfg = ocamlc_fixpoint_out_transition,
-            # cfg = ocamlc_out_transition,
-            default = "//stdlib:Std_exit",
-            allow_single_file = True
-        ),
+        # _stdexit = attr.label(
+        #     cfg = ocamlc_fixpoint_out_transition,
+        #     # cfg = ocamlc_out_transition,
+        #     default = "//stdlib:Std_exit",
+        #     allow_single_file = True
+        # ),
 
         ## FIXME: add cc_linkopts?
         cc_deps = attr.label_keyed_string_dict(

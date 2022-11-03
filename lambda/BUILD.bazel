@@ -5,8 +5,10 @@ load("//bzl:rules.bzl",
 )
 
 load("//config:CONFIG.bzl",
-     "ROOT_MODULE_OPTS",
-     "ROOT_SIG_OPTS"
+     "OC_COMMON_CFLAGS",
+     "PLATFORM_CFLAGS"
+     # "ROOT_MODULE_OPTS",
+     # "ROOT_SIG_OPTS"
      )
 
 exports_files([
@@ -16,10 +18,12 @@ exports_files([
     ## this is exported by genrule: "runtimedef.ml"
 ])
 
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS    = ROOT_MODULE_OPTS
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+# MODULE_OPTS = ROOT_MODULE_OPTS
+# SIG_OPTS    = ROOT_MODULE_OPTS
 
-STDLIB = ["//boot:stdlib"]
+STDLIB = ["//boot/lib:stdlib"]
 
 bootstrap_library(
     name = "lambda",
