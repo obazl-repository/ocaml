@@ -1,23 +1,49 @@
 
-exports_files([
-    # most of these for otherlibs/str/strstubs.c
-    "alloc.h",
-    "config.h",
-    "domain.h",
-    "domain_state.h",
-    "domain_state.tbl",
-    "compatibility.h",
-    "fail.h",
-    "m.h",
-    "memory.h",
-    "misc.h",
-    "mlvalues.h",
-    "s.h",
-    ## used by //bytecomp:opcodes_ml:
-    "instruct.h"
-])
+exports_files(glob(["**"]))
 
-# GENERATED_HEADERS := caml/opnames.h caml/version.h caml/jumptbl.h build_config.h
+filegroup(
+    name = "hdr_srcs",
+    srcs = glob(["*.h"], exclude=["s.h"]) + ["domain_state.tbl"],
+    visibility = ["//runtime/caml/cross-compile:__pkg__"]
+)
+
+alias(
+    name = "hdrs",
+    actual = "//runtime/caml/cross-compile:hdrs",
+    visibility = [
+        "//boot:__pkg__",
+        "//runtime:__pkg__",
+        "//otherlibs/systhreads:__pkg__",
+        "//otherlibs/unix:__pkg__",
+        "//yacc:__pkg__"
+    ],
+)
+
+## WARNING: if you build with make, these generated files will be
+## generated and placed in the source tree, so when you then build
+## with Bazel you'll get an error about file already existing.
+## In that case just delete the generated files in runtime/.
+
+## this is the baseline target, w/o cross-compile support. file 's.h'
+## is platform-dependend, so if we want cross-compiling we need
+## special handling, see below.
+cc_library(
+    name = "xhdrs",
+    hdrs = [
+        "domain_state.tbl",
+        # ## generated files:
+        ":opnames.h",
+        ":jumptbl.h",
+    ] + glob(["*.h"]),
+    include_prefix = "caml",
+    visibility = [
+        "//boot:__pkg__",
+        "//runtime:__pkg__",
+        "//otherlibs/systhreads:__pkg__",
+        "//otherlibs/unix:__pkg__",
+        "//yacc:__pkg__"
+    ],
+)
 
 genrule(
     outs = ["opnames.h"],
@@ -32,7 +58,8 @@ genrule(
 	    "-e 's/enum /static char * names_of_/' ",
 	    "-e 's/{$$/[] = {/' ",
 	    "-e 's/\\([[:upper:]][[:upper:]_0-9]*\\)/\"\\1\"/g' > $@"
-    ])
+    ]),
+    visibility = ["//runtime/caml/cross-compile:__pkg__"]
 )
 
 genrule(
@@ -43,30 +70,88 @@ genrule(
 	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
 	    "sed -n -e '/^  /s/ \\([A-Z]\\)/ \\&\\&lbl_\\1/gp' ",
 	    "-e '/^}/q' > $@"
-    ])
+    ]),
+    visibility = ["//runtime/caml/cross-compile:__pkg__"]
 )
 
-## WARNING: if you build with make, these generated files will be
-## generated and placed in the source tree, so when you then build
-## with Bazel you'll get an error about file already existing.
-## In that case just delete the generated files in runtime/.
-cc_library(
-    name = "hdrs",
-    hdrs = [
-        "domain_state.tbl",
-        # ## generated files:
-        ":opnames.h",
-        ":jumptbl.h",
-    ] + glob(["*.h"]),
-    include_prefix = "caml",
-    # hdrs = ["domain_state.tbl"],
-    # static_library = ...,
-    visibility = [
-        "//boot:__pkg__",
-        "//runtime:__pkg__",
-        "//otherlibs/systhreads:__pkg__",
-        "//otherlibs/unix:__pkg__",
-        "//yacc:__pkg__"
-    ],
-)
+### hack for cross-compiling. we cannot overwrite s.h by s.linux.h or
+### s.macos.h, so we have to copy everything into another directory.
+# cc_library(
+#     name = "xhdrs",
+#     hdrs = [
+#         ":all",
+#         ":opnames.h",
+#         ":jumptbl.h",
+#         ":s_h",
+#     ] + glob(["*.h"], exclude=["s.h"]),
+#     include_prefix = "caml/x",
+#     copts = [
+#         "-I",
+#         "caml/x"
+#         # "runtime/caml/x"
+#     ],
+#     # hdrs = ["domain_state.tbl"],
+#     # static_library = ...,
+#     visibility = [
+#         "//boot:__pkg__",
+#         "//runtime:__pkg__",
+#         "//otherlibs/systhreads:__pkg__",
+#         "//otherlibs/unix:__pkg__",
+#         "//yacc:__pkg__"
+#     ],
+# )
+
+# genrule(
+#     name = "all_hdrs",
+#     outs = ["x/domain_state.tbl"],
+#     srcs = ["domain_state.tbl"],
+#     cmd  = " ".join([
+#         "cp $(location domain_state.tbl) $@"
+#     ])
+# )
+
+# genrule(
+#     outs = ["x/domain_state.tbl"],
+#     name = "xdomain_state_tbl",
+#     srcs = ["domain_state.tbl"],
+#     cmd  = " ".join([
+#         "cp $(location domain_state.tbl) $@"
+#     ])
+# )
+
+# genrule(
+#     outs = ["x/opnames.h"],
+#     name = "xopnames_h",
+#     srcs = ["//runtime/caml:instruct.h"],
+#     cmd  = " ".join([
+# 	    # tr is for windows only?
+#         # 	tr -d '\r' < $< | \
+#         "cat $(location //runtime/caml:instruct.h) | ",
+# 	    "sed -e '/\\/\\*/d' ",
+# 	    "-e '/^#/d'",
+# 	    "-e 's/enum /static char * names_of_/' ",
+# 	    "-e 's/{$$/[] = {/' ",
+# 	    "-e 's/\\([[:upper:]][[:upper:]_0-9]*\\)/\"\\1\"/g' > $@"
+#     ])
+# )
+
+# genrule(
+#     name = "xjumptbl_h",
+#     outs = ["x/jumptbl.h"],
+#     srcs = ["//runtime/caml:instruct.h"],
+#     cmd  = " ".join([
+# 	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
+# 	    "sed -n -e '/^  /s/ \\([A-Z]\\)/ \\&\\&lbl_\\1/gp' ",
+# 	    "-e '/^}/q' > $@"
+#     ])
+# )
+
+# genrule(
+#     name = "s_h",
+#     outs = ["x/s.h"],
+#     srcs = ["s.h", "s.linux.h"],
+#     cmd  = " ".join([
+# 	    "cp $(location s.linux.h) $@"
+#     ])
+# )
 

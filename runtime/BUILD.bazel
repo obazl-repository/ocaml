@@ -65,7 +65,10 @@ BYTECCLIBS = ["-lm", "-lpthread"]
 cc_binary(
     name = "sak.exe",
     srcs = ["sak.c"],
-    copts = OC_CFLAGS + CFLAGS + CPPFLAGS,
+    copts = OC_CFLAGS + CFLAGS + CPPFLAGS + [
+        ## for platform-dependend s.h:
+        "-I", "$(GENDIR)/runtime/caml/cross-compile"
+    ],
     defines = RUNTIME_DEFINES,
     linkopts = OC_LDFLAGS + LDFLAGS,
     deps= ["//runtime/caml:hdrs"],
@@ -90,11 +93,13 @@ cc_library(
         "-x", "c",
         # "-Wall",
         # "-pedantic",
-        "-I$(GENDIR)/runtime" # build_config.h
+        "-I$(GENDIR)/runtime", # build_config.h
+        ## for platform-dependend s.h:
+        "-I", "$(GENDIR)/runtime/caml/cross-compile" ##HACK for xcompile
     ] + select({
-        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:macos?": [], # "-std=c11"],
         "//platforms/os:linux?": [],
-        "//conditions:default":  ["-std=c11"]
+        "//conditions:default":  [] #"-std=c11"]
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
@@ -120,11 +125,13 @@ cc_library(
     ],
     copts = [
         "-x", "c",
-        "-I$(GENDIR)/runtime" # build_config.h
+        "-I$(GENDIR)/runtime", # build_config.h
+        ## for platform-dependend s.h:
+        "-I", "$(GENDIR)/runtime/caml/cross-compile" ##HACK for xcompile
     ] + select({
-        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:macos?": [], #"-std=c11"],
         "//platforms/os:linux?": [],
-        "//conditions:default":  ["-std=c11"]
+        "//conditions:default":  [] #"-std=c11"]
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
@@ -511,15 +518,21 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
     }),
     copts = [
         "-x", "c",
-        "-I$(GENDIR)/runtime" # build_config.h
+        "-Iruntime",  # expose caml/*.h
+        "-I$(GENDIR)/runtime", # build_config.h
+        ## for platform-dependend s.h:
+        "-I", "$(GENDIR)/runtime/caml/cross-compile" ##HACK for xcompile
     ] + select({
-        "//platforms/os:macos?": ["-std=c11"],
+        "//platforms/os:macos?": [], #"-std=c11"],
         "//platforms/os:linux?": [],
-        "//conditions:default":  ["-std=c11"]
+        "//conditions:default":  [], #"-std=c11"]
     }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
     defines = RUNTIME_DEFINES,
     linkopts = RUNTIME_LIBDEPS + OC_LDFLAGS + LDFLAGS,
-    deps= [":camlrun"],
+    deps= [
+        ":camlrun",
+        "//runtime/caml:hdrs"
+    ],
     visibility = ["//visibility:public"]
 )
 

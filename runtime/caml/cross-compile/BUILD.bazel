@@ -1,0 +1,33 @@
+## cross-compile headers
+
+cc_library(
+    name = "hdrs",
+    hdrs = [
+        "//runtime/caml:hdr_srcs",
+        # "//runtime/caml:domain_state.tbl",
+        # # ## generated files:
+        "//runtime/caml:opnames.h",
+        "//runtime/caml:jumptbl.h",
+        ":platform_s.h"
+    ],
+    # strip_include_prefix = "",
+    # include_prefix = "caml",
+    visibility = [
+        "//boot:__pkg__",
+        "//runtime:__subpackages__",
+        "//otherlibs/systhreads:__pkg__",
+        "//otherlibs/unix:__pkg__",
+        "//yacc:__pkg__"
+    ],
+)
+
+genrule(
+    name = "platform_s.h",
+    outs = ["s.h"],
+    srcs = select({
+        "//platforms/os:linux?": ["//runtime/caml:s.linux.h"],
+        "//platforms/os:macos?": ["//runtime/caml:s.macos.h"]
+        # "//conditions:default": [],
+    }),
+    cmd  = "cp $(SRCS) $@"
+)
