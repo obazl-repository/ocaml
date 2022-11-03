@@ -1,4 +1,5 @@
 load("//bzl:rules.bzl",
+     "bootstrap_archive",
      "bootstrap_library",
      "bootstrap_module",
      "bootstrap_signature",
@@ -25,12 +26,12 @@ SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 STDLIB = ["//boot/lib:stdlib"]
 
+# bootstrap_archive(
 bootstrap_library(
     name = "driver",
     manifest  = [
         ":Compenv",
         ":Compile",
-        ":Compile_common",
         ":Compmisc",
         ":Errors",
         ":Main",
@@ -42,8 +43,12 @@ bootstrap_library(
         ":Optmain",
         ":Optmaindriver",
         ":Pparse",
+        ":Compile_common",
     ],
-    visibility = ["//testsuite:__pkg__"]
+    visibility = [
+        "//boot:__subpackages__",
+        "//testsuite:__pkg__"
+    ]
 )
 
 # bootstrap_library(
@@ -332,7 +337,9 @@ bootstrap_module(
         "//bytecomp:Bytelibrarian",
         "//stdlib:Stdlib.Arg",
     ],
-    visibility = ["//bytecomp:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__"
+    ]
 )
 
 bootstrap_signature(

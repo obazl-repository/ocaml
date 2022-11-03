@@ -1,3 +1,6 @@
+query --notool_deps
+query --noimplicit_deps
+
 common --override_repository=rules_ocaml=/Users/gar/obazl/rules_ocaml
 common --override_repository=opam=/Users/gar/obazl/tools_opam
 common --override_repository=obazl=/Users/gar/obazl/tools_obazl

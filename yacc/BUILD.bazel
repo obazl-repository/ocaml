@@ -23,7 +23,10 @@ cc_binary(
         "//conditions:default": []
     }),
     deps = ["//runtime/caml:hdrs"],
-    visibility = ["//toolchain/adapters:__pkg__"]
+    visibility = [
+        "//boot:__subpackages__",
+        "//toolchain/adapters:__pkg__"
+    ]
 )
 
 genrule(

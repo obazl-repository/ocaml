@@ -41,32 +41,26 @@ alias(
     actual = "//boot:ocamllex"
 )
 
-ocamlc_boot( ##FIXME: do we really need a separate rule?
-# compiler(
-    name = "ocamlc",
-    # compile_target = "//platform/cpu:arm",  ## ??
-    exec_compatible_with = [
-        ## *>vm ???
-    ],
-    opts = [
-        "-nostdlib", "-compat-32",
-    ],
-    # primitives = PRIMITIVES,
-    main = "//driver:Main",
-    deps = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
-        # "//boot:stdlib"
-    ],
-    visibility = [
-        "//compilers/stage2:__pkg__",
-        "//testsuite:__pkg__"
-    ]
-)
+# ocamlc_boot( ##FIXME: do we really need a separate rule?
+# # compiler(
+#     name = "ocamlc",
+#     # compile_target = "//platform/cpu:arm",  ## ??
+#     exec_compatible_with = [
+#         ## *>vm ???
+#     ],
+#     opts = [
+#         "-nostdlib", "-compat-32",
+#     ],
+#     # primitives = PRIMITIVES,
+#     main = "//driver:Main",
+#     deps = [
+#         "//compilerlibs:ocamlcommon",
+#         "//bytecomp:ocamlbytecomp",
+#         # "//boot:stdlib"
+#     ],
+#     visibility = [
+#         "//compilers/stage2:__pkg__",
+#         "//testsuite:__pkg__"
+#     ]
+# )
 
-# native compiled, emits native code (OBazl mode "n_n")
-# ocamlopt.opt$(EXE): \
-#                     compilerlibs/ocamlcommon.cmxa \
-#                     compilerlibs/ocamloptcomp.cmxa \
-#                     $(OPTSTART:.cmo=.cmx)
-# 	$(CAMLOPT_CMD) $(LINKFLAGS) -o $@ $^

@@ -43,10 +43,10 @@ def _ocamlc_fixpoint(ctx):
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
     # mode = "bytecode"
     # if mode == "bytecode":
-    #     tool = tc.ocamlrun
-    #     tool_args = [tc.ocamlc]
+    #     tool = tc.tool_runner
+    #     tool_args = [tc.compiler]
     # # else:
-    # #     tool = tc.ocamlrun.opt
+    # #     tool = tc.tool_runner.opt
     # #     tool_args = []
 
     # return impl_executable(ctx, mode, tc.linkmode, tool, tool_args)

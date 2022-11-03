@@ -44,13 +44,13 @@ def _bootstrap_signature_impl(ctx):
     # if mode == "native":
     #     exe = tc.ocamlopt.basename
     # else:
-    #     exe = tc.ocamlc.basename
+    #     exe = tc.compiler.basename
 
     ## FIXME:
     ## if mode == bc, run 'ocamlrun boot/ocamlc',
     ## if native, run 'boot/ocamlc.opt'
-    # tool = tc.ocamlrun
-    # tool_args = [tc.ocamlc]
+    # tool = tc.tool_runner
+    # tool_args = [tc.compiler]
 
     ################
     indirect_adjunct_depsets      = []
@@ -270,7 +270,7 @@ def _bootstrap_signature_impl(ctx):
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_cmi],
-        tools = [tool] + tool_args, # tc.ocamlrun, tc.ocamlc],
+        tools = [tool] + tool_args, # tc.tool_runner, tc.compiler],
         mnemonic = "CompileOcamlSignature",
         progress_message = "{mode} compiling bootstrap_signature: {ws}//{pkg}:{tgt}".format(
             mode = "TEST", # mode,

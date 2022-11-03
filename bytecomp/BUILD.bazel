@@ -206,7 +206,9 @@ bootstrap_module(
         "//utils:Clflags",
     ],
     data = ["//runtime:primitives"],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//driver:__pkg__"
+    ]
 )
 
 bootstrap_signature(

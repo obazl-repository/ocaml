@@ -159,6 +159,7 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 #           -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
 ##  Makefile.common: BOOT_STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/boot
 ## NB: for the last to work, BOOT_OCAMLC must be sys>vm (ocamlc.opt)
+BOOT_STDLIBFLAGS ["-nostdlib"]
 
 # CAMLOPT: runs vm>sys compiler
 # Defined in:
@@ -172,7 +173,6 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 ## CAMLOPT := $(BEST_OCAMLOPT) $(STDLIBFLAGS)
 # otherlibs/systhread/Makefile
 ## CAMLOPT=$(BEST_OCAMLOPT) $(LIBS)
-
 
 # CAMLOPT_CMD: for sys>* builds
 # Defined in Makefile.common: CAMLOPT_CMD = $(CAMLOPT)
@@ -327,7 +327,10 @@ CFLAGS = "@CFLAGS@".split(" ")
 #  -function-sections  (option not available)
 OC_NATIVE_CFLAGS = "@oc_native_cflags@".split(" ")
 
-OCNCF = "@oc_native_cflags@"
+#FIXME: -function-sections only for >sys (cmx output)
+# OCNCF = "@oc_native_cflags@"
+OCNCF = "" # until we get this fixed
+# ?? PLATFORM_NATIVE_CFLAGS = select({
 PLATFORM_CFLAGS = select({
     "//platforms/target:vm?": [],
     "//conditions:default": [] if OCNCF == "" else OCNCF.split(" ")
@@ -501,6 +504,7 @@ afl_instrument = "@afl@" == "true"
 FLAT_FLOAT_ARRAY = "@flat_float_array@" == "true"
 FUNCTION_SECTIONS = "@function_sections@" == "true"
 
+## FIXME: not for .mli files?
 # Makefile.common:
 OPTCOMPFLAGS = ["-function-sections"] if FUNCTION_SECTIONS else []
 

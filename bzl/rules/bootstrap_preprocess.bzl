@@ -16,10 +16,10 @@ def _bootstrap_preprocess_impl(ctx):
     mode = "bytecode"
 
     # if mode == "bytecode":
-    tool = tc.ocamlrun
-    tool_args = [tc.ocamlc]
+    tool = tc.tool_runner
+    tool_args = [tc.compiler]
     # else:
-    #     tool = tc.ocamlrun.opt
+    #     tool = tc.tool_runner.opt
     #     tool_args = []
 
     return impl_ns_resolver(ctx, mode, tool, tool_args)

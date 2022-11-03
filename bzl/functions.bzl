@@ -32,8 +32,8 @@ def config_tc(ctx):
 
     # mode = ctx.attr._toolchain[BuildSettingInfo].value
 
-    tool = tc.ocamlrun
-    tool_args = [tc.ocamlc]
+    tool = tc.tool_runner
+    tool_args = [tc.compiler]
     ext       = ".cmo"
 
     # stage = ctx.attr._stage[BuildSettingInfo].value
@@ -51,33 +51,33 @@ def config_tc(ctx):
     #     scope     = "__stage{stage}/".format(stage = s)
 
     # if mode == "boot":
-    #     tool = tc.ocamlrun
+    #     tool = tc.tool_runner
     #     tool_args = [ctx.file.ocamlc]
-    #     # tool_args = [tc.ocamlc] # FIXME: rename tc.boot_ocamlc
+    #     # tool_args = [tc.compiler] # FIXME: rename tc.boot_ocamlc
     #     ext       = ".cmo"
     #     scope     = "__boot/"
 
     # elif mode == "bc_bc":
-    #     tool = tc.ocamlrun
+    #     tool = tc.tool_runner
     #     tool_args = [ctx.file.ocamlc]
     #     ext       = ".cmo"
     #     scope     = "__bc/"
     # elif mode == "bc_n":
-    #     tool = tc.ocamlrun
+    #     tool = tc.tool_runner
     #     tool_args = [ctx.file.ocamlc]
-    #     # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+    #     # tool_args = [tc.compiler] # FIXME: rename tc.bc_n_ocamlc
     #     ext  = ".cmx"
     #     scope     = "__n/"
     # elif mode == "n_bc":  # FIXME
-    #     tool = tc.ocamlrun
+    #     tool = tc.tool_runner
     #     tool_args = [ctx.file.ocamlc]
-    #     # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+    #     # tool_args = [tc.compiler] # FIXME: rename tc.bc_n_ocamlc
     #     ext  = ".cmo"
     #     scope     = "__bc/"
     # elif mode == "n_n":  # FIXME
-    #     tool = tc.ocamlrun
+    #     tool = tc.tool_runner
     #     tool_args = [ctx.file.ocamlc]
-    #     # tool_args = [tc.ocamlc] # FIXME: rename tc.bc_n_ocamlc
+    #     # tool_args = [tc.compiler] # FIXME: rename tc.bc_n_ocamlc
     #     ext  = ".cmx"
     #     scope     = "__n/"
     # else:

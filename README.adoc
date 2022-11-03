@@ -93,6 +93,10 @@ In general configuration management under Bazel is very different (and
 much easier) than it is with configure/make. I don't have detailed
 documentation yet, but you can find lots of notes in link:bzl/docs[bzl/docs].
 
+=== Alternate C Compilers
+
+Support for Zig and LLVM.
+
 === Cross-compilers
 
 Bazel has excellent support for cross-compilation via link:https://bazel.build/extending/platforms[platforms] and link:https://bazel.build/extending/toolchains[toolchains]; for an overview see link:https://bazel.build/concepts/platforms[Building with platforms].

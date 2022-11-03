@@ -294,7 +294,7 @@ def _bootstrap_module(ctx):
     (tc, tool, tool_args, scope, ext) = config_tc(ctx)
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
-    if tc.target_vm:
+    if tc.target_host:
         ext = ".cmo"
     else:
         ext = ".cmx"
@@ -365,7 +365,7 @@ def _bootstrap_module(ctx):
     # direct_linkargs.append(out_cm_)
     default_outputs.append(out_cm_)
 
-    if not tc.target_vm:
+    if not tc.target_host:
         # if not ctx.attr._rule.startswith("bootstrap"):
         out_o = ctx.actions.declare_file(scope + module_name + ".o",
                                          sibling = out_cm_)
@@ -392,8 +392,8 @@ def _bootstrap_module(ctx):
     #########################
     args = ctx.actions.args()
 
-    if tc.target_vm:
-        args.add(tc.ocamlc)
+    if tc.target_host:
+        args.add(tc.compiler)
     # args.add_all(tool_args)
 
     _options = get_options(ctx.attr._rule, ctx)
@@ -566,15 +566,15 @@ def _bootstrap_module(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tc.ocamlrun, # tool,
+        executable = tc.tool_runner, # tool,
         arguments = [args],
         inputs    = inputs_depset,
         outputs   = action_outputs,
-        tools = [tc.ocamlrun, tc.ocamlc],
+        tools = [tc.tool_runner, tc.compiler],
         # tools = [tool] + tool_args,
         mnemonic = "CompileBootstrapModule",
         progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
-            mode = "TEST", ## "vm" if tc.target_vm else "sys",
+            mode = "TEST", ## "vm" if tc.target_host else "sys",
             rule=ctx.attr._rule,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,

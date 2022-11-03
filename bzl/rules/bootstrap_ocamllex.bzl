@@ -24,8 +24,8 @@ def _bootstrap_ocamllex_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
-    tool = tc.ocamlrun
-    tool_args = [tc.boot_ocamllex]
+    tool = tc.tool_runner
+    tool_args = [tc.lexer]
 
     # env = {"PATH": get_sdkpath(ctx)}
 

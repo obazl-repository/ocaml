@@ -1,16 +1,25 @@
 ## put this in ~/.bazelrc to enable for all bazel projects
 # build --incompatible_enable_cc_toolchain_resolution
 
-# build --//config/toolchain=zig
-# build --extra_toolchains="@zig_sdk//toolchain:darwin_amd64"
+# build --toolchain_resolution_debug=.*
+# build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 
+#### alternate toolchain:
+# build --extra_toolchains=@zig_sdk//toolchain:darwin_amd64
+# build --extra_toolchains=@zig_sdk//toolchain:linux_arm64_gnu.2.28
+
+#### cross-builds: specify target platform and 1 toolchain per host
+# build --extra_toolchains=@zig_sdk//toolchain:linux_amd64_gnu.2.25,@zig_sdk//toolchain:darwin_amd64
+# ## enable one of these
+# build --platforms=@zig_sdk//platform:linux_amd64
 # build --platforms=@zig_sdk//platform:linux_arm64
+## xcompile target:
+# build --//config/toolchain=zig
+
 
 # build --action_env BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 # build --action_env ZIG_SYSTEM_LINKER_HACK=1
 
-# build --toolchain_resolution_debug=.*
-# build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 
 ## set cc opts for specific files:
 # build --per_file_copt=

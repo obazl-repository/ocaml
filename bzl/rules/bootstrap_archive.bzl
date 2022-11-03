@@ -32,10 +32,10 @@ def _bootstrap_archive(ctx):
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
     # mode = "bytecode"
     # if mode == "bytecode":
-    #     tool = tc.ocamlrun
-    #     tool_args = [tc.ocamlc]
+    #     tool = tc.tool_runner
+    #     tool_args = [tc.compiler]
     # # else:
-    # #     tool = tc.ocamlrun.opt
+    # #     tool = tc.tool_runner.opt
     # #     tool_args = []
 
     # return impl_archive(ctx, mode, tc.linkmode, tool, tool_args)
@@ -100,7 +100,7 @@ def _bootstrap_archive(ctx):
     #         if "-shared" in ctx.attr.opts:
     #             _options.remove("-shared") ## avoid dup
 
-    if tc.target_vm:
+    if tc.target_host:
         ext = ".cma"
         # if shared:
         #     ext = ".cmxs"
@@ -130,7 +130,7 @@ def _bootstrap_archive(ctx):
     paths_direct.append(archive_file.dirname)
     action_outputs.append(archive_file)
 
-    if not tc.target_vm:
+    if not tc.target_host:
         archive_a_filename = tmpdir + archive_name + ".a"
         archive_a_file = ctx.actions.declare_file(scope + archive_a_filename)
         paths_direct.append(archive_a_file.dirname)
@@ -139,8 +139,8 @@ def _bootstrap_archive(ctx):
     #########################
     args = ctx.actions.args()
 
-    if tc.target_vm:
-        args.add(tc.ocamlc)
+    if tc.target_host:
+        args.add(tc.compiler)
     # args.add_all(tool_args)
 
     for arg in ctx.attr.opts:
@@ -194,7 +194,7 @@ def _bootstrap_archive(ctx):
                 elif dep.extension == "a":
                     if linkmode == "static":
                         # if mode in ["boot", "bc_bc", "bc_n"]:
-                        if tc.target_vm:
+                        if tc.target_host:
                             (bn, extn) = paths.split_extension(dep.basename)
                             # args.add(dep)
                             ## or:
@@ -344,7 +344,7 @@ def _bootstrap_archive(ctx):
             elif dep.extension == "a":
                 if tc.linkmode == "static":
                     # if mode in ["boot", "bc_bc", "bc_n"]:
-                    if tc.target_vm:
+                    if tc.target_host:
                         (bn, ext) = paths.split_extension(dep.basename)
                         # args.add(dep)
                         ## or:
@@ -384,15 +384,15 @@ def _bootstrap_archive(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tc.ocamlrun,
+        executable = tc.tool_runner,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
-        tools = [tc.ocamlrun, tc.ocamlc],
-        # tools = [tool] + tool_args, # [tc.ocamlopt, tc.ocamlc],
+        tools = [tc.tool_runner, tc.compiler],
+        # tools = [tool] + tool_args, # [tc.ocamlopt, tc.compiler],
         mnemonic = mnemonic,
         progress_message = "{mode} compiling {rule}: @{ws}//{pkg}:{tgt}".format(
-            mode = "TEST", # "vm" if tc.target_vm else "sys",
+            mode = "TEST", # "vm" if tc.target_host else "sys",
             rule = ctx.attr._rule,
             ws  = ctx.label.workspace_name,
             pkg = ctx.label.package,

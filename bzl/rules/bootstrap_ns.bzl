@@ -117,7 +117,7 @@ def _bootstrap_ns(ctx):
     # if mode == "native":
     #     exe = tc.ocamlopt.basename
     # else:
-    #     exe = tc.ocamlc.basename
+    #     exe = tc.compiler.basename
 
     ################
     default_outputs = [] ## .cmx only
@@ -181,7 +181,7 @@ def _bootstrap_ns(ctx):
     out_cmi = ctx.actions.declare_file(out_cmi_fname)
     action_outputs.append(out_cmi)
 
-    if tc.target_vm:
+    if tc.target_host:
         out_cm__fname = resolver_module_name + ".cmo"
     else:
         obj_o_fname = resolver_module_name + ".o"

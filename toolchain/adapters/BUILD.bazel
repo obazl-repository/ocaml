@@ -2,24 +2,38 @@ exports_files(["BUILD.bazel"])
 
 ## toolchains where buildhost == bootstrap
 
-load("//toolchain:BUILD.bzl", "bootstrap_toolchain_adapter")
+load(":BUILD.bzl", "bootstrap_toolchain_adapter")
 
 ######## toolchain adapters ########
 
 ## The bootstrap compiler is a precompiled vm>vm tool that comes with
 ## the distribution.
 bootstrap_toolchain_adapter(
-    name      = "bootstrap",
-    ocamlrun  = "//boot/bin:ocamlrun", # the vm, implemented in C
-    ocamlc    = "//boot:ocamlc", # the precompiled vm>vm bootstrap compiler
-    # vmruntime = "//boot:camlrun", # do we need this?
+    name        = "bootstrap",
+    build_host  = "vm",
+    target_host = "vm",
+    ## vm
+    tool_runner  = "//boot/bin:ocamlrun", # the vm, implemented in C
+    linkmode = "dynamic",
+    # repl        = "//toplevel:ocaml", # or ocamlnat
+    ## tools
+    compiler    = "//boot:ocamlc", # the precompiled vm>vm bootstrap compiler
+    lexer       = "//boot:ocamllex",
+    yacc        = "//boot/bin:ocamlyacc",
+)
+
+## vm>sys (ocamlopt.byte)
+bootstrap_toolchain_adapter(
+    name      = "stage1",
+    tool_runner = "//boot/bin:ocamlrun",
+    compiler  = "//boot:ocamlopt",
     linkmode = "dynamic"
 )
 
 bootstrap_toolchain_adapter(
     name     = "local",
-    ocamlrun = "//bin:ocamlrun",
-    ocamlc   = "//bin:ocamlc",
+    tool_runner = "//bin:ocamlrun",
+    compiler   = "//bin:ocamlc",
     linkmode = "dynamic"
 )
 
