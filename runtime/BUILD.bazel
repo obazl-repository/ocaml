@@ -71,8 +71,9 @@ cc_binary(
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
         "$(OC_LDFLAGS)",
+        "$(OC_DEFINES)",
     ],
-    defines = RUNTIME_DEFINES + ["$(OC_DEFINES)"],
+    defines = RUNTIME_DEFINES,
     linkopts = OC_LDFLAGS + LDFLAGS,
     deps= [
         "//runtime/caml:hdrs",
