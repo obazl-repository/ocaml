@@ -1,0 +1,19 @@
+load("//toolchain/profile:BUILD.bzl", "cc_toolchain_profile_selector")
+
+##############################
+cc_toolchain_profile_selector(
+    name                    = "linux",
+    profile                 = "//toolchain/profile/cc/linux",
+    target_host_constraints = ["@platforms//os:linux"],
+    # constraints             = [":fastbuild_mode"],
+)
+
+##############################
+cc_toolchain_profile_selector(
+    name                    = "zig",
+    profile                 = "//toolchain/profile/cc/linux:zig",
+    target_host_constraints = [
+        "@platforms//os:linux",
+        "@zig_sdk//libc:unconstrained"
+    ],
+)

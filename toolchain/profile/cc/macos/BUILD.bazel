@@ -1,4 +1,4 @@
-load("//toolchain/profiles:BUILD.bzl", "cc_toolchain_profile")
+load("//toolchain/profile:BUILD.bzl", "cc_toolchain_profile")
 
 #####################
 cc_toolchain_profile(

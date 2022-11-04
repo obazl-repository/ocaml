@@ -15,4 +15,4 @@ def obazl_deps():
         sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
     )
 
-    # native.register_toolchains("@ocaml//toolchain/profiles:default-opt")
+    # native.register_toolchains("@ocaml//toolchain/profile:default-opt")

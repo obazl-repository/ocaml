@@ -1,9 +1,9 @@
-load("//toolchain/profiles:BUILD.bzl", "cc_toolchain_profile_selector")
+load("//toolchain/profile:BUILD.bzl", "cc_toolchain_profile_selector")
 
 ##############################
 cc_toolchain_profile_selector(
     name                    = "macos",
-    profile                 = "//toolchain/profiles/cc/macos",
+    profile                 = "//toolchain/profile/cc/macos",
     target_host_constraints = ["@platforms//os:macos"],
     # constraints             = [":fastbuild_mode"],
 )

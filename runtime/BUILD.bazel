@@ -66,14 +66,13 @@ cc_binary(
     name = "sak.exe",
     srcs = ["sak.c"],
     copts = OC_CFLAGS + CFLAGS + CPPFLAGS + [
-        ## for platform-dependend s.h:
+        ## for platform-dependent s.h:
         "-I", "$(GENDIR)/runtime/caml/cross-compile",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
         "$(OC_LDFLAGS)",
-        "$(OC_DEFINES)",
     ],
-    defines = RUNTIME_DEFINES,
+    defines = [].extend("$(OC_DEFINES)".split(" ")),
     linkopts = OC_LDFLAGS + LDFLAGS,
     deps= [
         "//runtime/caml:hdrs",

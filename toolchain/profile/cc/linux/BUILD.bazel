@@ -1,0 +1,28 @@
+load("//toolchain/profile:BUILD.bzl",
+     "cc_toolchain_profile_selector",
+     "cc_toolchain_profile",
+)
+
+#####################
+## for cross-compiling to linux, or using zig on linux
+load(":BUILD.bzl", "fix_oc_cflags")
+
+OC_CFLAGS = fix_oc_cflags("-O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -ffunction-sections".\
+split(" "))
+
+cc_toolchain_profile(
+    name     = "zig",
+    CFLAGS   = OC_CFLAGS,
+    CPPFLAGS = " -D_FILE_OFFSET_BITS=64 ".split(" "),
+    LDFLAGS  = "".split(" "),
+    # DEFINES  = []
+)
+
+## from ./configure on linux:
+cc_toolchain_profile(
+    name     = "linux",
+    CFLAGS   = OC_CFLAGS + ["-fexcess-precision=standard", "-fno-tree-vrp"],
+    CPPFLAGS = " -D_FILE_OFFSET_BITS=64 ".split(" "),
+    LDFLAGS  = "".split(" "),
+    # DEFINES  = []
+)

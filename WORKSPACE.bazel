@@ -35,10 +35,10 @@ register_toolchains(
     # "//toolchain/selectors:instrumented",
 
     ## toolchain profiles - locals must come first
-    "//toolchain/selectors/profile/cc/local:linux",
-    "//toolchain/selectors/profile/cc/local:macos",
-    "//toolchain/selectors/profile/cc/macos",
-    "//toolchain/selectors/profile/cc/linux"
+    "//toolchain/profile/selector/cc/local:linux",
+    "//toolchain/profile/selector/cc/local:macos",
+    "//toolchain/profile/selector/cc/macos",
+    "//toolchain/profile/selector/cc/linux"
 )
 
 # register_execution_platforms(

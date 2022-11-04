@@ -3348,7 +3348,7 @@ OCAML_VERSION_SHORT=5.1
 
 ac_config_files="$ac_config_files config/CONFIG.bzl"
 
-ac_config_files="$ac_config_files toolchain/profiles/cc/local/BUILD.bazel"
+ac_config_files="$ac_config_files toolchain/profile/cc/local/BUILD.bazel"
 
 ac_config_files="$ac_config_files Makefile.build_config"
 
@@ -20645,7 +20645,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config/CONFIG.bzl") CONFIG_FILES="$CONFIG_FILES config/CONFIG.bzl" ;;
-    "toolchain/profiles/cc/local/BUILD.bazel") CONFIG_FILES="$CONFIG_FILES toolchain/profiles/cc/local/BUILD.bazel" ;;
+    "toolchain/profile/cc/local/BUILD.bazel") CONFIG_FILES="$CONFIG_FILES toolchain/profile/cc/local/BUILD.bazel" ;;
     "Makefile.build_config") CONFIG_FILES="$CONFIG_FILES Makefile.build_config" ;;
     "Makefile.config") CONFIG_FILES="$CONFIG_FILES Makefile.config" ;;
     "stdlib/sys.ml") CONFIG_FILES="$CONFIG_FILES stdlib/sys.ml" ;;

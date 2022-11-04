@@ -1,3 +1,3 @@
-load("//toolchain/profiles:BUILD.bzl", "cc_build_profile")
+load("//toolchain/profile:BUILD.bzl", "cc_build_profile")
 
 cc_build_profile(name = "profile", visibility = ["//visibility:public"])
