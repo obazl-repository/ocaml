@@ -8,9 +8,8 @@ OC_CFLAGS = fix_oc_cflags("-O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -W
 #####################
 cc_toolchain_profile(
     name     = "local",
-    # for testing, some harmless flags
     CFLAGS   = OC_CFLAGS,
     CPPFLAGS = " -D_FILE_OFFSET_BITS=64 ".split(" "),
     LDFLAGS  = "".split(" "),
-    DEFINES  = [] # "FOO BAR".split(" ")
+    # DEFINES  = []
 )

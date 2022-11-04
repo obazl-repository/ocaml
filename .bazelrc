@@ -7,9 +7,9 @@ build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 #### alternate toolchain: pass tc and profile if needed
 ## build --extra_toolchains=@zig_sdk//toolchain:darwin_amd64
 
-## zig on linux does not support some flags set by ./configre
+## zig on linux (amd) does not support some flags set by ./configre
 ## so we need to pass a customized tc profile
-# build --extra_toolchains=@zig_sdk//toolchain:linux_arm64_gnu.2.28,//profile/selector/cc/linux:zig
+# build --extra_toolchains=@zig_sdk//toolchain:linux_amd64_gnu.2.28,//profile/selector/cc/linux:zig
 
 #### cross-builds: specify target platform and 1 toolchain per host (?)
 #### plus target profile if needed (zig needs it)
@@ -19,7 +19,6 @@ build --extra_toolchains=@zig_sdk//toolchain:linux_amd64_gnu.2.31,//toolchain/pr
 # ## set the target platform:
 build --platforms=@zig_sdk//platform:linux_amd64
 # build --platforms=@zig_sdk//platform:linux_arm64
-
 
 # build --action_env BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 # build --action_env ZIG_SYSTEM_LINKER_HACK=1

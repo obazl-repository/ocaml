@@ -1,4 +1,7 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@bazel_skylib//rules:common_settings.bzl",
+     "string_flag", "string_setting")
+
 
 load("//bzl:rules.bzl",
      "bootstrap_executable",
@@ -11,7 +14,8 @@ load("//config:CONFIG.bzl",
      "HOST",
      "BYTECCLIBS",
      # flags
-     "OC_CFLAGS", "CFLAGS",
+     # "OC_CFLAGS",
+     "CFLAGS",
      "OC_CPPFLAGS", "CPPFLAGS",
      "OC_LDFLAGS", "LDFLAGS",
      # defines
@@ -22,9 +26,6 @@ load("//config:CONFIG.bzl",
      # other
      "LIBDIR", "ROOTDIR"
      )
-
-load("@bazel_skylib//rules:common_settings.bzl",
-     "string_flag", "string_setting")
 
 OPTIMIZATION_FLAGS = select({
     "//boot/vm:dbg?": ["-O0", "-g3"], # -Wall -Werror
@@ -65,24 +66,20 @@ BYTECCLIBS = ["-lm", "-lpthread"]
 cc_binary(
     name = "sak.exe",
     srcs = ["sak.c"],
-    copts = OC_CFLAGS + CFLAGS + CPPFLAGS + [
+    copts = CFLAGS + CPPFLAGS + [
         ## for platform-dependent s.h:
         "-I", "$(GENDIR)/runtime/caml/cross-compile",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
         "$(OC_LDFLAGS)",
     ],
-    defines = [].extend("$(OC_DEFINES)".split(" ")),
+    defines = RUNTIME_DEFINES,
     linkopts = OC_LDFLAGS + LDFLAGS,
     deps= [
         "//runtime/caml:hdrs",
     ],
     ## access to Make vars:
-    toolchains = [
-        "//toolchain:profile"
-        # "//toolchain/type:cc_tc_profile"
-        # "@bazel_tools//tools/cpp:current_cc_toolchain"
-    ],
+    toolchains = ["//toolchain:profile"],
     visibility = ["//runtime/caml:__pkg__"]
 )
 
@@ -106,7 +103,10 @@ cc_library(
         # "-pedantic",
         "-I$(GENDIR)/runtime", # build_config.h
         ## for platform-dependend s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile" ##HACK for xcompile
+        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        "$(OC_CFLAGS)",
+        "$(OC_CPPFLAGS)",
+        "$(OC_LDFLAGS)",
     ] + select({
         "//platforms/os:macos?": [], # "-std=c11"],
         "//platforms/os:linux?": [],
@@ -114,7 +114,7 @@ cc_library(
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
+    }) + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
     defines = RUNTIME_DEFINES,
     deps = [
         "//runtime/caml:hdrs"
@@ -122,7 +122,8 @@ cc_library(
     visibility = [
         "//boot:__subpackages__",
         "//lib:__pkg__"
-    ]
+    ],
+    toolchains = ["//toolchain:profile"],
 )
 
 ###########
@@ -138,7 +139,10 @@ cc_library(
         "-x", "c",
         "-I$(GENDIR)/runtime", # build_config.h
         ## for platform-dependend s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile" ##HACK for xcompile
+        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        "$(OC_CFLAGS)",
+        "$(OC_CPPFLAGS)",
+        "$(OC_LDFLAGS)",
     ] + select({
         "//platforms/os:macos?": [], #"-std=c11"],
         "//platforms/os:linux?": [],
@@ -146,11 +150,12 @@ cc_library(
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
+    }) + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
     linkopts = OC_LDFLAGS + LDFLAGS,
     defines = RUNTIME_DEFINES + OC_NATIVE_DEFINES,
     deps = ["//runtime/caml:hdrs"],
-    visibility = ["//lib:__pkg__"]
+    visibility = ["//lib:__pkg__"],
+    toolchains = ["//toolchain:profile"],
 )
 
 # load("//bzl/transitions:ocamlc_boot.bzl",
@@ -532,19 +537,23 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
         "-Iruntime",  # expose caml/*.h
         "-I$(GENDIR)/runtime", # build_config.h
         ## for platform-dependend s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile" ##HACK for xcompile
+        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        "$(OC_CFLAGS)",
+        "$(OC_CPPFLAGS)",
+        "$(OC_LDFLAGS)",
     ] + select({
         "//platforms/os:macos?": [], #"-std=c11"],
         "//platforms/os:linux?": [],
         "//conditions:default":  [], #"-std=c11"]
-    }) + OC_CFLAGS + CFLAGS + OC_CPPFLAGS,
+    }) + CFLAGS + OC_CPPFLAGS,
     defines = RUNTIME_DEFINES,
     linkopts = RUNTIME_LIBDEPS + OC_LDFLAGS + LDFLAGS,
     deps= [
         ":camlrun",
         "//runtime/caml:hdrs"
     ],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
+    toolchains = ["//toolchain:profile"],
 )
 
 ################################################################

@@ -12,7 +12,8 @@ load("//config:CONFIG.bzl",
      "ARCH", "MODEL", "SYSTEM",
      "HOST", "ROOTDIR", "LIBDIR",
      # flags
-     "OC_CFLAGS", "CFLAGS",
+     # "OC_CFLAGS",
+     "CFLAGS",
      "OC_CPPFLAGS", "CPPFLAGS",
      "OC_LDFLAGS", "LDFLAGS",
      # defines - replace by CC_DEFINES with selects
