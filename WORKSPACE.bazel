@@ -98,7 +98,7 @@ zig_toolchains(
     # url_formats = [
     #     "https://example.org/zig/zig-{host_platform}-{version}.{_ext}",
     # ],
-    # host_platform_sha256 = { ... },
+b    # host_platform_sha256 = { ... },
 )
 
 register_toolchains(

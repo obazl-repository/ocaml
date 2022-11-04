@@ -11,5 +11,4 @@ cc_toolchain_profile(
     CFLAGS   = OC_CFLAGS,
     CPPFLAGS = " -D_FILE_OFFSET_BITS=64 ".split(" "),
     LDFLAGS  = "".split(" "),
-    # DEFINES  = []
 )

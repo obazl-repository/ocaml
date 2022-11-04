@@ -15,7 +15,6 @@ cc_toolchain_profile(
     CFLAGS   = OC_CFLAGS,
     CPPFLAGS = " -D_FILE_OFFSET_BITS=64 ".split(" "),
     LDFLAGS  = "".split(" "),
-    # DEFINES  = []
 )
 
 ## from ./configure on linux:
@@ -24,5 +23,4 @@ cc_toolchain_profile(
     CFLAGS   = OC_CFLAGS + ["-fexcess-precision=standard", "-fno-tree-vrp"],
     CPPFLAGS = " -D_FILE_OFFSET_BITS=64 ".split(" "),
     LDFLAGS  = "".split(" "),
-    # DEFINES  = []
 )

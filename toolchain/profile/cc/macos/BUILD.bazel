@@ -1,12 +1,13 @@
 load("//toolchain/profile:BUILD.bzl", "cc_toolchain_profile")
+load("//toolchain/profile/cc:BUILD.bzl", "fix_oc_cflags")
+
+## for cross-compilation to mac
+
+OC_CFLAGS = fix_oc_cflags("-O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common".split(" "))
 
 #####################
 cc_toolchain_profile(
     name     = "macos",
-    # for testing, some harmless flags
-    CFLAGS   = ["-pipe"],
-    CPPFLAGS = ["-Rmodule-import"],
-    LDFLAGS  = ["-Rmodule-build"],
-    DEFINES  = ["MACOS_DEF"]
-)
-
+    CFLAGS   = OC_CFLAGS,
+    CPPFLAGS = " -D_FILE_OFFSET_BITS=64 ".split(" "),
+    LDFLAGS  = "".split(" "),
