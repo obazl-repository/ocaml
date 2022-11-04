@@ -2,24 +2,30 @@
 # build --incompatible_enable_cc_toolchain_resolution
 
 # build --toolchain_resolution_debug=.*
-build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
+# build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 
 #### alternate toolchain: pass tc and profile if needed
+
+## macos > macos: use zig toolchain
 ## build --extra_toolchains=@zig_sdk//toolchain:darwin_amd64
 
+## linux>linux: use zig
 ## zig on linux (amd) does not support some flags set by ./configre
 ## so we need to pass a customized tc profile
 # build --extra_toolchains=@zig_sdk//toolchain:linux_amd64_gnu.2.28,//toolchain/profile/selector/cc/linux:zig
 
 #### cross-builds: specify target platform and 1 toolchain per host (?)
 #### plus target profile if needed (zig needs it)
-build --extra_toolchains=@zig_sdk//toolchain:linux_amd64_gnu.2.31,//toolchain/profile/selector/cc/linux:zig
-##,@zig_sdk//toolchain:darwin_amd64
 
-# ## set the target platform:
-build --platforms=@zig_sdk//platform:linux_amd64
-# build --platforms=@zig_sdk//platform:linux_arm64
+### macos > linux using zig tc (requires custom tc profile)
+# build --extra_toolchains=@zig_sdk//toolchain:linux_amd64_gnu.2.31,//toolchain/profile/selector/cc/linux:zig
+# build --platforms=@zig_sdk//platform:linux_amd64
 
+### linux > macos using zig
+# build --extra_toolchains=@zig_sdk//toolchain:darwin_amd64,//toolchain/profile/selector/cc/macos
+# build --platforms=@zig_sdk//platform:macos_amd64
+
+################################################################
 # build --action_env BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 # build --action_env ZIG_SYSTEM_LINKER_HACK=1
 
