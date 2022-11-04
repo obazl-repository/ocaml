@@ -1,13 +1,16 @@
 load("//config:CONFIG.bzl",
-     "OC_CFLAGS", "CFLAGS", "OC_LDFLAGS", "LDFLAGS")
+     # "OC_CFLAGS",
+     "CFLAGS", "OC_LDFLAGS", "LDFLAGS")
 
-# gcc -O2 -fno-strict-aliasing -fwrapv -pthread -Wall -Wdeclaration-after-statement -Werror -fno-common    -Wl,-no_compact_unwind -o ocamlyacc closure.o error.o lalr.o lr0.o main.o mkpar.o output.o reader.o skeleton.o symtab.o verbose.o warshall.o
+## WARNING: there's a bug in closure.c, the prototype is (void) but the defn is (int n)
 
-## WARNING: there's a bug in closure.c, if -DDEBUG then print_closure
-## is defined twice.
+## macos make.log:
+# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common  -I./runtime  -D_FILE_OFFSET_BITS=64 -o yacc/closure.o yacc/closure.c
+
+# gcc -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common  -Wl,-no_compact_unwind  -o yacc/ocamlyacc yacc/closure.o yacc/error.o yacc/lalr.o yacc/lr0.o yacc/main.o yacc/mkpar.o yacc/output.o yacc/reader.o yacc/skeleton.o yacc/symtab.o yacc/verbose.o yacc/warshall.o
 
 cc_binary(
-    name = "ocamlyacc",
+    name = "yacc",
     srcs = [
         "closure.c", "error.c", "lalr.c", "lr0.c",
         "main.c", "mkpar.c", "output.c", "reader.c",
@@ -15,14 +18,20 @@ cc_binary(
         "version.h", "defs.h",
     ],
     copts = [
+        # "-fno-strict-aliasing",
+        # "-fwrapv",
+        "$(OC_CFLAGS)",
+        "$(OC_CPPFLAGS)",
         "-I", "$(GENDIR)/yacc",
-    ] + select({
-        ## On macos Bazel passes -DDEBUG in fastbuild mode
-        ## this breaks closure.c due to the bug mentioned above.
-        "//platforms/os:macos?": ["-UDEBUG"],
-        "//conditions:default": []
-    }),
+        "-Iruntime",  # expose caml/*.h
+        "-I$(GENDIR)/runtime", # build_config.h
+        "-I$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        # if -c opt, the clang toolchain inserts -DNDEBUG
+        "-Wno-error=macro-redefined" ## NDEBUG
+    ],
+    linkopts = ["$(OC_LDFLAGS)"],
     deps = ["//runtime/caml:hdrs"],
+    toolchains = ["//toolchain:profile"],
     visibility = [
         "//boot:__subpackages__",
         "//toolchain/adapters:__pkg__"
