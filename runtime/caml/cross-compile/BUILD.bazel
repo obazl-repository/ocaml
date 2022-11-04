@@ -4,15 +4,21 @@ cc_library(
     name = "hdrs",
     hdrs = [
         "//runtime/caml:hdr_srcs",
-        # "//runtime/caml:domain_state.tbl",
-        # # ## generated files:
-        # "//runtime/caml:opnames.h",
-        ":opnames.h",
-        # "//runtime/caml:jumptbl.h",
-        ":jumptbl.h",
-        # ":platform_s.h"
-        ":s.h"
-    ],
+        ":platform_s.h"
+    ] + select({
+        ## jumptb.h included by interp.c only #ifdef THREADED_CODE
+# #if defined(__GNUC__) && __GNUC__ >= 2 && !defined(DEBUG) \
+#     && !defined (SHRINKED_GNUC)
+# #define THREADED_CODE
+# #endif
+        # i.e. always, more or less
+        # "//config:THREADED": [":jumptbl_h"],
+        "//conditions:default": [":jumptbl_h"],
+    }) + select({
+        ## opnames.h only needed by instrtrace.c
+        # "//config/vm:DEBUG_TRACE": [":opnames.h"],
+        "//conditions:default": []
+    }),
     data = ["//runtime/caml:hdr_srcs"],
     deps = ["//runtime/caml:hdr_srcs"],
     # strip_include_prefix = ".",
@@ -39,7 +45,7 @@ genrule(
 
 genrule(
     name = "jumptbl_h",
-    outs = ["jumptbl.h"],
+    outs = ["caml/jumptbl.h"],
     srcs = ["//runtime/caml:instruct.h"],
     cmd  = " ".join([
 	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
@@ -50,9 +56,10 @@ genrule(
     visibility = ["//runtime/caml/cross-compile:__pkg__"]
 )
 
+## FIXME: only used by instrtrace.c
 genrule(
     outs = ["opnames.h"],
-    name = "opnames_h",
+    name = "ocaml/opnames_h",
     srcs = ["//runtime/caml:instruct.h"],
     cmd  = " ".join([
 	    # tr is for windows only?
