@@ -1,11 +1,12 @@
-
 exports_files(glob(["**"]))
 
-filegroup(
-    name = "hdr_srcs",
-    srcs = glob(["*.h"], exclude=["s.h"]) + ["domain_state.tbl"],
-    visibility = ["//runtime/caml/cross-compile:__pkg__"]
-)
+# filegroup(
+#     name = "hdr_srcs",
+#     srcs = glob(
+#         ["*.h"], exclude=["s.h", "opnames.h", "jumptbl.h"]
+#     ) + ["domain_state.tbl"],
+#     visibility = ["//runtime/caml/cross-compile:__pkg__"]
+# )
 
 alias(
     name = "hdrs",
@@ -28,51 +29,48 @@ alias(
 ## is platform-dependend, so if we want cross-compiling we need
 ## special handling, see below.
 cc_library(
-    name = "xhdrs",
-    hdrs = [
-        "domain_state.tbl",
-        # ## generated files:
-        ":opnames.h",
-        ":jumptbl.h",
-    ] + glob(["*.h"]),
+    name = "hdr_srcs",
+    # hdrs = [
+    #     "domain_state.tbl",
+    #     # ## generated files:
+    #     ":opnames.h",
+    #     ":jumptbl.h",
+    # ] + glob(["*.h"]),
+    hdrs = glob(
+        ["*.h"], exclude=["s.h", "opnames.h", "jumptbl.h"]
+    ) + ["domain_state.tbl"],
     include_prefix = "caml",
-    visibility = [
-        "//boot:__pkg__",
-        "//runtime:__pkg__",
-        "//otherlibs/systhreads:__pkg__",
-        "//otherlibs/unix:__pkg__",
-        "//yacc:__pkg__"
-    ],
+    visibility = ["//visibility:public"]
 )
 
-genrule(
-    outs = ["opnames.h"],
-    name = "opnames_h",
-    srcs = ["//runtime/caml:instruct.h"],
-    cmd  = " ".join([
-	    # tr is for windows only?
-        # 	tr -d '\r' < $< | \
-        "cat $(location //runtime/caml:instruct.h) | ",
-	    "sed -e '/\\/\\*/d' ",
-	    "-e '/^#/d'",
-	    "-e 's/enum /static char * names_of_/' ",
-	    "-e 's/{$$/[] = {/' ",
-	    "-e 's/\\([[:upper:]][[:upper:]_0-9]*\\)/\"\\1\"/g' > $@"
-    ]),
-    visibility = ["//runtime/caml/cross-compile:__pkg__"]
-)
+# genrule(
+#     outs = ["opnames.h"],
+#     name = "opnames_h",
+#     srcs = ["//runtime/caml:instruct.h"],
+#     cmd  = " ".join([
+# 	    # tr is for windows only?
+#         # 	tr -d '\r' < $< | \
+#         "cat $(location //runtime/caml:instruct.h) | ",
+# 	    "sed -e '/\\/\\*/d' ",
+# 	    "-e '/^#/d'",
+# 	    "-e 's/enum /static char * names_of_/' ",
+# 	    "-e 's/{$$/[] = {/' ",
+# 	    "-e 's/\\([[:upper:]][[:upper:]_0-9]*\\)/\"\\1\"/g' > $@"
+#     ]),
+#     visibility = ["//runtime/caml/cross-compile:__pkg__"]
+# )
 
-genrule(
-    name = "jumptbl_h",
-    outs = ["jumptbl.h"],
-    srcs = ["//runtime/caml:instruct.h"],
-    cmd  = " ".join([
-	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
-	    "sed -n -e '/^  /s/ \\([A-Z]\\)/ \\&\\&lbl_\\1/gp' ",
-	    "-e '/^}/q' > $@"
-    ]),
-    visibility = ["//runtime/caml/cross-compile:__pkg__"]
-)
+# genrule(
+#     name = "jumptbl_h",
+#     outs = ["jumptbl.h"],
+#     srcs = ["//runtime/caml:instruct.h"],
+#     cmd  = " ".join([
+# 	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
+# 	    "sed -n -e '/^  /s/ \\([A-Z]\\)/ \\&\\&lbl_\\1/gp' ",
+# 	    "-e '/^}/q' > $@"
+#     ]),
+#     visibility = ["//runtime/caml/cross-compile:__pkg__"]
+# )
 
 ### hack for cross-compiling. we cannot overwrite s.h by s.linux.h or
 ### s.macos.h, so we have to copy everything into another directory.

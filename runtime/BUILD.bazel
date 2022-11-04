@@ -245,6 +245,7 @@ filegroup(
             "instrtrace.c",
             "interp.c",
             "main.c",
+            "prims.c", ## in case make build write it to srcs
             "sak.c",
             "signals_nat.c",
             "startup_byt.c",
@@ -525,7 +526,7 @@ genrule(
 cc_binary( ##FIXME: move this to //runtime and use an alias here
     name = "ocamlrun",
     srcs = [
-        "//runtime:prims.c",
+        ":prims.c",
     ] + select({
         # add instrtrace if mode is debug on any platform, or
         # fastbuild on macos (where Bazel adds -DDEBUG)
@@ -536,8 +537,7 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
         "-x", "c",
         "-Iruntime",  # expose caml/*.h
         "-I$(GENDIR)/runtime", # build_config.h
-        ## for platform-dependend s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        "-I$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
         "$(OC_LDFLAGS)",

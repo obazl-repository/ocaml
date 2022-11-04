@@ -6,11 +6,16 @@ cc_library(
         "//runtime/caml:hdr_srcs",
         # "//runtime/caml:domain_state.tbl",
         # # ## generated files:
-        "//runtime/caml:opnames.h",
-        "//runtime/caml:jumptbl.h",
-        ":platform_s.h"
+        # "//runtime/caml:opnames.h",
+        ":opnames.h",
+        # "//runtime/caml:jumptbl.h",
+        ":jumptbl.h",
+        # ":platform_s.h"
+        ":s.h"
     ],
-    # strip_include_prefix = "",
+    data = ["//runtime/caml:hdr_srcs"],
+    deps = ["//runtime/caml:hdr_srcs"],
+    # strip_include_prefix = ".",
     # include_prefix = "caml",
     visibility = [
         "//boot:__pkg__",
@@ -30,4 +35,35 @@ genrule(
         # "//conditions:default": [],
     }),
     cmd  = "cp $(SRCS) $@"
+)
+
+genrule(
+    name = "jumptbl_h",
+    outs = ["jumptbl.h"],
+    srcs = ["//runtime/caml:instruct.h"],
+    cmd  = " ".join([
+	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
+	    "sed -n -e '/^  /s/ \\([A-Z]\\)/ \\&\\&lbl_\\1/gp' ",
+	    "-e '/^}/q'",
+        "> $@"
+    ]),
+    visibility = ["//runtime/caml/cross-compile:__pkg__"]
+)
+
+genrule(
+    outs = ["opnames.h"],
+    name = "opnames_h",
+    srcs = ["//runtime/caml:instruct.h"],
+    cmd  = " ".join([
+	    # tr is for windows only?
+        # 	tr -d '\r' < $< | \
+        "cat $(location //runtime/caml:instruct.h) | ",
+	    "sed -e '/\\/\\*/d' ",
+	    "-e '/^#/d'",
+	    "-e 's/enum /static char * names_of_/' ",
+	    "-e 's/{$$/[] = {/' ",
+	    "-e 's/\\([[:upper:]][[:upper:]_0-9]*\\)/\"\\1\"/g'",
+        "> $@"
+    ]),
+    visibility = ["//runtime/caml/cross-compile:__pkg__"]
 )
