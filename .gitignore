@@ -333,4 +333,4 @@ META
 ## Bazel
 bazel-*
 config/CONFIG.bzl
-toolchain/profiles/cc/local/BUILD.bazel
+toolchain/profile/cc/local/BUILD.bazel
