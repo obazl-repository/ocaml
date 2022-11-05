@@ -1,0 +1,30 @@
+package(default_visibility = ["//visibility:public"])
+
+load("//bzl:rules.bzl",
+     "bootstrap_archive",
+     "bootstrap_executable",
+     "bootstrap_module",
+     "boot_compiler"
+)
+
+boot_compiler(
+    name = "ocamlc",
+    # compile_target = "//platform/cpu:arm",  ## ??
+    exec_compatible_with = [
+        ## *>vm ???
+    ],
+    opts = [
+        "-nostdlib", "-compat-32",
+    ],
+    # primitives = PRIMITIVES,
+    main = "//driver:Main",
+    deps = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+        # "//boot/lib:stdlib"
+    ],
+    visibility = [
+        "//visibility:public"
+    ]
+)
+
