@@ -203,8 +203,8 @@ def _bootstrap_module(ctx):
 
     # print("TC: %s" % tc)
 
-    if tc.target_host in ["boot", "dev", "vm"]:
-        args.add(tc.compiler)
+    # if tc.target_host in ["boot", "dev", "vm"]:
+    #     args.add(tc.compiler)
     # args.add_all(tool_args)
 
     args.add_all(tc.copts)
@@ -379,11 +379,13 @@ def _bootstrap_module(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tool,
+        executable = tc.compiler[DefaultInfo].files_to_run,
+        # executable = tool,
         arguments = [args],
         inputs    = inputs_depset,
         outputs   = action_outputs,
-        tools = [tc.tool_runner, tc.compiler],
+        tools = [tc.compiler[DefaultInfo].files_to_run],
+        # tools = [tc.tool_runner, tc.compiler],
         # tools = [tool] + tool_args,
         mnemonic = "CompileBootstrapModule",
         progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(

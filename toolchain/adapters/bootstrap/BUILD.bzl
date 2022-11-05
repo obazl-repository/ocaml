@@ -35,7 +35,7 @@ def _bootstrap_toolchain_adapter_impl(ctx):
         std_exit               = ctx.attr.std_exit,
         camlheaders            = ctx.files.camlheaders,
         ## core tools
-        compiler               = ctx.file.compiler,
+        compiler               = ctx.attr.compiler,
         copts                  = copts,
         linkopts               = ctx.attr.linkopts,
         lexer                  = ctx.file.lexer,
@@ -161,7 +161,7 @@ bootstrap_toolchain_adapter = rule(
         "compiler": attr.label(
             ## providers constraints seem to be ignored
             # providers = [["OcamlArchiveMarker"]],
-            allow_single_file = True,
+            # allow_single_file = True,
             ## vm>* not executable
             ## sys>* executable
             # executable = True,

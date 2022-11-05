@@ -134,8 +134,8 @@ def _bootstrap_archive(ctx):
     #########################
     args = ctx.actions.args()
 
-    if tc.target_host:
-        args.add(tc.compiler)
+    # if tc.target_host:
+    #     args.add(tc.compiler)
     # args.add_all(tool_args)
 
     args.add_all(tc.linkopts)
@@ -381,11 +381,13 @@ def _bootstrap_archive(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tc.tool_runner,
+        executable = tc.compiler[DefaultInfo].files_to_run,
+        # executable = tc.tool_runner,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
-        tools = [tc.tool_runner, tc.compiler],
+        tools = [tc.compiler[DefaultInfo].files_to_run],
+        # tools = [tc.tool_runner, tc.compiler],
         # tools = [tool] + tool_args, # [tc.ocamlopt, tc.compiler],
         mnemonic = mnemonic,
         progress_message = "{mode} archiving {rule}: @{ws}//{pkg}:{tgt}".format(

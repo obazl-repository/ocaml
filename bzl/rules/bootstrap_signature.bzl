@@ -126,8 +126,8 @@ def _bootstrap_signature_impl(ctx):
     #########################
     args = ctx.actions.args()
 
-    if tc.target_host in ["boot", "dev", "vm"]:
-        args.add(tc.compiler)
+    # if tc.target_host in ["boot", "dev", "vm"]:
+    #     args.add(tc.compiler)
 
     args.add_all(tc.copts)
 
@@ -262,22 +262,32 @@ def _bootstrap_signature_impl(ctx):
 
     # print("bottomup_ns_inputs: %s" % bottomup_ns_inputs)
 
+    print("OCAMLC runfiles: %s" % tc.compiler[DefaultInfo].default_runfiles)
+    print("OCAMLC manifest: %s" % tc.compiler[DefaultInfo].files_to_run.runfiles_manifest)
+
     inputs_depset = depset(
         order = dsorder,
-        direct = direct_inputs, # + ctx.files._ns_resolver,
+        direct = direct_inputs # + ctx.files._ns_resolver,
+        + [tc.compiler[DefaultInfo].files_to_run.executable],
+
         # + ctx.files.data if ctx.files.data else [],
         transitive = indirect_inputs_depsets + ns_resolver_depset
         + bottomup_ns_inputs
+        + [tc.compiler[DefaultInfo].default_runfiles.files]
     )
 
     ################
     ctx.actions.run(
         # env = env,
-        executable = tool,
+        executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_cmi],
-        tools = [tc.tool_runner, tc.compiler],
+        tools = [
+            tc.compiler[DefaultInfo].default_runfiles.files,
+            tc.compiler[DefaultInfo].files_to_run
+        ],
+        # tools = [tc.tool_runner, tc.compiler],
         mnemonic = "CompileOcamlSignature",
         progress_message = "{mode} compiling bootstrap_signature: {ws}//{pkg}:{tgt}".format(
             mode = tc.build_host + ">" + tc.target_host,

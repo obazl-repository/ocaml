@@ -28,6 +28,18 @@ load("//config:CONFIG.bzl",
 alias(
     name   = "ocamlrun",
     actual = "//runtime:ocamlrun",
+sh_binary(
+    name = "ocamlc",
+    srcs = ["ocamlc.sh"],
+    data = [
+        "//boot:ocamlc",
+        "//runtime:ocamlrun"
+    ],
+    deps = ["@bazel_tools//tools/bash/runfiles"]
+)
+
+boot_ocamlc(
+    name   = "xocamlc"
 )
 
 alias(
