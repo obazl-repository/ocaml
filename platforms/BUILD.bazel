@@ -14,13 +14,28 @@ config_setting(name = "windows_x86_32?",
 # see //:xtarget for list of architectures
 
 constraint_setting(name = "platform")
-constraint_value(name = "sys?",   constraint_setting = ":platform")
-constraint_value(name = "vm?", constraint_setting = ":platform")
 
+constraint_value(name = "boot?",   constraint_setting = ":platform")
+platform(name = "boot",
+         parents = ["@local_config_platform//:host"],
+         constraint_values = [":boot?"])
+
+constraint_value(name = "baseline?",   constraint_setting = ":platform")
+platform(name = "baseline",
+         parents = ["@local_config_platform//:host"],
+         constraint_values = [":baseline?"])
+
+constraint_value(name = "dev?",   constraint_setting = ":platform")
+platform(name = "dev",
+         parents = ["@local_config_platform//:host"],
+         constraint_values = [":dev?"])
+
+constraint_value(name = "sys?",   constraint_setting = ":platform")
 platform(name = "sys",
          parents = ["@local_config_platform//:host"],
          constraint_values = [":sys?"])
 
+constraint_value(name = "vm?", constraint_setting = ":platform")
 platform(name = "vm",
          parents = ["@local_config_platform//:host"],
          constraint_values = [":vm?"])

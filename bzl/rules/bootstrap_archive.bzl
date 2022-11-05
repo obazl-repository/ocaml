@@ -25,20 +25,15 @@ def _bootstrap_archive(ctx):
 
     ## NB: impl_library also calls this, but we need it here too
     # (mode,
-    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
-
-    # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
-    # mode = "bytecode"
-    # if mode == "bytecode":
-    #     tool = tc.tool_runner
-    #     tool_args = [tc.compiler]
-    # # else:
-    # #     tool = tc.tool_runner.opt
-    # #     tool_args = []
-
-    # return impl_archive(ctx, mode, tc.linkmode, tool, tool_args)
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    if tc.target_host in ["boot", "dev", "vm"]:
+        tool = tc.tool_runner
+        ext = ".cma"
+    else:
+        tool = tc.compiler
+        ext = ".cmxa"
 
     debug = False # True
     # if ctx.label.name == "Bare_structs":
@@ -143,15 +138,17 @@ def _bootstrap_archive(ctx):
         args.add(tc.compiler)
     # args.add_all(tool_args)
 
+    args.add_all(tc.linkopts)
+
     for arg in ctx.attr.opts:
         if arg not in NEGATION_OPTS:
             args.add(arg)
 
-    primitives = []
-    if hasattr(ctx.attr, "primitives"):
-        if ctx.attr.primitives:
-            primitives.append(ctx.file.primitives)
-            args.add("-use-prims", ctx.file.primitives.path)
+    # primitives = []
+    # if hasattr(ctx.attr, "primitives"):
+    #     if ctx.attr.primitives:
+    #         primitives.append(ctx.file.primitives)
+    #         args.add("-use-prims", ctx.file.primitives.path)
 
     ## Submodules can be listed in ctx.files.submodules in any order,
     ## so we need to put them in correct order on the command line.
@@ -391,8 +388,8 @@ def _bootstrap_archive(ctx):
         tools = [tc.tool_runner, tc.compiler],
         # tools = [tool] + tool_args, # [tc.ocamlopt, tc.compiler],
         mnemonic = mnemonic,
-        progress_message = "{mode} compiling {rule}: @{ws}//{pkg}:{tgt}".format(
-            mode = "TEST", # "vm" if tc.target_host else "sys",
+        progress_message = "{mode} archiving {rule}: @{ws}//{pkg}:{tgt}".format(
+            mode = tc.build_host + ">" + tc.target_host,
             rule = ctx.attr._rule,
             ws  = ctx.label.workspace_name,
             pkg = ctx.label.package,

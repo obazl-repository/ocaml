@@ -268,7 +268,10 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Format",
     ],
-    visibility = ["//boot:__subpackages__"] # the new compiler
+    visibility = [
+        "//boot:__subpackages__",
+        "//dev:__subpackages__"
+    ]
 )
 
 bootstrap_module(

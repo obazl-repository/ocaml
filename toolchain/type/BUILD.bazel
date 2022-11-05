@@ -1,5 +1,43 @@
+## We need several toolchain types.
+
+## Bootstrap toolchain: a singleton toolchain, whose toolset is
+## exogenous: either C code (ocamlrun, ocamlyacc) or precompiled OCaml
+## code (ocamlc, ocamllex. Contains nothing that needs to be built
+## from OCaml code (avoiding self-dependence).
+
+## Baseline toolchains (for lack of a better term) include OCaml tools
+## and libs built using the bootstrap toolchain.
+
+# Different rules need different tools. For example, a rule for
+# linking executables needs std_exit.cmo, but compilation rules do
+# not. Rules targeting the VM need the "runtime" (tool runner); rules
+# targeting a native ISA do not. A rule capable of targeting either,
+# based on the build target, needs a toolchain that includes the
+# runtime.
+
+# To build a compiler, we need a bootstrap toolchain that does not
+# depend on anything that needs to be built by the compiler. We use it
+# to build the baseline compiler, and then we have another toolchain
+# that depends on the baseline compiler.
+
+# So why not one toolchain type per rule?
+
+## Bootstrap toolchain is singleton. What rules use it? Module and
+## archive rules to build the stdlib, and an executable rule to build
+## the baseline compiler. IOW the stdlib and ocamlc targets will
+## depend on the bootstrap toolchain. Then building something using
+## stdlib and the new ocamlc will depend on the baseline tc.
+
+## In particular, building the 2nd compiler will depend on the ocaml,
+## stdlib etc. built by the bootstrap tc. So it will depend on the
+## baseline toolchain, which uses those outputs of the bootstrap tc.
+
+## IOW building level N depends on the tc at N - 1, the previous
+## level.  Building the baseline depends on the bootstrap.
+
 toolchain_type(name = "bootstrap", visibility = ["//visibility:public"])
-toolchain_type(name = "local", visibility = ["//visibility:public"])
+
+toolchain_type(name = "baseline", visibility = ["//visibility:public"])
 
 toolchain_type(name = "ocaml_tc_profile",
                visibility = ["//visibility:public"])

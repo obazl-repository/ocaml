@@ -13,7 +13,7 @@ load("//bzl:providers.bzl",
 
 load(":impl_executable.bzl", "impl_executable")
 
-load("//bzl/transitions:identity.bzl", "identity_out_transition")
+# load("//bzl/transitions:identity.bzl", "identity_out_transition")
 
 load(":options.bzl",
      "options",
@@ -60,7 +60,7 @@ bootstrap_executable = rule(
             allow_single_file = True,
             providers = [[OcamlModuleMarker]],
             default = None,
-            cfg = identity_out_transition,
+            # cfg = identity_out_transition,
         ),
 
         deps = attr.label_list(
@@ -71,19 +71,19 @@ bootstrap_executable = rule(
                          [OcamlModuleMarker],
                          [OcamlNsMarker],
                          [CcInfo]],
-            cfg = identity_out_transition,
+            # cfg = identity_out_transition,
         ),
 
         _stdexit = attr.label(
             default = "//stdlib:Std_exit",
             allow_single_file = True,
-            cfg = identity_out_transition,
+            # cfg = identity_out_transition,
         ),
 
         _rule = attr.string( default = "bootstrap_executable" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
     executable = True,
     toolchains = ["//toolchain/type:bootstrap"],

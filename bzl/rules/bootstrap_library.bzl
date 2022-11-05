@@ -7,8 +7,8 @@ load("//bzl:providers.bzl",
 
 # load(":options.bzl", "options", "options_library")
 
-load("//bzl/transitions:manifest.bzl",
-     "manifest_out_transition")
+# load("//bzl/transitions:manifest.bzl",
+#      "manifest_out_transition")
 
 load(":impl_library.bzl", "impl_library")
 
@@ -107,7 +107,7 @@ Packages](../ug/collections.md).
             doc = "List of elements of library, which may be compiled modules, signatures, or other libraries.",
 
             ## will set ns config for packed modules if 'ns' not null
-            cfg = manifest_out_transition,
+            # cfg = manifest_out_transition,
 
             providers = [
                 # [OcamlArchiveProvider],
@@ -126,9 +126,9 @@ Packages](../ug/collections.md).
         ),
 
         _rule = attr.string( default = "bootstrap_library" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
     # provides = [OcamlLibraryMarker],
     executable = False,

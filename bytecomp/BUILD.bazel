@@ -6,7 +6,7 @@ load("//bzl:rules.bzl",
 )
 
 load("//config:CONFIG.bzl",
-     "RUNTIME_OCAMLRUN",
+     # "RUNTIME_OCAMLRUN",
      "OC_COMMON_CFLAGS",
      "PLATFORM_CFLAGS",
      "PRIMITIVES"
@@ -86,11 +86,11 @@ bootstrap_archive(
     #     "//bytecomp:ocamlbytecomp",
     # ],
     visibility = [
-        # "//visibility:public",
+        "//bin:__pkg__",  # the new compiler
         "//boot:__subpackages__",
+        "//dev:__subpackages__",
         "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
-        "//bin:__pkg__",  # the new compiler
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",
@@ -532,14 +532,29 @@ bootstrap_module(
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
 ## NEW_OCAMLRUN = //boot/bin:ocamlrun, we call it RUNTIME_OCAMLRUN
 ## make_opcodes is //tools:make_opcodes
+
+## macos make.log:
+# ../boot/ocamlrun ../boot/ocamllex -q make_opcodes.mll
+### Link make_opcodes program:
+# ../boot/ocamlrun ../boot/ocamlc -nostdlib -I ../boot -g -use-prims ../runtime/primitives -I .. make_opcodes.ml -o make_opcodes
+### Run make_opcodes pgm using "new" ocamlrun
+# ./runtime/ocamlrun tools/make_opcodes -opcodes < runtime/caml/instruct.h > bytecomp/opcodes.ml
+### Extract principal sig:
+# ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -i bytecomp/opcodes.ml > bytecomp/opcodes.mli
+### Compile both:
+# ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I bytecomp -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c bytecomp/opcodes.mli
+# ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I bytecomp -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c bytecomp/opcodes.ml
+
+## Run make_opcodes executable under "new" ocamlrun:
 genrule(
+    outs  = ["opcodes.ml"],
     name  = "opcodes_ml",
     srcs  = ["//runtime/caml:instruct.h", "//tools:make_opcodes"],
-    tools = [RUNTIME_OCAMLRUN], # or depend on toolchain?
-    outs  = ["opcodes.ml"],
+    tools = ["//boot/bin:ocamlrun"], #  FIXME
     cmd   = " ".join([
-        "$(execpath {NEW_OCAMLRUN})".format(
-            NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
+        # "$(execpath {NEW_OCAMLRUN})".format(
+        #     NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
+        "$(execpath //boot/bin:ocamlrun)",
         "$(location //tools:make_opcodes)",
         "-opcodes",
         "< $(location //runtime/caml:instruct.h)",

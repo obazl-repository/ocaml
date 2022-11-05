@@ -10,6 +10,13 @@ load("//bzl:providers.bzl",
 
 load(":impl_common.bzl", "tmpdir")
 
+## make.log:
+# ./boot/ocamlrun ./boot/ocamllex -q lex/lexer.mll
+# ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I lex -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c lex/lexer.mli
+# ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I lex -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c lex/lexer.ml
+
+# ./boot/ocamlrun ./ocamlopt -nostdlib -I ./stdlib -I otherlibs/dynlink  -o lex/ocamllex.opt lex/cset.cmx lex/syntax.cmx lex/parser.cmx lex/lexer.cmx lex/table.cmx lex/lexgen.cmx lex/compact.cmx lex/common.cmx lex/output.cmx lex/outputbis.cmx lex/main.cmx
+
 ########## RULE:  OCAML_INTERFACE  ################
 def _bootstrap_ocamllex_impl(ctx):
 
@@ -24,7 +31,13 @@ def _bootstrap_ocamllex_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
-    tool = tc.tool_runner
+    if tc.target_host in ["boot", "baseline", "vm"]:
+        tool = tc.tool_runner
+        ext = ".cmo"
+    else:
+        tool = tc.lexer
+        ext = ".cmx"
+
     tool_args = [tc.lexer]
 
     # env = {"PATH": get_sdkpath(ctx)}

@@ -4,61 +4,77 @@ package(default_visibility=["//visibility:public"])
 
 exports_files(glob(["*.bazel"]))
 
-##########
+###################
+toolchain_selector(
+    name           = "default",
+    toolchain = "//toolchain/adapters/bootstrap",
+)
+
+###################
 toolchain_selector(
     name           = "bootstrap",
-    toolchain = "//toolchain/adapters:bootstrap",
-    # build_host_constraints  = [
-    #     "//platforms/build:vm?"
-    # ],
-    # target_host_constraints  = [
-    #     "//platforms/target:vm?",
-    # ],
-    # toolchain_constraints = ["//runtime:bootstrap?"],
+    toolchain = "//toolchain/adapters/bootstrap",
+    build_host_constraints  = ["//platforms/build:boot?"],
+    target_host_constraints  = ["//platforms/target:boot?"],
+)
+
+toolchain_selector(
+    name           = "bootstrap_tool",
+    toolchain = "//toolchain/adapters/bootstrap",
+    build_host_constraints  = ["//platforms/build:boot?"],
+    target_host_constraints  = ["//platforms/build:boot?"],
+)
+
+###################
+toolchain_selector(
+    name           = "dev_tool",
+    toolchain = "//toolchain/adapters:dev_tool",
+    build_host_constraints  = ["//platforms/build:dev?"],
+    target_host_constraints  = ["//platforms/build:dev?"],
+)
+
+toolchain_selector(
+    name           = "dev",
+    toolchain = "//toolchain/adapters:dev",
+    build_host_constraints  = ["//platforms/build:dev?"],
+    target_host_constraints  = ["//platforms/target:dev?"],
 )
 
 ##########
 toolchain_selector(
-    name           = "local",
-    toolchain = "//toolchain/adapters:local",
-    # toolchain      = "@ocaml//toolchain/adapters/local:sysvm",
-    build_host_constraints  = [
-        # "@ocaml//platforms:vm?"
-        "@platforms//os:macos",
-    ],
-    target_host_constraints  = [
-        # "@ocaml//platforms:vm?"
-        "@platforms//os:macos",
-    ],
-    toolchain_constraints = ["//runtime:standard?"],
+    name           = "vmsys",
+    toolchain = "//toolchain/adapters:vmsys",
+    build_host_constraints  = ["//platforms:vm?"],
+    target_host_constraints  = ["//platforms:sys?"],
+    # toolchain_constraints = ["//runtime:standard?"],
 )
 
-##########
-toolchain_selector(
-    name           = "dbg",
-    toolchain = "//toolchain/adapters:debug",
-    build_host_constraints  = [
-        # "@ocaml//platforms:sys?"
-        "@platforms//os:macos"
-    ],
-    target_host_constraints  = [
-        # "@ocaml//platforms:sys?"
-        "@platforms//os:macos"
-    ],
-    toolchain_constraints = ["//runtime:debug?"],
-)
+# ##########
+# toolchain_selector(
+#     name           = "dbg",
+#     toolchain = "//toolchain/adapters:debug",
+#     build_host_constraints  = [
+#         # "@ocaml//platforms:sys?"
+#         "@platforms//os:macos"
+#     ],
+#     target_host_constraints  = [
+#         # "@ocaml//platforms:sys?"
+#         "@platforms//os:macos"
+#     ],
+#     toolchain_constraints = ["//runtime:debug?"],
+# )
 
-##########
-toolchain_selector(
-    name                    = "instrumented",
-    toolchain = "//toolchain/adapters:instrumented",
-    build_host_constraints  = [
-        # "@ocaml//platforms:sys?"
-        "@platforms//os:macos",
-    ],
-    target_host_constraints  = [
-        # "@ocaml//platforms:vm?"
-        "@platforms//os:macos",
-    ],
-    toolchain_constraints = ["//runtime:instrumented?"],
-)
+# ##########
+# toolchain_selector(
+#     name                    = "instrumented",
+#     toolchain = "//toolchain/adapters:instrumented",
+#     build_host_constraints  = [
+#         # "@ocaml//platforms:sys?"
+#         "@platforms//os:macos",
+#     ],
+#     target_host_constraints  = [
+#         # "@ocaml//platforms:vm?"
+#         "@platforms//os:macos",
+#     ],
+#     toolchain_constraints = ["//runtime:instrumented?"],
+# )

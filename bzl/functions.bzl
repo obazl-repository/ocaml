@@ -278,7 +278,7 @@ def get_module_name (ctx, src):
     # if ctx.label.name == "Stdlib":
     #     out_module = "stdlib"
 
-    return this_module, fs_prefix, out_module
+    return this_module, fs_prefix if fs_prefix else None, out_module
 
 #######################
 def get_fs_prefix(lbl_string):

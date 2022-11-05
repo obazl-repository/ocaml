@@ -15,14 +15,12 @@ def _bootstrap_ocamlyacc_impl(ctx):
       print("OCAML YACC TARGET: %s" % ctx.label.name)
 
   tc = ctx.toolchains["//toolchain/type:bootstrap"]
-  tool = tc.ocamlyacc
-
-  # env = {"PATH": get_sdkpath(ctx)}
+  print("yacc tc: %s" % tc.name)
 
   yaccer_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
   yacceri_fname = paths.replace_extension(ctx.file.src.basename, ".mli")
 
-  tmpdir = "_obazl_/"
+  # tmpdir = "_obazl_/"
 
   # yaccer = ctx.actions.declare_file(scope + yaccer_fname)
   # yacceri = ctx.actions.declare_file(scope + yacceri_fname)
@@ -32,14 +30,15 @@ def _bootstrap_ocamlyacc_impl(ctx):
   ctx.actions.run_shell(
       inputs  = [ctx.file.src],
       outputs = [yaccer], # yacceri],
-      tools   = [tool],
+      tools   = [tc.yacc],
       command = "\n".join([
           ## ocamlyacc is inflexible, it writes to cwd, that's it.
           ## so we copy source to output dir, cd here, and run ocamlyacc
-          "cp {src} {dest}".format(src = ctx.file.src.path, dest=yaccer.dirname),
+          # "echo 'output: {}';".format(yaccer.path),
+          "cp {src} {dest};".format(src = ctx.file.src.path, dest=yaccer.dirname),
           "cd {dest} && {tool} {src}".format(
               dest=yaccer.dirname,
-              tool = tc.ocamlyacc.basename,
+              tool = tc.yacc.basename,
               src=ctx.file.src.basename,
           ),
 

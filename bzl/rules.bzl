@@ -35,7 +35,7 @@ load("//bzl/rules:bootstrap_signature.bzl",
 load("//bzl/rules:bootstrap_test.bzl",
      _bootstrap_test = "bootstrap_test")
 
-load("//bzl/rules:ocamlc_boot.bzl", _ocamlc_boot = "ocamlc_boot")
+load("//bzl/rules:boot_compiler.bzl", _boot_compiler = "boot_compiler")
 load("//bzl/rules:ocamlc_fixpoint.bzl", _ocamlc_fixpoint = "ocamlc_fixpoint")
 # load("//bzl/rules:ocamlc_runtime.bzl", _ocamlc_runtime = "ocamlc_runtime")
 
@@ -54,6 +54,6 @@ bootstrap_repl   = _bootstrap_repl
 bootstrap_signature   = _bootstrap_signature
 bootstrap_test   = _bootstrap_test
 
-ocamlc_boot    = _ocamlc_boot
+boot_compiler    = _boot_compiler
 # ocamlc_runtime    = _ocamlc_runtime
 ocamlc_fixpoint    = _ocamlc_fixpoint

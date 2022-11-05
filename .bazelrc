@@ -1,7 +1,7 @@
 ## put this in ~/.bazelrc to enable for all bazel projects
 # build --incompatible_enable_cc_toolchain_resolution
 
-# build --toolchain_resolution_debug=.*
+build --toolchain_resolution_debug=.*
 # build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 
 #### alternate toolchain: pass tc and profile if needed
@@ -35,10 +35,33 @@
 ## put this in ~/.bazelrc to enable for all bazel projects
 # common --color=yes
 
+################################################################
 ## always stamp, it injects the absolute path of the workspace root
 # https://docs.bazel.build/versions/main/user-manual.html#flag--workspace_status_command
 build --stamp --workspace_status_command=$PWD/bzl/camlheader.sh
 
+################################################################
+## OCaml platforms: boot, vm, sys
+
+build:boot --host_platform=//platforms/build:boot
+build:boot --platforms=//platforms/target:boot
+
+build:dev --host_platform=//platforms/build:dev
+build:dev --platforms=//platforms/target:dev
+
+build:vmvm --host_platform=//platforms:vm
+build:vmvm --platforms=//platforms:vm
+
+build:sysvm --host_platform=//platforms:sys
+build:sysvm --platforms=//platforms:vm
+
+build:vmsys --host_platform=//platforms:vm
+build:vmsys --platforms=//platforms:sys
+
+build:syssys --host_platform=//platforms:sys
+build:syssys --platforms=//platforms:sys
+
+################################################################
 ## enable debug for ocamlrun:
 ## build --//config/debug:ocamlrun
 
@@ -48,21 +71,6 @@ build --stamp --workspace_status_command=$PWD/bzl/camlheader.sh
 # build:stage2 --//bzl/toolchain:ocamlc=//compilers/stage2:ocamlc
 # build:stage2 --//bzl:stage=1
 
-## toolchains
-
-# build:vm --platforms=@ocaml//platforms:vm
-
-# build:vmvm --host_platform=@ocaml//platforms:vm
-# build:vmvm --platforms=@ocaml//platforms:vm
-
-# build:sysvm --host_platform=@ocaml//platforms:sys
-# build:sysvm --platforms=@ocaml//platforms:vm
-
-# build:vmsys --host_platform=@ocaml//platforms:vm
-# build:vmsys --platforms=@ocaml//platforms:sys
-
-# build:syssys --host_platform=@ocaml//platforms:sys
-# build:syssys --platforms=@ocaml//platforms:sys
 
 try-import .config/dev.bazelrc
 try-import .config/user.bazelrc

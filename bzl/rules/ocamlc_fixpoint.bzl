@@ -13,9 +13,9 @@ load("//bzl:providers.bzl",
 
 load("//bzl:functions.bzl", "config_tc")
 
-load("//bzl/transitions:ocamlc_fixpoint.bzl",
-     "ocamlc_fixpoint_in_transition",
-     "ocamlc_fixpoint_out_transition")
+# load("//bzl/transitions:ocamlc_fixpoint.bzl",
+#      "ocamlc_fixpoint_in_transition",
+#      "ocamlc_fixpoint_out_transition")
 
 load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
 
@@ -366,7 +366,7 @@ ocamlc_fixpoint = rule(
         primitives = attr.label(
             default = "//runtime:primitives",
             allow_single_file = True,
-            cfg = ocamlc_fixpoint_out_transition,
+            # cfg = ocamlc_fixpoint_out_transition,
         ),
 
         _stage = attr.label(
@@ -402,7 +402,7 @@ ocamlc_fixpoint = rule(
         ),
         main = attr.label(
             doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
-            cfg = ocamlc_fixpoint_out_transition,
+            # cfg = ocamlc_fixpoint_out_transition,
             allow_single_file = True,
             providers = [[OcamlModuleMarker]],
             default = None,
@@ -417,7 +417,7 @@ ocamlc_fixpoint = rule(
         ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
-            cfg = ocamlc_fixpoint_out_transition,
+            # cfg = ocamlc_fixpoint_out_transition,
             providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
                          [OcamlLibraryMarker],
@@ -454,11 +454,11 @@ ocamlc_fixpoint = rule(
         # _debug           = attr.label(default = "@ocaml//debug"),
 
         # _rule = attr.string( default  = "ocaml_executable" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
-    cfg = ocamlc_fixpoint_in_transition,
+    # cfg = ocamlc_fixpoint_in_transition,
     executable = True,
     toolchains = ["//toolchain/type:bootstrap"],
 )

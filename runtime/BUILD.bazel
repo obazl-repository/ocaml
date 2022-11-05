@@ -152,11 +152,15 @@ cc_library(
     linkopts = ["$(OC_LDFLAGS)"],
     defines = RUNTIME_DEFINES + OC_NATIVE_DEFINES,
     deps = ["//runtime/caml:hdrs"],
-    visibility = ["//lib:__pkg__"],
     toolchains = ["//toolchain:profile"],
+    visibility = [
+        "//boot/lib:__pkg__",
+        "//dev/lib:__pkg__",
+        "//lib:__pkg__"
+    ],
 )
 
-# load("//bzl/transitions:ocamlc_boot.bzl",
+# load("//bzl/transitions:boot_compiler.bzl",
 #      "cc_in_transition",
 #      "cc_out_transition")
 

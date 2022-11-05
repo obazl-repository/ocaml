@@ -10,5 +10,5 @@ cc_toolchain_profile(
     name     = "local",
     CFLAGS   = OC_CFLAGS,
     CPPFLAGS = "@oc_cppflags@".split(" "),
-    LDFLAGS  = "@LDFLAGS@".split(" "),
+    LDFLAGS  = "@LDFLAGS@".split(" ") + "@oc_ldflags@".split(" ")
 )

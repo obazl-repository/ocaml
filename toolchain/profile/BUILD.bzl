@@ -6,10 +6,12 @@
 
 def _cc_build_profile_impl(ctx):
 
+    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     tcp = ctx.toolchains["//toolchain/type:cc_tc_profile"]
 
     return [
         platform_common.TemplateVariableInfo({
+            # "OC_COMPILER" : tc.compiler.path,  ## returns path?
             ## flags for cc rules
             "OC_CFLAGS"   : " ".join(tcp.CFLAGS),
             "OC_CPPFLAGS" : " ".join(tcp.CPPFLAGS),
@@ -30,7 +32,10 @@ cc_build_profile = rule(
     # },
     doc = "Exposes selected cc_toolchain_profile fields.",
     provides = [platform_common.TemplateVariableInfo],
-    toolchains = ["//toolchain/type:cc_tc_profile"]
+    toolchains = [
+        "//toolchain/type:cc_tc_profile",
+        # "//toolchain/type:bootstrap",
+    ]
 )
 
 #############################

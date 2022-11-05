@@ -34,9 +34,10 @@ bootstrap_archive(
         "//utils:ocamlcommon",
     ],
     visibility = [
-        "//boot:__subpackages__",
-        "//fixpoint:__pkg__",
         "//bin:__pkg__",  # the new compiler
+        "//boot:__subpackages__",
+        "//dev:__subpackages__",
+        "//fixpoint:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",

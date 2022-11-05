@@ -10,7 +10,7 @@ load("//config:CONFIG.bzl",
 # gcc -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common  -Wl,-no_compact_unwind  -o yacc/ocamlyacc yacc/closure.o yacc/error.o yacc/lalr.o yacc/lr0.o yacc/main.o yacc/mkpar.o yacc/output.o yacc/reader.o yacc/skeleton.o yacc/symtab.o yacc/verbose.o yacc/warshall.o
 
 cc_binary(
-    name = "yacc",
+    name = "ocamlyacc",
     srcs = [
         "closure.c", "error.c", "lalr.c", "lr0.c",
         "main.c", "mkpar.c", "output.c", "reader.c",
@@ -34,7 +34,7 @@ cc_binary(
     toolchains = ["//toolchain:profile"],
     visibility = [
         "//boot:__subpackages__",
-        "//toolchain/adapters:__pkg__"
+        "//toolchain/adapters:__subpackages__"
     ]
 )
 

@@ -1,6 +1,6 @@
-load("//bzl/transitions:misc.bzl",
-     "ocamlrun_in_transition",
-     "ocamlrun_out_transition")
+# load("//bzl/transitions:misc.bzl",
+#      "ocamlrun_in_transition",
+#      "ocamlrun_out_transition")
 
 load("//bzl/rules:impl_ccdeps.bzl", "dump_CcInfo")
 

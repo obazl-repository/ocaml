@@ -21,7 +21,7 @@ load("//bzl:functions.bzl",
      "normalize_module_label"
 )
 
-load(":options.bzl", "NEGATION_OPTS")
+load(":options.bzl", "get_options", "NEGATION_OPTS")
 
 load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
 
@@ -38,13 +38,13 @@ def _bootstrap_signature_impl(ctx):
     #     debug = True
 
     # (mode,
-    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    # (tc, tool, tool_args, scope, ext) = config_tc(ctx)
 
-    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
-    # if mode == "native":
-    #     exe = tc.ocamlopt.basename
-    # else:
-    #     exe = tc.compiler.basename
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    if tc.target_host in ["boot", "dev", "vm"]:
+        tool = tc.tool_runner
+    else:
+        tool = tc.compiler
 
     ## FIXME:
     ## if mode == bc, run 'ocamlrun boot/ocamlc',
@@ -83,6 +83,7 @@ def _bootstrap_signature_impl(ctx):
     #                                  sig_src,
     #                                  module_name + ".mli")
     # else:
+    scope = ""
     if from_name == module_name:
         if debug:
             print("not namespaced")
@@ -125,17 +126,23 @@ def _bootstrap_signature_impl(ctx):
     #########################
     args = ctx.actions.args()
 
-    args.add_all(tool_args)
+    if tc.target_host in ["boot", "dev", "vm"]:
+        args.add(tc.compiler)
 
-    for arg in ctx.attr.opts:
-        if arg not in NEGATION_OPTS:
-            args.add(arg)
+    args.add_all(tc.copts)
 
-    primitives = []
-    if hasattr(ctx.attr, "primitives"):
-        if ctx.attr.primitives:
-            primitives.append(ctx.file.primitives)
-            args.add("-use-prims", ctx.file.primitives.path)
+    _options = get_options(ctx.attr._rule, ctx)
+    args.add_all(_options)
+
+    # for arg in ctx.attr.opts:
+    #     if arg not in NEGATION_OPTS:
+    #         args.add(arg)
+
+    # primitives = []
+    # if hasattr(ctx.attr, "primitives"):
+    #     if ctx.attr.primitives:
+    #         primitives.append(ctx.file.primitives)
+    #         args.add("-use-prims", ctx.file.primitives.path)
 
     # if "-for-pack" in _options:
     #     for_pack = True
@@ -270,10 +277,10 @@ def _bootstrap_signature_impl(ctx):
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_cmi],
-        tools = [tool] + tool_args, # tc.tool_runner, tc.compiler],
+        tools = [tc.tool_runner, tc.compiler],
         mnemonic = "CompileOcamlSignature",
         progress_message = "{mode} compiling bootstrap_signature: {ws}//{pkg}:{tgt}".format(
-            mode = "TEST", # mode,
+            mode = tc.build_host + ">" + tc.target_host,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
             tgt=ctx.label.name

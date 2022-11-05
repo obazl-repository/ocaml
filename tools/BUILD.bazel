@@ -729,21 +729,22 @@ bootstrap_module(
 # $(make_opcodes): make_opcodes.ml
 # 	$(CAMLC) $< -o $@
 
-# ./boot/ocamlrun ../boot/ocamlc -nostdlib -I ../boot -g -use-prims ../runtime/primitives -I .. make_opcodes.ml -o make_opcodes
+## macos make.log:
+# ../boot/ocamlrun ../boot/ocamllex -q make_opcodes.mll
+### Link make_opcodes program:
+# ../boot/ocamlrun ../boot/ocamlc -nostdlib -I ../boot -g -use-prims ../runtime/primitives -I .. make_opcodes.ml -o make_opcodes
 
 bootstrap_executable(
     name = "make_opcodes",
     main = ":Make_opcodes",
     deps = ["//boot/lib:stdlib"],
-    # opts = ["-w", "-31"],
-    # data = ["//stdlib:header"],
     visibility = ["//bytecomp:__pkg__"]
 )
 
 bootstrap_module(
     name   = "Make_opcodes",
     struct = "make_opcodes.ml",
-    opts = ["-nostdlib"],
+    opts = ["-nostdlib", "-w", "-70"],
     primitives = PRIMITIVES,
     deps   = STDLIB + [
     ],

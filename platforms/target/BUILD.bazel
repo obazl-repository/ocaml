@@ -7,8 +7,18 @@ package(default_visibility = ["//visibility:public"])
 # see //:xtarget for list of architectures
 
 constraint_setting(name = "platform")
+constraint_value(name = "boot?",   constraint_setting = ":platform")
+constraint_value(name = "dev?",   constraint_setting = ":platform")
 constraint_value(name = "sys?",   constraint_setting = ":platform")
 constraint_value(name = "vm?", constraint_setting = ":platform")
+
+platform(name = "boot",
+         parents = ["@local_config_platform//:host"],
+         constraint_values = [":boot?"])
+
+platform(name = "dev",
+         parents = ["@local_config_platform//:host"],
+         constraint_values = [":dev?"])
 
 platform(name = "sys",
          parents = ["@local_config_platform//:host"],

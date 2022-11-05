@@ -1,4 +1,4 @@
-query --notool_deps
+# query --notool_deps
 query --noimplicit_deps
 
 common --override_repository=rules_ocaml=/Users/gar/obazl/rules_ocaml

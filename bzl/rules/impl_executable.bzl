@@ -68,14 +68,13 @@ def impl_executable(ctx):
     args = ctx.actions.args()
 
     args.add_all(tool_args)
-
     # if mode == "bytecode":
         ## FIXME: -custom only needed if linking with CC code?
         ## see section 20.1.3 at https://caml.inria.fr/pub/docs/manual-ocaml/intfc.html#s%3Ac-overview
         # args.add("-custom")
 
     _options = get_options(rule, ctx)
-    # print("OPTIONS: %s" % _options)
+    print("OPTIONS: %s" % _options)
     # do not uniquify options, it collapses all -I
     args.add_all(_options)
 
@@ -152,13 +151,13 @@ def impl_executable(ctx):
             if hasattr(main[OcamlProvider], "archive_manifests"):
                 manifest_list.append(main[OcamlProvider].archive_manifests)
 
-        direct_inputs_depsets.append(main[0][OcamlProvider].inputs)
-        direct_linkargs_depsets.append(main[0][OcamlProvider].linkargs)
-        direct_paths_depsets.append(main[0][OcamlProvider].paths)
+        direct_inputs_depsets.append(main[OcamlProvider].inputs)
+        direct_linkargs_depsets.append(main[OcamlProvider].linkargs)
+        direct_paths_depsets.append(main[OcamlProvider].paths)
 
-        direct_linkargs_depsets.append(main[0][DefaultInfo].files)
+        direct_linkargs_depsets.append(main[DefaultInfo].files)
 
-        paths_indirect.append(main[0][OcamlProvider].paths)
+        paths_indirect.append(main[OcamlProvider].paths)
 
         if CcInfo in main: # :
             # print("CcInfo main: %s" % main[0][CcInfo])
@@ -226,7 +225,7 @@ def impl_executable(ctx):
     ##FIXME: primitives go in runfiles?
     primitives = []
     if hasattr(ctx.attr, "primitives"):
-        ## rules: ocamlc_boot
+        ## rules: boot_compiler
         if ctx.attr.primitives:
             primitives.append(ctx.file.primitives)
             args.add("-use-prims", ctx.file.primitives.path)
@@ -267,8 +266,6 @@ def impl_executable(ctx):
 
     args.add("-o", out_exe)
 
-    print("tc.camlheaders: %s" % tc.camlheaders)
-
     inputs_depset = depset(
         direct = [] # [ctx.file._stdexit]
         + primitives
@@ -289,10 +286,12 @@ def impl_executable(ctx):
     elif ctx.attr._rule == "bootstrap_test":
         mnemonic = "CompileBootstrapTest"
 
-    elif ctx.attr._rule == "ocamlc_boot":
+    elif ctx.attr._rule == "boot_compiler":
         mnemonic = "CompileOcamlcBoot"
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
+
+    
 
     ################
     ctx.actions.run(
@@ -304,7 +303,7 @@ def impl_executable(ctx):
       tools = [tool] + tool_args,  # [tc.ocamlopt],
       mnemonic = mnemonic,
       progress_message = "{mode} linking {rule}: {ws}//{pkg}:{tgt}".format(
-          mode = "TEST", # mode,
+          mode = tc.build_host + ">" + tc.target_host,
           rule = ctx.attr._rule,
           ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
           pkg = ctx.label.package,
@@ -336,7 +335,7 @@ def impl_executable(ctx):
     #     exe_provider = PpxExecutableMarker(
     #         args = ctx.attr.args
     #     )
-    if ctx.attr._rule == "ocamlc_boot":
+    if ctx.attr._rule == "boot_compiler":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "bootstrap_executable":
         exe_provider = OcamlExecutableMarker()

@@ -4,7 +4,7 @@ load("//bzl:rules.bzl",
      "bootstrap_archive",
      "bootstrap_executable",
      "bootstrap_module",
-     "ocamlc_boot"
+     "boot_compiler"
 )
 
 #FIXME: clean these up!
@@ -27,31 +27,28 @@ load("//config:CONFIG.bzl",
 
 alias(
     name   = "ocamlrun",
-    actual = "//runtime:ocamlrun"
+    actual = "//runtime:ocamlrun",
 )
 
-ocamlc_boot( ##FIXME: do we really need a separate rule?
-# compiler(
-    name = "ocamlc",
-    # compile_target = "//platform/cpu:arm",  ## ??
-    exec_compatible_with = [
-        ## *>vm ???
-    ],
-    opts = [
-        "-nostdlib", "-compat-32",
-    ],
-    # primitives = PRIMITIVES,
-    main = "//driver:Main",
-    deps = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
-        # "//boot/lib:stdlib"
-    ],
-    visibility = [
-        "//compilers/stage2:__pkg__",
-        "//testsuite:__pkg__"
-    ]
+alias(
+    name   = "ocamlc",
+    actual = "//boot:ocamlc",
+    # target_compatible_with = ["//platforms/target:boot?"]
 )
+
+
+alias(
+    name   = "ocamllex",
+    actual = "//boot:ocamllex",
+    # target_compatible_with = ["//platforms/target:boot?"]
+)
+
+alias(
+    name   = "ocamlyacc",
+    actual = "//yacc:ocamlyacc",
+    target_compatible_with = ["//platforms/target:boot?"]
+)
+
 
 # tool type sys>vm?
 # The bytecode compiler compiled with the native-code compiler
@@ -95,6 +92,7 @@ bootstrap_executable(
         "//driver:Optmain"
     ],
     visibility = [
+        "//toolchain/adapters:__pkg__",
         "//testsuite:__pkg__"
     ]
 )
@@ -118,9 +116,4 @@ bootstrap_executable(
     visibility = [
         "//testsuite:__pkg__"
     ]
-)
-
-alias(
-    name = "ocamlyacc",
-    actual = "//yacc:ocamlyacc"
 )

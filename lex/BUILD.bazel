@@ -7,6 +7,25 @@ load("//bzl:rules.bzl",
      "bootstrap_library",
 )
 
+load("//config:CONFIG.bzl",
+     "OC_COMMON_CFLAGS",
+     "PLATFORM_CFLAGS",
+     # "ROOT_MODULE_OPTS",
+     # "ROOT_SIG_OPTS"
+     )
+
+MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+    "-nostdlib"
+]
+
+SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+    "-nostdlib"
+]
+# MODULE_OPTS = ROOT_MODULE_OPTS
+# SIG_OPTS = ROOT_SIG_OPTS
+
+STDLIB = ["//boot/lib:stdlib"]
+
 ## Makefile.common
 # Lexer generation
 # BOOT_OCAMLLEX ?= $(OCAMLRUN) $(ROOTDIR)/boot/ocamllex
@@ -27,13 +46,6 @@ load("//bzl:rules.bzl",
 ## BOOT_OCAMLLEX = //boot/ocamllex is the default for this dir
 # We implement it in the toolchain used by bootstrap_ocamllex
 
-
-load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
-
-MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS = ROOT_SIG_OPTS
-
-STDLIB = ["//boot/lib:stdlib"]
 
 # ../boot/ocamlrun ../boot/ocamlc -strict-sequence -nostdlib -I ../boot -use-prims ../runtime/primitives  -compat-32 -o ocamllex cset.cmo syntax.cmo parser.cmo lexer.cmo table.cmo lexgen.cmo compact.cmo common.cmo output.cmo outputbis.cmo main.cmo
 

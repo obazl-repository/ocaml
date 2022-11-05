@@ -4,7 +4,7 @@ load("//bzl:rules.bzl",
      "bootstrap_archive",
      "bootstrap_executable",
      "bootstrap_module",
-     "ocamlc_boot"
+     "boot_compiler"
 )
 
 #FIXME: clean these up!
@@ -12,7 +12,8 @@ load("//config:CONFIG.bzl",
      "ARCH", "MODEL", "SYSTEM",
      "HOST", "ROOTDIR", "LIBDIR",
      # flags
-     "OC_CFLAGS", "CFLAGS",
+     # "OC_CFLAGS",
+     "CFLAGS",
      "OC_CPPFLAGS", "CPPFLAGS",
      "OC_LDFLAGS", "LDFLAGS",
      # defines - replace by CC_DEFINES with selects
@@ -41,7 +42,7 @@ alias(
     actual = "//boot:ocamllex"
 )
 
-# ocamlc_boot( ##FIXME: do we really need a separate rule?
+# boot_compiler( ##FIXME: do we really need a separate rule?
 # # compiler(
 #     name = "ocamlc",
 #     # compile_target = "//platform/cpu:arm",  ## ??
