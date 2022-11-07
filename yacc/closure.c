@@ -28,9 +28,7 @@ static unsigned *EFF;
 
 void print_EFF (void);
 void print_first_derives (void);
-#ifdef        DEBUG
 void print_closure (int n);
-#endif
 
 void set_EFF(void)
 {

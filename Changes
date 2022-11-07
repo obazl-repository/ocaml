@@ -18,6 +18,9 @@ Working version
 
 ### Runtime system:
 
+- #11691, #11706: use __asm__ instead of asm for strict ISO C conformance
+  (Xavier Leroy, report by Gregg Reynolds , review by Sadiq Jaffer)
+
 ### Code generation and optimizations:
 
 - #8998, #11321, #11430: change mangling of OCaml long identifiers
@@ -35,6 +38,14 @@ Working version
 
 - #11102: Speed up register allocation by permanently spilling registers
   (Stephen Dolan, review by Xavier Leroy)
+
+- #11418: RISC-V multicore support.
+  (Nicolás Ojeda Bär, review by KC Sivaramakrishnan)
+
+- #11686: Better spilling heuristic for the Linear Scan allocator for more
+  efficient stack usage.
+  (Nicolás Ojeda Bär, Gabriel Scherer, Alain Frisch, review by Gabriel Scherer,
+  Alain Frisch and Nathanaëlle Courant)
 
 ### Standard library:
 
@@ -134,6 +145,9 @@ Working version
   modules with mismatching -for-pack
   (Pierre Chambart and Vincent Laviron, review by Mark Shinwell)
 
+- #11653: Add the -no-absname option to ocamlc, ocamlopt and ocamldep.
+  (Abiola Abdulsalam, review by Sébastien Hinderer and Florian Angeletti)
+
 ### Internal/compiler-libs changes:
 - #11027: Separate typing counter-examples from type_pat into retype_pat;
   type_pat is no longer in CPS.
@@ -181,6 +195,10 @@ Working version
 - #11643: Add missing test declaration to float_compare test, so that it will
   run.
   (Stefan Muenzel, review by David Allsopp)
+
+- #11630: Use correct location when reporting record labels with non-existent
+  paths.
+  (Nicolás Ojeda Bär, report by Jason Gross, review by Gabriel Scherer)
 
 OCaml 5.0
 ---------
@@ -342,6 +360,11 @@ OCaml 5.0
 
 - #11652: Fix benign off-by-one error in Windows implementation of caml_mem_map.
   (David Allsopp, review by Gabriel Scherer)
+
+- #11669, #11704: Fix construction of Effect.Unhandled exceptions in the
+  bytecode interpreter.
+  (David Allsopp and Xavier Leroy, report by Samuel Hym, review by Xavier Leroy
+  and Gabriel Scherer)
 
 ### Code generation and optimizations:
 
@@ -556,14 +579,14 @@ OCaml 5.0
   (Christopher Zimmermann, review by Anil Madhavapeddy)
 
 - #11126: Build system: make it possible to choose which ocamldep
-  (and flags) to use when computing depencies for the compiler.
+  (and flags) to use when computing dependencies for the compiler.
   Add a -no-slash option to ocamldep to let users override -slash.
   (Sébastien Hinderer, review by David Allsopp)
 
 - #11147: Factorize the stdlib-related compilation flags. Make it
   possible to control them consistently through the STDLIBFLAGS
   build variable. Make sure ocamldoc and ocamllex get compiled and
-  linked with debugging informations (-g).
+  linked with debugging information (-g).
   (Sébastien Hinderer, review by Gabriel Scherer)
 
 - #11149: Make the bootstrap process reproducible on systems with non-big-endian
@@ -857,6 +880,9 @@ OCaml 4.14.0 (28 March 2022)
 
 - #10786: The implementation of Complex.norm now uses Float.hypot.
   (Christophe Troestler, review by David Allsopp and Xavier Leroy)
+
+- #10464: Add List.is_empty.
+  (Craig Ferguson, review by David Allsopp)
 
 ### Other libraries:
 
