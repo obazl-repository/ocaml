@@ -7,10 +7,13 @@ load("//bzl:providers.bzl",
      "OcamlImportMarker",
      "OcamlLibraryMarker",
      "OcamlNsResolverProvider",
-     "OcamlModuleMarker",
+     # "OcamlModuleMarker",
      "OcamlNsMarker",
-     "OcamlProvider",
-     "OcamlSignatureProvider")
+     "OcamlSignatureProvider",
+
+     "BootInfo",
+     "ModuleInfo"
+     )
 
      # "PpxExecutableMarker")
 
@@ -72,109 +75,6 @@ def options(ws):
         #     default = Label("@ocaml//:sdkpath") # ppx also uses this
         # ),
     )
-
-#######################
-def options_executable(ws):
-
-    ws = "@" + ws
-
-    attrs = dict(
-
-        # _toolchain = attr.label(
-        #     default = "//bzl/toolchain:tc"
-        # ),
-
-        # ocamlc = attr.label(
-        #     allow_single_file = True,
-        #     default = "//bzl/toolchain:ocamlc"
-        # ),
-
-        # _camlheaders = attr.label_list(
-        #     allow_files = True,
-        #     default = [
-        #         "//stdlib:camlheader", "//stdlib:target_camlheader",
-        #         "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
-        #         "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
-        #     ]
-        # ),
-
-        # _boot       = attr.label(
-        #     default = "//bzl/toolchain:boot",
-        # ),
-
-        opts             = attr.string_list(
-            doc          = "List of OCaml options. Will override configurable default options."
-        ),
-
-        use_prims = attr.label(
-            doc = "Undocumented flag, heavily used in bootstrapping",
-            allow_single_file = True
-        ),
-
-        # _mode       = attr.label(
-        #     default = "//bzl/toolchain",
-        # ),
-
-        # mode       = attr.string(
-        #     doc     = "Overrides mode build setting.",
-        # ),
-
-        exe  = attr.string(
-            doc = "By default, executable name is derived from 'name' attribute; use this to override."
-        ),
-
-        data = attr.label_list(
-            allow_files = True,
-            doc = "Runtime dependencies: list of labels of data files needed by this executable at runtime."
-        ),
-        strip_data_prefixes = attr.bool(
-            doc = "Symlink each data file to the basename part in the runfiles root directory. E.g. test/foo.data -> foo.data.",
-            default = False
-        ),
-        deps = attr.label_list(
-            doc = "List of OCaml dependencies.",
-            # cfg = ocamlc_out_transition,
-            providers = [[OcamlArchiveProvider],
-                         [OcamlImportMarker],
-                         [OcamlLibraryMarker],
-                         [OcamlModuleMarker],
-                         [OcamlNsMarker],
-                         [CcInfo]],
-        ),
-
-        # _stdexit = attr.label(
-        #     # cfg = ocamlc_out_transition,
-        #     default = "//stdlib:Std_exit",
-        #     allow_single_file = True
-        # ),
-
-        ## FIXME: add cc_linkopts?
-        cc_deps = attr.label_keyed_string_dict(
-            doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
-            """,
-            ## FIXME: cc libs could come from LSPs that do not support CcInfo, e.g. rules_rust
-            # providers = [[CcInfo]]
-        ),
-
-        cc_linkall = attr.label_list(
-            ## equivalent to cc_library's "alwayslink"
-            doc     = "True: use `-whole-archive` (GCC toolchain) or `-force_load` (Clang toolchain). Deps in this attribute must also be listed in cc_deps.",
-            # providers = [CcInfo],
-        ),
-        cc_linkopts = attr.string_list(
-            doc = "List of C/C++ link options. E.g. `[\"-lstd++\"]`.",
-
-        ),
-
-        # _debug           = attr.label(default = "@ocaml//debug"),
-
-        _rule = attr.string( default  = "ocaml_executable" ),
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
-    )
-
-    return attrs
 
 #######################
 def options_module(ws):
@@ -276,7 +176,7 @@ def options_module(ws):
 def options_ns_archive(ws):
 
     _submod_providers   = [
-        [OcamlModuleMarker],
+        [ModuleInfo], # [OcamlModuleMarker],
         [OcamlNsMarker],
         [OcamlSignatureProvider]
     ]
@@ -364,14 +264,14 @@ def options_ns_library(ws):
         submodules = attr.label_list(
             doc = "List of namespaced submodules; will be renamed by prefixing the namespace,",
             allow_files = [".cmo", ".cmx", ".cmi"],
-            providers   = [[OcamlModuleMarker], [OcamlNsMarker]],
+            providers   = [[ModuleInfo], [OcamlNsMarker]],
             # cfg = ocaml_nslib_submodules_out_transition
         ),
 
         deps = attr.label_list(
             doc = "Non-namespaced deps of ns. Will not be renamed.",
             allow_files = [".cmo", ".cmx", ".cmi"],
-            providers   = [OcamlModuleMarker],
+            providers   = [ModuleInfo],
             # cfg = ocaml_nslib_submodules_out_transition
         ),
 
@@ -500,7 +400,7 @@ def options_ns_resolver(ws):
 #         deps = attr.label_list(
 #             doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",
 #             providers = [
-#                 [OcamlProvider],
+#                 [BootInfo],
 #                 [OcamlArchiveProvider],
 #                 [OcamlImportMarker],
 #                 [OcamlLibraryMarker],

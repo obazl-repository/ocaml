@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
-     "bootstrap_library",
-     "bootstrap_module",
-     "bootstrap_signature",
+     "boot_library",
+     "boot_module",
+     "boot_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -16,7 +16,7 @@ SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 STDLIB = ["//boot/lib:stdlib"]
 
-bootstrap_library(
+boot_library(
     name = "closure",
     manifest  = [
         ":Closure",
@@ -24,7 +24,7 @@ bootstrap_library(
     ],
 )
 
-bootstrap_module(
+boot_module(
     name   = "Closure",
     struct = "closure.ml",
     sig    = "Closure_cmi",
@@ -64,7 +64,7 @@ bootstrap_module(
     visibility = ["//middle_end:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Closure_cmi",
     src  = "closure.mli",
     opts = SIG_OPTS,
@@ -74,7 +74,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Closure_middle_end",
     struct = "closure_middle_end.ml",
     sig    = "Closure_middle_end_cmi",
@@ -97,7 +97,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Closure_middle_end_cmi",
     src  = "closure_middle_end.mli",
     opts = SIG_OPTS,

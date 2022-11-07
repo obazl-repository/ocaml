@@ -1,20 +1,20 @@
 exports_files(["dynlink.ml"])
 
 # load("//bzl:rules.bzl",
-#      "bootstrap_library",
-#      "bootstrap_module",
+#      "boot_library",
+#      "boot_module",
 # )
 
 # MODULE_OPTS = ["-nostdlib"]
 
-# bootstrap_library(
+# boot_library(
 #     name = "otherlibs_dynlink_byte_lib",
 #     modules  = [
 #         ":Dynlink",
 #     ],
 # )
 
-# bootstrap_module(
+# boot_module(
 #     name   = "Dynlink",
 #     struct = "dynlink.ml",
 #     opts = MODULE_OPTS,

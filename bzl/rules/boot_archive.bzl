@@ -2,15 +2,16 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl:providers.bzl",
-     "OcamlProvider",
+     "BootInfo",
+     "ModuleInfo",
+     "DepsAggregator",
+     "new_deps_aggregator",
+
      "OcamlArchiveProvider",
      "OcamlImportMarker",
      "OcamlLibraryMarker",
-     "OcamlModuleMarker",
      "OcamlNsMarker",
      "OcamlSignatureMarker")
-
-load("//bzl:functions.bzl", "config_tc")
 
 load(":options.bzl", "options")
 
@@ -20,12 +21,47 @@ load(":impl_common.bzl", "tmpdir", "dsorder")
 
 load(":options.bzl", "NEGATION_OPTS")
 
-###############################
-def _bootstrap_archive(ctx):
+load(":DEPS.bzl",
+     "aggregate_deps",
+     "merge_depsets",
+     "COMPILE", "LINK", "COMPILE_LINK")
 
-    ## NB: impl_library also calls this, but we need it here too
-    # (mode,
-    # (tc, tool, tool_args, scope, ext) = config_tc(ctx)
+################################################################
+def _manifest_out_transition_impl(settings, attr):
+    # print("manifest_out_transition")
+
+    # print("settings: %s" % settings)
+
+    # for d in dir(attr):
+    #     print("attr: %s" % d)
+
+    # for m in attr.manifest:
+    #     print("item: %s" % m)
+
+    # if settings["//platforms/xtarget"] == "sys":
+
+    # print("//bzl/toolchain:ocamlc: %s" %
+    #       settings["//bzl/toolchain:ocamlc"])
+
+    manifest = [str(f.package) + "/" + str(f.name) for f in attr.manifest]
+    manifest.append(attr.name)
+
+    return {
+            "//config:manifest": manifest
+    }
+
+manifest_out_transition = transition(
+    implementation = _manifest_out_transition_impl,
+    inputs = [
+        "//config:manifest"
+    ],
+    outputs = [
+        "//config:manifest"
+    ]
+)
+
+###############################
+def _impl_boot_archive(ctx):
 
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
     if tc.target_host in ["boot", "dev", "vm"]:
@@ -41,50 +77,112 @@ def _bootstrap_archive(ctx):
 
     # env = {"PATH": get_sdkpath(ctx)}
 
+    ################################################################
+    ################  OUTPUTS: out_archive  ################
+    ## same for plain and ns archives
+    if ctx.attr._rule.startswith("ocaml_ns"):
+        if ctx.attr.ns:
+            archive_name = ctx.attr.ns ## normalize_module_name(ctx.attr.ns)
+        else:
+            archive_name = ctx.label.name ## normalize_module_name(ctx.label.name)
+    else:
+        archive_name = ctx.label.name ## normalize_module_name(ctx.label.name)
+
+    if debug:
+        print("archive_name: %s" % archive_name)
+
+    action_outputs = []
+
+    archive_filename = archive_name + ext
+    out_archive = ctx.actions.declare_file(tmpdir + archive_filename)
+    # paths_direct.append(archive_file.dirname)
+    action_outputs.append(out_archive)
+
+    if not tc.target_host:
+        archive_a_filename = archive_name + ".a"
+        archive_a_file = ctx.actions.declare_file(tmpdir + archive_a_filename)
+        # paths_direct.append(archive_a_file.dirname)
+        action_outputs.append(archive_a_file)
+
+    ################################################################
+    ################  DEPS  ################
+    depsets = new_deps_aggregator()
+
+    manifest = []
+    for dep in ctx.attr.manifest:
+        manifest.append(dep[DefaultInfo].files)
+
+    for dep in ctx.attr.manifest:
+        depsets = aggregate_deps(ctx, dep, depsets, manifest)
+
+    sigs_depset = depset(
+        order=dsorder,
+        transitive = [merge_depsets(depsets, "sigs")])
+
+    cli_link_deps_depset = depset(
+        order = dsorder,
+        direct = [out_archive],
+        transitive = [merge_depsets(depsets, "cli_link_deps")]
+    )
+
+    afiles_depset  = depset(
+        order=dsorder,
+        transitive = [merge_depsets(depsets, "afiles")]
+    )
+
+    archived_cmx_depset = depset(
+        order=dsorder,
+        transitive = [merge_depsets(depsets, "archived_cmx")]
+    )
+
+    paths_depset  = depset(
+        order = dsorder,
+        direct = [out_archive.dirname],
+        transitive = [merge_depsets(depsets, "paths")]
+    )
+
     ###   CALL THE LIB IMPLEMENTATION
-    lib_providers = impl_library(ctx) #, mode, tool) # , tool_args)
+    # lib_providers = impl_library(ctx) #, mode, tool) # , tool_args)
     # FIXME: improve the return vals handling
 
-    libDefaultInfo = lib_providers[0]
+    # libDefaultInfo = lib_providers[0]
     # print("libDefaultInfo: %s" % libDefaultInfo.files.to_list())
 
-    outputGroupInfo = lib_providers[1]
+    # outputGroupInfo = lib_providers[1]
 
-    libOcamlProvider = lib_providers[2]
-    # print("libOcamlProvider.inputs type: %s" % type(libOcamlProvider.inputs))
-    # print("libOcamlProvider.linkargs: %s" % libOcamlProvider.linkargs)
-    # print("libOcamlProvider.paths type: %s" % type(libOcamlProvider.paths))
-    # print("libOcamlProvider.ns_resolver: %s" % libOcamlProvider.ns_resolver)
+    # libBootInfo = lib_providers[1]
+    # print("libBootInfo.inputs type: %s" % type(libBootInfo.inputs))
+    # print("libBootInfo.linkargs: %s" % libBootInfo.linkargs)
+    # print("libBootInfo.paths type: %s" % type(libBootInfo.paths))
+    # print("libBootInfo.ns_resolver: %s" % libBootInfo.ns_resolver)
 
     # ppxAdjunctsProvider = lib_providers[2] ## FIXME: only as needed
 
-    _ = lib_providers[3] # OcamlLibraryMarker
+    # _ = lib_providers[2] # OcamlLibraryMarker
 
     # if ctx.attr._rule.startswith("ocaml_ns"):
     #     nsMarker = lib_providers[5]  # OcamlNsMarker
     #     ccInfo  = lib_providers[6] if len(lib_providers) == 7 else False
     # else:
-    ccInfo  = lib_providers[4] if len(lib_providers) == 6 else False
+    # ccInfo  = lib_providers[4] if len(lib_providers) == 6 else False
 
     # if ctx.label.name == "tezos-legacy-store":
     #     print("LEGACY CC: %s" % ccInfo)
         # dump_ccdep(ctx, dep)
 
     ################################
-    if libOcamlProvider.ns_resolver == None:
-        print("NO NSRESOLVER FROM NSLIB")
-        fail("NO NSRESOLVER FROM NSLIB")
-    else:
-        ns_resolver = libOcamlProvider.ns_resolver
-        if debug:
-            print("ARCH GOT NSRESOLVER FROM NSLIB")
-            for f in libOcamlProvider.ns_resolver: # .files.to_list():
-                print("nsrsolver: %s" % f)
+    # if libBootInfo.ns_resolver == None:
+    #     print("NO NSRESOLVER FROM NSLIB")
+    #     fail("NO NSRESOLVER FROM NSLIB")
+    # else:
+    #     ns_resolver = libBootInfo.ns_resolver
+    #     if debug:
+    #         print("ARCH GOT NSRESOLVER FROM NSLIB")
+    #         for f in libBootInfo.ns_resolver: # .files.to_list():
+    #             print("nsrsolver: %s" % f)
 
-    paths_direct = []
-    paths_indirect = libOcamlProvider.paths
-
-    action_outputs = []
+    # paths_direct = []
+    # paths_indirect = libBootInfo.paths
 
     # _options = get_options(ctx.attr._rule, ctx)
 
@@ -103,36 +201,19 @@ def _bootstrap_archive(ctx):
     else:
         ext = ".cmxa"
 
-    #### declare output files ####
-    ## same for plain and ns archives
-    if ctx.attr._rule.startswith("ocaml_ns"):
-        if ctx.attr.ns:
-            archive_name = ctx.attr.ns ## normalize_module_name(ctx.attr.ns)
-        else:
-            archive_name = ctx.label.name ## normalize_module_name(ctx.label.name)
-    else:
-        archive_name = ctx.label.name ## normalize_module_name(ctx.label.name)
-
-    if debug:
-        print("archive_name: %s" % archive_name)
-
-    # stage = ctx.attr._stage[BuildSettingInfo].value
-    # scope     = "__stage{stage}/".format(stage = stage)
-    scope = ""
-
-    archive_filename = tmpdir + archive_name + ext
-    archive_file = ctx.actions.declare_file(scope + archive_filename)
-    paths_direct.append(archive_file.dirname)
-    action_outputs.append(archive_file)
-
-    if not tc.target_host:
-        archive_a_filename = tmpdir + archive_name + ".a"
-        archive_a_file = ctx.actions.declare_file(scope + archive_a_filename)
-        paths_direct.append(archive_a_file.dirname)
-        action_outputs.append(archive_a_file)
-
     #########################
     args = ctx.actions.args()
+
+    if tc.target_host in ["boot", "vm"]:
+        # if stage == bootstrap:
+        args.add_all(["-use-prims", tc.primitives])
+
+    args.add("-o", out_archive)
+
+    args.add("-a")
+
+    ## examples from mac make log:
+    ## ocamlbytecomp.cma, ocamloptcomp.cma:  -nostdlib, -use-prims
 
     # if tc.target_host:
     #     args.add(tc.compiler)
@@ -156,10 +237,10 @@ def _bootstrap_archive(ctx):
     ## impl_ns_library; the result contains the files of
     ## ctx.files.submodules in the correct order.
     ## submod[DefaultInfo].files won't work, it contains only one
-    ## module OcamlProvider. linkargs contains the deptree we need,
+    ## module BootInfo. linkargs contains the deptree we need,
     ## but it may contain additional modules, so we need to filter.
 
-    submod_arglist = [] # direct deps
+    # submod_arglist = [] # direct deps
 
     ## ns_archives have submodules, plain archives have modules
     manifest = ctx.files.manifest
@@ -167,10 +248,10 @@ def _bootstrap_archive(ctx):
 
     ## solve double-link problem:
 
-    if OcamlProvider in ns_resolver:
-        ns_resolver_files = ns_resolver[OcamlProvider].inputs.to_list()
-    else:
-        ns_resolver_files = []
+    # if BootInfo in ns_resolver:
+    #     ns_resolver_files = ns_resolver[BootInfo].inputs.to_list()
+    # else:
+    #     ns_resolver_files = []
     # print("ns_resolver_files: %s" % ns_resolver_files)
 
     # print("manifest: %s" % manifest)
@@ -206,30 +287,30 @@ def _bootstrap_archive(ctx):
     # cmd for building archive;
     # the latter excludes them (since they are in the archive)
     # NB also: ns_resolver only present if lib is ns
-    # for dep in libOcamlProvider.linkargs.to_list():
+    # for dep in libBootInfo.linkargs.to_list():
     ## libDefaultInfo is the DefaultInfo provider of the underlying lib
-    for dep in libDefaultInfo.files.to_list():
-        # print("linkarg: %s" % dep)
-        if dep in manifest: # add direct deps to cmd line...
-            submod_arglist.append(dep)
-        # elif ctx.attr._rule.startswith("ocaml_ns"):
-        #     if dep in ns_resolver_files:
-        #         submod_arglist.append(dep)
-        #     else: # should not happen!
-        #         ## nslib linkargs should only contain what's needed to
-        #         ## link and executable or build and archive.
-        #         # linkargs_list.append(dep)
-        #         fail("ns lib contains extra linkarg: %s" % dep)
-        else:
-            # linkargs should match direct deps list?
-            fail("lib contains extra linkarg: %s" % dep)
-            # submod_arglist.append(dep)
+    # for dep in libDefaultInfo.files.to_list():
+    #     # print("linkarg: %s" % dep)
+    #     if dep in manifest: # add direct deps to cmd line...
+    #         submod_arglist.append(dep)
+    #     # elif ctx.attr._rule.startswith("ocaml_ns"):
+    #     #     if dep in ns_resolver_files:
+    #     #         submod_arglist.append(dep)
+    #     #     else: # should not happen!
+    #     #         ## nslib linkargs should only contain what's needed to
+    #     #         ## link and executable or build and archive.
+    #     #         # linkargs_list.append(dep)
+    #     #         fail("ns lib contains extra linkarg: %s" % dep)
+    #     else:
+    #         # linkargs should match direct deps list?
+    #         fail("lib contains extra linkarg: %s" % dep)
+    #         # submod_arglist.append(dep)
 
-    ordered_submodules_depset = depset(direct=submod_arglist)
+    # ordered_submodules_depset = depset(direct=submod_arglist)
 
     # only direct deps go on cmd line:
-    # if libOcamlProvider.ns_resolver != None:
-    #     for ds in libOcamlProvider.ns_resolver:
+    # if libBootInfo.ns_resolver != None:
+    #     for ds in libBootInfo.ns_resolver:
     #         for f in ds.files.to_list():
     #             # print("ns_resolver: %s" % f)
     #             if f.extension == "cmx":
@@ -237,7 +318,7 @@ def _bootstrap_archive(ctx):
 
     ## cmi files
 
-    # for cmi in libOcamlProvider.cmi.to_list():
+    # for cmi in libBootInfo.cmi.to_list():
     #     print("DEP CMI: %s" % cmi)
 
     linkargs_list = []
@@ -248,18 +329,18 @@ def _bootstrap_archive(ctx):
     ## merge archive submanifests, to get list of all modules included
     ## in archives. use list to filter cmd line args
     includes = []
-    manifest_list = []
-    for dep in ctx.attr.manifest:
-        if OcamlProvider in dep:
-            if hasattr(dep[OcamlProvider], "archive_manifests"):
-                manifest_list.append(dep[OcamlProvider].archive_manifests)
+    # manifest_list = []
+    # for dep in ctx.attr.manifest:
+    #     if BootInfo in dep:
+    #         if hasattr(dep[BootInfo], "archive_manifests"):
+    #             manifest_list.append(dep[BootInfo].archive_manifests)
         # else sig?
 
-    merged_manifests = depset(transitive = manifest_list)
-    archive_filter_list = merged_manifests.to_list()
+    # merged_manifests = depset(transitive = manifest_list)
+    # archive_filter_list = merged_manifests.to_list()
     # print("Merged manifests: %s" % archive_filter_list)
 
-    for dep in libOcamlProvider.linkargs.to_list():
+    # for dep in libBootInfo.linkargs.to_list():
 
         #FIXME: dep is not namespaced so we won't match ever:
         # if ctx.label.name == lbl_name:
@@ -291,13 +372,13 @@ def _bootstrap_archive(ctx):
                 #     print("APPEND: %s" % dep)
         #         linkargs_list.append(dep)
         # else:
-        if dep not in manifest:
-            if dep not in archive_filter_list:
-                linkargs_list.append(dep)
+        # if dep not in manifest:
+        #     if dep not in archive_filter_list:
+        #         linkargs_list.append(dep)
             # else:
             #     print("removing double link: %s" % dep)
 
-    # for dep in libOcamlProvider.inputs.to_list():
+    # for dep in libBootInfo.inputs.to_list():
     #     # print("inputs dep: %s" % dep)
     #     # print("ns_resolver: %s" % ns_resolver)
     #     if dep not in submod_arglist:
@@ -311,9 +392,9 @@ def _bootstrap_archive(ctx):
         #     includes.append(dep.dirname)
         #     args.add(dep)
 
-    linkargs_depset = depset(
-        direct = linkargs_list,
-    )
+    # linkargs_depset = depset(
+    #     direct = linkargs_list,
+    # )
     # for linkarg in linkargs_depset.to_list():
     #     # native: archives cannot be passed with -a
 
@@ -327,48 +408,61 @@ def _bootstrap_archive(ctx):
 
 
     # for dep in ordered_submodules_depset.to_list():
-    for dep in libOcamlProvider.inputs.to_list():
-        # print("inputs dep: %s" % dep)
-        # print("ns_resolver: %s" % ns_resolver)
-        if dep in submod_arglist:
-            if dep.extension == "so":
-                if tc.linkmode in ["shared", "dynamic"]:
-                    (bn, ext) = paths.split_extension(dep.basename)
-                    # NB -dllib for shared libs, -cclib for static?
-                    args.add("-dllib", "l" + bn[3:])
-                    args.add("-ccopt", "-L" + dep.dirname)
-            ## FIXME: .a is expected with cmx, in bc it means cclib
-            elif dep.extension == "a":
-                if tc.linkmode == "static":
-                    # if mode in ["boot", "bc_bc", "bc_n"]:
-                    if tc.target_host:
-                        (bn, ext) = paths.split_extension(dep.basename)
-                        # args.add(dep)
-                        ## or:
-                        args.add("-cclib", "l" + bn[3:])
-                        args.add("-ccopt", "-L" + dep.dirname)
-            else:
-                includes.append(dep.dirname)
-                args.add(dep)
-        elif dep == ns_resolver:
-            includes.append(dep.dirname)
-            args.add(dep)
-        elif dep not in archive_filter_list:
-            linkargs_list.append(dep)
+    # for dep in libBootInfo.inputs.to_list():
+        # # print("inputs dep: %s" % dep)
+        # # print("ns_resolver: %s" % ns_resolver)
+        # if dep in submod_arglist:
+        #     if dep.extension == "so":
+        #         if tc.linkmode in ["shared", "dynamic"]:
+        #             (bn, ext) = paths.split_extension(dep.basename)
+        #             # NB -dllib for shared libs, -cclib for static?
+        #             args.add("-dllib", "l" + bn[3:])
+        #             args.add("-ccopt", "-L" + dep.dirname)
+        #     ## FIXME: .a is expected with cmx, in bc it means cclib
+        #     elif dep.extension == "a":
+        #         if tc.linkmode == "static":
+        #             # if mode in ["boot", "bc_bc", "bc_n"]:
+        #             if tc.target_host:
+        #                 (bn, ext) = paths.split_extension(dep.basename)
+        #                 # args.add(dep)
+        #                 ## or:
+        #                 args.add("-cclib", "l" + bn[3:])
+        #                 args.add("-ccopt", "-L" + dep.dirname)
+        #     else:
+        #         includes.append(dep.dirname)
+        #         args.add(dep)
+        # elif dep == ns_resolver:
+        #     includes.append(dep.dirname)
+        #     args.add(dep)
+        # elif dep not in archive_filter_list:
+        #     linkargs_list.append(dep)
         # else:
         #     print("removing double link: %s" % dep)
 
+    ## To get cli args in right order, we need then merged depset of
+    ## all deps. Then we use the manifest to filter.
+
+    filtering_depset = depset(
+        direct = ctx.files.manifest, ## only .cmo/.cmx files
+        transitive = [cli_link_deps_depset]
+    )
+
+    for dep in filtering_depset.to_list():
+        if dep in manifest:
+            args.add(dep)
 
     args.add_all(includes, before_each="-I", uniquify=True)
 
-    args.add("-a")
-
-    args.add("-o", archive_file)
-
     inputs_depset = depset(
         direct = ctx.files.data if ctx.files.data else [],
-        transitive = [libOcamlProvider.inputs]
-        + [libOcamlProvider.cmi]
+        transitive = []
+        + [
+            sigs_depset,
+            afiles_depset,
+            archived_cmx_depset]
+        # cli_link_deps_depset contains this archive, do not add to inputs
+        + depsets.deps.cli_link_deps
+        # + [libBootInfo.cmi]
     )
 
     # if ctx.attr._rule == "ocaml_ns_archive":
@@ -404,57 +498,70 @@ def _bootstrap_archive(ctx):
     ###################
     defaultDepset = depset(
         order  = dsorder,
-        direct = [archive_file] # .cmxa
+        direct = [out_archive] # .cmxa
     )
     newDefaultInfo = DefaultInfo(files = defaultDepset)
 
     # linkargs_depsets = depset(
     #     ## indirect deps (excluding direct deps, i.e. submodules & resolver)
     #     # direct = linkargs_list,
-    #     transitive = [libOcamlProvider.linkargs]
+    #     transitive = [libBootInfo.linkargs]
     # )
 
     # linkargs_depset = depset()
     # #     direct     = linkargs_list
-    # #     # transitive = [libOcamlProvider.linkargs]
+    # #     # transitive = [libBootInfo.linkargs]
     # #     # transitive = [linkargs_depsets]
     # # )
 
-    paths_depset  = depset(
-        order = dsorder,
-        direct = paths_direct,
-        transitive = [libOcamlProvider.paths]
-    )
+    # paths_depset  = depset(
+    #     order = dsorder,
+    #     direct = paths_direct,
+    #     transitive = [libBootInfo.paths]
+    # )
 
-    ## IMPORTANT: archives must deliver both the archive file and cmi
-    ## files for all archive members!
-    closure_depset = depset(
-        # direct     = action_outputs, # + ns_resolver,
-        # transitive = [libOcamlProvider.inputs]
-        direct=action_outputs,
-        transitive = [libOcamlProvider.cmi]
-    )
+    # ## IMPORTANT: archives must deliver both the archive file and cmi
+    # ## files for all archive members!
+    # closure_depset = depset(
+    #     # direct     = action_outputs, # + ns_resolver,
+    #     # transitive = [libBootInfo.inputs]
+    #     direct=action_outputs,
+    #     transitive = [libBootInfo.cmi]
+    # )
 
-    ocamlProvider = OcamlProvider(
-        files   = libOcamlProvider.files,
-        fileset = libOcamlProvider.fileset,
-        cmi     = libOcamlProvider.cmi,
-        inputs  = closure_depset,
-        linkargs = linkargs_depset,
-        paths    = paths_depset,
-    )
+    # ocamlProvider = BootInfo(
+    #     files   = libBootInfo.files,
+    #     fileset = libBootInfo.fileset,
+    #     cmi     = libBootInfo.cmi,
+    #     inputs  = closure_depset,
+    #     linkargs = linkargs_depset,
+    #     paths    = paths_depset,
+    # )
 
-    manifest_depset = depset(
-        transitive = [linkargs_depset, libOcamlProvider.files]
-    )
+    # manifest_depset = depset(
+    #     transitive = [linkargs_depset, libBootInfo.files]
+    # )
 
     ocamlArchiveProvider = OcamlArchiveProvider(
-        manifest = manifest_depset
+        # manifest = manifest_depset
+    )
+
+    bootProvider = BootInfo(
+        sigs     = sigs_depset,
+        cli_link_deps = cli_link_deps_depset,
+        afiles   = afiles_depset,
+        archived_cmx  = archived_cmx_depset,
+        paths    = paths_depset,
+
+        # ofiles   = ofiles_depset,
+        # archives = archives_depset,
+        # astructs = astructs_depset,
     )
 
     providers = [
         newDefaultInfo,
-        ocamlProvider,
+        # libBootInfo,
+        bootProvider,
         ocamlArchiveProvider
     ]
 
@@ -463,23 +570,23 @@ def _bootstrap_archive(ctx):
     # providers.append(ppxAdjunctsProvider)
     # ppx_codeps_depset = ppxAdjunctsProvider.ppx_codeps
 
-    outputGroupInfo = OutputGroupInfo(
-        fileset  = defaultDepset,
-        cmi      = libOcamlProvider.cmi,
-        linkargs = linkargs_depset,
-        manifest = manifest_depset,
-        closure = closure_depset,
-        # closure = depset(direct=action_outputs),
-        # all = depset(transitive=[
-        #     closure_depset,
-        #     # ppx_codeps_depset,
-        #     # cclib_files_depset,
-        # ])
-    )
-    providers.append(outputGroupInfo)
+    # outputGroupInfo = OutputGroupInfo(
+    #     fileset  = defaultDepset,
+    #     cmi      = libBootInfo.cmi,
+    #     linkargs = linkargs_depset,
+    #     manifest = manifest_depset,
+    #     closure = closure_depset,
+    #     # closure = depset(direct=action_outputs),
+    #     # all = depset(transitive=[
+    #     #     closure_depset,
+    #     #     # ppx_codeps_depset,
+    #     #     # cclib_files_depset,
+    #     # ])
+    # )
+    # providers.append(outputGroupInfo)
 
-    if ccInfo:
-        providers.append(ccInfo)
+    # if ccInfo:
+    #     providers.append(ccInfo)
 
     # we may be called by ocaml_ns_archive, so:
     # if ctx.attr._rule.startswith("ocaml_ns"):
@@ -491,8 +598,8 @@ def _bootstrap_archive(ctx):
     return providers
 
 #####################
-bootstrap_archive = rule(
-    implementation = _bootstrap_archive,
+boot_archive = rule(
+    implementation = _impl_boot_archive,
     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
     attrs = dict(
         # options("ocaml"),
@@ -505,26 +612,6 @@ bootstrap_archive = rule(
             doc = "bootstrap stage",
             default = "//bzl:stage"
         ),
-
-        #FIXME: underscore
-        # ocamlc = attr.label(
-        #     # cfg = ocamlc_out_transition,
-        #     allow_single_file = True,
-        #     default = "//bzl/toolchain:ocamlc"
-        # ),
-
-        # _boot       = attr.label(
-        #     default = "//bzl/toolchain:boot",
-        # ),
-
-        # _mode       = attr.label(
-        #     default = "//bzl/toolchain",
-        # ),
-
-        # mode       = attr.string(
-        #     doc     = "Overrides mode build setting.",
-        #     # default = ""
-        # ),
 
         primitives = attr.label(
             allow_single_file = True,
@@ -559,10 +646,11 @@ bootstrap_archive = rule(
             providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
                          [OcamlLibraryMarker],
-                         [OcamlModuleMarker],
+                         [ModuleInfo],
                          [OcamlNsMarker],
                          [OcamlSignatureMarker],
                          [CcInfo]],
+            # cfg = manifest_out_transition
         ),
 
         data = attr.label_list(
@@ -601,7 +689,7 @@ bootstrap_archive = rule(
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath")
         # ),
-        _rule = attr.string( default = "bootstrap_archive" ),
+        _rule = attr.string( default = "boot_archive" ),
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),
@@ -611,7 +699,12 @@ bootstrap_archive = rule(
     ## not affected if this is a dependency of an ns aggregator.
     # cfg     = nsarchive_in_transition,
     # cfg = compile_mode_in_transition,
-    provides = [OcamlArchiveProvider, OcamlProvider],
+
+    # bug in custom provider initializers:
+    # Illegal argument: element in 'provides' is of unexpected type.
+    # Should be list of providers, but got item of type tuple.
+    provides = [OcamlArchiveProvider, BootInfo],
+
     executable = False,
     fragments = ["platform", "cpp"],
     host_fragments = ["platform",  "cpp"],

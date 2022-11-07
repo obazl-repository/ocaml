@@ -1,5 +1,5 @@
 ## ocaml/_rules/impl_common.bzl
-tmpdir = "" # "__obazl/"
+tmpdir = "_build/" # "__obazl/"
 
 dsorder = "postorder"
 

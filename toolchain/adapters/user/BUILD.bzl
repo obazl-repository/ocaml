@@ -32,7 +32,7 @@ def _user_toolchain_adapter_impl(ctx):
         linkmode               = ctx.attr.linkmode,
         ## runtime
         stdlib                 = ctx.attr.stdlib,
-        std_exit               = ctx.attr.std_exit,
+        # std_exit               = ctx.attr.std_exit,
         camlheaders            = ctx.files.camlheaders,
         ## core tools
         compiler               = ctx.file.compiler,
@@ -85,7 +85,7 @@ user_toolchain_adapter = rule(
 
         "vmargs": attr.label( ## string list
             doc = "Args to pass to all invocations of ocamlrun",
-            default = "//boot/vm:args"
+            default = "//platforms/vm:args"
         ),
 
         "repl": attr.label(
@@ -111,12 +111,12 @@ user_toolchain_adapter = rule(
             # cfg = "exec",
         ),
 
-        "std_exit": attr.label(
-            # default = Label("//stdlib:Std_exit"),
-            executable = False,
-            allow_single_file = True,
-            # cfg = "exec",
-        ),
+        # "std_exit": attr.label(
+        #     # default = Label("//stdlib:Std_exit"),
+        #     executable = False,
+        #     allow_single_file = True,
+        #     # cfg = "exec",
+        # ),
 
         "camlheaders": attr.label_list(
             allow_files = True,

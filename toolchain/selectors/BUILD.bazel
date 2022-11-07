@@ -14,15 +14,20 @@ toolchain_selector(
 toolchain_selector(
     name           = "bootstrap",
     toolchain = "//toolchain/adapters/bootstrap",
-    build_host_constraints  = ["//platforms/build:boot?"],
-    target_host_constraints  = ["//platforms/target:boot?"],
+    # build_host_constraints  = ["//platforms/build:vm?"],
+    # target_host_constraints  = ["//platforms/target:vm?"],
 )
 
+# for vm.vm > vm.sys
 toolchain_selector(
-    name           = "bootstrap_tool",
-    toolchain = "//toolchain/adapters/bootstrap",
-    build_host_constraints  = ["//platforms/build:boot?"],
-    target_host_constraints  = ["//platforms/build:boot?"],
+    name           = "bootstrap_cross",
+    toolchain = "//toolchain/adapters/bootstrap:cross",
+    build_host_constraints  = ["//platforms/build:vm?"],
+    target_host_constraints = [
+        "//platforms/build:vm?",
+        "//platforms/xtarget:sys?",
+    ],
+    # toolchain_constraints   = ["//platforms/xtarget:sys?"]
 )
 
 ###################
@@ -49,32 +54,12 @@ toolchain_selector(
     # toolchain_constraints = ["//runtime:standard?"],
 )
 
-# ##########
-# toolchain_selector(
-#     name           = "dbg",
-#     toolchain = "//toolchain/adapters:debug",
-#     build_host_constraints  = [
-#         # "@ocaml//platforms:sys?"
-#         "@platforms//os:macos"
-#     ],
-#     target_host_constraints  = [
-#         # "@ocaml//platforms:sys?"
-#         "@platforms//os:macos"
-#     ],
-#     toolchain_constraints = ["//runtime:debug?"],
-# )
+##########
+toolchain_selector(
+    name           = "sysvm",
+    toolchain = "//toolchain/adapters:vmsys",
+    build_host_constraints  = ["//platforms:sys?"],
+    target_host_constraints  = ["//platforms:vm?"],
+    # toolchain_constraints = ["//runtime:standard?"],
+)
 
-# ##########
-# toolchain_selector(
-#     name                    = "instrumented",
-#     toolchain = "//toolchain/adapters:instrumented",
-#     build_host_constraints  = [
-#         # "@ocaml//platforms:sys?"
-#         "@platforms//os:macos",
-#     ],
-#     target_host_constraints  = [
-#         # "@ocaml//platforms:vm?"
-#         "@platforms//os:macos",
-#     ],
-#     toolchain_constraints = ["//runtime:instrumented?"],
-# )

@@ -1,8 +1,8 @@
 load("//bzl:rules.bzl",
-     "bootstrap_archive",
-     "bootstrap_library",
-     "bootstrap_module",
-     "bootstrap_signature",
+     "boot_archive",
+     "boot_library",
+     "boot_module",
+     "boot_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -17,7 +17,7 @@ SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 STDLIB = ["//boot/lib:stdlib"]
 
-bootstrap_library(
+boot_library(
     name = "middle_end",
     manifest  = [
         ":Backend_var",
@@ -40,8 +40,8 @@ bootstrap_library(
 
 ## defined in compilerlibs/Makefile.compilerlibs
 ## used by //compilerlibs:ocamlmiddleend and //compilerlibs:ocamloptcomp
-# bootstrap_library(
-bootstrap_archive(
+# boot_library(
+boot_archive(
     name = "ocamlmiddleend",
     manifest  = [
         ## NB: the makefiles take pains to put stuff in order, across
@@ -83,7 +83,7 @@ bootstrap_archive(
 )
 
 ################################################################
-bootstrap_signature(
+boot_signature(
     name = "Backend_intf_cmi",
     src  = "backend_intf.mli",
     opts = SIG_OPTS,
@@ -101,7 +101,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Backend_var",
     struct = "backend_var.ml",
     sig    = "Backend_var_cmi",
@@ -120,7 +120,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Backend_var_cmi",
     src  = "backend_var.mli",
     opts = SIG_OPTS,
@@ -134,7 +134,7 @@ bootstrap_signature(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Clambda",
     struct = "clambda.ml",
     sig    = "Clambda_cmi",
@@ -158,7 +158,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Clambda_cmi",
     src  = "clambda.mli",
     opts = SIG_OPTS,
@@ -178,7 +178,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Clambda_primitives",
     struct = "clambda_primitives.ml",
     sig    = "Clambda_primitives_cmi",
@@ -193,7 +193,7 @@ bootstrap_module(
     visibility = ["//middle_end:__subpackages__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Clambda_primitives_cmi",
     src  = "clambda_primitives.mli",
     opts = SIG_OPTS,
@@ -207,7 +207,7 @@ bootstrap_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Compilation_unit",
     struct = "compilation_unit.ml",
     sig    = "Compilation_unit_cmi",
@@ -230,7 +230,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Compilation_unit_cmi",
     src  = "compilation_unit.mli",
     opts = SIG_OPTS,
@@ -246,7 +246,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Compilenv",
     struct = "compilenv.ml",
     sig    = "Compilenv_cmi",
@@ -287,7 +287,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Compilenv_cmi",
     src  = "compilenv.mli",
     opts = SIG_OPTS,
@@ -308,7 +308,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Convert_primitives",
     struct = "convert_primitives.ml",
     sig    = "Convert_primitives_cmi",
@@ -323,7 +323,7 @@ bootstrap_module(
     visibility = ["//middle_end:__subpackages__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Convert_primitives_cmi",
     src  = "convert_primitives.mli",
     opts = SIG_OPTS,
@@ -334,7 +334,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Internal_variable_names",
     struct = "internal_variable_names.ml",
     sig    = "Internal_variable_names_cmi",
@@ -351,7 +351,7 @@ bootstrap_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Internal_variable_names_cmi",
     src  = "internal_variable_names.mli",
     opts = SIG_OPTS,
@@ -365,7 +365,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Linkage_name",
     struct = "linkage_name.ml",
     sig    = "Linkage_name_cmi",
@@ -384,7 +384,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Linkage_name_cmi",
     src  = "linkage_name.mli",
     opts = SIG_OPTS,
@@ -394,7 +394,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Printclambda",
     struct = "printclambda.ml",
     sig    = "Printclambda_cmi",
@@ -418,7 +418,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Printclambda_cmi",
     src  = "printclambda.mli",
     opts = SIG_OPTS,
@@ -429,7 +429,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Printclambda_primitives",
     struct = "printclambda_primitives.ml",
     sig    = "Printclambda_primitives_cmi",
@@ -448,7 +448,7 @@ bootstrap_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Printclambda_primitives_cmi",
     src  = "printclambda_primitives.mli",
     opts = SIG_OPTS,
@@ -460,7 +460,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Semantics_of_primitives",
     struct = "semantics_of_primitives.ml",
     sig    = "Semantics_of_primitives_cmi",
@@ -473,7 +473,7 @@ bootstrap_module(
     visibility = ["//middle_end:__subpackages__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Semantics_of_primitives_cmi",
     src  = "semantics_of_primitives.mli",
     opts = SIG_OPTS,
@@ -484,7 +484,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Symbol",
     struct = "symbol.ml",
     sig    = "Symbol_cmi",
@@ -505,7 +505,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Symbol_cmi",
     src  = "symbol.mli",
     opts = SIG_OPTS,
@@ -520,7 +520,7 @@ bootstrap_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Variable",
     struct = "variable.ml",
     sig    = "Variable_cmi",
@@ -541,7 +541,7 @@ bootstrap_module(
     visibility = ["//middle_end/flambda:__subpackages__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Variable_cmi",
     src  = "variable.mli",
     opts = SIG_OPTS,

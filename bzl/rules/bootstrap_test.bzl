@@ -2,7 +2,7 @@ load(":impl_executable.bzl", "impl_executable")
 
 # load("//ocaml/_transitions:transitions.bzl", "executable_in_transition")
 
-load(":options.bzl", "options", "options_executable")
+load(":boot_attrs_executable.bzl", "options_executable")
 
 ################################
 # rule_options = options("ocaml")

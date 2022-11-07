@@ -2,17 +2,17 @@ load("//bzl/rules:ocamlrun.bzl", _ocamlrun = "ocamlrun")
 
 load("//bzl/rules:promote.bzl", _promote = "promote")
 
-load("//bzl/rules:bootstrap_archive.bzl",
-     _bootstrap_archive = "bootstrap_archive")
+load("//bzl/rules:boot_archive.bzl",
+     _boot_archive = "boot_archive")
 
-load("//bzl/rules:bootstrap_executable.bzl",
-     _bootstrap_executable = "bootstrap_executable")
+load("//bzl/rules:boot_executable.bzl",
+     _boot_executable = "boot_executable")
 
-load("//bzl/rules:bootstrap_module.bzl",
-     _bootstrap_module = "bootstrap_module")
+load("//bzl/rules:boot_module.bzl",
+     _boot_module = "boot_module")
 
-load("//bzl/rules:bootstrap_library.bzl",
-     _bootstrap_library = "bootstrap_library")
+load("//bzl/rules:boot_library.bzl",
+     _boot_library = "boot_library")
 
 load("//bzl/rules:bootstrap_ns.bzl",
      _bootstrap_ns = "bootstrap_ns")
@@ -29,8 +29,8 @@ load("//bzl/rules:bootstrap_ocamlyacc.bzl",
 load("//bzl/rules:bootstrap_repl.bzl",
      _bootstrap_repl = "bootstrap_repl")
 
-load("//bzl/rules:bootstrap_signature.bzl",
-     _bootstrap_signature = "bootstrap_signature")
+load("//bzl/rules:boot_signature.bzl",
+     _boot_signature = "boot_signature")
 
 load("//bzl/rules:bootstrap_test.bzl",
      _bootstrap_test = "bootstrap_test")
@@ -42,16 +42,16 @@ load("//bzl/rules:ocamlc_fixpoint.bzl", _ocamlc_fixpoint = "ocamlc_fixpoint")
 ocamlrun = _ocamlrun
 promote  = _promote
 
-bootstrap_archive      = _bootstrap_archive
-bootstrap_executable      = _bootstrap_executable
-bootstrap_library  = _bootstrap_library
-bootstrap_module      = _bootstrap_module
+boot_archive      = _boot_archive
+boot_executable      = _boot_executable
+boot_library  = _boot_library
+boot_module      = _boot_module
 bootstrap_ns = _bootstrap_ns
 # bootstrap_preprocess  = _bootstrap_preprocess
 bootstrap_ocamllex    = _bootstrap_ocamllex
 bootstrap_ocamlyacc   = _bootstrap_ocamlyacc
 bootstrap_repl   = _bootstrap_repl
-bootstrap_signature   = _bootstrap_signature
+boot_signature   = _boot_signature
 bootstrap_test   = _bootstrap_test
 
 boot_compiler    = _boot_compiler

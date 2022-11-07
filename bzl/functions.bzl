@@ -13,85 +13,14 @@ load("//bzl:providers.bzl",
      "OcamlImportMarker",
      "OcamlLibraryMarker",
      "OcamlNsResolverProvider",
-     "OcamlModuleMarker",
      "OcamlNsMarker",
-     "OcamlProvider",
-     "OcamlSignatureProvider")
+     "OcamlSignatureProvider",
+     "BootInfo"
+     )
 
 WARNING_FLAGS = "@1..3@5..28@30..39@43@46..47@49..57@61..62-40"
 
-################
-def config_tc(ctx):
-
-    tc = ctx.toolchains["//toolchain/type:bootstrap"]
-
-    # if ctx.attr.mode:
-    #     mode = ctx.attr.mode
-    # else:
-    #     mode = ctx.attr._mode[BuildSettingInfo].value
-
-    # mode = ctx.attr._toolchain[BuildSettingInfo].value
-
-    tool = tc.tool_runner
-    tool_args = [tc.compiler]
-    ext       = ".cmo"
-
-    # stage = ctx.attr._stage[BuildSettingInfo].value
-    # scope     = "__stage{stage}/".format(stage = stage)
-    scope = ""
-
-    # if stage == 0:
-    #     scope     = "__stage0/"
-    # elif stage == 1:
-    #     scope     = "__stage1/"
-    # elif stage == 2:
-    #     scope     = "__stage2/"
-    # else:
-    #     s = stage - 1
-    #     scope     = "__stage{stage}/".format(stage = s)
-
-    # if mode == "boot":
-    #     tool = tc.tool_runner
-    #     tool_args = [ctx.file.ocamlc]
-    #     # tool_args = [tc.compiler] # FIXME: rename tc.boot_ocamlc
-    #     ext       = ".cmo"
-    #     scope     = "__boot/"
-
-    # elif mode == "bc_bc":
-    #     tool = tc.tool_runner
-    #     tool_args = [ctx.file.ocamlc]
-    #     ext       = ".cmo"
-    #     scope     = "__bc/"
-    # elif mode == "bc_n":
-    #     tool = tc.tool_runner
-    #     tool_args = [ctx.file.ocamlc]
-    #     # tool_args = [tc.compiler] # FIXME: rename tc.bc_n_ocamlc
-    #     ext  = ".cmx"
-    #     scope     = "__n/"
-    # elif mode == "n_bc":  # FIXME
-    #     tool = tc.tool_runner
-    #     tool_args = [ctx.file.ocamlc]
-    #     # tool_args = [tc.compiler] # FIXME: rename tc.bc_n_ocamlc
-    #     ext  = ".cmo"
-    #     scope     = "__bc/"
-    # elif mode == "n_n":  # FIXME
-    #     tool = tc.tool_runner
-    #     tool_args = [ctx.file.ocamlc]
-    #     # tool_args = [tc.compiler] # FIXME: rename tc.bc_n_ocamlc
-    #     ext  = ".cmx"
-    #     scope     = "__n/"
-    # else:
-    #     fail("Unsupported mode: %s" % mode)
-
-    # print("tool_args: %s" % tool_args)
-
-    # if ctx.attr._boot:
-    #     scope = "__boot/"
-
-    return tc, tool, tool_args, scope, ext
-    # return mode, tc, tool, tool_args, scope, ext
-
-###############################
+###################################
 def submodule_from_label_string(s):
     """Derive module name from label string."""
     lbl = Label(s)
@@ -275,6 +204,7 @@ def get_module_name (ctx, src):
 
     if ctx.label.name == "Std_exit":
         out_module = "std_exit"
+
     # if ctx.label.name == "Stdlib":
     #     out_module = "stdlib"
 

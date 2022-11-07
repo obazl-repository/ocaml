@@ -1,17 +1,16 @@
 load("//bzl:providers.bzl",
+     "BootInfo",
+     "ModuleInfo",
+
      "CompilationModeSettingProvider",
      "OcamlArchiveProvider",
      "OcamlExecutableMarker",
      "OcamlImportMarker",
      "OcamlLibraryMarker",
      "OcamlNsResolverProvider",
-     "OcamlModuleMarker",
      "OcamlNsMarker",
-     "OcamlProvider",
      "OcamlSignatureProvider",
      "OcamlTestMarker")
-
-load("//bzl:functions.bzl", "config_tc")
 
 # load("//bzl/transitions:ocamlc_fixpoint.bzl",
 #      "ocamlc_fixpoint_in_transition",
@@ -20,11 +19,13 @@ load("//bzl:functions.bzl", "config_tc")
 load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
 
 load(":impl_common.bzl", "dsorder", "opam_lib_prefix")
+load(":boot_attrs_executable.bzl", "options_executable")
 
 load(":options.bzl",
      "options",
-     "options_executable",
      "get_options")
+
+load(":impl_common.bzl", "tmpdir")
 
 # load(":impl_executable.bzl", "impl_executable")
 
@@ -36,8 +37,7 @@ def _ocamlc_fixpoint(ctx):
 
     ## FIXME: use impl_executable
 
-    # (mode,
-    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     # tc = ctx.toolchains["//toolchain/type:bootstrap"]
     # ##mode = ctx.attr._mode[CompilationModeSettingProvider].value
@@ -72,12 +72,14 @@ def _ocamlc_fixpoint(ctx):
     includes  = []
     cmxa_args  = []
 
+    scope = tmpdir
+
     out_exe = ctx.actions.declare_file(scope + ctx.label.name)
 
     #########################
     args = ctx.actions.args()
 
-    args.add_all(tool_args)
+    # args.add_all(tool_args)
 
     # if mode == "bytecode":
         ## FIXME: -custom only needed if linking with CC code?
@@ -128,14 +130,14 @@ def _ocamlc_fixpoint(ctx):
     ccInfo_list = []
 
     for dep in ctx.attr.deps:
-        # print("DEP: %s" % dep[OcamlProvider])
+        # print("DEP: %s" % dep[BootInfo])
         if CcInfo in dep:
             # print("CcInfo dep: %s" % dep)
             ccInfo_list.append(dep[CcInfo])
 
-        direct_inputs_depsets.append(dep[OcamlProvider].inputs)
-        direct_linkargs_depsets.append(dep[OcamlProvider].linkargs)
-        direct_paths_depsets.append(dep[OcamlProvider].paths)
+        direct_inputs_depsets.append(dep[BootInfo].inputs)
+        direct_linkargs_depsets.append(dep[BootInfo].linkargs)
+        direct_paths_depsets.append(dep[BootInfo].paths)
 
         direct_linkargs_depsets.append(dep[DefaultInfo].files)
 
@@ -161,17 +163,17 @@ def _ocamlc_fixpoint(ctx):
     if ctx.attr.main:
         main = ctx.attr.main
 
-        if OcamlProvider in main:
-            if hasattr(main[0][OcamlProvider], "archive_manifests"):
-                manifest_list.append(main[0][OcamlProvider].archive_manifests)
+        if BootInfo in main:
+            if hasattr(main[0][BootInfo], "archive_manifests"):
+                manifest_list.append(main[0][BootInfo].archive_manifests)
 
-        direct_inputs_depsets.append(main[0][OcamlProvider].inputs)
-        direct_linkargs_depsets.append(main[0][OcamlProvider].linkargs)
-        direct_paths_depsets.append(main[0][OcamlProvider].paths)
+        direct_inputs_depsets.append(main[0][BootInfo].inputs)
+        direct_linkargs_depsets.append(main[0][BootInfo].linkargs)
+        direct_paths_depsets.append(main[0][BootInfo].paths)
 
         direct_linkargs_depsets.append(main[0][DefaultInfo].files)
 
-        paths_indirect.append(main[0][OcamlProvider].paths)
+        paths_indirect.append(main[0][BootInfo].paths)
 
         if CcInfo in main: # :
             # print("CcInfo main: %s" % main[0][CcInfo])
@@ -292,12 +294,12 @@ def _ocamlc_fixpoint(ctx):
 
     ################
     ctx.actions.run(
-      # env = env,
-      executable = tool,
+        # env = env,
+        executable = tc.compiler[DefaultInfo].files_to_run,
       arguments = [args],
       inputs = inputs_depset,
       outputs = [out_exe],
-      tools = [tool] + tool_args,  # [tc.ocamlopt],
+        tools = [tc.compiler[DefaultInfo].files_to_run],
       mnemonic = mnemonic,
       progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
           mode = "TEST", # mode,
@@ -404,7 +406,7 @@ ocamlc_fixpoint = rule(
             doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
             # cfg = ocamlc_fixpoint_out_transition,
             allow_single_file = True,
-            providers = [[OcamlModuleMarker]],
+            providers = [[ModuleInfo]],
             default = None,
         ),
         data = attr.label_list(
@@ -421,7 +423,8 @@ ocamlc_fixpoint = rule(
             providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
                          [OcamlLibraryMarker],
-                         [OcamlModuleMarker],
+                         # [OcamlModuleMarker],
+                         [ModuleInfo],
                          [OcamlNsMarker],
                          [CcInfo]],
         ),

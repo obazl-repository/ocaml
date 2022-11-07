@@ -1,12 +1,12 @@
 load("//bzl:rules.bzl",
-     "bootstrap_archive",
-     "bootstrap_library",
-     "bootstrap_module",
-     "bootstrap_signature",
+     "boot_archive",
+     "boot_library",
+     "boot_module",
+     "boot_signature",
 )
 
 load("//config:CONFIG.bzl",
-     "RUNTIME_OCAMLRUN",
+     # "RUNTIME_OCAMLRUN",
      "OC_COMMON_CFLAGS",
      "NO_MISSING_MLI_ERROR",
      "PLATFORM_CFLAGS"
@@ -26,8 +26,8 @@ SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 STDLIB = ["//boot/lib:stdlib"]
 
-# bootstrap_archive(
-bootstrap_library(
+# boot_archive(
+boot_library(
     name = "driver",
     manifest  = [
         ":Compenv",
@@ -51,7 +51,7 @@ bootstrap_library(
     ]
 )
 
-# bootstrap_library(
+# boot_library(
 #     name = "ocamlcommon",
 #     manifest  = [
 #         ":Compenv",
@@ -65,7 +65,7 @@ bootstrap_library(
 # )
 
 ## compilerlibs/Makefile.compilerlibs
-# bootstrap_library(
+# boot_library(
 #     name = "ocamlbytecomp",
 #     manifest  = [
 #         ":Compile",
@@ -76,7 +76,7 @@ bootstrap_library(
 # )
 
 ################################################################
-bootstrap_module(
+boot_module(
     name   = "Compenv",
     struct = "compenv.ml",
     sig    = "Compenv_cmi",
@@ -110,7 +110,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Compenv_cmi",
     src  = "compenv.mli",
     opts = SIG_OPTS,
@@ -121,7 +121,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Compile",
     struct = "compile.ml",
     sig    = "Compile_cmi",
@@ -142,7 +142,7 @@ bootstrap_module(
     visibility = ["//bytecomp:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Compile_cmi",
     src  = "compile.mli",
     opts = SIG_OPTS,
@@ -155,7 +155,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Compile_common",
     struct = "compile_common.ml",
     sig    = "Compile_common_cmi",
@@ -187,7 +187,7 @@ bootstrap_module(
     visibility = ["//bytecomp:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Compile_common_cmi",
     src  = "compile_common.mli",
     opts = SIG_OPTS,
@@ -199,7 +199,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Compmisc",
     struct = "compmisc.ml",
     sig    = "Compmisc_cmi",
@@ -228,7 +228,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Compmisc_cmi",
     src  = "compmisc.mli",
     opts = SIG_OPTS,
@@ -239,7 +239,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Errors",
     struct = "errors.ml",
     sig    = "Errors_cmi",
@@ -250,7 +250,7 @@ bootstrap_module(
     visibility = ["//bytecomp:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Errors_cmi",
     src  = "errors.mli",
     opts = SIG_OPTS,
@@ -259,7 +259,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Main",
     struct = "main.ml",
     opts = MODULE_OPTS + ["-w", "-70"],
@@ -274,7 +274,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Main_args",
     struct = "main_args.ml",
     sig    = "Main_args_cmi",
@@ -305,7 +305,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Main_args_cmi",
     src  = "main_args.mli",
     opts = SIG_OPTS,
@@ -314,7 +314,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Maindriver",
     struct = "maindriver.ml",
     sig    = "Maindriver_cmi",
@@ -345,7 +345,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Maindriver_cmi",
     src  = "maindriver.mli",
     opts = SIG_OPTS,
@@ -354,7 +354,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Makedepend",
     struct = "makedepend.ml",
     sig    = "Makedepend_cmi",
@@ -388,7 +388,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Makedepend_cmi",
     src  = "makedepend.mli",
     opts = SIG_OPTS,
@@ -396,7 +396,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Optcompile",
     struct = "optcompile.ml",
     sig    = "Optcompile_cmi",
@@ -419,7 +419,7 @@ bootstrap_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Optcompile_cmi",
     src  = "optcompile.mli",
     opts = SIG_OPTS,
@@ -431,7 +431,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Opterrors",
     struct = "opterrors.ml",
     sig    = "Opterrors_cmi",
@@ -442,7 +442,7 @@ bootstrap_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Opterrors_cmi",
     src  = "opterrors.mli",
     opts = SIG_OPTS,
@@ -451,7 +451,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Optmain",
     struct = "optmain.ml",
     opts = MODULE_OPTS + NO_MISSING_MLI_ERROR,
@@ -465,7 +465,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Optmaindriver",
     struct = "optmaindriver.ml",
     sig    = "Optmaindriver_cmi",
@@ -501,7 +501,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Optmaindriver_cmi",
     src  = "optmaindriver.mli",
     opts = SIG_OPTS,
@@ -510,7 +510,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Pparse",
     struct = "pparse.ml",
     sig    = "Pparse_cmi",
@@ -542,7 +542,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Pparse_cmi",
     src  = "pparse.mli",
     opts = SIG_OPTS,

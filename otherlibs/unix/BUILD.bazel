@@ -1,13 +1,13 @@
 load("//bzl:rules.bzl",
-     "bootstrap_library",
-     "bootstrap_module",
-     "bootstrap_signature",
+     "boot_library",
+     "boot_module",
+     "boot_signature",
 )
 
 MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
-bootstrap_library(
+boot_library(
     name = "unix_cma",
     manifest  = [
         ":Unix",
@@ -15,7 +15,7 @@ bootstrap_library(
     ],
 )
 
-bootstrap_module(
+boot_module(
     name   = "Unix",
     struct = "unix.ml",
     sig    = "Unix_cmi",
@@ -36,7 +36,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Unix_cmi",
     src  = "unix.mli",
     opts = SIG_OPTS,
@@ -45,7 +45,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "UnixLabels",
     struct = "unixLabels.ml",
     sig    = "UnixLabels_cmi",
@@ -55,7 +55,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "UnixLabels_cmi",
     src  = "xx/unixLabels.mli",
     opts = SIG_OPTS + [

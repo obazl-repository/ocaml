@@ -11,4 +11,5 @@ cc_toolchain_profile(
     CFLAGS   = OC_CFLAGS,
     CPPFLAGS = "@oc_cppflags@".split(" "),
     LDFLAGS  = "@LDFLAGS@".split(" ") + "@oc_ldflags@".split(" ")
+    primitive = "//runtime:primitives"
 )

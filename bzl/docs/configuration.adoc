@@ -1,5 +1,7 @@
 = configuration under Bazel
 
+== legacy makefiles
+
 === compiler vars
 
 A complete mess. We have: BOOT_OCAMLC, COMPILER, OPTCOMPILER, CAMLC,
@@ -70,6 +72,8 @@ CAMLOPT=$(OCAMLRUN) $(OPTCOMPILER)
 
 === flags
 
+Flag vars:
+
 For compiling vm runtimes:
 
 * OC_CPPFLAGS
@@ -95,6 +99,14 @@ Makefile.config:
 runtime/$(UNIX_OR_WIN32)_non_shared.%.$(O): \
   OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
 
+
+Actual flags:
+
+* `-nostdlib` which means "no stdilb path", i.e. do not add the default stdlib path to search paths
+
+* `-nopervasies` undocumented and obsolete; originally Pervasives was
+  a module with basic ops for built-in types. Make log shows only used
+  to compile camlinternalFormatBasics.ml[i] and stdlib.ml[i]
 
 
 === defines

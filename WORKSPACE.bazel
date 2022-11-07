@@ -1,3 +1,5 @@
+workspace(name = "ocaml-dev")
+
 ## DO NOT DO THIS: workspace(name = "ocaml")
 ## (the obazl ruleset already defines @ocaml)
 
@@ -30,10 +32,11 @@ obazl_deps()
 # register_toolchains("@ocaml//toolchain/selectors/local:vmvm")
 register_toolchains(
 
+    # "//toolchain/selectors:bootstrap_cross",
     "//toolchain/selectors:bootstrap",
     "//toolchain/selectors:dev_tool",
     "//toolchain/selectors:dev",
-    "//toolchain/selectors:vmsys",
+    # "//toolchain/selectors:vmsys",
 
     "//toolchain/selectors:default",
 

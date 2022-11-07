@@ -23,13 +23,13 @@ def _bootstrap_ocamlyacc_impl(ctx):
   # tmpdir = "_obazl_/"
 
   # yaccer = ctx.actions.declare_file(scope + yaccer_fname)
-  # yacceri = ctx.actions.declare_file(scope + yacceri_fname)
-
-  yaccer = ctx.outputs.out
+  yacceri = ctx.actions.declare_file(yacceri_fname)
+  print("o: %s" % ctx.outputs.outs)
+  yaccer = ctx.outputs.outs[0]
 
   ctx.actions.run_shell(
       inputs  = [ctx.file.src],
-      outputs = [yaccer], # yacceri],
+      outputs = ctx.outputs.outs,
       tools   = [tc.yacc],
       command = "\n".join([
           ## ocamlyacc is inflexible, it writes to cwd, that's it.
@@ -45,7 +45,7 @@ def _bootstrap_ocamlyacc_impl(ctx):
       ])
   )
 
-  return [DefaultInfo(files = depset(direct = [yaccer]))]
+  return [DefaultInfo(files = depset(direct = [yaccer, yacceri]))]
 
 #################
 bootstrap_ocamlyacc = rule(
@@ -60,8 +60,8 @@ bootstrap_ocamlyacc = rule(
             doc = "A single .mly ocamlyacc source file label",
             allow_single_file = [".mly"]
         ),
-        out = attr.output(
-            doc = """Output filename.""",
+        outs = attr.output_list(
+            doc = """Output ml and mli files.""",
             mandatory = True
         ),
         opts = attr.string_list(

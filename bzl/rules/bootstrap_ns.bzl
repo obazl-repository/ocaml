@@ -1,7 +1,7 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
-     "OcamlProvider")
+     "BootInfo")
 
 load(":options.bzl",
      "options",
@@ -16,8 +16,6 @@ load(":impl_common.bzl", "tmpdir", "dsorder")
 
 # load("//bzl/rules:impl_ns_resolver.bzl", "impl_ns_resolver")
 
-load("//bzl:functions.bzl", "config_tc")
-
 ##############################################
 # alas, this won't work: checksums tied to file (module) name
 def symlink_submodules(ctx, ns_prefix, scope):
@@ -30,14 +28,14 @@ def symlink_submodules(ctx, ns_prefix, scope):
         print("submodule: %s" % submodule)
         cmo = submodule[DefaultInfo].files.to_list()[0]
         print("cmo: %s" % cmo)
-        for f in submodule[OcamlProvider].cmi.to_list():
+        for f in submodule[BootInfo].cmi.to_list():
             if f.extension == "cmi":
                 cmi = f
             elif f.extension == "mli":
                 mli = f
         print("cmi: %s" % cmi)
         print("mli: %s" % mli)
-        cmi = submodule[OcamlProvider].cmi.to_list()[0]
+        cmi = submodule[BootInfo].cmi.to_list()[0]
         print("cmi: %s" % cmi)
 
         (basename, ext) = paths.split_extension(cmo.basename)
@@ -109,8 +107,7 @@ def _bootstrap_ns(ctx):
     # if ctx.label.name == "":
     #     debug = True
 
-    # (mode,
-    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     # return impl_ns_resolver(ctx, mode, tool, tool_args)
 
@@ -135,6 +132,8 @@ def _bootstrap_ns(ctx):
     print("NS PREFIX: %s" % ns_prefix)
 
     user_ns_resolver = None
+
+    scope = tmpdir
 
     (symlinks, includes, aliases) = symlink_submodules(ctx, ns_prefix, scope)
 
@@ -198,8 +197,6 @@ def _bootstrap_ns(ctx):
     ################################
     args = ctx.actions.args()
 
-    args.add_all(tool_args)
-
     # _options = get_options(ctx.attr._rule, ctx)
     # args.add_all(_options)
     for arg in ctx.attr.opts:
@@ -235,11 +232,11 @@ def _bootstrap_ns(ctx):
 
     ctx.actions.run(
         # env = env,
-        executable = tool,
+        executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
-        tools = [tool] + tool_args,
+        tools = [tc.compiler[DefaultInfo].files_to_run],
         mnemonic = "OcamlNsResolverAction" if ctx.attr._rule == "ocaml_ns" else "PpxNsResolverAction",
         progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
             mode = "TEST", # mode,
@@ -274,7 +271,7 @@ def _bootstrap_ns(ctx):
         direct = action_outputs
     )
 
-    ocamlProvider = OcamlProvider(
+    ocamlProvider = BootInfo(
         cmi      = depset(direct = [out_cmi]),
         fileset  = fileset_depset,
         linkargs = linkset,

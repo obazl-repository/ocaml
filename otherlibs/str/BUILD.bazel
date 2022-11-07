@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
-     "bootstrap_archive",
-     "bootstrap_module",
-     "bootstrap_signature",
+     "boot_archive",
+     "boot_module",
+     "boot_signature",
 )
 
 load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
@@ -16,7 +16,7 @@ STDLIB = ["//boot/lib:stdlib"]
 # CLIBNAME=camlstr
 # CAMLOBJS=str.cmo
 
-bootstrap_archive(  ## mklib -o
+boot_archive(  ## mklib -o
     name = "str",
     opts = ["-linkall"],
     manifest = [
@@ -27,7 +27,7 @@ bootstrap_archive(  ## mklib -o
 
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.ml
 
-bootstrap_module(
+boot_module(
     name   = "Str",
     struct = "str.ml",
     sig    = "Str_cmi",
@@ -47,7 +47,7 @@ bootstrap_module(
 
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.mli
 
-bootstrap_signature(
+boot_signature(
     name = "Str_cmi",
     src  = "str.mli",
     opts = SIG_OPTS,

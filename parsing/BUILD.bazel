@@ -1,9 +1,18 @@
+## make log:
+
+# ./boot/ocamlrun ./boot/ocamlc
+# -nostdlib -use-prims -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
+
+# ./boot/ocamlrun ./ocamlopt
+# -nostdlib -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
+
 load("//bzl:rules.bzl",
-     "bootstrap_module",
+     "boot_archive",
+     "boot_library",
+     "boot_module",
      "bootstrap_ocamllex",
-     "bootstrap_signature",
-     "bootstrap_library",
      "bootstrap_ocamlyacc",
+     "boot_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -11,7 +20,7 @@ load("//config:CONFIG.bzl",
      "PLATFORM_CFLAGS",
      # "ROOT_MODULE_OPTS",
      # "ROOT_SIG_OPTS",
-     "PRIMITIVES"
+     # "PRIMITIVES"
      )
 
 MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
@@ -45,7 +54,8 @@ exports_files([
 # of //parsing:CamlinternalMenhirLib we would have something like
 # //boot/menhir:Ocaml.MenhirLib
 
-bootstrap_library(
+#boot_library(
+boot_archive(
     name = "parsing",
     manifest  = [
         ":Ast_helper",
@@ -72,7 +82,7 @@ bootstrap_library(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
-bootstrap_library(
+boot_library(
     name = "ocamlcommon",
     manifest  = [
         ":Ast_helper",
@@ -100,12 +110,11 @@ bootstrap_library(
 )
 
 ################################################################
-bootstrap_module(
+boot_module(
     name   = "Ast_helper",
     struct = "ast_helper.ml",
     sig    = "Ast_helper_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Int32",
@@ -128,11 +137,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Ast_helper_cmi",
     src  = "ast_helper.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Asttypes_cmi",
@@ -143,12 +151,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ast_invariants",
     struct = "ast_invariants.ml",
     sig    = "Ast_invariants_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.List",
         ":Ast_iterator",
@@ -161,11 +168,10 @@ bootstrap_module(
     visibility = ["//driver:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Ast_invariants_cmi",
     src  = "ast_invariants.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Location",
@@ -174,12 +180,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ast_iterator",
     struct = "ast_iterator.ml",
     sig    = "Ast_iterator_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.List",
         ":Location",
@@ -191,11 +196,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Ast_iterator_cmi",
     src  = "ast_iterator.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Location",
@@ -204,12 +208,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ast_mapper",
     struct = "ast_mapper.ml",
     sig    = "Ast_mapper_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Format",
@@ -234,11 +237,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Ast_mapper_cmi",
     src  = "ast_mapper.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Location",
@@ -247,11 +249,10 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Asttypes_cmi",
     src  = "asttypes.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Location",
@@ -268,12 +269,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Attr_helper",
     struct = "attr_helper.ml",
     sig    = "Attr_helper_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
@@ -287,11 +287,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Attr_helper_cmi",
     src  = "attr_helper.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Asttypes_cmi",
@@ -301,12 +300,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Builtin_attributes",
     struct = "builtin_attributes.ml",
     sig    = "Builtin_attributes_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Format",
@@ -327,11 +325,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Builtin_attributes_cmi",
     src  = "builtin_attributes.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//utils:Misc",
@@ -341,12 +338,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Depend",
     struct = "depend.ml",
     sig    = "Depend_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
@@ -361,11 +357,10 @@ bootstrap_module(
     visibility = ["//driver:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Depend_cmi",
     src  = "depend.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//utils:Misc",
@@ -375,12 +370,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Docstrings",
     struct = "docstrings.ml",
     sig    = "Docstrings_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Lexing",
@@ -395,11 +389,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Docstrings_cmi",
     src  = "docstrings.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Lazy",
@@ -410,13 +403,12 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "CamlinternalMenhirLib",
     struct = "camlinternalMenhirLib.ml",
     # struct = "//boot/menhir:menhirLib.ml",
     sig    = "CamlinternalMenhirLib_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Lazy",
         "//stdlib:Stdlib.Lexing",
@@ -435,11 +427,10 @@ genrule(
     ])
 )
 
-bootstrap_signature(
+boot_signature(
     name   = "CamlinternalMenhirLib_cmi",
     src    = "camlinternalMenhirLib.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Lazy",
         "//stdlib:Stdlib.Lexing",
@@ -456,12 +447,11 @@ genrule(
     ])
 )
 
-bootstrap_module(
+boot_module(
     name   = "Lexer",
     struct = "lexer.ml",
     sig    = "Lexer_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//utils:Misc",
         ":Parser"
@@ -480,23 +470,22 @@ bootstrap_ocamllex(
     src  = "lexer.mll"
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Lexer_cmi",
     src  = "lexer.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Parser_cmi"
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Location",
     struct = "location.ml",
     sig    = "Location_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Buffer",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Filename",
@@ -505,6 +494,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Parsing",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
         "//utils:Build_path_prefix_map",
@@ -527,26 +517,24 @@ bootstrap_module(
     ],
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Location_cmi",
     src  = "location.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
-        "//stdlib:Stdlib.Buffer",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Buffer_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
         "//utils:Warnings",
     ],
     visibility = ["//lambda:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Longident",
     struct = "longident.ml",
     sig    = "Longident_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.String",
@@ -562,22 +550,21 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Longident_cmi",
     src  = "longident.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
-        "//stdlib:Stdlib.Format"
+        "//stdlib:Stdlib",
+       "//stdlib:Stdlib.Format"
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Parse",
     struct = "parse.ml",
     sig    = "Parse_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Lexing",
@@ -596,11 +583,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Parse_cmi",
     src  = "parse.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Lexing",
@@ -610,12 +596,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Parser",
     struct = "parser.ml",
     sig    = "Parser_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":Ast_helper",
         ":CamlinternalMenhirLib",
@@ -647,11 +632,10 @@ genrule(
     ])
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Parser_cmi",
     src  = "parser.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         ":CamlinternalMenhirLib",
         ":Docstrings",
@@ -671,11 +655,10 @@ genrule(
     ])
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Parsetree_cmi",
     src  = "parsetree.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Asttypes_cmi",
@@ -692,12 +675,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Pprintast",
     struct = "pprintast.ml",
     sig    = "Pprintast_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
@@ -717,11 +699,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Pprintast_cmi",
     src  = "pprintast.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Location",
@@ -730,12 +711,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Printast",
     struct = "printast.ml",
     sig    = "Printast_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
@@ -757,11 +737,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Printast_cmi",
     src  = "printast.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Location",
@@ -770,12 +749,11 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Syntaxerr",
     struct = "syntaxerr.ml",
     sig    = "Syntaxerr_cmi",
     opts = MODULE_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Location",
@@ -787,11 +765,10 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Syntaxerr_cmi",
     src  = "syntaxerr.mli",
     opts = SIG_OPTS,
-    primitives = PRIMITIVES,
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         ":Location",

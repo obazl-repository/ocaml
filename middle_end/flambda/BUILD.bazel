@@ -1,8 +1,8 @@
 load("//bzl:rules.bzl",
-     "bootstrap_archive",
-     "bootstrap_library",
-     "bootstrap_module",
-     "bootstrap_signature",
+     "boot_archive",
+     "boot_library",
+     "boot_module",
+     "boot_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -18,7 +18,7 @@ SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 STDLIB = ["//boot/lib:stdlib"]
 
 # obazl testing, build everything
-bootstrap_archive(
+boot_archive(
     name = "flambda",
     manifest  = [
         ":Alias_analysis",
@@ -82,7 +82,7 @@ bootstrap_archive(
 ## compilerlibs/Makefile.compilerlibs:
 ## MIDDLE_END contains two sets of flambda deps. some are inlined, the
 ## rest are grouped in MIDDLE_END_FLAMBDA.
-bootstrap_library(
+boot_library(
     name = "ocamloptcomp",
     manifest  = [
         ## inlined in MIDDLE_END:
@@ -151,7 +151,7 @@ bootstrap_library(
 )
 
 ################################################################
-bootstrap_module(
+boot_module(
     name   = "Alias_analysis",
     struct = "alias_analysis.ml",
     sig    = "Alias_analysis_cmi",
@@ -171,7 +171,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Alias_analysis_cmi",
     src  = "alias_analysis.mli",
     opts = SIG_OPTS,
@@ -187,7 +187,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Allocated_const",
     struct = "allocated_const.ml",
     sig    = "Allocated_const_cmi",
@@ -203,7 +203,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Allocated_const_cmi",
     src  = "allocated_const.mli",
     opts = SIG_OPTS,
@@ -212,7 +212,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Augment_specialised_args",
     struct = "augment_specialised_args.ml",
     sig    = "Augment_specialised_args_cmi",
@@ -241,7 +241,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Augment_specialised_args_cmi",
     src  = "augment_specialised_args.mli",
     opts = SIG_OPTS,
@@ -254,7 +254,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Build_export_info",
     struct = "build_export_info.ml",
     sig    = "Build_export_info_cmi",
@@ -288,7 +288,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Build_export_info_cmi",
     src  = "build_export_info.mli",
     opts = SIG_OPTS,
@@ -300,7 +300,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Closure_conversion",
     struct = "closure_conversion.ml",
     sig    = "Closure_conversion_cmi",
@@ -341,7 +341,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Closure_conversion_cmi",
     src  = "closure_conversion.mli",
     opts = SIG_OPTS,
@@ -353,7 +353,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Closure_conversion_aux",
     struct = "closure_conversion_aux.ml",
     sig    = "Closure_conversion_aux_cmi",
@@ -373,7 +373,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Closure_conversion_aux_cmi",
     src  = "closure_conversion_aux.mli",
     opts = SIG_OPTS,
@@ -386,7 +386,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Closure_offsets",
     struct = "closure_offsets.ml",
     sig    = "Closure_offsets_cmi",
@@ -402,7 +402,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Closure_offsets_cmi",
     src  = "closure_offsets.mli",
     opts = SIG_OPTS,
@@ -414,7 +414,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Effect_analysis",
     struct = "effect_analysis.ml",
     sig    = "Effect_analysis_cmi",
@@ -430,7 +430,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Effect_analysis_cmi",
     src  = "effect_analysis.mli",
     opts = SIG_OPTS,
@@ -440,7 +440,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Export_info",
     struct = "export_info.ml",
     sig    = "Export_info_cmi",
@@ -469,7 +469,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Export_info_cmi",
     src  = "export_info.mli",
     opts = SIG_OPTS,
@@ -490,7 +490,7 @@ bootstrap_signature(
     visibility = ["//file_formats:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Export_info_for_pack",
     struct = "export_info_for_pack.ml",
     sig    = "Export_info_for_pack_cmi",
@@ -514,7 +514,7 @@ bootstrap_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Export_info_for_pack_cmi",
     src  = "export_info_for_pack.mli",
     opts = SIG_OPTS,
@@ -524,7 +524,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Extract_projections",
     struct = "extract_projections.ml",
     sig    = "Extract_projections_cmi",
@@ -545,7 +545,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Extract_projections_cmi",
     src  = "extract_projections.mli",
     opts = SIG_OPTS,
@@ -557,7 +557,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Find_recursive_functions",
     struct = "find_recursive_functions.ml",
     sig    = "Find_recursive_functions_cmi",
@@ -574,7 +574,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Find_recursive_functions_cmi",
     src  = "find_recursive_functions.mli",
     opts = SIG_OPTS,
@@ -586,7 +586,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Flambda",
     struct = "flambda.ml",
     sig    = "Flambda_cmi",
@@ -627,7 +627,7 @@ bootstrap_module(
     visibility = ["//middle_end/flambda/base_types:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Flambda_cmi",
     src  = "flambda.mli",
     opts = SIG_OPTS,
@@ -654,7 +654,7 @@ bootstrap_signature(
     visibility = ["//middle_end/flambda/base_types:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Flambda_invariants",
     struct = "flambda_invariants.ml",
     sig    = "Flambda_invariants_cmi",
@@ -688,7 +688,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Flambda_invariants_cmi",
     src  = "flambda_invariants.mli",
     opts = SIG_OPTS,
@@ -698,7 +698,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Flambda_iterators",
     struct = "flambda_iterators.ml",
     sig    = "Flambda_iterators_cmi",
@@ -713,7 +713,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Flambda_iterators_cmi",
     src  = "flambda_iterators.mli",
     opts = SIG_OPTS,
@@ -725,7 +725,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Flambda_middle_end",
     struct = "flambda_middle_end.ml",
     sig    = "Flambda_middle_end_cmi",
@@ -775,7 +775,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Flambda_middle_end_cmi",
     src  = "flambda_middle_end.mli",
     opts = SIG_OPTS,
@@ -786,7 +786,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Flambda_to_clambda",
     struct = "flambda_to_clambda.ml",
     sig    = "Flambda_to_clambda_cmi",
@@ -829,7 +829,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Flambda_to_clambda_cmi",
     src  = "flambda_to_clambda.mli",
     opts = SIG_OPTS,
@@ -843,7 +843,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Flambda_utils",
     struct = "flambda_utils.ml",
     sig    = "Flambda_utils_cmi",
@@ -879,7 +879,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Flambda_utils_cmi",
     src  = "flambda_utils.mli",
     opts = SIG_OPTS,
@@ -899,7 +899,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Freshening",
     struct = "freshening.ml",
     sig    = "Freshening_cmi",
@@ -924,7 +924,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Freshening_cmi",
     src  = "freshening.mli",
     opts = SIG_OPTS,
@@ -941,7 +941,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Import_approx",
     struct = "import_approx.ml",
     sig    = "Import_approx_cmi",
@@ -969,7 +969,7 @@ bootstrap_module(
     visibility = ["//driver:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Import_approx_cmi",
     src  = "import_approx.mli",
     opts = SIG_OPTS,
@@ -981,7 +981,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Inconstant_idents",
     struct = "inconstant_idents.ml",
     sig    = "Inconstant_idents_cmi",
@@ -1007,7 +1007,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inconstant_idents_cmi",
     src  = "inconstant_idents.mli",
     opts = SIG_OPTS,
@@ -1021,7 +1021,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Initialize_symbol_to_let_symbol",
     struct = "initialize_symbol_to_let_symbol.ml",
     sig    = "Initialize_symbol_to_let_symbol_cmi",
@@ -1036,7 +1036,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Initialize_symbol_to_let_symbol_cmi",
     src  = "initialize_symbol_to_let_symbol.mli",
     opts = SIG_OPTS,
@@ -1046,7 +1046,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Inline_and_simplify",
     struct = "inline_and_simplify.ml",
     sig    = "Inline_and_simplify_cmi",
@@ -1101,7 +1101,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inline_and_simplify_cmi",
     src  = "inline_and_simplify.mli",
     opts = SIG_OPTS,
@@ -1115,7 +1115,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Inline_and_simplify_aux",
     struct = "inline_and_simplify_aux.ml",
     sig    = "Inline_and_simplify_aux_cmi",
@@ -1153,7 +1153,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inline_and_simplify_aux_cmi",
     src  = "inline_and_simplify_aux.mli",
     opts = SIG_OPTS,
@@ -1178,7 +1178,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Inlining_cost",
     struct = "inlining_cost.ml",
     sig    = "Inlining_cost_cmi",
@@ -1205,7 +1205,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inlining_cost_cmi",
     src  = "inlining_cost.mli",
     opts = SIG_OPTS,
@@ -1216,7 +1216,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Inlining_decision",
     struct = "inlining_decision.ml",
     sig    = "Inlining_decision_cmi",
@@ -1241,7 +1241,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inlining_decision_cmi",
     src  = "inlining_decision.mli",
     opts = SIG_OPTS,
@@ -1257,7 +1257,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inlining_decision_intf_cmi",
     src  = "inlining_decision_intf.mli",
     opts = SIG_OPTS,
@@ -1272,7 +1272,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Inlining_stats",
     struct = "inlining_stats.ml",
     sig    = "Inlining_stats_cmi",
@@ -1291,7 +1291,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inlining_stats_cmi",
     src  = "inlining_stats.mli",
     opts = SIG_OPTS,
@@ -1302,7 +1302,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Inlining_stats_types",
     struct = "inlining_stats_types.ml",
     sig    = "Inlining_stats_types_cmi",
@@ -1315,7 +1315,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inlining_stats_types_cmi",
     src  = "inlining_stats_types.mli",
     opts = SIG_OPTS,
@@ -1325,7 +1325,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Inlining_transforms",
     struct = "inlining_transforms.ml",
     sig    = "Inlining_transforms_cmi",
@@ -1353,7 +1353,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Inlining_transforms_cmi",
     src  = "inlining_transforms.mli",
     opts = SIG_OPTS,
@@ -1369,7 +1369,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Invariant_params",
     struct = "invariant_params.ml",
     sig    = "Invariant_params_cmi",
@@ -1392,7 +1392,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Invariant_params_cmi",
     src  = "invariant_params.mli",
     opts = SIG_OPTS,
@@ -1404,7 +1404,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Lift_code",
     struct = "lift_code.ml",
     sig    = "Lift_code_cmi",
@@ -1423,7 +1423,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Lift_code_cmi",
     src  = "lift_code.mli",
     opts = SIG_OPTS,
@@ -1435,7 +1435,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Lift_constants",
     struct = "lift_constants.ml",
     sig    = "Lift_constants_cmi",
@@ -1467,7 +1467,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Lift_constants_cmi",
     src  = "lift_constants.mli",
     opts = SIG_OPTS,
@@ -1478,7 +1478,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Lift_let_to_initialize_symbol",
     struct = "lift_let_to_initialize_symbol.ml",
     sig    = "Lift_let_to_initialize_symbol_cmi",
@@ -1498,7 +1498,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Lift_let_to_initialize_symbol_cmi",
     src  = "lift_let_to_initialize_symbol.mli",
     opts = SIG_OPTS,
@@ -1509,7 +1509,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Parameter",
     struct = "parameter.ml",
     sig    = "Parameter_cmi",
@@ -1522,7 +1522,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Parameter_cmi",
     src  = "parameter.mli",
     opts = SIG_OPTS,
@@ -1533,7 +1533,7 @@ bootstrap_signature(
     ],
 )
 
-bootstrap_module(
+boot_module(
     name   = "Pass_wrapper",
     struct = "pass_wrapper.ml",
     sig    = "Pass_wrapper_cmi",
@@ -1545,7 +1545,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Pass_wrapper_cmi",
     src  = "pass_wrapper.mli",
     opts = SIG_OPTS,
@@ -1554,7 +1554,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Projection",
     struct = "projection.ml",
     sig    = "Projection_cmi",
@@ -1573,7 +1573,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Projection_cmi",
     src  = "projection.mli",
     opts = SIG_OPTS,
@@ -1586,7 +1586,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ref_to_variables",
     struct = "ref_to_variables.ml",
     sig    = "Ref_to_variables_cmi",
@@ -1606,7 +1606,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Ref_to_variables_cmi",
     src  = "ref_to_variables.mli",
     opts = SIG_OPTS,
@@ -1616,7 +1616,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Remove_free_vars_equal_to_args",
     struct = "remove_free_vars_equal_to_args.ml",
     sig    = "Remove_free_vars_equal_to_args_cmi",
@@ -1633,7 +1633,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Remove_free_vars_equal_to_args_cmi",
     src  = "remove_free_vars_equal_to_args.mli",
     opts = SIG_OPTS,
@@ -1644,7 +1644,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Remove_unused_arguments",
     struct = "remove_unused_arguments.ml",
     sig    = "Remove_unused_arguments_cmi",
@@ -1668,7 +1668,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Remove_unused_arguments_cmi",
     src  = "remove_unused_arguments.mli",
     opts = SIG_OPTS,
@@ -1679,7 +1679,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Remove_unused_closure_vars",
     struct = "remove_unused_closure_vars.ml",
     sig    = "Remove_unused_closure_vars_cmi",
@@ -1697,7 +1697,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Remove_unused_closure_vars_cmi",
     src  = "remove_unused_closure_vars.mli",
     opts = SIG_OPTS,
@@ -1707,7 +1707,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Remove_unused_program_constructs",
     struct = "remove_unused_program_constructs.ml",
     sig    = "Remove_unused_program_constructs_cmi",
@@ -1722,7 +1722,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Remove_unused_program_constructs_cmi",
     src  = "remove_unused_program_constructs.mli",
     opts = SIG_OPTS,
@@ -1732,7 +1732,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Share_constants",
     struct = "share_constants.ml",
     sig    = "Share_constants_cmi",
@@ -1747,7 +1747,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Share_constants_cmi",
     src  = "share_constants.mli",
     opts = SIG_OPTS,
@@ -1757,7 +1757,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Simple_value_approx",
     struct = "simple_value_approx.ml",
     sig    = "Simple_value_approx_cmi",
@@ -1800,7 +1800,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Simple_value_approx_cmi",
     src  = "simple_value_approx.mli",
     opts = SIG_OPTS,
@@ -1825,7 +1825,7 @@ bootstrap_signature(
     visibility = ["//middle_end:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Simplify_boxed_integer_ops",
     struct = "simplify_boxed_integer_ops.ml",
     sig    = "Simplify_boxed_integer_ops_cmi",
@@ -1846,7 +1846,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Simplify_boxed_integer_ops_cmi",
     src  = "simplify_boxed_integer_ops.mli",
     opts = SIG_OPTS,
@@ -1858,7 +1858,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Simplify_boxed_integer_ops_intf_cmi",
     src  = "simplify_boxed_integer_ops_intf.mli",
     opts = SIG_OPTS,
@@ -1872,7 +1872,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Simplify_common",
     struct = "simplify_common.ml",
     sig    = "Simplify_common_cmi",
@@ -1887,7 +1887,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Simplify_common_cmi",
     src  = "simplify_common.mli",
     opts = SIG_OPTS,
@@ -1899,7 +1899,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Simplify_primitives",
     struct = "simplify_primitives.ml",
     sig    = "Simplify_primitives_cmi",
@@ -1930,7 +1930,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Simplify_primitives_cmi",
     src  = "simplify_primitives.mli",
     opts = SIG_OPTS,
@@ -1946,7 +1946,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Traverse_for_exported_symbols",
     struct = "traverse_for_exported_symbols.ml",
     sig    = "Traverse_for_exported_symbols_cmi",
@@ -1970,7 +1970,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Traverse_for_exported_symbols_cmi",
     src  = "traverse_for_exported_symbols.mli",
     opts = SIG_OPTS,
@@ -1987,7 +1987,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Un_anf",
     struct = "un_anf.ml",
     sig    = "Un_anf_cmi",
@@ -2010,7 +2010,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Un_anf_cmi",
     src  = "un_anf.mli",
     opts = SIG_OPTS,
@@ -2021,7 +2021,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Unbox_closures",
     struct = "unbox_closures.ml",
     sig    = "Unbox_closures_cmi",
@@ -2041,7 +2041,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Unbox_closures_cmi",
     src  = "unbox_closures.mli",
     opts = SIG_OPTS,
@@ -2054,7 +2054,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Unbox_free_vars_of_closures",
     struct = "unbox_free_vars_of_closures.ml",
     sig    = "Unbox_free_vars_of_closures_cmi",
@@ -2076,7 +2076,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Unbox_free_vars_of_closures_cmi",
     src  = "unbox_free_vars_of_closures.mli",
     opts = SIG_OPTS,
@@ -2088,7 +2088,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Unbox_specialised_args",
     struct = "unbox_specialised_args.ml",
     sig    = "Unbox_specialised_args_cmi",
@@ -2106,7 +2106,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Unbox_specialised_args_cmi",
     src  = "unbox_specialised_args.mli",
     opts = SIG_OPTS,

@@ -1,9 +1,11 @@
+package(default_visibility = ["//visibility:public"])
+
 load("//bzl:rules.bzl",
-     "bootstrap_executable",
-     "bootstrap_library",
-     "bootstrap_module",
+     "boot_executable",
+     "boot_library",
+     "boot_module",
      "bootstrap_ocamllex",
-     "bootstrap_signature"
+     "boot_signature"
 )
 
 exports_files([
@@ -15,7 +17,6 @@ load("//config:CONFIG.bzl",
      # "TOOLS_SIG_OPTS"
      "OC_COMMON_CFLAGS",
      "PLATFORM_CFLAGS",
-     "PRIMITIVES"
      )
 
 # MODULE_OPTS/SIG_OPTS should include:
@@ -31,7 +32,7 @@ MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
 ]
 SIG_OPTS    = ["-nostdlib"] + OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
-STDLIB = ["//boot/lib:stdlib", "//stdlib:Std_exit"]
+STDLIB = ["//boot/lib:stdlib"] # , "//stdlib:Std_exit"]
 
 ## first the executables. modules and sigs below.
 # programs_byte := \
@@ -51,7 +52,7 @@ STDLIB = ["//boot/lib:stdlib", "//stdlib:Std_exit"]
 # ocamldep$(EXE): $(OCAMLDEP)
 # ocamldep.opt$(EXE): $(call byte2native, $(OCAMLDEP))
 
-bootstrap_executable(
+boot_executable(
     name = "ocamldep",
     main = ":Ocamldep",
     deps = [
@@ -63,7 +64,7 @@ bootstrap_executable(
 ################################################################
 # Profiling: https://ocaml.org/manual/profil.html
 # The OCaml profiling compilers: ocamlcp, ocamloptp, ocamlprof
-bootstrap_executable(
+boot_executable(
     name = "ocamlprof",
     main = ":Ocamlprof",
     deps = [
@@ -89,7 +90,7 @@ bootstrap_executable(
     ]
 )
 
-bootstrap_executable(
+boot_executable(
     name = "ocamlcp",
     main = ":Ocamlcp",
     deps = [
@@ -108,13 +109,38 @@ bootstrap_executable(
         "//utils:Load_path",
         "//utils:Ccomp",
         "//driver:Compenv",
-        "//driver:Main_args"
+        "//driver:Main_args",
+        ":Ocamlcp_common"
+    ]
+)
+
+boot_executable(
+    name = "ocamloptp",
+    main = ":Ocamloptp",
+    deps = [
+        "//utils:Config",
+        "//utils:Build_path_prefix_map",
+        "//utils:Misc",
+        "//utils:Profile",
+        "//utils:Warnings",
+        "//utils:Identifiable",
+        "//utils:Numbers",
+        "//utils:Arg_helper",
+        "//utils:Clflags",
+        "//utils:Local_store",
+        "//utils:Terminfo",
+        "//parsing:Location",
+        "//utils:Load_path",
+        "//utils:Ccomp",
+        "//driver:Compenv",
+        "//driver:Main_args",
+        ":Ocamlcp_common"
     ]
 )
 
 ################################################################
 # To help building mixed-mode libraries (OCaml + C)
-bootstrap_executable(
+boot_executable(
     name = "ocamlmklib",
     main = ":Ocamlmklib",
     deps = [
@@ -131,7 +157,7 @@ bootstrap_executable(
 #        local_store.cmo load_path.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
 # ocamlmktop$(EXE): $(OCAMLMKTOP)
 # ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
-bootstrap_executable(
+boot_executable(
     name = "ocamlmktop",
     main = ":Ocamlmktop",
     deps = [
@@ -156,14 +182,14 @@ bootstrap_executable(
 # $(cvt_emit): cvt_emit.cmo
 # 	$(CAMLC) $(LINKFLAGS) -o $@ $^
 
-bootstrap_executable(
+boot_executable(
     name = "cvt_emit.exe",
     main = ":Cvt_emit",
     # deps = STDLIB,
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Cvt_emit",
     struct = "cvt_emit.ml",
     opts = MODULE_OPTS,
@@ -173,7 +199,6 @@ bootstrap_module(
         "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
     ],
-    data = ["//runtime:primitives"]
 )
 
 bootstrap_ocamllex(
@@ -184,7 +209,7 @@ bootstrap_ocamllex(
 
 ################################################################
 # Reading cmt files
-bootstrap_executable(
+boot_executable(
     name = "ocamlcmt",
     main = ":Ocamlcmt",
     deps = [
@@ -201,19 +226,24 @@ bootstrap_executable(
 #           opnames.cmo dumpobj.cmo
 # dumpobj$(EXE): $(DUMPOBJ)
 # dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
-bootstrap_executable(
+## i.e. only native, no vm build
+boot_executable(
     name = "dumpobj",
     main = ":Dumpobj",
     deps = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
-        ":Opnames"
+        ":Opnames",
+        ":Dumpobj"
+    ],
+    target_compatible_with = [
+        "//platforms/target:sys?"
     ]
 )
 
 ################################################################
 ## ocamlobjinfo - Display info on compiled files
-bootstrap_executable(
+boot_executable(
     name = "ocamlobjinfo",
     main = ":Objinfo",
     deps = [
@@ -230,7 +260,7 @@ bootstrap_executable(
 #         primreq.cmo
 # primreq$(EXE): $(PRIMREQ)
 # primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
-bootstrap_executable(
+boot_executable(
     name = "primreq",
     main = ":Primreq",
     deps = [
@@ -241,7 +271,7 @@ bootstrap_executable(
 
 ################
 # Copy a bytecode executable, stripping debug info
-bootstrap_executable(
+boot_executable(
     name = "stripdebug",
     main = ":Stripdebug",
     deps = [
@@ -257,7 +287,7 @@ bootstrap_executable(
 #        cmpbyt.cmo
 # cmpbyt$(EXE): $(CMPBYT)
 # cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
-bootstrap_executable(
+boot_executable(
     name = "cmpbyt",
     main = ":Cmpbyt",
     deps = [
@@ -272,7 +302,7 @@ bootstrap_executable(
 # NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 # opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
-bootstrap_module(
+boot_module(
     name = "Opnames",
     struct = "opnames.ml",
     opts = MODULE_OPTS,
@@ -338,35 +368,8 @@ genrule(
 
 ##########################################################
 ################  ocaml modules and sigs  ################
-## dev/test - build everything
-bootstrap_library(
-    name = "tools",
-    manifest  = [
-        # ":Caml_tex",
-        ":Cmpbyt",
-        ":Dumpobj",
-        # ":Eqparsetree",
-        ":Objinfo",
-        ":Ocamlcmt",
-        ":Ocamlcp",
-        ":Ocamldep",
-        ":Ocamlmklib",
-        ":Ocamlmktop",
-        ":Ocamloptp",
-        ":Ocamlprof",
-        ":Primreq",
-        ":Profiling",
-        ":Stripdebug",
-    ]
-    ## TODO:
-    # ] + select({
-    #     "//compilers/mode:native": [":Lintapidiff.opt"]
-    #     "//conditions:default": []
-    # })
-)
-
 ## TODO: get the unix stuff set up
-# bootstrap_module(
+# boot_module(
 #     name   = "Caml_tex",
 #     struct = "caml_tex.ml",
 #     opts = MODULE_OPTS,
@@ -399,10 +402,9 @@ bootstrap_library(
 #         #### (Mtd)
 #         #### (Mty)
 #     ],
-#     data = ["//runtime:primitives"]
 # )
 
-bootstrap_module(
+boot_module(
     name   = "Cmpbyt",
     struct = "cmpbyt.ml",
     opts = MODULE_OPTS,
@@ -412,11 +414,11 @@ bootstrap_module(
         "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Dumpobj",
+    target_compatible_with = ["//platforms/target:sys?"],
     struct = "dumpobj.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
@@ -440,7 +442,6 @@ bootstrap_module(
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
     ],
-    data = ["//runtime:primitives"]
 )
 
 # eqparsetree.ml", line 66, characters 7-22:
@@ -448,7 +449,7 @@ bootstrap_module(
 #             ^^^^^^^^^^^^^^^
 # Error: The constructor Const_string expects 3 argument(s),
 #        but is applied here to 1 argument(s)
-# bootstrap_module(
+# boot_module(
 #     name   = "Eqparsetree",
 #     struct = "eqparsetree.ml",
 #     opts = MODULE_OPTS,
@@ -458,14 +459,13 @@ bootstrap_module(
 #         # "//parsing:Longident",
 #         # "//parsing:Location",
 #     ],
-#     data = ["//runtime:primitives"]
-# )
+# # )
 
 # lintapidiff.ml", line 41, characters 15-29:
 # 41 | module IdMap = Misc.StringMap
 #                     ^^^^^^^^^^^^^^
 # Error: Unbound module Misc.StringMap
-# bootstrap_module(
+# boot_module(
 #     name   = "Lintapidiff.opt",
 #     mode   = "native",
 #     struct = "lintapidiff.ml",
@@ -489,10 +489,9 @@ bootstrap_module(
 #         "//typing:Printtyp",
 #         "//utils:Misc",
 #     ],
-#     data = ["//runtime:primitives"]
-# )
+# # )
 
-bootstrap_module(
+boot_module(
     name   = "Objinfo",
     struct = "objinfo.ml",
     opts = MODULE_OPTS,
@@ -523,10 +522,9 @@ bootstrap_module(
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ocamlcmt",
     struct = "ocamlcmt.ml",
     opts = MODULE_OPTS,
@@ -552,10 +550,9 @@ bootstrap_module(
         "//stdlib:Stdlib.Arg",
         "//typing:Annot_cmi",
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ocamlcp",
     struct = "ocamlcp.ml",
     opts = MODULE_OPTS,
@@ -568,21 +565,36 @@ bootstrap_module(
         "//stdlib:Stdlib.Filename",
         "//driver:Compenv",
         "//stdlib:Stdlib.Arg",
+        ":Ocamlcp_common"
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
+    name   = "Ocamlcp_common",
+    struct = "ocamlcp_common.ml",
+    opts = MODULE_OPTS,
+    deps   = STDLIB + [
+        # "//stdlib:Stdlib.Sys",
+        # "//stdlib:Stdlib.String",
+        # "//stdlib:Stdlib.Printf",
+        "//driver:Main_args",
+        # "//stdlib:Stdlib.List",
+        # "//stdlib:Stdlib.Filename",
+        # "//driver:Compenv",
+        # "//stdlib:Stdlib.Arg",
+    ],
+)
+
+boot_module(
     name   = "Ocamldep",
     struct = "ocamldep.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//driver:Makedepend"
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ocamlmklib",
     struct = "ocamlmklib.ml",
     opts = MODULE_OPTS,
@@ -599,10 +611,9 @@ bootstrap_module(
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ocamlmktop",
     struct = "ocamlmktop.ml",
     opts = MODULE_OPTS,
@@ -614,27 +625,26 @@ bootstrap_module(
         "//utils:Ccomp",
         "//stdlib:Stdlib.Array",
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ocamloptp",
     struct = "ocamloptp.ml",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//driver:Main_args",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
         "//driver:Compenv",
+        "//driver:Main_args",
         "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+        ":Ocamlcp_common"
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Ocamlprof",
     struct = "ocamlprof.ml",
     opts = MODULE_OPTS,
@@ -656,10 +666,9 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//utils:Warnings",
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Primreq",
     struct = "primreq.ml",
     opts = MODULE_OPTS,
@@ -670,10 +679,9 @@ bootstrap_module(
         "//utils:Config",
         "//utils:Misc",
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Profiling",
     struct = "profiling.ml",
     sig    = "Profiling_cmi",
@@ -683,20 +691,18 @@ bootstrap_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Sys",
     ],
-    data = ["//runtime:primitives"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Profiling_cmi",
     src  = "profiling.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
     ],
-    data = ["//runtime:primitives"]
 )
 
 # ../boot/ocamlrun ../boot/ocamlc
-bootstrap_module(
+boot_module(
     name   = "Stripdebug",
     struct = "stripdebug.ml",
     opts = MODULE_OPTS,
@@ -708,7 +714,6 @@ bootstrap_module(
         "//stdlib:Stdlib.Sys",
         "//utils:Misc",
     ],
-    data = ["//runtime:primitives"]
 )
 
 ################################################################
@@ -730,30 +735,61 @@ bootstrap_module(
 # 	$(CAMLC) $< -o $@
 
 ## macos make.log:
+# cd stdlib - stdlib includes links to runtime/libcamlrun.a, runtime/libasmrun.a
 # ../boot/ocamlrun ../boot/ocamllex -q make_opcodes.mll
-### Link make_opcodes program:
+## compile and link:
 # ../boot/ocamlrun ../boot/ocamlc -nostdlib -I ../boot -g -use-prims ../runtime/primitives -I .. make_opcodes.ml -o make_opcodes
+## run:
+# ./runtime/ocamlrun tools/make_opcodes -opcodes < runtime/caml/instruct.h > bytecomp/opcodes.ml
 
-bootstrap_executable(
+boot_executable(
     name = "make_opcodes",
     main = ":Make_opcodes",
-    deps = ["//boot/lib:stdlib"],
     visibility = ["//bytecomp:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Make_opcodes",
     struct = "make_opcodes.ml",
-    opts = ["-nostdlib", "-w", "-70"],
-    primitives = PRIMITIVES,
+    nocopts = True,
+    opts = ["-nostdlib"], # "-w", "-70"],
     deps   = STDLIB + [
     ],
-    data = ["//runtime:primitives"]
+    # data = ["//runtime:primitives"]
 )
 
 bootstrap_ocamllex(
     name = "make_opcodes_ml",
     out  = "make_opcodes.ml",
     src  = "make_opcodes.mll",
+    opts = ["-q"]
     # vmargs = ["-t", "-b"]
 )
+
+################################################################
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+build_test(
+    name = "tools",
+    targets = [
+        # ":Caml_tex",
+        ":cmpbyt",
+        # ":dumpobj",   ## sys target only
+        # ":Eqparsetree",
+        ":ocamlobjinfo",
+        ":ocamlcmt",
+        ":ocamlcp",
+        ":ocamldep",
+        ":ocamlmklib",
+        ":ocamlmktop",
+        ":ocamloptp",
+        ":ocamlprof",
+        ":primreq",
+        ":stripdebug",
+    ]
+    ## TODO:
+    # ] + select({
+    #     "//compilers/mode:native": [":Lintapidiff.opt"]
+    #     "//conditions:default": []
+    # })
+)
+

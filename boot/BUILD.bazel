@@ -1,1 +1,44 @@
-exports_files(["ocamlc", "ocamllex"])
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["ocamllex"])
+
+## Package //boot contains pre-compiled OCaml executables (ocamlc,
+## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
+
+alias(
+    name   = "ocamlrun.exe",
+    actual = "//runtime:ocamlrun"
+)
+
+sh_binary(
+    name = "ocamlc.byte",
+    srcs = ["ocamlc.sh"],
+    data = [
+        ":ocamlc",
+        ":ocamlrun.exe",
+        "//stdlib:camlheaders", # genrule, no dep on ocamlc.
+        # We cannot depend on Std_exit on pain of circularity.
+        # It depends on Stdlib, which is compiled by this tool.
+        # "//stdlib:Std_exit"
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ]
+)
+
+sh_binary(
+    name = "ocamllex.byte",
+    srcs = ["ocamllex.sh"],
+    data = [
+        ":ocamllex",
+        ":ocamlrun.exe"
+    ],
+    deps = ["@bazel_tools//tools/bash/runfiles"]
+)
+
+# ocamlyacc is written in C, so no ocamlyacc.opt.
+alias(
+    name   = "ocamlyacc.exe",
+    actual = "//yacc:ocamlyacc"
+)

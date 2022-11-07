@@ -1,8 +1,8 @@
 exports_files(["topeval.ml", "topmain.ml", "trace.ml"])
 
 # load("//bzl:rules.bzl",
-#      "bootstrap_library",
-#      "bootstrap_module",
+#      "boot_library",
+#      "boot_module",
 # )
 
 # load("//config:CONFIG.bzl",
@@ -16,7 +16,7 @@ exports_files(["topeval.ml", "topmain.ml", "trace.ml"])
 
 
 
-# bootstrap_library(
+# boot_library(
 #     name = "byte",
 #     manifest  = [
 #         ":Topeval",
@@ -25,7 +25,7 @@ exports_files(["topeval.ml", "topmain.ml", "trace.ml"])
 #     ],
 # )
 
-# bootstrap_module(
+# boot_module(
 #     name   = "Topeval",
 #     struct = "topeval.ml",
 #     sig    = "//toplevel:Topeval_cmi",
@@ -77,7 +77,7 @@ exports_files(["topeval.ml", "topmain.ml", "trace.ml"])
 #     visibility = ["//toplevel:__pkg__"]
 # )
 
-# bootstrap_module(
+# boot_module(
 #     name   = "Topmain",
 #     struct = "topmain.ml",
 #     sig    = "//toplevel:Topmain_cmi",
@@ -112,7 +112,7 @@ exports_files(["topeval.ml", "topmain.ml", "trace.ml"])
 #     visibility = ["//toplevel:__pkg__"]
 # )
 
-# bootstrap_module(
+# boot_module(
 #     name   = "Trace",
 #     struct = "trace.ml",
 #     sig    = "//toplevel:Trace_cmi",

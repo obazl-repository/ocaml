@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
-     "bootstrap_module",
-     "bootstrap_signature",
-     "bootstrap_library",
+     "boot_module",
+     "boot_signature",
+     "boot_library",
 )
 
 load("//config:CONFIG.bzl",
@@ -25,7 +25,7 @@ exports_files([
 ])
 
 ################################################################
-bootstrap_library(
+boot_library(
     name = "file_formats",
     manifest  = [
         ":Cmi_format",
@@ -35,7 +35,7 @@ bootstrap_library(
 )
 
 ## defined in compilerlibs/Makefile.compilerlibs as COMP_CMI
-bootstrap_library(
+boot_library(
     name = "ocamlcommon",
     manifest  = [
         ":Cmo_format_cmi",
@@ -45,7 +45,7 @@ bootstrap_library(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Cmi_format",
     struct = "cmi_format.ml",
     sig    = "Cmi_format_cmi",
@@ -66,7 +66,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Cmi_format_cmi",
     src  = "cmi_format.mli",
     opts = SIG_OPTS,
@@ -82,7 +82,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Cmo_format_cmi",
     src  = "cmo_format.mli",
     opts = SIG_OPTS,
@@ -99,7 +99,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Cmt_format",
     struct = "cmt_format.ml",
     sig    = "Cmt_format_cmi",
@@ -129,7 +129,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Cmt_format_cmi",
     src  = "cmt_format.mli",
     opts = SIG_OPTS,
@@ -144,7 +144,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Cmx_format_cmi",
     src  = "cmx_format.mli",
     opts = SIG_OPTS,
@@ -161,7 +161,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Cmxs_format_cmi",
     src  = "cmxs_format.mli",
     opts = SIG_OPTS,
@@ -176,7 +176,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Linear_format",
     struct = "linear_format.ml",
     sig    = "Linear_format_cmi",
@@ -194,7 +194,7 @@ bootstrap_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Linear_format_cmi",
     src  = "linear_format.mli",
     opts = SIG_OPTS,

@@ -1,9 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl",
-     "bootstrap_archive",
-     "bootstrap_executable",
-     "bootstrap_module",
+     "boot_archive",
+     "boot_executable",
+     "boot_module",
      "boot_compiler"
 )
 

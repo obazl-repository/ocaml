@@ -1,7 +1,7 @@
 load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
+     "ModuleInfo",
      "OcamlLibraryMarker",
-     "OcamlModuleMarker",
      "OcamlNsResolverProvider",
      "OcamlSignatureProvider")
 
@@ -13,7 +13,7 @@ load("//bzl:providers.bzl",
 load(":impl_library.bzl", "impl_library")
 
 ###############################
-def _bootstrap_library(ctx):
+def _boot_library(ctx):
 
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
@@ -35,18 +35,18 @@ def _bootstrap_library(ctx):
 # rule_options.update(options_library("ocaml"))
 
 #####################
-bootstrap_library = rule(
-    implementation = impl_library, ## _bootstrap_library,
-    doc = """Aggregates a collection of OCaml modules. [User Guide](../ug/bootstrap_library.md). Provides: [OcamlLibraryMarker](providers_ocaml.md#ocamllibraryprovider).
+boot_library = rule(
+    implementation = impl_library, ## _boot_library,
+    doc = """Aggregates a collection of OCaml modules. [User Guide](../ug/boot_library.md). Provides: [OcamlLibraryMarker](providers_ocaml.md#ocamllibraryprovider).
 
 **WARNING** Not yet fully supported - subject to change. Use with caution.
 
-An `bootstrap_library` is a collection of modules packaged into an OBazl
+An `boot_library` is a collection of modules packaged into an OBazl
 target; it is not a single binary file. It is a OBazl convenience rule
 that allows a target to depend on a collection of deps under a single
 label, rather than having to list each individually.
 
-Be careful not to confuse `bootstrap_library` with `ocaml_archive`. The
+Be careful not to confuse `boot_library` with `ocaml_archive`. The
 latter generates OCaml binaries (`.cma`, `.cmxa`, '.a' archive files);
 the former does not generate anything, it just passes on its
 dependencies under a single label, packaged in a
@@ -112,7 +112,7 @@ Packages](../ug/collections.md).
             providers = [
                 # [OcamlArchiveProvider],
                 [OcamlLibraryMarker],
-                [OcamlModuleMarker],
+                [ModuleInfo],
                 [OcamlNsResolverProvider],
                 # [OcamlNsMarker],
                 [OcamlSignatureProvider],
@@ -125,7 +125,7 @@ Packages](../ug/collections.md).
 """
         ),
 
-        _rule = attr.string( default = "bootstrap_library" ),
+        _rule = attr.string( default = "boot_library" ),
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),

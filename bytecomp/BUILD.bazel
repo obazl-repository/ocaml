@@ -1,15 +1,15 @@
 load("//bzl:rules.bzl",
-     "bootstrap_archive",
-     "bootstrap_library",
-     "bootstrap_module",
-     "bootstrap_signature",
+     "boot_archive",
+     "boot_library",
+     "boot_module",
+     "boot_signature",
 )
 
 load("//config:CONFIG.bzl",
      # "RUNTIME_OCAMLRUN",
      "OC_COMMON_CFLAGS",
      "PLATFORM_CFLAGS",
-     "PRIMITIVES"
+     # "PRIMITIVES"
      )
 
 exports_files([
@@ -29,10 +29,14 @@ SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
     "-nostdlib"
 ]
 
+## make log:
+
+
+
 STDLIB = ["//boot/lib:stdlib"]
 
 ## dev/test: build everthing
-bootstrap_library(
+boot_library(
     name = "bytecomp",
     manifest  = [
         ":Bytegen",
@@ -60,7 +64,7 @@ bootstrap_library(
 # compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
 # 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
 
-bootstrap_archive(
+boot_archive(
     name = "ocamlbytecomp",
     opts = select({
         "//bzl/toolchain:boot": [],
@@ -99,7 +103,7 @@ bootstrap_archive(
 )
 
 ##############
-# bootstrap_library(
+# boot_library(
 #     name = "ocamlbytecomp",
 #     manifest  = [
 #         ":Bytegen",
@@ -120,7 +124,7 @@ bootstrap_archive(
 ################################################################
 ## for ocamlcommmon archive:
 # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
-bootstrap_library(
+boot_library(
     name = "ocamlcommon",
     manifest  = [
         "//driver:Compenv",
@@ -143,7 +147,7 @@ bootstrap_library(
 )
 
 ################################################################
-bootstrap_module(
+boot_module(
     name   = "Bytegen",
     struct = "bytegen.ml",
     sig    = "Bytegen_cmi",
@@ -177,7 +181,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Bytegen_cmi",
     src  = "bytegen.mli",
     opts = SIG_OPTS,
@@ -187,7 +191,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Bytelibrarian",
     struct = "bytelibrarian.ml",
     sig    = "Bytelibrarian_cmi",
@@ -211,7 +215,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Bytelibrarian_cmi",
     src  = "bytelibrarian.mli",
     opts = SIG_OPTS,
@@ -221,7 +225,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Bytelink",
     struct = "bytelink.ml",
     sig    = "Bytelink_cmi",
@@ -261,7 +265,7 @@ bootstrap_module(
     ## "//stdlib:camlheader"
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Bytelink_cmi",
     src  = "bytelink.mli",
     opts = SIG_OPTS,
@@ -274,7 +278,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Bytepackager",
     struct = "bytepackager.ml",
     sig    = "Bytepackager_cmi",
@@ -306,7 +310,7 @@ bootstrap_module(
     visibility = ["//driver:__pkg__"]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Bytepackager_cmi",
     src  = "bytepackager.mli",
     opts = SIG_OPTS,
@@ -318,7 +322,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Bytesections",
     struct = "bytesections.ml",
     sig    = "Bytesections_cmi",
@@ -326,6 +330,7 @@ bootstrap_module(
     deps   = STDLIB + [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib",
         "//utils:Config"
     ],
     data = ["//runtime:primitives"],
@@ -336,7 +341,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Bytesections_cmi",
     src  = "bytesections.mli",
     opts = SIG_OPTS,
@@ -348,7 +353,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Dll",
     struct = "dll.ml",
     sig    = "Dll_cmi",
@@ -371,7 +376,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Dll_cmi",
     src  = "dll.mli",
     opts = SIG_OPTS,
@@ -383,7 +388,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Emitcode",
     struct = "emitcode.ml",
     sig    = "Emitcode_cmi",
@@ -420,7 +425,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Emitcode_cmi",
     src  = "emitcode.mli",
     opts = SIG_OPTS,
@@ -433,7 +438,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Instruct",
     struct = "instruct.ml",
     sig    = "Instruct_cmi",
@@ -454,7 +459,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Instruct_cmi",
     src  = "instruct.mli",
     opts = SIG_OPTS,
@@ -474,7 +479,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Meta",
     struct = "meta.ml",
     sig    = "Meta_cmi",
@@ -490,7 +495,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Meta_cmi",
     src  = "meta.mli",
     opts = SIG_OPTS,
@@ -511,7 +516,7 @@ bootstrap_signature(
 # -w +a-4-9-40-41-42-44-45-48
 # -warn-error +a
 # -bin-annot -strict-formats
-bootstrap_module(
+boot_module(
     name   = "Opcodes",
     struct = "opcodes.ml",
     # sig    = ":Opcodes_cmi",
@@ -519,7 +524,6 @@ bootstrap_module(
     deps   = STDLIB + [
     ],
     # data = ["//runtime:primitives"],
-    primitives = PRIMITIVES,
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -537,8 +541,10 @@ bootstrap_module(
 # ../boot/ocamlrun ../boot/ocamllex -q make_opcodes.mll
 ### Link make_opcodes program:
 # ../boot/ocamlrun ../boot/ocamlc -nostdlib -I ../boot -g -use-prims ../runtime/primitives -I .. make_opcodes.ml -o make_opcodes
-### Run make_opcodes pgm using "new" ocamlrun
+
+### Run make_opcodes pgm using "new" ocamlrun (why?)
 # ./runtime/ocamlrun tools/make_opcodes -opcodes < runtime/caml/instruct.h > bytecomp/opcodes.ml
+
 ### Extract principal sig:
 # ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -i bytecomp/opcodes.ml > bytecomp/opcodes.mli
 ### Compile both:
@@ -550,7 +556,10 @@ genrule(
     outs  = ["opcodes.ml"],
     name  = "opcodes_ml",
     srcs  = ["//runtime/caml:instruct.h", "//tools:make_opcodes"],
-    tools = ["//boot/bin:ocamlrun"], #  FIXME
+    tools = [
+        "//boot/bin:ocamlrun", #  FIXME- makefile runs under runtime/ocamlrun
+        # "//tools:make_opcodes" # no need to transition to exec target
+    ],
     cmd   = " ".join([
         # "$(execpath {NEW_OCAMLRUN})".format(
         #     NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
@@ -567,7 +576,7 @@ genrule(
 # the rules don't seem to work for that
 # but we can just compile the ml file without an mli file, no?
 
-# bootstrap_signature(
+# boot_signature(
 #     name = "opcodes_mli",
 #     src  = "opcodes.ml",
 #     opts = SIG_OPTS,
@@ -597,7 +606,7 @@ genrule(
 #     ])
 # )
 
-bootstrap_module(
+boot_module(
     name   = "Printinstr",
     struct = "printinstr.ml",
     sig    = "Printinstr_cmi",
@@ -620,7 +629,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Printinstr_cmi",
     src  = "printinstr.mli",
     opts = SIG_OPTS,
@@ -631,7 +640,7 @@ bootstrap_signature(
     data = ["//runtime:primitives"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Symtable",
     struct = "symtable.ml",
     sig    = "Symtable_cmi",
@@ -670,7 +679,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Symtable_cmi",
     src  = "symtable.mli",
     opts = SIG_OPTS,

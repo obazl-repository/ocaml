@@ -7,23 +7,28 @@
 
 load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
+     "BootInfo",
+     "ModuleInfo",
+
      "OcamlArchiveProvider",
      "OcamlExecutableMarker",
      "OcamlImportMarker",
      "OcamlLibraryMarker",
      "OcamlNsResolverProvider",
-     "OcamlModuleMarker",
      "OcamlNsMarker",
-     "OcamlProvider",
      "OcamlSignatureProvider",
      "OcamlTestMarker")
 
 load(":impl_executable.bzl", "impl_executable")
 
-load(":options.bzl",
-     "options",
-     "options_executable",
-     "get_options")
+load(":BUILD.bzl", "exe_deps_out_transition")
+
+load(":boot_attrs_executable.bzl", "options_executable")
+
+# load(":options.bzl",
+#      "options",
+#      "options_executable",
+#      "get_options")
 
 ################################
 ####################################################
@@ -76,6 +81,7 @@ load(":options.bzl",
 #     ]
 # )
 
+################################################################
 rule_options = options_executable("ocaml")
 
 ########################
@@ -92,41 +98,6 @@ boot_compiler = rule(
             allow_single_file = True,
             # cfg = boot_compiler_out_transition,
         ),
-
-        _stage = attr.label(
-            doc = "bootstrap stage",
-            default = "//bzl:stage0"
-        ),
-
-        # ocamlc = attr.label(
-        #     allow_single_file = True,
-        #     default = "//boot/bin:ocamlc"
-        # ),
-
-        main = attr.label(
-            doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
-            # cfg = boot_compiler_out_transition,
-            allow_single_file = True,
-            providers = [[OcamlModuleMarker]],
-            default = None,
-        ),
-
-        deps = attr.label_list(
-            doc = "List of OCaml dependencies.",
-            # cfg = boot_compiler_out_transition,
-            providers = [[OcamlArchiveProvider],
-                         [OcamlImportMarker],
-                         [OcamlLibraryMarker],
-                         [OcamlModuleMarker],
-                         [OcamlNsMarker],
-                         [CcInfo]],
-        ),
-
-        # _stdexit = attr.label(
-        #     cfg = boot_compiler_out_transition,
-        #     default = "//stdlib:Std_exit",
-        #     allow_single_file = True
-        # ),
 
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"

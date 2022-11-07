@@ -4,8 +4,8 @@ load("@bazel_skylib//rules:common_settings.bzl",
 
 
 load("//bzl:rules.bzl",
-     "bootstrap_executable",
-     "bootstrap_module",
+     "boot_executable",
+     "boot_module",
      # "ocamlc_runtime",
      "ocamlrun")
 
@@ -28,7 +28,7 @@ load("//config:CONFIG.bzl",
      )
 
 OPTIMIZATION_FLAGS = select({
-    "//boot/vm:dbg?": ["-O0", "-g3"], # -Wall -Werror
+    "//platforms/vm:dbg?": ["-O0", "-g3"], # -Wall -Werror
     "//conditions:default": []
 })
 
@@ -37,8 +37,8 @@ RUNTIME_DEFINES = select({
     "//config/mode:instrumented?": ["CAML_INSTR"],
     "//conditions:default": ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 }) + select({
-    ## WARNING: //boot/vm just for -DDEBUG, not debugger mode (-c dbg)
-    "//boot/vm:DEBUG?": ["DEBUG"],
+    ## WARNING: //platforms/vm just for -DDEBUG, not debugger mode (-c dbg)
+    "//platforms/vm:DEBUG?": ["DEBUG"],
     "//conditions:default": []
 })
 
@@ -172,7 +172,7 @@ cc_library(
 # 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
 ## level 0 - uses //boot/bin:ocamlc
 # ocamlc_runtime(
-# bootstrap_executable(
+# boot_executable(
 #     name = "ocamlc",
 #     # exe  = "ocamlc",
 #     opts = ["-compat-32"],
@@ -525,6 +525,12 @@ genrule(
 ## under bazel we can build boot/ocamlrun etc. directly.
 
 ################################################################
+# From Makefile.common: Most of the time, boot/ocamlrun and
+# runtime/ocamlrun are the same. However, under some circumstances it
+# is important to be able to distinguish one from the other, hence
+# these two variables. (OCAMLRUN NEW_OCAMLRUN)
+# NEW_OCAMLRUN only used for running 'make_opcodes', in tools and bytecomp.
+
 cc_binary( ##FIXME: move this to //runtime and use an alias here
     name = "ocamlrun",
     srcs = [
@@ -532,7 +538,7 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
     ] + select({
         # add instrtrace if mode is debug on any platform, or
         # fastbuild on macos (where Bazel adds -DDEBUG)
-        "//boot/vm:trace?": ["//runtime:instrtrace"],
+        "//platforms/vm:trace?": ["//runtime:instrtrace"],
         "//conditions:default": []
     }),
     copts = [
@@ -559,7 +565,7 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
 
 ################################################################
 ## problem: makefiles set different options for bytecode and native
-## runtimes, meaning commonrun would have to be built twice. the
+## runtimes. meaning commonrun would have to be built twice. the
 ## legacy build pgm always does this, compiling srcs to different
 ## outputs (named with a type suffix, e.g. .bd for bytecode debug.)
 ## but with bazel we need not do this. instead of multiple targets
@@ -756,3 +762,44 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
 # 	    echo "$(locationn LIBDIR)" >> $@
 #     ])
 # )
+
+################################################################
+##  experiments: partition the code
+##      libprimitives, libmem, libinterp, etc.
+
+cc_library(
+    name = "mem",
+    alwayslink = True, linkstatic = True,
+    srcs = [
+        "gc_ctrl.c",
+        "gc_stats.c",
+        "memory.c",
+        "memprof.c",
+        "shared_heap.c",
+    ],
+    copts = [
+        "-x", "c",
+        "-I$(GENDIR)/runtime", # build_config.h
+        ## for platform-dependend s.h:
+        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        "$(OC_CFLAGS)",
+        "$(OC_CPPFLAGS)",
+    ] + select({
+        "//platforms/os:macos?": [], #"-std=c11"],
+        "//platforms/os:linux?": [],
+        "//conditions:default":  [] #"-std=c11"]
+    }) + select({
+        "//config/mode:pedantic?": ["-pedantic"],
+        "//conditions:default":  []
+    }) + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
+    linkopts = ["$(OC_LDFLAGS)"],
+    defines = RUNTIME_DEFINES + OC_NATIVE_DEFINES,
+    deps = ["//runtime/caml:hdrs"],
+    toolchains = ["//toolchain:profile"],
+    visibility = [
+        "//boot/lib:__pkg__",
+        "//dev/lib:__pkg__",
+        "//lib:__pkg__"
+    ],
+)
+

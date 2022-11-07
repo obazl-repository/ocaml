@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
-     "bootstrap_library",
-     "bootstrap_module",
-     "bootstrap_signature",
+     "boot_library",
+     "boot_module",
+     "boot_signature",
 )
 
 exports_files([
@@ -18,7 +18,7 @@ SIG_OPTS = ["-nostdlib"]
 # we can do this with `bazel run`
 # https://dev.to/bazel/bazel-can-write-to-the-source-folder-b9b
 
-bootstrap_library(
+boot_library(
     name = "menhir",
     manifest= [
         ":MenhirLib",
@@ -28,7 +28,7 @@ bootstrap_library(
 
 ## FIXME: convert to namespace Ocaml (or Menhir or something)
 
-bootstrap_module(
+boot_module(
     name   = "MenhirLib",
     struct = "menhirLib.ml",
     sig    = "MenhirLib_cmi",
@@ -48,7 +48,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "MenhirLib_cmi",
     src  = "menhirLib.mli",
     opts = SIG_OPTS,
@@ -59,7 +59,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Parser",
     struct = "parser.ml",
     sig    = "Parser_cmi",
@@ -109,7 +109,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Parser_cmi",
     src  = "parser.mli",
     opts = SIG_OPTS,

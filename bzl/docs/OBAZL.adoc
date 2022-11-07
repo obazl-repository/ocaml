@@ -194,7 +194,7 @@ build command is `bazel build toplevel:ocaml`
   ** `//boot/bin:ocamlrun` (`cc_binary`)
   ** `//runtime:sak.exe` (`cc_binary`)
   ** `//runtime:primitives_dat` (`genrule`) => `primitives`
-* `make -C stdlib ... all` => `//stdlib` (`bootstrap_archive`)
+* `make -C stdlib ... all` => `//stdlib` (`boot_archive`)
 * `//middle_end:ocamlmiddleend` - archive, instead of `//compilerlibs:ocamlmiddleend`
 
 For root targets like `make ocamlc` we use a pseudo-package

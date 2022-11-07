@@ -1,5 +1,32 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_skylib//rules:common_settings.bzl",
+     "string_flag", "string_setting")
+
+# constraint_setting(name = "xtarget")
+# constraint_value(name = "vm?", constraint_setting = ":xtarget")
+# constraint_value(name = "sys?", constraint_setting = ":xtarget")
+# platform(name = "vmsys",
+#          parents = ["@local_config_platform//:host"],
+#          constraint_values = [
+#              "//platforms/build:vm?",
+#              ":sys?"
+#          ])
+# platform(name = "vm",
+#          parents = ["@local_config_platform//:host"],
+#          constraint_values = [":vm?"])
+
+string_flag(
+    name = "xtarget",
+    values = ["vm", "sys", ""],
+    build_setting_default = "",
+    visibility = ["//visibility:public"]
+)
+
+config_setting(name = "vm?",  flag_values = {":xtarget": "vm"})
+config_setting(name = "sys?", flag_values = {":xtarget": "sys"})
+
+
 # ? suffix: constraint_value
 # no suffix: platform
 
@@ -9,11 +36,11 @@ alias(name = "boot?", actual = "//platforms:boot?")
 alias(name = "dev", actual = "//platforms:dev")
 alias(name = "dev?", actual = "//platforms:dev?")
 
-alias(name = "vm", actual = "//platforms:vm")
-alias(name = "vm?", actual = "//platforms:vm?")
+# alias(name = "vm", actual = "//platforms:vm")
+# alias(name = "vm?", actual = "//platforms:vm?")
 
-alias(name = "sys", actual = "//platforms:sys")
-alias(name = "sys?", actual = "//platforms:sys?")
+# alias(name = "sys", actual = "//platforms:sys")
+# alias(name = "sys?", actual = "//platforms:sys?")
 
 ################################################################
 alias(name = "linux_amd64?", actual = "//platforms:linux_amd64?")

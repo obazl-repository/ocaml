@@ -16,7 +16,6 @@ def _cc_build_profile_impl(ctx):
             "OC_CFLAGS"   : " ".join(tcp.CFLAGS),
             "OC_CPPFLAGS" : " ".join(tcp.CPPFLAGS),
             "OC_LDFLAGS"  : " ".join(tcp.LDFLAGS),
-
             # ## ocaml compile flags
             # "OCAML_COPTS"   : " ".join(tcp.CFLAGS),
             # ## ocaml link flags
@@ -48,7 +47,6 @@ def _cc_toolchain_profile_impl(ctx):
             CFLAGS   = ctx.attr.CFLAGS,
             CPPFLAGS = ctx.attr.CPPFLAGS,
             LDFLAGS  = ctx.attr.LDFLAGS,
-
             # OCAML_COPTS   = ctx.attr.OCAML_COPTS,
             # OCAML_LOPTS   = ctx.attr.OCAML_LOPTS,
         ),

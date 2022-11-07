@@ -3,44 +3,10 @@ load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "C_COMPILE_ACTION_NAM
 
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
-## exports: bootstrap_toolchain_adapter (rule)
+## exports: bootstrap_toolchain_adapter (rule). includes stuff only
+## used during bootstrapping, e.g. primitives.
 
 ## obtaining CC toolchain:  https://github.com/bazelbuild/bazel/issues/7260
-
-################################################################
-#### rule, with in-transition ####
-def _bootstrap_toolchain_adapter_impl(ctx):
-
-    print("YACC: %s" % ctx.attr.yacc)
-
-    copts = []
-    if ctx.file.primitives:
-        copts.extend(["-use-prims", ctx.file.primitives])
-    copts.extend(ctx.attr.copts)
-
-    return [platform_common.ToolchainInfo(
-        # Public fields
-        name                   = ctx.label.name,
-        ## fixme: rename build_host, target_host
-        build_host             = ctx.attr.build_host,
-        target_host            = ctx.attr.target_host,
-        ## vm
-        tool_runner            = ctx.file.tool_runner,
-        vmargs                 = ctx.attr.vmargs,
-        repl                   = ctx.file.repl,
-        vmlibs                 = ctx.files.vmlibs,
-        linkmode               = ctx.attr.linkmode,
-        ## runtime
-        stdlib                 = ctx.attr.stdlib,
-        std_exit               = ctx.attr.std_exit,
-        camlheaders            = ctx.files.camlheaders,
-        ## core tools
-        compiler               = ctx.attr.compiler,
-        copts                  = copts,
-        linkopts               = ctx.attr.linkopts,
-        lexer                  = ctx.file.lexer,
-        yacc                   = ctx.file.yacc,
-    )]
 
 ##################################################
 def _toolchain_in_transition_impl(settings, attr):
@@ -65,7 +31,7 @@ toolchain_in_transition = transition(
 
 ######################################################
 def _tool_runner_out_transition_impl(settings, attr):
-    print("tool_runner_out_transition")
+    # print("tool_runner_out_transition")
     # print("  stage: %s" % settings["//bzl:stage"])
     # print("//bzl/toolchain:ocamlc: %s" %
     #       settings["//bzl/toolchain:ocamlc"])
@@ -89,6 +55,40 @@ tool_runner_out_transition = transition(
     ]
 )
 
+################################################################
+#### rule, with in-transition ####
+def _bootstrap_toolchain_adapter_impl(ctx):
+
+    copts = []
+    # if ctx.file.primitives:
+    #     copts.extend(["-use-prims", ctx.file.primitives.path])
+    # copts.extend(ctx.attr.copts)
+
+    return [platform_common.ToolchainInfo(
+        # Public fields
+        name                   = ctx.label.name,
+        build_host             = ctx.attr.build_host,
+        target_host            = ctx.attr.target_host,
+        xtarget_host            = ctx.attr.xtarget_host,
+        ## vm
+        tool_runner            = ctx.file.tool_runner,
+        vmargs                 = ctx.attr.vmargs,
+        repl                   = ctx.file.repl,
+        vmlibs                 = ctx.files.vmlibs,
+        linkmode               = ctx.attr.linkmode,
+        ## runtime
+        stdlib                 = ctx.attr.stdlib,
+        # std_exit               = ctx.attr.std_exit,
+        camlheaders            = ctx.files.camlheaders,
+        ## core tools
+        compiler               = ctx.attr.compiler,
+        copts                  = ctx.attr.copts,
+        linkopts               = ctx.attr.linkopts,
+        primitives             = ctx.file.primitives,
+        lexer                  = ctx.attr.lexer,
+        yacc                   = ctx.file.yacc,
+    )]
+
 ###################################
 ## the rule interface
 bootstrap_toolchain_adapter = rule(
@@ -97,11 +97,15 @@ bootstrap_toolchain_adapter = rule(
 
         "build_host": attr.string(
             doc     = "OCaml host platform: vm (bytecode) or an arch.",
-            default = "local"
+            default = "vm"
         ),
         "target_host": attr.string(
             doc     = "OCaml target platform: vm (bytecode) or an arch.",
-            default = "local"
+            default = "vm"
+        ),
+        "xtarget_host": attr.string(
+            doc     = "Cross-cross target platform: vm (bytecode) or an arch.",
+            default = ""
         ),
 
         ## Virtual Machine
@@ -114,7 +118,7 @@ bootstrap_toolchain_adapter = rule(
 
         "vmargs": attr.label( ## string list
             doc = "Args to pass to all invocations of ocamlrun",
-            default = "//boot/vm:args"
+            default = "//platforms/vm:args"
         ),
 
         "repl": attr.label(
@@ -140,20 +144,21 @@ bootstrap_toolchain_adapter = rule(
             # cfg = "exec",
         ),
 
-        "std_exit": attr.label(
-            # default = Label("//stdlib:Std_exit"),
-            executable = False,
-            allow_single_file = True,
-            # cfg = "exec",
-        ),
+        # "std_exit": attr.label(
+        #     # default = Label("//stdlib:Std_exit"),
+        #     executable = False,
+        #     allow_single_file = True,
+        #     # cfg = "exec",
+        # ),
 
         "camlheaders": attr.label_list(
             allow_files = True,
-            default = [
-                "//stdlib:camlheader", "//stdlib:target_camlheader",
-                "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
-                "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
-            ],
+            # default = [
+            #     # "//stdlib:camlheaders"
+            #     "//stdlib:camlheader", "//stdlib:target_camlheader",
+            #     "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+            #     "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+            # ],
         ),
 
         ################################
@@ -175,7 +180,7 @@ bootstrap_toolchain_adapter = rule(
         "linkopts" : attr.string_list(
         ),
         "lexer": attr.label(
-            allow_single_file = True,
+            # allow_single_file = True,
             # executable = True,
             # cfg = "exec",
         ),

@@ -1,8 +1,8 @@
 load(":impl_executable.bzl", "impl_executable")
 
-load("//bzl:functions.bzl", "config_tc")
+load(":boot_attrs_executable.bzl", "options_executable")
 
-load(":options.bzl", "options", "options_executable")
+load(":options.bzl", "options")
 
 #########################
 def _bootstrap_repl_impl(ctx):
@@ -19,8 +19,7 @@ def _bootstrap_repl_impl(ctx):
     # "$(location :ocaml.tmp)",
     # "$(location ocaml)",
 
-    # (mode,
-    (tc, tool, tool_args, scope, ext) = config_tc(ctx)
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     args = ctx.actions.args()
     args.add(ctx.file._expunger)
@@ -32,11 +31,11 @@ def _bootstrap_repl_impl(ctx):
     print("EXPUNGER: %s" % ctx.file._expunger)
 
     ctx.actions.run(
-        executable = tool,
+        executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs = [ocaml_tmp, ctx.file._expunger], # ctx.file.stdlib],
         outputs = [ocaml],
-        tools = [tool],
+        tools = [tc.compiler[DefaultInfo].files_to_run],
         mnemonic = "toplevel",
         progress_message = "building toplevel: {ws}//{pkg}:{tgt}".format(
             # mode = mode,

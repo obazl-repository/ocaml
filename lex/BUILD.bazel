@@ -1,30 +1,37 @@
 load("//bzl:rules.bzl",
-     "bootstrap_executable",
-     "bootstrap_module",
+     "boot_executable",
+     "boot_module",
      "bootstrap_ocamllex",
      "bootstrap_ocamlyacc",
-     "bootstrap_signature",
-     "bootstrap_library",
+     "boot_signature",
+     "boot_library",
 )
 
 load("//config:CONFIG.bzl",
-     "OC_COMMON_CFLAGS",
+     # "OC_COMMON_CFLAGS",
      "PLATFORM_CFLAGS",
      # "ROOT_MODULE_OPTS",
      # "ROOT_SIG_OPTS"
      )
 
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-    "-nostdlib"
-]
+# MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+MODULE_OPTS = ["-strict-formats"]
+# = PLATFORM_CFLAGS + [
+#     "-nostdlib"
+# ]
 
-SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-    "-nostdlib"
-]
+# SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+SIG_OPTS    =  ["-strict-formats"]
+# PLATFORM_CFLAGS + [
+#     "-nostdlib"
+# ]
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # SIG_OPTS = ROOT_SIG_OPTS
 
-STDLIB = ["//boot/lib:stdlib"]
+## HACK ALERT. There's a bug in the rules. The dependency on
+## //lib:Stdlib should be added automatically, either by the toolchain
+## or by the rules.
+STDLIB = ["//stdlib:Stdlib"]
 
 ## Makefile.common
 # Lexer generation
@@ -47,38 +54,32 @@ STDLIB = ["//boot/lib:stdlib"]
 # We implement it in the toolchain used by bootstrap_ocamllex
 
 
-# ../boot/ocamlrun ../boot/ocamlc -strict-sequence -nostdlib -I ../boot -use-prims ../runtime/primitives  -compat-32 -o ocamllex cset.cmo syntax.cmo parser.cmo lexer.cmo table.cmo lexgen.cmo compact.cmo common.cmo output.cmo outputbis.cmo main.cmo
+# ../boot/ocamlrun ../boot/ocamlc
+# -strict-sequence -nostdlib
+# -I ../boot -use-prims ../runtime/primitives
+# -compat-32 -o ocamllex
+# cset.cmo syntax.cmo parser.cmo lexer.cmo table.cmo
+# lexgen.cmo compact.cmo common.cmo output.cmo outputbis.cmo main.cmo
 
-bootstrap_executable(
+boot_executable(
     name = "ocamllex",
     main = ":Main",
     opts = [
         "-strict-sequence", "-nostdlib",
-        # "-I", "../boot",
         "-compat-32",
-        # "-ccopt", "-Wno-error=ignored-optimization-argument",
-        # "-ccopt", "-Wl,-export_dynamic",
-        # "-ccopt", "-Wno-error=unknown-argument"
+        "-w", "-31",
     ],
-    use_prims = "//runtime:primitives",
+    use_prims = True, # "//runtime:primitives",
     data = ["//runtime:primitives"],
     deps = [
-        ":lex"
-        # ":Common",
-        # ":Compact",
-        # ":Cset",
-        # ":Lexer",
-        # ":Lexgen",
-        # ":Output",
-        # ":Outputbis",
-        # ":Parser",
-        # ":Syntax",
-        # ":Table",
+        ## FIXME: stdlib and Std_exit should be added by the rule or toolchain:
+        # "//stdlib",
+        ":lex",
     ],
-    visibility = ["//promote:__pkg__"]
+    visibility = ["//visibility:public"]
 )
 
-# bootstrap_executable(
+# boot_executable(
 #     name = "ocamllex.opt",
 #     mode = "native",
 #     main = ":Main",
@@ -104,7 +105,7 @@ bootstrap_executable(
 #     ]
 # )
 
-bootstrap_library(
+boot_library(
     name = "lex",
     manifest  = [
         ":Common",
@@ -120,7 +121,7 @@ bootstrap_library(
     ],
 )
 
-bootstrap_module(
+boot_module(
     name   = "Common",
     struct = "common.ml",
     sig    = "Common_cmi",
@@ -136,7 +137,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Common_cmi",
     src  = "common.mli",
     opts = SIG_OPTS,
@@ -146,7 +147,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Compact",
     struct = "compact.ml",
     sig    = "Compact_cmi",
@@ -160,7 +161,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Compact_cmi",
     src  = "compact.mli",
     opts = SIG_OPTS,
@@ -170,7 +171,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Cset",
     struct = "cset.ml",
     sig    = "Cset_cmi",
@@ -182,7 +183,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Cset_cmi",
     src  = "cset.mli",
     opts = SIG_OPTS,
@@ -190,7 +191,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Lexer",
     struct = "lexer.ml",
     sig    = "Lexer_cmi",
@@ -207,7 +208,7 @@ bootstrap_ocamllex(
     src  = "lexer.mll"
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Lexer_cmi",
     src  = "lexer.mli",
     opts = SIG_OPTS,
@@ -216,7 +217,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Lexgen",
     struct = "lexgen.ml",
     sig    = "Lexgen_cmi",
@@ -230,6 +231,7 @@ bootstrap_module(
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Bool",
@@ -237,7 +239,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Lexgen_cmi",
     src  = "lexgen.mli",
     opts = SIG_OPTS,
@@ -246,30 +248,43 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Main",
     struct = "main.ml",
+    sig    = "Main_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Syntax", ## (Lex Syntax)
-        ":Outputbis", ## (Lex Outputbis)
-        ":Output", ## (Lex Output)
-        ":Lexgen", ## (Lex Lexgen)
-        ":Lexer", ## (Lex Lexer)
-        ":Cset", ## (Lex Cset)
-        ":Compact", ## (Lex Compact)
-        ":Common", ## (Lex Common)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Printexc",
-        ":Parser",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+        ":Common",
+        ":Compact",
+        ":Cset",
+        ":Lexer",
+        ":Lexgen",
+        ":Output",
+        ":Outputbis",
+        ":Parser",
+        ":Syntax",
     ]
 )
 
-bootstrap_module(
+boot_signature(
+    name = "Main_cmi",
+    src  = "main.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        # ":Syntax_cmi", ## (Lex Syntax)
+        # ":Lexgen_cmi", ## (Lex Lexgen)
+        # ":Compact_cmi", ## (Lex Compact)
+        # ":Common_cmi", ## (Lex Common)
+    ]
+)
+
+boot_module(
     name   = "Output",
     struct = "output.ml",
     sig    = "Output_cmi",
@@ -286,7 +301,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Output_cmi",
     src  = "output.mli",
     opts = SIG_OPTS,
@@ -298,7 +313,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Outputbis",
     struct = "outputbis.ml",
     sig    = "Outputbis_cmi",
@@ -315,7 +330,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Outputbis_cmi",
     src  = "outputbis.mli",
     opts = SIG_OPTS,
@@ -326,23 +341,38 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Parser",
     struct = "parser.ml",
+    sig    = ":Parser_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":Syntax"
+        ":Syntax",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Parsing",
+        "//stdlib:Stdlib.Printf",
+    ]
+)
+
+boot_signature(
+    name = "Parser_cmi",
+    src  = "parser.mli",
+    opts = SIG_OPTS,
+    deps   = STDLIB + [
+        ":Syntax",
+        "//stdlib:Stdlib.Lexing",
     ]
 )
 
 bootstrap_ocamlyacc(
     name = "parser_ml",
-    out  = "parser.ml",
+    outs = ["parser.ml", "parser.mli"],
     src  = "parser.mly",
-    opts = ["-v"]
+    opts = ["-v", "--strict"]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Syntax",
     struct = "syntax.ml",
     sig    = "Syntax_cmi",
@@ -352,7 +382,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Syntax_cmi",
     src  = "syntax.mli",
     opts = SIG_OPTS,
@@ -361,7 +391,7 @@ bootstrap_signature(
     ]
 )
 
-bootstrap_module(
+boot_module(
     name   = "Table",
     struct = "table.ml",
     sig    = "Table_cmi",
@@ -371,7 +401,7 @@ bootstrap_module(
     ]
 )
 
-bootstrap_signature(
+boot_signature(
     name = "Table_cmi",
     src  = "table.mli",
     opts = SIG_OPTS,

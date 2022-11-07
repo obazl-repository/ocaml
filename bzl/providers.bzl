@@ -1,42 +1,103 @@
+################
+## Bazel version 5
+# BootInfo = provider(
+#     doc = "foo",
+#     fields = {
+#         "sigs"          : "Depset of .cmi files. always added to inputs, never to cmd line.",
+#         "cli_link_deps" : "Depset of cm[x]a and cm[x|o] files to be added to inputs and link cmd line (executables and archives).",
+#         "afiles"        : "Depset of the .a files that go with .cmxa files",
+#         "archived_cmx"  : "Depset of archived .cmx and .o files. always added to inputs, never to cmd line.",
+#         "paths"         : "string depset, for efficiency",
+#         # "ofiles"        :    "depset of the .o files that go with .cmx files",
+#         # "archives"      :  "depset of .cmxa and .cma files",
+#         # "cma"           :       "depset of .cma files",
+#         # "cmxa"          :       "depset of .cmxa files",
+#         # "astructs"      :  "depset of archived structs, added to link depgraph but not command line.",
+#         # "cmts"          :      "depset of cmt/cmti files",
+#     },
+# )
 
-# An Ocaml "fileset" is the set of files emitted by the Ocaml
-# compiler. For modules: .cmx, .cmi, .o; for sigs, just .cmi.
+################################################################
+## For version 6:
+def _ModuleInfo_init(*, sig = None, struct = None):
+    return { "sig" : sig, "struct": struct }
 
-# DefaultInfo.files == whatever is appropriate for the cmd line, e.g. .cmx for modules, .cmxa for archives, .cmi for sigs.
-
-# OcamlProvider.filesets == filesets appropriate for target type. E.g.
-# for ns archives, DefaultInfo.files contains the cmxa file, and
-# OcamlProvider.filesets contains the filesets for the resolver and
-# submodules. For libs, contains filesets for all modules, plus the
-# resolver fileset if the lib is namespaced.
-
-# Filesets allow us to extract elements (e.g. cmi files) from
-# namespaced libs and archives.
-
-OcamlProvider = provider(
-    doc = "OCaml build provider; content depends on target rule type.",
+ModuleInfo, _new_moduleinfo = provider(
+    doc = "foo",
     fields = {
-        "fileset": "depset of files emitted by the Ocaml compiler. For modules: .cmx, .cmi, .o; for sigs, just .cmi; for libs and archives, filesets for submodules, plus resolver fileset if namespaced.",
+        "sig"   : "One .cmi file",
+        "struct": "One .cmo or .cmx file"
+    },
+    init = _ModuleInfo_init
+)
 
-        "cmi" : "Cmi files provided",
+##########################
+def _BootInfo_init(*,
+                   sigs          = [],
+                   cli_link_deps = [],
+                   afiles        = [],
+                   archived_cmx  = [],
+                   mli           = [],
+                   paths         = [],
+                   # ofiles      = [],
+                   # archives    = [],
+                   # astructs    = [],
+                   # cmts        = [],
+                        ):
+    return {
+        "sigs"          : sigs,
+        "cli_link_deps" : cli_link_deps,
+        "afiles"        : afiles,
+        "archived_cmx"  : archived_cmx,
+        "mli"           : mli,
+        "paths"         : paths,
+    }
 
-        "archive_manifests": "Depset of inherited archive manifests",
+BootInfo, _new_ocamlbootinfo = provider(
+    doc = "foo",
+    fields = {
+        "sigs"          : "Depset of .cmi files. always added to inputs, never to cmd line.",
+        "cli_link_deps" : "Depset of cm[x]a and cm[x|o] files to be added to inputs and link cmd line (executables and archives).",
+        "afiles"        : "Depset of the .a files that go with .cmxa files",
+        "archived_cmx"  : "Depset of archived .cmx and .o files. always added to inputs, never to cmd line.",
+        "mli"           : ".mli files needed for .ml compilation",
+        "paths"         : "string depset, for efficiency",
+        # "ofiles"        :    "depset of the .o files that go with .cmx files",
+        # "archives"      :  "depset of .cmxa and .cma files",
+        # "cma"           :       "depset of .cma files",
+        # "cmxa"          :       "depset of .cmxa files",
+        # "astructs"      :  "depset of archived structs, added to link depgraph but not command line.",
+        # "cmts"          :      "depset of cmt/cmti files",
+    },
+    init = _BootInfo_init
+)
 
-        "closure"             : "File depset of transitive closure of deps",
-        "inputs"             : "file depset",
-        "linkargs"             : "file depset",
-        "paths"             : "string depset",
-
-        "files"             : "DEPRECATED",
-        "archives"          : "file depset",
-        "archive_deps"       : "file depset of archive deps",
-        "ppx_codeps"      : "file depset",
-        "ppx_codep_paths" : "string depset",
-        "cc_deps"           : "dictionary depset",
-        "ns_resolver"       : "single target",
+##########################
+DepsAggregator = provider(
+    fields = {
+        "deps"    : "struct of BootInfo providers",
+        "ccinfos" : "list of CcInfo providers",
     }
 )
 
+def new_deps_aggregator():
+    return DepsAggregator(
+        deps = BootInfo(
+            sigs          = [],
+            cli_link_deps = [],
+            afiles        = [],
+            archived_cmx  = [],
+            mli           = [],
+            paths         = [],
+            # ofiles      = [],
+            # archives    = [],
+            # astructs    = [], # archived cmx structs, for linking
+            # cmts        = [],
+        ),
+        ccinfos           = []
+    )
+
+################################################################
 OcamlArchiveProvider = provider(
     doc = """OCaml archive provider.
 
@@ -92,7 +153,7 @@ OcamlSignatureProvider = provider(
 OcamlExecutableMarker = provider(doc = "OCaml Executable Marker provider.")
 OcamlImportMarker    = provider(doc = "OCaml Library Marker provider.")
 OcamlLibraryMarker   = provider(doc = "OCaml Library Marker provider.")
-OcamlModuleMarker    = provider(doc = "OCaml Module Marker provider.")
+# OcamlModuleMarker    = provider(doc = "OCaml Module Marker provider.")
 OcamlNsMarker        = provider(doc = "OCaml Namespace Marker provider.")
 OcamlSignatureMarker = provider(doc = "OCaml Signature Marker provider.")
 OcamlTestMarker      = provider(doc = "OCaml Test Marker provider.")
