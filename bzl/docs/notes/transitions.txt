@@ -1,0 +1,21 @@
+bazel build stdlib:Stdlib.Either
+
+SUBCOMMAND: # //runtime:camlrun [action 'Compiling runtime/alloc.c',
+                                        configuration: 4ad0c72fba7e78b00fcd67488bf5899373a7db9dc808c0c110ee2635 736119cb45c1,
+                                        execution platform: @local_config_platform//:host]
+
+SUBCOMMAND: # //stdlib:Stdlib.Either [action 'boot>boot compiling boot_module: //stdlib:Stdlib.Either',
+                                             configuration: dbd0714069eb3a3a8618862cf4d55162fa4c4ae18c05c786acfb9f1711290651b261,
+                                             execution platform: @local_config_platform//:host]
+
+################################################################
+
+bazel build dev/bin:ocamlc
+
+SUBCOMMAND: # //runtime:camlrun [action 'Compiling runtime/alloc.c',
+                                        configuration: 6273b5e192d35f676d88fcc61b780dbbc2aa02a521062fc32f544639 9a451b87078e,
+                                        execution platform: //platforms/build:boot]
+
+SUBCOMMAND: # //dev/bin:ocamlc [action 'boot>boot linking boot_compiler: //dev/bin:ocamlc',
+                                       configuration: 4c8d7eb49637e1ed8a83c321b6fffc252659826c6a5af39723 946ef86b33ae540ccea,
+                                       execution platform: //platforms/build:boot]

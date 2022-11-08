@@ -1,0 +1,42 @@
+
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME  -o runtime/addrmap.b.o runtime/addrmap.c
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux  -o runtime/addrmap.n.o runtime/addrmap.c
+
+################
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DDEBUG  -o runtime/addrmap.bd.o runtime/addrmap.c
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux -DDEBUG  -o runtime/addrmap.nd.o runtime/addrmap.c
+
+################
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DCAML_INSTR  -o runtime/addrmap.bi.o runtime/addrmap.c
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux -DCAML_INSTR  -o runtime/addrmap.ni.o runtime/addrmap.c
+
+################
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections -fPIC  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME  -o runtime/addrmap.bpic.o runtime/addrmap.c
+
+gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux -fPIC  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME  -o runtime/addrmap.npic.o runtime/addrmap.c
+
+################################################################
+deps:
+
+gcc -MM -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux -fPIC  runtime/addrmap.c -MT 'runtime/addrmap.npic.o' -MF .dep/runtime/addrmap.npic.d
+
+gcc -MM -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME  runtime/addrmap.c -MT 'runtime/addrmap.bpic.o' -MF .dep/runtime/addrmap.bpic.d
+
+gcc -MM -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux -DCAML_INSTR  runtime/addrmap.c -MT 'runtime/addrmap.ni.o' -MF .dep/runtime/addrmap.ni.d
+
+gcc -MM -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DCAML_INSTR  runtime/addrmap.c -MT 'runtime/addrmap.bi.o' -MF .dep/runtime/addrmap.bi.d
+
+gcc -MM -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux -DDEBUG  runtime/addrmap.c -MT 'runtime/addrmap.nd.o' -MF .dep/runtime/addrmap.nd.d
+
+gcc -MM -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DDEBUG  runtime/addrmap.c -MT 'runtime/addrmap.bd.o' -MF .dep/runtime/addrmap.bd.d
+
+gcc -MM -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_linux  runtime/addrmap.c -MT 'runtime/addrmap.n.o' -MF .dep/runtime/addrmap.n.d
+
+gcc -MM -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME  runtime/addrmap.c -MT 'runtime/addrmap.b.o' -MF .dep/runtime/addrmap.b.d

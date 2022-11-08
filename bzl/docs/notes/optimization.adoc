@@ -1,0 +1,9 @@
+= optimization config
+
+link:https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc[Recommended compiler and linker flags for GCC]
+
+
+link:https://www.incredibuild.com/blog/compiling-with-clang-optimization-flags[Compiling with Clang Optimization Flags]
+
+
+link:https://stackoverflow.com/questions/15548023/clang-optimization-levels[stack overflow], info on clang optimizations

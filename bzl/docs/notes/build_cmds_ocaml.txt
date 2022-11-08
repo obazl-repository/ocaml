@@ -1,0 +1,63 @@
+A typical module:
+
+../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal  -nopervasives -c camlinternalFormatBasics.mli
+
+../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal  -nopervasives -c camlinternalFormatBasics.ml
+
+################
+
+../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal  -nopervasives -c camlinternalFormatBasics.mli
+
+../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal  -nopervasives -c camlinternalFormatBasics.ml
+
+################
+
+../boot/ocamlrun ../ocamlopt -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal  -function-sections  -nopervasives -c camlinternalFormatBasics.ml
+
+################################################################
+
+Bootstrap toolchain (vm>vm):    --host_platform=//platforms:boot  --platforms=//platforms:vm
+
+../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal -o stdlib__Either.cmi -c either.mli
+.
+../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal -o stdlib__Either.cmo -c either.ml
+
+################
+
+stage 1 vm>vm toolchain:  --host_platform=//platforms:vm  --platforms=//platform:vm
+
+../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   \
+         -o stdlib__Either.cmi -c either.mli
+
+../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   \
+         -o stdlib__Either.cmo -c either.ml
+
+################
+
+stage 2 vm>sys toolchain:
+
+../boot/ocamlrun ../ocamlopt -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal  -function-sections   \
+           -o stdlib__Either.cmx -c either.ml
+
+################################################################
+
+std_exit:
+
+../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   -c std_exit.mli
+../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   -c std_exit.ml
+
+../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   -c std_exit.mli
+../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   -c std_exit.ml
+
+../boot/ocamlrun ../ocamlopt -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal    -c std_exit.ml
+
+
+################################################################
+
+ocamlc.byte:
+
+./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I driver -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c driver/main.mli
+
+./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I driver -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c driver/main.ml
+
+./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -compat-32 -o ocamlc compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma driver/main.cmo

@@ -1,0 +1,191 @@
+= configuration under Bazel
+
+== legacy makefiles
+
+=== compiler vars
+
+A complete mess. We have: BOOT_OCAMLC, COMPILER, OPTCOMPILER, CAMLC,
+CAMLOPT, OCAMLOPT, BEST_OCAMLC, and BEST_OCAMLOPT.
+
+Summary:
+
+* `OCAMLRUN` is always `boot/ocamlrun`, exept when set on the cmd line, as in the `library-cross` target in the root Makefile.
+* `NEW_OCAMLRUN`  is always `runtime/ocamlrun`
+* `ROOTDIR` is project root
+
+* `BOOT_OCAMLC` is `boot/ocamlc.opt` if available (and newer than
+  `boot/ocamlc`), otherwise `boot/ocamlc`
++
+  TEST_BOOT_OCAMLC_OPT = $(shell \
+  test $(ROOTDIR)/boot/ocamlc.opt -nt $(ROOTDIR)/boot/ocamlc; \
+  echo $$?)
+
+# Use boot/ocamlc.opt if available
+ifeq "$(TEST_BOOT_OCAMLC_OPT)" "0"
+  BOOT_OCAMLC = $(ROOTDIR)/boot/ocamlc.opt
+else
+  BOOT_OCAMLC = $(OCAMLRUN) $(ROOTDIR)/boot/ocamlc
+endif
++
+* `COMPILER` is `ocamlc` (i.e. $(ROOTDIR)/ocamlc)
+* `OPTCOMPILER` is `ocamlopt` (i.e. $(ROOTDIR)/ocamlopt)
+
+* `CAMLC`:
+  ** in root Makefile is $(BOOT_CAMLC) plus some args
+  ** in `stdlib/` is $(OCAMLRUN) $(COMPILER)
+  ** in `tools`:
++
+  CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -g \
+        -use-prims $(ROOTDIR)/runtime/primitives -I $(ROOTDIR)
++
+
+* `CAMLOPT`
+  ** in `tools/Makefile`:
++
+CAMLOPT = $(OCAMLRUN) $(ROOTDIR)/ocamlopt$(EXE) $(STDLIBFLAGS) -g
++
+
+So the compilers are built in the rootdir, then copied/moved to `boot/`?
+
+Under Bazel compilers are built in `compilers/stage`, `compilers/stage2`.
+
+Makefile.common:
+
+# we use OCAMLRUN to designate [boot/ocamlrun] and keep NEW_OCAMLRUN to refer
+# to runtime/ocamlrun, because it's less frequently used.
+OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
+NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
+
+
+stdlib/Makefile:
+COMPILER=$(ROOTDIR)/ocamlc$(EXE)
+CAMLC=$(OCAMLRUN) $(COMPILER)
+COMPFLAGS=-strict-sequence -absname -w +a-4-9-41-42-44-45-48 \
+          -g -warn-error +A -bin-annot -nostdlib -principal
+ifeq "$(FLAMBDA)" "true"
+OPTCOMPFLAGS += -O3
+endif
+OPTCOMPILER=$(ROOTDIR)/ocamlopt
+CAMLOPT=$(OCAMLRUN) $(OPTCOMPILER)
+
+
+
+=== flags
+
+Flag vars:
+
+For compiling vm runtimes:
+
+* OC_CPPFLAGS
+* runtime_CPPFLAGS
+* ocamlrund_CPPFLAGS
+* ocamlruni_CPPFLAGS
+* OC_CFLAGS
+* SHAREDLIB_CFLAGS
+
+For compiling native runtimes:
+
+* OC_NATIVE_CPPFLAGS
+
+The various runtime targets add their CPPFLAGS to OC_CPPFLAGS (for vm)
+or OC_NATIVE_CPPFLAGS (for native).
+
+OC_CPPFLAGS:
+
+Makefile.config:
+
+    OC_CPPFLAGS=-I$(ROOTDIR)/runtime  -D_FILE_OFFSET_BITS=64
+
+runtime/$(UNIX_OR_WIN32)_non_shared.%.$(O): \
+  OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
+
+
+Actual flags:
+
+* `-nostdlib` which means "no stdilb path", i.e. do not add the default stdlib path to search paths
+
+* `-nopervasies` undocumented and obsolete; originally Pervasives was
+  a module with basic ops for built-in types. Make log shows only used
+  to compile camlinternalFormatBasics.ml[i] and stdlib.ml[i]
+
+
+=== defines
+
+* -DCAMLDLLIMPORT
+* -DIN_CAML_RUNTIME
+* -DDEBUG
+* -DCAML_INSTR
+* -DNATIVE_CODE
+* -DTARGET_$(ARCH)
+* -DMODEL_$(MODEL)
+* -DSYS_$(SYSTEM)
+* -DRUNTIME_NAME
+* -DBUILDING_LIBCAMLRUNS
+* -D_FILE_OFFSET_BITS=64
+* -DCAML_BUILDING_UNIX  (otherlibs/unix/Makefile)
+* -Dsymbol_prefix=""'  (tools/Makefile)
+
+
+* runtime_CPPFLAGS = -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME
+* ocamlrund_CPPFLAGS = -DDEBUG
+* ocamlruni_CPPFLAGS = -DCAML_INSTR
+
+Makefile.common:
+
+OC_NATIVE_CPPFLAGS=\
+  -DNATIVE_CODE -DTARGET_$(ARCH) -DMODEL_$(MODEL) -DSYS_$(SYSTEM)
+
+
+* -DRUNTIME_NAME:
+
+stdlib/Makefile:
+
+$(HEADERPROGRAM)%$(O): \
+  OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
+
+$(TARGETHEADERPROGRAM)%$(O): $(HEADERPROGRAM).c
+	$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
+	      -DRUNTIME_NAME='"$(HEADER_TARGET_PATH)ocamlrun$(subst .,,$*)"' \
+	      $(OUTPUTOBJ)$@ $^
+
+
+```
+runtime/$(UNIX_OR_WIN32)_non_shared.%.$(O): \
+  OC_CPPFLAGS += -DBUILDING_LIBCAMLRUNS
+```
+
+=== deps
+
+Makefiles use `ocamldep`. Bazel does not use it so anything involving
+ocamldep in the makefiles can be ignored.
+
+=== debug
+
+* C debug mode
+
+  ** `-DDEBUG` - only set for `ocamlrund_CPPFLAGS`, i.e. only for that
+     target. Bazel controls it via a config setting `//config/debug`,
+     and does not define separate targets for debug and intrumented versions.
+  ** `-g` flag
+
+Makefile support:
+
+* `DEBUG`
+* `DEBUG_PRINT`
+* `OCAMLDEBUG`  (env var?)
+* `CAML_DEBUG_FILE` (env var?)
+* `OC_DEBUG_CPPFLAGS` - undefined, but used in //Makefile
+* `OC_DEBUG_CPPDEFINES`
+* `CC_HAS_DEBUG_PREFIX_MAP`
+* `AS_HAS_DEBUG_PREFIX_MAP`
+* `SO_DEBUG` - `otherlibs/unix/sockopt_unix.c`
+
+
+Bazel: 
+
+
+* OCaml debug runtimes
+
+* OCaml compiler debug flags
+
+  ** `-g` flag
