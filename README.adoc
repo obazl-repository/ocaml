@@ -63,6 +63,12 @@ Core compilers: `ocamlc.byte`, `ocamlc.opt`, `ocamlopt.byte`, `ocamlopt.opt`.
 
 Core tools: bytecode and native versions of: `ocamllex`, `ocamlyacc`, `ocamlobjinfo`, etc.
 
+=== Bootstrap the bootstrappers
+
+Build new versions of the precompiled bootstrap tools (`ocamlc` and
+`ocamllex`) that come with the distribution.
+
+
 === Minimal configuration
 
 Configuration is the most complex part of the build. The legacy build
@@ -93,9 +99,15 @@ In general configuration management under Bazel is very different (and
 much easier) than it is with configure/make. I don't have detailed
 documentation yet, but you can find lots of notes in link:bzl/docs[bzl/docs].
 
+=== Debug builds
+
+Support for link:https://github.com/google/sanitizers[sanitized]
+builds of the C runtimes is a goal, but not a requirement.
+
 === Alternate C Compilers
 
-Support for Zig and LLVM.
+Support for
+link:https://sr.ht/~motiejus/bazel-zig-cc/[Zig] and link:https://github.com/grailbio/bazel-toolchain[LLVM].
 
 === Cross-compiling
 
@@ -194,17 +206,9 @@ The Bazel build program supports command-line options to control:
 Baseline builds use the bootstrap toolchain. The build targets are in
 `//boot/bin` and `//boot/lib`.
 
-The main build targets at this point:
+The main build targets are listed in link:Build.bazel[Build.bazel].
+Target `//:toolchain` is a test target that builds all of them.
 
-* the bootstrap stuff:
- ** `//boot/bin:ocamlrun`
- ** `//boot/lib:stdlib`
-
-* also
- ** `//bin:ocamlc`
- ** `//bin:ocamlrun`
- ** `//lib:camlrun`
- ** `//lib:asmrun`
 
 
 ==== Cross-builds
@@ -262,12 +266,21 @@ two distinct build protocols.
     *** `(vm>sys)`     - `ocamlopt.byte`
 
 
-=== Parameterized build targets [[parameterized_build_targets]]
+=== Build variants: parametric build targets [[parameterized_build_targets]]
 
-The legacy build system defines a number of build targets that are in
-effect variants of a single target. In such cases OBazl instead
-defines a single build target with parameters controlling which
-variant to build. In general this results in much simpler code.
+The legacy build system defines a different build target for each
+compiler type: `ocamlc.byte`, `ocamlc.opt`, `ocamlopt.byte`, and
+`ocamlopt.opt`, and similarly for other tools. The Bazel program
+treats these as build variants of a single target: `//boot/compiler`.
+The variant built is controlled by configuration settings that may be
+passed on the command line or saved in a `.bazelrc` file.
+
+The runtimes also come in variants: standard, debug, and instrumented.
+Each gets a separate build target in the legacy system, and has a
+separate name (`ocamlrun`, `ocamlrund`, `ocamlruni` etc.). Bazel
+treats these too as variants of a parameterized build target. For
+example, passing `--//runtime:instr` tells Bazel to build
+the instrumented variant of the runtime (i.e. `ocamlruni`)
 
 A consequence of this approach is that different variants are not
 distinguished by name; for example the debug runtime would be
@@ -311,7 +324,6 @@ NOTE: the pic and shared versions are not supported in the baseline OBazl versio
 === Bootstrapping a Bootstrap Compiler [[bootstrapp]]
 
 ==== The Bootstrapping Problem
-
 
 
 To build a new bootstrap compiler.

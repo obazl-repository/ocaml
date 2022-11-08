@@ -11,10 +11,9 @@ build_test(
 
         "//boot/bin:ocamlc.byte",
         "//boot/bin:ocamlopt.byte",
+        "//boot/bin:ocamllex",
         # "//boot/bin:ocamlc.opt",
         # "//boot/bin:ocamlopt.opt",
-
-        "//boot/bin:ocamllex",
 
         # ":Caml_tex",
         "//tools:cmpbyt",
@@ -31,10 +30,5 @@ build_test(
         "//tools:primreq",
         "//tools:stripdebug",
     ]
-    ## TODO:
-    # ] + select({
-    #     "//compilers/mode:native": [":Lintapidiff.opt"]
-    #     "//conditions:default": []
-    # })
 )
 

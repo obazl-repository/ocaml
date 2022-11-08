@@ -1,3 +1,5 @@
+##FIXME: rename //config/variant
+
 load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag",
      "string_flag", "string_setting")
