@@ -202,7 +202,8 @@ def get_module_name (ctx, src):
     else: ## not a submodule
         out_module = this_module
 
-    if ctx.label.name == "Std_exit":
+    ## Compilers are hard-coded to look for std_exit.cmo (lowercase)
+    if out_module == "Std_exit":
         out_module = "std_exit"
 
     # if ctx.label.name == "Stdlib":
