@@ -12,10 +12,18 @@ See the link:https://github.com/ocaml/ocaml[upstream repository] for the origina
 
 3. `cd` into the root directory of the cloned repo and run configure: `$ ./configure`
 
-3. Build stuff: `$ bazel test :toolchain`
-
+4. Build the principal tools: `$ bazel test :toolchain`
++
 Target `:toolchain` builds all main targets; it's defined in
 link:BUILD.bazel[BUILD.bazel]. The main build targets are listed there.
++
+5. Use Zig:  `$ bazel run boot/compiler --config=maczig` (or `--config=linuxzig`)
+
+6. Cross-compile:
+
+  a. mac->linux:  `$ bazel run boot/bin:ocamlrun --config=mac_linuxamd64`
+  a. linux->mac:  `$ bazel run boot/bin:ocamlrun --config=linuxamd64_macamd64`
+
 
 See link:bzl/docs/usage.adoc[usage] for more information.
 
@@ -180,7 +188,7 @@ build things. Instead it is provided by separate rulesets such as:
 ** link:https://github.com/bazelbuild/rules_pkg[rules_pkg]
 ** link:https://github.com/vaticle/bazel-distribution[bazel-distribution]
 
-== Status  (2022/10/31)
+== Status  (2022/11/8)
 
 === Legacy versions
 
@@ -237,7 +245,7 @@ Baseline builds use the bootstrap toolchain. The build targets are in
 The main build targets are listed in link:Build.bazel[Build.bazel].
 Target `//:toolchain` is a test target that builds all of them.
 
-
+Docs and the debugger are not yet bazelized.
 
 ==== Cross-builds
 
