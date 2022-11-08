@@ -1,0 +1,176 @@
+= usage
+:toc: auto
+:toclevels: 3
+
+To build: `$ bazel build <target> <settings>`, where a setting looks
+like `--foo/bar` or `--foo/bar=baz`.
+
+To build and run an executable under Bazel, pass options to the
+executable after `--`. For example:
+
+  $ bazel build boot/compiler -- -version
+
+Bazel build settings go before the `--`; for example:
+
+  $ bazel build boot/compiler --config=maczig -- -version
+
+This command uses the Zig toolchain on a Mac to build the compiler, then runs it, passing the `-version` option.
+
+== Build configurations
+
+See link:configuration.adoc[configuration] for the list of build
+settings you can use to control builds.
+
+You can pass those settings on the command line, or you can put them
+in a `.bazelrc` file. To avoid polluting the root
+link:../../.bazelrc[.bazelrc] file, create `.config/user.bazelrc` and
+put the settings there. The root `.bazelrc` will load that file if
+exits.
+
+Normally, the root `.bazelrc` file would be under version control and
+would contain nothing but `try-import .config/user.bazelrc` (or
+similar); the `user.bazelrc` file would _not_ be under version
+control. But for this project I'm including lots of stuff in
+link:../../.bazelrc[.bazelrc] so users can get started with a minimum
+of configuration hassle.
+
+See link:https://bazel.build/run/bazelrc[Write bazelrc configuration
+files] for more information on `.bazelrc` files.
+
+IMPORTANT: Cross-compiling requires some extra configuration; see below.
+
+== Subvariants
+
+There are four OCaml subvariants: optimized, standard, debug, and instrumented.
+
+There are three runtime variants: opt (optimized), fastbuild (for development), and dbg.
+
+So you could build a standard `ocamlopt.byte` with a debug runtime, or
+a debug `ocamlc.byte` with a standard runtime.
+
+=== C variants
+
+* `-c dbg` or `--compilation_mode=dbg`. Causes `-g` to be used for compilation.
++
+IMPORTANT: `-c dbg` does **not** enable `-DDEBUG` automatically.
++
+* `-c fastbuild` - this is the default. Configures the fastest
+  possible builds. Sets `-DDEBUG` but **not** `-g`.
+* `-c opt` - optimized build
+
+=== OCaml subvariants
+
+WARNING: These settings are still in flux.
+
+The OCaml build code piggy-backs on the `-c` flag used for C builds.
+So if you pass `-c dbg`, both the runtime and the OCaml tool will be
+built for the debugger.
+
+A different set of config settings allows you to control OCaml builds separately from C builds:
+
+* `--//config/ocaml:dbg`
+* `--//config/ocaml:dev` = C "fastbuild"
+* `--//config/ocaml:opt`
+* `--//config/ocaml:instr` - instrumented
+
+NOTE: There are a lot of possibilities here. For example
+`--//config/ocaml:xmo` could control the `-opaque` flag (cross-module
+optimization, xmo).
+
+== Alternate CC toolchains
+
+To use the Zig toolchain to compile the runtimes:
+
+* on a mac, pass `--config=maczig`
+* on linux, pass `--config=linuxzig`
+
+These Bazel configurations are defined in link:../../.bazelrc[.bazelrc].
+
+IMPORTANT: These settings only affect selection of the CC toolchain, not the OCaml toolchain.
+
+What happens if you pass, say, `--config=linuxzig` on a Mac? Your
+build will still succeed, but it will not use the Zig toolchain.
+That's because passing `--extra_toolchains` only _registers_
+toolchains; it does not force Bazel to select the toolchain passed.
+For that to happen, the toolchain's configuration constraints must
+match the build configuration. The Zig toolchain for Linux specifies
+that it should only be selected if the build host is configured as
+`@platforms//os:linux`, which will not be the case on a Mac.
+
+If you do not explicitly set the host platform, then Bazel will
+automatically set the build host configuration by interrogating the
+system. If you do set the host platform, then Bazel will use it to
+select the toolchain. Try using `--config=linuxzig` and
+`--host_platform=//platforms/build:linux` with toolchain debugging
+enabled (in `.bazelrc`). You should see Bazel select Zig's linux
+toolchain, which will run on the mac but emit linux x86_64 code.
+
+(Which means that Bazel's platform configurations are just logical
+constraints that do not necessarily match the local machine.)
+
+== Cross-compiling
+
+To cross compile you must give Bazel several pieces of information:
+
+* which platform to target: `--platforms=<target>`.
+* which toolchain to use:  `--extra_toolchains=tc1,tc2`
+* configuration data for the exec (build) platform
+* configuration data for the target platform
+
+This information is expressed as "config"s in link:../../.bazelrc[.bazelrc].
+
+To build on a Mac targeting linux/x86_64 (aka linux/amd64):
+
+    $ sw_vers
+    ProductName:	macOS
+    ProductVersion:	12.6
+    BuildVersion:	21G115
+    $ bazel build boot/bin:ocamlrun --config=mac_linuxamd64
+    ...
+    Target //runtime:ocamlrun up-to-date:
+    bazel-bin/runtime/ocamlrun
+    ...
+    [gar:~/obazl-repository/ocaml-bazel]$ file bazel-bin/runtime/ocamlrun
+    bazel-bin/runtime/ocamlrun: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.0.0, stripped
+
+=== Cross-compilation: toolchain profiles
+
+A _toolchain profile_ is a collection of compile and link flags, data
+files, etc. needed to support a build.
+
+Cross-compiling requires two build profiles one for the build platform
+and one for the target platform. The cross-compiler runs on (and
+indeed may be built on) the build host, but to emit target code it
+needs to be configured. For example, the link flags accepted for the
+target output may be different than those needed to build the
+cross-compiler itself.
+
+Further more, separate profiles are required for the CC
+toolchain and the OCaml toolchain. And to make matters even worse,
+different toolchains may require different flags and thus different profiles.
+
+The Bazel program uses (or abuses) the toolchain mechanism to support
+"toolchain profiles". Bazel toolchains are somewhat OCamlish: they're
+(quasi-)typed and they are composed of an interface and an
+implementation. Normally an interface exposes a suite of tools that
+the implementation provides (e.g. a file path for the `compiler`
+symbol in the interface). OBazl's toolchain profiles just provide
+toolchain configuration information instead of tools. The advantage of
+this is that they are selected in the same way toolchains are
+selected, by platform constraints.
+
+The CC toolchain profiles are found under `//toolchain/profile`.
+The configuration for the local C compiler is in
+link:../../toolchain/profile/cc/local/BUILD.bazel[//toolchain/profile/cc/local/BUILD.bazel].
+This file is generated by the `./configure` script from
+`BUILD.bazel.in` in the same directory.
+
+When cross-compiling C code, the compiler will need a profile for the target
+system. Those may be found in
+link:../../toolchain/profile/cc/linux/BUILD.bazel[//toolchain/profile/cc/linux/BUILD.bazel]
+and
+link:../../toolchain/profile/cc/macos/BUILD.bazel[//toolchain/profile/cc/macos/BUILD.bazel].
+Unlike the local profile, which is generated by `/.configure`, these
+are hardcoded, copied from the local profile produced on each
+platform. This is unavoidable; there is no way I know of to
+automatically configure a machine you don't have.

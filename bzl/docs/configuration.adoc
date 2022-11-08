@@ -20,3 +20,7 @@
 * `--//config:warnings (string list) - use to override the default
   `["-w", "+a-4-9-41-42-44-45-48"]`
 
+
+== C config
+
+C compile flags for specific files may be set on the command line using `--per_file_copt`.

@@ -334,3 +334,4 @@ META
 bazel-*
 config/CONFIG.bzl
 toolchain/profile/cc/local/BUILD.bazel
+*.log

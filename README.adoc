@@ -6,14 +6,18 @@ See the link:https://github.com/ocaml/ocaml[upstream repository] for the origina
 
 ==== Quickstart
 
-* `$ ./configure`
-* `$ bazel test :toolchain`
+1. Install Bazel.  Recommendation: link:https://github.com/bazelbuild/bazelisk[Bazelisk]
 
-This target builds all main targets.  See link:BUILD.bazel[BUILD.bazel] for the list.
+2. Clone link:https://github.com/obazl-repository/ocaml[this repo].
 
-The compiler targets are in `//boot`, `//boot/bin`, `//boot/lib`, and
-`//boot/compiler`. For example, `$ bazel run boot/compiler --
--version`.
+3. `cd` into the root directory of the cloned repo and run configure: `$ ./configure`
+
+3. Build stuff: `$ bazel test :toolchain`
+
+Target `:toolchain` builds all main targets; it's defined in
+link:BUILD.bazel[BUILD.bazel]. The main build targets are listed there.
+
+See link:bzl/docs/usage.adoc[usage] for more information.
 
 == Overview
 
@@ -129,6 +133,19 @@ x86 Mac, an arm Mac compiler, an x86 Linux compiler, an arm Linux compiler, etc.
 
 Goal: cross-compile cross-compilers. For example, to build,
 on an x86 Mac, a Linux x86 -> Linux arm OCaml compiler.
+
+=== Persistent Workers
+
+Bazel supports link:https://bazel.build/remote/persistent[persistent
+workers] - tools that effectively run as service providers. Without
+persistent workers, the compiler must startup, run, and shutdown once
+for each file it compiles. With a persistent worker, the compiler
+starts up once and stays loaded; clients then pass it source files to
+compile.
+
+Implementing OCaml compilers as persistent workers is really a
+separate project, but I list it here as a general goal anyway.
+
 
 == Non-Goals
 
