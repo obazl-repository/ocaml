@@ -38,7 +38,7 @@ def _bootstrap_ocamlyacc_impl(ctx):
           "cp {src} {dest};".format(src = ctx.file.src.path, dest=yaccer.dirname),
           "cd {dest} && {tool} {src}".format(
               dest=yaccer.dirname,
-              tool = tc.yacc.basename,
+              tool = "../" + tc.yacc.short_path,
               src=ctx.file.src.basename,
           ),
 

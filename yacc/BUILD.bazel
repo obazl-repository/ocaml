@@ -26,9 +26,12 @@ cc_binary(
         "-Iruntime",  # expose caml/*.h
         "-I$(GENDIR)/runtime", # build_config.h
         "-I$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+    ] + select({
         # if -c opt, the clang toolchain inserts -DNDEBUG
-        "-Wno-error=macro-redefined" ## NDEBUG
-    ],
+        # which causes a macro-redefined error
+        # "mac bazel clang": ["-Wno-error=macro-redefined"] ## NDEBUG
+        "//conditions:default": []
+    }),
     linkopts = ["$(OC_LDFLAGS)"],
     deps = ["//runtime/caml:hdrs"],
     toolchains = ["//toolchain:profile"],
