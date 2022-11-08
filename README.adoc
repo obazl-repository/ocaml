@@ -4,6 +4,17 @@
 
 See the link:https://github.com/ocaml/ocaml[upstream repository] for the original OCaml README.
 
+==== Quickstart
+
+* `$ ./configure`
+* `$ bazel test :toolchain`
+
+This target builds all main targets.  See link:BUILD.bazel[BUILD.bazel] for the list.
+
+The compiler targets are in `//boot`, `//boot/bin`, `//boot/lib`, and
+`//boot/compiler`. For example, `$ bazel run boot/compiler --
+-version`.
+
 == Overview
 
 OBazl is a Bazel Language Support Pack for OCaml. This fork of the

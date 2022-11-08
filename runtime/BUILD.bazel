@@ -120,11 +120,12 @@ cc_library(
     deps = [
         "//runtime/caml:hdrs"
     ],
+    toolchains = ["//toolchain:profile"],
     visibility = [
+        "//:__pkg__",
         "//boot:__subpackages__",
         "//lib:__pkg__"
     ],
-    toolchains = ["//toolchain:profile"],
 )
 
 ###########
@@ -156,6 +157,7 @@ cc_library(
     deps = ["//runtime/caml:hdrs"],
     toolchains = ["//toolchain:profile"],
     visibility = [
+        "//:__pkg__",
         "//boot/lib:__pkg__",
         "//dev/lib:__pkg__",
         "//lib:__pkg__"
