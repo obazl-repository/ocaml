@@ -151,6 +151,10 @@ x86 Mac, an arm Mac compiler, an x86 Linux compiler, an arm Linux compiler, etc.
 Goal: cross-compile cross-compilers. For example, to build,
 on an x86 Mac, a Linux x86 -> Linux arm OCaml compiler.
 
+=== Mainainability
+
+Eventually the code will be simplified and easy to read.
+
 === Persistent Workers
 
 Bazel supports link:https://bazel.build/remote/persistent[persistent
