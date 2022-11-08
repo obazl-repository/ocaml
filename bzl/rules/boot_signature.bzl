@@ -26,7 +26,7 @@ load("//bzl:functions.bzl",
 
 load(":options.bzl", "get_options", "NEGATION_OPTS")
 
-load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
+load(":impl_ccdeps.bzl", "dump_CcInfo")
 
 load(":impl_common.bzl",
      "dsorder",

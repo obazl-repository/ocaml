@@ -15,7 +15,7 @@ load("//bzl:providers.bzl",
      "OcamlSignatureProvider",
      "OcamlTestMarker")
 
-load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
+load(":impl_ccdeps.bzl", "dump_CcInfo")
 
 load(":impl_common.bzl", "dsorder", "opam_lib_prefix")
 

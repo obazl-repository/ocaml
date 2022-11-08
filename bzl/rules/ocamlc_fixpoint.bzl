@@ -16,7 +16,7 @@ load("//bzl:providers.bzl",
 #      "ocamlc_fixpoint_in_transition",
 #      "ocamlc_fixpoint_out_transition")
 
-load(":impl_ccdeps.bzl", "link_ccdeps", "dump_CcInfo")
+load(":impl_ccdeps.bzl", "dump_CcInfo")
 
 load(":impl_common.bzl", "dsorder", "opam_lib_prefix")
 load(":boot_attrs_executable.bzl", "options_executable")
@@ -180,13 +180,13 @@ def _ocamlc_fixpoint(ctx):
             ccInfo_list.append(main[0][CcInfo]) # [CcInfo])
 
         ccInfo = cc_common.merge_cc_infos(cc_infos = ccInfo_list)
-        [
-            action_inputs_ccdep_filelist,
-            cc_runfiles
-        ] = link_ccdeps(ctx,
-                        tc.linkmode,
-                        args,
-                        ccInfo)
+        # [
+        #     action_inputs_ccdep_filelist,
+        #     cc_runfiles
+        # ] = link_ccdeps(ctx,
+        #                 tc.linkmode,
+        #                 args,
+        #                 ccInfo)
 
 
     ## end ctx.attr.main handling

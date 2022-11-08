@@ -1,0 +1,38 @@
+## EXPERIMENTAL - one ocamlcc target to emit all flavors
+
+package(default_visibility = ["//visibility:public"])
+
+load("//bzl:rules.bzl", "boot_compiler")
+
+# ocamlc.byte:   -nostdlib, -use-prims, -compat-32
+# ocamlopt.byte: -nostdlib, -use-prims
+# ocamlc.opt:    -nostdlib
+# ocamlopt.opt:  -nostdlib
+boot_compiler(
+    name = "compiler",
+    opts = [
+        "-nostdlib"
+    ] + select({
+        "//platforms/xtarget:sys?": [],
+        "//conditions:default": ["-compat-32"]
+    }),
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+    ] + select({
+        # select on config_setting, not constraint value
+        "//platforms/xtarget:sys?": ["//asmcomp:ocamloptcomp"],
+        "//platforms/xtarget:vm?": ["//bytecomp:ocamlbytecomp"],
+        "//conditions:default": ["//bytecomp:ocamlbytecomp"],
+    }),
+    main = select({
+        "//platforms/xtarget:sys?": "//driver:Optmain",
+        "//platforms/xtarget:vm?" : "//driver:Main",
+        "//conditions:default"    : "//driver:Main"
+    }),
+    use_prims = select({
+        "//platforms/target:sys?": False,
+        "//conditions:default": True
+    }),
+    toolchains = ["//toolchain:profile"]
+)
+
