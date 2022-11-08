@@ -61,49 +61,29 @@ STDLIB = ["//stdlib:Stdlib"]
 # cset.cmo syntax.cmo parser.cmo lexer.cmo table.cmo
 # lexgen.cmo compact.cmo common.cmo output.cmo outputbis.cmo main.cmo
 
+# ./boot/ocamlrun ./ocamlopt
+# -nostdlib -I ./stdlib -I otherlibs/dynlink
+# -o lex/ocamllex.opt
+# lex/cset.cmx lex/syntax.cmx lex/parser.cmx lex/lexer.cmx lex/table.cmx lex/lexgen.cmx
+# lex/compact.cmx lex/common.cmx lex/output.cmx lex/outputbis.cmx lex/main.cmx
+
+BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
 boot_executable(
-    name = "ocamllex",
-    main = ":Main",
-    opts = [
-        "-strict-sequence", "-nostdlib",
-        "-compat-32",
-        "-w", "-31",
-    ],
-    use_prims = True, # "//runtime:primitives",
-    data = ["//runtime:primitives"],
-    deps = [
-        ## FIXME: stdlib and Std_exit should be added by the rule or toolchain:
-        # "//stdlib",
-        ":lex",
-    ],
+    name       = "ocamllex",
+    prologue   = [":lex"],
+    main       = ":Main",
+    opts       = select({
+        "//platforms/target:vm?" : BOOT_OPTS,
+        "//platforms/target:sys?": ["-nostdlib"],
+        "//conditions:default"   : BOOT_OPTS
+   }),
+    use_prims  = select({
+        "//platforms/target:vm?" : True,
+        "//platforms/target:sys?": False,
+        "//conditions:default"   : True
+    }),
     visibility = ["//visibility:public"]
 )
-
-# boot_executable(
-#     name = "ocamllex.opt",
-#     mode = "native",
-#     main = ":Main",
-#     opts = [
-#         "-verbose",
-#         "-g", "-nostdlib",
-#         # "-I", "boot",      ## home of std_exit.cmo?
-#         # "-use-prims", "runtime/primitives",
-#         # "-I", "stdlib",
-#         "-I", "runtime",
-#         "-compat-32",
-#         # "-ccopt", "-Wno-error=ignored-optimization-argument",
-#         # "-ccopt", "-Wl,-export_dynamic",
-#         # "-ccopt", "-Wno-error=unknown-argument"
-#     ],
-#     data = ["//runtime:primitives"],
-#     deps = [
-#         ":Cset", ":Syntax", ":Parser",
-#         ":Lexer",
-#         ":Table", ":Lexgen",
-#         ":Compact", ":Common", ":Output", ":Outputbis",
-#         "//boot:Std_exit",
-#     ]
-# )
 
 boot_library(
     name = "lex",

@@ -17,7 +17,7 @@ load("//config:CONFIG.bzl",
      # "ROOT_SIG_OPTS",
      "OC_COMMON_CFLAGS",
      "PLATFORM_CFLAGS",
-     # "PRIMITIVES"
+     "IGNORE_MISSING_MLI"
      )
 
 exports_files([
@@ -37,12 +37,15 @@ exports_files([
 ])
 
 ##FIXME: -nostdlib in global
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-    "-nostdlib"
-]
-SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-    "-nostdlib"
-]
+MODULE_OPTS = ["-w", "-40"]
+# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+#     "-nostdlib"
+# ]
+
+SIG_OPTS    = []
+# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+#     "-nostdlib"
+# ]
 
 STDLIB = ["//boot/lib:stdlib"]
 
@@ -211,7 +214,7 @@ boot_signature(
 boot_module(
     name   = "Cmt2annot",
     struct = "cmt2annot.ml",
-    opts = MODULE_OPTS + ["-w", "-70"],
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
     deps   = STDLIB + [
         ":Types",
         ":Typedtree",
@@ -304,7 +307,7 @@ boot_module(
     name   = "Datarepr",
     struct = "datarepr.ml",
     sig    = "Datarepr_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "-40"],
     deps   = STDLIB + [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -314,9 +317,6 @@ boot_module(
         ":Ident",
         ":Path",
         ":Types",
-        #### (TypeSet)
-        #### (Uid)
-        #### (Variance)
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -1228,11 +1228,12 @@ boot_module(
     name   = "Shape",
     struct = "shape.ml",
     sig    = "Shape_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "-40"],
     deps   = STDLIB + [
         ":Ident",
-        "//typing:Path",
-        "//utils:Identifiable"
+        ":Path",
+        "//utils:Identifiable",
+        "//utils:Misc"
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -1253,7 +1254,7 @@ boot_module(
     name   = "Signature_group",
     struct = "signature_group.ml",
     sig    = "Signature_group_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "-40"],
     deps   = STDLIB + [
         ":Types",
         ":Ident",

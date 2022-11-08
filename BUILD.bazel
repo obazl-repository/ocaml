@@ -5,8 +5,12 @@ exports_files(["Makefile.config", "VERSION"])
 build_test(
     name = "toolchain",
     targets = [
-        "//boot/bin:ocamlc",
-        "//boot/bin:ocamlopt",
+
+        "//runtime:camlrun",
+        "//runtime:asmrun",
+
+        "//boot/bin:ocamlc.byte",
+        "//boot/bin:ocamlopt.byte",
         # "//boot/bin:ocamlc.opt",
         # "//boot/bin:ocamlopt.opt",
 

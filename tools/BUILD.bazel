@@ -17,6 +17,7 @@ load("//config:CONFIG.bzl",
      # "TOOLS_SIG_OPTS"
      "OC_COMMON_CFLAGS",
      "PLATFORM_CFLAGS",
+     "IGNORE_MISSING_MLI",
      )
 
 # MODULE_OPTS/SIG_OPTS should include:
@@ -26,13 +27,12 @@ load("//config:CONFIG.bzl",
 # -strict-sequence -warn-error
 # +A -principal -strict-formats -bin-annot
 
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-    "-nostdlib",
-    "-w", "-70"
-]
-SIG_OPTS    = ["-nostdlib"] + OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-
-STDLIB = ["//boot/lib:stdlib"] # , "//stdlib:Std_exit"]
+MODULE_OPTS = []
+# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+#     "-nostdlib",
+#     "-w", "-70"
+# ]
+SIG_OPTS    = [] # ["-nostdlib"] + OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 ## first the executables. modules and sigs below.
 # programs_byte := \
@@ -55,7 +55,7 @@ STDLIB = ["//boot/lib:stdlib"] # , "//stdlib:Std_exit"]
 boot_executable(
     name = "ocamldep",
     main = ":Ocamldep",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
@@ -66,8 +66,7 @@ boot_executable(
 # The OCaml profiling compilers: ocamlcp, ocamloptp, ocamlprof
 boot_executable(
     name = "ocamlprof",
-    main = ":Ocamlprof",
-    deps = [
+    prologue = [
         "//utils:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -87,13 +86,17 @@ boot_executable(
         "//parsing:Pprintast",
         "//parsing:Lexer",
         "//parsing:Parse",
-    ]
+    ],
+    main = ":Ocamlprof",
+    # warnings = ["$(WARNINGS)"],
+    use_prims = True,
+    # toolchains = ["//toolchain/profile/ocaml"]
 )
 
 boot_executable(
     name = "ocamlcp",
     main = ":Ocamlcp",
-    deps = [
+    prologue = [
         "//utils:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -117,7 +120,7 @@ boot_executable(
 boot_executable(
     name = "ocamloptp",
     main = ":Ocamloptp",
-    deps = [
+    prologue = [
         "//utils:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -143,7 +146,7 @@ boot_executable(
 boot_executable(
     name = "ocamlmklib",
     main = ":Ocamlmklib",
-    deps = [
+    prologue = [
         "//utils:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -160,7 +163,7 @@ boot_executable(
 boot_executable(
     name = "ocamlmktop",
     main = ":Ocamlmktop",
-    deps = [
+    prologue = [
         "//utils:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -185,15 +188,14 @@ boot_executable(
 boot_executable(
     name = "cvt_emit.exe",
     main = ":Cvt_emit",
-    # deps = STDLIB,
     visibility = ["//asmcomp:__subpackages__"]
 )
 
 boot_module(
     name   = "Cvt_emit",
     struct = "cvt_emit.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
         "//bytecomp:Bytesections",
@@ -212,7 +214,7 @@ bootstrap_ocamllex(
 boot_executable(
     name = "ocamlcmt",
     main = ":Ocamlcmt",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
@@ -230,7 +232,7 @@ boot_executable(
 boot_executable(
     name = "dumpobj",
     main = ":Dumpobj",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         ":Opnames",
@@ -246,7 +248,7 @@ boot_executable(
 boot_executable(
     name = "ocamlobjinfo",
     main = ":Objinfo",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         "//middle_end:ocamlmiddleend",
@@ -263,7 +265,7 @@ boot_executable(
 boot_executable(
     name = "primreq",
     main = ":Primreq",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
@@ -274,7 +276,7 @@ boot_executable(
 boot_executable(
     name = "stripdebug",
     main = ":Stripdebug",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
@@ -290,7 +292,7 @@ boot_executable(
 boot_executable(
     name = "cmpbyt",
     main = ":Cmpbyt",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
@@ -306,7 +308,7 @@ boot_module(
     name = "Opnames",
     struct = "opnames.ml",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
     ]
 )
 
@@ -373,7 +375,7 @@ genrule(
 #     name   = "Caml_tex",
 #     struct = "caml_tex.ml",
 #     opts = MODULE_OPTS,
-#     deps   = STDLIB + [
+#     deps   = [
 #         "//driver:Compenv",
 #         "//driver:Compmisc",
 #         "//otherlibs/str:Str",
@@ -407,8 +409,8 @@ genrule(
 boot_module(
     name   = "Cmpbyt",
     struct = "cmpbyt.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
         "//bytecomp:Bytesections",
@@ -421,7 +423,7 @@ boot_module(
     target_compatible_with = ["//platforms/target:sys?"],
     struct = "dumpobj.ml",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Sys",
         "//bytecomp:Symtable",
         "//stdlib:Stdlib.String",
@@ -453,7 +455,7 @@ boot_module(
 #     name   = "Eqparsetree",
 #     struct = "eqparsetree.ml",
 #     opts = MODULE_OPTS,
-#     deps   = STDLIB + [
+#     deps   = [
 #         # "//parsing:Asttypes_cmi",
 #         "//parsing:Parsetree_cmi",
 #         # "//parsing:Longident",
@@ -470,7 +472,7 @@ boot_module(
 #     mode   = "native",
 #     struct = "lintapidiff.ml",
 #     opts = MODULE_OPTS,
-#     deps   = STDLIB + [
+#     deps   = [
 #         "//driver:Pparse",
 #         "//otherlibs/str:Str",
 #         "//parsing:Location",
@@ -494,8 +496,8 @@ boot_module(
 boot_module(
     name   = "Objinfo",
     struct = "objinfo.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//stdlib:Stdlib.Sys",
         "//bytecomp:Symtable",
         "//middle_end:Symbol",
@@ -527,8 +529,8 @@ boot_module(
 boot_module(
     name   = "Ocamlcmt",
     struct = "ocamlcmt.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//typing:Untypeast",
         "//typing:Stypes",
         "//stdlib:Stdlib.String",
@@ -555,8 +557,8 @@ boot_module(
 boot_module(
     name   = "Ocamlcp",
     struct = "ocamlcp.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -572,8 +574,8 @@ boot_module(
 boot_module(
     name   = "Ocamlcp_common",
     struct = "ocamlcp_common.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         # "//stdlib:Stdlib.Sys",
         # "//stdlib:Stdlib.String",
         # "//stdlib:Stdlib.Printf",
@@ -588,8 +590,8 @@ boot_module(
 boot_module(
     name   = "Ocamldep",
     struct = "ocamldep.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//driver:Makedepend"
     ],
 )
@@ -597,8 +599,8 @@ boot_module(
 boot_module(
     name   = "Ocamlmklib",
     struct = "ocamlmklib.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Stack",
@@ -616,8 +618,8 @@ boot_module(
 boot_module(
     name   = "Ocamlmktop",
     struct = "ocamlmktop.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Filename",
@@ -630,8 +632,8 @@ boot_module(
 boot_module(
     name   = "Ocamloptp",
     struct = "ocamloptp.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//driver:Compenv",
         "//driver:Main_args",
         "//stdlib:Stdlib.Arg",
@@ -647,8 +649,8 @@ boot_module(
 boot_module(
     name   = "Ocamlprof",
     struct = "ocamlprof.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//parsing:Location",
         "//parsing:Parse",
         "//parsing:Parsetree_cmi",
@@ -671,8 +673,8 @@ boot_module(
 boot_module(
     name   = "Primreq",
     struct = "primreq.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//file_formats:Cmo_format_cmi",
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.List",
@@ -686,7 +688,7 @@ boot_module(
     struct = "profiling.ml",
     sig    = "Profiling_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Sys",
@@ -697,7 +699,7 @@ boot_signature(
     name = "Profiling_cmi",
     src  = "profiling.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
     ],
 )
 
@@ -705,8 +707,8 @@ boot_signature(
 boot_module(
     name   = "Stripdebug",
     struct = "stripdebug.ml",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    deps   = [
         "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.List",
@@ -752,10 +754,13 @@ boot_module(
     name   = "Make_opcodes",
     struct = "make_opcodes.ml",
     nocopts = True,
-    opts = ["-nostdlib"], # "-w", "-70"],
-    deps   = STDLIB + [
+    deps = [
+        "//stdlib:Stdlib",
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Printf",
     ],
-    # data = ["//runtime:primitives"]
+    opts = ["-nostdlib"] + IGNORE_MISSING_MLI
 )
 
 bootstrap_ocamllex(

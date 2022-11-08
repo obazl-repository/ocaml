@@ -46,10 +46,6 @@ def _boot_signature_impl(ctx):
     #     debug = True
 
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
-    if tc.target_host in ["boot", "dev", "vm"]:
-        tool = tc.tool_runner
-    else:
-        tool = tc.compiler
 
     ################################################################
     ################
@@ -648,5 +644,6 @@ boot_signature = rule(
     # provides = [OcamlSignatureProvider],
 
     executable = False,
-    toolchains = ["//toolchain/type:bootstrap"],
+    toolchains = ["//toolchain/type:bootstrap",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )

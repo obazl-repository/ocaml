@@ -32,13 +32,9 @@ def _bootstrap_ocamllex_impl(ctx):
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     if tc.target_host in ["boot", "baseline", "vm"]:
-        # tool = tc.tool_runner
         ext = ".cmo"
     else:
-        # tool = tc.lexer
         ext = ".cmx"
-
-    # tool_args = [tc.lexer]
 
     # env = {"PATH": get_sdkpath(ctx)}
 
@@ -55,11 +51,6 @@ def _bootstrap_ocamllex_impl(ctx):
 
     args.add_all(ctx.attr.vmargs)
 
-    # args.add_all(tool_args)
-
-    # if mode == "native":  ## OBSOLETE? use tc.target_host?
-    #     args.add("-ml")
-
     args.add_all(ctx.attr.opts)
 
     args.add("-o", lexer)
@@ -69,12 +60,10 @@ def _bootstrap_ocamllex_impl(ctx):
     ctx.actions.run(
         # env = env,
         executable = tc.lexer[DefaultInfo].files_to_run,
-        # executable = tool,
         arguments = [args],
         inputs = [ctx.file.src],
         outputs = [lexer],
         tools = [tc.lexer[DefaultInfo].files_to_run],
-        # tools = [tool] + tool_args,
         mnemonic = "OcamlLex",
         progress_message = "{mode} ocaml_lex: @{ws}//{pkg}:{tgt}".format(
             mode = "TEST", # mode,

@@ -9,7 +9,7 @@ load("//config:CONFIG.bzl",
      # "RUNTIME_OCAMLRUN",
      "OC_COMMON_CFLAGS",
      "PLATFORM_CFLAGS",
-     # "PRIMITIVES"
+     "IGNORE_MISSING_MLI"
      )
 
 exports_files([
@@ -520,7 +520,7 @@ boot_module(
     name   = "Opcodes",
     struct = "opcodes.ml",
     # sig    = ":Opcodes_cmi",
-    opts = MODULE_OPTS + ["-w", "-70"],
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
     deps   = STDLIB + [
     ],
     # data = ["//runtime:primitives"],

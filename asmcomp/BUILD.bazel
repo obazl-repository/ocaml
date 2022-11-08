@@ -15,7 +15,7 @@ load("//bzl:rules.bzl",
 
 load("//config:CONFIG.bzl",
      "OC_COMMON_CFLAGS",
-     "NO_MISSING_MLI_ERROR",
+     "IGNORE_MISSING_MLI",
      "PLATFORM_CFLAGS")
 
 MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
@@ -199,7 +199,7 @@ boot_module(
         "//config/arch:riscv64"   : "//asmcomp/riscv:CSE.ml",
         "//config/arch:s390x"   : "//asmcomp/s390x:CSE.ml",
     }, no_match_error = "unknown arch"),
-    opts = MODULE_OPTS + NO_MISSING_MLI_ERROR,
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
     deps   = STDLIB + [
         ":Cmm",
         ":CSEgen",
@@ -284,7 +284,7 @@ boot_module(
         "//config/arch:riscv64"   : "//asmcomp/riscv:arch.ml",
         "//config/arch:s390x"   : "//asmcomp/s390x:arch.ml",
     }, no_match_error = "unknown arch"),
-    opts = MODULE_OPTS + NO_MISSING_MLI_ERROR,
+    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
     deps   = STDLIB + [
         "//utils:Clflags"
     ],

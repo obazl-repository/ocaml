@@ -23,8 +23,8 @@ load("//config:CONFIG.bzl",
      # "PRIMITIVES"
      )
 
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+MODULE_OPTS = [] #OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+SIG_OPTS    = [] #OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # SIG_OPTS    = ROOT_MODULE_OPTS # + ["-nopervasives"]
@@ -600,7 +600,7 @@ boot_module(
     name   = "Parser",
     struct = "parser.ml",
     sig    = "Parser_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-w", "-40"],
     deps   = STDLIB + [
         ":Ast_helper",
         ":CamlinternalMenhirLib",

@@ -73,11 +73,11 @@ SIG_OPTS    = [] ## OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 # 	$(CAMLC) $(LINKFLAGS) -o $@ $^
 boot_executable(
     name = "expunge",
-    main = "//toplevel:Expunge",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ],
+    main = "//toplevel:Expunge",
     visibility = ["//toplevel:__pkg__"]
 )
 

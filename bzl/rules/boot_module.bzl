@@ -89,10 +89,8 @@ def _impl_boot_module(ctx):
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     if tc.target_host in ["boot", "dev", "vm"]:
-        # tool = tc.tool_runner
         ext = ".cmo"
     else:
-        # tool = tc.compiler
         ext = ".cmx"
 
     ################################################################
@@ -343,6 +341,12 @@ def _impl_boot_module(ctx):
     if not ctx.attr.nocopts:
         args.add_all(tc.copts)
 
+    # if ctx.attr.warnings == []:
+    #     args.add_all(ctx.attr.warnings)
+    # else:
+    args.add_all(tc.warnings[BuildSettingInfo].value)
+
+
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
 
@@ -504,6 +508,9 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
             doc = "List of OCaml options. Will override configurable default options."
         ),
 
+        warnings = attr.string_list(
+        ),
+
         nocopts = attr.bool(
             doc = "to disable use toolchain's copts"
         ),
@@ -584,9 +591,6 @@ In addition to the [OCaml configurable defaults](#configdefs) that apply to all
         #     doc = "Experimental",
         #     providers = [OcamlNsResolverProvider],
         #     default = "@ocaml//bootstrap/ns:resolver",
-        # ),
-
-        # _warnings = attr.label(
         # ),
 
         _rule = attr.string( default = "boot_module" ),

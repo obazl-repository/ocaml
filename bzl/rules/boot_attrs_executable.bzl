@@ -60,7 +60,7 @@ def options_executable(ws):
             # cfg = exe_deps_out_transition,
         ),
 
-        deps = attr.label_list(
+        prologue = attr.label_list(
             doc = "List of OCaml dependencies.",
             providers = [[OcamlArchiveProvider],
                          [OcamlImportMarker],
@@ -73,6 +73,10 @@ def options_executable(ws):
 
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
+        ),
+
+        warnings         = attr.string_list(
+            doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
         use_prims = attr.bool(

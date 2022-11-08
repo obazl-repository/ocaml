@@ -15,8 +15,26 @@ config_setting(name = "debug?", flag_values = {":debug": "True"})
 bool_flag( name = "instrumented", build_setting_default = False)
 config_setting(name = "instrumented?", flag_values = {":instrumented": "True"})
 
+bool_flag( name = "bin-annot", build_setting_default = True)
+config_setting(name = "bin-annot?", flag_values = {":bin-annot": "True"})
+
+bool_flag( name = "principal", build_setting_default = True)
+config_setting(name = "principal?", flag_values = {":principal": "True"})
+
 bool_flag( name = "sig_src", build_setting_default = False)
 config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
+
+bool_flag( name = "absname", build_setting_default = True)
+config_setting(name = "absname?", flag_values = {":absname": "True"})
+
+
+label_flag( name = "primitives",
+            build_setting_default = "//runtime:primitives")
+
+string_list_flag(name = "warnings",
+                 build_setting_default = [
+                     "-w", "+a-4-9-41-42-44-45-48",
+                     "-warn-error", "+A"])
 
 config_setting(
     name = "macos_fastbuild?",

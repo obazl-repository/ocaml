@@ -1,3 +1,5 @@
 load("//toolchain/profile:BUILD.bzl", "cc_build_profile")
 
+## FIXME: put this in toolchain/profile/cc, so we have
+# //toolchain/profile/cc
 cc_build_profile(name = "profile", visibility = ["//visibility:public"])

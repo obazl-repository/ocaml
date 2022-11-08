@@ -23,14 +23,22 @@ bootstrap_toolchain_adapter(
     target_host = "vm",
     compiler    = "//boot:ocamlc.byte",
     copts       = [ ## compile opts (sigs/modules only)
-        "-strict-sequence", "-absname",
-        "-w", "+a-4-9-41-42-44-45-48",
-        "-warn-error", "+A",
-        "-bin-annot",
+        "-strict-sequence",
+        # "-warn-error", "+A",
         "-nostdlib",
-        "-principal",
-    ],
-    primitives  = "//runtime:primitives",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
     camlheaders = [
         # "//stdlib:camlheaders"
         "//stdlib:camlheader", "//stdlib:target_camlheader",
@@ -44,26 +52,27 @@ bootstrap_toolchain_adapter(
 )
 
 # this tc used to cross-compile from vm.vm to vm.sys
-bootstrap_toolchain_adapter(
-    name        = "cross",
-    build_host  = "vm",
-    target_host = "vm",
-    xtarget_host = "sys",
-    compiler    = "//boot:ocamlc.byte",
-    copts       = [
-        # "-strict-sequence", "-absname",
-        # "-w", "+a-4-9-41-42-44-45-48",
-        # "-warn-error", "+A",
-        # "-bin-annot",
-        # "-nostdlib",
-        # "-principal",
-    ],
-    # primitives  = "//runtime:primitives",
-    lexer       = "//boot:ocamllex.byte",
-    yacc        = "//boot:ocamlyacc.exe",
-    tool_runner = "//boot:ocamlrun.exe",
-    # std_exit = "//stdlib:Std_exit"
-)
+## no, use same tc with config_setting --//platforms/xtarget=vm, sys
+# bootstrap_toolchain_adapter(
+#     name        = "cross",
+#     build_host  = "vm",
+#     target_host = "vm",
+#     xtarget_host = "sys",
+#     compiler    = "//boot:ocamlc.byte",
+#     copts       = [
+#         # "-strict-sequence", "-absname",
+#         # "-w", "+a-4-9-41-42-44-45-48",
+#         # "-warn-error", "+A",
+#         # "-bin-annot",
+#         # "-nostdlib",
+#         # "-principal",
+#     ],
+#     # primitives  = "//runtime:primitives",
+#     lexer       = "//boot:ocamllex.byte",
+#     yacc        = "//boot:ocamlyacc.exe",
+#     tool_runner = "//boot:ocamlrun.exe",
+#     # std_exit = "//stdlib:Std_exit"
+# )
 
 ################################################################
 # to produce compiler as a dev tool, build_host == target_host,

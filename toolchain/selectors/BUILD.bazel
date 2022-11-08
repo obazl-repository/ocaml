@@ -25,7 +25,7 @@ toolchain_selector(
     build_host_constraints  = ["//platforms/build:vm?"],
     target_host_constraints = [
         "//platforms/build:vm?",
-        "//platforms/xtarget:sys?",
+        # "//platforms/xtarget:sys?",
     ],
     # toolchain_constraints   = ["//platforms/xtarget:sys?"]
 )

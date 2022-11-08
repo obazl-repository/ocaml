@@ -3,6 +3,7 @@
 
 # build --toolchain_resolution_debug=.*
 # build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
+# build --toolchain_resolution_debug=//toolchain/type:bootstrap
 
 #### alternate toolchain: pass tc and profile if needed
 

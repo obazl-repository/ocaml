@@ -27,6 +27,8 @@ load("//config:CONFIG.bzl",
      "LIBDIR", "ROOTDIR"
      )
 
+exports_files(["gen_primitives.sh"] + glob(["*.c"]))
+
 OPTIMIZATION_FLAGS = select({
     "//platforms/vm:dbg?": ["-O0", "-g3"], # -Wall -Werror
     "//conditions:default": []
@@ -159,10 +161,6 @@ cc_library(
         "//lib:__pkg__"
     ],
 )
-
-# load("//bzl/transitions:boot_compiler.bzl",
-#      "cc_in_transition",
-#      "cc_out_transition")
 
 ### //runtime:ocamlc moved to //compilers:ocamlc
 ## root Makefile:

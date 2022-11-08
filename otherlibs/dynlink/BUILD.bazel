@@ -197,7 +197,7 @@ boot_executable(
     name = "extract_crc",
     main = ":Extract_crc",
     opts = ["-nostdlib"],
-    deps   = [":dynlink"]
+    prologue = [":dynlink"]
 )
 
 boot_module(

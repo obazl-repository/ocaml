@@ -18,12 +18,12 @@ exports_files([
     ## this is exported by genrule: "runtimedef.ml"
 ])
 
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+MODULE_OPTS = ["-w", "-40"] #OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+SIG_OPTS    = [] #OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # SIG_OPTS    = ROOT_MODULE_OPTS
 
-STDLIB = ["//boot/lib:stdlib"]
+STDLIB = [] # ["//boot/lib:stdlib"]
 
 boot_library(
     name = "lambda",
@@ -258,8 +258,8 @@ boot_module(
     sig    = "Runtimedef_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
+        "//stdlib:Stdlib"
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
@@ -290,6 +290,7 @@ boot_signature(
     src  = "runtimedef.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//stdlib:Stdlib"
     ],
     data = ["//runtime:primitives"],
 )
@@ -346,6 +347,7 @@ boot_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib"
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -358,6 +360,7 @@ boot_signature(
     src  = "switch.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//stdlib:Stdlib"
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )

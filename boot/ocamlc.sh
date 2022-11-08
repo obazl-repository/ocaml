@@ -39,5 +39,4 @@ fi
 
 $(rlocation ocaml-dev/runtime/ocamlrun) $(rlocation ocaml-dev/boot/ocamlc) -I `dirname $(rlocation ocaml-dev/stdlib/camlheader)` $@
 
-# $(rlocation ocaml-dev/runtime/ocamlrun) $(rlocation ocaml-dev/boot/ocamlc) $@
 

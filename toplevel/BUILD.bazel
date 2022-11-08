@@ -49,7 +49,7 @@ SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
 #     args = ["-nostdlib",
 #             "-I", "/Users/gar/ocaml/ocaml/bazel-bin/stdlib/__boot",
 #             "-noinit"],
-#     deps = [
+#     prologue = [
 #         "//compilerlibs:ocamlcommon",
 #         "//bytecomp:ocamlbytecomp",
 #         ":ocamltoplevel",

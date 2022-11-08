@@ -5,9 +5,8 @@ package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl",
      "boot_archive",
-     "boot_executable",
-     "boot_module",
      "boot_compiler",
+     "boot_module",
 )
 
 # ocamlc.byte:  *>vm  -> (vmvm)  - compiler transition to vmvm
@@ -40,7 +39,7 @@ boot_compiler(
         "-nostdlib", "-compat-32",
     ],
     main = "//driver:Main",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
      ],
@@ -101,14 +100,14 @@ boot_compiler(
     name = "ocamlopt.byte",
     # goal is to produce vm>sys compiler, so we need a compiler that emits vm
     target_compatible_with = [
-        "//platforms/target:vm?",
+        # "//platforms/target:vm?",
     ],
     # toolchain will transition to bld>bld, either vmvm or sysys
     # xtarget:sys? selects this output
     main = "//driver:Optmain",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
-        "//compilerlibs:ocamloptcomp",
+        "//asmcomp:ocamloptcomp",
     ],
     # visibility = [
     #     "//toolchain/adapters:__pkg__",
@@ -138,7 +137,7 @@ boot_compiler(
 ## build tc either syssys or vmsys, xtarget == vm
 ## tc transitions to syssys or vmvm
 ## compiler emits sys, archives must be cmxa;
-boot_executable(
+boot_compiler(  ## not yet supported
     name = "ocamlc.opt",
     # goal is to produce sys>vm compiler, so we need a compiler that emits sys
     target_compatible_with = ["//platforms/target:sys?"],
@@ -148,9 +147,9 @@ boot_executable(
     #  which we then use to compile a sys>vm compiler (emitting native code)
     opts = [],
     main = "//driver:Main",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
-        "//compilerlibs:ocamloptcomp",
+        "//asmcomp:ocamloptcomp",
         # "//driver",
     ],
 )
@@ -177,12 +176,12 @@ boot_executable(
 ## compilerlibs/ocamloptcomp.cmxa
 ## driver/optmain.cmx
 
-boot_executable(
+boot_compiler( # not yet supported
     name = "ocamlopt.opt",
     main = "//driver:Optmain",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
-        "//compilerlibs:ocamloptcomp",
+        "//asmcomp:ocamloptcomp",
     ],
     visibility = [
         "//testsuite:__pkg__"

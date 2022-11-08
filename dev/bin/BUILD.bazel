@@ -2,7 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl",
      "boot_archive",
-     "boot_executable",
      "boot_module",
      "boot_compiler"
 )
@@ -18,7 +17,7 @@ boot_compiler(
     ],
     # primitives = PRIMITIVES,
     main = "//driver:Main",
-    deps = [
+    prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         # "//boot/lib:stdlib"

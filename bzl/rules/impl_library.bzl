@@ -44,7 +44,6 @@ def build_packed_module(
     out_cmi = ctx.actions.declare_file(tmpdir + module_name + ".cmi")
 
     args = ctx.actions.args()
-    # args.add_all(tool_args)
 
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
@@ -73,7 +72,6 @@ def build_packed_module(
         inputs    = inputs,
         outputs   = [out_cm_, out_cmi],
         tools = [tc.compiler[DefaultInfo].files_to_run],
-        # tools = [tool] + tool_args,
         mnemonic = "CompilePackedModule",
         progress_message = "{mode} packing {rule}: {ws}//{pkg}:{tgt}".format(
             mode = "TEST", # mode,
@@ -116,7 +114,7 @@ def build_packed_module(
     return providers
 
 #################
-def impl_library(ctx): # , mode, tool): # , tool_args):
+def impl_library(ctx):
 
     debug = False
     # print("**** NS_LIB {} ****************".format(ctx.label))

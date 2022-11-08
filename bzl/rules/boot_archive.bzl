@@ -65,10 +65,8 @@ def _impl_boot_archive(ctx):
 
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
     if tc.target_host in ["boot", "dev", "vm"]:
-        tool = tc.tool_runner
         ext = ".cma"
     else:
-        tool = tc.compiler
         ext = ".cmxa"
 
     debug = False # True
@@ -141,58 +139,6 @@ def _impl_boot_archive(ctx):
         transitive = [merge_depsets(depsets, "paths")]
     )
 
-    ###   CALL THE LIB IMPLEMENTATION
-    # lib_providers = impl_library(ctx) #, mode, tool) # , tool_args)
-    # FIXME: improve the return vals handling
-
-    # libDefaultInfo = lib_providers[0]
-    # print("libDefaultInfo: %s" % libDefaultInfo.files.to_list())
-
-    # outputGroupInfo = lib_providers[1]
-
-    # libBootInfo = lib_providers[1]
-    # print("libBootInfo.inputs type: %s" % type(libBootInfo.inputs))
-    # print("libBootInfo.linkargs: %s" % libBootInfo.linkargs)
-    # print("libBootInfo.paths type: %s" % type(libBootInfo.paths))
-    # print("libBootInfo.ns_resolver: %s" % libBootInfo.ns_resolver)
-
-    # ppxAdjunctsProvider = lib_providers[2] ## FIXME: only as needed
-
-    # _ = lib_providers[2] # OcamlLibraryMarker
-
-    # if ctx.attr._rule.startswith("ocaml_ns"):
-    #     nsMarker = lib_providers[5]  # OcamlNsMarker
-    #     ccInfo  = lib_providers[6] if len(lib_providers) == 7 else False
-    # else:
-    # ccInfo  = lib_providers[4] if len(lib_providers) == 6 else False
-
-    # if ctx.label.name == "tezos-legacy-store":
-    #     print("LEGACY CC: %s" % ccInfo)
-        # dump_ccdep(ctx, dep)
-
-    ################################
-    # if libBootInfo.ns_resolver == None:
-    #     print("NO NSRESOLVER FROM NSLIB")
-    #     fail("NO NSRESOLVER FROM NSLIB")
-    # else:
-    #     ns_resolver = libBootInfo.ns_resolver
-    #     if debug:
-    #         print("ARCH GOT NSRESOLVER FROM NSLIB")
-    #         for f in libBootInfo.ns_resolver: # .files.to_list():
-    #             print("nsrsolver: %s" % f)
-
-    # paths_direct = []
-    # paths_indirect = libBootInfo.paths
-
-    # _options = get_options(ctx.attr._rule, ctx)
-
-    # shared = False
-    # if ctx.attr.shared:
-    #     shared = ctx.attr.shared or "-shared" in _options
-    #     if shared:
-    #         if "-shared" in ctx.attr.opts:
-    #             _options.remove("-shared") ## avoid dup
-
     if tc.target_host:
         ext = ".cma"
         # if shared:
@@ -214,10 +160,6 @@ def _impl_boot_archive(ctx):
 
     ## examples from mac make log:
     ## ocamlbytecomp.cma, ocamloptcomp.cma:  -nostdlib, -use-prims
-
-    # if tc.target_host:
-    #     args.add(tc.compiler)
-    # args.add_all(tool_args)
 
     args.add_all(tc.linkopts)
 
@@ -476,13 +418,10 @@ def _impl_boot_archive(ctx):
     ctx.actions.run(
         # env = env,
         executable = tc.compiler[DefaultInfo].files_to_run,
-        # executable = tc.tool_runner,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
         tools = [tc.compiler[DefaultInfo].files_to_run],
-        # tools = [tc.tool_runner, tc.compiler],
-        # tools = [tool] + tool_args, # [tc.ocamlopt, tc.compiler],
         mnemonic = mnemonic,
         progress_message = "{mode} archiving {rule}: @{ws}//{pkg}:{tgt}".format(
             mode = tc.build_host + ">" + tc.target_host,

@@ -749,4 +749,4 @@ flexdll_dirs = [@flexdll_dir@]
 WINDOWS_UNICODE = "@windows_unicode@" == "1"
 windows_unicode = @windows_unicode@ != 0
 
-NO_MISSING_MLI_ERROR = ["-w", "-70"]
+IGNORE_MISSING_MLI = ["-w", "-70"]

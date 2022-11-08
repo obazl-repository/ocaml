@@ -1,5 +1,5 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
-load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
@@ -36,11 +36,13 @@ def _tool_runner_out_transition_impl(settings, attr):
     # print("//bzl/toolchain:ocamlc: %s" %
     #       settings["//bzl/toolchain:ocamlc"])
 
-    boot_host = "//platforms/build:boot"
+    exec = "//platforms/build:boot"
+
+    # exec = "@local_config_platform//:host"
 
     return {
-        "//command_line_option:host_platform" : boot_host,
-        "//command_line_option:platforms"     : boot_host
+        "//command_line_option:host_platform" : exec,
+        "//command_line_option:platforms"     : exec
     }
 
 tool_runner_out_transition = transition(
@@ -84,6 +86,7 @@ def _bootstrap_toolchain_adapter_impl(ctx):
         compiler               = ctx.attr.compiler,
         copts                  = ctx.attr.copts,
         linkopts               = ctx.attr.linkopts,
+        warnings               = ctx.attr.warnings,
         primitives             = ctx.file.primitives,
         lexer                  = ctx.attr.lexer,
         yacc                   = ctx.file.yacc,
@@ -170,12 +173,19 @@ bootstrap_toolchain_adapter = rule(
             ## vm>* not executable
             ## sys>* executable
             # executable = True,
-            # cfg = "exec",
+            # cfg = tool_runner_out_transition
         ),
         "copts" : attr.string_list(
         ),
         "primitives" : attr.label(
+            ## label flag, settable by --//config:primitives=//foo/bar
+            default = "//config:primitives",
             allow_single_file = True
+        ),
+        "warnings" : attr.label(
+            ## string list, settable by --//config:primitives=//foo/bar
+            default = "//config:warnings",
+            # allow_single_file = True
         ),
         "linkopts" : attr.string_list(
         ),

@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 ## exports:
 ##   cc_build_profile - exposes tc fields as Make vars

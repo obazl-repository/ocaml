@@ -57,7 +57,7 @@ def impl_executable(ctx):
     if ctx.attr.main:
         depsets = aggregate_deps(ctx, ctx.attr.main, depsets, manifest)
 
-    for dep in ctx.attr.deps:
+    for dep in ctx.attr.prologue:
         aggregate_deps(ctx, dep, depsets, manifest)
 
     sigs_depset = depset(
@@ -113,14 +113,20 @@ def impl_executable(ctx):
     #########################
     args = ctx.actions.args()
 
-    # if ctx.attr.use_prims:
-    #     args.add_all(["-use-prims", tc.primitives.path])
-        # args.add_all(["-I", tc.primitives.dirname])
+    if ctx.attr.use_prims:
+        # ps = tc.primitives[DefaultInfo].files.to_list()
+        # print("P: %s" % ps[0])
+        args.add_all(["-use-prims", tc.primitives.path])
 
-    # args.add_all(tc.copts)
+    # args.add_all(tc.linkopts)
 
     _options = get_options(rule, ctx)
     args.add_all(_options)
+
+    if ctx.attr.warnings == [  ]:
+        args.add_all(ctx.attr.warnings)
+    else:
+        args.add_all(tc.warnings[BuildSettingInfo].value)
 
     data_inputs = []
     if ctx.attr.data:
@@ -140,11 +146,11 @@ def impl_executable(ctx):
     ## To get cli args in right order, we need then merged depset of
     ## all deps. Then we use the manifest to filter.
 
-    manifest = ctx.files.deps
+    manifest = ctx.files.prologue
 
     filtering_depset = depset(
         order = dsorder,
-        direct = ctx.files.deps, #  + [ctx.file.main],
+        direct = ctx.files.prologue, #  + [ctx.file.main],
         transitive = [cli_link_deps_depset]
     )
 
@@ -180,11 +186,11 @@ def impl_executable(ctx):
         direct = []
         + [ctx.file._std_exit, ctx.file._stdlib]
         + [ctx.file.main] if ctx.file.main else []
-        + [tc.primitives] # if tc.primitives else []
         # compiler runfiles contain camlheader files:
         + runfiles
         ,
         transitive = []
+        + [depset([tc.primitives])] # if tc.primitives else []
         + [
             sigs_depset,
             cli_link_deps_depset,

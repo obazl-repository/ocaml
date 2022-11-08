@@ -21,14 +21,7 @@ def _boot_library(ctx):
 
     mode = "bytecode"
 
-    # if mode == "bytecode":
-    tool = tc.tool_runner
-    # tool_args = [tc.compiler]
-    # else:
-    #     tool = tc.tool_runner.opt
-    #     tool_args = []
-
-    return impl_library(ctx, mode, tool) #, tool_args)
+    return impl_library(ctx)
 
 ###############################
 # rule_options = options("ocaml")
