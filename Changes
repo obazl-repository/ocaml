@@ -145,6 +145,9 @@ Working version
   modules with mismatching -for-pack
   (Pierre Chambart and Vincent Laviron, review by Mark Shinwell)
 
+- #11646: Add colors to error message hints.
+  (Christiana Anthony, review by Florian Angeletti)
+
 - #11653: Add the -no-absname option to ocamlc, ocamlopt and ocamldep.
   (Abiola Abdulsalam, review by Sébastien Hinderer and Florian Angeletti)
 
@@ -735,6 +738,10 @@ OCaml 5.0
 - #11622: Prevent stack overflow when printing a constructor or record
   mismatch error involving recursive types.
   (Florian Angeletti, review by Gabriel Scherer)
+
+- #11662, #11673: fix a memory leak when using Dynlink,
+  the bug was only present in development version of OCaml 5.
+  (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
 
 OCaml 4.14.0 (28 March 2022)
 ----------------------------
