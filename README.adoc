@@ -97,7 +97,7 @@ documentation yet, but you can find lots of notes in link:bzl/docs[bzl/docs].
 
 Support for Zig and LLVM.
 
-=== Cross-compilers
+=== Cross-compiling
 
 Bazel has excellent support for cross-compilation via link:https://bazel.build/extending/platforms[platforms] and link:https://bazel.build/extending/toolchains[toolchains]; for an overview see link:https://bazel.build/concepts/platforms[Building with platforms].
 
@@ -109,9 +109,7 @@ on an x86 Mac, a Linux x86 -> Linux arm OCaml compiler.
 
 == Non-Goals
 
-* Additional compilers: flambda; profiling compilers (`ocamcp`, `ocamloptp`).
-
-* Complete configuration: it is not a goal to support all configuration
+* Configuration completeness: it is not a goal to support all configuration
 settings supported by the legacy build system. That is, it is not a
 goal to expose such settings as user-controllable build options.
 +
@@ -127,19 +125,24 @@ Bazel is certainly capable of supporting such options, but for the
 baseline version it is not a goal to do so.
 +
 
+* Documentation builds.
+
 * Simultaneous builds of multiple variants. The legacy build system
   builds `ocamlrun`, `ocamlrund`, as well as bytecode and native
   variants of the compilers and tools.  OBazl builds one thing at a time.  See below, <<parameterized_build_targets>>.
 
-* Distribution: packaging builds for distribution is not a goal. Such
-packaging logic is generally not included in Bazel language rules,
-whose job is solely to build things. Instead it is provided by
-separate rulesets such as:
+* Distribution: packaging builds for distribution is not a goal. No
+point in supporting release builds unless and until the maintainers
+decide they want to use Bazel in production. Such packaging logic is
+generally not included in Bazel language rules, whose job is solely to
+build things. Instead it is provided by separate rulesets such as:
 +
 ** link:https://github.com/bazelbuild/rules_pkg[rules_pkg]
 ** link:https://github.com/vaticle/bazel-distribution[bazel-distribution]
 
 == Status  (2022/10/31)
+
+=== Legacy versions
 
 The OBazl code suffices to build some earlier versions, e.g. 4.14.0,
 5.0. Work is underway to upgrade it to support the latest version
@@ -151,15 +154,45 @@ compiler (the precompiled `ocamlc` that comes with the distribution)
 is used to build the stage1 `ocamlc`, which is used to build the
 stage2 `ocamlc`.  This mechanism is still under development.
 
-=== Trunk
+==== branch: bazel/4.14.0
+
+All the compilers and tools build.
+
+=== bazel/trunk
 
 The main branch of this repository is `bazel/trunk`; it tracks the
 `trunk` branch of the upstream repository (and so may be outdated at
 any given point in time).
 
-The bazel code in this branch is derived from the code in branch
-`bazel/4.14.0`; some work remains to be done to upgrade it to support
-trunk (OCaml 5.1.x).
+==== Configuration
+
+The Bazel build program supports command-line options to control:
+
+* Platform-based toolchain selection - see link:bzl/docs/toolchains.adoc[toolchains] for more information
+* Build subvariants - standard, debug, and instrumented builds - see link:bzl/docs/build_variants.adoc[build_variants]
+* Debugging profiles. Debugging configuration is rather involved,
+  since the C runtimes and the OCaml tools can be debugged separately.
+  Furthermore, there are two kinds of debugging: one involves building
+  with `-g` and use of the debugger, and other (for C) involves
+  setting preproccessor macros (typically `-DDEBUG`) whether or not
+  `-g` is used. The Bazel build program affords fine-grained control
+  of debug profiles - see link:bzl/docs/debugging.adoc[debugging] for details.
+* Compile/link flags - by default, bootstrapping builds use flags like
+  `-nostdlib`, `-use-prims`, `-principal`, etc. These are globally
+  controllable. For example during development one might want to use
+  `-no-principal`, or use a customize `primitives` file. These
+  configurations can be set on the command line (or via `.bazelrc`).
+  See link:bzl/docs/configuration.adoc[configuration] for more
+  information.
+* Build structure configuration. For lack of a better term. For
+  example, configuration setting `--//config:sig_src` (subject to
+  renaming) can be used to control whether or not `.mli` files are
+  separately compiled, if the build targets are configured to use it.  For an example see target link:https://github.com/obazl-repository/ocaml/blob/1cef348aa2fd3536883169ad8b371d5c36870736/stdlib/BUILD.bazel#L2320-L2328[Stdlib.Weak].
+
+==== Baseline builds
+
+Baseline builds use the bootstrap toolchain. The build targets are in
+`//boot/bin` and `//boot/lib`.
 
 The main build targets at this point:
 
@@ -173,23 +206,20 @@ The main build targets at this point:
  ** `//lib:camlrun`
  ** `//lib:asmrun`
 
-==== MacOS Clang
 
-The main targets should build successfully.
+==== Cross-builds
 
-==== MacOS Zig
+Cross-compilation of the runtimes works: you can build a Linux x86_64
+runtime on a MacOS x86_64 build host, for example. Cross-compilation
+of the OCaml tools is currently limited to what can be produced by the
+`vm>vm` bootstrap compiler, i.e. `ocamlopt.byte`, which runs on the VM
+and emits native code. But support for variants of `ocamlopt.byte`
+targeting different native platforms is not yet supported. Only the
+variant targeting the local native platform is supported.
 
-The runtime builds but I get errors trying to use it to run the bootstrap compiler, e.g.
+For more information see link:bzl/docs/cross_compilation.adoc[bzl/docs/cross_compilation.adoc]
 
-```
-(Illegal instruction): ocamlrun failed: error executing command (from target //stdlib:CamlinternalFormatBasics_cmi)
-```
 
-No idea why.  I'm hoping its just a configuration bug.
-
-=== branch: bazel/4.14.0
-
-All the compilers and tools build.
 
 == The OBazl Build: concepts and structure
 
