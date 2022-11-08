@@ -17,13 +17,22 @@ See the link:https://github.com/ocaml/ocaml[upstream repository] for the origina
 Target `:toolchain` builds all main targets; it's defined in
 link:BUILD.bazel[BUILD.bazel]. The main build targets are listed there.
 +
-5. Use Zig:  `$ bazel run boot/compiler --config=maczig` (or `--config=linuxzig`)
+5. Use Zig:  `$ bazel build boot/compiler --config=maczig` (or `--config=linuxzig`)
+
+6. Use a debug variant of the runtime (instead of `build boot/bin:ocamlrund`):
+
+    $ bazel build boot/bin:ocamlrun -c dbg
 
 6. Cross-compile:
 
-  a. mac->linux:  `$ bazel run boot/bin:ocamlrun --config=mac_linuxamd64`
-  a. linux->mac:  `$ bazel run boot/bin:ocamlrun --config=linuxamd64_macamd64`
+  a. mac->linux:  `$ bazel build boot/bin:ocamlrun --config=mac_linuxamd64`
+  a. linux->mac:  `$ bazel build boot/bin:ocamlrun --config=linuxamd64_macamd64`
 
+You can build and run executables under Bazel by using the `run` command instead of `build`; put arguments after `--`. For example:
+
+     $ bazel run boot/compiler --config=maczig -- -version
+
+To get more verbose output pass `--config=show`
 
 See link:bzl/docs/usage.adoc[usage] for more information.
 

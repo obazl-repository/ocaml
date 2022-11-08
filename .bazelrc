@@ -2,6 +2,11 @@
 build --incompatible_enable_cc_toolchain_resolution
 ## put it in ~/.bazelrc to enable for all bazel projects
 
+## maybe also put these in ~/.bazelrc, or ./config/user.bazelrc
+common --color=yes
+common:show --subcommands=pretty_print
+common:show --verbose_failures
+
 # build --toolchain_resolution_debug=.*
 build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 # build --toolchain_resolution_debug=//toolchain/type:bootstrap
