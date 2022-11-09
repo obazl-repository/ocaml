@@ -21,7 +21,7 @@ toolchain attribute that expresses this is marked with
 `executable=True` and `cfg="exec"`. That is what forces
 `compilation_mode` to `opt`.
 
-Example: rule `bootstrap_ocamllex`. This rule runs the bootstrap (i.e.
+Example: rule `boot_lexer`. This rule runs the bootstrap (i.e.
 precompiled) `ocamllex`. To do that it uses the vm runtime `ocamlrun`.
 The rule obtains both `ocamllex` and `ocamlrun` from toolchain
 attributes. Both attributes are marked with `executable=True` and

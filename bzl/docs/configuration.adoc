@@ -1,5 +1,27 @@
 = configuration
 
+The `./configure` script emits several classes of config data: toolchain and system.
+
+* toolchain config is stuff like compile and link flags. determined by finding and interrogating the tools.
+
+* system config is stuff like OS, architecture. determined by interrogating the system in various ways
+
+* installation config: e.g. the standard PREFIX, EXEC_PREFIX, etc. specified by the user via `./configure` arguments and/or environment vars.
+
+OBazl partitions the output of `./configure` accordingly:
+
+* `//toolchain/profile/cc` and its subdirectories contain toolchain configuration data
+* `//profile/system` contains system configuration data; for example
+  `//profile/system/local` for the local system, and, for
+  cross-compilation, `//profile/system/linux` and
+  `//profile/system/macos`.
+
+The configuration information is communicated to build rules through
+Bazels _custom variable_ mechanism.
+
+=== config settings
+
+
 * `--//config:primitives=/path/to/primitives` - sets the file of
   primitives to be used with `-use-primitives. This is a global
   setting. Default is `//runtime:primitives`.

@@ -1,2 +1,13 @@
 = toolchains
 
+
+
+Toolchain resolution is a little complicated. Details at link:https://bazel.build/configure/toolchain-resolution[Toolchain Resolution Implementation Details]
+
+
+Key point: "[T]he dependency from a target to a toolchain uses a
+special configuration that forces the execution platform to be the
+same for both. Despite the name "toolchain transition", this is not
+implemented as a configuration transition..."
+
+
