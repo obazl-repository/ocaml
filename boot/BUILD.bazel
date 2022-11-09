@@ -6,16 +6,16 @@ exports_files(["ocamllex"])
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
 
 alias(
-    name   = "ocamlrun.exe",
+    name   = "ocamlrun.boot",
     actual = "//runtime:ocamlrun"
 )
 
 sh_binary(
-    name = "ocamlc.byte",
+    name = "ocamlc.boot",
     srcs = ["ocamlc.sh"],
     data = [
         ":ocamlc",
-        ":ocamlrun.exe",
+        ":ocamlrun.boot",
         "//stdlib:camlheaders", # genrule, no dep on ocamlc.
         # We cannot depend on Std_exit on pain of circularity.
         # It depends on Stdlib, which is compiled by this tool.
@@ -28,17 +28,17 @@ sh_binary(
 )
 
 sh_binary(
-    name = "ocamllex.byte",
+    name = "ocamllex.boot",
     srcs = ["ocamllex.sh"],
     data = [
         ":ocamllex",
-        ":ocamlrun.exe"
+        ":ocamlrun.boot"
     ],
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
 # ocamlyacc is written in C, so no ocamlyacc.opt.
 alias(
-    name   = "ocamlyacc.exe",
+    name   = "ocamlyacc.boot",
     actual = "//yacc:ocamlyacc"
 )
