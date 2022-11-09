@@ -157,7 +157,6 @@ boot_module(
         "//lambda:Lambda",
         "//lambda:Matching",
         "//lambda:Switch",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.List",
@@ -186,6 +185,7 @@ boot_signature(
     src  = "bytegen.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Asttypes_cmi",
         ":Instruct",
     ],
     data = ["//runtime:primitives"]
@@ -206,7 +206,6 @@ boot_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Format",
         "//utils:Config",
-        "//file_formats:Cmo_format_cmi",
         "//utils:Clflags",
     ],
     data = ["//runtime:primitives"],
@@ -220,6 +219,7 @@ boot_signature(
     src  = "bytelibrarian.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//file_formats:Cmo_format_cmi",
         "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"]
@@ -254,7 +254,6 @@ boot_module(
         "//stdlib:Stdlib.Filename",
         "//utils:Consistbl",
         "//utils:Config",
-        "//file_formats:Cmo_format_cmi",
         "//utils:Clflags",
         "//stdlib:Stdlib.Char",
         "//utils:Ccomp",
@@ -303,7 +302,6 @@ boot_module(
         "//stdlib:Stdlib.Filename",
         "//typing:Env",
         "//utils:Config",
-        "//file_formats:Cmo_format_cmi",
         "//utils:Clflags",
     ],
     data = ["//runtime:primitives"],
@@ -315,6 +313,7 @@ boot_signature(
     src  = "bytepackager.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//file_formats:Cmo_format_cmi",
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
         "//typing:Env_cmi"
@@ -394,9 +393,7 @@ boot_module(
     sig    = "Emitcode_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//file_formats:Cmo_format_cmi",
         "//lambda:Translmod",
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Char",
@@ -430,6 +427,7 @@ boot_signature(
     src  = "emitcode.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Asttypes_cmi",
         "//file_formats:Cmo_format_cmi",
         "//typing:Ident",
         "//utils:Misc",
@@ -646,9 +644,7 @@ boot_module(
     sig    = "Symtable_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//file_formats:Cmo_format_cmi",
         "//lambda:Runtimedef",
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Buffer",
@@ -684,12 +680,13 @@ boot_signature(
     src  = "symtable.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
+        "//file_formats:Cmo_format_cmi",
+        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Digest",
-        "//file_formats:Cmo_format_cmi"
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Obj",
+        "//typing:Ident",
+        "//utils:Misc",
     ],
     data = ["//runtime:primitives"],
     visibility = [
