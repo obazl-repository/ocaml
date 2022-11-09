@@ -72,7 +72,6 @@ boot_module(
     sig    = "Debuginfo_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi", # => "//parsing:Location_cmi",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         "//parsing:Location",
@@ -120,7 +119,6 @@ boot_module(
         "//typing:Ident",
         "//typing:Env",
         "//utils:Clflags",
-        "//parsing:Asttypes_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -187,7 +185,6 @@ boot_module(
         "//utils:Clflags",
         "//stdlib:Stdlib.Char",
         "//typing:Btype",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
     visibility = ["//bytecomp:__pkg__"]
@@ -200,6 +197,7 @@ boot_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
+        "//parsing:Asttypes_cmi",
         "//typing:Typedtree_cmi",
         "//parsing:Location",
         "//typing:Ident",
@@ -225,7 +223,6 @@ boot_module(
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
         "//utils:Clflags",
-        "//parsing:Asttypes_cmi",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -241,8 +238,9 @@ boot_signature(
     src  = "printlambda.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
+        ":Lambda",
+        ":Debuginfo",
+        "//parsing:Asttypes_cmi",
         "//typing:Types",
         "//stdlib:Stdlib.Format",
     ]
@@ -314,7 +312,6 @@ boot_module(
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Fun",
         "//utils:Clflags",
-        "//parsing:Asttypes_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -332,6 +329,7 @@ boot_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
+        "//parsing:Asttypes_cmi",
         "//typing:Ident",
     ]
 )
@@ -392,7 +390,6 @@ boot_module(
     deps   = STDLIB + [
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Printf",
@@ -447,7 +444,6 @@ boot_module(
         "//utils:Clflags",
         ## (CamlinternalOO)
         "//typing:Btype",
-        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -487,7 +483,6 @@ boot_module(
         "//typing:Primitive",
         "//typing:Predef",
         "//typing:Path",
-        "//parsing:Parsetree_cmi",
         ## (Parmatch)
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Obj",
@@ -501,7 +496,6 @@ boot_module(
         "//utils:Config",
         "//utils:Clflags",
         "//typing:Btype",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ]
 )
@@ -511,15 +505,16 @@ boot_signature(
     src  = "translcore.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        "//typing:Typedtree_cmi",
-        "//typing:Path",
+        "//parsing:Asttypes_cmi",
         "//parsing:Location",
-        "//typing:Ident",
+        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Format",
         "//typing:Env",
-        "//parsing:Asttypes_cmi",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Typedtree_cmi",
+        ":Debuginfo",
+        ":Lambda",
     ]
 )
 
@@ -552,7 +547,6 @@ boot_module(
         "//typing:Env",
         "//typing:Ctype",
         "//utils:Clflags",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
     visibility = [
@@ -570,6 +564,7 @@ boot_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
+        "//parsing:Asttypes_cmi",
         "//typing:Typedtree_cmi",
         "//typing:Primitive",
         "//parsing:Location",
@@ -594,7 +589,6 @@ boot_module(
         "//utils:Config",
         "//utils:Clflags",
         "//typing:Btype",
-        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -605,6 +599,7 @@ boot_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
+        "//parsing:Asttypes_cmi",
         "//typing:Ident",
         "//typing:Env",
     ]
@@ -638,7 +633,6 @@ boot_module(
         "//typing:Env",
         "//utils:Config",
         "//utils:Clflags",
-        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -649,6 +643,7 @@ boot_signature(
     deps   = STDLIB + [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
+        "//parsing:Asttypes_cmi",
         "//typing:Types",
          "//typing:Typedtree_cmi",
         "//typing:Primitive",

@@ -179,7 +179,6 @@ boot_module(
     sig    = "Btype_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -208,6 +207,7 @@ boot_signature(
     deps   = STDLIB + [
         ":Types",
         ":Path",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -225,14 +225,14 @@ boot_module(
         ":Ident",
         ":Envaux",
         ":Env",
-        ":Annot_cmi",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Option",
         "//parsing:Longident",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//file_formats:Cmt_format",
-        "//parsing:Asttypes_cmi",
+        # "//parsing:Asttypes_cmi",
+        # ":Annot_cmi",
+        # "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Array",
     ],
     visibility = ["//tools:__pkg__"]
@@ -244,7 +244,6 @@ boot_module(
     sig    = "Ctype_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
         "//stdlib:Stdlib.Hashtbl",
@@ -309,7 +308,6 @@ boot_module(
     sig    = "Datarepr_cmi",
     opts = MODULE_OPTS + ["-w", "-40"],
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.List",
@@ -329,6 +327,7 @@ boot_signature(
     src  = "datarepr.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Asttypes_cmi",
         ":Types",
         ":Path",
         ":Ident",
@@ -342,7 +341,6 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//file_formats:Cmi_format",
-        "//parsing:Asttypes_cmi",
         "//parsing:Builtin_attributes",
         "//parsing:Location",
         "//parsing:Longident",
@@ -417,7 +415,6 @@ boot_module(
     sig    = "Envaux_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -437,6 +434,7 @@ boot_signature(
     src  = "envaux.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
         ":Env",
         ":Path",
@@ -450,7 +448,6 @@ boot_module(
     sig    = "Errortrace_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
         ":Path",
@@ -548,7 +545,6 @@ boot_module(
     sig    = "Includecore_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Builtin_attributes",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Int",
@@ -580,6 +576,7 @@ boot_signature(
     src  = "includecore.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
         "//parsing:Parsetree_cmi",
@@ -713,7 +710,6 @@ boot_module(
     sig    = "Mtype_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
@@ -734,6 +730,7 @@ boot_signature(
     src  = "mtype.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Asttypes_cmi",
         ":Env",
         ":Ident",
         ":Path",
@@ -747,7 +744,6 @@ boot_module(
     sig    = "Oprint_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Pprintast",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Char",
@@ -758,7 +754,6 @@ boot_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-        ":Outcometree_cmi",
     ],
     visibility = [
         "//toplevel:__pkg__",
@@ -800,10 +795,8 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//parsing:Ast_helper",
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Buffer",
         "//stdlib:Stdlib.Char",
@@ -900,7 +893,6 @@ boot_module(
     sig    = "Patterns_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
         "//stdlib:Stdlib.List",
@@ -979,9 +971,7 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//parsing:Ast_helper",
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.List",
         ":Btype",
         ":Ident",
@@ -1005,6 +995,8 @@ boot_signature(
     src  = "predef.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Asttypes_cmi",
+        "//parsing:Parsetree_cmi",
         ":Ident",
         ":Path",
         ":Types",
@@ -1019,12 +1011,10 @@ boot_module(
     deps   = STDLIB + [
         "//parsing:Attr_helper",
         "//parsing:Location",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.String",
         "//utils:Misc",
-        ":Outcometree_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -1053,7 +1043,6 @@ boot_module(
     sig    = "Printpat_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
@@ -1085,10 +1074,8 @@ boot_module(
     sig    = "Printtyp_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
@@ -1107,7 +1094,6 @@ boot_module(
         ":Errortrace",
         ":Ident",
         ":Oprint",
-        ":Outcometree_cmi",
         ":Path",
         ":Predef",
         ":Primitive",
@@ -1146,6 +1132,7 @@ boot_signature(
         "//parsing:Location",
         "//stdlib:Stdlib.Format",
         "//parsing:Asttypes_cmi",
+        "//parsing:Parsetree_cmi",
     ]
 )
 
@@ -1162,7 +1149,6 @@ boot_module(
         "//stdlib:Stdlib.String",
         "//parsing:Printast",
         "//parsing:Pprintast",
-        "//parsing:Parsetree_cmi",
         "//parsing:Longident",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
@@ -1170,7 +1156,6 @@ boot_module(
         "//stdlib:Stdlib.Format",
         "//utils:Clflags",
         "//stdlib:Stdlib.Char",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
     visibility = [
@@ -1186,6 +1171,7 @@ boot_signature(
     deps   = STDLIB + [
         ":Typedtree",
         ":Path",
+        "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
         "//parsing:Longident",
         "//stdlib:Stdlib.Format",
@@ -1206,7 +1192,6 @@ boot_module(
         ":Ident",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ]
 )
@@ -1219,6 +1204,7 @@ boot_signature(
         ":Typedtree",
         ":Path",
         ":Ident",
+        "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
         "//parsing:Longident",
     ]
@@ -1282,7 +1268,6 @@ boot_module(
     deps   = STDLIB + [
         ":Typedtree",
         ":Printtyp",
-        ":Annot_cmi",
         "//stdlib:Stdlib.String",
         "//utils:Misc",
         "//parsing:Location",
@@ -1317,7 +1302,6 @@ boot_module(
     deps   = STDLIB + [
         "//parsing:Ast_mapper",
         "//parsing:Location",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.String",
@@ -1367,7 +1351,6 @@ boot_module(
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.List",
         "//utils:Lazy_backtrack",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ]
 )
@@ -1399,7 +1382,6 @@ boot_module(
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.List",
         "//utils:Lazy_backtrack",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
     visibility = ["//file_formats:__pkg__"]
@@ -1449,11 +1431,9 @@ boot_module(
     deps   = STDLIB + [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
-        "//parsing:Asttypes_cmi",
         "//parsing:Builtin_attributes",
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Lazy",
@@ -1500,18 +1480,18 @@ boot_signature(
     src  = "typeclass.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Types",
-        ":Typedtree",
-        ":Path",
-        ":Ident",
-        ":Errortrace",
-        ":Env",
-        ":Ctype",
-        "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Format",
         "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Format",
+        ":Ctype",
+        ":Env",
+        ":Errortrace",
+        ":Ident",
+        ":Path",
+        ":Typedtree",
+        ":Types",
     ]
 )
 
@@ -1523,11 +1503,9 @@ boot_module(
     deps   = STDLIB + [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
-        "//parsing:Asttypes_cmi",
         "//parsing:Builtin_attributes",
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
@@ -1609,12 +1587,10 @@ boot_module(
 
         "//parsing:Ast_helper",
         "//parsing:Ast_iterator",
-        "//parsing:Asttypes_cmi",
         "//parsing:Attr_helper",
         "//parsing:Builtin_attributes",
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//parsing:Pprintast",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -1796,9 +1772,7 @@ boot_module(
     sig    = "Typedecl_variance_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.String",
         "//utils:Lazy_backtrack",
@@ -1838,10 +1812,8 @@ boot_module(
     sig    = "Typedtree_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//utils:Lazy_backtrack",
@@ -1892,13 +1864,11 @@ boot_module(
     deps   = STDLIB + [
         "//file_formats:Cmi_format",
         "//file_formats:Cmt_format",
-        "//parsing:Asttypes_cmi",
         "//parsing:Attr_helper",
         "//parsing:Builtin_attributes",
         "//parsing:Location",
         "//parsing:Longident",
         "//parsing:Parse",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Format",
@@ -1982,13 +1952,11 @@ boot_module(
         ":Ctype",
         "//lambda:Lambda",
         "//stdlib:Stdlib.Sys",
-        "//parsing:Parsetree_cmi",
         "//parsing:Longident",
         "//stdlib:Stdlib.List",
         "//utils:Lazy_backtrack",
         "//utils:Config",
         "//utils:Clflags",
-        "//parsing:Asttypes_cmi",
     ],
     visibility = ["//lambda:__pkg__"]
 )
@@ -2003,6 +1971,7 @@ boot_signature(
         ":Path",
         ":Env",
         "//lambda:Lambda_cmi",
+        "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
         "//parsing:Longident",
     ]
@@ -2019,7 +1988,6 @@ boot_module(
         ":Path",
         ":Ident",
         ":Shape",
-        "//parsing:Parsetree_cmi",
         "//utils:Misc",
         "//parsing:Longident",
         "//parsing:Location",
@@ -2029,7 +1997,6 @@ boot_module(
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
         "//utils:Config",
-        "//parsing:Asttypes_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -2048,6 +2015,8 @@ boot_signature(
     src  = "types.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Asttypes_cmi",
+        "//parsing:Parsetree_cmi",
         ":Ident",
         ":Path",
         ":Primitive",
@@ -2076,7 +2045,6 @@ boot_module(
         ":Btype",
         "//stdlib:Stdlib.String",
         "//parsing:Pprintast",
-        "//parsing:Parsetree_cmi",
         "//utils:Misc",
         "//parsing:Longident",
         "//parsing:Location",
@@ -2086,7 +2054,6 @@ boot_module(
         "//stdlib:Stdlib.Format",
         "//utils:Clflags",
         "//parsing:Builtin_attributes",
-        "//parsing:Asttypes_cmi",
         "//parsing:Ast_helper",
     ],
     visibility = ["//toplevel:__pkg__"]
@@ -2117,10 +2084,8 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         "//parsing:Ast_helper",
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Int32",

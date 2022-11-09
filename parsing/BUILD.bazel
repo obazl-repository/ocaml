@@ -10,8 +10,8 @@ load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
      "boot_module",
-     "bootstrap_ocamllex",
-     "bootstrap_ocamlyacc",
+     "boot_lexer",
+     "boot_yacc",
      "boot_signature",
 )
 
@@ -75,9 +75,6 @@ boot_archive(
         ":Pprintast",
         ":Printast",
         ":Syntaxerr",
-
-        # ":Asttypes_cmi",
-        # ":Parsetree_cmi",
     ],
     visibility = ["//compilerlibs:__pkg__"]
 )
@@ -102,9 +99,6 @@ boot_library(
         ":Pprintast",
         ":Printast",
         ":Syntaxerr",
-
-        # ":Asttypes_cmi",
-        # ":Parsetree_cmi",
     ],
     visibility = ["//compilerlibs:__pkg__"]
 )
@@ -122,11 +116,9 @@ boot_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Nativeint",
         "//utils:Misc",
-        ":Asttypes_cmi",
         ":Docstrings",
         ":Location",
         ":Longident",
-        ":Parsetree_cmi",
         ":Syntaxerr",
     ],
     visibility = [
@@ -159,10 +151,8 @@ boot_module(
     deps   = STDLIB + [
         "//stdlib:Stdlib.List",
         ":Ast_iterator",
-        ":Asttypes_cmi",
         ":Builtin_attributes",
         ":Longident",
-        ":Parsetree_cmi",
         ":Syntaxerr",
     ],
     visibility = ["//driver:__pkg__"]
@@ -176,6 +166,7 @@ boot_signature(
         "//stdlib:Stdlib.Format",
         ":Location",
         ":Longident",
+        ":Asttypes_cmi",
         ":Parsetree_cmi",
     ]
 )
@@ -188,7 +179,6 @@ boot_module(
     deps   = STDLIB + [
         "//stdlib:Stdlib.List",
         ":Location",
-        ":Parsetree_cmi",
     ],
     visibility = [
         "//tools:__pkg__",
@@ -225,10 +215,8 @@ boot_module(
         "//utils:Load_path",
         "//utils:Misc",
         ":Ast_helper",
-        ":Asttypes_cmi",
         ":Location",
         ":Longident",
-        ":Parsetree_cmi",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -245,6 +233,7 @@ boot_signature(
         "//stdlib:Stdlib.Format",
         ":Location",
         ":Longident",
+        ":Asttypes_cmi",
         ":Parsetree_cmi",
     ]
 )
@@ -277,9 +266,7 @@ boot_module(
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
-        ":Asttypes_cmi",
         ":Location",
-        ":Parsetree_cmi",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -313,10 +300,8 @@ boot_module(
         "//stdlib:Stdlib.Printf",
         "//utils:Misc",
         "//utils:Warnings",
-        ":Asttypes_cmi",
         ":Location",
         ":Longident",
-        ":Parsetree_cmi",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -334,6 +319,7 @@ boot_signature(
         "//utils:Misc",
         ":Location",
         ":Longident",
+        ":Asttypes_cmi",
         ":Parsetree_cmi",
     ]
 )
@@ -348,11 +334,9 @@ boot_module(
         "//stdlib:Stdlib.Option",
         "//utils:Clflags",
         "//utils:Misc",
-        ":Asttypes_cmi",
         ":Builtin_attributes",
         ":Location",
         ":Longident",
-        ":Parsetree_cmi",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -366,6 +350,7 @@ boot_signature(
         "//utils:Misc",
         ":Location",
         ":Longident",
+        ":Asttypes_cmi",
         ":Parsetree_cmi",
     ]
 )
@@ -381,7 +366,6 @@ boot_module(
         "//stdlib:Stdlib.List",
         "//utils:Warnings",
         ":Location",
-        ":Parsetree_cmi",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -464,7 +448,7 @@ boot_module(
     ]
 )
 
-bootstrap_ocamllex(
+boot_lexer(
     name = "lexer_ml",
     out  = "lexer.ml",
     src  = "lexer.mll"
@@ -686,10 +670,8 @@ boot_module(
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.String",
         ":Ast_helper",
-        ":Asttypes_cmi",
         ":Location",
         ":Longident",
-        ":Parsetree_cmi",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -707,6 +689,7 @@ boot_signature(
         "//stdlib:Stdlib.Format",
         ":Location",
         ":Longident",
+        ":Asttypes_cmi",
         ":Parsetree_cmi",
     ]
 )
@@ -724,10 +707,8 @@ boot_module(
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.String",
         "//utils:Clflags",
-        ":Asttypes_cmi",
         ":Location",
         ":Longident",
-        ":Parsetree_cmi",
         ":Pprintast",
     ],
     visibility = [
@@ -745,6 +726,7 @@ boot_signature(
         "//stdlib:Stdlib.Format",
         ":Location",
         ":Longident",
+        ":Asttypes_cmi",
         ":Parsetree_cmi",
     ]
 )

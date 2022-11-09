@@ -362,7 +362,6 @@ boot_module(
         "//parsing:Location",
         "//parsing:Parse",
         "//parsing:Parser",
-        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Bytes",
@@ -391,6 +390,7 @@ boot_signature(
     src  = "makedepend.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib_cmi",
     ]
 )
@@ -520,7 +520,6 @@ boot_module(
         "//stdlib:Stdlib.String",
         "//utils:Profile",
         "//stdlib:Stdlib.Printf",
-        "//parsing:Parsetree_cmi",
         "//parsing:Parse",
         "//utils:Misc",
         "//parsing:Location",
