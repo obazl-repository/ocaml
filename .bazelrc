@@ -1,4 +1,4 @@
-## always use this setting:
+## always use these settings:
 build --incompatible_enable_cc_toolchain_resolution
 ## put it in ~/.bazelrc to enable for all bazel projects
 
@@ -7,9 +7,22 @@ common --color=yes
 common:show --subcommands=pretty_print
 common:show --verbose_failures
 
-# build --toolchain_resolution_debug=.*
-# build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
-# build --toolchain_resolution_debug=//toolchain/type:bootstrap
+#build --toolchain_resolution_debug=.*
+#build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
+build --toolchain_resolution_debug=//toolchain/type:bootstrap
+
+### testing:
+# --extra_execution_platforms: The platforms that are available as
+# execution platforms to run actions. Platforms can be specified by
+# exact target, or as a target pattern. These platforms will be
+# considered before those declared in the WORKSPACE file by
+# register_execution_platforms().
+
+# Q: how is that related to --host_platform? The latter just sets
+# constraint values? Whereas register_execution_platforms declares
+# exec platforms available for tc resolution, regardless of which
+# constraint-values are in effect. IOW --host_platform sets the action
+# configuration.
 
 #### alternate toolchain: pass tc and profile if needed
 
@@ -33,6 +46,12 @@ common:mac_linuxamd64 --platforms=@zig_sdk//platform:linux_amd64
 ### linux > macos using zig
 common:linuxamd64_macamd64 --extra_toolchains=@zig_sdk//toolchain:darwin_amd64,//toolchain/profile/selector/cc/macos
 common:linuxamd64_macamd64 --platforms=@zig_sdk//platform:macos_amd64
+
+################################################################
+### sanitizers - default CC toolchains have builtin support!
+
+# common:asan --features=asan
+# common:ubsan --features=msan
 
 ################################################################
 # build --action_env BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1

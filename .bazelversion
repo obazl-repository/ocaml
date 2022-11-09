@@ -1,4 +1,6 @@
-last_green
+6.0.0rc1
+
+#last_green
 
 # last_green (6.x) required, for custom provider initializers
 # https://bazel.build/extending/rules#custom_providers

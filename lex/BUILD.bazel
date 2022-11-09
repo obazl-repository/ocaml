@@ -1,8 +1,8 @@
 load("//bzl:rules.bzl",
      "boot_executable",
      "boot_module",
-     "bootstrap_ocamllex",
-     "bootstrap_ocamlyacc",
+     "boot_lexer",
+     "boot_yacc",
      "boot_signature",
      "boot_library",
 )
@@ -51,7 +51,7 @@ STDLIB = ["//stdlib:Stdlib"]
 # 	$(OCAMLYACC) $(OCAMLYACCFLAGS) $<
 
 ## BOOT_OCAMLLEX = //boot/ocamllex is the default for this dir
-# We implement it in the toolchain used by bootstrap_ocamllex
+# We implement it in the toolchain used by boot_lexer
 
 
 # ../boot/ocamlrun ../boot/ocamlc
@@ -182,7 +182,7 @@ boot_module(
     visibility = ["//file_formats:__pkg__"]
 )
 
-bootstrap_ocamllex(
+boot_lexer(
     name = "lexer_ml",
     out  = "lexer.ml",
     src  = "lexer.mll"
@@ -345,7 +345,7 @@ boot_signature(
     ]
 )
 
-bootstrap_ocamlyacc(
+boot_yacc(
     name = "parser_ml",
     outs = ["parser.ml", "parser.mli"],
     src  = "parser.mly",

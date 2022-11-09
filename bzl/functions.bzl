@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl/rules:impl_common.bzl",
+load("//bzl/rules/common:impl_common.bzl",
      "dsorder", "module_sep", "resolver_suffix",
      "opam_lib_prefix",
      "tmpdir"

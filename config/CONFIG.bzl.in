@@ -61,10 +61,11 @@ NATIVE_COMPILER = "@native_compiler@" == "true"
 ### Set ARCH=none if your machine is not supported
 ARCH = "@arch@"
 
-# Whether the architecture has 64 bits
+# Whether the architecture has 64 bits. Used in root Makefile for
+# controlling test compile for machine-depedent code
 ARCH64 = "@arch64@" == "true"
 
-# Endianness for this architecture
+# Endianness for this architecture - not used anywhere in the sources
 ENDIANNESS = "@endianness@"
 
 ### Name of architecture model for the native-code compiler.
@@ -79,6 +80,9 @@ ENDIANNESS = "@endianness@"
 MODEL = "@model@"
 
 ### Name of operating system family for the native-code compiler.
+# Used in Makefile.common to set OC_NATIVE_CPPFLAGS
+# tools/Makefile, set DEF_SYMBOL_PREFIX for mac, cygwin: -Dsymbol_prefix="_"
+# testsuite/Makefile to test for cygwin only
 SYSTEM = "@system@"
 
 TARGET = "@target@"

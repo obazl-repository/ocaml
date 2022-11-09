@@ -5,7 +5,7 @@ load("//bzl:rules.bzl",
      "boot_module",
      "bootstrap_repl",
      "boot_signature",
-     "bootstrap_test",
+     "kick_test",
 )
 
 # load("//config:CONFIG.bzl",
@@ -88,7 +88,7 @@ bootstrap_repl(
 #     )
 # )
 
-# bootstrap_test(
+# kick_test(
 #     name = "ocaml.test",
 #     main = ":ocaml",
 # )

@@ -40,7 +40,11 @@ genrule(
         "//platforms/os:macos?": ["//runtime/caml:s.macos.h"]
         # "//conditions:default": [],
     }),
-    cmd  = "cp $(SRCS) $@"
+    cmd  = "cp $(SRCS) $@",
+    # exec_compatible_with = [
+    #     # "@platforms//os:linux",
+    #     "@platforms//os:macos",
+    # ]
 )
 
 genrule(

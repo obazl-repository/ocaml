@@ -4,7 +4,7 @@ load("//bzl:rules.bzl",
      "boot_executable",
      "boot_library",
      "boot_module",
-     "bootstrap_ocamllex",
+     "boot_lexer",
      "boot_signature"
 )
 
@@ -203,7 +203,7 @@ boot_module(
     ],
 )
 
-bootstrap_ocamllex(
+boot_lexer(
     name = "cvt_emit_ml",
     out  = "cvt_emit.ml",
     src  = "cvt_emit.mll"
@@ -763,7 +763,7 @@ boot_module(
     opts = ["-nostdlib"] + IGNORE_MISSING_MLI
 )
 
-bootstrap_ocamllex(
+boot_lexer(
     name = "make_opcodes_ml",
     out  = "make_opcodes.ml",
     src  = "make_opcodes.mll",

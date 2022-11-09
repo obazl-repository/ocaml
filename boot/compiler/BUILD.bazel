@@ -20,6 +20,7 @@ boot_compiler(
         "//compilerlibs:ocamlcommon",
     ] + select({
         # select on config_setting, not constraint value
+        ## FIXME: should select on target not xtarget?
         "//platforms/xtarget:sys?": ["//asmcomp:ocamloptcomp"],
         "//platforms/xtarget:vm?": ["//bytecomp:ocamlbytecomp"],
         "//conditions:default": ["//bytecomp:ocamlbytecomp"],
@@ -33,6 +34,6 @@ boot_compiler(
         "//platforms/target:sys?": False,
         "//conditions:default": True
     }),
-    toolchains = ["//toolchain:profile"]
+    toolchains = ["//profile/system/local"]
 )
 

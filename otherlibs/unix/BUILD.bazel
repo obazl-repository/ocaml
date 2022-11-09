@@ -83,10 +83,64 @@ genrule(
 )
 
 ################################################################
+filegroup(
+    name = "common_c_sources",
+    srcs = [
+        "access.c", "addrofstr.c", "chdir.c", "chmod.c",
+        "cst2constr.c", "cst2constr.h",
+        "cstringv.c", "execv.c", "execve.c",
+        "execvp.c", "fsync.c", "mkdir.c", "exit.c",
+        "getaddrinfo.c", "getcwd.c", "gethost.c", "gethostname.c",
+        "getnameinfo.c", "getproto.c", "getserv.c", "gmtime.c",
+        "mmap_ba.c", "putenv.c", "rmdir.c", "socketaddr.c",
+        "strofaddr.c", "time.c", "unlink.c"
+    ]
+)
+
+filegroup(
+    name = "unix_sources",
+    srcs = glob(["*_unix.c"]) + [
+        "nanosecond_stat.h",
+        "alarm.c", "chown.c", "chroot.c", "closedir.c", "dup2.c",
+        "fchmod.c", "fchown.c", "fcntl.c", "fork.c", "ftruncate.c",
+        "getegid.c", "geteuid.c", "getgid.c", "getgr.c",
+        "getgroups.c", "getlogin.c", "getppid.c", "getpw.c",
+        "getuid.c", "initgroups.c", "itimer.c", "kill.c",
+        "mkfifo.c", "nice.c", "opendir.c", "readdir.c",
+        "rewinddir.c", "setgid.c", "setgroups.c", "setsid.c",
+        "setuid.c", "signals.c", "spawn.c", "termios.c",
+        "umask.c", "wait.c"
+    ]
+)
+
+filegroup(
+    name = "win32_sources",
+    srcs = glob(["*_win32.c"]) + [
+        "close_on.c", "createprocess.c", "nonblock.c",
+        "startup.c", "system.c", "windbug.c", "windir.c",
+        "winlist.c", "winwait.c", "winworker.c"
+    ]
+)
+
+## make log:
+# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -g
+# -I../../runtime
+# -D_FILE_OFFSET_BITS=64  -DCAML_BUILDING_UNIX
+# -o chown.o chown.c
+
 cc_library(
     name = "unix",
-    srcs = glob(["*.c", "*.h"]),
+    srcs = [
+        "common_c_sources",
+        "unix_sources"
+    ],
     hdrs = ["unixsupport.h", "socketaddr.h"],
+    copts= [
+        "-I", "$(GENDIR)/runtime/caml/cross-compile",
+        # "$(FILE_OFFSET_BITS)"
+    ],
+    defines = ["CAML_BUILDING_UNIX"],
     linkopts = ["-lm"],
-    deps = ["//runtime/caml:hdrs"]
+    deps = ["//runtime/caml:hdrs"],
+    toolchains = ["//profile/system/local"],
 )

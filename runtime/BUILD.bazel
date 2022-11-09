@@ -2,90 +2,36 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag", "string_setting")
 
+## NB: config flags a settings, e.g. --//runtime:dbg, at bottom of file
+
+load(":BUILD.bzl", "asan")
 
 load("//bzl:rules.bzl",
      "boot_executable",
-     "boot_module",
-     # "ocamlc_runtime",
-     "ocamlrun")
-
-load("//config:CONFIG.bzl",
-     "ARCH", "MODEL", "SYSTEM",
-     "HOST",
-     "BYTECCLIBS",
-     # flags
-     # "OC_CFLAGS",
-     "CFLAGS",
-     "OC_CPPFLAGS", "CPPFLAGS",
-     "OC_LDFLAGS", "LDFLAGS",
-     # defines
-     "OC_NATIVE_DEFINES",
-     # "OC_DEBUG_CPPDEFINES", "OC_INSTR_CPPDEFINES",
-     # "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
-     # "CC_DEFINES", "CC_NATIVE_DEFINES",
-     # other
-     "LIBDIR", "ROOTDIR"
-     )
+     "boot_module")
 
 exports_files(["gen_primitives.sh"] + glob(["*.c"]))
 
 OPTIMIZATION_FLAGS = select({
-    "//platforms/vm:dbg?": ["-O0", "-g3"], # -Wall -Werror
+    ":dbg?": ["-O0", "-g3"], # -Wall -Werror
     "//conditions:default": []
 })
 
+# IN_CAML_RUNTIME only used in domain_state.h
 RUNTIME_DEFINES = select({
     # for both vm and sys runtimes
     "//config/mode:instrumented?": ["CAML_INSTR"],
     "//conditions:default": ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 }) + select({
     ## WARNING: //platforms/vm just for -DDEBUG, not debugger mode (-c dbg)
-    "//platforms/vm:DEBUG?": ["DEBUG"],
+    ":DEBUG?": ["DEBUG"],
     "//conditions:default": []
 })
 
-RUNTIME_LIBDEPS = BYTECCLIBS
-
-string_flag(name = "runtime",
-            build_setting_default = "std",
-            values = [
-                "std", # standard
-                "dbg", # debug
-                "instr"  # instrumented
-            ],
-            visibility = ["//visibility:public"]
-            )
-config_setting(name = "standard?", flag_values = {":runtime": "std"},
-            visibility = ["//visibility:public"])
-config_setting(name = "debug?", flag_values = {":runtime": "dbg"},
-            visibility = ["//visibility:public"])
-config_setting(name = "instrumented?", flag_values = {":runtime": "instr"},
-            visibility = ["//visibility:public"])
-
-BYTECCLIBS = ["-lm", "-lpthread"]
-
-##########
-cc_binary(
-    name = "sak.exe",
-    srcs = ["sak.c"],
-    copts = CFLAGS + CPPFLAGS + [
-        ## for platform-dependent s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile",
-        "$(OC_CFLAGS)",
-        "$(OC_CPPFLAGS)",
-    ],
-    defines = RUNTIME_DEFINES,
-    linkopts = ["$(OC_LDFLAGS)"],
-    deps= [
-        "//runtime/caml:hdrs",
-    ],
-    ## access to Make vars:
-    toolchains = ["//toolchain:profile"],
-    visibility = ["//runtime/caml:__pkg__"]
-)
-
+################################################################
 ## TODO: we only need one runtime lib target if we select on build
-## target to decide which to build.  Call it "runtime" or "ocaml_runtime".
+## target to decide which to build. Call it "runtime" or
+## "ocaml_runtime".
 cc_library(
     name = "camlrun",
     alwayslink = True, linkstatic = True,
@@ -108,19 +54,34 @@ cc_library(
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
-        "//platforms/os:macos?": [], # "-std=c11"],
+        "//platforms/os:macos?": ["-std=c11"],
         "//platforms/os:linux?": [],
         "//conditions:default":  [] #"-std=c11"]
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    }) + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
-    linkopts = ["$(OC_LDFLAGS)"],
+    }) + select({
+        # "//runtime:asan?": ["-I", "runtime", "-fsanitize=address"],
+        "//conditions:default":  []
+    })
+    ,
+    # + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
+    linkopts = ["$(OC_LDFLAGS)"]
+    + select({
+        # "//runtime:msan?": ["-fsanitize=leak", "-fPIE", "-pie"],
+        "//conditions:default": []
+    }) + select({
+        # "//runtime:asan": ["-fsanitize=address"],
+        "//conditions:default": []
+    })
+    ,
     defines = RUNTIME_DEFINES,
     deps = [
         "//runtime/caml:hdrs"
     ],
-    toolchains = ["//toolchain:profile"],
+    toolchains = [
+        "//profile/system/local"
+    ],
     visibility = [
         "//:__pkg__",
         "//boot:__subpackages__",
@@ -151,11 +112,20 @@ cc_library(
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    }) + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
+    }),
     linkopts = ["$(OC_LDFLAGS)"],
-    defines = RUNTIME_DEFINES + OC_NATIVE_DEFINES,
+    defines = RUNTIME_DEFINES + [ # OC_NATIVE_DEFINES + [
+    ] + select({
+        # to unify camlrun and asmrun targets, need to select these:
+        "//conditions:default"   : [
+            "NATIVE_CODE",
+            "TARGET_$(ARCH)",
+            "MODEL_$(MODEL)",
+            "SYS_$(SYSTEM)"
+        ] #testing
+    }),
     deps = ["//runtime/caml:hdrs"],
-    toolchains = ["//toolchain:profile"],
+    toolchains = ["//profile/system/local"],
     visibility = [
         "//:__pkg__",
         "//boot/lib:__pkg__",
@@ -224,10 +194,10 @@ cc_library(
 ## ARCH: arm | arm64 | i386 | amd64 | power | riscv | s390x
 ## Bazel: arch must be set, by config setting to be determined.
 ## For now it's hardcoded as amd64 since I'm using a legacy Mac for dev.
-RUNTIME_ASM_OBJECTS = select({
-    "//platforms:windows_x86_32?": [ARCH + "nt.asm"],
-    "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
-})
+# RUNTIME_ASM_OBJECTS = select({
+#     "//platforms:windows_x86_32?": [ARCH + "nt.asm"],
+#     "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
+# })
 
 ## WARNING: on windows the build for asm files is different, see //Makefile
 
@@ -404,18 +374,14 @@ genrule(
     outs = ["build_config.h"],
     name = "build_config_h",
     tools = ["//runtime:sak.exe"],
-    srcs = ["//:Makefile.config"],
+    srcs = ["//:Makefile.config", "//profile/system/local:BUILD.bazel"],
     cmd  = " ".join([
-        ## $(call C_LITERAL,$(LIBDIR)) ==
-        "OSD=`$(location //runtime:sak.exe) encode-C-literal {libdir}`;".format(
-            libdir = LIBDIR),
-        "echo OSD: $$OSD;",
-	    "echo '/* This file is generated from {ROOTDIR}/Makefile.config */' > $@;".format(ROOTDIR = ROOTDIR),
-
-        ## FIXME: may stdlib locn stage-dependend
-	    "echo \"#define OCAML_STDLIB_DIR $$OSD\" >> $@;",
-	    "echo '#define HOST \"{HOST}\"' >> $@".format(HOST=HOST)
+        "STDLIBDIR=`$(location //runtime:sak.exe) encode-C-literal $(LIBDIR)`;",
+	    "echo '/* This file is generated from $(location //profile/system/local:BUILD.bazel) */' > $@;",
+	    "echo \"#define OCAML_STDLIB_DIR $$STDLIBDIR\" >> $@;",
+	    "echo '#define HOST \"$(HOST)\"' >> $@"
     ]),
+    toolchains = ["//profile/system/local"],
     visibility = ["//boot:__pkg__"]
 )
 
@@ -538,7 +504,7 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
     ] + select({
         # add instrtrace if mode is debug on any platform, or
         # fastbuild on macos (where Bazel adds -DDEBUG)
-        "//platforms/vm:trace?": ["//runtime:instrtrace"],
+        ":trace?": ["//runtime:instrtrace"],
         "//conditions:default": []
     }),
     copts = [
@@ -549,17 +515,21 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
-        "//platforms/os:macos?": [], #"-std=c11"],
+        "//platforms/os:macos?": ["-std=c11"],
         "//platforms/os:linux?": [],
-        "//conditions:default":  [], #"-std=c11"]
-    }) + CFLAGS + OC_CPPFLAGS,
+        "//conditions:default":  ["-std=c11"]
+    }), # + CFLAGS + OC_CPPFLAGS,
     defines = RUNTIME_DEFINES,
-    linkopts = ["$(OC_LDFLAGS)"] + RUNTIME_LIBDEPS,
+    linkopts = ["$(OC_LDFLAGS)"] + select({
+        "//platforms/target:sys?": ["$(SYS_LINKLIBS)"],
+        "//platforms/target:vm?" : ["$(VM_LINKLIBS)"],
+        "//conditions:default"   : ["$(VM_LINKLIBS)"],
+    }),
     deps= [
         ":camlrun",
         "//runtime/caml:hdrs"
     ],
-    toolchains = ["//toolchain:profile"],
+    toolchains = ["//profile/system/local"],
     visibility = ["//visibility:public"],
 )
 
@@ -667,89 +637,6 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
 
 # linux: clock_gettime etc. - complicated, see configure.ac
 
-# cc_binary(
-#     name = "ocamlruni",
-#     srcs = ["prims.c"],
-#     copts = OC_CFLAGS + CFLAGS + select({
-#         "//config/debug:ocamlrun-debug": ["-g"],
-#         #FIXME: on mac bazel always adds -DDEBUG for fastbuild
-#         "//conditions:default": ["-UDEBUG"]
-#     }),
-#     linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS + select({
-#         # Makefile adds INSTRUMENTED_RUNTIME_LIBS, found by ./configure
-#         #FIXME: use this select to fail this target if no monnotonic clock
-#         "//conditions:default": []
-#     }),
-#     deps= [":camlrun"],
-#     visibility = ["//visibility:public"]
-# )
-
-# cc_library(  ## produces libcamlruni
-#     name = "camlruni",
-#     srcs = [
-#         ":build_config.h",
-#     ] + RUNTIME_BYTECODE_C_SOURCES,
-#     copts = [
-#         "-I$(GENDIR)/runtime" # to pick up build_config.h
-#     ] + OC_CPPFLAGS,
-#     defines = CC_DEFINES,
-#     deps = ["//runtime/caml:hdrs"]
-# )
-
-################################################################
-################  NATIVE  ################
-# ###########
-# cc_library(
-#     name = "asmrun",
-#     srcs = [
-#         ":build_config.h",
-#         # "signals_osdep.h"
-#     ] + NATIVE_ONLY_C_SOURCES + RUNTIME_ASM_OBJECTS,
-#     # ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
-
-# # RUNTIME_NATIVE_C_SOURCES = COMMON_C_SOURCES + NATIVE_ONLY_C_SOURCES
-
-#     copts = [
-#         "-I$(GENDIR)/runtime" # to pick up build_config.h
-#     ] + OC_CPPFLAGS,
-#     linkopts = LDFLAGS + OC_LDFLAGS,
-#     defines = CC_DEFINES + CC_NATIVE_DEFINES,
-#     deps = ["//runtime/caml:hdrs"]
-# )
-
-## debug native runtime:
-# runtime/%.nd.$(O): OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS) $(ocamlrund_CPPFLAGS)
-# $(DEPDIR)/runtime/%.nd.$(D): \
-#   OC_CPPFLAGS += $(OC_NATIVE_CPPFLAGS) $(ocamlrund_CPPFLAGS)
-
-# cc_library(
-#     name = "asmrund",
-#     srcs = [
-#         ":build_config.h",
-#         # "signals_osdep.h"
-#     ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
-#     copts = [
-#         "-I$(GENDIR)/runtime" # to pick up build_config.h
-#     ] + OC_CPPFLAGS,
-#     linkopts = LDFLAGS + OC_LDFLAGS,
-#     defines = CC_DEFINES + CC_NATIVE_DEFINES, # + OC_DEBUG_CPPDEFINES,
-#     deps = ["//runtime/caml:hdrs"]
-# )
-
-# ## instrumented native runtime
-# cc_library(
-#     name = "asmruni",
-#     srcs = [
-#         ":build_config.h",
-#         # "signals_osdep.h"
-#     ] + RUNTIME_NATIVE_C_SOURCES + RUNTIME_ASM_OBJECTS,
-#     copts = [
-#         "-I$(GENDIR)/runtime" # to pick up build_config.h
-#     ] + OC_CPPFLAGS,
-#     linkopts = LDFLAGS + OC_LDFLAGS,
-#     defines = CC_DEFINES + CC_NATIVE_DEFINES,
-#     deps = ["//runtime/caml:hdrs"]
-# )
 
 ## Generating an ld.conf is not a build-time task; it can be done as
 ## part of a packaging task.
@@ -791,11 +678,16 @@ cc_library(
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    }) + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
+    }), # + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
     linkopts = ["$(OC_LDFLAGS)"],
-    defines = RUNTIME_DEFINES + OC_NATIVE_DEFINES,
+    defines = RUNTIME_DEFINES + [
+        "NATIVE_CODE",
+        "TARGET_$(ARCH)",
+        "MODEL_$(MODEL)",
+        "SYS_$(SYSTEM)"
+    ],
     deps = ["//runtime/caml:hdrs"],
-    toolchains = ["//toolchain:profile"],
+    toolchains = ["//profile/system/local"],
     visibility = [
         "//boot/lib:__pkg__",
         "//dev/lib:__pkg__",
@@ -803,3 +695,101 @@ cc_library(
     ],
 )
 
+################################################################
+## sak - swiss army knife. tool used for the build only.
+##########
+## make log:
+# gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME -DNATIVE_CODE -DTARGET_amd64 -DMODEL_default -DSYS_macosx  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME  -o runtime/sak.o runtime/sak.c
+# gcc  -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common  -Wl,-no_compact_unwind  -o runtime/sak runtime/sak.o
+
+# NB: none of the defines here are used in sak.c!
+cc_binary(
+    name = "sak.exe",
+    srcs = ["sak.c"],
+    copts = [
+        ## for platform-dependent s.h:
+        "-I", "$(GENDIR)/runtime/caml/cross-compile",
+        "$(OC_CFLAGS)",
+        "$(OC_CPPFLAGS)",
+    ],
+    defines = RUNTIME_DEFINES,
+    linkopts = ["$(OC_LDFLAGS)"],
+    deps= [
+        "//runtime/caml:hdrs",
+    ],
+    ## access to Make vars:
+    toolchains = ["//profile/system/local"],
+    visibility = ["//runtime/caml:__pkg__"]
+)
+
+################################################################
+load("@bazel_skylib//lib:selects.bzl", "selects")
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_list_flag")
+
+string_flag(name = "runtime",
+            build_setting_default = "std",
+            values = [
+                "std", # standard
+                "dbg", # debug
+                "instr"  # instrumented
+            ],
+            visibility = ["//visibility:public"]
+            )
+
+config_setting(name = "standard?", flag_values = {":runtime": "std"},
+               visibility = ["//visibility:public"])
+
+# FIXME: dbg? true if either -c dbg or --//runtime:dbg
+config_setting(name = "vmdbg?", flag_values = {":runtime": "dbg"},
+               visibility = ["//visibility:public"])
+selects.config_setting_group(
+    name = "dbg?",
+    match_any = [":vmdbg?", "//config/compilation_mode:dbg?"],
+)
+
+config_setting(name = "instrumented?", flag_values = {":runtime": "instr"},
+               visibility = ["//visibility:public"])
+
+
+## WARNING: for Bazel, -c dbg means `-g`, not `-DDEBUG`
+
+bool_flag(name = "DEBUG", build_setting_default = False)
+config_setting(name = "DEBUG?", flag_values = {":DEBUG": "True"})
+
+bool_flag(name = "trace", build_setting_default = False)
+config_setting(name = "trace?", flag_values = {":trace": "True"})
+
+selects.config_setting_group(
+    name = "DEBUG_TRACE?",
+    match_any = [
+        ":trace?",
+        ":DEBUG?",
+        "//config/compilation_mode:dbg?"
+    ],
+)
+
+#### sanitizers
+bool_flag(name = "asan", build_setting_default = False)
+config_setting(name = "asan?", flag_values = {":asan": "True"})
+bool_flag(name = "msan", build_setting_default = False)
+config_setting(name = "msan?", flag_values = {":msan": "True"})
+
+
+################
+bool_flag(name = "fastbuild", build_setting_default = False)
+config_setting(name = "vmfastbuild?", flag_values = {":fastbuild": "True"})
+selects.config_setting_group(
+    name = "fastbuild?",
+    match_any = [":vmfastbuild?",
+                 "//config/compilation_mode:fastbuild?"],
+)
+
+config_setting(
+    name = "instrtrace?",
+    values = {"compilation_mode":"fastbuild"},
+    constraint_values = ["@platforms//os:macos"]
+)
+
+string_list_flag(name = "args", build_setting_default = [],
+            visibility = ["//toolchain:__subpackages__"])

@@ -34,7 +34,7 @@ cc_binary(
     }),
     linkopts = ["$(OC_LDFLAGS)"],
     deps = ["//runtime/caml:hdrs"],
-    toolchains = ["//toolchain:profile"],
+    toolchains = ["//profile/system/local"],
     visibility = [
         "//boot:__subpackages__",
         "//toolchain/adapters:__subpackages__"
