@@ -1,0 +1,25 @@
+load("//profile:BUILD.bzl", "cc_build_profile")
+exports_files(["BUILD.bazel"])
+
+ARCH        = "@arch@"
+PREFIX      = "@prefix@"
+EXEC_PREFIX = PREFIX if "@exec_prefix@" == "${prefix}" else "@exec_prefix@"
+LIBDIR = EXEC_PREFIX + "/lib/ocaml" if "@libdir@" == "${exec_prefix}/lib/ocaml" else "@libdir@"
+
+## FIXME: give this a more expressive name, e.g.
+# //toolchain/profile/system
+# or better, //profiles/system
+# then tc profiles in //profiles/tc
+cc_build_profile(
+    name        = "local",
+    ARCH        = ARCH,
+    MODEL       = "@model@",
+    SYSTEM      = "@system@",
+    HOST        = "@host@",
+    TARGET      = "@target@",
+
+    PREFIX      = PREFIX,
+    EXEC_PREFIX = EXEC_PREFIX,
+    LIBDIR      = LIBDIR,
+    visibility  = ["//visibility:public"]
+)
