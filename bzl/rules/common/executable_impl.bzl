@@ -1,35 +1,20 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl:providers.bzl",
-     "BootInfo",
-     "DepsAggregator",
      "new_deps_aggregator",
-
-     "CompilationModeSettingProvider",
-     "OcamlArchiveProvider",
      "OcamlExecutableMarker",
-     "OcamlImportMarker",
-     "OcamlLibraryMarker",
-     "OcamlNsResolverProvider",
-     "OcamlNsMarker",
-     "OcamlSignatureProvider",
-     "OcamlTestMarker")
+     "OcamlTestMarker"
+)
 
-load(":impl_ccdeps.bzl", "dump_CcInfo")
+load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
-load(":impl_common.bzl", "dsorder", "opam_lib_prefix")
+load("//bzl/rules/common:options.bzl", "get_options")
 
-load(":options.bzl",
-     # "options",
-     # "options_executable",
-     "get_options")
-
-load(":DEPS.bzl",
+load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
-     "merge_depsets",
-     "COMPILE", "LINK", "COMPILE_LINK")
+     "merge_depsets")
 
-###############################
+#########################
 def impl_executable(ctx):
 
     scope = ""
@@ -207,7 +192,7 @@ def impl_executable(ctx):
         mnemonic = "CompileBootstrapExecutable"
     elif ctx.attr._rule == "bootstrap_repl":
         mnemonic = "CompileToplevel"
-    elif ctx.attr._rule == "bootstrap_test":
+    elif ctx.attr._rule == "kick_test":
         mnemonic = "CompileBootstrapTest"
 
     elif ctx.attr._rule == "boot_compiler":
@@ -273,7 +258,7 @@ def impl_executable(ctx):
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "bootstrap_test":
+    elif ctx.attr._rule == "kick_test":
         exe_provider = OcamlTestMarker()
     else:
         fail("Wrong rule called impl_executable: %s" % ctx.attr._rule)

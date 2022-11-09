@@ -1,11 +1,7 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:providers.bzl", "CompilationModeSettingProvider")
-
-# load("//ocaml/_functions:utils.bzl", "get_sdkpath")
-
-########## RULE:  OCAML_INTERFACE  ################
-def _bootstrap_ocamlyacc_impl(ctx):
+###################
+def impl_yacc(ctx):
 
   debug = False
   # if (ctx.label.name == "_Impl"):
@@ -46,30 +42,3 @@ def _bootstrap_ocamlyacc_impl(ctx):
   )
 
   return [DefaultInfo(files = depset(direct = [yaccer, yacceri]))]
-
-#################
-bootstrap_ocamlyacc = rule(
-    implementation = _bootstrap_ocamlyacc_impl,
-    doc = """Generates an OCaml source file from an ocamlyacc source file.
-    """,
-    attrs = dict(
-        # _sdkpath = attr.label(
-        #     default = Label("@ocaml//:sdkpath")
-        # ),
-        src = attr.label(
-            doc = "A single .mly ocamlyacc source file label",
-            allow_single_file = [".mly"]
-        ),
-        outs = attr.output_list(
-            doc = """Output ml and mli files.""",
-            mandatory = True
-        ),
-        opts = attr.string_list(
-            doc = "Options"
-        ),
-        _rule = attr.string( default = "ocaml_yacc" )
-    ),
-    # provides = [],
-    executable = False,
-    toolchains = ["//toolchain/type:bootstrap"]
-)

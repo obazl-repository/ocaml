@@ -2,7 +2,7 @@ load("//bzl:providers.bzl",
      "BootInfo", "DepsAggregator",
      "ModuleInfo", "OcamlSignatureProvider")
 
-load(":impl_ccdeps.bzl",
+load("//bzl/rules/common:impl_ccdeps.bzl",
      "cc_shared_lib_to_ccinfo",
      "normalize_ccinfo",
      "extract_cclibs", "dump_CcInfo")

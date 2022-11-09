@@ -17,19 +17,6 @@ load("//bzl:providers.bzl",
 
      # "PpxExecutableMarker")
 
-# load("//ocaml/_transitions:transitions.bzl",
-#      "ocaml_module_sig_out_transition",
-#      "ocaml_executable_deps_out_transition",
-#      "ocaml_module_deps_out_transition")
-
-# load("//ocaml/_transitions:ns_transitions.bzl",
-#      "ocaml_module_cc_deps_out_transition",
-#      "ocaml_nslib_main_out_transition",
-#      "ocaml_nslib_submodules_out_transition",
-#      # "ocaml_nslib_sublibs_out_transition",
-#      "ocaml_nslib_ns_out_transition",
-#      )
-
 ## Naming conventions:
 #
 #  * hidden prefix:           '_'   (e.g. _rule)
@@ -84,24 +71,6 @@ def options_module(ws):
         # _linkall  = attr.label(default = ws + "//module/linkall"),  # bool
         # _threads   = attr.label(default = ws + "//module/threads"),   # bool
 
-        ################
-        # ns = attr.label(
-        #     doc = "Label of ocaml_ns target"
-        # ),
-        # _ns_submodules = attr.label(
-        #     doc = "Experimental.  May be set by ocaml_ns_library containing this module as a submodule.",
-        #     default = "@ocaml//ns:submodules",  # => string_list_setting
-        #     # allow_files = True,
-        #     # mandatory = True
-        # ),
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
-
-        # _ns_strategy = attr.label(
-        #     doc = "Experimental",
-        #     default = "@ocaml//ns:strategy"
-        # ),
     )
 
 #######################

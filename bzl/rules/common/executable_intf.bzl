@@ -1,48 +1,11 @@
-load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-
-load("//bzl:providers.bzl", "OcamlVerboseFlagProvider")
-
 load("//bzl:providers.bzl",
-     "BootInfo",
      "ModuleInfo",
-
      "OcamlArchiveProvider",
-     "OcamlImportMarker",
      "OcamlLibraryMarker",
-     "OcamlNsResolverProvider",
-     "OcamlNsMarker",
-     "OcamlSignatureProvider")
-
-     # "PpxExecutableMarker")
-
-# load("//ocaml/_transitions:transitions.bzl",
-#      "ocaml_module_sig_out_transition",
-#      "ocaml_executable_deps_out_transition",
-#      "ocaml_module_deps_out_transition")
-
-# load("//ocaml/_transitions:ns_transitions.bzl",
-#      "ocaml_module_cc_deps_out_transition",
-#      "ocaml_nslib_main_out_transition",
-#      "ocaml_nslib_submodules_out_transition",
-#      # "ocaml_nslib_sublibs_out_transition",
-#      "ocaml_nslib_ns_out_transition",
-#      )
-
-## Naming conventions:
-#
-#  * hidden prefix:           '_'   (e.g. _rule)
-#  * ns config state prefix:  '__'  (i.e. label atts)
-
-NEGATION_OPTS = [
-    "-no-g", "-no-noassert",
-    "-no-linkall",
-    "-no-short-paths", "-no-strict-formats", "-no-strict-sequence",
-    "-no-keep-locs", "-no-opaque",
-    "-no-thread", "-no-verbose"
-]
+)
 
 #######################
-def options_executable(ws):
+def executable_attrs():
 
     attrs = dict(
 
@@ -63,10 +26,8 @@ def options_executable(ws):
         prologue = attr.label_list(
             doc = "List of OCaml dependencies.",
             providers = [[OcamlArchiveProvider],
-                         [OcamlImportMarker],
                          [OcamlLibraryMarker],
                          [ModuleInfo],
-                         [OcamlNsMarker],
                          [CcInfo]],
             # cfg = exe_deps_out_transition,
         ),
