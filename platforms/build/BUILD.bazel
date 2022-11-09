@@ -1,19 +1,28 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+# string_flag(name = "build", build_setting_default = "boot",
+#             values = ["boot", "vm", "sys"],
+#             visibility = ["//visibility:public"])
+# config_setting(name = "boot?", flag_values = {":build": "boot"},
+#                visibility = ["//visibility:public"])
+# config_setting(name = "vm?", flag_values = {":build": "vm"},
+#                visibility = ["//visibility:public"])
+# config_setting(name = "sys?", flag_values = {":build": "sys"},
+#                visibility = ["//visibility:public"])
+
 # ? suffix: constraint_value
 # no suffix: platform
 
 alias(name = "boot", actual = "//platforms:boot")
 alias(name = "boot?", actual = "//platforms:boot?")
 
-alias(name = "dev", actual = "//platforms:dev")
-alias(name = "dev?", actual = "//platforms:dev?")
-
 alias(name = "vm", actual = "//platforms:vm")
 alias(name = "vm?", actual = "//platforms:vm?")
 
-alias(name = "sys", actual = "//platforms:sys")
-alias(name = "sys?", actual = "//platforms:sys?")
+# alias(name = "sys", actual = "//platforms:sys")
+# alias(name = "sys?", actual = "//platforms:sys?")
 
 ################################################################
 alias(name = "linux_amd64?", actual = "//platforms:linux_amd64?")

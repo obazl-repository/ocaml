@@ -85,7 +85,7 @@ user_toolchain_adapter = rule(
 
         "vmargs": attr.label( ## string list
             doc = "Args to pass to all invocations of ocamlrun",
-            default = "//platforms/vm:args"
+            default = "//runtime:args"
         ),
 
         "repl": attr.label(

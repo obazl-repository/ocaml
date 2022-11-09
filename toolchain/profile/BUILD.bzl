@@ -1,43 +1,10 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 ## exports:
-##   cc_build_profile - exposes tc fields as Make vars
 ##   cc_toolchain_profile           (rule)
 ##   cc_toolchain_profile_selector  (macro wrapping native.toolchain rule)
 
-def _cc_build_profile_impl(ctx):
-
-    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
-    tcp = ctx.toolchains["//toolchain/type:cc_tc_profile"]
-
-    return [
-        platform_common.TemplateVariableInfo({
-            # "OC_COMPILER" : tc.compiler.path,  ## returns path?
-            ## flags for cc rules
-            "OC_CFLAGS"   : " ".join(tcp.CFLAGS),
-            "OC_CPPFLAGS" : " ".join(tcp.CPPFLAGS),
-            "OC_LDFLAGS"  : " ".join(tcp.LDFLAGS),
-            # ## ocaml compile flags
-            # "OCAML_COPTS"   : " ".join(tcp.CFLAGS),
-            # ## ocaml link flags
-            # "OCAML_LOPTS"   : " ".join(tcp.CFLAGS),
-        }),
-    ]
-
-#####################
-cc_build_profile = rule(
-    _cc_build_profile_impl,
-    # attrs = {
-    #     "fld": attr.string()
-    # },
-    doc = "Exposes selected cc_toolchain_profile fields.",
-    provides = [platform_common.TemplateVariableInfo],
-    toolchains = [
-        "//toolchain/type:cc_tc_profile",
-        # "//toolchain/type:bootstrap",
-    ]
-)
-
+################################################################
 #############################
 def _cc_toolchain_profile_impl(ctx):
 
@@ -48,8 +15,8 @@ def _cc_toolchain_profile_impl(ctx):
             CFLAGS   = ctx.attr.CFLAGS,
             CPPFLAGS = ctx.attr.CPPFLAGS,
             LDFLAGS  = ctx.attr.LDFLAGS,
-            # OCAML_COPTS   = ctx.attr.OCAML_COPTS,
-            # OCAML_LOPTS   = ctx.attr.OCAML_LOPTS,
+            VM_LINKLIBS  = ctx.attr.VM_LINKLIBS,
+            SYS_LINKLIBS  = ctx.attr.SYS_LINKLIBS,
         ),
     ]
 
@@ -66,13 +33,12 @@ cc_toolchain_profile = rule(
         "LDFLAGS": attr.string_list(
             doc     = "Options for linking.",
         ),
-
-        # "OCAML_COPTS": attr.string_list(
-        #     doc     = "OCaml compile options.",
-        # ),
-        # "OCAML_LOPTS": attr.string_list(
-        #     doc     = "OCaml link options.",
-        # ),
+        "VM_LINKLIBS": attr.string_list(
+            doc     = "Libs to link with the vm runtime (libcamlrun.a).",
+        ),
+        "SYS_LINKLIBS": attr.string_list(
+            doc     = "Libs to link with the native runtime (libasmrun.a).",
+        ),
     },
     doc = "Defines compile/archive/link options for selected CC toolchain.",
     # provides = [

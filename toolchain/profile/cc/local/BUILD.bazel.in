@@ -7,8 +7,10 @@ OC_CFLAGS = fix_oc_cflags("@oc_cflags@".split(" "))
 
 #####################
 cc_toolchain_profile(
-    name     = "local",
-    CFLAGS   = OC_CFLAGS,
-    CPPFLAGS = "@oc_cppflags@".split(" "),
-    LDFLAGS  = "@LDFLAGS@".split(" ") + "@oc_ldflags@".split(" ")
+    name         = "local",
+    CFLAGS       = OC_CFLAGS,
+    CPPFLAGS     = "@oc_cppflags@".split(" "),
+    LDFLAGS      = "@LDFLAGS@".split(" ") + "@oc_ldflags@".split(" "),
+    VM_LINKLIBS  = "@bytecclibs@".split(" "),
+    SYS_LINKLIBS = "@nativecclibs@".split(" ")
 )

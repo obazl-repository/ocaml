@@ -4,27 +4,34 @@ exports_files(["BUILD.bazel"])
 
 package(default_visibility = ["//visibility:public"])
 
-constraint_setting(name = "platform")
+constraint_setting(name = "platform",
+                   default_constraint_value = ":boot?")
+
+# constraint_setting(name = "xtarget")
 
 constraint_value(name = "boot?",   constraint_setting = ":platform")
 platform(name = "boot",
          parents = ["@local_config_platform//:host"],
+         # exec_compatible_with = [":vm?"],
          constraint_values = [":boot?"])
 
-constraint_value(name = "dev?",   constraint_setting = ":platform")
-platform(name = "dev",
+constraint_value(name = "vm?", constraint_setting = ":platform")
+platform(name = "vm",
          parents = ["@local_config_platform//:host"],
-         constraint_values = [":dev?"])
+         constraint_values = [":vm?"])
 
 constraint_value(name = "sys?",   constraint_setting = ":platform")
 platform(name = "sys",
          parents = ["@local_config_platform//:host"],
          constraint_values = [":sys?"])
 
-constraint_value(name = "vm?", constraint_setting = ":platform")
-platform(name = "vm",
-         parents = ["@local_config_platform//:host"],
-         constraint_values = [":vm?"])
+
+# constraint_value(name = "dev?",   constraint_setting = ":platform")
+# platform(name = "dev",
+#          parents = ["@local_config_platform//:host"],
+#          constraint_values = [":dev?"])
+
+# platform(name = "default", parents = ["@local_config_platform//:host"])
 
 ################################################################
 config_setting(name = "linux_amd64?",

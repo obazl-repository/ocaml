@@ -30,32 +30,32 @@ toolchain_in_transition = transition(
 )
 
 ######################################################
-def _tool_runner_out_transition_impl(settings, attr):
-    # print("tool_runner_out_transition")
-    # print("  stage: %s" % settings["//bzl:stage"])
-    # print("//bzl/toolchain:ocamlc: %s" %
-    #       settings["//bzl/toolchain:ocamlc"])
+# def _tool_runner_out_transition_impl(settings, attr):
+#     # print("tool_runner_out_transition")
+#     # print("  stage: %s" % settings["//bzl:stage"])
+#     # print("//bzl/toolchain:ocamlc: %s" %
+#     #       settings["//bzl/toolchain:ocamlc"])
 
-    exec = "//platforms/build:boot"
+#     exec = "//platforms/build:boot?"
 
-    # exec = "@local_config_platform//:host"
+#     # exec = "@local_config_platform//:host"
 
-    return {
-        "//command_line_option:host_platform" : exec,
-        "//command_line_option:platforms"     : exec
-    }
+#     return {
+#         "//command_line_option:host_platform" : exec,
+#         "//command_line_option:platforms"     : exec
+#     }
 
-tool_runner_out_transition = transition(
-    implementation = _tool_runner_out_transition_impl,
-    inputs = [
-        "//command_line_option:host_platform",
-        "//command_line_option:platforms"
-    ],
-    outputs = [
-        "//command_line_option:host_platform",
-        "//command_line_option:platforms"
-    ]
-)
+# tool_runner_out_transition = transition(
+#     implementation = _tool_runner_out_transition_impl,
+#     inputs = [
+#         "//command_line_option:host_platform",
+#         "//command_line_option:platforms"
+#     ],
+#     outputs = [
+#         "//command_line_option:host_platform",
+#         "//command_line_option:platforms"
+#     ]
+# )
 
 ################################################################
 #### rule, with in-transition ####
@@ -97,6 +97,9 @@ def _bootstrap_toolchain_adapter_impl(ctx):
 bootstrap_toolchain_adapter = rule(
     _bootstrap_toolchain_adapter_impl,
     attrs = {
+        # "_toolchain" : attr.label(
+        #     default = "//toolchain/adapters/bootstrap"
+        # ),
 
         "build_host": attr.string(
             doc     = "OCaml host platform: vm (bytecode) or an arch.",
@@ -116,12 +119,13 @@ bootstrap_toolchain_adapter = rule(
             doc = "Batch interpreter. ocamlrun, usually",
             allow_single_file = True,
             executable = True,
-            cfg = tool_runner_out_transition
+            cfg = "exec"
+            # cfg = tool_runner_out_transition
         ),
 
         "vmargs": attr.label( ## string list
             doc = "Args to pass to all invocations of ocamlrun",
-            default = "//platforms/vm:args"
+            default = "//runtime:args"
         ),
 
         "repl": attr.label(

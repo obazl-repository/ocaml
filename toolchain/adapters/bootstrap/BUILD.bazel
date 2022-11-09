@@ -1,6 +1,6 @@
 exports_files(["BUILD.bazel"])
 
-load(":BUILD.bzl", "bootstrap_toolchain_adapter")
+load("//toolchain/adapters:BUILD.bzl", "bootstrap_toolchain_adapter")
 
 ## The bootstrap compiler and lexer are precompiled vm>vm tools that
 ## come with the distribution. Everything else in //boot/bin and
@@ -16,12 +16,14 @@ load(":BUILD.bzl", "bootstrap_toolchain_adapter")
 # then need another arg (cross-compile target or xtarget) to tell the
 # selected toolchain what kind of output to emit.
 
-# this tc is for endo-compilation, vm.vm > vm.vm
+# only one selector for this tc: //toolchain/selectors:bootstrap
+# with build_host_constraints  = ["//platforms/build:boot?"],
 bootstrap_toolchain_adapter(
     name        = "bootstrap",
-    build_host  = "vm",
+    build_host  = "boot",
     target_host = "vm",
-    compiler    = "//boot:ocamlc.byte",
+    # _tc = nothing
+    compiler    = "//boot:ocamlc.boot",
     copts       = [ ## compile opts (sigs/modules only)
         "-strict-sequence",
         # "-warn-error", "+A",
@@ -45,63 +47,18 @@ bootstrap_toolchain_adapter(
         "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
         "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
     ],
-    lexer       = "//boot:ocamllex.byte",
-    yacc        = "//boot:ocamlyacc.exe",
-    tool_runner = "//boot:ocamlrun.exe",  # alias to //runtime:ocamlrun
+    lexer       = "//boot:ocamllex.boot",
+    yacc        = "//boot:ocamlyacc.boot",
+    tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
     # std_exit = "//stdlib:Std_exit"
 )
 
-# this tc used to cross-compile from vm.vm to vm.sys
-## no, use same tc with config_setting --//platforms/xtarget=vm, sys
-# bootstrap_toolchain_adapter(
-#     name        = "cross",
-#     build_host  = "vm",
-#     target_host = "vm",
-#     xtarget_host = "sys",
-#     compiler    = "//boot:ocamlc.byte",
-#     copts       = [
-#         # "-strict-sequence", "-absname",
-#         # "-w", "+a-4-9-41-42-44-45-48",
-#         # "-warn-error", "+A",
-#         # "-bin-annot",
-#         # "-nostdlib",
-#         # "-principal",
-#     ],
-#     # primitives  = "//runtime:primitives",
-#     lexer       = "//boot:ocamllex.byte",
-#     yacc        = "//boot:ocamlyacc.exe",
-#     tool_runner = "//boot:ocamlrun.exe",
-#     # std_exit = "//stdlib:Std_exit"
-# )
-
 ################################################################
-# to produce compiler as a dev tool, build_host == target_host,
-# and the toolchain uses the boot compiler
-bootstrap_toolchain_adapter(
-    name        = "dev_tool",
-    build_host  = "dev",
-    target_host = "dev",
-    compiler    = "//dev/bin:ocamlc",
-    copts       = [
-        "-strict-sequence", "-absname",
-        "-w", "+a-4-9-41-42-44-45-48",
-        "-warn-error", "+A",
-        "-bin-annot", "-nostdlib", "-principal",
-    ],
-    ## no primitives
-    # lexer       = "//boot/bin:ocamllex",  # => //dev/bin:ocamllex.byte
-    # yacc        = "//boot/bin:ocamlyacc", # => //dev/bin:ocamlyacc.byte
-    # stdlib      = "//boot/lib:stdlib",    # => //dev/lib:stdlib.cma
-    tool_runner = "//boot/bin:ocamlrun",
-)
-
-
 bootstrap_toolchain_adapter(
     name        = "dev",
     build_host  = "dev",
     target_host = "dev",
     compiler    = "//dev/bin:ocamlc",
-    # compiler    = "//boot/bin:ocamlc",    # => //dev/bin:ocamlc.byte, //dev/bin:ocamlopt.byte
     copts       = [
         "-strict-sequence", "-absname",
         "-w", "+a-4-9-41-42-44-45-48",
@@ -114,6 +71,7 @@ bootstrap_toolchain_adapter(
     # stdlib      = "//boot/lib:stdlib",    # => //dev/lib:stdlib.cma
     tool_runner = "//boot/bin:ocamlrun",
 )
+
 
 bootstrap_toolchain_adapter(
     name        = "vmvm",

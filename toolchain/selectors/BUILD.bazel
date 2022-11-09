@@ -5,61 +5,45 @@ package(default_visibility=["//visibility:public"])
 exports_files(glob(["*.bazel"]))
 
 ###################
-toolchain_selector(
-    name           = "default",
-    toolchain = "//toolchain/adapters/bootstrap",
-)
+# toolchain_selector(
+#     name           = "default",
+#     toolchain = "//toolchain/adapters/bootstrap",
+# )
 
 ###################
 toolchain_selector(
     name           = "bootstrap",
     toolchain = "//toolchain/adapters/bootstrap",
-    # build_host_constraints  = ["//platforms/build:vm?"],
+    # toolchain_constraints   = [
+    #     "//platforms/build:boot?",
+    #     # "//platforms/target:vm?"
+    # ]
+    build_host_constraints  = ["//platforms/build:boot?"],
     # target_host_constraints  = ["//platforms/target:vm?"],
 )
 
-# for vm.vm > vm.sys
 toolchain_selector(
-    name           = "bootstrap_cross",
-    toolchain = "//toolchain/adapters/bootstrap:cross",
+    name           = "vm",
+    toolchain = "//toolchain/adapters:vm",
     build_host_constraints  = ["//platforms/build:vm?"],
-    target_host_constraints = [
-        "//platforms/build:vm?",
-        # "//platforms/xtarget:sys?",
-    ],
+    # target_host_constraints = ["//platforms/target:vm?"],
     # toolchain_constraints   = ["//platforms/xtarget:sys?"]
 )
 
-###################
-toolchain_selector(
-    name           = "dev_tool",
-    toolchain = "//toolchain/adapters:dev_tool",
-    build_host_constraints  = ["//platforms/build:dev?"],
-    target_host_constraints  = ["//platforms/build:dev?"],
-)
-
-toolchain_selector(
-    name           = "dev",
-    toolchain = "//toolchain/adapters:dev",
-    build_host_constraints  = ["//platforms/build:dev?"],
-    target_host_constraints  = ["//platforms/target:dev?"],
-)
-
-##########
+# ##########
 toolchain_selector(
     name           = "vmsys",
     toolchain = "//toolchain/adapters:vmsys",
     build_host_constraints  = ["//platforms:vm?"],
     target_host_constraints  = ["//platforms:sys?"],
-    # toolchain_constraints = ["//runtime:standard?"],
 )
 
-##########
-toolchain_selector(
-    name           = "sysvm",
-    toolchain = "//toolchain/adapters:vmsys",
-    build_host_constraints  = ["//platforms:sys?"],
-    target_host_constraints  = ["//platforms:vm?"],
-    # toolchain_constraints = ["//runtime:standard?"],
-)
+# ##########
+# toolchain_selector(
+#     name           = "sysvm",
+#     toolchain = "//toolchain/adapters:vmsys",
+#     build_host_constraints  = ["//platforms:sys?"],
+#     target_host_constraints  = ["//platforms:vm?"],
+#     # toolchain_constraints = ["//runtime:standard?"],
+# )
 
