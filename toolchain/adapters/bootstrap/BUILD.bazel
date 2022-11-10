@@ -1,6 +1,6 @@
 exports_files(["BUILD.bazel"])
 
-load("//toolchain/adapters:BUILD.bzl", "bootstrap_toolchain_adapter")
+load(":BUILD.bzl", "boot_toolchain_adapter")
 
 ## The bootstrap compiler and lexer are precompiled vm>vm tools that
 ## come with the distribution. Everything else in //boot/bin and
@@ -18,12 +18,21 @@ load("//toolchain/adapters:BUILD.bzl", "bootstrap_toolchain_adapter")
 
 # only one selector for this tc: //toolchain/selectors:bootstrap
 # with build_host_constraints  = ["//platforms/build:boot?"],
-bootstrap_toolchain_adapter(
+boot_toolchain_adapter(
     name        = "bootstrap",
     build_host  = "boot",
-    target_host = "vm",
-    # _tc = nothing
-    compiler    = "//boot:ocamlc.boot",
+    target_host = select({
+        "//conditions:default": "vm"
+    }),
+    compiler    = select({
+        # "//platforms/ocaml/emitter:sys?": "//boot/compiler",
+        # "//platforms/ocaml/emitter:vm?": "//boot/compiler",
+        "//conditions:default": "//boot:ocamlc.boot",
+    }),
+    lexer       = "//boot:ocamllex.boot",
+    yacc        = "//boot:ocamlyacc.boot",
+    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
+    tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
     copts       = [ ## compile opts (sigs/modules only)
         "-strict-sequence",
         # "-warn-error", "+A",
@@ -47,61 +56,41 @@ bootstrap_toolchain_adapter(
         "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
         "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
     ],
-    lexer       = "//boot:ocamllex.boot",
-    yacc        = "//boot:ocamlyacc.boot",
-    tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
     # std_exit = "//stdlib:Std_exit"
 )
 
-################################################################
-bootstrap_toolchain_adapter(
-    name        = "dev",
-    build_host  = "dev",
-    target_host = "dev",
-    compiler    = "//dev/bin:ocamlc",
-    copts       = [
-        "-strict-sequence", "-absname",
-        "-w", "+a-4-9-41-42-44-45-48",
-        "-warn-error", "+A",
-        "-bin-annot", "-nostdlib", "-principal",
-    ],
-    ## no primitives
-    # lexer       = "//boot/bin:ocamllex",  # => //dev/bin:ocamllex.byte
-    # yacc        = "//boot/bin:ocamlyacc", # => //dev/bin:ocamlyacc.byte
-    # stdlib      = "//boot/lib:stdlib",    # => //dev/lib:stdlib.cma
-    tool_runner = "//boot/bin:ocamlrun",
-)
-
-
-bootstrap_toolchain_adapter(
-    name        = "vmvm",
-    build_host  = "vm",
-    target_host = "vm",
-    compiler    = "//bin:ocamlc.byte",
-    lexer       = "//bin:ocamllex",
-    yacc        = "//bin:ocamlyacc",
-    stdlib      = "//lib:stdlib",
-    tool_runner = "//boot/bin:ocamlrun",
-)
-
-bootstrap_toolchain_adapter(
+#######################
+boot_toolchain_adapter(
     name        = "vmsys",
-    build_host  = "vm",
+    build_host  = "boot",
     target_host = "sys",
-    compiler    = "//bin:ocamlopt.byte",
-    lexer       = "//bin:ocamllex",
-    yacc        = "//bin:ocamlyacc",
-    stdlib      = "//lib:stdlib",
-    tool_runner = "//boot/bin:ocamlrun",
-)
-
-bootstrap_toolchain_adapter(
-    name        = "syssys",
-    build_host  = "sys",
-    target_host = "sys",
-    compiler    = "//bin:ocamlopt.byte",
-    lexer       = "//bin:ocamllex",
-    yacc        = "//bin:ocamlyacc",
-    stdlib      = "//lib:stdlib",
-    tool_runner = "//boot/bin:ocamlrun",
+    compiler    = "//boot:ocamlc.boot",
+    lexer       = "//boot:ocamllex.boot",
+    yacc        = "//boot:ocamlyacc.boot",
+    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
+    tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
+    copts       = [ ## compile opts (sigs/modules only)
+        "-strict-sequence",
+        # "-warn-error", "+A",
+        "-nostdlib",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+    camlheaders = [
+        # "//stdlib:camlheaders"
+        "//stdlib:camlheader", "//stdlib:target_camlheader",
+        "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+        "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+    ],
+    # std_exit = "//stdlib:Std_exit"
 )

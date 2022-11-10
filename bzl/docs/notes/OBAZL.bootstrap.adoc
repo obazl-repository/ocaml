@@ -187,7 +187,7 @@ The vms are composed by linking a vm runtime library (e.g.
 
 === Toolchain adapter fields
 
-Bazel rule: `bootstrap_toolchain_adapter`
+Bazel rule: `boot_toolchain_adapter`
 
 * compiler:
   ** precompiled (comes with distribution)

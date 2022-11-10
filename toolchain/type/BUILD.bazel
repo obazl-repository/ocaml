@@ -5,8 +5,8 @@
 ## code (ocamlc, ocamllex. Contains nothing that needs to be built
 ## from OCaml code (avoiding self-dependence).
 
-## Baseline toolchains (for lack of a better term) include OCaml tools
-## and libs built using the bootstrap toolchain.
+## Kick toolchains (for lack of a better term) depend on Boot
+## toolchains.
 
 # Different rules need different tools. For example, a rule for
 # linking executables needs std_exit.cmo, but compilation rules do
@@ -35,22 +35,15 @@
 ## IOW building level N depends on the tc at N - 1, the previous
 ## level.  Building the baseline depends on the bootstrap.
 
-toolchain_type(name = "bootstrap", visibility = ["//visibility:public"])
+toolchain_type(name = "bootstrap",
+               target_compatible_with = ["//platforms/build:vm?"],
+               visibility = ["//visibility:public"])
 
-toolchain_type(name = "baseline", visibility = ["//visibility:public"])
+toolchain_type(name = "kick", visibility = ["//visibility:public"])
 
+####  TOOLCHAIN PROFILES  ################
 toolchain_type(name = "ocaml_tc_profile",
                visibility = ["//visibility:public"])
 
 toolchain_type(name = "cc_tc_profile",
                visibility = ["//visibility:public"])
-
-# toolchain_type(
-#     name = "bytecode",
-#     visibility = ["//visibility:public"],
-# )
-
-# toolchain_type(
-#     name = "native",
-#     visibility = ["//visibility:public"],
-# )

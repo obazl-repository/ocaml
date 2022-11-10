@@ -48,6 +48,7 @@ def archive_attrs():
         manifest = attr.label_list(
             doc = "List of component modules.",
             providers = [[OcamlLibraryMarker],
+                         [OcamlArchiveProvider],
                          [ModuleInfo],
                          [CcInfo]],
             # cfg = manifest_out_transition

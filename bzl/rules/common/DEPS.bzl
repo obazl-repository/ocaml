@@ -59,10 +59,10 @@ def aggregate_deps(ctx,
     depsets.deps.cli_link_deps.append(provider.cli_link_deps)
 
     if ModuleInfo in target:
-        if target.label.name == "Common":
-            print("ModuleInfo: %s" % target[ModuleInfo])
-            print("DefaultInfo.files: %s" % target[DefaultInfo].files)
-            print("BootInfo.linkdeps: %s" % target[BootInfo].cli_link_deps)
+        # if target.label.name == "Common":
+            # print("ModuleInfo: %s" % target[ModuleInfo])
+            # print("DefaultInfo.files: %s" % target[DefaultInfo].files)
+            # print("BootInfo.linkdeps: %s" % target[BootInfo].cli_link_deps)
             # fail("COMMON")
         depsets.deps.sigs.append(
             depset([target[ModuleInfo].sig]))

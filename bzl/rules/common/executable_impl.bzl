@@ -15,11 +15,9 @@ load("//bzl/rules/common:DEPS.bzl",
      "merge_depsets")
 
 #########################
-def impl_executable(ctx):
+def impl_executable(ctx, tc):
 
     scope = ""
-
-    tc = ctx.toolchains["//toolchain/type:bootstrap"]
 
     debug = False
     # if ctx.label.name == "test":
@@ -194,9 +192,10 @@ def impl_executable(ctx):
         mnemonic = "CompileToplevel"
     elif ctx.attr._rule == "kick_test":
         mnemonic = "CompileBootstrapTest"
-
     elif ctx.attr._rule == "boot_compiler":
         mnemonic = "CompileOcamlcBoot"
+    elif ctx.attr._rule == "kick_compiler":
+        mnemonic = "CompileOcamlcKick"
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
 
@@ -253,6 +252,8 @@ def impl_executable(ctx):
 
     exe_provider = None
     if ctx.attr._rule == "boot_compiler":
+        exe_provider = OcamlExecutableMarker()
+    elif ctx.attr._rule == "kick_compiler":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
         exe_provider = OcamlExecutableMarker()

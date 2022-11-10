@@ -1,8 +1,8 @@
 #######################
 def toolchain_selector(
     name,
-    toolchain,
-    toolchain_type = "//toolchain/type:bootstrap",
+    adapter,
+    type,
     build_host_constraints=None,
     target_host_constraints=None,
     toolchain_constraints=None,
@@ -10,8 +10,8 @@ def toolchain_selector(
 
     native.toolchain(
         name                   = name,
-        toolchain              = toolchain,
-        toolchain_type         = toolchain_type,
+        toolchain              = adapter,
+        toolchain_type         = type,
         exec_compatible_with   = build_host_constraints,
         target_settings        = toolchain_constraints,
         target_compatible_with = target_host_constraints,

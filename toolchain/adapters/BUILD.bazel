@@ -1,10 +1,10 @@
 exports_files(["BUILD.bazel"])
 
-load(":BUILD.bzl", "bootstrap_toolchain_adapter")
+load(":BUILD.bzl", "boot_toolchain_adapter")
 
 ## selector: //toolchain/selectors:vm
 ## build_host_constraints  = ["//platforms/build:vm?"],
-bootstrap_toolchain_adapter(
+boot_toolchain_adapter(
     name        = "vm",
     build_host  = "vm",
     # target_host = "vm",
@@ -40,7 +40,7 @@ bootstrap_toolchain_adapter(
 )
 
 ################################################################
-# bootstrap_toolchain_adapter(
+# boot_toolchain_adapter(
 #     name        = "dev",
 #     build_host  = "dev",
 #     target_host = "dev",
@@ -59,7 +59,7 @@ bootstrap_toolchain_adapter(
 # )
 
 
-# bootstrap_toolchain_adapter(
+# boot_toolchain_adapter(
 #     name        = "vmvm",
 #     build_host  = "vm",
 #     target_host = "vm",
@@ -70,7 +70,7 @@ bootstrap_toolchain_adapter(
 #     tool_runner = "//boot/bin:ocamlrun",
 # )
 
-# bootstrap_toolchain_adapter(
+# boot_toolchain_adapter(
 #     name        = "vmsys",
 #     build_host  = "vm",
 #     target_host = "sys",
@@ -81,7 +81,7 @@ bootstrap_toolchain_adapter(
 #     tool_runner = "//boot/bin:ocamlrun",
 # )
 
-# bootstrap_toolchain_adapter(
+# boot_toolchain_adapter(
 #     name        = "syssys",
 #     build_host  = "sys",
 #     target_host = "sys",

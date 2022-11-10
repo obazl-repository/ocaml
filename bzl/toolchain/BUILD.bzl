@@ -102,7 +102,7 @@ def bootstrap_register_toolchains(installation = None, noocaml = None):
 #     # ),
 # }
 
-# def _bootstrap_toolchain_impl(ctx):
+# def _boot_toolchain_impl(ctx):
 
 #     # if ctx.host_fragments.apple:
 #     #     _cc_opts = ["-Wl,-no_compact_unwind"]
@@ -150,8 +150,8 @@ def bootstrap_register_toolchains(installation = None, noocaml = None):
 #         ),
 #     ]
 
-# bootstrap_toolchain_impl = rule(
-#     _bootstrap_toolchain_impl,
+# boot_toolchain_impl = rule(
+#     _boot_toolchain_impl,
 #     attrs = _bootstrap_tools_attrs,
 #     doc = "Defines a Ocaml toolchain based on an SDK",
 #     provides = [platform_common.ToolchainInfo], # platform_common.TemplateVariableInfo],

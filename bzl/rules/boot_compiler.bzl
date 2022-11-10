@@ -1,9 +1,15 @@
 load("//bzl/rules/common:executable_impl.bzl", "impl_executable")
 load("//bzl/rules/common:executable_intf.bzl", "executable_attrs")
 
+########################
+def _boot_compiler(ctx):
+
+    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    return impl_executable(ctx, tc)
+
 #####################
 boot_compiler = rule(
-    implementation = impl_executable,
+    implementation = _boot_compiler,
 
     doc = "Builds stage 1 ocamlc using stage 0 boot/ocamlc",
 

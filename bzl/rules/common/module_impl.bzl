@@ -21,8 +21,8 @@ def impl_module(ctx):
         # fail("x")
 
     tc = ctx.toolchains["//toolchain/type:bootstrap"]
-
-    if tc.target_host in ["boot", "dev", "vm"]:
+    print("tc target_host: %s" % tc.target_host)
+    if tc.target_host in ["vm"]:
         ext = ".cmo"
     else:
         ext = ".cmx"

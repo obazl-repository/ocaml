@@ -2,7 +2,7 @@
 #      "bool_flag", "bool_setting",
 #      "string_flag", "string_setting")
 
-# load(":BUILD.bzl", "bootstrap_toolchain_impl")
+# load(":BUILD.bzl", "boot_toolchain_impl")
 
 package(default_visibility = ["//visibility:public"])
 

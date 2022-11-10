@@ -5,7 +5,9 @@ load("//bzl:rules.bzl",
      "boot_library",
      "boot_module",
      "boot_lexer",
-     "boot_signature"
+     "boot_signature",
+
+     "kick_executable"
 )
 
 exports_files([
@@ -743,6 +745,12 @@ boot_module(
 # ../boot/ocamlrun ../boot/ocamlc -nostdlib -I ../boot -g -use-prims ../runtime/primitives -I .. make_opcodes.ml -o make_opcodes
 ## run:
 # ./runtime/ocamlrun tools/make_opcodes -opcodes < runtime/caml/instruct.h > bytecomp/opcodes.ml
+
+kick_executable(
+    name = "kick_opcodes",
+    main = ":Make_opcodes",
+    visibility = ["//bytecomp:__pkg__"]
+)
 
 boot_executable(
     name = "make_opcodes",

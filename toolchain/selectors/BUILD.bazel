@@ -13,7 +13,8 @@ exports_files(glob(["*.bazel"]))
 ###################
 toolchain_selector(
     name           = "bootstrap",
-    toolchain = "//toolchain/adapters/bootstrap",
+    type           = "//toolchain/type:bootstrap",
+    adapter        = "//toolchain/adapters/bootstrap",
     # toolchain_constraints   = [
     #     "//platforms/build:boot?",
     #     # "//platforms/target:vm?"
@@ -23,20 +24,31 @@ toolchain_selector(
 )
 
 toolchain_selector(
+    name           = "boot-vmsys",
+    type           = "//toolchain/type:bootstrap",
+    adapter        = "//toolchain/adapters/bootstrap:vmsys",
+    build_host_constraints  = ["//platforms/build:boot?"],
+    target_host_constraints  = ["//platforms/target:sys?"],
+)
+
+################################################################
+toolchain_selector(
     name           = "vm",
-    toolchain = "//toolchain/adapters:vm",
+    type           = "//toolchain/type:kick",
+    adapter        = "//toolchain/adapters/kick",
     build_host_constraints  = ["//platforms/build:vm?"],
     # target_host_constraints = ["//platforms/target:vm?"],
     # toolchain_constraints   = ["//platforms/xtarget:sys?"]
 )
 
 # ##########
-toolchain_selector(
-    name           = "vmsys",
-    toolchain = "//toolchain/adapters:vmsys",
-    build_host_constraints  = ["//platforms:vm?"],
-    target_host_constraints  = ["//platforms:sys?"],
-)
+# toolchain_selector(
+#     name           = "vmsys",
+#     type           = "//toolchain/type:kick",
+#     adapter        = "//toolchain/adapters:vmsys",
+#     build_host_constraints  = ["//platforms:vm?"],
+#     target_host_constraints  = ["//platforms:sys?"],
+# )
 
 # ##########
 # toolchain_selector(

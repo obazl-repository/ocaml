@@ -1,9 +1,15 @@
 load("//bzl/rules/common:executable_impl.bzl", "impl_executable")
 load("//bzl/rules/common:executable_intf.bzl", "executable_attrs")
 
+########################
+def _kick_executable(ctx):
+
+    tc = ctx.toolchains["//toolchain/type:kick"]
+    return impl_executable(ctx, tc)
+
 #######################
-boot_executable = rule(
-    implementation = impl_executable,
+kick_executable = rule(
+    implementation = _kick_executable,
     doc = "Links OCaml executable binary using the bootstrap toolchain",
     attrs = dict(
         executable_attrs(),
@@ -14,5 +20,5 @@ boot_executable = rule(
         # ),
     ),
     executable = True,
-    toolchains = ["//toolchain/type:bootstrap"],
+    toolchains = ["//toolchain/type:kick"],
 )
