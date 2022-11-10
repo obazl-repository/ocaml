@@ -4,8 +4,6 @@ load("@bazel_skylib//rules:common_settings.bzl",
 
 ## NB: config flags a settings, e.g. --//runtime:dbg, at bottom of file
 
-load(":BUILD.bzl", "asan")
-
 load("//bzl:rules.bzl",
      "boot_executable",
      "boot_module")
