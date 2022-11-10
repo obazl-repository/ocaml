@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# echo "HELLO"
+#set -x
 
 # echo "args: $@"
 
@@ -33,10 +33,19 @@ else
 fi
 #       # --- end runfiles.bash initialization ---
 
-set -x
+STDLIB=
+if [ $1 = "NOSTDLIB" ]; then
+    shift
+else
+    STDLIB="-I `dirname $(rlocation boot/lib/stdlib.cma)`"
+fi
 
-$(rlocation boot/bin/ocamlrun) $(rlocation boot/bin/ocamlc.byte) -I `dirname $(rlocation boot/lib/stdlib.cma)` $@
+# echo "STDLIB: $STDLIB"
 
-# -I `dirname $(rlocation boot/stdlib/camlheader)` $@
+CMD="$(rlocation boot/bin/ocamlrun) $(rlocation boot/bin/ocamlc.byte) $STDLIB $@"
+
+echo "CMD: $CMD"
+
+$CMD
 
 

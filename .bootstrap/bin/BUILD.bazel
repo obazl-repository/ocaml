@@ -5,6 +5,22 @@ exports_files(["ocamllex"])
 sh_binary(
     name = "ocamlc",
     srcs = ["ocamlc.sh"],
+    # args = ["STDLIB"],
+    data = [
+        ":ocamlc.byte",
+        ":ocamlrun",
+        "@boot//lib:stdlib",
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ]
+)
+
+sh_binary(
+    name = "ocamlc.boot",
+    srcs = ["ocamlc.sh"],
+    args = ["NOSTDLIB"],
     data = [
         ":ocamlc.byte",
         ":ocamlrun",
