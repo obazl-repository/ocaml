@@ -460,6 +460,7 @@ boot_module(
     visibility = [
         "//boot:__subpackages__",
         "//bin:__pkg__",
+        "//dev:__subpackages__",
         "//:__pkg__"
     ]
 )
@@ -488,7 +489,6 @@ boot_module(
         "//utils:Config",
         "//middle_end:Compilenv",
         "//utils:Clflags",
-        "//middle_end:Backend_intf_cmi",
         "//asmcomp:Asmpackager",
         ## (Asmlink)
         "//asmcomp:Asmlibrarian",
@@ -505,6 +505,7 @@ boot_signature(
     src  = "optmaindriver.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//middle_end:Backend_intf_cmi",
         "//stdlib:Stdlib.Format",
     ]
 )

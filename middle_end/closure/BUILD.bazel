@@ -31,16 +31,15 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = [
         "//middle_end:Semantics_of_primitives", ## (Middle_end Semantics_of_primitives)
-        "//middle_end:Convert_primitives", ## (Middle_end Convert_primitives)
-        "//middle_end:Compilenv", ## (Middle_end Compilenv)
-        "//middle_end:Clambda_primitives", ## (Middle_end Clambda_primitives)
-        "//middle_end:Clambda", ## (Middle_end Clambda)
-        "//middle_end:Backend_var", ## (Middle_end Backend_var)
-        "//middle_end:Backend_intf_cmi", ## (Middle_end Backend_intf)
-        "//lambda:Switch", ## (Lambda Switch)
-        "//lambda:Simplif", ## (Lambda Simplif)
-        "//lambda:Lambda", ## (Lambda Lambda)
-        "//lambda:Debuginfo", ## (Lambda Debuginfo)
+        "//middle_end:Convert_primitives",
+        "//middle_end:Compilenv",
+        "//middle_end:Clambda_primitives",
+        "//middle_end:Clambda",
+        "//middle_end:Backend_var",
+        "//lambda:Switch",
+        "//lambda:Simplif",
+        "//lambda:Lambda",
+        "//lambda:Debuginfo",
         "//utils:Warnings",
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
@@ -58,7 +57,6 @@ boot_module(
         "//utils:Config",
         "//utils:Clflags",
         "//stdlib:Stdlib.Char",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
     visibility = ["//middle_end:__pkg__"]
@@ -69,8 +67,9 @@ boot_signature(
     src  = "closure.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end:Clambda", ## (Middle_end Clambda)
-        "//middle_end:Backend_intf_cmi", ## (Middle_end Backend_intf)
+        "//parsing:Asttypes_cmi",
+        "//middle_end:Clambda",
+        "//middle_end:Backend_intf_cmi",
     ]
 )
 

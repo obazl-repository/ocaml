@@ -149,7 +149,6 @@ boot_module(
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Int32",
         "//typing:Ident",
-        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"],
     visibility = [
@@ -187,7 +186,6 @@ boot_module(
         "//lambda:Lambda",
         "//typing:Types",
         "//typing:Primitive",
-        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//middle_end:__subpackages__"]
@@ -274,7 +272,6 @@ boot_module(
         "//typing:Env",
         "//stdlib:Stdlib.Digest",
         "//utils:Config",
-        "//file_formats:Cmx_format_cmi",
         "//middle_end/flambda/base_types:Closure_id",
         "//utils:Clflags",
         "//stdlib:Stdlib.Buffer",
@@ -317,7 +314,6 @@ boot_module(
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//lambda:Printlambda",
         "//utils:Misc",
-        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//middle_end:__subpackages__"]
@@ -408,7 +404,6 @@ boot_module(
         "//stdlib:Stdlib.List",
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
@@ -442,7 +437,6 @@ boot_module(
         "//stdlib:Stdlib.Printf",
         "//typing:Primitive",
         "//stdlib:Stdlib.Format",
-        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//middle_end/flambda:__pkg__"]
@@ -467,7 +461,6 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
-        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//middle_end:__subpackages__"]

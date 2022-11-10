@@ -220,7 +220,6 @@ boot_module(
         ":Reg",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
@@ -252,7 +251,6 @@ boot_module(
         # "//middle_end:Backend_var",
         #FIXME: bug in deps mgmt, import archive containing Backend_var
         "//middle_end:ocamlmiddleend",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Random",
@@ -269,6 +267,7 @@ boot_signature(
     deps   = STDLIB + [
         ":Cmm",
         "//lambda:Debuginfo",
+        "//parsing:Asttypes_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -334,7 +333,6 @@ boot_module(
         "//middle_end:Compilenv",
         "//utils:Clflags",
         "//middle_end:Clambda",
-        "//middle_end:Backend_intf_cmi",
 
         # arch-dependent targets
         ":CSE", ":Emit", ":Reload", ":Scheduling", ":Selection"
@@ -373,7 +371,6 @@ boot_module(
         "//middle_end/flambda:Export_info",
         "//utils:Config",
         "//middle_end:Compilenv",
-        "//file_formats:Cmx_format_cmi",
         "//utils:Clflags",
         "//middle_end:Clambda",
         ## (Ccomp)
@@ -387,6 +384,7 @@ boot_signature(
     src  = "asmlibrarian.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
+        "//file_formats:Cmx_format_cmi",
         "//stdlib:Stdlib.Format",
     ],
     data = ["//runtime:primitives"]
@@ -418,11 +416,9 @@ boot_module(
         ## (Consistbl)
         "//utils:Config",
         "//middle_end:Compilenv",
-        "//file_formats:Cmx_format_cmi",
         "//utils:Clflags",
         "//middle_end:Clambda",
         ## (Ccomp)
-        "//middle_end:Backend_intf_cmi",
         "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
@@ -433,10 +429,11 @@ boot_signature(
     src  = "asmlink.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        "//utils:Misc_cmi",
-        "//stdlib:Stdlib.Format",
+        "//file_formats:Cmx_format_cmi",
+        "//middle_end:Backend_intf_cmi",
         "//stdlib:Stdlib.Digest",
-        "//file_formats:Cmx_format_cmi"
+        "//stdlib:Stdlib.Format",
+        "//utils:Misc_cmi",
     ],
     data = ["//runtime:primitives"]
 )
@@ -469,12 +466,9 @@ boot_module(
         "//utils:Config",
         "//middle_end:Compilenv",
         "//middle_end:Compilation_unit",
-        "//file_formats:Cmx_format_cmi",
         "//middle_end/closure:Closure_middle_end",
         "//utils:Clflags",
         "//middle_end:Clambda",
-        ## (Ccomp)
-        "//middle_end:Backend_intf_cmi",
     ],
     data = ["//runtime:primitives"],
     visibility = [
@@ -490,6 +484,7 @@ boot_signature(
     deps   = STDLIB + [
         "//stdlib:Stdlib.Format",
         "//typing:Env",
+        "//file_formats:Cmx_format_cmi",
         "//middle_end:Backend_intf_cmi",
     ],
     data = ["//runtime:primitives"]
@@ -504,7 +499,6 @@ boot_module(
         ":Mach",
         ":Linear",
         ":Cmm",
-        ":Branch_relaxation_intf_cmi",
     ],
     data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__subpackages__"]
@@ -558,7 +552,6 @@ boot_module(
         "//stdlib:Stdlib.List",
         "//lambda:Debuginfo",
         "//middle_end:Backend_var",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"],
@@ -608,13 +601,10 @@ boot_module(
         "//lambda:Debuginfo",
         "//utils:Config",
         "//middle_end:Compilenv",
-        "//file_formats:Cmxs_format_cmi",
-        "//file_formats:Cmx_format_cmi",
         "//utils:Clflags",
         ## (Clambda_primitives)
         "//middle_end:Clambda",
         "//middle_end:Backend_var",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
         ## (Arch)
     # ] + select({
@@ -629,17 +619,15 @@ boot_signature(
     src  = "cmm_helpers.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmmgen_state",
-        ":Cmm",
-        ## (Targetint)
-        "//typing:Primitive",
-        "//stdlib:Stdlib.Nativeint",
-        "//stdlib:Stdlib.Digest",
+        "//file_formats:Cmxs_format_cmi",
         "//lambda:Debuginfo",
-        "//file_formats:Cmx_format_cmi",
-        ## (Clambda_primitives)
         "//middle_end:Clambda",
         "//parsing:Asttypes_cmi",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Nativeint",
+        "//typing:Primitive",
+        ":Cmm",
+        ":Cmmgen_state",
     ],
     data = ["//runtime:primitives"]
 )
@@ -680,7 +668,6 @@ boot_module(
         "//lambda:Debuginfo",
         "//middle_end:Clambda",
         "//middle_end:Compilenv",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Int64",
@@ -700,10 +687,6 @@ boot_module(
         ":Cmmgen_state",
         ":Arch",
         "//middle_end:Backend_var",
-        ## (Clambda_primitives)
-        ## (Printclambda_primitives)
-        ## (V)
-        ## (VP)
     ],
     data = ["//runtime:primitives"]
 )
@@ -714,6 +697,7 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Cmm",
+        "//parsing:Asttypes_cmi",
         "//middle_end:Clambda",
     ],
     data = ["//runtime:primitives"]
@@ -925,7 +909,6 @@ boot_module(
         "//utils:Config",
         ":Arch",
         ":Cmm",
-        ":Emitenv_cmi",
         ## (Scoped_location)
     ],
     data = ["//runtime:primitives"],
@@ -1207,7 +1190,6 @@ boot_module(
         "//lambda:Debuginfo",
         "//utils:Clflags",
         "//middle_end:Backend_var",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
     ],
     data = ["//runtime:primitives"]
@@ -1219,6 +1201,7 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Cmm",
+        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
     ],
@@ -1539,7 +1522,6 @@ boot_module(
         "//stdlib:Stdlib.Int64",
         "//lambda:Debuginfo",
         "//middle_end:Backend_var",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
         ## (Arch)
     # ] + select({
@@ -1650,7 +1632,6 @@ boot_module(
     deps   = STDLIB + [
         "//lambda:Debuginfo",
         "//middle_end:Backend_var",
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.List",
@@ -1671,6 +1652,7 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
         ":Cmm",
+        "//parsing:Asttypes_cmi",
         "//lambda:Debuginfo",
     ],
     data = ["//runtime:primitives"]
@@ -1692,7 +1674,6 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":X86_proc",
-        ":X86_ast_cmi",
         "//stdlib:Stdlib.Int64",
     ],
     data = ["//runtime:primitives"],
@@ -1716,7 +1697,6 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":X86_proc",
-        ":X86_ast_cmi",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         "//utils:Misc",
@@ -1746,7 +1726,6 @@ boot_module(
     opts = MODULE_OPTS,
     deps   = STDLIB + [
         ":X86_proc",
-        ":X86_ast_cmi",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int64",
@@ -1772,7 +1751,6 @@ boot_module(
     sig    = "X86_proc_cmi",
     opts = MODULE_OPTS,
     deps   = STDLIB + [
-        ":X86_ast_cmi",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         "//utils:Misc",
