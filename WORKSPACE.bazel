@@ -30,18 +30,29 @@ obazl_deps()
 # in --platform, --host_platform, and --execution_platforms options.
 
 register_execution_platforms(
+
+    ## these are target platforms, do not register here
+    # "//platforms:sys_vm_vm",
+    # "//platforms:sys_vm_sys",
+    # "//platforms:sys_sys_sys",
+    # "//platforms:sys_sys_vm",
+
+    ## proper exec platforms
     # "//platforms:default",
     "//platforms:boot",
     "//platforms:vm",
+    "//platforms/build:vm",
     "//platforms:sys",
 )
 
 # register_toolchains("@ocaml//toolchain/selectors/local:vmvm")
 register_toolchains(
 
-    # "//toolchain/selectors:bootstrap_cross",
-    "//toolchain/selectors:bootstrap",
-    "//toolchain/selectors:vm",
+    "//toolchain/selectors/kick:sys_vm_vm",
+    "//toolchain/selectors/kick:vm",
+    "//toolchain/selectors/boot",
+    "//toolchain/selectors/boot:vmsys",
+    "//toolchain/selectors/boot:default",
     # "//toolchain/selectors:dev",
     # "//toolchain/selectors:vmsys",
 
