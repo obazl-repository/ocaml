@@ -192,6 +192,8 @@ baseline version it is not a goal to do so.
   builds `ocamlrun`, `ocamlrund`, as well as bytecode and native
   variants of the compilers and tools.  OBazl builds one thing at a time.  See below, <<parameterized_build_targets>>.
 
+* OPAM support
+
 * Distribution: packaging builds for distribution is not a goal. No
 point in supporting release builds unless and until the maintainers
 decide they want to use Bazel in production. Such packaging logic is
