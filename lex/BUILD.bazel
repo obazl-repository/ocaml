@@ -2,7 +2,6 @@ load("//bzl:rules.bzl",
      "boot_executable",
      "boot_module",
      "boot_lexer",
-     "boot_yacc",
      "boot_signature",
      "boot_library",
 )
@@ -345,11 +344,19 @@ boot_signature(
     ]
 )
 
-boot_yacc(
+genrule(
     name = "parser_ml",
     outs = ["parser.ml", "parser.mli"],
-    src  = "parser.mly",
-    opts = ["-v", "--strict"]
+    srcs = ["parser.mly"],
+    # assumption: ocamlyacc won't change, this is ok for bootstrapping?
+    tools = ["//yacc:ocamlyacc"],
+    cmd   = " ".join([
+        "$(execpath //yacc:ocamlyacc)",
+        "--strict", "-v",
+        "$(location parser.mly);",
+        "cp lex/parser.ml $(RULEDIR)/;",
+        "cp lex/parser.mli $(RULEDIR)/;"
+    ])
 )
 
 boot_module(

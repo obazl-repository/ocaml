@@ -36,7 +36,9 @@ cc_binary(
     deps = ["//runtime/caml:hdrs"],
     toolchains = ["//profile/system/local"],
     visibility = [
+        "//:__pkg__",  # :toolchain target
         "//boot:__subpackages__",
+        "//lex:__pkg__",
         "//toolchain/adapters:__subpackages__"
     ]
 )

@@ -25,9 +25,6 @@ load("//bzl/rules:boot_library.bzl",
 load("//bzl/rules:boot_lexer.bzl",
      _boot_lexer = "boot_lexer")
 
-load("//bzl/rules:boot_yacc.bzl",
-     _boot_yacc = "boot_yacc")
-
 # load("//bzl/rules:bootstrap_repl.bzl",
 #      _bootstrap_repl = "bootstrap_repl")
 
@@ -53,7 +50,6 @@ boot_module      = _boot_module
 # bootstrap_ns = _bootstrap_ns
 # bootstrap_preprocess  = _bootstrap_preprocess
 boot_lexer    = _boot_lexer
-boot_yacc   = _boot_yacc
 # bootstrap_repl   = _bootstrap_repl
 boot_signature   = _boot_signature
 kick_test   = _kick_test

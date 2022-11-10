@@ -11,7 +11,6 @@ load("//bzl:rules.bzl",
      "boot_library",
      "boot_module",
      "boot_lexer",
-     "boot_yacc",
      "boot_signature",
 )
 
