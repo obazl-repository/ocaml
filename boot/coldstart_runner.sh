@@ -36,7 +36,7 @@ else
 fi
 #       # --- end runfiles.bash initialization ---
 
-# echo "camlheader: $(rlocation ocaml-dev/stdlib/camlheader)"
+# echo "camlheader: $(rlocation ocaml_tools/stdlib/camlheader)"
 
 # set -x
 
@@ -52,19 +52,19 @@ mkdir -p $BOOTDIR/lib
 echo "workspace(name = \"boot\")" > $BOOTDIR/WORKSPACE.bazel
 echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/BUILD.bazel
 
-cp -f $(rlocation ocaml-dev/runtime/ocamlrun) $BOOTDIR/bin
-cp -f $(rlocation ocaml-dev/boot/ocamlc) $BOOTDIR/bin/ocamlc.byte
-cp -f $(rlocation ocaml-dev/boot/ocamllex) $BOOTDIR/bin/ocamllex.byte
-cp -f $(rlocation ocaml-dev/yacc/ocamlyacc) $BOOTDIR/bin
+cp -f $(rlocation ocaml_tools/runtime/ocamlrun) $BOOTDIR/bin
+cp -f $(rlocation ocaml_tools/boot/ocamlc) $BOOTDIR/bin/ocamlc.byte
+cp -f $(rlocation ocaml_tools/boot/ocamllex) $BOOTDIR/bin/ocamllex.byte
+cp -f $(rlocation ocaml_tools/yacc/ocamlyacc) $BOOTDIR/bin
 
-cp -f $(rlocation ocaml-dev/stdlib/_build/stdlib.cma) $BOOTDIR/lib
-cp -f `dirname $(rlocation ocaml-dev/stdlib/_build/stdlib.cma)`/*.cmi $BOOTDIR/lib
-cp -f $(rlocation ocaml-dev/stdlib/_build/std_exit.cmo) $BOOTDIR/lib
-cp -f $(rlocation ocaml-dev/stdlib/_build/std_exit.cmi) $BOOTDIR/lib
+cp -f $(rlocation ocaml_tools/stdlib/_build/stdlib.cma) $BOOTDIR/lib
+cp -f `dirname $(rlocation ocaml_tools/stdlib/_build/stdlib.cma)`/*.cmi $BOOTDIR/lib
+cp -f $(rlocation ocaml_tools/stdlib/_build/std_exit.cmo) $BOOTDIR/lib
+cp -f $(rlocation ocaml_tools/stdlib/_build/std_exit.cmi) $BOOTDIR/lib
 
-HDRS=`dirname $(rlocation ocaml-dev/stdlib/camlheader)`/camlhead*
+HDRS=`dirname $(rlocation ocaml_tools/stdlib/camlheader)`/camlhead*
 cp -f $HDRS $BOOTDIR/lib
-HDRS=`dirname $(rlocation ocaml-dev/stdlib/camlheader)`/target_camlhead*
+HDRS=`dirname $(rlocation ocaml_tools/stdlib/camlheader)`/target_camlhead*
 cp -f $HDRS $BOOTDIR/lib
 
 chmod ug=+rx-w,o=-rwx $BOOTDIR/bin/*

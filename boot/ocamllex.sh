@@ -33,5 +33,5 @@ else
 fi
 #       # --- end runfiles.bash initialization ---
 
-$(rlocation ocaml-dev/runtime/ocamlrun) -t $(rlocation ocaml-dev/boot/ocamllex) $@
+$(rlocation ocaml_tools/runtime/ocamlrun) -t $(rlocation ocaml_tools/boot/ocamllex) $@
 

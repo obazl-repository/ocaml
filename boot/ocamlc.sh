@@ -33,10 +33,10 @@ else
 fi
 #       # --- end runfiles.bash initialization ---
 
-# echo "camlheader: $(rlocation ocaml-dev/stdlib/camlheader)"
+# echo "camlheader: $(rlocation ocaml_tools/stdlib/camlheader)"
 
 # set -x
 
-$(rlocation ocaml-dev/runtime/ocamlrun) $(rlocation ocaml-dev/boot/ocamlc) -I `dirname $(rlocation ocaml-dev/stdlib/camlheader)` $@
+$(rlocation ocaml_tools/runtime/ocamlrun) $(rlocation ocaml_tools/boot/ocamlc) -I `dirname $(rlocation ocaml_tools/stdlib/camlheader)` $@
 
 
