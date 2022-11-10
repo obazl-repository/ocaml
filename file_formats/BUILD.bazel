@@ -78,6 +78,7 @@ boot_signature(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//tools:__pkg__",
         "//typing:__pkg__"
     ]
 )
@@ -134,13 +135,16 @@ boot_signature(
     src  = "cmt_format.mli",
     opts = SIG_OPTS,
     deps   = STDLIB + [
-        ":Cmi_format", ## (File_formats Cmi_format)
+        ":Cmi_format",
         "//typing:Types",
         "//typing:Typedtree_cmi",
         "//utils:Misc",
         "//parsing:Location",
         "//typing:Env",
         "//stdlib:Stdlib.Digest",
+    ],
+    visibility = [
+        "//tools:__pkg__",
     ]
 )
 

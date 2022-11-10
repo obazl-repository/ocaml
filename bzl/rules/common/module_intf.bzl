@@ -60,6 +60,7 @@ def module_attrs():
             doc = "List of OCaml dependencies.",
             providers = [[OcamlArchiveProvider],
                          [OcamlLibraryMarker],
+                         [OcamlSignatureProvider],
                          [ModuleInfo],
                          [CcInfo]],
             # transition undoes changes that may have been made by ns_lib

@@ -440,9 +440,9 @@ boot_module(
         "//typing:Ident",
         "//stdlib:Stdlib.Hashtbl",
         "//utils:Config",
-        "//file_formats:Cmo_format_cmi",
+        # "//file_formats:Cmo_format_cmi",
         "//bytecomp:Bytesections",
-        "//parsing:Asttypes_cmi",
+        # "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
     ],
@@ -509,22 +509,22 @@ boot_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//middle_end:Linkage_name",
-        #### (LargeFile)
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
         "//middle_end/flambda:Export_info",
         "//stdlib:Stdlib.Digest",
         "//middle_end:Compilation_unit",
-        "//file_formats:Cmxs_format_cmi",
-        "//file_formats:Cmx_format_cmi",
-        "//file_formats:Cmt_format",
-        "//file_formats:Cmo_format_cmi",
-        "//file_formats:Cmi_format",
         "//bytecomp:Bytesections",
         "//utils:Binutils",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
+
+        "//file_formats:Cmi_format_cmi",
+        "//file_formats:Cmo_format_cmi",
+        "//file_formats:Cmt_format_cmi",
+        "//file_formats:Cmx_format_cmi",
+        "//file_formats:Cmxs_format_cmi",
     ],
 )
 
@@ -552,7 +552,7 @@ boot_module(
         "//utils:Clflags",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
-        "//typing:Annot_cmi",
+        # "//typing:Annot_cmi",
     ],
 )
 
@@ -655,7 +655,7 @@ boot_module(
     deps   = [
         "//parsing:Location",
         "//parsing:Parse",
-        "//parsing:Parsetree_cmi",
+        # "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Bytes",
