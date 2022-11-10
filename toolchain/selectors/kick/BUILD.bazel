@@ -1,37 +1,28 @@
-load(":BUILD.bzl", "toolchain_selector")
+load("//toolchain/selectors:BUILD.bzl", "toolchain_selector")
 
 package(default_visibility=["//visibility:public"])
 
 exports_files(glob(["*.bazel"]))
 
-###################
-# toolchain_selector(
-#     name           = "default",
-#     toolchain = "//toolchain/adapters/boot",
-# )
+## testing cross-compiles
 
-###################
+# 1. Target vm->vm on local system
 toolchain_selector(
-    name           = "bootstrap",
-    type           = "//toolchain/type:bootstrap",
-    adapter        = "//toolchain/adapters/boot",
-    # toolchain_constraints   = [
-    #     "//platforms/build:boot?",
-    #     # "//platforms/target:vm?"
-    # ]
-    build_host_constraints  = ["//platforms/build:boot?"],
-    # target_host_constraints  = ["//platforms/target:vm?"],
+    name           = "sys_vm_vm",
+    # exec_compatible_with = [],
+    type           = "//toolchain/type:bootstrap", # kick",
+    adapter        = "//toolchain/adapters/kick:sys_vm_vm",
+    # build_host_constraints  = ["//platforms/build:vm?"],
+    target_host_constraints = [
+        "//platforms/ocaml/executor:vm?",
+        "//platforms/ocaml/emitter:vm?"
+    ],
 )
 
-toolchain_selector(
-    name           = "boot-vmsys",
-    type           = "//toolchain/type:bootstrap",
-    adapter        = "//toolchain/adapters/boot:vmsys",
-    build_host_constraints  = ["//platforms/build:boot?"],
-    target_host_constraints  = ["//platforms/target:sys?"],
-)
+
 
 ################################################################
+###################
 toolchain_selector(
     name           = "vm",
     type           = "//toolchain/type:kick",

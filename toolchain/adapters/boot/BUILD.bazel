@@ -19,7 +19,7 @@ load(":BUILD.bzl", "boot_toolchain_adapter")
 # only one selector for this tc: //toolchain/selectors:bootstrap
 # with build_host_constraints  = ["//platforms/build:boot?"],
 boot_toolchain_adapter(
-    name        = "bootstrap",
+    name        = "boot",
     build_host  = "boot",
     target_host = select({
         "//conditions:default": "vm"

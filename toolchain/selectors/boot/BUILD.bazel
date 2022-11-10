@@ -1,4 +1,4 @@
-load(":BUILD.bzl", "toolchain_selector")
+load("//toolchain/selectors:BUILD.bzl", "toolchain_selector")
 
 package(default_visibility=["//visibility:public"])
 
@@ -12,19 +12,22 @@ exports_files(glob(["*.bazel"]))
 
 ###################
 toolchain_selector(
-    name           = "bootstrap",
+    name           = "default",
     type           = "//toolchain/type:bootstrap",
     adapter        = "//toolchain/adapters/boot",
-    # toolchain_constraints   = [
-    #     "//platforms/build:boot?",
-    #     # "//platforms/target:vm?"
-    # ]
-    build_host_constraints  = ["//platforms/build:boot?"],
-    # target_host_constraints  = ["//platforms/target:vm?"],
+    # exec_compatible_with = ["//platforms:boot?"],
 )
 
 toolchain_selector(
-    name           = "boot-vmsys",
+    name           = "boot",
+    type           = "//toolchain/type:bootstrap",
+    adapter        = "//toolchain/adapters/boot",
+    build_host_constraints  = ["//platforms/build:boot?"],
+    target_host_constraints  = ["//platforms/target:vm?"],
+)
+
+toolchain_selector(
+    name           = "vmsys",
     type           = "//toolchain/type:bootstrap",
     adapter        = "//toolchain/adapters/boot:vmsys",
     build_host_constraints  = ["//platforms/build:boot?"],

@@ -74,7 +74,7 @@ toolchain(  ##selector
         "@platforms//os:macos",
     ],
     # toolchain = ":bootstrap_tc_macos",
-    toolchain = "//bzl/toolchain/adapters/bootstrap",
+    toolchain = "//bzl/toolchain/adapters/boot",
     visibility = ["//visibility:public"]
 )
 
