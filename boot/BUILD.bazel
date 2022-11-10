@@ -1,14 +1,36 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//bzl:rules.bzl", "boot_coldstart")
+
 exports_files(["ocamllex"])
 
 ## Package //boot contains pre-compiled OCaml executables (ocamlc,
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
 
-alias(
-    name   = "ocamlrun.boot",
-    actual = "//runtime:ocamlrun"
+boot_coldstart(
+    name = "coldstart",
+    runner = "coldstart_runner.sh",
+    data = [
+        "//runtime:ocamlrun",
+        ":ocamlc",
+        ":ocamllex",
+        "//yacc:ocamlyacc",
+        "@bazel_tools//tools/bash/runfiles",
+        "//stdlib:stdlib",
+        "//stdlib:Std_exit",
+        "//stdlib:Std_exit_cmi",
+        "//stdlib:Stdlib_cmi",
+        "//stdlib:camlheaders",
+    ],
+    # deps = [
+    # ],
 )
+
+sh_binary(
+    name = "clean",
+    srcs = ["clean.sh"]
+)
+
 
 sh_binary(
     name = "ocamlc.boot",

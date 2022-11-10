@@ -1,0 +1,16 @@
+
+filegroup(
+    name = "stdlib",
+    srcs = [
+        "stdlib.cma",
+        "std_exit.cmi",
+        "std_exit.cmo",
+        "camlheader",
+        "camlheaderd",
+        "camlheaderi",
+        "target_camlheader",
+        "target_camlheaderd",
+        "target_camlheaderi",
+    ],
+    visibility = ["@boot//bin:__pkg__"]
+)

@@ -1,3 +1,6 @@
+load("//bzl/rules:boot_coldstart.bzl",
+     _boot_coldstart = "boot_coldstart")
+
 load("//bzl/rules:boot_archive.bzl",
      _boot_archive = "boot_archive")
 
@@ -41,6 +44,7 @@ load("//bzl/rules:kick_compiler.bzl", _kick_compiler = "kick_compiler")
 # load("//bzl/rules:ocamlc_fixpoint.bzl", _ocamlc_fixpoint = "ocamlc_fixpoint")
 # load("//bzl/rules:ocamlc_runtime.bzl", _ocamlc_runtime = "ocamlc_runtime")
 
+boot_coldstart      = _boot_coldstart
 boot_archive      = _boot_archive
 boot_executable      = _boot_executable
 kick_executable      = _kick_executable
