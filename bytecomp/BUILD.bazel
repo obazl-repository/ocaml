@@ -173,7 +173,6 @@ boot_module(
         ":Instruct",
         # "//stdlib:Stdlib",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//driver:__pkg__",
         "//toplevel:__pkg__",
@@ -188,7 +187,6 @@ boot_signature(
         "//parsing:Asttypes_cmi",
         ":Instruct",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -208,7 +206,6 @@ boot_module(
         "//utils:Config",
         "//utils:Clflags",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//driver:__pkg__"
     ]
@@ -222,7 +219,6 @@ boot_signature(
         "//file_formats:Cmo_format_cmi",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -260,7 +256,6 @@ boot_module(
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Array",
     ],
-    data = ["//runtime:primitives"],
     ## "//stdlib:camlheader"
 )
 
@@ -274,7 +269,6 @@ boot_signature(
         "//stdlib:Stdlib.Format",
         "//file_formats:Cmo_format_cmi",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -304,7 +298,6 @@ boot_module(
         "//utils:Config",
         "//utils:Clflags",
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//driver:__pkg__"]
 )
 
@@ -318,7 +311,6 @@ boot_signature(
         "//stdlib:Stdlib.Format",
         "//typing:Env_cmi"
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -332,7 +324,6 @@ boot_module(
         "//stdlib:Stdlib",
         "//utils:Config"
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -346,7 +337,6 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -368,7 +358,6 @@ boot_module(
         "//utils:Binutils",
         "//stdlib:Stdlib.Array",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//toplevel:__subpackages__"
@@ -381,7 +370,6 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = STDLIB + [
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -415,7 +403,6 @@ boot_module(
         "//typing:Env",
         ## (LongString)
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//driver:__pkg__",
         "//toplevel:__pkg__",
@@ -433,7 +420,6 @@ boot_signature(
         "//utils:Misc",
         ":Instruct",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -450,7 +436,6 @@ boot_module(
         "//typing:Ident",
         "//typing:Env",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__"
@@ -470,7 +455,6 @@ boot_signature(
         "//typing:Ident",
         "//typing:Env",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//driver:__pkg__"
@@ -486,7 +470,6 @@ boot_module(
         ":Instruct",
         "//stdlib:Stdlib.Obj",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//toplevel:__pkg__"
@@ -501,7 +484,6 @@ boot_signature(
         ":Instruct",
         "//stdlib:Stdlib.Obj",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -521,7 +503,6 @@ boot_module(
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
     deps   = STDLIB + [
     ],
-    # data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -580,8 +561,7 @@ genrule(
 #     opts = SIG_OPTS,
 #     deps   = STDLIB + [
 #     ],
-#     data = ["//runtime:primitives"]
-# )
+# # )
 
 # bytecomp/opcodes.mli: bytecomp/opcodes.ml
 # 	$(CAMLC) -i $< > $@
@@ -620,7 +600,6 @@ boot_module(
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Array",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//driver:__pkg__",
         "//toplevel:__pkg__",
@@ -635,7 +614,6 @@ boot_signature(
         ":Instruct",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -667,7 +645,6 @@ boot_module(
         ":Meta",
         #### (LongString)
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -688,7 +665,6 @@ boot_signature(
         "//typing:Ident",
         "//utils:Misc",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]

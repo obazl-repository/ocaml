@@ -272,8 +272,6 @@ boot_archive(
 boot_archive(
     name       = "stdlib",
     ## makefiles pass -use-prims. does that make sense, for an archive?
-    # data       = ["//runtime:primitives"],
-    # primitives = "//runtime:primitives",
     manifest   = [
         ":Stdlib", ## functions as the ns_resolver module
         ":CamlinternalFormat",
@@ -363,7 +361,6 @@ boot_module(
         ":CamlinternalFormatBasics",
     ],
     # pp_deps = ["//stdlib:expand_module_aliases.awk"],
-    # visibility = ["//visibility:public"]
 )
 
 # ../runtime/ocamlrun ../boot/ocamlc
@@ -404,8 +401,6 @@ boot_signature(
     deps   = [
         ":CamlinternalFormatBasics", #_cmi",
     ],
-    # data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 # bootstrap_preprocess(
@@ -461,8 +456,6 @@ boot_module(
         ":Stdlib.Sys", ## (Stdlib Sys)
         ":Stdlib.String", ## (Stdlib String)
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -502,8 +495,6 @@ boot_signature(
         # not a submodule of the namespace, without renaming. Then we
         # could list sibling deps directly.
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -513,7 +504,6 @@ boot_module(
     opts   = ["-nopervasives"],
     # primitives = PRIMITIVES,
     # deps   = [],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -522,8 +512,7 @@ boot_signature(
     opts   = ["-nopervasives"],
     # primitives = PRIMITIVES,
     # deps   = [],
-    # visibility = ["//visibility:public"]
-)
+ )
 
 boot_module(
     name   = "CamlinternalLazy",
@@ -564,7 +553,6 @@ boot_module(
         ":Stdlib.Lazy", ## (Stdlib Lazy)
         ":Stdlib.Array", ## (Stdlib Array)
     ],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -575,8 +563,6 @@ boot_signature(
         # ":Stdlib",
         ":Stdlib.Obj",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -659,8 +645,6 @@ boot_module(
         ":Stdlib.Seq",
         ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -671,8 +655,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -684,8 +666,6 @@ boot_module(
     deps   = [
         ":Stdlib.Array"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 ## WARNING: output name same as input name, so write to tmp dir:
@@ -698,7 +678,6 @@ genrule(
         "$(location :arrayLabels.mli)",
         "> $@"
     ]),
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -709,8 +688,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -720,8 +697,6 @@ boot_module(
     sig    = "Stdlib.Atomic_cmi",
     opts = MODULE_OPTS,
     deps   = [],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -732,8 +707,6 @@ boot_signature(
     deps   = [
         # ":Stdlib_cmi"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -752,8 +725,6 @@ boot_module(
         ## (Array1)
         ## (Array0)
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -769,8 +740,6 @@ boot_signature(
         ## (Array1)
         ## (Array0)
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -779,8 +748,6 @@ boot_module(
     struct = "bool.ml",
     sig    = "Stdlib.Bool_cmi",
     opts = MODULE_OPTS,
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -808,8 +775,6 @@ boot_module(
         ":Stdlib.Char",
         ":Stdlib.Bytes",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -821,8 +786,6 @@ boot_signature(
         ":Stdlib.Uchar",
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -838,8 +801,6 @@ boot_module(
         ":Stdlib.Sys",
         ":Stdlib.Uchar",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -852,8 +813,6 @@ boot_signature(
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -865,8 +824,6 @@ boot_module(
     deps   = [
         ":Stdlib.Bytes",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -878,8 +835,6 @@ boot_signature(
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -891,8 +846,6 @@ boot_module(
     deps   = [
         ":Stdlib.Obj"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -903,8 +856,6 @@ boot_signature(
     deps   = [
         ":Stdlib.In_channel"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -914,8 +865,6 @@ boot_module(
     sig    = "Stdlib.Char_cmi",
     opts = MODULE_OPTS,
     deps   = [":Stdlib"],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -923,8 +872,6 @@ boot_signature(
     name = "Stdlib.Char_cmi",
     src  = "char.mli",
     opts = SIG_OPTS,
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -934,8 +881,6 @@ boot_module(
     sig    = "Stdlib.Complex_cmi",
     opts = MODULE_OPTS,
     deps   = ["Stdlib.Float"],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -944,8 +889,6 @@ boot_signature(
     src  = "complex.mli",
     opts = SIG_OPTS,
     deps   = [ ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -955,8 +898,6 @@ boot_module(
     sig    = "Stdlib.Condition_cmi",
     opts = MODULE_OPTS,
     deps   = [":Stdlib.Mutex"],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -965,8 +906,6 @@ boot_signature(
     src  = "condition.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib.Mutex_cmi"],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -980,8 +919,6 @@ boot_module(
         ":Stdlib.Char",
         ":Stdlib.Bytes",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -993,8 +930,6 @@ boot_signature(
         ":Stdlib.In_channel_cmi"
         # ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1013,8 +948,6 @@ boot_module(
         "Stdlib.Obj",
         "Stdlib.Sys",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1023,8 +956,6 @@ boot_signature(
     src  = "domain.mli",
     opts = SIG_OPTS,
     deps   = [ ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1039,8 +970,6 @@ boot_module(
         "Stdlib.Printexc",
         "Stdlib.Printf",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1049,8 +978,6 @@ boot_signature(
     src  = "effect.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib.Printexc_cmi"],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1063,7 +990,6 @@ boot_module(
     # deps   = [
     # ],
     # data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1076,7 +1002,6 @@ boot_signature(
     #     # ":Stdlib"
     # ],
     # data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1096,8 +1021,6 @@ boot_module(
         ":Stdlib.Seq",
         ":Stdlib.Sys",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1108,8 +1031,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Hashtbl_cmi",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1128,8 +1049,6 @@ boot_module(
         ":Stdlib.String",
         ":Stdlib.Sys",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1138,8 +1057,6 @@ boot_signature(
     src  = "filename.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib"],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1153,8 +1070,6 @@ boot_module(
         ":Stdlib.List",
         ":Stdlib.Array",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1166,8 +1081,6 @@ boot_signature(
         ":Stdlib.Seq",
         ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1192,8 +1105,6 @@ boot_module(
         ":Stdlib.Stack",
         ":Stdlib.String",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1208,8 +1119,6 @@ boot_signature(
         ":Stdlib.Either_cmi",
         ":Stdlib.Seq_cmi",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1221,8 +1130,6 @@ boot_module(
     deps   = [
         ":Stdlib.Printexc",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1232,8 +1139,6 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = [
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1248,8 +1153,6 @@ boot_module(
         ":Stdlib.Printf",
         ":Stdlib.Printexc",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1260,8 +1163,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Printexc",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1278,8 +1179,6 @@ boot_module(
         ":Stdlib.Stream",
         ":Stdlib.String",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1291,8 +1190,6 @@ boot_signature(
         # ":Stdlib",
         ":Stdlib.Stream"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1314,8 +1211,6 @@ boot_module(
         ## (MakeSeeded)
         ## (H)
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1327,8 +1222,6 @@ boot_signature(
         ":Stdlib.Seq",
         ## (H)
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1340,8 +1233,6 @@ boot_module(
     deps   = [
         ":Stdlib.Fun"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1352,8 +1243,6 @@ boot_signature(
     deps   = [
         ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1365,8 +1254,6 @@ boot_module(
     deps   = [
         ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1377,8 +1264,6 @@ boot_signature(
     deps   = [
         # ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1391,8 +1276,6 @@ boot_module(
         # ":Stdlib_cmi",
         ":Stdlib.Sys",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1404,8 +1287,6 @@ boot_signature(
         # ":Stdlib_cmi",
         ":Stdlib.Sys",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1417,8 +1298,6 @@ boot_module(
     deps   = [
         ":Stdlib",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1429,8 +1308,6 @@ boot_signature(
     deps   = [
         # ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1446,8 +1323,6 @@ boot_module(
         ":Stdlib.Obj",
         ":CamlinternalLazy",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1458,8 +1333,6 @@ boot_signature(
     deps   = [
         ":CamlinternalLazy",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1476,7 +1349,6 @@ boot_module(
         ":Stdlib.Array",
         ":Stdlib"
     ],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1487,8 +1359,6 @@ boot_signature(
     deps   = [
         # ":Stdlib_cmi"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1502,8 +1372,6 @@ boot_module(
         ":Stdlib.Seq",
         ":Stdlib.Either",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1515,8 +1383,6 @@ boot_signature(
         ":Stdlib.Seq",
         ":Stdlib.Either",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1528,8 +1394,6 @@ boot_module(
     deps   = [
         ":Stdlib.List",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1541,8 +1405,6 @@ boot_signature(
         ":Stdlib.Seq",
         ":Stdlib.Either",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1555,8 +1417,6 @@ boot_module(
         ":Stdlib.List",
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1567,8 +1427,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1580,8 +1438,6 @@ boot_module(
     deps   = [
         ":Stdlib.Bytes",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1592,8 +1448,6 @@ boot_signature(
     deps   = [
         ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1607,8 +1461,6 @@ boot_module(
         ":Stdlib.Map",
         ":Stdlib.Hashtbl"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1624,8 +1476,6 @@ boot_signature(
         ":Stdlib.Hashtbl"
         # H
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1639,8 +1489,6 @@ boot_module(
         # ":Stdlib.Map",
         # ":Stdlib.Hashtbl"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1656,8 +1504,6 @@ boot_signature(
         # ":Stdlib.Hashtbl"
         # # H
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1670,8 +1516,6 @@ boot_module(
         # ":Stdlib_cmi",
         ":Stdlib.Sys",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1683,8 +1527,6 @@ boot_signature(
         # ":Stdlib_cmi",
         ":Stdlib.Sys",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1698,8 +1540,6 @@ boot_module(
         ":Stdlib.Nativeint",
         ":Stdlib.Int32",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1711,8 +1551,6 @@ boot_signature(
         # ":Stdlib_cmi",
         ":Stdlib.Int32",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1724,8 +1562,6 @@ boot_module(
     deps   = [
         ":CamlinternalOO",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1738,8 +1574,6 @@ boot_signature(
     deps   = [
         ":CamlinternalOO",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1751,8 +1585,6 @@ boot_module(
     deps   = [
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1763,8 +1595,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1774,8 +1604,6 @@ boot_module(
     sig    = "Stdlib.Out_channel_cmi",
     opts = MODULE_OPTS,
     deps   = [":Stdlib.Fun"],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1810,8 +1638,6 @@ boot_signature(
         ":Stdlib.Lexing_cmi",
         # ":Stdlib_cmi"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1823,8 +1649,6 @@ boot_module(
         ":CamlinternalFormatBasics",
         ## (LargeFile)
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 # bootstrap_implicit_signature(
 #     name    = "Stdlib.Parsing_cmi",
@@ -1846,8 +1670,6 @@ boot_module(
         ":Stdlib.Obj",
         ":Stdlib.Printf",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1858,8 +1680,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Obj_cmi"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1873,8 +1693,6 @@ boot_module(
         ":CamlinternalFormat",
         ":Stdlib.Buffer",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1885,8 +1703,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Buffer",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1899,8 +1715,6 @@ boot_module(
         ":Stdlib",
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1912,8 +1726,6 @@ boot_signature(
         ":Stdlib.Seq",
         # ":Stdlib",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1936,8 +1748,6 @@ boot_module(
         ":Stdlib.Nativeint",
         ":Stdlib.String",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1950,8 +1760,6 @@ boot_signature(
         ":Stdlib.Int64",
         ":Stdlib.Int32",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -1964,8 +1772,6 @@ boot_module(
         ":Stdlib.Seq",
         # ":Stdlib"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -1977,8 +1783,6 @@ boot_signature(
         ":Stdlib",
         ":Stdlib.Seq"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2000,8 +1804,6 @@ boot_module(
         ":Stdlib.Printf",
         ":Stdlib.String",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2015,8 +1817,6 @@ boot_signature(
         ":Stdlib_cmi",
         # ":CamlinternalFormatBasics_cmi",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2032,8 +1832,6 @@ boot_module(
         ":Stdlib.Condition",
         ":Stdlib.Mutex",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2043,8 +1841,6 @@ boot_signature(
     opts  = SIG_OPTS,
     deps  = [
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2058,7 +1854,6 @@ boot_module(
         ":Stdlib.Either",
         ":Stdlib.Lazy"
     ],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2067,7 +1862,6 @@ boot_signature(
     src  = "seq.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib.Either_cmi"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2080,8 +1874,6 @@ boot_module(
         ":Stdlib.Seq",
         ":Stdlib.List",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2092,8 +1884,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2106,8 +1896,6 @@ boot_module(
         ":Stdlib.Seq",
         ":Stdlib.List",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2118,8 +1906,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Seq",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2134,8 +1920,6 @@ boot_module(
         ":Stdlib.BytesLabels",
         ":Stdlib.ArrayLabels",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2149,8 +1933,6 @@ boot_signature(
         ":Stdlib.BytesLabels",
         ":Stdlib.ArrayLabels",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2166,8 +1948,6 @@ boot_module(
         ":Stdlib.Lazy",
         ":Stdlib.Bytes",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2177,8 +1957,6 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = [
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2190,8 +1968,6 @@ boot_module(
     deps   = [
         ":Stdlib.Bytes",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2203,8 +1979,6 @@ boot_signature(
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2216,8 +1990,6 @@ boot_module(
     deps   = [
         ":Stdlib.String",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2229,8 +2001,6 @@ boot_signature(
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2247,8 +2017,6 @@ boot_module(
         "//conditions:default": []
     }),
     opts = MODULE_OPTS,
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2257,8 +2025,6 @@ boot_signature(
     src  = "sys.mli",
     opts = SIG_OPTS,
     deps = [":Stdlib"],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2270,8 +2036,6 @@ boot_module(
     deps   = [
         ":Stdlib.Char",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2282,8 +2046,6 @@ boot_signature(
     deps   = [
         ":Stdlib.Char",
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2302,8 +2064,6 @@ boot_module(
         "//conditions:default": []
     }),
     opts = MODULE_OPTS,
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2313,8 +2073,6 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = [
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_module(
@@ -2335,8 +2093,6 @@ boot_module(
         ":Stdlib.Hashtbl",
         ## (H)
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 boot_signature(
@@ -2346,10 +2102,7 @@ boot_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Stdlib.Hashtbl",
-        ## (H)
     ],
-    data = ["//runtime:primitives"],
-    # visibility = ["//visibility:public"]
 )
 
 ################################################################

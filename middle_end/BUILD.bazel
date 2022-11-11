@@ -93,7 +93,6 @@ boot_signature(
         "//typing:Ident",
         "//middle_end/flambda/base_types:Closure_id",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__pkg__",
         "//driver:__pkg__",
@@ -113,7 +112,6 @@ boot_module(
         "//lambda:Debuginfo",
         "//utils:Clflags",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__subpackages__",
         "//middle_end:__subpackages__"
@@ -130,7 +128,6 @@ boot_signature(
         "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo_cmi"
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//asmcomp:__pkg__"]
 )
 
@@ -150,7 +147,6 @@ boot_module(
         "//stdlib:Stdlib.Int32",
         "//typing:Ident",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__pkg__",
         "//middle_end:__subpackages__"
@@ -169,7 +165,6 @@ boot_signature(
         "//typing:Ident",
         "//parsing:Asttypes_cmi",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__pkg__",
         "//file_formats:__pkg__",
@@ -187,7 +182,6 @@ boot_module(
         "//typing:Types",
         "//typing:Primitive",
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end:__subpackages__"]
 )
 
@@ -201,7 +195,6 @@ boot_signature(
         "//lambda:Lambda_cmi",
         "//parsing:Asttypes_cmi"
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
@@ -220,7 +213,6 @@ boot_module(
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__pkg__",
         "//middle_end/flambda:__subpackages__",
@@ -237,7 +229,6 @@ boot_signature(
         "//utils:Identifiable",
         "//typing:Ident_cmi"
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//middle_end/flambda:__pkg__",
         "//middle_end/flambda/base_types:__pkg__"
@@ -276,7 +267,6 @@ boot_module(
         "//utils:Clflags",
         "//stdlib:Stdlib.Buffer",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//asmcomp:__subpackages__",
         "//driver:__pkg__",
@@ -302,7 +292,6 @@ boot_signature(
         "//file_formats:Cmx_format_cmi",
         "//middle_end/flambda/base_types:Closure_id",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -315,7 +304,6 @@ boot_module(
         "//lambda:Printlambda",
         "//utils:Misc",
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end:__subpackages__"]
 )
 
@@ -327,7 +315,6 @@ boot_signature(
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//parsing:Asttypes_cmi",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -343,7 +330,6 @@ boot_module(
         "//stdlib:Stdlib.Filename",
         "//lambda:Debuginfo",
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
@@ -354,7 +340,6 @@ boot_signature(
     deps   = STDLIB + [
         "//lambda:Lambda_cmi"
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//middle_end/flambda:__subpackages__",
         # "//otherlibs/dynlink:__pkg__"
@@ -373,7 +358,6 @@ boot_module(
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//middle_end/flambda:__pkg__",
         "//tools:__pkg__",
@@ -387,7 +371,6 @@ boot_signature(
     deps   = STDLIB + [
         "//utils:Identifiable_cmi"
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -406,7 +389,6 @@ boot_module(
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Array",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//middle_end:__subpackages__",
         "//tools:__pkg__",
@@ -421,7 +403,6 @@ boot_signature(
         ":Clambda", ## (Middle_end Clambda)
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -438,7 +419,6 @@ boot_module(
         "//typing:Primitive",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
@@ -451,7 +431,6 @@ boot_signature(
         "//stdlib:Stdlib.Format",
         "//parsing:Asttypes_cmi",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -462,7 +441,6 @@ boot_module(
     deps   = STDLIB + [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end:__subpackages__"]
 )
 
@@ -474,7 +452,6 @@ boot_signature(
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//parsing:Asttypes_cmi",
     ],
-    data = ["//runtime:primitives"]
 )
 
 boot_module(
@@ -491,7 +468,6 @@ boot_module(
         "//utils:Identifiable",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"],
     visibility = [
         "//middle_end/flambda:__pkg__",
         "//tools:__pkg__",
@@ -509,7 +485,6 @@ boot_signature(
         "//utils:Identifiable",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
@@ -530,7 +505,6 @@ boot_module(
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end/flambda:__subpackages__"]
 )
 
@@ -545,7 +519,6 @@ boot_signature(
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
     ],
-    data = ["//runtime:primitives"],
     visibility = ["//middle_end/flambda:__subpackages__"]
 )
 

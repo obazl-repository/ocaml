@@ -290,7 +290,6 @@ boot_signature(
     deps   = STDLIB + [
         "//stdlib:Stdlib"
     ],
-    data = ["//runtime:primitives"],
 )
 
 boot_module(
