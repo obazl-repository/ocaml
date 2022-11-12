@@ -3,9 +3,10 @@ package(default_visibility = ["//visibility:public"])
 load("//bzl:rules.bzl",
      "boot_executable",
      "boot_library",
-     "baseline_module",
      "boot_lexer",
-     "baseline_signature",
+     "build_tool",
+     "compiler_module",
+     "compiler_signature",
 
      # "baseline_executable"
 )
@@ -193,7 +194,7 @@ boot_executable(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Cvt_emit",
     struct = "cvt_emit.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -306,7 +307,7 @@ boot_executable(
 # NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 # opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
-baseline_module(
+compiler_module(
     name = "Opnames",
     struct = "opnames.ml",
     opts = MODULE_OPTS,
@@ -373,7 +374,7 @@ genrule(
 ##########################################################
 ################  ocaml modules and sigs  ################
 ## TODO: get the unix stuff set up
-# baseline_module(
+# compiler_module(
 #     name   = "Caml_tex",
 #     struct = "caml_tex.ml",
 #     opts = MODULE_OPTS,
@@ -408,7 +409,7 @@ genrule(
 #     ],
 # )
 
-baseline_module(
+compiler_module(
     name   = "Cmpbyt",
     struct = "cmpbyt.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -420,7 +421,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Dumpobj",
     target_compatible_with = ["//platforms/target:sys?"],
     struct = "dumpobj.ml",
@@ -453,7 +454,7 @@ baseline_module(
 #             ^^^^^^^^^^^^^^^
 # Error: The constructor Const_string expects 3 argument(s),
 #        but is applied here to 1 argument(s)
-# baseline_module(
+# compiler_module(
 #     name   = "Eqparsetree",
 #     struct = "eqparsetree.ml",
 #     opts = MODULE_OPTS,
@@ -469,7 +470,7 @@ baseline_module(
 # 41 | module IdMap = Misc.StringMap
 #                     ^^^^^^^^^^^^^^
 # Error: Unbound module Misc.StringMap
-# baseline_module(
+# compiler_module(
 #     name   = "Lintapidiff.opt",
 #     mode   = "native",
 #     struct = "lintapidiff.ml",
@@ -495,7 +496,7 @@ baseline_module(
 #     ],
 # # )
 
-baseline_module(
+compiler_module(
     name   = "Objinfo",
     struct = "objinfo.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -528,7 +529,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Ocamlcmt",
     struct = "ocamlcmt.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -556,7 +557,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Ocamlcp",
     struct = "ocamlcp.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -573,7 +574,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Ocamlcp_common",
     struct = "ocamlcp_common.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -589,7 +590,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Ocamldep",
     struct = "ocamldep.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -598,7 +599,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Ocamlmklib",
     struct = "ocamlmklib.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -617,7 +618,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Ocamlmktop",
     struct = "ocamlmktop.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -631,7 +632,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Ocamloptp",
     struct = "ocamloptp.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -648,7 +649,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Ocamlprof",
     struct = "ocamlprof.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -672,7 +673,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Primreq",
     struct = "primreq.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -685,7 +686,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Profiling",
     struct = "profiling.ml",
     sig    = "Profiling_cmi",
@@ -697,7 +698,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Profiling_cmi",
     src  = "profiling.mli",
     opts = SIG_OPTS,
@@ -706,7 +707,7 @@ baseline_signature(
 )
 
 # ../boot/ocamlrun ../boot/ocamlc
-baseline_module(
+compiler_module(
     name   = "Stripdebug",
     struct = "stripdebug.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -752,13 +753,13 @@ baseline_module(
 #     visibility = ["//bytecomp:__pkg__"]
 # )
 
-boot_executable(
+build_tool(
     name = "make_opcodes",
     main = ":Make_opcodes",
     visibility = ["//bytecomp:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Make_opcodes",
     struct = "make_opcodes.ml",
     nocopts = True,

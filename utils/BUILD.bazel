@@ -16,8 +16,8 @@ load("//bzl:rules.bzl",
      "boot_config",
      "boot_executable",
      "boot_library",
-     "baseline_module",
-     "baseline_signature",
+     "compiler_module",
+     "compiler_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -156,7 +156,7 @@ boot_library(
 )
 
 ################################################################
-baseline_module(
+compiler_module(
     name   = "Arg_helper",
     struct = "arg_helper.ml",
     sig    = "Arg_helper_cmi",
@@ -174,7 +174,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Arg_helper_cmi",
     src  = "arg_helper.mli",
     opts = SIG_OPTS,
@@ -183,7 +183,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Binutils",
     struct = "binutils.ml",
     sig    = "Binutils_cmi",
@@ -216,7 +216,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Binutils_cmi",
     src  = "binutils.mli",
     opts = SIG_OPTS,
@@ -225,7 +225,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Build_path_prefix_map",
     struct = "build_path_prefix_map.ml",
     sig    = "Build_path_prefix_map_cmi",
@@ -244,7 +244,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Build_path_prefix_map_cmi",
     src  = "build_path_prefix_map.mli",
     opts = SIG_OPTS,
@@ -253,7 +253,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Ccomp",
     struct = "ccomp.ml",
     sig    = "Ccomp_cmi",
@@ -279,7 +279,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Ccomp_cmi",
     src  = "ccomp.mli",
     opts = SIG_OPTS,
@@ -288,7 +288,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Clflags",
     struct = "clflags.ml",
     sig    = "Clflags_cmi",
@@ -320,7 +320,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Clflags_cmi",
     src  = "clflags.mli",
     opts = SIG_OPTS,
@@ -333,7 +333,7 @@ baseline_signature(
     visibility = ["//driver:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Config",
     struct = "config.ml",
     sig    = "Config_cmi",
@@ -429,7 +429,7 @@ boot_config(
 #     ])
 # )
 
-baseline_signature(
+compiler_signature(
     name = "Config_cmi",
     src  = "config.mli",
     opts = SIG_OPTS,
@@ -445,7 +445,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Consistbl",
     struct = "consistbl.ml",
     sig    = "Consistbl_cmi",
@@ -465,7 +465,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Consistbl_cmi",
     src  = "consistbl.mli",
     opts = SIG_OPTS,
@@ -478,7 +478,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Diffing",
     struct = "diffing.ml",
     sig    = "Diffing_cmi",
@@ -493,7 +493,7 @@ baseline_module(
     visibility = ["//typing:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Diffing_cmi",
     src  = "diffing.mli",
     opts = SIG_OPTS,
@@ -504,7 +504,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Diffing_with_keys",
     struct = "diffing_with_keys.ml",
     sig    = "Diffing_with_keys_cmi",
@@ -521,7 +521,7 @@ baseline_module(
     visibility = ["//typing:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Diffing_with_keys_cmi",
     src  = "diffing_with_keys.mli",
     opts = SIG_OPTS,
@@ -532,7 +532,7 @@ baseline_signature(
     visibility = ["//typing:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Domainstate",
     struct = "domainstate.ml",
     sig    = "Domainstate_cmi",
@@ -561,7 +561,7 @@ genrule(
     ])
 )
 
-baseline_signature(
+compiler_signature(
     name = "Domainstate_cmi",
     src  = "domainstate.mli",
     opts = SIG_OPTS,
@@ -594,7 +594,7 @@ genrule(
 # 	$(CPP) -I runtime/caml $< > $@
 
 
-baseline_module(
+compiler_module(
     name   = "Identifiable",
     struct = "identifiable.ml",
     sig    = "Identifiable_cmi",
@@ -616,7 +616,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Identifiable_cmi",
     src  = "identifiable.mli",
     opts = SIG_OPTS,
@@ -633,7 +633,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Int_replace_polymorphic_compare",
     struct = "int_replace_polymorphic_compare.ml",
     sig    = "Int_replace_polymorphic_compare_cmi",
@@ -648,14 +648,14 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Int_replace_polymorphic_compare_cmi",
     src  = "int_replace_polymorphic_compare.mli",
     opts = SIG_OPTS,
     deps   = ["//stdlib:Stdlib"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Lazy_backtrack",
     struct = "lazy_backtrack.ml",
     sig    = "Lazy_backtrack_cmi",
@@ -669,7 +669,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Lazy_backtrack_cmi",
     src  = "lazy_backtrack.mli",
     opts = SIG_OPTS,
@@ -679,7 +679,7 @@ baseline_signature(
     visibility = ["//typing:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Load_path",
     struct = "load_path.ml",
     sig    = "Load_path_cmi",
@@ -708,7 +708,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Load_path_cmi",
     src  = "load_path.mli",
     opts = SIG_OPTS,
@@ -717,7 +717,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Local_store",
     struct = "local_store.ml",
     sig    = "Local_store_cmi",
@@ -733,7 +733,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Local_store_cmi",
     src  = "local_store.mli",
     opts = SIG_OPTS,
@@ -742,7 +742,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Misc",
     struct = "misc.ml",
     sig    = "Misc_cmi",
@@ -787,7 +787,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Misc_cmi",
     src  = "misc.mli",
     opts = SIG_OPTS,
@@ -807,7 +807,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Numbers",
     struct = "numbers.ml",
     sig    = "Numbers_cmi",
@@ -832,7 +832,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Numbers_cmi",
     src  = "numbers.mli",
     opts = SIG_OPTS,
@@ -845,7 +845,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Profile",
     struct = "profile.ml",
     sig    = "Profile_cmi",
@@ -873,7 +873,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Profile_cmi",
     src  = "profile.mli",
     opts = SIG_OPTS,
@@ -882,7 +882,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Strongly_connected_components",
     struct = "strongly_connected_components.ml",
     sig    = "Strongly_connected_components_cmi",
@@ -901,7 +901,7 @@ baseline_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Strongly_connected_components_cmi",
     src  = "strongly_connected_components.mli",
     opts = SIG_OPTS,
@@ -913,7 +913,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Targetint",
     struct = "targetint.ml",
     sig    = "Targetint_cmi",
@@ -929,7 +929,7 @@ baseline_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Targetint_cmi",
     src  = "targetint.mli",
     opts = SIG_OPTS,
@@ -939,7 +939,7 @@ baseline_signature(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Terminfo",
     struct = "terminfo.ml",
     sig    = "Terminfo_cmi",
@@ -955,14 +955,14 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Terminfo_cmi",
     src  = "terminfo.mli",
     opts = SIG_OPTS,
     deps   = ["//stdlib:Stdlib_cmi"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Warnings",
     struct = "warnings.ml",
     sig    = "Warnings_cmi",
@@ -994,7 +994,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Warnings_cmi",
     src  = "warnings.mli",
     opts = SIG_OPTS,

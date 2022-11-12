@@ -1,9 +1,9 @@
 ## GENERATED FILE ##
 
 load("//bzl:rules.bzl",
-     "baseline_module",
+     "stdlib_module",
      "bootstrap_ns_library",
-     "baseline_signature",
+     "stdlib_signature",
      "ocaml_library",
      # "ocaml_module",
      "ocaml_ns_archive",
@@ -142,7 +142,7 @@ bootstrap_ns_library(
     # ]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Arg",
     struct = "arg.ml",
     sig    = "Arg_cmi",
@@ -159,7 +159,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Arg_cmi",
     src  = "arg.mli",
     opts = SIG_OPTS,
@@ -175,7 +175,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Array",
     struct = "array.ml",
     sig    = "Array_cmi",
@@ -187,7 +187,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Array_cmi",
     src  = "array.mli",
     opts = SIG_OPTS,
@@ -198,7 +198,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "ArrayLabels",
     struct = "arrayLabels.ml",
     sig    = "ArrayLabels_cmi",
@@ -220,7 +220,7 @@ genrule(
     ]),
 )
 
-baseline_signature(
+stdlib_signature(
     name = "ArrayLabels_cmi",
     src  = "arrayLabels.mli",
     opts = SIG_OPTS,
@@ -230,7 +230,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Atomic",
     struct = "atomic.ml",
     sig    = "Atomic_cmi",
@@ -241,7 +241,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Atomic_cmi",
     src  = "atomic.mli",
     opts = SIG_OPTS,
@@ -251,7 +251,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Bigarray",
     struct = "bigarray.ml",
     sig    = "Bigarray_cmi",
@@ -269,7 +269,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Bigarray_cmi",
     src  = "bigarray.mli",
     opts = SIG_OPTS,
@@ -284,7 +284,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Bool",
     struct = "bool.ml",
     sig    = "Bool_cmi",
@@ -295,7 +295,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Bool_cmi",
     src  = "bool.mli",
     opts = SIG_OPTS,
@@ -305,7 +305,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Buffer",
     struct = "buffer.ml",
     sig    = "Buffer_cmi",
@@ -325,7 +325,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Buffer_cmi",
     src  = "buffer.mli",
     opts = SIG_OPTS,
@@ -337,7 +337,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Bytes",
     struct = "bytes.ml",
     sig    = "Bytes_cmi",
@@ -352,7 +352,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Bytes_cmi",
     src  = "bytes.mli",
     opts = SIG_OPTS,
@@ -364,7 +364,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "BytesLabels",
     struct = "bytesLabels.ml",
     sig    = "BytesLabels_cmi",
@@ -375,7 +375,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "BytesLabels_cmi",
     src  = "bytesLabels.mli",
     opts = SIG_OPTS,
@@ -385,7 +385,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Callback",
     struct = "callback.ml",
     sig    = "Callback_cmi",
@@ -396,7 +396,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Callback_cmi",
     src  = "callback.mli",
     opts = SIG_OPTS,
@@ -417,7 +417,7 @@ baseline_signature(
 # They depend on other subcomponents, but since they are not renamed
 # such deps must not be listed; instead just list :Stdlib.
 
-baseline_module(
+stdlib_module(
     name   = "CamlinternalAtomic",
     struct = "camlinternalAtomic.ml",
     sig    = "CamlinternalAtomic_cmi",
@@ -425,14 +425,14 @@ baseline_module(
     # deps   = []
 )
 
-baseline_signature(
+stdlib_signature(
     name = "CamlinternalAtomic_cmi",
     src  = "camlinternalAtomic.mli",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
     # deps   = []
 )
 
-baseline_module(
+stdlib_module(
     name   = "CamlinternalFormat",
     struct = "camlinternalFormat.ml",
     sig    = "CamlinternalFormat_cmi",
@@ -451,7 +451,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "CamlinternalFormat_cmi",
     src  = "camlinternalFormat.mli",
     opts = CAMLINTERNAL_OPTS + [
@@ -490,7 +490,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "CamlinternalFormatBasics",
     struct = "camlinternalFormatBasics.ml",
     sig    = "CamlinternalFormatBasics_cmi",
@@ -498,14 +498,14 @@ baseline_module(
     # deps   = []
 )
 
-baseline_signature(
+stdlib_signature(
     name = "CamlinternalFormatBasics_cmi",
     src  = "camlinternalFormatBasics.mli",
     opts = CAMLINTERNAL_OPTS + ["-nopervasives"],
     # deps   = []
 )
 
-baseline_module(
+stdlib_module(
     name   = "CamlinternalLazy",
     struct = "camlinternalLazy.ml",
     sig    = "CamlinternalLazy_cmi",
@@ -518,7 +518,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "CamlinternalLazy_cmi",
     src  = "camlinternalLazy.mli",
     # does not refer to any modules, but Stdlib is opened
@@ -531,7 +531,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "CamlinternalMod",
     struct = "camlinternalMod.ml",
     sig    = "CamlinternalMod_cmi",
@@ -546,7 +546,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "CamlinternalMod_cmi",
     src  = "camlinternalMod.mli",
     opts = CAMLINTERNAL_OPTS,
@@ -557,7 +557,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "CamlinternalOO",
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
@@ -575,7 +575,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "CamlinternalOO_cmi",
     src  = "camlinternalOO.mli",
     opts = CAMLINTERNAL_OPTS + ["-no-alias-deps"],
@@ -586,7 +586,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Char",
     struct = "char.ml",
     sig    = "Char_cmi",
@@ -595,7 +595,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Char_cmi",
     src  = "char.mli",
     opts = SIG_OPTS,
@@ -605,7 +605,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Complex",
     struct = "complex.ml",
     sig    = "Complex_cmi",
@@ -614,7 +614,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Complex_cmi",
     src  = "complex.mli",
     opts = SIG_OPTS,
@@ -624,7 +624,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Digest",
     struct = "digest.ml",
     sig    = "Digest_cmi",
@@ -637,7 +637,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Digest_cmi",
     src  = "digest.mli",
     opts = SIG_OPTS,
@@ -648,7 +648,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Either",
     struct = "either.ml",
     sig    = "Either_cmi",
@@ -658,7 +658,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Either_cmi",
     src  = "either.mli",
     opts = SIG_OPTS,
@@ -668,7 +668,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Ephemeron",
     struct = "ephemeron.ml",
     sig    = "Ephemeron_cmi",
@@ -686,7 +686,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Ephemeron_cmi",
     src  = "ephemeron.mli",
     opts = SIG_OPTS,
@@ -697,7 +697,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Filename",
     struct = "filename.ml",
     sig    = "Filename_cmi",
@@ -714,7 +714,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Filename_cmi",
     src  = "filename.mli",
     opts = SIG_OPTS,
@@ -724,7 +724,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Float",
     struct = "float.ml",
     sig    = "Float_cmi",
@@ -738,7 +738,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Float_cmi",
     src  = "float.mli",
     opts = SIG_OPTS,
@@ -749,7 +749,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Format",
     struct = "format.ml",
     sig    = "Format_cmi",
@@ -771,7 +771,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Format_cmi",
     src  = "format.mli",
     opts = SIG_OPTS + ["-w", "+A", "-w", "-fragile-match"],
@@ -784,7 +784,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Fun",
     struct = "fun.ml",
     sig    = "Fun_cmi",
@@ -795,7 +795,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Fun_cmi",
     src  = "fun.mli",
     opts = SIG_OPTS,
@@ -805,7 +805,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Gc",
     struct = "gc.ml",
     sig    = "Gc_cmi",
@@ -819,7 +819,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Gc_cmi",
     src  = "gc.mli",
     opts = SIG_OPTS,
@@ -829,7 +829,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Genlex",
     struct = "genlex.ml",
     sig    = "Genlex_cmi",
@@ -845,7 +845,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Genlex_cmi",
     src  = "genlex.mli",
     opts = SIG_OPTS,
@@ -856,7 +856,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Hashtbl",
     struct = "hashtbl.ml",
     sig    = "Hashtbl_cmi",
@@ -877,7 +877,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Hashtbl_cmi",
     src  = "hashtbl.mli",
     opts = SIG_OPTS,
@@ -888,7 +888,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "In_channel",
     struct = "in_channel.ml",
     sig    = "In_channel_cmi",
@@ -899,7 +899,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "In_channel_cmi",
     src  = "in_channel.mli",
     opts = SIG_OPTS,
@@ -909,7 +909,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Int",
     struct = "int.ml",
     sig    = "Int_cmi",
@@ -920,7 +920,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Int_cmi",
     src  = "int.mli",
     opts = SIG_OPTS,
@@ -930,7 +930,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Int32",
     struct = "int32.ml",
     sig    = "Int32_cmi",
@@ -942,7 +942,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Int32_cmi",
     src  = "int32.mli",
     opts = SIG_OPTS + ["-no-alias-deps"],
@@ -953,7 +953,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Int64",
     struct = "int64.ml",
     sig    = "Int64_cmi",
@@ -964,7 +964,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Int64_cmi",
     src  = "int64.mli",
     opts = SIG_OPTS,
@@ -974,7 +974,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Lazy",
     struct = "lazy.ml",
     sig    = "Lazy_cmi",
@@ -989,7 +989,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Lazy_cmi",
     src  = "lazy.mli",
     opts = SIG_OPTS,
@@ -999,7 +999,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Lexing",
     struct = "lexing.ml",
     sig    = "Lexing_cmi",
@@ -1014,7 +1014,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Lexing_cmi",
     src  = "lexing.mli",
     opts = SIG_OPTS,
@@ -1024,7 +1024,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "List",
     struct = "list.ml",
     sig    = "List_cmi",
@@ -1037,7 +1037,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "List_cmi",
     src  = "list.mli",
     opts = SIG_OPTS,
@@ -1049,7 +1049,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "ListLabels",
     struct = "listLabels.ml",
     sig    = "ListLabels_cmi",
@@ -1060,7 +1060,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "ListLabels_cmi",
     src  = "listLabels.mli",
     opts = SIG_OPTS,
@@ -1071,7 +1071,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Map",
     struct = "map.ml",
     sig    = "Map_cmi",
@@ -1084,7 +1084,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Map_cmi",
     src  = "map.mli",
     opts = SIG_OPTS,
@@ -1095,7 +1095,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Marshal",
     struct = "marshal.ml",
     sig    = "Marshal_cmi",
@@ -1106,7 +1106,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Marshal_cmi",
     src  = "marshal.mli",
     opts = SIG_OPTS,
@@ -1116,7 +1116,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "MoreLabels",
     struct = "moreLabels.ml",
     sig    = "MoreLabels_cmi",
@@ -1129,7 +1129,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "MoreLabels_cmi",
     src  = "moreLabels.mli",
     opts = SIG_OPTS,
@@ -1144,7 +1144,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Nativeint",
     struct = "nativeint.ml",
     sig    = "Nativeint_cmi",
@@ -1156,7 +1156,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Nativeint_cmi",
     src  = "nativeint.mli",
     opts = SIG_OPTS,
@@ -1167,7 +1167,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Obj",
     struct = "obj.ml",
     sig    = "Obj_cmi",
@@ -1180,7 +1180,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Obj_cmi",
     src  = "obj.mli",
     opts = SIG_OPTS,
@@ -1191,7 +1191,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Oo",
     struct = "oo.ml",
     sig    = "Oo_cmi",
@@ -1202,7 +1202,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Oo_cmi",
     src  = "oo.mli",
     opts = SIG_OPTS + ["-no-principal"],
@@ -1212,7 +1212,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Option",
     struct = "option.ml",
     sig    = "Option_cmi",
@@ -1224,7 +1224,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Option_cmi",
     src  = "option.mli",
     opts = SIG_OPTS,
@@ -1235,7 +1235,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Out_channel",
     struct = "out_channel.ml",
     sig    = "Out_channel_cmi",
@@ -1246,7 +1246,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Out_channel_cmi",
     src  = "out_channel.mli",
     opts = SIG_OPTS,
@@ -1256,7 +1256,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Parsing",
     struct = "parsing.ml",
     sig    = "Parsing_cmi",
@@ -1269,7 +1269,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Parsing_cmi",
     src  = "parsing.mli",
     opts = SIG_OPTS,
@@ -1280,7 +1280,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Pervasives",
     struct = "pervasives.ml",
     opts = MODULE_OPTS,
@@ -1292,7 +1292,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Printexc",
     struct = "printexc.ml",
     sig    = "Printexc_cmi",
@@ -1308,7 +1308,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Printexc_cmi",
     src  = "printexc.mli",
     opts = SIG_OPTS,
@@ -1318,7 +1318,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Printf",
     struct = "printf.ml",
     sig    = "Printf_cmi",
@@ -1331,7 +1331,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Printf_cmi",
     src  = "printf.mli",
     opts = SIG_OPTS + ["-w", "+A", "-w", "-fragile-match"],
@@ -1341,7 +1341,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Queue",
     struct = "queue.ml",
     sig    = "Queue_cmi",
@@ -1353,7 +1353,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Queue_cmi",
     src  = "queue.mli",
     opts = SIG_OPTS,
@@ -1364,7 +1364,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Random",
     struct = "random.ml",
     sig    = "Random_cmi",
@@ -1383,7 +1383,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Random_cmi",
     src  = "random.mli",
     opts = SIG_OPTS,
@@ -1395,7 +1395,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Result",
     struct = "result.ml",
     sig    = "Result_cmi",
@@ -1407,7 +1407,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Result_cmi",
     src  = "result.mli",
     opts = SIG_OPTS,
@@ -1418,7 +1418,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Scanf",
     struct = "scanf.ml",
     sig    = "Scanf_cmi",
@@ -1440,7 +1440,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name  = "Scanf_cmi",
     src   = "scanf.mli",
     opts  = SIG_OPTS + [
@@ -1454,7 +1454,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Seq",
     struct = "seq.ml",
     sig    = "Seq_cmi",
@@ -1462,14 +1462,14 @@ baseline_module(
     # deps   = []
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Seq_cmi",
     src  = "seq.mli",
     opts = SIG_OPTS,
     # deps   = []
 )
 
-baseline_module(
+stdlib_module(
     name   = "Set",
     struct = "set.ml",
     sig    = "Set_cmi",
@@ -1481,7 +1481,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Set_cmi",
     src  = "set.mli",
     opts = SIG_OPTS,
@@ -1491,7 +1491,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Stack",
     struct = "stack.ml",
     sig    = "Stack_cmi",
@@ -1503,7 +1503,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Stack_cmi",
     src  = "stack.mli",
     opts = SIG_OPTS,
@@ -1513,7 +1513,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "StdLabels",
     struct = "stdLabels.ml",
     sig    = "StdLabels_cmi",
@@ -1527,7 +1527,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "StdLabels_cmi",
     src  = "stdLabels.mli",
     opts = SIG_OPTS,
@@ -1546,7 +1546,7 @@ baseline_signature(
 
 # ../boot/ocamlrun ../ocamlopt -strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 -g -warn-error +A -bin-annot -nostdlib -principal -safe-string -strict-formats    -c std_exit.ml
 
-baseline_module(
+stdlib_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
     opts = MODULE_OPTS + ["-use-prims", "../runtime/primitives"],
@@ -1578,7 +1578,7 @@ genrule(
     ]),
 )
 
-baseline_module(
+stdlib_module(
     name   = "Stdlib",
     visibility = ["//visibility:public"],
     struct = "x/stdlib.ml",
@@ -1604,7 +1604,7 @@ genrule(
     ]),
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Stdlib_cmi",
     src  = "x/stdlib.mli",
     opts = SIG_OPTS + [
@@ -1617,7 +1617,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Stream",
     struct = "stream.ml",
     sig    = "Stream_cmi",
@@ -1632,7 +1632,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Stream_cmi",
     src  = "stream.mli",
     opts = SIG_OPTS,
@@ -1642,7 +1642,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "String",
     struct = "string.ml",
     sig    = "String_cmi",
@@ -1654,7 +1654,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "String_cmi",
     src  = "string.mli",
     opts = SIG_OPTS,
@@ -1664,7 +1664,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "StringLabels",
     struct = "stringLabels.ml",
     sig    = "StringLabels_cmi",
@@ -1675,7 +1675,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "StringLabels_cmi",
     src  = "stringLabels.mli",
     opts = SIG_OPTS,
@@ -1685,7 +1685,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Sys",
     struct = "sys.ml",
     sig    = "Sys_cmi",
@@ -1696,7 +1696,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Sys_cmi",
     src  = "sys.mli",
     opts = SIG_OPTS,
@@ -1706,7 +1706,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Uchar",
     struct = "uchar.ml",
     sig    = "Uchar_cmi",
@@ -1718,7 +1718,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Uchar_cmi",
     src  = "uchar.mli",
     opts = SIG_OPTS,
@@ -1729,7 +1729,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Unit",
     struct = "unit.ml",
     sig    = "Unit_cmi",
@@ -1739,7 +1739,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Unit_cmi",
     src  = "unit.mli",
     opts = SIG_OPTS,
@@ -1749,7 +1749,7 @@ baseline_signature(
     data = ["//runtime:primitives"]
 )
 
-baseline_module(
+stdlib_module(
     name   = "Weak",
     struct = "weak.ml",
     sig    = "Weak_cmi",
@@ -1765,7 +1765,7 @@ baseline_module(
     data = ["//runtime:primitives"]
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Weak_cmi",
     src  = "weak.mli",
     opts = SIG_OPTS,

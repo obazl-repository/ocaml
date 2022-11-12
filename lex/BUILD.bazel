@@ -1,8 +1,8 @@
 load("//bzl:rules.bzl",
      "boot_executable",
-     "baseline_module",
+     "compiler_module",
      "boot_lexer",
-     "baseline_signature",
+     "compiler_signature",
      "boot_library",
 )
 
@@ -101,7 +101,7 @@ boot_library(
     visibility = ["//boot:__subpackages__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Common",
     struct = "common.ml",
     sig    = "Common_cmi",
@@ -117,7 +117,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Common_cmi",
     src  = "common.mli",
     opts = SIG_OPTS,
@@ -127,7 +127,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Compact",
     struct = "compact.ml",
     sig    = "Compact_cmi",
@@ -141,7 +141,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Compact_cmi",
     src  = "compact.mli",
     opts = SIG_OPTS,
@@ -151,7 +151,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Cset",
     struct = "cset.ml",
     sig    = "Cset_cmi",
@@ -163,7 +163,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cset_cmi",
     src  = "cset.mli",
     opts = SIG_OPTS,
@@ -171,7 +171,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Lexer",
     struct = "lexer.ml",
     sig    = "Lexer_cmi",
@@ -188,7 +188,7 @@ boot_lexer(
     src  = "lexer.mll"
 )
 
-baseline_signature(
+compiler_signature(
     name = "Lexer_cmi",
     src  = "lexer.mli",
     opts = SIG_OPTS,
@@ -197,7 +197,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Lexgen",
     struct = "lexgen.ml",
     sig    = "Lexgen_cmi",
@@ -219,7 +219,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Lexgen_cmi",
     src  = "lexgen.mli",
     opts = SIG_OPTS,
@@ -228,7 +228,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Main",
     struct = "main.ml",
     sig    = "Main_cmi",
@@ -253,7 +253,7 @@ baseline_module(
     visibility = ["//boot:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Main_cmi",
     src  = "main.mli",
     opts = SIG_OPTS,
@@ -265,7 +265,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Output",
     struct = "output.ml",
     sig    = "Output_cmi",
@@ -282,7 +282,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Output_cmi",
     src  = "output.mli",
     opts = SIG_OPTS,
@@ -294,7 +294,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Outputbis",
     struct = "outputbis.ml",
     sig    = "Outputbis_cmi",
@@ -311,7 +311,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Outputbis_cmi",
     src  = "outputbis.mli",
     opts = SIG_OPTS,
@@ -322,7 +322,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Parser",
     struct = "parser.ml",
     sig    = ":Parser_cmi",
@@ -336,7 +336,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Parser_cmi",
     src  = "parser.mli",
     opts = SIG_OPTS,
@@ -361,7 +361,7 @@ genrule(
     ])
 )
 
-baseline_module(
+compiler_module(
     name   = "Syntax",
     struct = "syntax.ml",
     sig    = "Syntax_cmi",
@@ -371,7 +371,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Syntax_cmi",
     src  = "syntax.mli",
     opts = SIG_OPTS,
@@ -380,7 +380,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Table",
     struct = "table.ml",
     sig    = "Table_cmi",
@@ -390,7 +390,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Table_cmi",
     src  = "table.mli",
     opts = SIG_OPTS,

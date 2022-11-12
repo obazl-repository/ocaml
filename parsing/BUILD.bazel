@@ -9,9 +9,9 @@
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
-     "baseline_module",
+     "compiler_module",
      "boot_lexer",
-     "baseline_signature",
+     "compiler_signature",
 )
 
 MODULE_OPTS = []
@@ -87,7 +87,7 @@ boot_library(
 )
 
 ################################################################
-baseline_module(
+compiler_module(
     name   = "Ast_helper",
     struct = "ast_helper.ml",
     sig    = "Ast_helper_cmi",
@@ -112,7 +112,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Ast_helper_cmi",
     src  = "ast_helper.mli",
     opts = SIG_OPTS,
@@ -126,7 +126,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Ast_invariants",
     struct = "ast_invariants.ml",
     sig    = "Ast_invariants_cmi",
@@ -141,7 +141,7 @@ baseline_module(
     visibility = ["//driver:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Ast_invariants_cmi",
     src  = "ast_invariants.mli",
     opts = SIG_OPTS,
@@ -154,7 +154,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Ast_iterator",
     struct = "ast_iterator.ml",
     sig    = "Ast_iterator_cmi",
@@ -169,7 +169,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Ast_iterator_cmi",
     src  = "ast_iterator.mli",
     opts = SIG_OPTS,
@@ -181,7 +181,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Ast_mapper",
     struct = "ast_mapper.ml",
     sig    = "Ast_mapper_cmi",
@@ -208,7 +208,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Ast_mapper_cmi",
     src  = "ast_mapper.mli",
     opts = SIG_OPTS,
@@ -221,7 +221,7 @@ baseline_signature(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Asttypes_cmi",
     src  = "asttypes.mli",
     opts = SIG_OPTS,
@@ -241,7 +241,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Attr_helper",
     struct = "attr_helper.ml",
     sig    = "Attr_helper_cmi",
@@ -257,7 +257,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Attr_helper_cmi",
     src  = "attr_helper.mli",
     opts = SIG_OPTS,
@@ -270,7 +270,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Builtin_attributes",
     struct = "builtin_attributes.ml",
     sig    = "Builtin_attributes_cmi",
@@ -293,7 +293,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Builtin_attributes_cmi",
     src  = "builtin_attributes.mli",
     opts = SIG_OPTS,
@@ -307,7 +307,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Depend",
     struct = "depend.ml",
     sig    = "Depend_cmi",
@@ -324,7 +324,7 @@ baseline_module(
     visibility = ["//driver:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Depend_cmi",
     src  = "depend.mli",
     opts = SIG_OPTS,
@@ -338,7 +338,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Docstrings",
     struct = "docstrings.ml",
     sig    = "Docstrings_cmi",
@@ -356,7 +356,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Docstrings_cmi",
     src  = "docstrings.mli",
     opts = SIG_OPTS,
@@ -370,7 +370,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "CamlinternalMenhirLib",
     struct = "camlinternalMenhirLib.ml",
     # struct = "//boot/menhir:menhirLib.ml",
@@ -394,7 +394,7 @@ genrule(
     ])
 )
 
-baseline_signature(
+compiler_signature(
     name   = "CamlinternalMenhirLib_cmi",
     src    = "camlinternalMenhirLib.mli",
     opts = SIG_OPTS,
@@ -414,7 +414,7 @@ genrule(
     ])
 )
 
-baseline_module(
+compiler_module(
     name   = "Lexer",
     struct = "lexer.ml",
     sig    = "Lexer_cmi",
@@ -437,7 +437,7 @@ boot_lexer(
     src  = "lexer.mll"
 )
 
-baseline_signature(
+compiler_signature(
     name = "Lexer_cmi",
     src  = "lexer.mli",
     opts = SIG_OPTS,
@@ -446,7 +446,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Location",
     struct = "location.ml",
     sig    = "Location_cmi",
@@ -484,7 +484,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Location_cmi",
     src  = "location.mli",
     opts = SIG_OPTS,
@@ -497,7 +497,7 @@ baseline_signature(
     visibility = ["//lambda:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Longident",
     struct = "longident.ml",
     sig    = "Longident_cmi",
@@ -517,7 +517,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Longident_cmi",
     src  = "longident.mli",
     opts = SIG_OPTS,
@@ -527,7 +527,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Parse",
     struct = "parse.ml",
     sig    = "Parse_cmi",
@@ -550,7 +550,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Parse_cmi",
     src  = "parse.mli",
     opts = SIG_OPTS,
@@ -563,7 +563,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Parser",
     struct = "parser.ml",
     sig    = "Parser_cmi",
@@ -599,7 +599,7 @@ genrule(
     ])
 )
 
-baseline_signature(
+compiler_signature(
     name = "Parser_cmi",
     src  = "parser.mli",
     opts = SIG_OPTS,
@@ -622,7 +622,7 @@ genrule(
     ])
 )
 
-baseline_signature(
+compiler_signature(
     name = "Parsetree_cmi",
     src  = "parsetree.mli",
     opts = SIG_OPTS,
@@ -642,7 +642,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Pprintast",
     struct = "pprintast.ml",
     sig    = "Pprintast_cmi",
@@ -664,7 +664,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Pprintast_cmi",
     src  = "pprintast.mli",
     opts = SIG_OPTS,
@@ -677,7 +677,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Printast",
     struct = "printast.ml",
     sig    = "Printast_cmi",
@@ -701,7 +701,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printast_cmi",
     src  = "printast.mli",
     opts = SIG_OPTS,
@@ -714,7 +714,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Syntaxerr",
     struct = "syntaxerr.ml",
     sig    = "Syntaxerr_cmi",
@@ -730,7 +730,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Syntaxerr_cmi",
     src  = "syntaxerr.mli",
     opts = SIG_OPTS,

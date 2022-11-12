@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
      "boot_library",
-     "baseline_module",
-     "baseline_signature",
+     "compiler_module",
+     "compiler_signature",
 )
 
 exports_files([
@@ -28,7 +28,7 @@ boot_library(
 
 ## FIXME: convert to namespace Ocaml (or Menhir or something)
 
-baseline_module(
+compiler_module(
     name   = "MenhirLib",
     struct = "menhirLib.ml",
     sig    = "MenhirLib_cmi",
@@ -48,7 +48,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "MenhirLib_cmi",
     src  = "menhirLib.mli",
     opts = SIG_OPTS,
@@ -59,7 +59,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Parser",
     struct = "parser.ml",
     sig    = "Parser_cmi",
@@ -109,7 +109,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Parser_cmi",
     src  = "parser.mli",
     opts = SIG_OPTS,

@@ -1,8 +1,8 @@
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
-     "baseline_module",
-     "baseline_signature",
+     "compiler_module",
+     "compiler_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -76,7 +76,7 @@ boot_library(
 # )
 
 ################################################################
-baseline_module(
+compiler_module(
     name   = "Compenv",
     struct = "compenv.ml",
     sig    = "Compenv_cmi",
@@ -107,7 +107,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Compenv_cmi",
     src  = "compenv.mli",
     opts = SIG_OPTS,
@@ -118,7 +118,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Compile",
     struct = "compile.ml",
     sig    = "Compile_cmi",
@@ -139,7 +139,7 @@ baseline_module(
     visibility = ["//bytecomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Compile_cmi",
     src  = "compile.mli",
     opts = SIG_OPTS,
@@ -152,7 +152,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Compile_common",
     struct = "compile_common.ml",
     sig    = "Compile_common_cmi",
@@ -184,7 +184,7 @@ baseline_module(
     visibility = ["//bytecomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Compile_common_cmi",
     src  = "compile_common.mli",
     opts = SIG_OPTS,
@@ -196,7 +196,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Compmisc",
     struct = "compmisc.ml",
     sig    = "Compmisc_cmi",
@@ -225,7 +225,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Compmisc_cmi",
     src  = "compmisc.mli",
     opts = SIG_OPTS,
@@ -236,7 +236,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Errors",
     struct = "errors.ml",
     sig    = "Errors_cmi",
@@ -247,7 +247,7 @@ baseline_module(
     visibility = ["//bytecomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Errors_cmi",
     src  = "errors.mli",
     opts = SIG_OPTS,
@@ -256,7 +256,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Main",
     struct = "main.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -272,7 +272,7 @@ baseline_module(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Main_args",
     struct = "main_args.ml",
     sig    = "Main_args_cmi",
@@ -303,7 +303,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Main_args_cmi",
     src  = "main_args.mli",
     opts = SIG_OPTS,
@@ -312,7 +312,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Maindriver",
     struct = "maindriver.ml",
     sig    = "Maindriver_cmi",
@@ -343,7 +343,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Maindriver_cmi",
     src  = "maindriver.mli",
     opts = SIG_OPTS,
@@ -352,7 +352,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Makedepend",
     struct = "makedepend.ml",
     sig    = "Makedepend_cmi",
@@ -386,7 +386,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Makedepend_cmi",
     src  = "makedepend.mli",
     opts = SIG_OPTS,
@@ -396,7 +396,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Optcompile",
     struct = "optcompile.ml",
     sig    = "Optcompile_cmi",
@@ -419,7 +419,7 @@ baseline_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Optcompile_cmi",
     src  = "optcompile.mli",
     opts = SIG_OPTS,
@@ -431,7 +431,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Opterrors",
     struct = "opterrors.ml",
     sig    = "Opterrors_cmi",
@@ -442,7 +442,7 @@ baseline_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Opterrors_cmi",
     src  = "opterrors.mli",
     opts = SIG_OPTS,
@@ -451,7 +451,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Optmain",
     struct = "optmain.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -466,7 +466,7 @@ baseline_module(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Optmaindriver",
     struct = "optmaindriver.ml",
     sig    = "Optmaindriver_cmi",
@@ -501,7 +501,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Optmaindriver_cmi",
     src  = "optmaindriver.mli",
     opts = SIG_OPTS,
@@ -511,7 +511,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Pparse",
     struct = "pparse.ml",
     sig    = "Pparse_cmi",
@@ -542,7 +542,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Pparse_cmi",
     src  = "pparse.mli",
     opts = SIG_OPTS,

@@ -1,8 +1,8 @@
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
-     "baseline_module",
-     "baseline_signature",
+     "compiler_module",
+     "compiler_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -143,7 +143,7 @@ boot_library(
 )
 
 ################################################################
-baseline_module(
+compiler_module(
     name   = "Bytegen",
     struct = "bytegen.ml",
     sig    = "Bytegen_cmi",
@@ -174,7 +174,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Bytegen_cmi",
     src  = "bytegen.mli",
     opts = SIG_OPTS,
@@ -184,7 +184,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Bytelibrarian",
     struct = "bytelibrarian.ml",
     sig    = "Bytelibrarian_cmi",
@@ -206,7 +206,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Bytelibrarian_cmi",
     src  = "bytelibrarian.mli",
     opts = SIG_OPTS,
@@ -216,7 +216,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Bytelink",
     struct = "bytelink.ml",
     sig    = "Bytelink_cmi",
@@ -254,7 +254,7 @@ baseline_module(
     ## "//stdlib:camlheader"
 )
 
-baseline_signature(
+compiler_signature(
     name = "Bytelink_cmi",
     src  = "bytelink.mli",
     opts = SIG_OPTS,
@@ -266,7 +266,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Bytepackager",
     struct = "bytepackager.ml",
     sig    = "Bytepackager_cmi",
@@ -296,7 +296,7 @@ baseline_module(
     visibility = ["//driver:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Bytepackager_cmi",
     src  = "bytepackager.mli",
     opts = SIG_OPTS,
@@ -308,7 +308,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Bytesections",
     struct = "bytesections.ml",
     sig    = "Bytesections_cmi",
@@ -325,7 +325,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Bytesections_cmi",
     src  = "bytesections.mli",
     opts = SIG_OPTS,
@@ -335,7 +335,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Dll",
     struct = "dll.ml",
     sig    = "Dll_cmi",
@@ -357,7 +357,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Dll_cmi",
     src  = "dll.mli",
     opts = SIG_OPTS,
@@ -368,7 +368,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Emitcode",
     struct = "emitcode.ml",
     sig    = "Emitcode_cmi",
@@ -402,7 +402,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Emitcode_cmi",
     src  = "emitcode.mli",
     opts = SIG_OPTS,
@@ -415,7 +415,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Instruct",
     struct = "instruct.ml",
     sig    = "Instruct_cmi",
@@ -434,7 +434,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Instruct_cmi",
     src  = "instruct.mli",
     opts = SIG_OPTS,
@@ -452,7 +452,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Meta",
     struct = "meta.ml",
     sig    = "Meta_cmi",
@@ -467,7 +467,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Meta_cmi",
     src  = "meta.mli",
     opts = SIG_OPTS,
@@ -487,7 +487,7 @@ baseline_signature(
 # -w +a-4-9-40-41-42-44-45-48
 # -warn-error +a
 # -bin-annot -strict-formats
-baseline_module(
+compiler_module(
     name   = "Opcodes",
     struct = "opcodes.ml",
     # sig    = ":Opcodes_cmi",
@@ -547,7 +547,7 @@ genrule(
 # the rules don't seem to work for that
 # but we can just compile the ml file without an mli file, no?
 
-# baseline_signature(
+# compiler_signature(
 #     name = "opcodes_mli",
 #     src  = "opcodes.ml",
 #     opts = SIG_OPTS,
@@ -576,7 +576,7 @@ genrule(
 #     ])
 # )
 
-baseline_module(
+compiler_module(
     name   = "Printinstr",
     struct = "printinstr.ml",
     sig    = "Printinstr_cmi",
@@ -598,7 +598,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printinstr_cmi",
     src  = "printinstr.mli",
     opts = SIG_OPTS,
@@ -608,7 +608,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Symtable",
     struct = "symtable.ml",
     sig    = "Symtable_cmi",
@@ -644,7 +644,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Symtable_cmi",
     src  = "symtable.mli",
     opts = SIG_OPTS,

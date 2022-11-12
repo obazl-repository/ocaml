@@ -1,9 +1,19 @@
-load("//bzl/rules/common:signature_impl.bzl", "signature_impl")
-load("//bzl/rules/common:signature_intf.bzl", "signature_attrs")
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
+load("//bzl/actions:signature_impl.bzl", "signature_impl")
+load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
+
+################################################################
+def _compiler_signature(ctx):
+
+    (this, extension) = paths.split_extension(ctx.file.src.basename)
+    module_name = this[:1].capitalize() + this[1:]
+
+    return signature_impl(ctx, module_name)
 
 #######################
-baseline_signature = rule(
-    implementation = signature_impl,
+compiler_signature = rule(
+    implementation = _compiler_signature,
     doc = "Sig rule for bootstrapping ocaml compilers",
     exec_groups = {
         "boot": exec_group(
@@ -25,7 +35,7 @@ baseline_signature = rule(
             default = "//stdlib:Stdlib"
         ),
 
-        _rule = attr.string( default = "baseline_signature" ),
+        _rule = attr.string( default = "compiler_signature" ),
     ),
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,

@@ -9,8 +9,8 @@
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
-     "baseline_module",
-     "baseline_signature",
+     "compiler_module",
+     "compiler_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -183,7 +183,7 @@ boot_library(
 
 
 ################################################################
-baseline_module(
+compiler_module(
     name   = "CSE",
     struct = select({
         ## FIXME: select on xtarget or target host
@@ -207,7 +207,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "CSEgen",
     struct = "CSEgen.ml",
     sig    = "CSEgen_cmi",
@@ -227,7 +227,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "CSEgen_cmi",
     src  = "CSEgen.mli",
     opts = SIG_OPTS,
@@ -238,7 +238,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Afl_instrument",
     struct = "afl_instrument.ml",
     sig    = "Afl_instrument_cmi",
@@ -256,7 +256,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Afl_instrument_cmi",
     src  = "afl_instrument.mli",
     opts = SIG_OPTS,
@@ -267,7 +267,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Arch",
     struct = select({
         "//config/arch:x86_64": "//asmcomp/amd64:arch.ml",
@@ -284,7 +284,7 @@ baseline_module(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Asmgen",
     struct = "asmgen.ml",
     sig    = "Asmgen_cmi",
@@ -334,7 +334,7 @@ baseline_module(
     visibility = ["//driver:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Asmgen_cmi",
     src  = "asmgen.mli",
     opts = SIG_OPTS,
@@ -347,7 +347,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Asmlibrarian",
     struct = "asmlibrarian.ml",
     sig    = "Asmlibrarian_cmi",
@@ -370,7 +370,7 @@ baseline_module(
     visibility = ["//driver:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Asmlibrarian_cmi",
     src  = "asmlibrarian.mli",
     opts = SIG_OPTS,
@@ -380,7 +380,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Asmlink",
     struct = "asmlink.ml",
     sig    = "Asmlink_cmi",
@@ -413,7 +413,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Asmlink_cmi",
     src  = "asmlink.mli",
     opts = SIG_OPTS,
@@ -426,7 +426,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Asmpackager",
     struct = "asmpackager.ml",
     sig    = "Asmpackager_cmi",
@@ -464,7 +464,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Asmpackager_cmi",
     src  = "asmpackager.mli",
     opts = SIG_OPTS,
@@ -476,7 +476,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Branch_relaxation",
     struct = "branch_relaxation.ml",
     sig    = "Branch_relaxation_cmi",
@@ -489,7 +489,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Branch_relaxation_cmi",
     src  = "branch_relaxation.mli",
     opts = SIG_OPTS,
@@ -499,7 +499,7 @@ baseline_signature(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Branch_relaxation_intf_cmi",
     src  = "branch_relaxation_intf.mli",
     opts = SIG_OPTS,
@@ -510,7 +510,7 @@ baseline_signature(
     # data = ["//runtime:primitives"]
 )
 
-# baseline_module(
+# compiler_module(
 #     name   = "Branch_relaxation_intf",
 #     struct = "branch_relaxation_intf.ml",
 #     opts = MODULE_OPTS,
@@ -522,7 +522,7 @@ baseline_signature(
 #     ],
 # # )
 
-baseline_module(
+compiler_module(
     name   = "Cmm",
     struct = "cmm.ml",
     sig    = "Cmm_cmi",
@@ -543,7 +543,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmm_cmi",
     src  = "cmm.mli",
     opts = SIG_OPTS,
@@ -556,7 +556,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Cmm_helpers",
     struct = "cmm_helpers.ml",
     sig    = "Cmm_helpers_cmi",
@@ -594,7 +594,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmm_helpers_cmi",
     src  = "cmm_helpers.mli",
     opts = SIG_OPTS,
@@ -611,7 +611,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Cmm_invariants",
     struct = "cmm_invariants.ml",
     sig    = "Cmm_invariants_cmi",
@@ -626,7 +626,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmm_invariants_cmi",
     src  = "cmm_invariants.mli",
     opts = SIG_OPTS,
@@ -636,7 +636,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Cmmgen",
     struct = "cmmgen.ml",
     sig    = "Cmmgen_cmi",
@@ -667,7 +667,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmmgen_cmi",
     src  = "cmmgen.mli",
     opts = SIG_OPTS,
@@ -678,7 +678,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Cmmgen_state",
     struct = "cmmgen_state.ml",
     sig    = "Cmmgen_state_cmi",
@@ -694,7 +694,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmmgen_state_cmi",
     src  = "cmmgen_state.mli",
     opts = SIG_OPTS,
@@ -705,7 +705,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Coloring",
     struct = "coloring.ml",
     sig    = "Coloring_cmi",
@@ -723,7 +723,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Coloring_cmi",
     src  = "coloring.mli",
     opts = SIG_OPTS,
@@ -731,7 +731,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Comballoc",
     struct = "comballoc.ml",
     sig    = "Comballoc_cmi",
@@ -747,7 +747,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Comballoc_cmi",
     src  = "comballoc.mli",
     opts = SIG_OPTS,
@@ -757,7 +757,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Dataflow",
     struct = "dataflow.ml",
     sig    = "Dataflow_cmi",
@@ -771,7 +771,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Dataflow_cmi",
     src  = "dataflow.mli",
     opts = SIG_OPTS,
@@ -781,7 +781,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Deadcode",
     struct = "deadcode.ml",
     sig    = "Deadcode_cmi",
@@ -800,7 +800,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Deadcode_cmi",
     src  = "deadcode.mli",
     opts = SIG_OPTS,
@@ -815,7 +815,7 @@ baseline_signature(
 # 	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
 # 	|| { rm -f $@; exit 2; }
 
-baseline_module(
+compiler_module(
     name   = "Emit",
     struct = select({
         "//config/arch:x86_64": "//asmcomp/amd64:emit.ml",
@@ -840,7 +840,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Emit_cmi",
     src  = "emit.mli",
     opts = SIG_OPTS,
@@ -851,7 +851,7 @@ baseline_signature(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Emitaux",
     struct = "emitaux.ml",
     sig    = "Emitaux_cmi",
@@ -877,7 +877,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Emitaux_cmi",
     src  = "emitaux.mli",
     opts = SIG_OPTS,
@@ -890,7 +890,7 @@ baseline_signature(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Emitenv_cmi",
     src  = "emitenv.mli",
     opts = SIG_OPTS,
@@ -900,7 +900,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Interf",
     struct = "interf.ml",
     sig    = "Interf_cmi",
@@ -919,7 +919,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Interf_cmi",
     src  = "interf.mli",
     opts = SIG_OPTS,
@@ -929,7 +929,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Interval",
     struct = "interval.ml",
     sig    = "Interval_cmi",
@@ -946,7 +946,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Interval_cmi",
     src  = "interval.mli",
     opts = SIG_OPTS,
@@ -957,7 +957,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Linear",
     struct = "linear.ml",
     sig    = "Linear_cmi",
@@ -974,7 +974,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Linear_cmi",
     src  = "linear.mli",
     opts = SIG_OPTS,
@@ -987,7 +987,7 @@ baseline_signature(
     visibility = ["//file_formats:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Linearize",
     struct = "linearize.ml",
     sig    = "Linearize_cmi",
@@ -1008,7 +1008,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Linearize_cmi",
     src  = "linearize.mli",
     opts = SIG_OPTS,
@@ -1019,7 +1019,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Linscan",
     struct = "linscan.ml",
     sig    = "Linscan_cmi",
@@ -1036,7 +1036,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Linscan_cmi",
     src  = "linscan.mli",
     opts = SIG_OPTS,
@@ -1045,7 +1045,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Liveness",
     struct = "liveness.ml",
     sig    = "Liveness_cmi",
@@ -1063,7 +1063,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Liveness_cmi",
     src  = "liveness.mli",
     opts = SIG_OPTS,
@@ -1073,7 +1073,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Mach",
     struct = "mach.ml",
     sig    = "Mach_cmi",
@@ -1083,7 +1083,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Mach_cmi",
     src  = "mach.mli",
     opts = SIG_OPTS,
@@ -1092,7 +1092,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Polling",
     struct = "polling.ml",
     sig    = "Polling_cmi",
@@ -1108,7 +1108,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Polling_cmi",
     src  = "polling.mli",
     opts = SIG_OPTS,
@@ -1119,7 +1119,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Printcmm",
     struct = "printcmm.ml",
     sig    = "Printcmm_cmi",
@@ -1138,7 +1138,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printcmm_cmi",
     src  = "printcmm.mli",
     opts = SIG_OPTS,
@@ -1150,7 +1150,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Printlinear",
     struct = "printlinear.ml",
     sig    = "Printlinear_cmi",
@@ -1167,7 +1167,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printlinear_cmi",
     src  = "printlinear.mli",
     opts = SIG_OPTS,
@@ -1178,7 +1178,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Printmach",
     struct = "printmach.ml",
     sig    = "Printmach_cmi",
@@ -1201,7 +1201,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printmach_cmi",
     src  = "printmach.mli",
     opts = SIG_OPTS,
@@ -1212,7 +1212,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Proc",
     struct = select({
         ## supported archs: amd64, arm, arm64, i386, power, riscv, s390x
@@ -1240,7 +1240,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Proc_cmi",
     src  = "proc.mli",
     opts = SIG_OPTS,
@@ -1252,7 +1252,7 @@ baseline_signature(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Reg",
     struct = "reg.ml",
     sig    = "Reg_cmi",
@@ -1270,7 +1270,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Reg_cmi",
     src  = "reg.mli",
     opts = SIG_OPTS,
@@ -1282,7 +1282,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Reload",
     struct = select({
         "//config/arch:x86_64": "//asmcomp/amd64:reload.ml",
@@ -1307,7 +1307,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Reload_cmi",
     src  = "reload.mli",
     opts = SIG_OPTS,
@@ -1317,7 +1317,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Reloadgen",
     struct = "reloadgen.ml",
     sig    = "Reloadgen_cmi",
@@ -1333,7 +1333,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Reloadgen_cmi",
     src  = "reloadgen.mli",
     opts = SIG_OPTS,
@@ -1345,7 +1345,7 @@ baseline_signature(
 )
 
 
-baseline_module(
+compiler_module(
     name   = "Schedgen",
     struct = "schedgen.ml",
     sig    = "Schedgen_cmi",
@@ -1367,7 +1367,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Schedgen_cmi",
     src  = "schedgen.mli",
     opts = SIG_OPTS,
@@ -1378,7 +1378,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Scheduling",
     struct = select({
         "//config/arch:x86_64": "//asmcomp/amd64:scheduling.ml",
@@ -1397,7 +1397,7 @@ baseline_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Scheduling_cmi",
     src  = "scheduling.mli",
     opts = SIG_OPTS,
@@ -1407,7 +1407,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Selection",
     struct = select({
         "//config/arch:x86_64": "//asmcomp/amd64:selection.ml",
@@ -1428,7 +1428,7 @@ baseline_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Selectgen",
     struct = "selectgen.ml",
     sig    = "Selectgen_cmi",
@@ -1458,7 +1458,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Selectgen_cmi",
     src  = "selectgen.mli",
     opts = SIG_OPTS,
@@ -1474,7 +1474,7 @@ baseline_signature(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Selection_cmi",
     src  = "selection.mli",
     opts = SIG_OPTS,
@@ -1485,7 +1485,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Spill",
     struct = "spill.ml",
     sig    = "Spill_cmi",
@@ -1506,7 +1506,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Spill_cmi",
     src  = "spill.mli",
     opts = SIG_OPTS,
@@ -1517,7 +1517,7 @@ baseline_signature(
    ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Split",
     struct = "split.ml",
     sig    = "Split_cmi",
@@ -1532,7 +1532,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Split_cmi",
     src  = "split.mli",
     opts = SIG_OPTS,
@@ -1542,7 +1542,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Strmatch",
     struct = "strmatch.ml",
     sig    = "Strmatch_cmi",
@@ -1563,7 +1563,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Strmatch_cmi",
     src  = "strmatch.mli",
     opts = SIG_OPTS,
@@ -1574,7 +1574,7 @@ baseline_signature(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "X86_ast_cmi",
     src  = "x86_ast.mli",
     opts = SIG_OPTS,
@@ -1582,7 +1582,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "X86_dsl",
     struct = "x86_dsl.ml",
     sig    = "X86_dsl_cmi",
@@ -1594,7 +1594,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "X86_dsl_cmi",
     src  = "x86_dsl.mli",
     opts = SIG_OPTS,
@@ -1603,7 +1603,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "X86_gas",
     struct = "x86_gas.ml",
     sig    = "X86_gas_cmi",
@@ -1621,7 +1621,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "X86_gas_cmi",
     src  = "x86_gas.mli",
     opts = SIG_OPTS,
@@ -1630,7 +1630,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "X86_masm",
     struct = "x86_masm.ml",
     sig    = "X86_masm_cmi",
@@ -1645,7 +1645,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "X86_masm_cmi",
     src  = "x86_masm.mli",
     opts = SIG_OPTS,
@@ -1654,7 +1654,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "X86_proc",
     struct = "x86_proc.ml",
     sig    = "X86_proc_cmi",
@@ -1674,7 +1674,7 @@ baseline_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "X86_proc_cmi",
     src  = "x86_proc.mli",
     opts = SIG_OPTS,

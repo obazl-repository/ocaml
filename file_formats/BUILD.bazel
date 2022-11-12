@@ -1,6 +1,6 @@
 load("//bzl:rules.bzl",
-     "baseline_module",
-     "baseline_signature",
+     "compiler_module",
+     "compiler_signature",
      "boot_library",
 )
 
@@ -43,7 +43,7 @@ boot_library(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Cmi_format",
     struct = "cmi_format.ml",
     sig    = "Cmi_format_cmi",
@@ -64,7 +64,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmi_format_cmi",
     src  = "cmi_format.mli",
     opts = SIG_OPTS,
@@ -81,7 +81,7 @@ baseline_signature(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmo_format_cmi",
     src  = "cmo_format.mli",
     opts = SIG_OPTS,
@@ -98,7 +98,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Cmt_format",
     struct = "cmt_format.ml",
     sig    = "Cmt_format_cmi",
@@ -128,7 +128,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmt_format_cmi",
     src  = "cmt_format.mli",
     opts = SIG_OPTS,
@@ -146,7 +146,7 @@ baseline_signature(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmx_format_cmi",
     src  = "cmx_format.mli",
     opts = SIG_OPTS,
@@ -163,7 +163,7 @@ baseline_signature(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Cmxs_format_cmi",
     src  = "cmxs_format.mli",
     opts = SIG_OPTS,
@@ -178,7 +178,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Linear_format",
     struct = "linear_format.ml",
     sig    = "Linear_format_cmi",
@@ -196,7 +196,7 @@ baseline_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Linear_format_cmi",
     src  = "linear_format.mli",
     opts = SIG_OPTS,

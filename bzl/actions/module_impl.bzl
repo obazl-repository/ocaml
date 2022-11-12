@@ -11,7 +11,10 @@ load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:options.bzl", "get_options")
 
 #####################
-def module_impl(ctx):
+def module_impl(ctx, module_name):
+
+    basename = ctx.label.name
+    from_name = basename[:1].capitalize() + basename[1:]
 
     debug = False
     # if ctx.label.name in ["Stdlib"]:
@@ -85,14 +88,13 @@ def module_impl(ctx):
     # compile action will fail before we can do that, since it's
     # outputs will be in the wrong place.
 
-    module_name = None
     mlifile = None
     cmifile = None
     sig_src = None
 
     ## get_module_name decides if this module is in a namespace
     ## and if so adds ns prefix
-    (from_name, ns, module_name) = get_module_name(ctx, ctx.file.struct)
+    # (from_name, ns, module_name) = get_module_name(ctx, ctx.file.struct)
     # print("module_name: %s" % module_name)
     # print("ns: %s" % ns)
 
@@ -279,22 +281,8 @@ def module_impl(ctx):
     # indirect_ppx_codep_path_depsets = []
     indirect_cc_deps  = {}
 
-    ns_resolver = False
-    ns_resolver_files = []
-    if ctx.attr.ns:
-        ns_resolver = ctx.attr.ns
-        ns_resolver_files = ctx.files.ns
-    # print("NS_RESOLVER: %s" % ns_resolver)
-
-    # paths_direct = [out_cm_.dirname] # d.dirname for d in direct_linkargs]
-    # if ns_resolver:
-    #     paths_direct.extend([f.dirname for f in ns_resolver_files])
-    # print("RESOLVER PATHS: %s" % paths_direct)
-
     #########################
     args = ctx.actions.args()
-
-    args.add("-nostdlib")
 
     if hasattr(ctx.attr, "_stdlib_resolver"):
         includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
@@ -303,6 +291,9 @@ def module_impl(ctx):
             args.add_all(["-use-prims", tc.primitives])
     else:
         args.add("-nopervasives")
+
+    if hasattr(ctx.attr, "_opts"):
+        args.add_all(ctx.attr._opts)
 
     if not ctx.attr.nocopts:
         args.add_all(tc.copts)
@@ -320,11 +311,6 @@ def module_impl(ctx):
     ################ Direct Deps ################
 
     includes.extend(paths_depset.to_list())
-
-    # if hasattr(ctx.attr._ns_resolver[OcamlNsResolverProvider], "resolver"):
-    # if ns_resolver:
-    #     args.add("-no-alias-deps")
-    #     args.add("-open", ns)
 
     stdlib_resolver = []
     if hasattr(ctx.attr, "_stdlib_resolver"):

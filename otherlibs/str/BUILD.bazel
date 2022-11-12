@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
      "boot_archive",
-     "baseline_module",
-     "baseline_signature",
+     "compiler_module",
+     "compiler_signature",
 )
 
 load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
@@ -27,7 +27,7 @@ boot_archive(  ## mklib -o
 
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.ml
 
-baseline_module(
+compiler_module(
     name   = "Str",
     struct = "str.ml",
     sig    = "Str_cmi",
@@ -47,7 +47,7 @@ baseline_module(
 
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.mli
 
-baseline_signature(
+compiler_signature(
     name = "Str_cmi",
     src  = "str.mli",
     opts = SIG_OPTS,

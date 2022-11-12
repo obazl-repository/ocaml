@@ -3,9 +3,11 @@ load("//bzl:rules.bzl",
      "boot_camlheaders",
      "boot_library",
      "boot_module",
-     "baseline_module",
-     "boot_signature",
-     "baseline_signature")
+     "boot_signature")
+
+load(":BUILD_RULES.bzl",
+     "stdlib_boot_module", "stdlib_module",
+     "stdlib_boot_signature", "stdlib_signature")
 
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
@@ -13,235 +15,13 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(["expand_module_aliases.awk", "weak.ml", "weak.mli"])
 
-## NB: ocamldep does not show deps on the Stdlib module. So files with
-## no deps according to ocamldep may in fact have a dependency on the
-## Stdlib module (only). E.g. sys.mli. Some files in fact have no
-## deps, e.g. bool.mli.
-
-## make log: flags same for >vm and >sys, except the former adds -use-prims
-
-## NB: camlinternal files differ from public submodules:
-# compiled twice for >vm, with and without -use-prims
-
-## NB:
-# -nopervasives used ONLY for camlinternalFormatBasics, stdlib
-# this is added automatically by rules boot_module, boot_signature
-# but not by baseline_module, baseline_signature
-
-# -fragile-match only for camlinternalFormat, printf, format, scanf
-
-# ../runtime/ocamlrun ../boot/ocamlc
-# -use-prims ../runtime/primitives
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal -nopervasives
-# -c camlinternalFormatBasics.mli  (and .ml)
-
-# ../boot/ocamlrun ../ocamlc
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal -nopervasives
-# -c camlinternalFormatBasics.mli
-
-# ../boot/ocamlrun ../ocamlopt  (NB: does not recompile mli files)
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal -nopervasives
-# -c camlinternalFormatBasics.ml
-
-# uses ocamlc to run awl using -pp
-
-## resolver Stdlib: uses awk preprocessing to expand the module aliasing equations, once with -use-prims, once w/o
-
-# ../runtime/ocamlrun ../boot/ocamlc
-# -use-prims ../runtime/primitives
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal
-# -nopervasives -no-alias-deps -w -49
-# -pp "$AWK -f ./expand_module_aliases.awk"
-# -c stdlib.mli
-
-# ../boot/ocamlrun ../ocamlc
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal
-# -nopervasives -no-alias-deps -w -49
-# -pp "$AWK -f ./expand_module_aliases.awk"
-# -c stdlib.mli
-
-# ../boot/ocamlrun ../ocamlopt
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal
-# -nopervasives -no-alias-deps -w -49
-# -pp "$AWK -f ./expand_module_aliases.awk"
-# -c stdlib.ml
-
-## submodules:
-# ../runtime/ocamlrun ../boot/ocamlc
-# -use-prims ../runtime/primitives
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal
-# -o stdlib__Either.cmi -c either.mli  (ditto either.ml)
-
-# ../boot/ocamlrun ../ocamlc
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal
-# -o stdlib__Either.cmi -c either.mli  (ditto either.ml)
-
-# load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
-
-# to match the makefile log:
-# COMPFLAGS = [
-#     "-strict-sequence", "-absname",
-#     "-w", "+a-4-9-41-42-44-45-48",
-#     # "-g",
-#     "-warn-error", "+A",
-#     "-bin-annot",
-#     "-nostdlib", "-principal",
-#     # "-safe-string", "-strict-formats"
-# ]
-
 MODULE_OPTS = []
 SIG_OPTS    = []
 
 LABEL_OPTS = ["-nolabels"]
 
-################################################################
-  ################  Module: Std_exit    ################
-################################################################
-## Module Std_exit is an "executive" module - it exports no symbols,
-## and is used in executables for its side-effects. The bytecode
-## compiler inserts module Std_exit at the end of every executable.
+# Std_exit is at the bottom of this file.
 
-## (I.e. it is not required for building native executables?)
-
-## Its signature is empty (it exports no symbols), and its structfile
-## contains a single line of code:
-
-# (* Ensure that [at_exit] functions are called at the end of every program *)
-# let _ = do_at_exit()
-
-# The module itself has no external dependencies, but it does depend
-# on the internal Pervasives module, so compiling with "-nopervasives"
-# will fail with:
-
-# 18 | let _ = do_at_exit()
-#              ^^^^^^^^^^
-# Error: Unbound value do_at_exit
-
-# and stdlib.ml has:
-# let _ = register_named_value "Pervasives.do_at_exit" do_at_exit
-
-# The module itself has no dependencies, but the compilers induce a
-# pseudo-dependency on the standard library archive and module Stdlib,
-# so compilation does depend on Stdlib. Futhermore, if you
-# bootstrap-link an executable with Std_exit at the end but omit
-# stdlib.cm[x]a, you'll get:
-
-#     Error: Module `Stdlib' is unavailable (required by `Std_exit')
-
-# Compiling Std_exit with "-nostdlib" produces: "Error: Unbound module
-# Stdlib". This is because this flag only tells OCaml to disregard its
-# internal default path to Stdlib; it will still "-open Stdlib", which
-# is what results in the error, and furthermore a dependency on the
-# stdlib library (stdlib.cma, stdlib.cmxa) is hardcoded into the the
-# compilers (bytelink.ml and asmlink.ml).
-
-# So for a bootstrap compile we need to pass "-nostdlib" (so the
-# compiler will not search its default stdlib path) and have a
-# dependency on //stdlib:Stdlib.
-
-## Make log below. Notice the ocamlc is not the boot version but the
-## 1st gen version. This works with -nostdlib because it is run from
-## within //stdlib. The other flags are not necessary, they're just an
-## artifact of the Makefile build system.
-
-# ../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   -c std_exit.mli
-# ../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   -c std_exit.ml
-
-baseline_signature(
-    name = "Std_exit_cmi",
-    src  = "std_exit.mli",
-    opts = ["-nostdlib"],
-    deps   = ["//stdlib:Stdlib"]
-)
-
-baseline_module(
-    name   = "Std_exit",
-    struct = "std_exit.ml",
-    sig    = select({
-        "//config:sig_src?": "std_exit.mli",
-        "//conditions:default": "Std_exit_cmi"
-    }),
-    opts   = ["-nostdlib"],
-    deps   = ["//stdlib:Stdlib"],
-)
-
-# using genrule we still get:
-# Error: Unbound module Stdlib
-# genrule(
-#     name = "Std_exit",
-#     outs = ["Std_exit.cmo"],
-#     srcs = [
-#         "//boot:ocamlc",
-#         "std_exit.ml", "std_exit.mli"
-#     ],
-#     tools = ["//runtime:ocamlrun"],
-#     cmd_bash  = " ".join([
-#         "$(execpath //runtime:ocamlrun) $(location //boot:ocamlc)",
-#         # "-use-prims ../runtime/primitives",
-#         "-strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal",
-#         "$(location std_exit.mli)",
-#         "$(location std_exit.ml)",
-#         "> $@"
-#     ]),
-# )
-
-####################################################
-####    The Standard Library    ####
-####################################################
-## NB: "Error: Unbound module Stdlib".
-# When bootstrapping there is no std lib yet; we pass -nostdlib to
-# avoid putting its path in the search path. But the (bootstrap)
-# compiler opens Stdlib by default, so we will always get the
-# above-noted error. Pass -nopervasives to prevent this.
-# This applies to:
-# * camlinternalAtomic.ml[i],
-# * camlinternalFormatBasics.ml[i]
-# * stdlib.ml[i]
-
-# Special cases: camlinternal* are not namespaced:
-#   * camlinternaAtomic and camlinternalFormatBasics are deps of Stdlib.
-#     they themselve have no deps, so -nopervasives
-#   * the other camlinternal* depend on Stdlib, and may depend on
-#     submodules in Stdlib ns
-
-#   * when obazl builds submodules, it passes -open Stdlib. That's
-#     enough to resolve symbols in the ns, but not their bindings. We
-#     get errors like "Error: Unbound type constructor ref" and
-#     "Error: Unbound value >=". I *think* that means the sym was
-#     resolved in an interface the impl is missing.
-
-
-## flags generated by $(shell ./Compflags $@) are added to individual
-## targets
-
-# ../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48-70 -g -warn-error +A -bin-annot -nostdlib -principal -safe-string -strict-formats   \
-# 	         -o stdlib__Bigarray.cmi -c bigarray.mli
-
-# camlinternal: Atomic, Format, FormatBasics, Lazy, Mod, OO
-# CAMLINTERNAL_OPTS = [
-#     # "-use-prims", "../runtime/primitives",
-#     # "-nopervasives"
-#     # "-open", "Stdlib"
-# ] + COMPFLAGS
-
-# Atomic, FormatBasics:  ["-nopervasives"]
-#Format: ["-w", "+A", "-w", "-fragile-match"]
-
-# OCAMLRUN = boot/ocamlrun
-# COMPILER = ocamlc built in root dir (i.e. stage1?)
-# CAMLC=$(OCAMLRUN) $(COMPILER)
-# %.cmi: %.mli
-# 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
-
-# stdlib__%.cmo:
-# 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) \
-# 	         -o $@ -c $(filter %.ml, $^)
-
-# %.cmo: %.ml
-# 	$(CAMLC) $(COMPFLAGS) $(shell ./Compflags $@) -c $<
-
-# %.cmx: %.ml
-# 	$(CAMLOPT) $(COMPFLAGS) $(OPTCOMPFLAGS) $(shell ./Compflags $@) -c $<
 
 ## NB: we do not need to define an ocaml_ns_resolver (or rather
 ## bootstrap_ns_resolver), since Stdlib serves as our ns_resolver
@@ -252,6 +32,7 @@ baseline_module(
 # NB: boot_library will not work. The compilers expect to find
 # stdlib.cm[x]a - this is hardcoded.
 
+# stdlib_archive(
 boot_archive(
     name       = "stdlib",
     ## makefiles pass -use-prims. does that make sense, for an archive?
@@ -259,10 +40,28 @@ boot_archive(
     visibility = ["//visibility:public"],
 )
 
+## We use several different rules:
+
+# stdlib_boot_[module|signature] - for Stdlib, Std_exit and
+# CamlinternalFormatBasics only. These are not in the ns but the
+# submodules of the ns depend on them; they "bootstrap" the ns.
+
+# (I.e. 'stdlib_boot_' corresponds to 'Camlinternal')
+
+# stdlib_[module|signature] for the submodules of the Stdlib namespace.
+
+# That leaves five modules essential that are not in the Stdlib
+# namespace, but that depend on submodules, and are depended on by
+# submodules. These are the Camlinternal* modules. The use the
+# stdlib_boot_* rules but pass '-open Stdlib' explicitly.
+
 ##################################################################
 ##############  Main Resolver Module: Stdlib  ####################
+# The resolver is not itself a member of the namespace; it does not
+# depend on itself! So it can build independently of stdlib.cma.
 
-boot_module(
+#stdlib_resolver(
+stdlib_boot_module(
     name   = "Stdlib",
     struct = "_build/stdlib.ml",
     sig    = "Stdlib_cmi", # doesn't work with stdlib.mli
@@ -277,18 +76,6 @@ boot_module(
     ],
     # pp_deps = ["//stdlib:expand_module_aliases.awk"],
 )
-
-# ../runtime/ocamlrun ../boot/ocamlc
-# -use-prims ../runtime/primitives
-# -strict-sequence -absname -w +a-4-9-41-42-44-45-48-70
-# -g -warn-error +A -bin-annot -nostdlib -principal
-# -safe-string -strict-formats
-
-## added to stdlib.cm[iox] only, by $(shell Comflags $@):
-# -nopervasives -no-alias-deps -w -49
-# -pp "$AWK -f ./expand_module_aliases.awk" -c stdlib.mli
-## the awk script inserts the stdlib__ prefix in the module aliasing
-## equations in stdlib.ml[i]
 
 # WARNING: if we run this as a separate task (instead of passing the
 # cmd to the compiler via -pp) we must write to a subdir, since the
@@ -305,7 +92,7 @@ genrule(
     ]),
 )
 
-boot_signature(
+stdlib_boot_signature(
     name = "Stdlib_cmi",
     src  = "_build/stdlib.mli",
     opts = SIG_OPTS + [
@@ -348,7 +135,23 @@ genrule(
 # They depend on other subcomponents, but since they are not renamed
 # such deps must not be listed; instead just list :Stdlib.
 
-baseline_module(
+stdlib_boot_module(
+    name   = "CamlinternalFormatBasics",
+    struct = "camlinternalFormatBasics.ml",
+    sig    = "camlinternalFormatBasics.mli",
+    # sig    = select({
+    #     "//config:sig_src?": "camlinternalFormatBasics.mli",
+    #     "//conditions:default": "CamlinternalFormatBasics_cmi",
+    # }),
+)
+
+stdlib_boot_signature(
+    name = "CamlinternalFormatBasics_cmi",
+    src  = "camlinternalFormatBasics.mli",
+ )
+
+
+stdlib_boot_module(
     name   = "CamlinternalFormat",
     struct = "camlinternalFormat.ml",
     sig    = "CamlinternalFormat_cmi",
@@ -356,10 +159,10 @@ baseline_module(
     #     "//config:sig_src?"   : "camlinternalformat.mli",
     #     "//conditions:default": "CamlinternalFormat_cmi"
     # }),
+    opts = ["-open", "Stdlib"],
     warnings = ["fragile-match"],
     deps   = [
         ":CamlinternalFormatBasics",
-        # ":Stdlib",
         ":Stdlib.Buffer", ## (Stdlib Buffer)
         ":Stdlib.Bytes", ## (Stdlib Bytes)
         ":Stdlib.Char", ## (Stdlib Char)
@@ -369,12 +172,13 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+stdlib_boot_signature(
     name = "CamlinternalFormat_cmi",
     src  = "camlinternalFormat.mli",
+    opts = ["-open", "Stdlib"],
     warnings = ["fragile-match"],
     deps   = [
-        ":CamlinternalFormatBasics", #_cmi",
+        ":CamlinternalFormatBasics",
 
         # Depends on Buffer, but we need to go through the ns Stdlib.
         # The problem is we cannot express a dependency on an ns
@@ -404,49 +208,33 @@ baseline_signature(
     ],
 )
 
-boot_module(
-    name   = "CamlinternalFormatBasics",
-    struct = "camlinternalFormatBasics.ml",
-    sig    = "camlinternalFormatBasics.mli",
-    # sig    = select({
-    #     "//config:sig_src?": "camlinternalFormatBasics.mli",
-    #     "//conditions:default": "CamlinternalFormatBasics_cmi",
-    # }),
-)
-
-boot_signature(
-    name = "CamlinternalFormatBasics_cmi",
-    src  = "camlinternalFormatBasics.mli",
- )
-
-baseline_module(
+stdlib_boot_module(
     name   = "CamlinternalLazy",
     struct = "camlinternalLazy.ml",
     sig    = select({
         "//config:sig_src?": "camlinternalLazy.mli",
         "//conditions:default": "CamlinternalLazy_cmi"
     }),
-    opts = select({
+    opts = ["-open", "Stdlib"] + select({
         # "//platforms/target:sys?": ["-afl-inst-ratio", "0"],
         "//conditions:default": []
     }),
     deps   = [
-        ":Stdlib",
         ":Stdlib.Obj",
         ":Stdlib.Sys",
     ],
 )
 
-baseline_signature(
+stdlib_boot_signature(
     name = "CamlinternalLazy_cmi",
     src  = "camlinternalLazy.mli",
-    deps   = [":Stdlib"],
 )
 
-baseline_module(
+stdlib_boot_module(
     name   = "CamlinternalMod",
     struct = "camlinternalMod.ml",
     sig    = "CamlinternalMod_cmi",
+    opts = ["-open", "Stdlib"],
     deps   = [
         ":CamlinternalOO", ## (CamlinternalOO)
         ":CamlinternalLazy", ## (CamlinternalOO)
@@ -456,20 +244,21 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+stdlib_boot_signature(
     name = "CamlinternalMod_cmi",
     src  = "camlinternalMod.mli",
+    opts = ["-open", "Stdlib"],
     deps   = [
-        # ":Stdlib",
         ":Stdlib.Obj",
     ],
 )
 
-baseline_module(
+stdlib_boot_module(
     name   = "CamlinternalOO",
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
-    # opts   = select({
+    opts = ["-open", "Stdlib"],
+    # + select({
     #     # "//platforms/target:vm?": [],
     #     # "//platforms/target:sys?": [
     #     #     "-inline", "0",
@@ -478,7 +267,6 @@ baseline_module(
     #     "//conditions:default": []
     # }),
     deps   = [
-        # ":Stdlib",
         ":Stdlib.Sys",
         ":Stdlib.String",
         ":Stdlib.Obj",
@@ -489,24 +277,21 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+stdlib_boot_signature(
     name = "CamlinternalOO_cmi",
     src  = "camlinternalOO.mli",
-    deps   = [
-        ":Stdlib.Obj"
-    ],
+    opts = ["-open", "Stdlib"],
+    deps   = [":Stdlib.Obj"]
 )
 
 #########################################################
 ################  Namespaced Submodules  ################
 
-baseline_module(
+stdlib_module(
     name   = "Stdlib.Arg",
-    ns    = ":Stdlib",
     struct = "arg.ml",
     sig    = "Stdlib.Arg_cmi",
     opts = MODULE_OPTS,
-    # data = DATA_PRIMS,
     deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -518,8 +303,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Arg_cmi",
     src  = "arg.mli",
     opts = SIG_OPTS,
@@ -534,20 +318,17 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Array",
     struct = "array.ml",
     sig    = "Stdlib.Array_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":Stdlib.Seq",
-        ":Stdlib"
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Array_cmi",
     src  = "array.mli",
     opts = SIG_OPTS,
@@ -556,8 +337,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.ArrayLabels",
     struct = "arrayLabels.ml",
     sig    = "Stdlib.ArrayLabels_cmi",
@@ -579,8 +359,7 @@ genrule(
     ]),
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.ArrayLabels_cmi",
     src  = "_build/arrayLabels.mli",
     opts = SIG_OPTS,
@@ -589,17 +368,15 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+stdlib_module(
     struct = "atomic.ml",
     name   = "Stdlib.Atomic",
-    ns    = ":Stdlib",
     sig    = "Stdlib.Atomic_cmi",
     opts = MODULE_OPTS,
     deps   = [],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Atomic_cmi",
     src  = "atomic.mli",
     opts = SIG_OPTS,
@@ -608,8 +385,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Bigarray",
     struct = "bigarray.ml",
     sig    = "Stdlib.Bigarray_cmi",
@@ -626,8 +402,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Bigarray_cmi",
     src  = "bigarray.mli",
     opts = SIG_OPTS,
@@ -641,23 +416,20 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Bool",
     struct = "bool.ml",
     sig    = "Stdlib.Bool_cmi",
     opts = MODULE_OPTS,
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Bool_cmi",
     src  = "bool.mli",
     opts = SIG_OPTS,
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Buffer",
     struct = "buffer.ml",
     sig    = "Stdlib.Buffer_cmi",
@@ -676,8 +448,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Buffer_cmi",
     src  = "buffer.mli",
     opts = SIG_OPTS,
@@ -687,8 +458,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Bytes",
     struct = "bytes.ml",
     sig    = "Stdlib.Bytes_cmi",
@@ -702,8 +472,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Bytes_cmi",
     src  = "bytes.mli",
     opts = SIG_OPTS,
@@ -714,8 +483,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.BytesLabels",
     struct = "bytesLabels.ml",
     sig    = "Stdlib.BytesLabels_cmi",
@@ -725,8 +493,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.BytesLabels_cmi",
     src  = "bytesLabels.mli",
     opts = SIG_OPTS,
@@ -736,8 +503,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Callback",
     struct = "callback.ml",
     sig    = "Stdlib.Callback_cmi",
@@ -747,8 +513,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Callback_cmi",
     src  = "callback.mli",
     opts = SIG_OPTS,
@@ -757,24 +522,21 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+stdlib_module(
     name   = "Stdlib.Char",
-    ns    = ":Stdlib",
     struct = "char.ml",
     sig    = "Stdlib.Char_cmi",
     opts = MODULE_OPTS,
     deps   = [":Stdlib"],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Char_cmi",
     src  = "char.mli",
     opts = SIG_OPTS,
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Complex",
     struct = "complex.ml",
     sig    = "Stdlib.Complex_cmi",
@@ -782,16 +544,14 @@ baseline_module(
     deps   = ["Stdlib.Float"],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Complex_cmi",
     src  = "complex.mli",
     opts = SIG_OPTS,
     deps   = [ ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Condition",
     struct = "condition.ml",
     sig    = "Stdlib.Condition_cmi",
@@ -799,16 +559,14 @@ baseline_module(
     deps   = [":Stdlib.Mutex"],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Condition_cmi",
     src  = "condition.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib.Mutex_cmi"],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Digest",
     struct = "digest.ml",
     sig    = "Stdlib.Digest_cmi",
@@ -820,8 +578,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Digest_cmi",
     src  = "digest.mli",
     opts = SIG_OPTS,
@@ -831,8 +588,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Domain",
     struct = "domain.ml",
     sig    = "Stdlib.Domain_cmi",
@@ -849,16 +605,14 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Domain_cmi",
     src  = "domain.mli",
     opts = SIG_OPTS,
     deps   = [ ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Effect",
     struct = "effect.ml",
     sig    = "Stdlib.Effect_cmi",
@@ -872,16 +626,14 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Effect_cmi",
     src  = "effect.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib.Printexc_cmi"],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Either",
     struct = "either.ml",
     sig    = "Stdlib.Either_cmi",
@@ -892,8 +644,7 @@ baseline_module(
     # data = ["//runtime:primitives"],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Either_cmi",
     src  = "either.mli",
     # opts = SIG_OPTS,
@@ -904,8 +655,7 @@ baseline_signature(
     # data = ["//runtime:primitives"],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Ephemeron",
     struct = "ephemeron.ml",
     sig    = "Stdlib.Ephemeron_cmi",
@@ -923,8 +673,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Ephemeron_cmi",
     src  = "ephemeron.mli",
     opts = SIG_OPTS,
@@ -933,8 +682,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Filename",
     struct = "filename.ml",
     sig    = "Stdlib.Filename_cmi",
@@ -951,16 +699,14 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Filename_cmi",
     src  = "filename.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib"],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Float",
     struct = "float.ml",
     sig    = "Stdlib.Float_cmi",
@@ -972,8 +718,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Float_cmi",
     src  = "float.mli",
     opts = SIG_OPTS,
@@ -983,8 +728,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Format",
     struct = "format.ml",
     sig    = "Stdlib.Format_cmi",
@@ -1008,8 +752,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Format_cmi",
     src  = "format.mli",
     opts = SIG_OPTS,
@@ -1023,8 +766,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Fun",
     struct = "fun.ml",
     sig    = "Stdlib.Fun_cmi",
@@ -1034,8 +776,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Fun_cmi",
     src  = "fun.mli",
     opts = SIG_OPTS,
@@ -1043,8 +784,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Gc",
     struct = "gc.ml",
     sig    = "Stdlib.Gc_cmi",
@@ -1057,8 +797,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Gc_cmi",
     src  = "gc.mli",
     opts = SIG_OPTS,
@@ -1067,8 +806,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Genlex",
     struct = "genlex.ml",
     sig    = "Stdlib.Genlex_cmi",
@@ -1083,8 +821,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Genlex_cmi",
     src  = "genlex.mli",
     opts = SIG_OPTS,
@@ -1094,8 +831,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Hashtbl",
     struct = "hashtbl.ml",
     sig    = "Stdlib.Hashtbl_cmi",
@@ -1115,8 +851,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Hashtbl_cmi",
     src  = "hashtbl.mli",
     opts = SIG_OPTS,
@@ -1126,8 +861,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.In_channel",
     struct = "in_channel.ml",
     sig    = "Stdlib.In_channel_cmi",
@@ -1137,8 +871,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.In_channel_cmi",
     src  = "in_channel.mli",
     opts = SIG_OPTS,
@@ -1147,8 +880,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Int",
     struct = "int.ml",
     sig    = "Stdlib.Int_cmi",
@@ -1158,8 +890,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Int_cmi",
     src  = "int.mli",
     opts = SIG_OPTS,
@@ -1168,8 +899,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Int32",
     struct = "int32.ml",
     sig    = "Stdlib.Int32_cmi",
@@ -1180,8 +910,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Int32_cmi",
     src  = "int32.mli",
     opts = SIG_OPTS + ["-no-alias-deps"],
@@ -1191,8 +920,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Int64",
     struct = "int64.ml",
     sig    = "Stdlib.Int64_cmi",
@@ -1202,8 +930,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Int64_cmi",
     src  = "int64.mli",
     opts = SIG_OPTS,
@@ -1212,8 +939,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Lazy",
     struct = "lazy.ml",
     sig    = "Stdlib.Lazy_cmi",
@@ -1227,8 +953,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Lazy_cmi",
     src  = "lazy.mli",
     opts = SIG_OPTS,
@@ -1237,8 +962,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Lexing",
     struct = "lexing.ml",
     sig    = "Stdlib.Lexing_cmi",
@@ -1253,8 +977,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Lexing_cmi",
     src  = "lexing.mli",
     opts = SIG_OPTS,
@@ -1263,9 +986,8 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+stdlib_module(
     name   = "Stdlib.List",
-    ns    = ":Stdlib",
     struct = "list.ml",
     sig    = "Stdlib.List_cmi",
     opts = MODULE_OPTS,
@@ -1276,8 +998,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.List_cmi",
     src  = "list.mli",
     opts = SIG_OPTS,
@@ -1287,8 +1008,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.ListLabels",
     struct = "listLabels.ml",
     sig    = "Stdlib.ListLabels_cmi",
@@ -1298,8 +1018,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.ListLabels_cmi",
     src  = "listLabels.mli",
     opts = SIG_OPTS,
@@ -1309,8 +1028,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Map",
     struct = "map.ml",
     sig    = "Stdlib.Map_cmi",
@@ -1321,8 +1039,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Map_cmi",
     src  = "map.mli",
     opts = SIG_OPTS,
@@ -1331,8 +1048,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Marshal",
     struct = "marshal.ml",
     sig    = "Stdlib.Marshal_cmi",
@@ -1342,8 +1058,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Marshal_cmi",
     src  = "marshal.mli",
     opts = SIG_OPTS,
@@ -1352,8 +1067,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.MoreLabels",
     struct = "moreLabels.ml",
     sig    = "Stdlib.MoreLabels_cmi",
@@ -1365,8 +1079,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.MoreLabels_cmi",
     src  = "moreLabels.mli",
     opts = SIG_OPTS,
@@ -1380,8 +1093,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Mutex",
     struct = "mutex.ml",
     sig    = "Stdlib.Mutex_cmi",
@@ -1393,8 +1105,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Mutex_cmi",
     src  = "mutex.mli",
     opts = SIG_OPTS,
@@ -1408,8 +1119,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Nativeint",
     struct = "nativeint.ml",
     sig    = "Stdlib.Nativeint_cmi",
@@ -1420,8 +1130,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Nativeint_cmi",
     src  = "nativeint.mli",
     opts = SIG_OPTS,
@@ -1431,8 +1140,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Obj",
     struct = "obj.ml",
     sig    = "Stdlib.Obj_cmi",
@@ -1444,8 +1152,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Obj_cmi",
     src  = "obj.mli",
     opts = SIG_OPTS,
@@ -1455,9 +1162,8 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+stdlib_module(
     name   = "Stdlib.Oo",
-    ns    = ":Stdlib",
     struct = "oo.ml",
     sig    = "Stdlib.Oo_cmi",
     opts = MODULE_OPTS,
@@ -1466,9 +1172,8 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+stdlib_signature(
     name = "Stdlib.Oo_cmi",
-    ns   = ":Stdlib",
     src  = "oo.mli",
     opts = SIG_OPTS + [
         "-no-principal" ## Only place this flag is used
@@ -1478,8 +1183,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Option",
     struct = "option.ml",
     sig    = "Stdlib.Option_cmi",
@@ -1489,8 +1193,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Option_cmi",
     src  = "option.mli",
     opts = SIG_OPTS,
@@ -1499,8 +1202,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Out_channel",
     struct = "out_channel.ml",
     sig    = "Stdlib.Out_channel_cmi",
@@ -1508,16 +1210,14 @@ baseline_module(
     deps   = [":Stdlib.Fun"],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Out_channel_cmi",
     src  = "out_channel.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib"],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Parsing",
     struct = "parsing.ml",
     sig    = "Stdlib.Parsing_cmi",
@@ -1530,8 +1230,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Parsing_cmi",
     src  = "parsing.mli",
     opts = SIG_OPTS,
@@ -1542,8 +1241,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Pervasives",
     struct = "pervasives.ml",
     opts = MODULE_OPTS,
@@ -1558,8 +1256,7 @@ baseline_module(
 #     visibility = ["//visibility:public"]
 # )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Printexc",
     struct = "printexc.ml",
     sig    = "Stdlib.Printexc_cmi",
@@ -1574,8 +1271,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Printexc_cmi",
     src  = "printexc.mli",
     opts = SIG_OPTS,
@@ -1584,8 +1280,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Printf",
     struct = "printf.ml",
     sig    = "Stdlib.Printf_cmi",
@@ -1598,8 +1293,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Printf_cmi",
     src  = "printf.mli",
     opts = SIG_OPTS,
@@ -1609,8 +1303,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Queue",
     struct = "queue.ml",
     sig    = "Stdlib.Queue_cmi",
@@ -1621,8 +1314,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Queue_cmi",
     src  = "queue.mli",
     opts = SIG_OPTS,
@@ -1632,8 +1324,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Random",
     struct = "random.ml",
     sig    = "Stdlib.Random_cmi",
@@ -1654,8 +1345,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Random_cmi",
     src  = "random.mli",
     opts = SIG_OPTS,
@@ -1666,8 +1356,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Result",
     struct = "result.ml",
     sig    = "Stdlib.Result_cmi",
@@ -1678,8 +1367,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Result_cmi",
     src  = "result.mli",
     opts = SIG_OPTS,
@@ -1689,8 +1377,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Scanf",
     struct = "scanf.ml",
     sig    = "Stdlib.Scanf_cmi",
@@ -1711,8 +1398,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name  = "Stdlib.Scanf_cmi",
     src   = "scanf.mli",
     opts  = SIG_OPTS,
@@ -1723,8 +1409,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Semaphore",
     struct = "semaphore.ml",
     sig    = "Stdlib.Semaphore_cmi",
@@ -1738,8 +1423,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name  = "Stdlib.Semaphore_cmi",
     src   = "semaphore.mli",
     opts  = SIG_OPTS,
@@ -1747,8 +1431,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     struct = "seq.ml",
     name   = "Stdlib.Seq",
     sig    = "Stdlib.Seq_cmi",
@@ -1760,16 +1443,14 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Seq_cmi",
     src  = "seq.mli",
     opts = SIG_OPTS,
     deps   = [":Stdlib.Either_cmi"],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Set",
     struct = "set.ml",
     sig    = "Stdlib.Set_cmi",
@@ -1780,8 +1461,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Set_cmi",
     src  = "set.mli",
     opts = SIG_OPTS,
@@ -1790,8 +1470,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Stack",
     struct = "stack.ml",
     sig    = "Stdlib.Stack_cmi",
@@ -1802,8 +1481,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Stack_cmi",
     src  = "stack.mli",
     opts = SIG_OPTS,
@@ -1812,8 +1490,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.StdLabels",
     struct = "stdLabels.ml",
     sig    = "Stdlib.StdLabels_cmi",
@@ -1826,8 +1503,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.StdLabels_cmi",
     src  = "stdLabels.mli",
     opts = SIG_OPTS,
@@ -1839,8 +1515,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Stream",
     struct = "stream.ml",
     sig    = "Stdlib.Stream_cmi",
@@ -1854,8 +1529,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Stream_cmi",
     src  = "stream.mli",
     opts = SIG_OPTS,
@@ -1863,8 +1537,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.String",
     struct = "string.ml",
     sig    = "Stdlib.String_cmi",
@@ -1874,8 +1547,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.String_cmi",
     src  = "string.mli",
     opts = SIG_OPTS,
@@ -1885,8 +1557,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.StringLabels",
     struct = "stringLabels.ml",
     sig    = "Stdlib.StringLabels_cmi",
@@ -1896,8 +1567,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.StringLabels_cmi",
     src  = "stringLabels.mli",
     opts = SIG_OPTS,
@@ -1907,8 +1577,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Sys",
     struct = "sys.ml",
     # sig    = "Stdlib.Sys_cmi",
@@ -1923,16 +1592,14 @@ baseline_module(
     opts = MODULE_OPTS,
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Sys_cmi",
     src  = "sys.mli",
     opts = SIG_OPTS,
     deps = [":Stdlib"],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Uchar",
     struct = "uchar.ml",
     sig    = "Stdlib.Uchar_cmi",
@@ -1942,8 +1609,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Uchar_cmi",
     src  = "uchar.mli",
     opts = SIG_OPTS,
@@ -1952,8 +1618,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Unit",
     struct = "unit.ml",
     # sig    = "Stdlib.Unit_cmi",
@@ -1970,8 +1635,7 @@ baseline_module(
     opts = MODULE_OPTS,
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Unit_cmi",
     src  = "unit.mli",
     opts = SIG_OPTS,
@@ -1979,8 +1643,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
-    ns    = ":Stdlib",
+stdlib_module(
     name   = "Stdlib.Weak",
     struct = "weak.ml",
     # sig    = "Stdlib.Weak_cmi",
@@ -1999,8 +1662,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
-    ns   = ":Stdlib",
+stdlib_signature(
     name = "Stdlib.Weak_cmi",
     src  = "weak.mli",
     opts = SIG_OPTS,
@@ -2200,3 +1862,43 @@ genrule(
 #     ],
 #     visibility = ["//promote:__pkg__"]
 # )
+
+################################################################
+  ################  Module: Std_exit    ################
+################################################################
+## Module Std_exit is an "executive" module - it exports no symbols,
+## and is used in executables for its side-effects. The bytecode
+## compiler inserts module Std_exit at the end of every executable.
+
+## (I.e. it is not required for building native executables?)
+
+## Its signature is empty (it exports no symbols), and its structfile
+## contains a single line of code:
+
+# (* Ensure that [at_exit] functions are called at the end of every program *)
+# let _ = do_at_exit()
+
+# The module itself has no external dependencies, but it does depend
+# on the internal Pervasives module, so it must be NOT be compiled
+# with '-nopervasives'.
+
+## Special case: our convention is the normalize file names to match
+## canical module names. In this case that would yield Std_exit; but
+## the compilers are hard-coded to look for 'std_exit'. So this rule
+## special cases this.
+
+stdlib_boot_signature(
+    name = "Std_exit_cmi",
+    src  = "std_exit.mli",
+)
+
+stdlib_boot_module(
+    name   = "Std_exit",
+    struct = "std_exit.ml",
+    sig    = select({
+        "//config:sig_src?": "std_exit.mli",
+        "//conditions:default": "Std_exit_cmi"
+    }),
+    opts = ["-open", "Stdlib"],
+    deps = [":Stdlib"]
+)

@@ -1,10 +1,20 @@
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
 load("//bzl:providers.bzl", "BootInfo", "ModuleInfo")
-load("//bzl/rules/common:module_intf.bzl", "module_attrs")
-load("//bzl/rules/common:module_impl.bzl", "module_impl")
+load("//bzl/attrs:module_attrs.bzl", "module_attrs")
+load("//bzl/actions:module_impl.bzl", "module_impl")
+
+######################
+def _boot_module(ctx):
+
+    (this, extension) = paths.split_extension(ctx.file.struct.basename)
+    module_name = this[:1].capitalize() + this[1:]
+
+    return module_impl(ctx, module_name)
 
 ####################
 boot_module = rule(
-    implementation = module_impl,
+    implementation = _boot_module,
     doc = "Compiles a module with the bootstrap compiler.",
     exec_groups = {
         "boot": exec_group(
@@ -24,6 +34,7 @@ boot_module = rule(
     },
     attrs = dict(
         module_attrs(),
+        _opts = attr.string_list( ),
         _rule = attr.string( default = "boot_module" ),
     ),
     # cfg = compile_mode_in_transition,

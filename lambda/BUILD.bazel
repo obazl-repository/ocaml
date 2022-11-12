@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
      "boot_library",
-     "baseline_module",
-     "baseline_signature",
+     "compiler_module",
+     "compiler_signature",
 )
 
 exports_files([
@@ -62,7 +62,7 @@ boot_library(
 )
 
 ################################################################
-baseline_module(
+compiler_module(
     name   = "Debuginfo",
     struct = "debuginfo.ml",
     sig    = "Debuginfo_cmi",
@@ -86,7 +86,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Debuginfo_cmi",
     src  = "debuginfo.mli",
     opts = SIG_OPTS,
@@ -98,7 +98,7 @@ baseline_signature(
     visibility = ["//middle_end:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Lambda",
     struct = "lambda.ml",
     sig    = "Lambda_cmi",
@@ -126,7 +126,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Lambda_cmi",
     src  = "lambda.mli",
     opts = SIG_OPTS,
@@ -147,7 +147,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Matching",
     struct = "matching.ml",
     sig    = "Matching_cmi",
@@ -186,7 +186,7 @@ baseline_module(
     visibility = ["//bytecomp:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Matching_cmi",
     src  = "matching.mli",
     opts = SIG_OPTS,
@@ -200,7 +200,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Printlambda",
     struct = "printlambda.ml",
     sig    = "Printlambda_cmi",
@@ -229,7 +229,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printlambda_cmi",
     src  = "printlambda.mli",
     opts = SIG_OPTS,
@@ -254,7 +254,7 @@ baseline_signature(
 # -I lambda ... -I toplevel
 # -c lambda/runtimedef.ml
 
-baseline_module(
+compiler_module(
     name   = "Runtimedef",
     struct = "runtimedef.ml",
     sig    = "Runtimedef_cmi",
@@ -287,7 +287,7 @@ genrule(
     visibility = ["//visibility:public"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Runtimedef_cmi",
     src  = "runtimedef.mli",
     opts = SIG_OPTS,
@@ -296,7 +296,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Simplif",
     struct = "simplif.ml",
     sig    = "Simplif_cmi",
@@ -325,7 +325,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Simplif_cmi",
     src  = "simplif.mli",
     opts = SIG_OPTS,
@@ -337,7 +337,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Switch",
     struct = "switch.ml",
     sig    = "Switch_cmi",
@@ -356,7 +356,7 @@ baseline_module(
      ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Switch_cmi",
     src  = "switch.mli",
     opts = SIG_OPTS,
@@ -366,7 +366,7 @@ baseline_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Tmc",
     struct = "tmc.ml",
     sig    = "Tmc_cmi",
@@ -376,7 +376,7 @@ baseline_module(
     ],
 )
 
-baseline_signature(
+compiler_signature(
     name = "Tmc_cmi",
     src  = "tmc.mli",
     opts = SIG_OPTS,
@@ -385,7 +385,7 @@ baseline_signature(
     ],
 )
 
-baseline_module(
+compiler_module(
     name   = "Translattribute",
     struct = "translattribute.ml",
     sig    = "Translattribute_cmi",
@@ -407,7 +407,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Translattribute_cmi",
     src  = "translattribute.mli",
     opts = SIG_OPTS,
@@ -420,7 +420,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Translclass",
     struct = "translclass.ml",
     sig    = "Translclass_cmi",
@@ -450,7 +450,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Translclass_cmi",
     src  = "translclass.mli",
     opts = SIG_OPTS,
@@ -465,7 +465,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Translcore",
     struct = "translcore.ml",
     sig    = "Translcore_cmi",
@@ -503,7 +503,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Translcore_cmi",
     src  = "translcore.mli",
     opts = SIG_OPTS,
@@ -521,7 +521,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Translmod",
     struct = "translmod.ml",
     sig    = "Translmod_cmi",
@@ -560,7 +560,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Translmod_cmi",
     src  = "translmod.mli",
     opts = SIG_OPTS,
@@ -575,7 +575,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Translobj",
     struct = "translobj.ml",
     sig    = "Translobj_cmi",
@@ -595,7 +595,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Translobj_cmi",
     src  = "translobj.mli",
     opts = SIG_OPTS,
@@ -608,7 +608,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Translprim",
     struct = "translprim.ml",
     sig    = "Translprim_cmi",
@@ -639,7 +639,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Translprim_cmi",
     src  = "translprim.mli",
     opts = SIG_OPTS,

@@ -218,8 +218,8 @@ BOOT_STDLIBFLAGS = ["-nostdlib"]
 ## the matching toolchain.
 
 # opts attrib:
-# baseline_module: OC_COMMON_CFLAGS, add OC_NATIVE_CFLAGS if target == sys
-# baseline_signature: OC_COMMON_CFLAGS for both vm and sys targets
+# compiler_module: OC_COMMON_CFLAGS, add OC_NATIVE_CFLAGS if target == sys
+# compiler_signature: OC_COMMON_CFLAGS for both vm and sys targets
 # BOOT_OCAMLRUN = "//boot/bin:ocamlrun"
 # RUNTIME_OCAMLRUN = "//bin:ocamlrun"
 

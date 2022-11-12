@@ -239,6 +239,8 @@ def impl_executable(ctx):  ## , tc):
         mnemonic = "CompileBootstrapTest"
     elif ctx.attr._rule == "boot_compiler":
         mnemonic = "CompileOcamlcBoot"
+    elif ctx.attr._rule == "build_tool":
+        mnemonic = "CompileBuildTool"
     elif ctx.attr._rule == "baseline_compiler":
         mnemonic = "CompileOcamlcKick"
     else:
@@ -303,6 +305,8 @@ def impl_executable(ctx):  ## , tc):
     if ctx.attr._rule == "boot_compiler":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
+        exe_provider = OcamlExecutableMarker()
+    elif ctx.attr._rule == "build_tool":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
         exe_provider = OcamlExecutableMarker()

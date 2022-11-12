@@ -7,10 +7,10 @@
 # -nostdlib -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
 
 load("//bzl:rules.bzl",
-     "baseline_module",
+     "compiler_module",
      "boot_archive",
      "boot_library",
-     "baseline_signature")
+     "compiler_signature")
 
 load("//config:CONFIG.bzl",
      # "ROOT_MODULE_OPTS",
@@ -161,7 +161,7 @@ boot_library(
 )
 
 ################################################################
-baseline_signature(
+compiler_signature(
     name = "Annot_cmi",
     src  = "annot.mli",
     opts = SIG_OPTS,
@@ -171,7 +171,7 @@ baseline_signature(
     visibility = ["//tools:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Btype",
     struct = "btype.ml",
     sig    = "Btype_cmi",
@@ -198,7 +198,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Btype_cmi",
     src  = "btype.mli",
     opts = SIG_OPTS,
@@ -209,7 +209,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Cmt2annot",
     struct = "cmt2annot.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
@@ -236,7 +236,7 @@ baseline_module(
     visibility = ["//tools:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Ctype",
     struct = "ctype.ml",
     sig    = "Ctype_cmi",
@@ -282,7 +282,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Ctype_cmi",
     src  = "ctype.mli",
     opts = SIG_OPTS,
@@ -300,7 +300,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Datarepr",
     struct = "datarepr.ml",
     sig    = "Datarepr_cmi",
@@ -320,7 +320,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Datarepr_cmi",
     src  = "datarepr.mli",
     opts = SIG_OPTS,
@@ -332,7 +332,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Env",
     struct = "env.ml",
     sig    = "Env_cmi",
@@ -380,7 +380,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Env_cmi",
     src  = "env.mli",
     opts = SIG_OPTS,
@@ -407,7 +407,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Envaux",
     struct = "envaux.ml",
     sig    = "Envaux_cmi",
@@ -427,7 +427,7 @@ baseline_module(
     visibility = ["//tools:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Envaux_cmi",
     src  = "envaux.mli",
     opts = SIG_OPTS,
@@ -440,7 +440,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Errortrace",
     struct = "errortrace.ml",
     sig    = "Errortrace_cmi",
@@ -453,7 +453,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Errortrace_cmi",
     src  = "errortrace.mli",
     opts = SIG_OPTS,
@@ -465,7 +465,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Ident",
     struct = "ident.ml",
     sig    = "Ident_cmi",
@@ -493,7 +493,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Ident_cmi",
     src  = "ident.mli",
     opts = SIG_OPTS,
@@ -507,7 +507,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Includeclass",
     struct = "includeclass.ml",
     sig    = "Includeclass_cmi",
@@ -523,7 +523,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Includeclass_cmi",
     src  = "includeclass.mli",
     opts = SIG_OPTS,
@@ -537,7 +537,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Includecore",
     struct = "includecore.ml",
     sig    = "Includecore_cmi",
@@ -569,7 +569,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Includecore_cmi",
     src  = "includecore.mli",
     opts = SIG_OPTS,
@@ -590,7 +590,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Includemod",
     struct = "includemod.ml",
     sig    = "Includemod_cmi",
@@ -632,7 +632,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Includemod_cmi",
     src  = "includemod.mli",
     opts = SIG_OPTS,
@@ -654,7 +654,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Includemod_errorprinter",
     struct = "includemod_errorprinter.ml",
     sig    = "Includemod_errorprinter_cmi",
@@ -685,7 +685,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Includemod_errorprinter_cmi",
     src  = "includemod_errorprinter.mli",
     opts = SIG_OPTS,
@@ -702,7 +702,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Mtype",
     struct = "mtype.ml",
     sig    = "Mtype_cmi",
@@ -723,7 +723,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Mtype_cmi",
     src  = "mtype.mli",
     opts = SIG_OPTS,
@@ -736,7 +736,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Oprint",
     struct = "oprint.ml",
     sig    = "Oprint_cmi",
@@ -758,7 +758,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Oprint_cmi",
     src  = "oprint.mli",
     opts = SIG_OPTS,
@@ -771,7 +771,7 @@ baseline_signature(
 
 # ./boot/ocamlrun ./boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66-70 -warn-error +a -bin-annot -safe-string -strict-formats -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c typing/outcometree.mli
 
-baseline_signature(
+compiler_signature(
     name = "Outcometree_cmi",
     src  = "outcometree.mli",
     opts = SIG_OPTS,
@@ -786,7 +786,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Parmatch",
     struct = "parmatch.ml",
     sig    = "Parmatch_cmi",
@@ -830,7 +830,7 @@ baseline_module(
     visibility = ["//lambda:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Parmatch_cmi",
     src  = "parmatch.mli",
     opts = SIG_OPTS,
@@ -847,7 +847,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Path",
     struct = "path.ml",
     sig    = "Path_cmi",
@@ -872,7 +872,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Path_cmi",
     src  = "path.mli",
     opts = SIG_OPTS,
@@ -885,7 +885,7 @@ baseline_signature(
     visibility = ["//middle_end:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Patterns",
     struct = "patterns.ml",
     sig    = "Patterns_cmi",
@@ -904,7 +904,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Patterns_cmi",
     src  = "patterns.mli",
     opts = SIG_OPTS,
@@ -919,7 +919,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Persistent_env",
     struct = "persistent_env.ml",
     sig    = "Persistent_env_cmi",
@@ -946,7 +946,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Persistent_env_cmi",
     src  = "persistent_env.mli",
     opts = SIG_OPTS,
@@ -962,7 +962,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Predef",
     struct = "predef.ml",
     sig    = "Predef_cmi",
@@ -988,7 +988,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Predef_cmi",
     src  = "predef.mli",
     opts = SIG_OPTS,
@@ -1001,7 +1001,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Primitive",
     struct = "primitive.ml",
     sig    = "Primitive_cmi",
@@ -1023,7 +1023,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Primitive_cmi",
     src  = "primitive.mli",
     opts = SIG_OPTS,
@@ -1035,7 +1035,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Printpat",
     struct = "printpat.ml",
     sig    = "Printpat_cmi",
@@ -1052,7 +1052,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printpat_cmi",
     src  = "printpat.mli",
     opts = SIG_OPTS,
@@ -1066,7 +1066,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Printtyp",
     struct = "printtyp.ml",
     sig    = "Printtyp_cmi",
@@ -1115,7 +1115,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printtyp_cmi",
     src  = "printtyp.mli",
     opts = SIG_OPTS,
@@ -1134,7 +1134,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Printtyped",
     struct = "printtyped.ml",
     sig    = "Printtyped_cmi",
@@ -1162,7 +1162,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Printtyped_cmi",
     src  = "printtyped.mli",
     opts = SIG_OPTS,
@@ -1176,7 +1176,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Rec_check",
     struct = "rec_check.ml",
     sig    = "Rec_check_cmi",
@@ -1194,7 +1194,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Rec_check_cmi",
     src  = "rec_check.mli",
     opts = SIG_OPTS,
@@ -1208,7 +1208,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Shape",
     struct = "shape.ml",
     sig    = "Shape_cmi",
@@ -1224,7 +1224,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Shape_cmi",
     src  = "shape.mli",
     opts = SIG_OPTS,
@@ -1234,7 +1234,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Signature_group",
     struct = "signature_group.ml",
     sig    = "Signature_group_cmi",
@@ -1248,7 +1248,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Signature_group_cmi",
     src  = "signature_group.mli",
     opts = SIG_OPTS,
@@ -1258,7 +1258,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Stypes",
     struct = "stypes.ml",
     sig    = "Stypes_cmi",
@@ -1278,7 +1278,7 @@ baseline_module(
     visibility = ["//tools:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Stypes_cmi",
     src  = "stypes.mli",
     opts = SIG_OPTS,
@@ -1292,7 +1292,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Subst",
     struct = "subst.ml",
     sig    = "Subst_cmi",
@@ -1323,7 +1323,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Subst_cmi",
     src  = "subst.mli",
     opts = SIG_OPTS,
@@ -1336,7 +1336,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Tast_iterator",
     struct = "tast_iterator.ml",
     sig    = "Tast_iterator_cmi",
@@ -1353,7 +1353,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Tast_iterator_cmi",
     src  = "tast_iterator.mli",
     opts = SIG_OPTS,
@@ -1367,7 +1367,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Tast_mapper",
     struct = "tast_mapper.ml",
     sig    = "Tast_mapper_cmi",
@@ -1385,7 +1385,7 @@ baseline_module(
     visibility = ["//file_formats:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Tast_mapper_cmi",
     src  = "tast_mapper.mli",
     opts = SIG_OPTS,
@@ -1399,7 +1399,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Type_immediacy",
     struct = "type_immediacy.ml",
     sig    = "Type_immediacy_cmi",
@@ -1412,7 +1412,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Type_immediacy_cmi",
     src  = "type_immediacy.mli",
     opts = SIG_OPTS,
@@ -1421,7 +1421,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typeclass",
     struct = "typeclass.ml",
     sig    = "Typeclass_cmi",
@@ -1473,7 +1473,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typeclass_cmi",
     src  = "typeclass.mli",
     opts = SIG_OPTS,
@@ -1493,7 +1493,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typecore",
     struct = "typecore.ml",
     sig    = "Typecore_cmi",
@@ -1558,7 +1558,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typecore_cmi",
     src  = "typecore.mli",
     opts = SIG_OPTS,
@@ -1576,7 +1576,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typedecl",
     struct = "typedecl.ml",
     sig    = "Typedecl_cmi",
@@ -1625,7 +1625,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typedecl_cmi",
     src  = "typedecl.mli",
     opts = SIG_OPTS,
@@ -1649,7 +1649,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typedecl_immediacy",
     struct = "typedecl_immediacy.ml",
     sig    = "Typedecl_immediacy_cmi",
@@ -1665,7 +1665,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typedecl_immediacy_cmi",
     src  = "typedecl_immediacy.mli",
     opts = SIG_OPTS,
@@ -1679,7 +1679,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typedecl_properties",
     struct = "typedecl_properties.ml",
     sig    = "Typedecl_properties_cmi",
@@ -1695,7 +1695,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typedecl_properties_cmi",
     src  = "typedecl_properties.mli",
     opts = SIG_OPTS,
@@ -1706,7 +1706,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typedecl_separability",
     struct = "typedecl_separability.ml",
     sig    = "Typedecl_separability_cmi",
@@ -1727,7 +1727,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typedecl_separability_cmi",
     src  = "typedecl_separability.mli",
     opts = SIG_OPTS,
@@ -1740,7 +1740,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typedecl_unboxed",
     struct = "typedecl_unboxed.ml",
     sig    = "Typedecl_unboxed_cmi",
@@ -1754,7 +1754,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typedecl_unboxed_cmi",
     src  = "typedecl_unboxed.mli",
     opts = SIG_OPTS,
@@ -1764,7 +1764,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typedecl_variance",
     struct = "typedecl_variance.ml",
     sig    = "Typedecl_variance_cmi",
@@ -1786,7 +1786,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typedecl_variance_cmi",
     src  = "typedecl_variance.mli",
     opts = SIG_OPTS,
@@ -1804,7 +1804,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typedtree",
     struct = "typedtree.ml",
     sig    = "Typedtree_cmi",
@@ -1832,7 +1832,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typedtree_cmi",
     src  = "typedtree.mli",
     opts = SIG_OPTS,
@@ -1854,7 +1854,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typemod",
     struct = "typemod.ml",
     sig    = "Typemod_cmi",
@@ -1913,7 +1913,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typemod_cmi",
     src  = "typemod.mli",
     opts = SIG_OPTS,
@@ -1932,7 +1932,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typeopt",
     struct = "typeopt.ml",
     sig    = "Typeopt_cmi",
@@ -1959,7 +1959,7 @@ baseline_module(
     visibility = ["//lambda:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typeopt_cmi",
     src  = "typeopt.mli",
     opts = SIG_OPTS,
@@ -1975,7 +1975,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Types",
     struct = "types.ml",
     sig    = "Types_cmi",
@@ -2008,7 +2008,7 @@ baseline_module(
     ]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Types_cmi",
     src  = "types.mli",
     opts = SIG_OPTS,
@@ -2024,7 +2024,7 @@ baseline_signature(
     visibility = ["//lambda:__pkg__"]
 )
 
-baseline_module(
+compiler_module(
     name   = "Typetexp",
     struct = "typetexp.ml",
     sig    = "Typetexp_cmi",
@@ -2057,7 +2057,7 @@ baseline_module(
     visibility = ["//toplevel:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Typetexp_cmi",
     src  = "typetexp.mli",
     opts = SIG_OPTS,
@@ -2075,7 +2075,7 @@ baseline_signature(
     ]
 )
 
-baseline_module(
+compiler_module(
     name   = "Untypeast",
     struct = "untypeast.ml",
     sig    = "Untypeast_cmi",
@@ -2127,7 +2127,7 @@ baseline_module(
     visibility = ["//tools:__pkg__"]
 )
 
-baseline_signature(
+compiler_signature(
     name = "Untypeast_cmi",
     src  = "untypeast.mli",
     opts = SIG_OPTS,

@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_compiler",
-     "baseline_module")
+     "compiler_module")
 
 load("//bzl/rules/macros:compiler.bzl", "compiler")
 load("//bzl/rules/macros:lexer.bzl", "lexer")

@@ -26,7 +26,7 @@ Bazels _custom variable_ mechanism.
   primitives to be used with `-use-primitives. This is a global
   setting. Default is `//runtime:primitives`.
 
-* `--//config:sig_src` (boolean) may be used by `baseline_module` rules to
+* `--//config:sig_src` (boolean) may be used by `compiler_module` rules to
   select, for the `sig` attribute, a source .mli file instead of a the
   label of a compiled .cmi. (I.e whether or not .mli files are
   compiled separately.)

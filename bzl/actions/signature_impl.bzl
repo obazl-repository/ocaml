@@ -15,7 +15,7 @@ load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 
 ########################
-def signature_impl(ctx):
+def signature_impl(ctx, module_name):
 
     debug = False
     # if ctx.label.name in ["Pervasives"]
@@ -23,6 +23,9 @@ def signature_impl(ctx):
 
     # if "//toolchain/type:boot" in ctx.toolchains:
     #     fail("BOOT")
+
+    basename = ctx.label.name
+    from_name = basename[:1].capitalize() + basename[1:]
 
     stage = ctx.attr._stage[BuildSettingInfo].value
     # print("signature _stage: %s" % stage)
@@ -60,7 +63,7 @@ def signature_impl(ctx):
     # from_name.
 
     ns = None
-    (from_name, ns, module_name) = get_module_name(ctx, sig_src)
+    # (from_name, ns, module_name) = get_module_name(ctx, sig_src)
     if debug:
         print("From {src} To: {dst}".format(
             src = from_name, dst = module_name))
@@ -182,8 +185,6 @@ def signature_impl(ctx):
     #########################
     args = ctx.actions.args()
 
-    args.add("-nostdlib")
-
     if hasattr(ctx.attr, "_stdlib_resolver"):
         includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
         if tc.target_host in ["boot", "vm"]:
@@ -191,6 +192,9 @@ def signature_impl(ctx):
             args.add_all(["-use-prims", tc.primitives])
     else:
         args.add("-nopervasives")
+
+    if hasattr(ctx.attr, "_opts"):
+        args.add_all(ctx.attr._opts)
 
     args.add_all(tc.copts)
 
@@ -304,7 +308,7 @@ def signature_impl(ctx):
         ],
         # tools = [tc.tool_runner, tc.compiler],
         mnemonic = "CompileOcamlSignature",
-        progress_message = "{mode} compiling baseline_signature: {ws}//{pkg}:{tgt}".format(
+        progress_message = "{mode} compiling compiler_signature: {ws}//{pkg}:{tgt}".format(
             mode = tc.build_host + ">" + tc.target_host,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
