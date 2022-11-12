@@ -1,5 +1,78 @@
 = bootstrapping
 
+== The Bootstrap Problem
+
+=== The Problem
+
+* the build recursion must terminate
+* Bazel forbids cycles in the dep graph, so the compiler target cannot indirectly depend on itself
+
+More practical problems:
+
+* the stdlib must be bootstrapped - -nostdlib, etc.
+* primitives - to change the primitives, the compiler must be told to use the new stuff rather than those that are baked-in
+
+
+=== The Solution
+
+== legacy
+
+=== primitives
+
+Primitives are the operations implemented in C. So the compiler
+already has them, in its runtime library. But to build a new version
+of the compiler, possibly including changes to the primitives, the
+compiler must use an externally-provided table of primitives rather
+than its internal table.
+
+That's what the `-use-prims` option is for. The `primitives` file is
+generated, by a simple shell script, from the C sources in `runtime/`
+and passed to the compiler as `-use-prims <primsfile>`. It just
+contains a list of the symbols exported by the C files as OCaml
+primitives. The primitives are marked by `CAMLprim value`; the shell
+script just strips this prefix. For example, `runtime/hash.c`
+contains:
+
+```
+CAMLprim value caml_hash(value count, value limit, value seed, value obj)
+```
+
+which turns into `caml_hash` in the `primitives` file.
+
+
+
+The legacy build always uses this for bootstrapping, even for the
+coldstart. Recall that the coldstart effectively rebuilds the boot
+compiler, on the assumption that the source code in the distribution
+is in sync with the `boot/ocamlc` that ships with it. If that is the
+case, there is no reason to us `-use-prims` for the coldstart. It's
+only needed if the C sources change.
+
+
+
+== obazl
+
+
+
+Bazel:
+
+* Target `//boot:coldstart` builds the boot toolchain and installs it in hidden directory `.bootstrap`.  Everything in `.bootstrap` is read-only.
+
+* The toolchain used for development depends on the tools in `.bootstrap`.
+
+Toolchains:
+
+* boot - contains only the precompiled tools and the c tools
+
+* boot  - contains boot plus stdlib compiled with boot
+
+* baseline - contains tools and stdlib compiled with boot toolchain
+
+* dev - tools and stdlib compiled with baseline
+
+
+== References
+
 link:https://github.com/ocaml/ocaml/pull/11149[Make the bootstrap process repeatable #11149] (OCaml)
 
 bootstrap cycles in bazel: https://gist.github.com/rrbutani/f5d80af864e67d873ae4491111d9dcce

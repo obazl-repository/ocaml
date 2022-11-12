@@ -1,0 +1,8 @@
+debugger
+manual
+ocamldoc
+ocamltest
+stdlib/templates
+testsuite
+tools/unlabel-patches
+toplevel

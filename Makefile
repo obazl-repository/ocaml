@@ -274,9 +274,9 @@ ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 endif
 
 # Core bootstrapping cycle
-.PHONY: coreboot
+.PHONY: cobaseline
 ifeq "$(FLAT_FLOAT_ARRAY)" "true"
-coreboot:
+cobaseline:
 # Promote the new compiler but keep the old runtime
 # This compiler runs on boot/ocamlrun and produces bytecode for
 # runtime/ocamlrun
@@ -296,7 +296,7 @@ coreboot:
 # Check if fixpoint reached
 	$(MAKE) compare
 else
-coreboot:
+cobaseline:
 	$(error Cannot bootstrap when configured with \
 --disable-flat-float-array)
 endif
@@ -317,7 +317,7 @@ endif
 # The compilation of ocaml will fail if the runtime has changed.
 # Never mind, just do make bootstrap to reach fixpoint again.
 .PHONY: bootstrap
-bootstrap: coreboot
+bootstrap: cobaseline
 # utils/config.ml must be restored to config.status's configuration
 # lex/ocamllex$(EXE) was stripped in order to compare it
 	rm -f utils/config.ml lex/ocamllex$(EXE)

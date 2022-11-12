@@ -1,15 +1,8 @@
 load("//bzl:rules.bzl",
      "boot_library",
-     "boot_module",
-     "boot_signature",
+     "baseline_module",
+     "baseline_signature",
 )
-
-load("//config:CONFIG.bzl",
-     "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS"
-     # "ROOT_MODULE_OPTS",
-     # "ROOT_SIG_OPTS"
-     )
 
 exports_files([
     "debuginfo.mli", "debuginfo.ml",
@@ -18,12 +11,15 @@ exports_files([
     ## this is exported by genrule: "runtimedef.ml"
 ])
 
-MODULE_OPTS = ["-w", "-40"] #OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-SIG_OPTS    = [] #OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-# MODULE_OPTS = ROOT_MODULE_OPTS
-# SIG_OPTS    = ROOT_MODULE_OPTS
+# make log:
+# ./boot/ocamlrun ./ocamlopt
+# -nostdlib -I ./stdlib -I otherlibs/dynlink
+# -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
+# -I lambda ... -I toplevel
+# -c lambda/debuginfo.ml
 
-STDLIB = [] # ["//boot/lib:stdlib"]
+MODULE_OPTS = []
+SIG_OPTS    = []
 
 boot_library(
     name = "lambda",
@@ -66,12 +62,12 @@ boot_library(
 )
 
 ################################################################
-boot_module(
+baseline_module(
     name   = "Debuginfo",
     struct = "debuginfo.ml",
     sig    = "Debuginfo_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         "//parsing:Location",
@@ -90,11 +86,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Debuginfo_cmi",
     src  = "debuginfo.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi", # => "//parsing:Location_cmi",
         "//typing:Ident_cmi",
         "//stdlib:Stdlib.Format",
@@ -102,12 +98,12 @@ boot_signature(
     visibility = ["//middle_end:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Lambda",
     struct = "lambda.ml",
     sig    = "Lambda_cmi",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
+    deps   = [
         ":Debuginfo",
         "//typing:Types",
         "//typing:Primitive",
@@ -130,11 +126,11 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     name = "Lambda_cmi",
     src  = "lambda.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Types_cmi",
         "//typing:Primitive",
@@ -151,12 +147,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Matching",
     struct = "matching.ml",
     sig    = "Matching_cmi",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
+    deps   = [
         ":Switch", ## (Lambda Switch)
         ":Printlambda", ## (Lambda Printlambda)
         ":Lambda", ## (Lambda Lambda)
@@ -190,11 +186,11 @@ boot_module(
     visibility = ["//bytecomp:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Matching_cmi",
     src  = "matching.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//parsing:Asttypes_cmi",
@@ -204,12 +200,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Printlambda",
     struct = "printlambda.ml",
     sig    = "Printlambda_cmi",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Types",
@@ -233,11 +229,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Printlambda_cmi",
     src  = "printlambda.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda",
         ":Debuginfo",
         "//parsing:Asttypes_cmi",
@@ -250,12 +246,20 @@ boot_signature(
 # lambda/runtimedef.ml: lambda/generate_runtimedef.sh runtime/caml/fail.h \
 #     runtime/primitives
 # 	$^ > $@
-boot_module(
+
+# make log:
+# ./boot/ocamlrun ./ocamlopt
+# -nostdlib -I ./stdlib -I otherlibs/dynlink
+# -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
+# -I lambda ... -I toplevel
+# -c lambda/runtimedef.ml
+
+baseline_module(
     name   = "Runtimedef",
     struct = "runtimedef.ml",
     sig    = "Runtimedef_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib"
     ],
     visibility = [
@@ -283,21 +287,21 @@ genrule(
     visibility = ["//visibility:public"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Runtimedef_cmi",
     src  = "runtimedef.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib"
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Simplif",
     struct = "simplif.ml",
     sig    = "Simplif_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         ":Tmc",
@@ -321,11 +325,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Simplif_cmi",
     src  = "simplif.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//parsing:Asttypes_cmi",
@@ -333,12 +337,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Switch",
     struct = "switch.ml",
     sig    = "Switch_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
@@ -352,41 +356,41 @@ boot_module(
      ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Switch_cmi",
     src  = "switch.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib"
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Tmc",
     struct = "tmc.ml",
     sig    = "Tmc_cmi",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
+    deps   = [
         ":Lambda"
     ],
 )
 
-boot_signature(
+baseline_signature(
     name = "Tmc_cmi",
     src  = "tmc.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda_cmi",
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Translattribute",
     struct = "translattribute.ml",
     sig    = "Translattribute_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//parsing:Longident",
         "//stdlib:Stdlib.List",
@@ -403,11 +407,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Translattribute_cmi",
     src  = "translattribute.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Typedtree_cmi",
@@ -416,17 +420,17 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Translclass",
     struct = "translclass.ml",
     sig    = "Translclass_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
-        ":Translobj", ## (Lambda Translobj)
-        ":Translcore", ## (Lambda Translcore)
-        ":Matching", ## (Lambda Matching)
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
+    deps   = [
+        ":Translobj",
+        ":Translcore",
+        ":Matching",
+        ":Lambda",
+        ":Debuginfo",
         "//typing:Types",
         ## (Typeopt)
         "//typing:Typedtree",
@@ -441,16 +445,16 @@ boot_module(
         "//stdlib:Stdlib.Format",
         "//typing:Env",
         "//utils:Clflags",
-        ## (CamlinternalOO)
+        "//stdlib:CamlinternalOO",
         "//typing:Btype",
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Translclass_cmi",
     src  = "translclass.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
          "//typing:Typedtree_cmi",
@@ -461,12 +465,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Translcore",
     struct = "translcore.ml",
     sig    = "Translcore_cmi",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
+    deps   = [
         ":Translprim", ## (Lambda Translprim)
         ":Translobj", ## (Lambda Translobj)
         ":Translattribute", ## (Lambda Translattribute)
@@ -499,11 +503,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Translcore_cmi",
     src  = "translcore.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Parsetree_cmi",
@@ -517,12 +521,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Translmod",
     struct = "translmod.ml",
     sig    = "Translmod_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Translprim", ## (Lambda Translprim)
         ":Translobj", ## (Lambda Translobj)
         ":Translcore", ## (Lambda Translcore)
@@ -556,11 +560,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Translmod_cmi",
     src  = "translmod.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//parsing:Asttypes_cmi",
@@ -571,12 +575,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Translobj",
     struct = "translobj.ml",
     sig    = "Translobj_cmi",
-    opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//typing:Primitive",
@@ -591,11 +595,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Translobj_cmi",
     src  = "translobj.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
         "//parsing:Asttypes_cmi",
@@ -604,12 +608,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Translprim",
     struct = "translprim.ml",
     sig    = "Translprim_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Matching", ## (Lambda Matching)
         ":Lambda", ## (Lambda Lambda)
         ":Debuginfo", ## (Lambda Debuginfo)
@@ -635,13 +639,13 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Translprim_cmi",
     src  = "translprim.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
+    deps   = [
+        ":Lambda",
+        ":Debuginfo",
         "//parsing:Asttypes_cmi",
         "//typing:Types",
          "//typing:Typedtree_cmi",

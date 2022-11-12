@@ -1,4 +1,4 @@
-load(":BUILD.bzl", "cc_build_profile")
+load("//profile:BUILD.bzl", "cc_build_profile")
 exports_files(["BUILD.bazel"])
 
 PREFIX      = "/usr/local"

@@ -19,20 +19,53 @@ load(":BUILD.bzl", "boot_toolchain_adapter")
 # only one selector for this tc: //toolchain/selectors:bootstrap
 # with build_host_constraints  = ["//platforms/build:boot?"],
 boot_toolchain_adapter(
-    name        = "boot",
+    name        = "Xboot",
     build_host  = "boot",
     target_host = select({
         "//conditions:default": "vm"
     }),
-    compiler    = select({
-        # "//platforms/ocaml/emitter:sys?": "//boot/compiler",
-        # "//platforms/ocaml/emitter:vm?": "//boot/compiler",
-        "//conditions:default": "//boot:ocamlc.boot",
-    }),
-    lexer       = "//boot:ocamllex.boot",
-    yacc        = "//boot:ocamlyacc.boot",
+    compiler    = "//boot/bin:ocamlc.boot",
+    lexer       = "//boot/bin:ocamllex.boot",
+    yacc        = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
-    tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
+    # tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
+    copts       = [ ## compile opts (sigs/modules only)
+        "-strict-sequence",
+        # "-warn-error", "+A",
+        "-nostdlib",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+    camlheaders = [
+        # "//stdlib:camlheaders"
+        "//stdlib:camlheader", "//stdlib:target_camlheader",
+        "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+        "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+    ],
+    # std_exit = "//stdlib:Std_exit"
+)
+
+boot_toolchain_adapter(
+    name        = "default",
+    build_host  = "boot",
+    target_host = select({
+        "//conditions:default": "vm"
+    }),
+    compiler    = "//boot/bin:ocamlc.boot",
+    lexer       = "//boot:ocamllex.boot",
+    yacc        = "//yacc:ocamlyacc",
+    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
+    # tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
     copts       = [ ## compile opts (sigs/modules only)
         "-strict-sequence",
         # "-warn-error", "+A",
@@ -62,13 +95,13 @@ boot_toolchain_adapter(
 #######################
 boot_toolchain_adapter(
     name        = "vmsys",
-    build_host  = "boot",
+    build_host  = "vmsys",
     target_host = "sys",
-    compiler    = "//boot:ocamlc.boot",
-    lexer       = "//boot:ocamllex.boot",
-    yacc        = "//boot:ocamlyacc.boot",
+    compiler    = "//boot/bin:ocamlc.boot",
+    lexer       = "//boot/bin:ocamllex.boot",
+    yacc        = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
-    tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
+    # tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
     copts       = [ ## compile opts (sigs/modules only)
         "-strict-sequence",
         # "-warn-error", "+A",

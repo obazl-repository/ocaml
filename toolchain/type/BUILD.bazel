@@ -35,11 +35,11 @@
 ## IOW building level N depends on the tc at N - 1, the previous
 ## level.  Building the baseline depends on the bootstrap.
 
-toolchain_type(name = "bootstrap",
-               target_compatible_with = ["//platforms/build:vm?"],
-               visibility = ["//visibility:public"])
+toolchain_type(name = "boot", visibility = ["//visibility:public"])
 
-toolchain_type(name = "kick", visibility = ["//visibility:public"])
+toolchain_type(name = "baseline", visibility = ["//visibility:public"])
+
+toolchain_type(name = "dev", visibility = ["//visibility:public"])
 
 ####  TOOLCHAIN PROFILES  ################
 toolchain_type(name = "ocaml_tc_profile",

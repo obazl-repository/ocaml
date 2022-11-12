@@ -6,34 +6,47 @@ package(default_visibility = ["//visibility:public"])
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_compiler",
-     "boot_module",
+     "baseline_module")
+
+load("//bzl/rules/macros:compiler.bzl", "compiler")
+load("//bzl/rules/macros:lexer.bzl", "lexer")
+load("//bzl/rules/macros:stdlib.bzl", "stdlib")
+
+compiler(
+    name  = "ocamlc.byte",
+    stage = "baseline",  ## depends on boot toolchain
+    build_host_constraints = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
+    target_host_constraints = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
 )
 
-# ocamlc.byte:  *>vm  -> (vmvm)  - compiler transition to vmvm
-# ocamlopt.byte *>vm  => (vmsys) - compiler transition to vmvm
-# ocamlc.opt:   *>sys -> (sysvm) - compiler transition to syssys
-# ocamlopt.opt  *>sys => (syssys) - compiler transition to syssys
-
-# vm>vm
-alias(
-    name   = "ocamlc",
-    actual = ":ocamlc.byte"
+lexer(
+    name  = "ocamllex.byte",
+    stage = "baseline",
+    build_host_constraints = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
+    target_host_constraints = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
 )
 
-################################################################
-alias( # implemented in C, so not byte/opt versions.
+alias( # implemented in C, so no byte/opt versions.
+    name   = "ocamlyacc",
+    actual = "//yacc:ocamlyacc",
+    target_compatible_with = ["//platforms/target:boot?"]
+)
+
+alias( # implemented in C, so no byte/opt versions.
     name   = "ocamlrun",
     actual = "//runtime:ocamlrun",
 )
 
-alias(
-    name   = "ocamllex",
-    actual = "//lex:ocamllex",
-    # target_compatible_with = ["//platforms/target:boot?"]
-)
-
-alias( # implemented in C, so not byte/opt versions.
-    name   = "ocamlyacc.exe",
-    actual = "//yacc:ocamlyacc",
-    target_compatible_with = ["//platforms/target:boot?"]
-)
+stdlib(stage  = "baseline")

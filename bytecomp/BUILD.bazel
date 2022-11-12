@@ -1,15 +1,15 @@
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
-     "boot_module",
-     "boot_signature",
+     "baseline_module",
+     "baseline_signature",
 )
 
 load("//config:CONFIG.bzl",
      # "RUNTIME_OCAMLRUN",
      "OC_COMMON_CFLAGS",
      "PLATFORM_CFLAGS",
-     "IGNORE_MISSING_MLI"
+     "IGNORE_MISSING_MLI",
      )
 
 exports_files([
@@ -21,19 +21,15 @@ exports_files([
     "symtable.mli", "symtable.ml"
 ])
 
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-    "-nostdlib"
-]
+MODULE_OPTS = []
+# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+#     "-nostdlib"
+# ]
 
-SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-    "-nostdlib"
-]
-
-## make log:
-
-
-
-STDLIB = ["//boot/lib:stdlib"]
+SIG_OPTS    = []
+# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
+#     "-nostdlib"
+# ]
 
 ## dev/test: build everthing
 boot_library(
@@ -147,12 +143,12 @@ boot_library(
 )
 
 ################################################################
-boot_module(
+baseline_module(
     name   = "Bytegen",
     struct = "bytegen.ml",
     sig    = "Bytegen_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Debuginfo",
         "//lambda:Lambda",
         "//lambda:Matching",
@@ -171,7 +167,6 @@ boot_module(
         "//utils:Config",
         "//utils:Misc",
         ":Instruct",
-        # "//stdlib:Stdlib",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -179,22 +174,22 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Bytegen_cmi",
     src  = "bytegen.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         ":Instruct",
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Bytelibrarian",
     struct = "bytelibrarian.ml",
     sig    = "Bytelibrarian_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Emitcode",
         ":Bytelink",
         "//stdlib:Stdlib.String",
@@ -211,22 +206,22 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Bytelibrarian_cmi",
     src  = "bytelibrarian.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmo_format_cmi",
         "//stdlib:Stdlib.Format",
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Bytelink",
     struct = "bytelink.ml",
     sig    = "Bytelink_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Symtable",
         ":Instruct",
         ":Emitcode",
@@ -259,11 +254,11 @@ boot_module(
     ## "//stdlib:camlheader"
 )
 
-boot_signature(
+baseline_signature(
     name = "Bytelink_cmi",
     src  = "bytelink.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Symtable",
         "//utils:Misc",
         "//stdlib:Stdlib.Format",
@@ -271,12 +266,12 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Bytepackager",
     struct = "bytepackager.ml",
     sig    = "Bytepackager_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Instruct",
         ":Emitcode",
         ":Bytelink",
@@ -301,11 +296,11 @@ boot_module(
     visibility = ["//driver:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Bytepackager_cmi",
     src  = "bytepackager.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmo_format_cmi",
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
@@ -313,15 +308,14 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Bytesections",
     struct = "bytesections.ml",
     sig    = "Bytesections_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib",
         "//utils:Config"
     ],
     visibility = [
@@ -331,23 +325,22 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Bytesections_cmi",
     src  = "bytesections.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
-    ],
+    deps   = [],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Dll",
     struct = "dll.ml",
     sig    = "Dll_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Obj",
@@ -364,23 +357,23 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Dll_cmi",
     src  = "dll.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Emitcode",
     struct = "emitcode.ml",
     sig    = "Emitcode_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Translmod",
         "//parsing:Location",
         "//stdlib:Stdlib.Array",
@@ -409,11 +402,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Emitcode_cmi",
     src  = "emitcode.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//file_formats:Cmo_format_cmi",
         "//typing:Ident",
@@ -422,14 +415,13 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Instruct",
     struct = "instruct.ml",
     sig    = "Instruct_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Lambda",
-        # "//stdlib:Stdlib",
         "//typing:Types",
         "//typing:Subst",
         "//parsing:Location",
@@ -442,12 +434,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Instruct_cmi",
     src  = "instruct.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
-        # "//stdlib:Stdlib",
+    deps   = [
         "//lambda:Lambda_cmi",
         "//typing:Types",
         "//typing:Subst",
@@ -461,12 +452,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Meta",
     struct = "meta.ml",
     sig    = "Meta_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Instruct",
         "//stdlib:Stdlib.Obj",
     ],
@@ -476,11 +467,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Meta_cmi",
     src  = "meta.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Instruct",
         "//stdlib:Stdlib.Obj",
     ],
@@ -496,12 +487,13 @@ boot_signature(
 # -w +a-4-9-40-41-42-44-45-48
 # -warn-error +a
 # -bin-annot -strict-formats
-boot_module(
+baseline_module(
     name   = "Opcodes",
     struct = "opcodes.ml",
     # sig    = ":Opcodes_cmi",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
-    deps   = STDLIB + [
+    deps   = [
+        # "//stdlib:Stdlib"
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -555,11 +547,11 @@ genrule(
 # the rules don't seem to work for that
 # but we can just compile the ml file without an mli file, no?
 
-# boot_signature(
+# baseline_signature(
 #     name = "opcodes_mli",
 #     src  = "opcodes.ml",
 #     opts = SIG_OPTS,
-#     deps   = STDLIB + [
+#     deps   = [
 #     ],
 # # )
 
@@ -584,12 +576,12 @@ genrule(
 #     ])
 # )
 
-boot_module(
+baseline_module(
     name   = "Printinstr",
     struct = "printinstr.ml",
     sig    = "Printinstr_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Printlambda",
         "//lambda:Lambda",
         ":Instruct",
@@ -606,22 +598,22 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Printinstr_cmi",
     src  = "printinstr.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Instruct",
         "//stdlib:Stdlib.Format",
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Symtable",
     struct = "symtable.ml",
     sig    = "Symtable_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Runtimedef",
         "//parsing:Location",
         "//stdlib:Stdlib.Array",
@@ -652,11 +644,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Symtable_cmi",
     src  = "symtable.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmo_format_cmi",
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Digest",

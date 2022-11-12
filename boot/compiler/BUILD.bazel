@@ -10,6 +10,7 @@ load("//bzl:rules.bzl", "boot_compiler")
 # ocamlopt.opt:  -nostdlib
 boot_compiler(
     name = "compiler",
+    stage = "dev",
     opts = [
         "-nostdlib"
     ] + select({

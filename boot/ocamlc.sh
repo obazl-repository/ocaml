@@ -20,7 +20,9 @@ fi
 # echo "RUNFILES_DIR: ${RUNFILES_DIR}"
 # echo "RUNFILES_MANIFEST_FILE: ${RUNFILES_MANIFEST_FILE}"
 # echo
-# echo `cat  ${RUNFILES_MANIFEST_FILE}`
+# for x in `cat ${RUNFILES_MANIFEST_FILE}`; do
+#     echo $x
+# done
 # echo
 
 if [[ -f "${RUNFILES_DIR:-/dev/null}/bazel_tools/tools/bash/runfiles/runfiles.bash" ]]; then
@@ -33,10 +35,10 @@ else
 fi
 #       # --- end runfiles.bash initialization ---
 
-# echo "camlheader: $(rlocation ocaml_tools/stdlib/camlheader)"
+# echo "camlheader: $(rlocation ocaml_tools/stdlib/_build/camlheader)"
 
-# set -x
+# #set -x
 
-$(rlocation ocaml_tools/runtime/ocamlrun) $(rlocation ocaml_tools/boot/ocamlc) -I `dirname $(rlocation ocaml_tools/stdlib/camlheader)` $@
+$(rlocation ocaml_tools/runtime/ocamlrun) $(rlocation ocaml_tools/boot/ocamlc) -I `dirname $(rlocation ocaml_tools/stdlib/_build/camlheader)` $@
 
 

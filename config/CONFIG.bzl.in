@@ -218,8 +218,8 @@ BOOT_STDLIBFLAGS = ["-nostdlib"]
 ## the matching toolchain.
 
 # opts attrib:
-# boot_module: OC_COMMON_CFLAGS, add OC_NATIVE_CFLAGS if target == sys
-# boot_signature: OC_COMMON_CFLAGS for both vm and sys targets
+# baseline_module: OC_COMMON_CFLAGS, add OC_NATIVE_CFLAGS if target == sys
+# baseline_signature: OC_COMMON_CFLAGS for both vm and sys targets
 # BOOT_OCAMLRUN = "//boot/bin:ocamlrun"
 # RUNTIME_OCAMLRUN = "//bin:ocamlrun"
 
@@ -722,6 +722,7 @@ RUNTIMEI = "@instrumented_runtime@" == "true"
 
 ## from utils/config.generated.ml.in
 OCAML_BINDIR = "@ocaml_bindir@"
+OCAML_LIBDIR = "@ocaml_libdir@"
 standard_library_default = "@ocaml_libdir@"
 
 default_rpath = "@rpath@"
@@ -754,3 +755,5 @@ WINDOWS_UNICODE = "@windows_unicode@" == "1"
 windows_unicode = @windows_unicode@ != 0
 
 IGNORE_MISSING_MLI = ["-w", "-70"]
+
+STDLIB_RESOLVER = ["//stdlib:Stdlib"]

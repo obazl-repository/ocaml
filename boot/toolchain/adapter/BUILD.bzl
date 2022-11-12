@@ -1,15 +1,9 @@
-load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
-## exports: kick_toolchain_adapter (rule). includes stuff only
-## used during bootstrapping, e.g. primitives.
-
-## obtaining CC toolchain:  https://github.com/bazelbuild/bazel/issues/7260
-
-######################################
-def _kick_toolchain_adapter_impl(ctx):
+##########################################
+def _toolchain_adapter_impl(ctx):
 
     copts = []
     # if ctx.file.primitives:
@@ -23,13 +17,13 @@ def _kick_toolchain_adapter_impl(ctx):
         target_host            = ctx.attr.target_host,
         xtarget_host            = ctx.attr.xtarget_host,
         ## vm
-        tool_runner            = ctx.file.tool_runner,
+        runtime            = ctx.file.runtime,
         vmargs                 = ctx.attr.vmargs,
         repl                   = ctx.file.repl,
         vmlibs                 = ctx.files.vmlibs,
         linkmode               = ctx.attr.linkmode,
         ## runtime
-        stdlib                 = ctx.attr.stdlib,
+        # stdlib                 = ctx.attr.stdlib,
         # std_exit               = ctx.attr.std_exit,
         camlheaders            = ctx.files.camlheaders,
         ## core tools
@@ -39,14 +33,13 @@ def _kick_toolchain_adapter_impl(ctx):
         warnings               = ctx.attr.warnings,
         primitives             = ctx.file.primitives,
         lexer                  = ctx.attr.lexer,
-        yacc                   = ctx.file.yacc,
+        yaccer                 = ctx.file.yaccer,
     )]
 
 ###################################
 ## the rule interface
-kick_toolchain_adapter = rule(
-    _kick_toolchain_adapter_impl,
-    doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
+toolchain_adapter = rule(
+    _toolchain_adapter_impl,
     attrs = {
         # "_toolchain" : attr.label(
         #     default = "//toolchain/adapters/boot"
@@ -66,11 +59,12 @@ kick_toolchain_adapter = rule(
         ),
 
         ## Virtual Machine
-        "tool_runner": attr.label(
+        "runtime": attr.label(
             doc = "Batch interpreter. ocamlrun, usually",
             allow_single_file = True,
             executable = True,
             cfg = "exec"
+            # cfg = runtime_out_transition
         ),
 
         "vmargs": attr.label( ## string list
@@ -93,13 +87,13 @@ kick_toolchain_adapter = rule(
             # default = "static"
         ),
 
-        #### runtime
-        "stdlib": attr.label(
-            # default   = "//stdlib",
-            executable = False,
-            # allow_single_file = True,
-            # cfg = "exec",
-        ),
+        #### runtime stuff ####
+        # "stdlib": attr.label(
+        #     default   = "//boot/toolchain:stdlib",
+        #     executable = False,
+        #     # allow_single_file = True,
+        #     # cfg = "exec",
+        # ),
 
         # "std_exit": attr.label(
         #     # default = Label("//stdlib:Std_exit"),
@@ -110,8 +104,7 @@ kick_toolchain_adapter = rule(
 
         "camlheaders": attr.label_list(
             allow_files = True,
-            # default = [
-            #     # "//stdlib:camlheaders"
+            default = ["//stdlib:camlheaders"]
             #     "//stdlib:camlheader", "//stdlib:target_camlheader",
             #     "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
             #     "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
@@ -121,25 +114,25 @@ kick_toolchain_adapter = rule(
         ################################
         ## Core Tools
         "compiler": attr.label(
-            ## providers constraints seem to be ignored
-            # providers = [["OcamlArchiveMarker"]],
-            # allow_single_file = True,
-            ## vm>* not executable
-            ## sys>* executable
+            default = "//boot/toolchain:compiler",
+            allow_files = True,
             executable = True,
             cfg = "exec"
+            # cfg = compiler_out_transition
         ),
+
         "lexer": attr.label(
-            # allow_single_file = True,
+            default = "//boot/toolchain:lexer",
             executable = True,
             cfg = "exec",
         ),
 
-        "yacc": attr.label(
+        "yaccer": attr.label(
             allow_single_file = True,
             executable = True,
             cfg = "exec",
         ),
+
         "copts" : attr.string_list(
         ),
         "primitives" : attr.label(
@@ -175,6 +168,7 @@ kick_toolchain_adapter = rule(
         # ),
     },
     # cfg = toolchain_in_transition,
+    doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
     provides = [platform_common.ToolchainInfo],
 
     ## NB: config frags evidently expose CLI opts like `--cxxopt`;
@@ -184,29 +178,66 @@ kick_toolchain_adapter = rule(
     fragments = ["cpp", "platform"], ## "apple"],
     host_fragments = ["cpp", "platform"], ##, "apple"],
 
-    ## ocaml toolchain adapter depends on cc toolchain
+    ## executables need this to link cc stuff:
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"]
 )
 
-################
-def _dump_cc_toolchain(ctx):
-    print("**** CcToolchainInfo ****")
+################################################################
+##########################################
+def _stdlib_toolchain_adapter_impl(ctx):
 
-    cctc = find_cpp_toolchain(ctx)
-    print("cctc type: %s" % type(cctc))
-    items = dir(cctc)
-    for item in items:
-        print("{item}".format(item=item))
-        val = getattr(cctc, item)
-        print("  t: %s" % type(val))
-        # if item == "dynamic_runtime_lib":
-        #     print(":: %s" % cctc.dynamic_runtime_lib(
-        #         feature_configuration = cc_common.configure_features(
-        #             ctx = ctx,
-        #             cc_toolchain = cctc,
-        #             requested_features = ctx.features,
-        #             unsupported_features = ctx.disabled_features,
-        #         )
-        #     ))
-        # if item == "linker_files":
-        #     print(":: %s" % cctc.linker_files)
+    return [platform_common.ToolchainInfo(
+        # Public fields
+        name                   = ctx.label.name,
+        build_host             = ctx.attr.build_host,
+        target_host            = ctx.attr.target_host,
+        ## runtime
+        stdlib                 = ctx.attr.stdlib,
+        std_exit               = ctx.file.std_exit,
+        camlheaders            = ctx.files.camlheaders,
+    )]
+
+###################################
+## the rule interface
+stdlib_toolchain_adapter = rule(
+    _stdlib_toolchain_adapter_impl,
+    attrs = {
+        "stdlib": attr.label(
+            default   = "//boot/toolchain:stdlib",
+            executable = False,
+            # allow_single_file = True,
+            # cfg = "exec",
+        ),
+
+        "std_exit": attr.label(
+            default = Label("//boot/toolchain:std_exit"),
+            executable = False,
+            allow_single_file = True,
+            # cfg = "exec",
+        ),
+
+        "camlheaders": attr.label_list(
+            allow_files = True,
+            default = ["//stdlib:camlheaders"]
+        ),
+
+        "build_host": attr.string(
+            doc     = "OCaml host platform: vm (bytecode) or an arch.",
+            default = "vm"
+        ),
+        "target_host": attr.string(
+            doc     = "OCaml target platform: vm (bytecode) or an arch.",
+            default = "vm"
+        ),
+        "xtarget_host": attr.string(
+            doc     = "Cross-cross target platform: vm (bytecode) or an arch.",
+            default = ""
+        ),
+
+
+
+    },
+    # cfg = toolchain_in_transition,
+    doc = "Defines a stdlib for bootstrapping the OCaml toolchain",
+    provides = [platform_common.ToolchainInfo],
+)

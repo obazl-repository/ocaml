@@ -1,83 +1,26 @@
-# load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-# load("@bazel_skylib//lib:new_sets.bzl", "sets")
-# load("@bazel_skylib//lib:paths.bzl", "paths")
-
-# # load("//ocaml/_transitions:ns_transitions.bzl", "nsarchive_in_transition")
-
-# load("//bzl:providers.bzl",
-#      "CompilationModeSettingProvider",
-#      "BootInfo",
-#      "DepsAggregator",
-#      "new_deps_aggregator",
-#      "OcamlSignatureProvider")
-
-#      # "OcamlArchiveProvider",
-#      # "OcamlLibraryMarker",
-
-#      # "OcamlModuleMarker",
-#      # "OcamlNsResolverProvider",
-
-# load("//bzl:functions.bzl",
-#      "capitalize_initial_char",
-#      "get_fs_prefix",
-#      "get_module_name",
-#      "normalize_module_label"
-# )
-
-# load("//bzl/rules/common:options.bzl", "get_options", "NEGATION_OPTS")
-
-# load("//bzl/rules:impl_ccdeps.bzl", "dump_CcInfo")
-
-# load("//bzl/rules/common:impl_common.bzl",
-#      "dsorder",
-#      "opam_lib_prefix",
-#      "tmpdir")
-
-# load("//bzl/rules/common:DEPS.bzl",
-#      "aggregate_deps",
-#      "merge_depsets",
-#      "COMPILE", "LINK", "COMPILE_LINK")
-
 #######################
 def signature_attrs():
 
     return dict(
-        # rule_options,
-
-        # _boot       = attr.label(
-        #     default = "//bzl/toolchain:boot",
-        # ),
 
         primitives = attr.label(
             # default = "//runtime:primitives",
             allow_single_file = True,
         ),
 
-        # _toolchain = attr.label(
-        #     default = "//bzl/toolchain:tc"
-        # ),
-
         _stage = attr.label(
             doc = "bootstrap stage",
             default = "//bzl:stage"
         ),
 
-        # ocamlc = attr.label(
-        #     # cfg = ocamlc_out_transition,
-        #     allow_single_file = True,
-        #     default = "//bzl/toolchain:ocamlc"
-        # ),
-
-        # _mode       = attr.label(
-        #     default = "//bzl/toolchain",
-        # ),
-        # mode       = attr.string(
-        #     doc     = "Overrides global mode build setting.",
-        # ),
-
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
         ),
+
+        warnings = attr.string_list(
+            doc = "List of ids, with or without '-' prefix. Do not include '-w'"
+        ),
+
         ## GLOBAL CONFIGURABLE DEFAULTS (all ppx_* rules)
         # _debug           = attr.label(default = "@ocaml//debug"),
         # _cmt             = attr.label(default = "@ocaml//cmt"),

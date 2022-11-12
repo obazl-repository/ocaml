@@ -1,0 +1,5 @@
+toolchain_type(name = "boot", visibility = ["//visibility:public"])
+toolchain_type(name = "baseline", visibility = ["//visibility:public"])
+toolchain_type(name = "stdlib", visibility = ["//visibility:public"])
+
+toolchain_type(name = "foo", visibility = ["//visibility:public"])

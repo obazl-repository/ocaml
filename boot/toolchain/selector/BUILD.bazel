@@ -1,0 +1,48 @@
+load("//toolchain/selectors:BUILD.bzl", "toolchain_selector")
+
+package(default_visibility=["//visibility:public"])
+
+exports_files(glob(["*.bazel"]))
+
+toolchain_selector(
+    name           = "boot",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:boot",
+    build_host_constraints  = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
+    target_host_constraints  = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
+)
+
+toolchain_selector(
+    name           = "baseline",
+    type           = "//boot/toolchain/type:baseline",
+    adapter        = "//boot/toolchain/adapter:baseline",
+    build_host_constraints  = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
+    target_host_constraints  = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
+)
+
+toolchain_selector(
+    name           = "stdlib",
+    type           = "//boot/toolchain/type:stdlib",
+    adapter        = "//boot/toolchain/adapter:stdlib",
+    build_host_constraints  = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
+    target_host_constraints  = [
+        "//boot/constraints/executor:vm",
+        "//boot/constraints/emitter:vm"
+    ],
+)
+

@@ -7,17 +7,26 @@ package(default_visibility = ["//visibility:public"])
 # inherit from local config platform, so runtime always matches local
 # platform.
 
-platform(name = "sys_vm_vm",    # ocamlc.byte
-         parents = ["@local_config_platform//:host"],
-         exec_compatible_with = [
-             # not compatible with //platforms:boot?
-             "//platforms:vm?", "//platforms:sys?"
-
-         ],
-         constraint_values = [
-             # "@platforms//os:linux", "@platforms//cpu:x86_64",
-             "//platforms/ocaml/executor:vm?",
-             "//platforms/ocaml/emitter:vm?"])
+platform(
+    name = "sys_vm_vm",    # ocamlc.byte
+    parents = ["@local_config_platform//:host"],
+    # registering this platform sets these values:
+    constraint_values = [
+        # "@platforms//os:linux", "@platforms//cpu:x86_64",
+        "//platforms/ocaml/executor:vm?",
+        "//platforms/ocaml/emitter:vm?"
+    ],
+    # the constraint values set by this platform above do not exclude
+    # toolchains that do not use them. e.g. a tc selector with no exec
+    # compatibility constraints could be selected, or one with only
+    # one of the following constraints (this platform would be
+    # "compatible" with both).
+    exec_compatible_with = [
+        # not compatible with //platforms:boot?
+        "//platforms/ocaml/executor:vm?",
+        "//platforms/ocaml/emitter:vm?"
+    ],
+)
 
 platform(name = "sys_vm_sys",   # ocamlopt.byte
          parents = ["@local_config_platform//:host"],
@@ -80,7 +89,7 @@ platform(name = "sys",
 #          parents = ["@local_config_platform//:host"],
 #          constraint_values = [":dev?"])
 
-# platform(name = "default", parents = ["@local_config_platform//:host"])
+platform(name = "default", parents = ["@local_config_platform//:host"])
 
 ################################################################
 config_setting(name = "linux_amd64?",

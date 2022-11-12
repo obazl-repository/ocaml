@@ -7,10 +7,10 @@
 # -nostdlib -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
 
 load("//bzl:rules.bzl",
-     "boot_module",
+     "baseline_module",
      "boot_archive",
      "boot_library",
-     "boot_signature")
+     "baseline_signature")
 
 load("//config:CONFIG.bzl",
      # "ROOT_MODULE_OPTS",
@@ -46,8 +46,6 @@ SIG_OPTS    = []
 # OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
 #     "-nostdlib"
 # ]
-
-STDLIB = ["//boot/lib:stdlib"]
 
 boot_archive(
     name = "typing",
@@ -163,22 +161,22 @@ boot_library(
 )
 
 ################################################################
-boot_signature(
+baseline_signature(
     name = "Annot_cmi",
     src  = "annot.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location"
     ],
     visibility = ["//tools:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Btype",
     struct = "btype.ml",
     sig    = "Btype_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -200,22 +198,22 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Btype_cmi",
     src  = "btype.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Path",
         "//parsing:Asttypes_cmi",
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Cmt2annot",
     struct = "cmt2annot.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Tast_iterator",
@@ -238,12 +236,12 @@ boot_module(
     visibility = ["//tools:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Ctype",
     struct = "ctype.ml",
     sig    = "Ctype_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//parsing:Longident",
         "//stdlib:Stdlib.Hashtbl",
@@ -284,11 +282,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Ctype_cmi",
     src  = "ctype.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
@@ -302,12 +300,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Datarepr",
     struct = "datarepr.ml",
     sig    = "Datarepr_cmi",
     opts = MODULE_OPTS + ["-w", "-40"],
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.List",
@@ -322,11 +320,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Datarepr_cmi",
     src  = "datarepr.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         ":Types",
         ":Path",
@@ -334,12 +332,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Env",
     struct = "env.ml",
     sig    = "Env_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmi_format",
         "//parsing:Builtin_attributes",
         "//parsing:Location",
@@ -382,11 +380,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Env_cmi",
     src  = "env.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmi_format_cmi",
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
@@ -409,12 +407,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Envaux",
     struct = "envaux.ml",
     sig    = "Envaux_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -429,11 +427,11 @@ boot_module(
     visibility = ["//tools:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Envaux_cmi",
     src  = "envaux.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
         ":Env",
@@ -442,12 +440,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Errortrace",
     struct = "errortrace.ml",
     sig    = "Errortrace_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
         ":Path",
@@ -455,11 +453,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Errortrace_cmi",
     src  = "errortrace.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
         ":Path",
@@ -467,12 +465,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Ident",
     struct = "ident.ml",
     sig    = "Ident_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Int",
@@ -495,11 +493,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Ident_cmi",
     src  = "ident.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
         "//utils:Identifiable",
     ],
@@ -509,12 +507,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Includeclass",
     struct = "includeclass.ml",
     sig    = "Includeclass_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Builtin_attributes",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
@@ -525,11 +523,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Includeclass_cmi",
     src  = "includeclass.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.Format",
         ":Ctype",
@@ -539,12 +537,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Includecore",
     struct = "includecore.ml",
     sig    = "Includecore_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Builtin_attributes",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Int",
@@ -571,11 +569,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Includecore_cmi",
     src  = "includecore.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
@@ -592,12 +590,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Includemod",
     struct = "includemod.ml",
     sig    = "Includemod_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Builtin_attributes",
         "//parsing:Location",
@@ -634,11 +632,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Includemod_cmi",
     src  = "includemod.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//parsing:Longident",
         "//parsing:Parsetree_cmi",
@@ -656,12 +654,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Includemod_errorprinter",
     struct = "includemod_errorprinter.ml",
     sig    = "Includemod_errorprinter_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Format",
@@ -687,11 +685,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Includemod_errorprinter_cmi",
     src  = "includemod_errorprinter.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Longident",
         "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Format",
@@ -704,12 +702,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Mtype",
     struct = "mtype.ml",
     sig    = "Mtype_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
@@ -725,11 +723,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Mtype_cmi",
     src  = "mtype.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         ":Env",
         ":Ident",
@@ -738,12 +736,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Oprint",
     struct = "oprint.ml",
     sig    = "Oprint_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Pprintast",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Char",
@@ -760,11 +758,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Oprint_cmi",
     src  = "oprint.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
         ":Outcometree_cmi",
@@ -773,11 +771,11 @@ boot_signature(
 
 # ./boot/ocamlrun ./boot/ocamlc -g -nostdlib -I boot -use-prims runtime/primitives -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48-66-70 -warn-error +a -bin-annot -safe-string -strict-formats -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c typing/outcometree.mli
 
-boot_signature(
+baseline_signature(
     name = "Outcometree_cmi",
     src  = "outcometree.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
         ":Type_immediacy",
@@ -788,12 +786,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Parmatch",
     struct = "parmatch.ml",
     sig    = "Parmatch_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Ast_helper",
         "//parsing:Location",
         "//parsing:Longident",
@@ -832,11 +830,11 @@ boot_module(
     visibility = ["//lambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Parmatch_cmi",
     src  = "parmatch.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
@@ -849,12 +847,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Path",
     struct = "path.ml",
     sig    = "Path_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.List",
@@ -874,11 +872,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Path_cmi",
     src  = "path.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.Set",
@@ -887,12 +885,12 @@ boot_signature(
     visibility = ["//middle_end:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Patterns",
     struct = "patterns.ml",
     sig    = "Patterns_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//parsing:Longident",
         "//stdlib:Stdlib.List",
@@ -906,11 +904,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Patterns_cmi",
     src  = "patterns.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Longident",
         "//parsing:Parsetree_cmi",
@@ -921,12 +919,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Persistent_env",
     struct = "persistent_env.ml",
     sig    = "Persistent_env_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmi_format",
         "//parsing:Location",
         "//stdlib:Stdlib.Digest",
@@ -948,11 +946,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Persistent_env_cmi",
     src  = "persistent_env.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmi_format_cmi",
         "//parsing:Location",
         "//stdlib:Stdlib.Digest",
@@ -964,12 +962,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Predef",
     struct = "predef.ml",
     sig    = "Predef_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Ast_helper",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
@@ -990,11 +988,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Predef_cmi",
     src  = "predef.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
         ":Ident",
@@ -1003,12 +1001,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Primitive",
     struct = "primitive.ml",
     sig    = "Primitive_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Attr_helper",
         "//parsing:Location",
         "//stdlib:Stdlib.Format",
@@ -1025,11 +1023,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Primitive_cmi",
     src  = "primitive.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Parsetree_cmi",
@@ -1037,12 +1035,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Printpat",
     struct = "printpat.ml",
     sig    = "Printpat_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
@@ -1054,11 +1052,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Printpat_cmi",
     src  = "printpat.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Longident",
         "//parsing:Parsetree_cmi",
@@ -1068,12 +1066,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Printtyp",
     struct = "printtyp.ml",
     sig    = "Printtyp_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//parsing:Longident",
         "//stdlib:Stdlib.Array",
@@ -1117,11 +1115,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Printtyp_cmi",
     src  = "printtyp.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Path",
         ":Outcometree_cmi",
@@ -1136,12 +1134,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Printtyped",
     struct = "printtyped.ml",
     sig    = "Printtyped_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Path",
@@ -1164,11 +1162,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Printtyped_cmi",
     src  = "printtyped.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Typedtree",
         ":Path",
         "//parsing:Asttypes_cmi",
@@ -1178,12 +1176,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Rec_check",
     struct = "rec_check.ml",
     sig    = "Rec_check_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typeopt",
         ":Typedtree",
@@ -1196,11 +1194,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Rec_check_cmi",
     src  = "rec_check.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Typedtree",
         ":Path",
         ":Ident",
@@ -1210,12 +1208,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Shape",
     struct = "shape.ml",
     sig    = "Shape_cmi",
     opts = MODULE_OPTS + ["-w", "-40"],
-    deps   = STDLIB + [
+    deps   = [
         ":Ident",
         ":Path",
         "//utils:Identifiable",
@@ -1226,22 +1224,22 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Shape_cmi",
     src  = "shape.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Ident_cmi",
         ":Path_cmi"
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Signature_group",
     struct = "signature_group.ml",
     sig    = "Signature_group_cmi",
     opts = MODULE_OPTS + ["-w", "-40"],
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Ident",
         ":Btype",
@@ -1250,22 +1248,22 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Signature_group_cmi",
     src  = "signature_group.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         "//stdlib:Stdlib.Seq",
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Stypes",
     struct = "stypes.ml",
     sig    = "Stypes_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Typedtree",
         ":Printtyp",
         "//stdlib:Stdlib.String",
@@ -1280,11 +1278,11 @@ boot_module(
     visibility = ["//tools:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Stypes_cmi",
     src  = "stypes.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Typedtree",
         ":Path",
         ":Annot_cmi",
@@ -1294,12 +1292,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Subst",
     struct = "subst.ml",
     sig    = "Subst_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Ast_mapper",
         "//parsing:Location",
         "//stdlib:Stdlib.List",
@@ -1325,11 +1323,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Subst_cmi",
     src  = "subst.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Path",
         ":Ident",
@@ -1338,12 +1336,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Tast_iterator",
     struct = "tast_iterator.ml",
     sig    = "Tast_iterator_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Subst",
@@ -1355,11 +1353,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Tast_iterator_cmi",
     src  = "tast_iterator.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Typedtree",
         ":Path",
         ":Env",
@@ -1369,12 +1367,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Tast_mapper",
     struct = "tast_mapper.ml",
     sig    = "Tast_mapper_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Subst",
@@ -1387,11 +1385,11 @@ boot_module(
     visibility = ["//file_formats:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Tast_mapper_cmi",
     src  = "tast_mapper.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Typedtree",
         ":Path",
         ":Env",
@@ -1401,12 +1399,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Type_immediacy",
     struct = "type_immediacy.ml",
     sig    = "Type_immediacy_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Builtin_attributes",
     ],
     visibility = [
@@ -1414,21 +1412,21 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Type_immediacy_cmi",
     src  = "type_immediacy.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Parsetree_cmi"
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typeclass",
     struct = "typeclass.ml",
     sig    = "Typeclass_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
         "//parsing:Builtin_attributes",
@@ -1475,11 +1473,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typeclass_cmi",
     src  = "typeclass.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
@@ -1495,12 +1493,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typecore",
     struct = "typecore.ml",
     sig    = "Typecore_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
         "//parsing:Builtin_attributes",
@@ -1560,11 +1558,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typecore_cmi",
     src  = "typecore.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Path",
@@ -1578,12 +1576,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typedecl",
     struct = "typedecl.ml",
     sig    = "Typedecl_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
 
         "//parsing:Ast_helper",
         "//parsing:Ast_iterator",
@@ -1627,11 +1625,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typedecl_cmi",
     src  = "typedecl.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
@@ -1651,12 +1649,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typedecl_immediacy",
     struct = "typedecl_immediacy.ml",
     sig    = "Typedecl_immediacy_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedecl_unboxed",
         ":Typedecl_properties",
@@ -1667,11 +1665,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typedecl_immediacy_cmi",
     src  = "typedecl_immediacy.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedecl_properties",
         ":Type_immediacy",
@@ -1681,12 +1679,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typedecl_properties",
     struct = "typedecl_properties.ml",
     sig    = "Typedecl_properties_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Subst",
         ":Ident",
@@ -1697,23 +1695,23 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typedecl_properties_cmi",
     src  = "typedecl_properties.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Ident",
         ":Env",
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typedecl_separability",
     struct = "typedecl_separability.ml",
     sig    = "Typedecl_separability_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedecl_properties",
         ":Subst",
@@ -1729,11 +1727,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typedecl_separability_cmi",
     src  = "typedecl_separability.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedecl_properties",
         ":Ident",
@@ -1742,12 +1740,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typedecl_unboxed",
     struct = "typedecl_unboxed.ml",
     sig    = "Typedecl_unboxed_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Subst",
         ":Env",
@@ -1756,22 +1754,22 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typedecl_unboxed_cmi",
     src  = "typedecl_unboxed.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Env",
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typedecl_variance",
     struct = "typedecl_variance.ml",
     sig    = "Typedecl_variance_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.String",
@@ -1788,11 +1786,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typedecl_variance_cmi",
     src  = "typedecl_variance.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Typedecl_properties",
@@ -1806,12 +1804,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typedtree",
     struct = "typedtree.ml",
     sig    = "Typedtree_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//parsing:Longident",
         "//stdlib:Stdlib.List",
@@ -1834,11 +1832,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typedtree_cmi",
     src  = "typedtree.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Primitive",
         ":Path",
@@ -1856,12 +1854,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typemod",
     struct = "typemod.ml",
     sig    = "Typemod_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmi_format",
         "//file_formats:Cmt_format",
         "//parsing:Attr_helper",
@@ -1915,11 +1913,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typemod_cmi",
     src  = "typemod.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Typedecl",
@@ -1934,12 +1932,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Typeopt",
     struct = "typeopt.ml",
     sig    = "Typeopt_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Typedecl_unboxed",
@@ -1961,11 +1959,11 @@ boot_module(
     visibility = ["//lambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typeopt_cmi",
     src  = "typeopt.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Path",
@@ -1977,12 +1975,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Types",
     struct = "types.ml",
     sig    = "Types_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Type_immediacy",
         ":Primitive",
         ":Path",
@@ -2010,11 +2008,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Types_cmi",
     src  = "types.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
         ":Ident",
@@ -2026,12 +2024,12 @@ boot_signature(
     visibility = ["//lambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Typetexp",
     struct = "typetexp.ml",
     sig    = "Typetexp_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Subst",
@@ -2059,11 +2057,11 @@ boot_module(
     visibility = ["//toplevel:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Typetexp_cmi",
     src  = "typetexp.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Types",
         ":Typedtree",
         ":Path",
@@ -2077,12 +2075,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Untypeast",
     struct = "untypeast.ml",
     sig    = "Untypeast_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Ast_helper",
         "//parsing:Location",
         "//parsing:Longident",
@@ -2129,11 +2127,11 @@ boot_module(
     visibility = ["//tools:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Untypeast_cmi",
     src  = "untypeast.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Typedtree",
         ":Path",
         "//parsing:Parsetree_cmi",

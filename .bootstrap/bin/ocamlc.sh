@@ -20,7 +20,9 @@ fi
 # echo "RUNFILES_DIR: ${RUNFILES_DIR}"
 # echo "RUNFILES_MANIFEST_FILE: ${RUNFILES_MANIFEST_FILE}"
 # echo
-# echo `cat  ${RUNFILES_MANIFEST_FILE}`
+# for x in `cat ${RUNFILES_MANIFEST_FILE}`; do
+#     echo $x
+# done
 # echo
 
 if [[ -f "${RUNFILES_DIR:-/dev/null}/bazel_tools/tools/bash/runfiles/runfiles.bash" ]]; then

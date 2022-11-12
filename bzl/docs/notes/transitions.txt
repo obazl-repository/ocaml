@@ -4,7 +4,7 @@ SUBCOMMAND: # //runtime:camlrun [action 'Compiling runtime/alloc.c',
                                         configuration: 4ad0c72fba7e78b00fcd67488bf5899373a7db9dc808c0c110ee2635 736119cb45c1,
                                         execution platform: @local_config_platform//:host]
 
-SUBCOMMAND: # //stdlib:Stdlib.Either [action 'boot>boot compiling boot_module: //stdlib:Stdlib.Either',
+SUBCOMMAND: # //stdlib:Stdlib.Either [action 'boot>boot compiling baseline_module: //stdlib:Stdlib.Either',
                                              configuration: dbd0714069eb3a3a8618862cf4d55162fa4c4ae18c05c786acfb9f1711290651b261,
                                              execution platform: @local_config_platform//:host]
 

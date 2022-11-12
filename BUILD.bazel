@@ -1,17 +1,20 @@
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
-exports_files(["Makefile.config", "VERSION"])
+exports_files(["Makefile.config", "VERSION", "BUILD.bazel"])
 
 build_test(
     name = "toolchain",
     targets = [
-
+        ## boot stuff
         "//runtime:camlrun",
         "//runtime:asmrun",
+        "//lex:ocamllex",
+        "//yacc:ocamlyacc",
+        "//stdlib",
 
-        "//boot/bin:ocamlc.byte",
-        "//boot/bin:ocamlopt.byte",
-        "//boot/bin:ocamllex",
+        # "//boot/bin:ocamlc.byte",
+        # "//boot/bin:ocamlopt.byte",
+        # "//boot/bin:ocamllex",
         # "//boot/bin:ocamlc.opt",
         # "//boot/bin:ocamlopt.opt",
 

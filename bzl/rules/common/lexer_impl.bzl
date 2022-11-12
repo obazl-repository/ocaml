@@ -1,7 +1,5 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl/rules/common:impl_common.bzl", "tmpdir")
-
 ## make.log:
 # ./boot/ocamlrun ./boot/ocamllex -q lex/lexer.mll
 # ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I lex -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c lex/lexer.mli
@@ -21,7 +19,29 @@ def impl_lexer(ctx):
 
     # mode = ctx.attr.mode
 
-    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    # tc = ctx.exec_groups[ctx.attr._stage].toolchains[
+    #     "//toolchain/type:{}".format(ctx.attr._stage)
+    # ]
+    # tc = ctx.toolchains["//toolchain/type:boot"]
+
+
+    stage = ctx.attr._stage[BuildSettingInfo].value
+    print("module _stage: %s" % stage)
+
+    tc = None
+    if stage == "boot":
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+    elif stage == "baseline":
+        tc = ctx.exec_groups["baseline"].toolchains[
+            "//boot/toolchain/type:baseline"]
+    elif stage == "dev":
+        tc = ctx.exec_groups["dev"].toolchains[
+            "//boot/toolchain/type:boot"]
+    else:
+        print("UNHANDLED STAGE: %s" % stage)
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
 
     if tc.target_host in ["boot", "baseline", "vm"]:
         ext = ".cmo"
@@ -48,6 +68,8 @@ def impl_lexer(ctx):
     args.add("-o", lexer)
 
     args.add(ctx.file.src)
+
+    print("TC LEXER: %s:" % tc.lexer)
 
     ctx.actions.run(
         # env = env,

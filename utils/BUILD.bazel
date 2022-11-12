@@ -13,10 +13,11 @@
 
 load("//bzl:rules.bzl",
      "boot_archive",
+     "boot_config",
      "boot_executable",
      "boot_library",
-     "boot_module",
-     "boot_signature",
+     "baseline_module",
+     "baseline_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -155,7 +156,7 @@ boot_library(
 )
 
 ################################################################
-boot_module(
+baseline_module(
     name   = "Arg_helper",
     struct = "arg_helper.ml",
     sig    = "Arg_helper_cmi",
@@ -173,7 +174,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Arg_helper_cmi",
     src  = "arg_helper.mli",
     opts = SIG_OPTS,
@@ -182,7 +183,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Binutils",
     struct = "binutils.ml",
     sig    = "Binutils_cmi",
@@ -215,7 +216,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Binutils_cmi",
     src  = "binutils.mli",
     opts = SIG_OPTS,
@@ -224,7 +225,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Build_path_prefix_map",
     struct = "build_path_prefix_map.ml",
     sig    = "Build_path_prefix_map_cmi",
@@ -243,7 +244,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Build_path_prefix_map_cmi",
     src  = "build_path_prefix_map.mli",
     opts = SIG_OPTS,
@@ -252,7 +253,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Ccomp",
     struct = "ccomp.ml",
     sig    = "Ccomp_cmi",
@@ -278,7 +279,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     name = "Ccomp_cmi",
     src  = "ccomp.mli",
     opts = SIG_OPTS,
@@ -287,7 +288,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Clflags",
     struct = "clflags.ml",
     sig    = "Clflags_cmi",
@@ -319,7 +320,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Clflags_cmi",
     src  = "clflags.mli",
     opts = SIG_OPTS,
@@ -332,7 +333,7 @@ boot_signature(
     visibility = ["//driver:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Config",
     struct = "config.ml",
     sig    = "Config_cmi",
@@ -340,6 +341,7 @@ boot_module(
     deps   = [ # [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option", # if not bootstrapping?
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys"
     ],
@@ -362,47 +364,72 @@ boot_module(
 # utils/config.ml: \
 #   utils/config_$(if $(filter true,$(IN_COREBOOT_CYCLE)),boot,main).ml
 # 	cp $< $@
-genrule(
-    outs   = ["config.ml"],
-    name   = "config_ml__",
-    srcs   = select({
-        "//config:bootstrapping?": [":config_boot.ml"],
-        "//conditions:default": [":config_main.ml"]
+boot_config(
+    name   = "config_ml",
+    out    = "config.ml",
+    header = select({
+        "//config/stage:boot?" : ":config.fixed.ml",
+        "//config/stage:dev?"  : ":config.dev.ml",
+        "//config/stage:test?" : ":config.dev.ml",
+        "//conditions:default" : ":config.generated.ml"
     }),
-    cmd    = " ".join([
-        "cp $(SRCS) $@"
-    ])
+    footer = "config.common.ml",
 )
+
+# genrule(
+#     outs   = ["config.ml"],
+#     name   = "config_ml__",
+#     srcs   = select({
+#         "//config:bootstrapping?": [":config_boot.ml"],
+#         "//config/stage:dev?"    : [":config_dev.ml"],
+#         "//conditions:default"   : [":config_main.ml"]
+#     }),
+#     cmd    = " ".join([
+#         "cp $(SRCS) $@"
+#     ])
+# )
 
 # utils/config_boot.ml: utils/config.fixed.ml utils/config.common.ml
 # 	cat $^ > $@
-genrule(
-    outs   = ["config_boot.ml"],
-    name   = "config_boot_ml",
-    srcs   = [
-        ":config.fixed.ml",
-        ":config.common.ml"
-    ],
-    cmd    = " ".join([
-        "cat $(SRCS) > $@"
-    ])
-)
+# genrule(
+#     outs   = ["config_boot.ml"],
+#     name   = "config_boot_ml",
+#     srcs   = [
+#         ":config.fixed.ml",
+#         ":config.common.ml"
+#     ],
+#     cmd    = " ".join([
+#         "cat $(SRCS) > $@"
+#     ])
+# )
+
+# genrule(
+#     outs   = ["config_dev.ml"],
+#     name   = "config_dev_ml",
+#     srcs   = [
+#         ":config.dev.ml",
+#         ":config.common.ml"
+#     ],
+#     cmd    = " ".join([
+#         "cat $(SRCS) > $@"
+#     ])
+# )
 
 # utils/config_main.ml: utils/config.generated.ml utils/config.common.ml
 # 	cat $^ > $@
-genrule(
-    outs   = ["config_main.ml"],
-    name   = "config_main_ml",
-    srcs   = [
-        ":config.generated.ml",
-        ":config.common.ml"
-    ],
-    cmd    = " ".join([
-        "cat $(SRCS) > $@"
-    ])
-)
+# genrule(
+#     outs   = ["config_main.ml"],
+#     name   = "config_main_ml",
+#     srcs   = [
+#         ":config.generated.ml",
+#         ":config.common.ml"
+#     ],
+#     cmd    = " ".join([
+#         "cat $(SRCS) > $@"
+#     ])
+# )
 
-boot_signature(
+baseline_signature(
     name = "Config_cmi",
     src  = "config.mli",
     opts = SIG_OPTS,
@@ -418,7 +445,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Consistbl",
     struct = "consistbl.ml",
     sig    = "Consistbl_cmi",
@@ -438,7 +465,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Consistbl_cmi",
     src  = "consistbl.mli",
     opts = SIG_OPTS,
@@ -451,7 +478,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Diffing",
     struct = "diffing.ml",
     sig    = "Diffing_cmi",
@@ -466,7 +493,7 @@ boot_module(
     visibility = ["//typing:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Diffing_cmi",
     src  = "diffing.mli",
     opts = SIG_OPTS,
@@ -477,7 +504,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Diffing_with_keys",
     struct = "diffing_with_keys.ml",
     sig    = "Diffing_with_keys_cmi",
@@ -494,7 +521,7 @@ boot_module(
     visibility = ["//typing:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Diffing_with_keys_cmi",
     src  = "diffing_with_keys.mli",
     opts = SIG_OPTS,
@@ -505,7 +532,7 @@ boot_signature(
     visibility = ["//typing:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Domainstate",
     struct = "domainstate.ml",
     sig    = "Domainstate_cmi",
@@ -534,7 +561,7 @@ genrule(
     ])
 )
 
-boot_signature(
+baseline_signature(
     name = "Domainstate_cmi",
     src  = "domainstate.mli",
     opts = SIG_OPTS,
@@ -567,7 +594,7 @@ genrule(
 # 	$(CPP) -I runtime/caml $< > $@
 
 
-boot_module(
+baseline_module(
     name   = "Identifiable",
     struct = "identifiable.ml",
     sig    = "Identifiable_cmi",
@@ -589,7 +616,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Identifiable_cmi",
     src  = "identifiable.mli",
     opts = SIG_OPTS,
@@ -606,7 +633,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Int_replace_polymorphic_compare",
     struct = "int_replace_polymorphic_compare.ml",
     sig    = "Int_replace_polymorphic_compare_cmi",
@@ -621,14 +648,14 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Int_replace_polymorphic_compare_cmi",
     src  = "int_replace_polymorphic_compare.mli",
     opts = SIG_OPTS,
     deps   = ["//stdlib:Stdlib"]
 )
 
-boot_module(
+baseline_module(
     name   = "Lazy_backtrack",
     struct = "lazy_backtrack.ml",
     sig    = "Lazy_backtrack_cmi",
@@ -642,7 +669,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Lazy_backtrack_cmi",
     src  = "lazy_backtrack.mli",
     opts = SIG_OPTS,
@@ -652,7 +679,7 @@ boot_signature(
     visibility = ["//typing:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Load_path",
     struct = "load_path.ml",
     sig    = "Load_path_cmi",
@@ -681,7 +708,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Load_path_cmi",
     src  = "load_path.mli",
     opts = SIG_OPTS,
@@ -690,7 +717,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Local_store",
     struct = "local_store.ml",
     sig    = "Local_store_cmi",
@@ -706,16 +733,16 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Local_store_cmi",
     src  = "local_store.mli",
-    opts = SIG_OPTS + ["-open", "Stdlib"], # "-I", "bazel-out/darwin-fastbuild/bin/stdlib"], FIXME
+    opts = SIG_OPTS,
     deps   = [
         "//stdlib:Stdlib_cmi"
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Misc",
     struct = "misc.ml",
     sig    = "Misc_cmi",
@@ -760,7 +787,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Misc_cmi",
     src  = "misc.mli",
     opts = SIG_OPTS,
@@ -780,7 +807,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Numbers",
     struct = "numbers.ml",
     sig    = "Numbers_cmi",
@@ -805,7 +832,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Numbers_cmi",
     src  = "numbers.mli",
     opts = SIG_OPTS,
@@ -818,7 +845,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Profile",
     struct = "profile.ml",
     sig    = "Profile_cmi",
@@ -846,7 +873,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Profile_cmi",
     src  = "profile.mli",
     opts = SIG_OPTS,
@@ -855,7 +882,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Strongly_connected_components",
     struct = "strongly_connected_components.ml",
     sig    = "Strongly_connected_components_cmi",
@@ -874,7 +901,7 @@ boot_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Strongly_connected_components_cmi",
     src  = "strongly_connected_components.mli",
     opts = SIG_OPTS,
@@ -886,7 +913,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Targetint",
     struct = "targetint.ml",
     sig    = "Targetint_cmi",
@@ -902,7 +929,7 @@ boot_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Targetint_cmi",
     src  = "targetint.mli",
     opts = SIG_OPTS,
@@ -912,7 +939,7 @@ boot_signature(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Terminfo",
     struct = "terminfo.ml",
     sig    = "Terminfo_cmi",
@@ -928,14 +955,14 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Terminfo_cmi",
     src  = "terminfo.mli",
     opts = SIG_OPTS,
     deps   = ["//stdlib:Stdlib_cmi"]
 )
 
-boot_module(
+baseline_module(
     name   = "Warnings",
     struct = "warnings.ml",
     sig    = "Warnings_cmi",
@@ -967,7 +994,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Warnings_cmi",
     src  = "warnings.mli",
     opts = SIG_OPTS,

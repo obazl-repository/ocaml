@@ -5,7 +5,7 @@ def build_packed_module(
 
     print("BUILDING PACKED MODULE: %s" % ctx.attr.pack_ns)
 
-    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    tc = ctx.toolchains["//toolchain/type:boot"]
 
     module_name = ctx.attr.pack_ns[:1].capitalize() + ctx.attr.pack_ns[1:]
     out_cm_ = ctx.actions.declare_file(tmpdir + module_name + ".cmo")

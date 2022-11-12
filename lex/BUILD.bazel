@@ -1,8 +1,8 @@
 load("//bzl:rules.bzl",
      "boot_executable",
-     "boot_module",
+     "baseline_module",
      "boot_lexer",
-     "boot_signature",
+     "baseline_signature",
      "boot_library",
 )
 
@@ -67,22 +67,22 @@ STDLIB = ["//stdlib:Stdlib"]
 # lex/compact.cmx lex/common.cmx lex/output.cmx lex/outputbis.cmx lex/main.cmx
 
 BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
-boot_executable(
-    name       = "ocamllex",
-    prologue   = [":lex"],
-    main       = ":Main",
-    opts       = select({
-        "//platforms/target:vm?" : BOOT_OPTS,
-        "//platforms/target:sys?": ["-nostdlib"],
-        "//conditions:default"   : BOOT_OPTS
-   }),
-    use_prims  = select({
-        "//platforms/target:vm?" : True,
-        "//platforms/target:sys?": False,
-        "//conditions:default"   : True
-    }),
-    visibility = ["//visibility:public"]
-)
+# boot_executable(
+#     name       = "ocamllex",
+#     prologue   = [":lex"],
+#     main       = ":Main",
+#     opts       = select({
+#         "//platforms/target:vm?" : BOOT_OPTS,
+#         "//platforms/target:sys?": ["-nostdlib"],
+#         "//conditions:default"   : BOOT_OPTS
+#    }),
+#     use_prims  = select({
+#         "//platforms/target:vm?" : True,
+#         "//platforms/target:sys?": False,
+#         "//conditions:default"   : True
+#     }),
+#     visibility = ["//visibility:public"]
+# )
 
 boot_library(
     name = "lex",
@@ -98,9 +98,10 @@ boot_library(
         ":Syntax",
         ":Table",
     ],
+    visibility = ["//boot:__subpackages__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Common",
     struct = "common.ml",
     sig    = "Common_cmi",
@@ -116,7 +117,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Common_cmi",
     src  = "common.mli",
     opts = SIG_OPTS,
@@ -126,7 +127,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Compact",
     struct = "compact.ml",
     sig    = "Compact_cmi",
@@ -140,7 +141,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Compact_cmi",
     src  = "compact.mli",
     opts = SIG_OPTS,
@@ -150,7 +151,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Cset",
     struct = "cset.ml",
     sig    = "Cset_cmi",
@@ -162,7 +163,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Cset_cmi",
     src  = "cset.mli",
     opts = SIG_OPTS,
@@ -170,7 +171,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Lexer",
     struct = "lexer.ml",
     sig    = "Lexer_cmi",
@@ -187,7 +188,7 @@ boot_lexer(
     src  = "lexer.mll"
 )
 
-boot_signature(
+baseline_signature(
     name = "Lexer_cmi",
     src  = "lexer.mli",
     opts = SIG_OPTS,
@@ -196,7 +197,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Lexgen",
     struct = "lexgen.ml",
     sig    = "Lexgen_cmi",
@@ -218,7 +219,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Lexgen_cmi",
     src  = "lexgen.mli",
     opts = SIG_OPTS,
@@ -227,7 +228,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Main",
     struct = "main.ml",
     sig    = "Main_cmi",
@@ -248,10 +249,11 @@ boot_module(
         ":Outputbis",
         ":Parser",
         ":Syntax",
-    ]
+    ],
+    visibility = ["//boot:__subpackages__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Main_cmi",
     src  = "main.mli",
     opts = SIG_OPTS,
@@ -263,7 +265,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Output",
     struct = "output.ml",
     sig    = "Output_cmi",
@@ -280,7 +282,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Output_cmi",
     src  = "output.mli",
     opts = SIG_OPTS,
@@ -292,7 +294,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Outputbis",
     struct = "outputbis.ml",
     sig    = "Outputbis_cmi",
@@ -309,7 +311,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Outputbis_cmi",
     src  = "outputbis.mli",
     opts = SIG_OPTS,
@@ -320,7 +322,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Parser",
     struct = "parser.ml",
     sig    = ":Parser_cmi",
@@ -334,7 +336,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Parser_cmi",
     src  = "parser.mli",
     opts = SIG_OPTS,
@@ -359,7 +361,7 @@ genrule(
     ])
 )
 
-boot_module(
+baseline_module(
     name   = "Syntax",
     struct = "syntax.ml",
     sig    = "Syntax_cmi",
@@ -369,7 +371,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Syntax_cmi",
     src  = "syntax.mli",
     opts = SIG_OPTS,
@@ -378,7 +380,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Table",
     struct = "table.ml",
     sig    = "Table_cmi",
@@ -388,7 +390,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Table_cmi",
     src  = "table.mli",
     opts = SIG_OPTS,

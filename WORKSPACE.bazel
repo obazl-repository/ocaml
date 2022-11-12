@@ -34,30 +34,36 @@ local_repository(
 # Tell Bazel about our toolchains so it can resolve them based on values passed
 # in --platform, --host_platform, and --execution_platforms options.
 
-# register_execution_platforms(
+register_execution_platforms(
+    # "//dev/platforms:sys_vm_vm",
 
-#     ## these are target platforms, do not register here
-#     # "//platforms:sys_vm_vm",
-#     # "//platforms:sys_vm_sys",
-#     # "//platforms:sys_sys_sys",
-#     # "//platforms:sys_sys_vm",
+    # "//platforms:boot",
+    # "//platforms:vm",
+    # "//platforms/build:vm",
+    # "//platforms:sys",
 
-#     ## proper exec platforms
-#     # "//platforms:default",
-#     "//platforms:boot",
-#     "//platforms:vm",
-#     "//platforms/build:vm",
-#     "//platforms:sys",
-# )
+    # "//platforms:sys_vm_vm",
+    "//boot/platforms:boot",
+    "//boot/platforms:baseline",
+    # "//platforms:default",
+)
 
 # register_toolchains("@ocaml//toolchain/selectors/local:vmvm")
 register_toolchains(
+    "//boot/toolchain/selector:boot",
+    "//boot/toolchain/selector:baseline",
+    # "//boot/toolchain/selector:stdlib",
 
-    # "//toolchain/selectors/kick:sys_vm_vm",
-    # "//toolchain/selectors/kick:vm",
-    # "//toolchain/selectors/boot",
-    # "//toolchain/selectors/boot:vmsys",
+    "//toolchain/selectors/boot:vmsys",
     "//toolchain/selectors/boot:default",
+
+    # "//toolchain/selectors/boot",
+
+
+    # "//toolchain/selectors/baseline:sys_vm_vm",
+    # "//toolchain/selectors/baseline:vm",
+
+
     # "//toolchain/selectors:dev",
     # "//toolchain/selectors:vmsys",
 

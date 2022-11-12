@@ -1,11 +1,11 @@
 exports_files(["BUILD.bazel"])
 
-load("//toolchain/adapters/kick:BUILD.bzl", "kick_toolchain_adapter")
+load("//toolchain/adapters/baseline:BUILD.bzl", "baseline_toolchain_adapter")
 load("//toolchain/adapters/boot:BUILD.bzl", "boot_toolchain_adapter")
 
 
 ## cross-compile testing - just to check tc selection
-# kick_toolchain_adapter(
+# baseline_toolchain_adapter(
 boot_toolchain_adapter(
     name        = "sys_vm_vm",
     build_host  = "vm",
@@ -38,8 +38,8 @@ boot_toolchain_adapter(
 ## come with the distribution. Everything else in //boot/bin and
 ## //boot/lib is compiled using those tools. Plus ocamlyacc which is
 ## implemented in C.
-kick_toolchain_adapter(
-    name        = "kick",
+baseline_toolchain_adapter(
+    name        = "baseline",
     build_host  = "vm",
     target_host = "vm",
     compiler    = "//boot/compiler",
@@ -61,7 +61,7 @@ kick_toolchain_adapter(
 
 # # to produce compiler as a dev tool, build_host == target_host,
 # # and the toolchain uses the boot compiler
-# kick_toolchain_adapter(
+# baseline_toolchain_adapter(
 #     name        = "dev_tool",
 #     build_host  = "dev",
 #     target_host = "dev",
@@ -80,7 +80,7 @@ kick_toolchain_adapter(
 # )
 
 
-# kick_toolchain_adapter(
+# baseline_toolchain_adapter(
 #     name        = "dev",
 #     build_host  = "dev",
 #     target_host = "dev",
@@ -99,7 +99,7 @@ kick_toolchain_adapter(
 #     tool_runner = "//boot/bin:ocamlrun",
 # )
 
-# kick_toolchain_adapter(
+# baseline_toolchain_adapter(
 #     name        = "vmvm",
 #     build_host  = "vm",
 #     target_host = "vm",
@@ -110,7 +110,7 @@ kick_toolchain_adapter(
 #     tool_runner = "//boot/bin:ocamlrun",
 # )
 
-# kick_toolchain_adapter(
+# baseline_toolchain_adapter(
 #     name        = "vmsys",
 #     build_host  = "vm",
 #     target_host = "sys",
@@ -121,7 +121,7 @@ kick_toolchain_adapter(
 #     tool_runner = "//boot/bin:ocamlrun",
 # )
 
-# kick_toolchain_adapter(
+# baseline_toolchain_adapter(
 #     name        = "syssys",
 #     build_host  = "sys",
 #     target_host = "sys",

@@ -19,6 +19,7 @@ cc_build_profile(
     TARGET      = "x86_64-apple-darwin21.6.0",
 
     PREFIX      = PREFIX,
+    BINDIR      = "${exec_prefix}/bin",
     EXEC_PREFIX = EXEC_PREFIX,
     LIBDIR      = LIBDIR,
     visibility  = ["//visibility:public"]

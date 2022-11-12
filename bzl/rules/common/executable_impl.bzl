@@ -15,9 +15,7 @@ load("//bzl/rules/common:DEPS.bzl",
      "merge_depsets")
 
 #########################
-def impl_executable(ctx, tc):
-
-    scope = ""
+def impl_executable(ctx):  ## , tc):
 
     debug = False
     # if ctx.label.name == "test":
@@ -30,6 +28,39 @@ def impl_executable(ctx, tc):
             kind = ctx.attr._rule,
             tgt  = ctx.label.name
         ))
+
+    # tc = ctx.toolchains["//toolchain/type:boot"]
+    # print("boot tc: %s" % tc)
+
+    if hasattr(attr, "stage"):
+        stage = ctx.attr.stage
+    else:
+        stage = ctx.attr._stage[BuildSettingInfo].value
+
+    print("executable _stage: %s" % stage)
+
+    workdir = "_{}/".format(stage)
+
+    tc = None
+    if stage == "boot":
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+    elif stage == "baseline":
+        tc = ctx.exec_groups["baseline"].toolchains[
+            "//boot/toolchain/type:baseline"]
+    elif stage == "dev":
+        tc = ctx.exec_groups["dev"].toolchains[
+            "//boot/toolchain/type:baseline"]
+    else:
+        print("UNHANDLED STAGE: %s" % stage)
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+
+    print("xtc boot tc: %s" % tc)
+    # fail("X")
+
+    # xtc = ctx.exec_groups["boot"].toolchains["//boot/toolchain/type:boot"]
+    # print("xtc boot tc: %s" % xtc)
 
     ################################################################
     ################  DEPS  ################
@@ -80,7 +111,7 @@ def impl_executable(ctx, tc):
     # includes  = []
     # cmxa_args  = []
 
-    out_exe = ctx.actions.declare_file(scope + ctx.label.name)
+    out_exe = ctx.actions.declare_file(workdir + ctx.label.name)
 
     ####  flags and options for bootstrapping executables
 
@@ -123,6 +154,20 @@ def impl_executable(ctx, tc):
 
     includes.append(ctx.file._stdlib.dirname)
     includes.append(ctx.file._std_exit.dirname)
+
+    compiler_runfiles = []
+    for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+        if rf.short_path.startswith("stdlib"):
+            # print("STDLIB: %s" % rf)
+            # args.add("-DFOOBAR")
+            # args.add_all(["-I", rf.dirname])
+            includes.append(rf.dirname)
+            compiler_runfiles.append(rf)
+        if rf.path.endswith("ocamlrun"):
+            # print("OCAMLRUN: %s" % rf)
+            compiler_runfiles.append(rf)
+    ##FIXME: add tc.stdlib, tc.std_exit
+
 
     args.add_all(includes, before_each="-I", uniquify=True)
 
@@ -169,7 +214,7 @@ def impl_executable(ctx, tc):
         direct = []
         + [ctx.file._std_exit, ctx.file._stdlib]
         + [ctx.file.main] if ctx.file.main else []
-        # compiler runfiles contain camlheader files:
+        # compiler runfiles contain camlheader files & stdlib:
         + runfiles
         ,
         transitive = []
@@ -190,11 +235,11 @@ def impl_executable(ctx, tc):
         mnemonic = "CompileBootstrapExecutable"
     elif ctx.attr._rule == "bootstrap_repl":
         mnemonic = "CompileToplevel"
-    elif ctx.attr._rule == "kick_test":
+    elif ctx.attr._rule == "baseline_test":
         mnemonic = "CompileBootstrapTest"
     elif ctx.attr._rule == "boot_compiler":
         mnemonic = "CompileOcamlcBoot"
-    elif ctx.attr._rule == "kick_compiler":
+    elif ctx.attr._rule == "baseline_compiler":
         mnemonic = "CompileOcamlcKick"
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
@@ -203,7 +248,6 @@ def impl_executable(ctx, tc):
     ctx.actions.run(
         # env = env,
         executable = tc.compiler[DefaultInfo].files_to_run,
-        # executable = tool,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_exe],
@@ -225,7 +269,12 @@ def impl_executable(ctx, tc):
     compiler_runfiles = []
     for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
         if rf.short_path.startswith("stdlib"):
+            # print("STDLIB: %s" % rf)
             compiler_runfiles.append(rf)
+        if rf.path.endswith("ocamlrun"):
+            # print("OCAMLRUN: %s" % rf)
+            compiler_runfiles.append(rf)
+    ##FIXME: add tc.stdlib, tc.std_exit
 
     if ctx.attr.strip_data_prefixes:
       myrunfiles = ctx.runfiles(
@@ -253,13 +302,13 @@ def impl_executable(ctx, tc):
     exe_provider = None
     if ctx.attr._rule == "boot_compiler":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "kick_compiler":
+    elif ctx.attr._rule == "baseline_compiler":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "kick_test":
+    elif ctx.attr._rule == "baseline_test":
         exe_provider = OcamlTestMarker()
     else:
         fail("Wrong rule called impl_executable: %s" % ctx.attr._rule)

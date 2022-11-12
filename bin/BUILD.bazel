@@ -1,0 +1,226 @@
+## production compilers, direct from source
+
+package(default_visibility = ["//visibility:public"])
+
+load("//bzl:rules.bzl",
+     "boot_archive",
+     "baseline_module",
+     "boot_compiler"
+)
+
+boot_compiler(
+    name = "ocamlc.byte",
+    stage = "dev",
+    exec_compatible_with = [
+        ## *>vm ???
+    ],
+    opts = [
+        "-nostdlib", "-compat-32",
+    ],
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+     ],
+    main = "//driver:Main",
+    visibility = [
+        "//visibility:public"
+    ]
+)
+
+sh_binary(
+    name = "ocamlc.run",
+    srcs = ["ocamlc.sh"],
+    # args = ["STDLIB"],
+    data = [
+        ":ocamlc.byte",
+        "//runtime:ocamlrun",
+        "//stdlib:Stdlib",
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ]
+)
+
+# sh_binary(
+#     name = "ocamlc.runner",
+#     srcs = [":ocamlc.sh"],
+#     data = [
+#         ":ocamlc.byte",
+#         "//runtime:ocamlrun",
+#         "//stdlib:camlheaders", # genrule, no dep on ocamlc.
+#         # We cannot depend on Std_exit on pain of circularity.
+#         # It depends on Stdlib, which is compiled by this tool.
+#         # "//stdlib:Std_exit"
+#     ],
+#     deps = [
+#          # for the runfiles lib used in ocamlc.sh:
+#         "@bazel_tools//tools/bash/runfiles"
+#     ]
+# )
+
+
+# boot_compiler(
+#     name = "ocamlc",
+#     # compile_target = "//platform/cpu:arm",  ## ??
+#     exec_compatible_with = [
+#         ## *>vm ???
+#     ],
+#     opts = [
+#         "-nostdlib", "-compat-32",
+#     ],
+#     # primitives = PRIMITIVES,
+#     main = "//driver:Main",
+#     prologue = [
+#         "//compilerlibs:ocamlcommon",
+#         "//bytecomp:ocamlbytecomp",
+#         # "//boot/lib:stdlib"
+#     ],
+#     visibility = [
+#         "//visibility:public"
+#     ]
+# )
+
+##  Cross-compiling and Cross-cross-compiling
+
+## Note first that the bootstrap toolchain can only emit VM code. It
+## can produce a vmsys compiler, but it cannot produce a sysvm or
+## syssys compiler. To do that we need to use the vmsys compiler from
+## the boot toolchain, so sys>* compilers are 2nd order. E.g to build
+## a sysvm compiler we first must build a vmsys compiler we can use to
+## do it. That in turn requires a vmvm compiler, to produce the vmsys
+## compiler.
+
+# x-build example. actually a cross-cross-compile.
+# desired output is sys>vm compiler (or amd>arm)
+# to produce that, we need a compiler that emits sys
+# so we set target to sys, and build to either sys or vm, i.e. syssys or vmsys
+# and we need to set xtarget=vm either way.
+# the build rule depends on tc, and Bazel transitions to exec>exec, i.e. syssys or vmvm
+# if we started with a syssys goal we get a syssys compile to use, governed by xtarget=vm
+# if we started with vmsys, we get a vmvm compiler
+# in that case we need to tell that vmvm tool to emit a vmsys compiler
+# we do that by setting xtarget to sys
+# (or, we could use cfg=target transition on the tc? would not work for cpu xtargets e.g. amd>arm)
+# and then use that second compiler to emit a sysvm compiler.
+# so we build either two or three compilers.
+
+
+# vm>sys
+# ocamlopt$(EXE): compilerlibs/ocamlcommon.cma compilerlibs/ocamloptcomp.cma $(OPTSTART)
+# 	$(CAMLC) $(OC_COMMON_LDFLAGS) -o $@ $^
+## OPTSTART=driver/optmain.cmo
+## CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
+## BOOT_STDLIBFLAGS ?= -nostdlib -I $(ROOTDIR)/boot
+## BOOT_OCAMLC boot/ocamlc.opt (sys>vm) if available (and newer than
+#   boot/ocamlc), otherwise boot/ocamlc (vm>vm)
+
+## make log:
+# ./boot/ocamlrun ./boot/ocamlc
+# -nostdlib
+# -I ./boot
+# -use-prims runtime/primitives
+# -g -o ocamlopt
+# compilerlibs/ocamlcommon.cma
+# compilerlibs/ocamloptcomp.cma
+# driver/optmain.cmo
+
+## build tc either vmvm or sysvm, xtarget sys
+## tc transitions to vmvm or syssys
+## so compiler emits vm, archives must be cma;
+## bld rule sees xtarget
+boot_compiler(
+    name = "ocamlopt.byte",
+    stage = "dev",
+    # goal is to produce vm>sys compiler, so we need a compiler that emits vm
+    target_compatible_with = [
+        # "//platforms/target:vm?",
+    ],
+    # toolchain will transition to bld>bld, either vmvm or sysys
+    # xtarget:sys? selects this output
+    main = "//driver:Optmain",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//asmcomp:ocamloptcomp",
+    ],
+    # visibility = [
+    #     "//toolchain/adapters:__pkg__",
+    #     "//testsuite:__pkg__"
+    # ]
+)
+
+# tool type sys>vm?
+# The bytecode compiler compiled with the native-code compiler
+# ocamlc.opt$(EXE): compilerlibs/ocamlcommon.cmxa \
+#                   compilerlibs/ocamlbytecomp.cmxa $(BYTESTART:.cmo=.cmx)
+# 	$(CAMLOPT_CMD) $(OC_COMMON_LDFLAGS) -o $@ $^ -cclib "$(BYTECCLIBS)"
+#
+# BYTESTART=driver/main.cmo
+# OPTSTART=driver/optmain.cmo
+
+## make log:
+# ./boot/ocamlrun ./ocamlopt
+# -nostdlib
+# -I ./stdlib -I otherlibs/dynlink
+# -g -o ocamlc.opt
+# compilerlibs/ocamlcommon.cmxa
+# compilerlibs/ocamlbytecomp.cmxa
+# driver/main.cmx
+# -cclib "-lm  -lpthread"
+
+## build tc either syssys or vmsys, xtarget == vm
+## tc transitions to syssys or vmvm
+## compiler emits sys, archives must be cmxa;
+boot_compiler(  ## not yet supported
+    name = "ocamlc.opt",
+    stage = "dev",
+    # goal is to produce sys>vm compiler, so we need a compiler that emits sys
+    target_compatible_with = ["//platforms/target:sys?"],
+    # toolchain will transition to bld>bld, either vmvm or sysys
+    #  we need to pass xtarget=sys (cross-exec platform) so the compile will be built correctly
+    #  e.g. if we start with vmsys, transition is to vmvm with xtarget=sys, to produce vmsys compiler
+    #  which we then use to compile a sys>vm compiler (emitting native code)
+    opts = [],
+    main = "//driver:Main",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//asmcomp:ocamloptcomp",
+        # "//driver",
+    ],
+)
+
+# The native-code compiler compiled with itself
+# ocamlopt.opt$(EXE): \
+#                     compilerlibs/ocamlcommon.cmxa \
+#                     compilerlibs/ocamloptcomp.cmxa \
+#                     $(OPTSTART:.cmo=.cmx)
+# 	$(CAMLOPT_CMD) $(OC_COMMON_LDFLAGS) -o $@ $^
+
+## WARNING: This builds, but produces a bytecode executable. Awaiting
+## work on toolchains and platforms to select the vm>sys compiler
+## (aka ocamlopt.byte).
+## e.g. --platforms=//platforms/target:sys,
+## --platforms=//platforms/target:arm64, etc.
+
+## make log:
+## ./boot/ocamlrun ./ocamlopt
+## -nostdlib
+## -I ./stdlib -I otherlibs/dynlink
+## -g -o ocamlopt.opt
+## compilerlibs/ocamlcommon.cmxa
+## compilerlibs/ocamloptcomp.cmxa
+## driver/optmain.cmx
+
+boot_compiler( # not yet supported
+    name = "ocamlopt.opt",
+    stage = "dev",
+    main = "//driver:Optmain",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//asmcomp:ocamloptcomp",
+    ],
+    visibility = [
+        "//testsuite:__pkg__"
+    ]
+)
+

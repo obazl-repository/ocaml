@@ -2,10 +2,10 @@ load("//bzl:rules.bzl",
      "boot_archive",
      "boot_executable",
      "boot_library",
-     "boot_module",
+     "baseline_module",
      "bootstrap_repl",
-     "boot_signature",
-     "kick_test",
+     "baseline_signature",
+     "baseline_test",
 )
 
 # load("//config:CONFIG.bzl",
@@ -88,7 +88,7 @@ bootstrap_repl(
 #     )
 # )
 
-# kick_test(
+# baseline_test(
 #     name = "ocaml.test",
 #     main = ":ocaml",
 # )
@@ -157,7 +157,7 @@ boot_archive(
 )
 
 ################################################################
-boot_module(
+baseline_module(
     name   = "Expunge",
     struct = "expunge.ml",
     opts = MODULE_OPTS,
@@ -177,7 +177,7 @@ boot_module(
     visibility = ["//utils:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Genprintval",
     struct = "genprintval.ml",
     sig    = "Genprintval_cmi",
@@ -209,7 +209,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Genprintval_cmi",
     src  = "genprintval.mli",
     opts = SIG_OPTS,
@@ -222,7 +222,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Topcommon",
     struct = "topcommon.ml",
     sig    = "Topcommon_cmi",
@@ -269,7 +269,7 @@ boot_module(
     visibility = ["//toplevel/byte:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Topcommon_cmi",
     src  = "topcommon.mli",
     opts = SIG_OPTS,
@@ -292,7 +292,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Topdirs",
     struct = "topdirs.ml",
     sig    = "Topdirs_cmi",
@@ -333,7 +333,7 @@ boot_module(
     visibility = ["//toplevel/byte:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Topdirs_cmi",
     src  = "topdirs.mli",
     opts = SIG_OPTS,
@@ -343,7 +343,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Topeval",
     struct = select({
         # "//toplevel:bytecode": "//toplevel/byte:topeval.ml",
@@ -399,7 +399,7 @@ boot_module(
     visibility = ["//toplevel:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Topeval_cmi",
     src  = "topeval.mli",
     opts = SIG_OPTS,
@@ -412,7 +412,7 @@ boot_signature(
     visibility = ["//toplevel:__subpackages__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Toploop",
     struct = "toploop.ml",
     sig    = "Toploop_cmi",
@@ -447,7 +447,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Toploop_cmi",
     src  = "toploop.mli",
     opts = SIG_OPTS,
@@ -467,7 +467,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Topmain",
     struct = select({
         # "//toplevel:bytecode": "//toplevel/byte:topmain.ml",
@@ -506,7 +506,7 @@ boot_module(
     visibility = ["//toplevel:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Topmain_cmi",
     src  = "topmain.mli",
     opts = SIG_OPTS, # + ["-nopervasives"],
@@ -515,7 +515,7 @@ boot_signature(
     visibility = ["//toplevel:__subpackages__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Topstart",
     struct = "topstart.ml",
     opts = MODULE_OPTS,
@@ -524,7 +524,7 @@ boot_module(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Trace",
     struct = select({
         # "//toplevel:bytecode": "//toplevel/byte:trace.ml",
@@ -551,7 +551,7 @@ boot_module(
     visibility = ["//toplevel:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Trace_cmi",
     src  = "trace.mli",
     opts = SIG_OPTS,

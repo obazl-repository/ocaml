@@ -1,6 +1,6 @@
 load("//bzl:rules.bzl",
-     "boot_module",
-     "boot_signature",
+     "baseline_module",
+     "baseline_signature",
      "boot_library",
 )
 
@@ -15,8 +15,6 @@ SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # SIG_OPTS = ROOT_SIG_OPTS
-
-STDLIB = ["//boot/lib:stdlib"]
 
 exports_files([
     "cmi_format.mli", "cmi_format.ml",
@@ -45,12 +43,12 @@ boot_library(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Cmi_format",
     struct = "cmi_format.ml",
     sig    = "Cmi_format_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//typing:Types",
         "//stdlib:Stdlib.String",
         "//utils:Misc",
@@ -66,11 +64,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Cmi_format_cmi",
     src  = "cmi_format.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//typing:Types",
         "//utils:Misc",
         "//stdlib:Stdlib.Format",
@@ -83,11 +81,11 @@ boot_signature(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Cmo_format_cmi",
     src  = "cmo_format.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Misc_cmi",
         "//typing:Ident",
         "//lambda:Lambda"
@@ -100,12 +98,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Cmt_format",
     struct = "cmt_format.ml",
     sig    = "Cmt_format_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmi_format", ## (File_formats Cmi_format)
         "//typing:Types",
         "//typing:Typedtree",
@@ -130,11 +128,11 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Cmt_format_cmi",
     src  = "cmt_format.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmi_format",
         "//typing:Types",
         "//typing:Typedtree_cmi",
@@ -148,11 +146,11 @@ boot_signature(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Cmx_format_cmi",
     src  = "cmx_format.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Misc_cmi",
         "//middle_end/flambda:Export_info_cmi",
         "//stdlib:Stdlib.Digest",
@@ -165,11 +163,11 @@ boot_signature(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Cmxs_format_cmi",
     src  = "cmxs_format.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Misc_cmi",
         "//stdlib:Stdlib.Digest"
     ],
@@ -180,12 +178,12 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Linear_format",
     struct = "linear_format.ml",
     sig    = "Linear_format_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.String",
         "//utils:Misc",
         "//parsing:Location",
@@ -198,11 +196,11 @@ boot_module(
     visibility = ["//asmcomp:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Linear_format_cmi",
     src  = "linear_format.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//asmcomp:Linear_cmi",
         "//stdlib:Stdlib.Digest_cmi",
         "//asmcomp:Cmm"

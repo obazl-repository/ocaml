@@ -1,9 +1,11 @@
 def lexer_attrs():
 
     return dict(
-        # _sdkpath = attr.label(
-        #     default = Label("@ocaml//:sdkpath")
-        # ),
+        _stage = attr.label(
+            doc = "bootstrap stage",
+            default = "//bzl:stage"
+        ),
+
         src = attr.label(
             doc = "A single .mll source file label",
             allow_single_file = [".mll"]

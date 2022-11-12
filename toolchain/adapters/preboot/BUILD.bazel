@@ -1,0 +1,38 @@
+exports_files(["BUILD.bazel"])
+
+load(":BUILD.bzl", "boot_toolchain_adapter")
+
+# only one boot tc adapter:
+boot_toolchain_adapter(
+    name        = "boot",
+    build_host  = "boot",
+    target_host = "boot",
+    compiler    = "//boot:ocamlc",
+    lexer       = "//boot:ocamllex",
+    yaccer      = "//yacc:ocamlyacc",
+    tool_runner = "//runtime:ocamlrun",
+    copts       = [ ## compile opts (sigs/modules only)
+        "-strict-sequence",
+        # "-warn-error", "+A",
+        "-nostdlib",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # primitives  = "//runtime:primitives",
+    # warnings  - use defaults
+    # camlheaders = [
+    #     # "//stdlib:camlheaders"
+    #     "//stdlib:camlheader", "//stdlib:target_camlheader",
+    #     "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+    #     "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+    # ],
+    # std_exit = "//stdlib:Std_exit"
+)

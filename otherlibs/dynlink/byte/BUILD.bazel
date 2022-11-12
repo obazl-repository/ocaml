@@ -2,7 +2,7 @@ exports_files(["dynlink.ml"])
 
 # load("//bzl:rules.bzl",
 #      "boot_library",
-#      "boot_module",
+#      "baseline_module",
 # )
 
 # MODULE_OPTS = ["-nostdlib"]
@@ -14,7 +14,7 @@ exports_files(["dynlink.ml"])
 #     ],
 # )
 
-# boot_module(
+# baseline_module(
 #     name   = "Dynlink",
 #     struct = "dynlink.ml",
 #     opts = MODULE_OPTS,

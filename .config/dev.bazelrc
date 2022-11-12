@@ -1,5 +1,5 @@
-query --notool_deps
-query --noimplicit_deps
+# query --notool_deps
+# query --noimplicit_deps
 
 ## put these in ~/.bazelrc to enable for all bazel projects
 # build --incompatible_enable_cc_toolchain_resolution

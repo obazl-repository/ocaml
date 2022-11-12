@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
      "boot_library",
-     "boot_module",
-     "boot_signature",
+     "baseline_module",
+     "baseline_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -54,7 +54,7 @@ boot_library(
 )
 
 ################################################################
-boot_module(
+baseline_module(
     name   = "Closure_element",
     struct = "closure_element.ml",
     sig    = "Closure_element_cmi",
@@ -66,7 +66,7 @@ boot_module(
     visibility = ["//:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Closure_element_cmi",
     src  = "closure_element.mli",
     opts = SIG_OPTS,
@@ -79,7 +79,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Closure_id",
     struct = "closure_id.ml",
     sig    = "Closure_id_cmi",
@@ -94,7 +94,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Closure_id_cmi",
     src  = "closure_id.mli",
     opts = SIG_OPTS,
@@ -104,7 +104,7 @@ boot_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Closure_origin",
     struct = "closure_origin.ml",
     sig    = "Closure_origin_cmi",
@@ -116,7 +116,7 @@ boot_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Closure_origin_cmi",
     src  = "closure_origin.mli",
     opts = SIG_OPTS,
@@ -128,7 +128,7 @@ boot_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Export_id",
     struct = "export_id.ml",
     sig    = "Export_id_cmi",
@@ -142,7 +142,7 @@ boot_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Export_id_cmi",
     src  = "export_id.mli",
     opts = SIG_OPTS,
@@ -153,7 +153,7 @@ boot_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Id_types",
     struct = "id_types.ml",
     sig    = "Id_types_cmi",
@@ -168,7 +168,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Id_types_cmi",
     src  = "id_types.mli",
     opts = SIG_OPTS,
@@ -178,7 +178,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Mutable_variable",
     struct = "mutable_variable.ml",
     sig    = "Mutable_variable_cmi",
@@ -190,7 +190,7 @@ boot_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Mutable_variable_cmi",
     src  = "mutable_variable.mli",
     opts = SIG_OPTS,
@@ -205,7 +205,7 @@ boot_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Set_of_closures_id",
     struct = "set_of_closures_id.ml",
     sig    = "Set_of_closures_id_cmi",
@@ -219,7 +219,7 @@ boot_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Set_of_closures_id_cmi",
     src  = "set_of_closures_id.mli",
     opts = SIG_OPTS,
@@ -230,7 +230,7 @@ boot_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Set_of_closures_origin",
     struct = "set_of_closures_origin.ml",
     sig    = "Set_of_closures_origin_cmi",
@@ -242,7 +242,7 @@ boot_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Set_of_closures_origin_cmi",
     src  = "set_of_closures_origin.mli",
     opts = SIG_OPTS,
@@ -254,7 +254,7 @@ boot_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Static_exception",
     struct = "static_exception.ml",
     sig    = "Static_exception_cmi",
@@ -267,7 +267,7 @@ boot_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Static_exception_cmi",
     src  = "static_exception.mli",
     opts = SIG_OPTS,
@@ -277,7 +277,7 @@ boot_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Tag",
     struct = "tag.ml",
     sig    = "Tag_cmi",
@@ -293,7 +293,7 @@ boot_module(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_signature(
+baseline_signature(
     name = "Tag_cmi",
     src  = "tag.mli",
     opts = SIG_OPTS,
@@ -303,7 +303,7 @@ boot_signature(
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 
-boot_module(
+baseline_module(
     name   = "Var_within_closure",
     struct = "var_within_closure.ml",
     sig    = "Var_within_closure_cmi",
@@ -318,7 +318,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Var_within_closure_cmi",
     src  = "var_within_closure.mli",
     opts = SIG_OPTS,

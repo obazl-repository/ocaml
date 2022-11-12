@@ -5,7 +5,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 def _cc_build_profile_impl(ctx):
 
-    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    # tc = ctx.toolchains["//toolchain/type:boot"]
     tcp = ctx.toolchains["//toolchain/type:cc_tc_profile"]
 
     cctc = ctx.toolchains["@bazel_tools//tools/cpp:toolchain_type"]
@@ -33,8 +33,9 @@ def _cc_build_profile_impl(ctx):
             "MODEL"       : ctx.attr.MODEL,
             "TARGET"      : ctx.attr.TARGET,
 
-            ## Installationn config
+            ## Installation config
             "PREFIX"      : ctx.attr.PREFIX,
+            "BINDIR"      : ctx.attr.BINDIR,
             "EXEC_PREFIX" : ctx.attr.EXEC_PREFIX,
             "LIBDIR"      : ctx.attr.LIBDIR,
         }),
@@ -50,6 +51,7 @@ cc_build_profile = rule(
         "TARGET"      : attr.string(),
         "MODEL"       : attr.string(),
         "PREFIX"      : attr.string(),
+        "BINDIR"      : attr.string(),
         "EXEC_PREFIX" : attr.string(),
         "LIBDIR"      : attr.string(),
     },
@@ -58,6 +60,6 @@ cc_build_profile = rule(
     toolchains = [
         "@bazel_tools//tools/cpp:toolchain_type",
         "//toolchain/type:cc_tc_profile",
-        # "//toolchain/type:bootstrap",
+        # "//toolchain/type:boot",
     ]
 )

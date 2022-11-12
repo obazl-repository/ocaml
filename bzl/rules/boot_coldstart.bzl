@@ -37,5 +37,5 @@ boot_coldstart = rule(
         ),
     ),
     executable = True,
-    # toolchains = ["//toolchain/type:bootstrap"],
+    # toolchains = ["//toolchain/type:boot"],
 )

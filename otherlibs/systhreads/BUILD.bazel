@@ -1,8 +1,8 @@
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
-     "boot_module",
-     "boot_signature",
+     "baseline_module",
+     "baseline_signature",
 )
 
 load("//config:CONFIG.bzl",
@@ -60,7 +60,7 @@ boot_archive(
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot -safe-string mutex.mli
 
 
-boot_module(
+baseline_module(
     name   = "Condition",
     struct = "condition.ml",
     sig    = "Condition_cmi",
@@ -70,7 +70,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Condition_cmi",
     src  = "condition.mli",
     opts = SIG_OPTS,
@@ -79,7 +79,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Event",
     struct = "event.ml",
     sig    = "Event_cmi",
@@ -94,7 +94,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Event_cmi",
     src  = "event.mli",
     opts = SIG_OPTS,
@@ -102,7 +102,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Mutex",
     struct = "mutex.ml",
     sig    = "Mutex_cmi",
@@ -111,7 +111,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Mutex_cmi",
     src  = "mutex.mli",
     opts = SIG_OPTS,
@@ -119,7 +119,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Semaphore",
     struct = "semaphore.ml",
     sig    = "Semaphore_cmi",
@@ -130,7 +130,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Semaphore_cmi",
     src  = "semaphore.mli",
     opts = SIG_OPTS,
@@ -138,7 +138,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "Thread",
     struct = "thread.ml",
     sig    = "Thread_cmi",
@@ -151,7 +151,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "Thread_cmi",
     src  = "thread.mli",
     opts = SIG_OPTS,
@@ -159,7 +159,7 @@ boot_signature(
     ]
 )
 
-boot_module(
+baseline_module(
     name   = "ThreadUnix",
     struct = "threadUnix.ml",
     sig    = "ThreadUnix_cmi",
@@ -171,7 +171,7 @@ boot_module(
     ]
 )
 
-boot_signature(
+baseline_signature(
     name = "ThreadUnix_cmi",
     src  = "threadUnix.mli",
     opts = SIG_OPTS,

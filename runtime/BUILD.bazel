@@ -6,7 +6,7 @@ load("@bazel_skylib//rules:common_settings.bzl",
 
 load("//bzl:rules.bzl",
      "boot_executable",
-     "boot_module")
+     "baseline_module")
 
 exports_files(["gen_primitives.sh"] + glob(["*.c"]))
 
@@ -395,10 +395,7 @@ genrule(
     name  = "primitives_dat",
     visibility = ["//visibility:public"],
     tools = [":gen_primitives.sh"],
-    ## cwd is proj root, but the script assumes it is runtime
     cmd   = " ".join([
-        # "echo PWD: $$(PWD);",
-        # "cd runtime && ",
         "$(location :gen_primitives.sh) > $@;"
     ]),
     ## script depends on these (Bazel: runfiles):
@@ -790,4 +787,7 @@ config_setting(
 )
 
 string_list_flag(name = "args", build_setting_default = [],
-            visibility = ["//toolchain:__subpackages__"])
+            visibility = [
+                "//boot:__subpackages__",
+                "//toolchain:__subpackages__"
+            ])

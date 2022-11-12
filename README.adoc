@@ -501,20 +501,20 @@ target will build the new bootstrap compiler.
 
 
 ```
-bootstrap: coreboot
+bootstrap: cobaseline
 # utils/config.ml must be restored to config.status's configuration
 # lex/ocamllex$(EXE) was stripped in order to compare it
 	rm -f utils/config.ml lex/ocamllex$(EXE)
 	$(MAKE) all
 ```
 
-Target `coreboot` is the "Core bootstrapping cycle". Bootstrapping
+Target `cobaseline` is the "Core bootstrapping cycle". Bootstrapping
 here involves the notion of "promoting" (i.e. copying) newly built
 stuff into the `boot/` subdir, and recursively (kinda) using the
 compiler to build itself until it reaches a fixed point (where the
 build output is equal to its input).
 
-First step of coreboot is to "promote" the new compiler and runtime -
+First step of cobaseline is to "promote" the new compiler and runtime -
 copy (not link) them into `boot`, overwriting the original `ocamlc` (and
 `ocamllex`). It also copies stdlib files into `boot`. (Why?)
 
@@ -524,15 +524,15 @@ the stdlib is rebuilt with the new compiler and runtime, and these new
 new versions are promoted again. Then the whole shmear (target core)
 is rebuilt.
 
-Note that `bootstrap` depends on `coreboot`, then runs `make all`, and
+Note that `bootstrap` depends on `cobaseline`, then runs `make all`, and
 target `all` depends on `coreall`.
 
-What's the difference between `coreboot` and `coreall`? The former
+What's the difference between `cobaseline` and `coreall`? The former
 makes target `partialclean`, which deletes a bunch of stuff, then
 rebuilds things and "promotes" them. Both build `ocamlc`, `ocamllex`,
-and `ocamltools`, but `coreboot` does this with flag
+and `ocamltools`, but `cobaseline` does this with flag
 `IN_COREBOOT_CYCLE` enabled. They also both build the stdlib, but
-`coreboot` does this using `runtime/ocamlrun`, whereas `coreall` does
+`cobaseline` does this using `runtime/ocamlrun`, whereas `coreall` does
 it using `boot/ocamlrun`. Why? Remember that the `coldstart` target
 built `runtime/ocamlrun` and then linked it into `boot/`. But
 `bootstrap` then (by running `make all`) rebuilds `runtime/ocamlrun`
@@ -544,16 +544,16 @@ _without_ copying it into `boot`.
 (Only `coldstart` copies `runtime/ocamlrun` into `boot/ocamlrun`)
 
 Note that target `bootstrap`, like target `world`, runs `$(MAKE) all`.
-But it depends on `coreboot` instead of `coldstart`. The former is
+But it depends on `cobaseline` instead of `coldstart`. The former is
 responsible for "promoting" stuff
 
-IMPORTANT: the result of target coreboot is a new bootstrap compiler,
+IMPORTANT: the result of target cobaseline is a new bootstrap compiler,
 not a local compiler.
 
 in the root Makefile:
 
 ```
-coreboot:
+cobaseline:
 # Promote the new compiler but keep the old runtime
 # This compiler runs on boot/ocamlrun and produces bytecode for
 # runtime/ocamlrun

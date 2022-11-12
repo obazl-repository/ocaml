@@ -17,7 +17,7 @@ def bootstrap_register_toolchains(installation = None, noocaml = None):
     native.register_toolchains("//toolchain/bootstrap:linux")
     native.register_toolchains("//toolchain/bootstrap:linux_to_macos")
 
-    # native.register_toolchains("//toolchain/type:bootstrap_macos")
+    # native.register_toolchains("//toolchain/type:boot_macos")
     # native.register_toolchains("@ocaml//toolchain:bootstrap_linux")
 
 ################################################################

@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
@@ -5,7 +6,7 @@ load("//bzl:providers.bzl",
      "new_deps_aggregator",
      "OcamlArchiveProvider")
 
-load("//bzl/rules/common:impl_common.bzl", "tmpdir", "dsorder")
+load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -18,11 +19,33 @@ load("//bzl/rules/common:transitions.bzl", "manifest_out_transition")
 ###############################
 def impl_archive(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    stage = ctx.attr._stage[BuildSettingInfo].value
+    # print("archive _stage: %s" % stage)
+
+    workdir = "_{}/".format(stage)
+
+    tc = None
+    if stage == "boot":
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+    elif stage == "baseline":
+        tc = ctx.exec_groups["baseline"].toolchains[
+            "//boot/toolchain/type:baseline"]
+    elif stage == "dev":
+        #FIXME
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+    else:
+        print("UNHANDLED STAGE: %s" % stage)
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+
     if tc.target_host in ["boot", "dev", "vm"]:
         ext = ".cma"
     else:
         ext = ".cmxa"
+
+    ext = ".cma" # for now
 
     debug = False # True
     # if ctx.label.name == "Bare_structs":
@@ -47,13 +70,13 @@ def impl_archive(ctx):
     action_outputs = []
 
     archive_filename = archive_name + ext
-    out_archive = ctx.actions.declare_file(tmpdir + archive_filename)
+    out_archive = ctx.actions.declare_file(workdir + archive_filename)
     # paths_direct.append(archive_file.dirname)
     action_outputs.append(out_archive)
 
     if not tc.target_host:
         archive_a_filename = archive_name + ".a"
-        archive_a_file = ctx.actions.declare_file(tmpdir + archive_a_filename)
+        archive_a_file = ctx.actions.declare_file(workdir + archive_a_filename)
         # paths_direct.append(archive_a_file.dirname)
         action_outputs.append(archive_a_file)
 

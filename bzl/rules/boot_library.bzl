@@ -16,11 +16,28 @@ the former does not generate anything, it just passes on its
 dependencies under a single label, packaged in a
 [OcamlLibraryMarker](providers_ocaml.md#ocamllibraryprovider).
     """,
+
+    exec_groups = {
+        "boot": exec_group(
+            exec_compatible_with = [
+                "//platforms/ocaml/executor:vm?",
+                "//platforms/ocaml/emitter:vm?"
+            ],
+            toolchains = ["//boot/toolchain/type:boot"],
+        ),
+        "baseline": exec_group(
+            exec_compatible_with = [
+                "//platforms/ocaml/executor:vm?",
+                "//platforms/ocaml/emitter:vm?"
+            ],
+            toolchains = ["//boot/toolchain/type:baseline"],
+        ),
+    },
+
     attrs = dict(
         library_attrs(),
         _rule = attr.string( default = "boot_library" ),
     ),
     # provides = [OcamlLibraryMarker],
     executable = False,
-    toolchains = ["//toolchain/type:bootstrap"]
 )

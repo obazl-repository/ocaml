@@ -11,7 +11,7 @@ def executable_attrs():
 
         _stage = attr.label(
             doc = "bootstrap stage",
-            default = "//bzl:stage0"
+            default = "//bzl:stage"
         ),
 
         main = attr.label(

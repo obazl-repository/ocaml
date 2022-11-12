@@ -92,3 +92,4 @@ else
 fi
 
 echo "STABLE_WORKSPACE_ROOT `pwd`"
+echo "STABLE_WS_ROOT ${BUILD_WORKSPACE_ROOT}"

@@ -10,4 +10,14 @@ special configuration that forces the execution platform to be the
 same for both. Despite the name "toolchain transition", this is not
 implemented as a configuration transition..."
 
+This seems to be a little more up to date:  link:https://bazel.build/extending/toolchains#toolchain-resolution[Toolchain resolution]
 
+
+https://bazel.build/reference/be/common-definitions#common-attributes
+
+`exec_compatible_with` on rules:
+
+"A list of constraint_values that must be present in the execution
+platform for this target. This is in addition to any constraints
+already set by the rule type. Constraints are used to restrict the
+list of available execution platforms."

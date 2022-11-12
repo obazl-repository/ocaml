@@ -1,3 +1,18 @@
+load("//bzl:rules.bzl",
+     "boot_archive",
+     "boot_camlheaders",
+     "boot_library",
+     "boot_module",
+     "baseline_module",
+     "boot_signature",
+     "baseline_signature")
+
+load(":BUILD.bzl", "STDLIB_MANIFEST")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["expand_module_aliases.awk", "weak.ml", "weak.mli"])
+
 ## NB: ocamldep does not show deps on the Stdlib module. So files with
 ## no deps according to ocamldep may in fact have a dependency on the
 ## Stdlib module (only). E.g. sys.mli. Some files in fact have no
@@ -10,6 +25,9 @@
 
 ## NB:
 # -nopervasives used ONLY for camlinternalFormatBasics, stdlib
+# this is added automatically by rules boot_module, boot_signature
+# but not by baseline_module, baseline_signature
+
 # -fragile-match only for camlinternalFormat, printf, format, scanf
 
 # ../runtime/ocamlrun ../boot/ocamlc
@@ -58,27 +76,6 @@
 # -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal
 # -o stdlib__Either.cmi -c either.mli  (ditto either.ml)
 
-load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
-     "boot_module",
-     # "bootstrap_preprocess",
-     "boot_signature")
-
-load("//config:CONFIG.bzl",
-     ## stdlib overrides OCAMLC, does not use ROOT_OCAMLC_OPTS
-     ## "ROOT_CAMLC_OPTS",
-
-     "OPTCOMPFLAGS",
-     # "USE_PRIMS",
-     # "DATA_PRIMS",
-     # "PRIMITIVES"
-     )
-
-package(default_visibility = ["//visibility:public"])
-
-exports_files(["expand_module_aliases.awk", "weak.ml", "weak.mli"])
-
 # load("//config:CONFIG.bzl", "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS")
 
 # to match the makefile log:
@@ -92,17 +89,10 @@ exports_files(["expand_module_aliases.awk", "weak.ml", "weak.mli"])
 #     # "-safe-string", "-strict-formats"
 # ]
 
-MODULE_OPTS = [] ## COMPFLAGS
+MODULE_OPTS = []
+SIG_OPTS    = []
 
-# MODULE_OPTS = ROOT_MODULE_OPTS
-SIG_OPTS = MODULE_OPTS
-
-
-LABEL_OPTS = ["-nolabels", "-no-alias-deps"]
-LABEL_SIGOPTS = [
-    ## this pp not needed by obazl?
-    ## ' -pp "$AWK -f ./expand_module_aliases.awk"'
-]
+LABEL_OPTS = ["-nolabels"]
 
 ################################################################
   ################  Module: Std_exit    ################
@@ -157,14 +147,14 @@ LABEL_SIGOPTS = [
 # ../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   -c std_exit.mli
 # ../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   -c std_exit.ml
 
-boot_signature(
+baseline_signature(
     name = "Std_exit_cmi",
     src  = "std_exit.mli",
     opts = ["-nostdlib"],
     deps   = ["//stdlib:Stdlib"]
 )
 
-boot_module(
+baseline_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
     sig    = select({
@@ -259,87 +249,13 @@ boot_module(
 ## This library target just aggregates the resolver and submodules.
 ## They can be listed in any order.
 
-boot_archive(
-    name       = "test",
-    manifest   = [
-        ":Stdlib.Bool",
-        ":Stdlib.Sys",
-    ]
-)
-
 # NB: boot_library will not work. The compilers expect to find
 # stdlib.cm[x]a - this is hardcoded.
+
 boot_archive(
     name       = "stdlib",
     ## makefiles pass -use-prims. does that make sense, for an archive?
-    manifest   = [
-        ":Stdlib", ## functions as the ns_resolver module
-        ":CamlinternalFormat",
-        ":CamlinternalFormatBasics",
-        ":CamlinternalLazy",
-        ":CamlinternalMod",
-        ":CamlinternalOO",
-        ":Stdlib.Arg",
-        ":Stdlib.Array",
-        ":Stdlib.ArrayLabels",
-        ":Stdlib.Atomic",
-        ":Stdlib.Bigarray",
-        ":Stdlib.Bool",
-        ":Stdlib.Buffer",
-        ":Stdlib.Bytes",
-        ":Stdlib.BytesLabels",
-        ":Stdlib.Callback",
-        ":Stdlib.Char",
-        ":Stdlib.Complex",
-        ":Stdlib.Condition",
-        ":Stdlib.Digest",
-        ":Stdlib.Domain",
-        ":Stdlib.Effect",
-        ":Stdlib.Either",
-        ":Stdlib.Ephemeron",
-        ":Stdlib.Filename",
-        ":Stdlib.Float",
-        ":Stdlib.Format",
-        ":Stdlib.Fun",
-        ":Stdlib.Gc",
-        ":Stdlib.Hashtbl",
-        ":Stdlib.In_channel",
-        ":Stdlib.Int",
-        ":Stdlib.Int32",
-        ":Stdlib.Int64",
-        ":Stdlib.Lazy",
-        ":Stdlib.Lexing",
-        ":Stdlib.List",
-        ":Stdlib.ListLabels",
-        ":Stdlib.Map",
-        ":Stdlib.Marshal",
-        ":Stdlib.MoreLabels",
-        ":Stdlib.Mutex",
-        ":Stdlib.Nativeint",
-        ":Stdlib.Obj",
-        ":Stdlib.Oo",
-        ":Stdlib.Option",
-        ":Stdlib.Out_channel",
-        ":Stdlib.Parsing",
-        ":Stdlib.Printexc",
-        ":Stdlib.Printf",
-        ":Stdlib.Queue",
-        ":Stdlib.Random",
-        ":Stdlib.Result",
-        ":Stdlib.Scanf",
-        ":Stdlib.Semaphore",
-        ":Stdlib.Seq",
-        ":Stdlib.Set",
-        ":Stdlib.Stack",
-        ":Stdlib.StdLabels",
-        ":Stdlib.String",
-        ":Stdlib.StringLabels",
-        ":Stdlib.Sys",
-        ":Stdlib.Uchar",
-        ":Stdlib.Unit",
-        ":Stdlib.Weak",
-        #":Stdlib.Weak",
-    ],
+    manifest   = STDLIB_MANIFEST,
     visibility = ["//visibility:public"],
 )
 
@@ -348,15 +264,14 @@ boot_archive(
 
 boot_module(
     name   = "Stdlib",
-    struct = "x/stdlib.ml",
+    struct = "_build/stdlib.ml",
     sig    = "Stdlib_cmi", # doesn't work with stdlib.mli
     # use_prims = True,
     opts = [
-        "-nopervasives",
         "-no-alias-deps",
-        "-w", "-49",
         # "-pp", "awk -f expand_module_aliases.awk",
     ],
+    warnings = ["49"], # no-cmi-file
     deps = [
         ":CamlinternalFormatBasics",
     ],
@@ -382,7 +297,7 @@ boot_module(
 
 genrule(
     name = "stdlib_ml_awk",
-    outs = ["x/stdlib.ml"], ## FIXME
+    outs = ["_build/stdlib.ml"], ## FIXME
     srcs = ["stdlib.ml", "//stdlib:expand_module_aliases.awk"],
     cmd_bash  = " ".join([
         "awk -f $(location //stdlib:expand_module_aliases.awk) $(location :stdlib.ml)",
@@ -392,12 +307,11 @@ genrule(
 
 boot_signature(
     name = "Stdlib_cmi",
-    src  = "x/stdlib.mli",
+    src  = "_build/stdlib.mli",
     opts = SIG_OPTS + [
-        "-nopervasives",
         "-no-alias-deps",
-        "-w", "-49",
     ],
+    warnings = ["49"], # no-cmi-file
     deps   = [
         ":CamlinternalFormatBasics", #_cmi",
     ],
@@ -415,7 +329,7 @@ boot_signature(
 
 genrule(
     name = "stdlib_mli_awk",
-    outs = ["x/stdlib.mli"],
+    outs = ["_build/stdlib.mli"],
     srcs = ["stdlib.mli", "//stdlib:expand_module_aliases.awk"],
     cmd_bash  = " ".join([
         "awk -f $(location //stdlib:expand_module_aliases.awk) $(location :stdlib.mli)",
@@ -434,7 +348,7 @@ genrule(
 # They depend on other subcomponents, but since they are not renamed
 # such deps must not be listed; instead just list :Stdlib.
 
-boot_module(
+baseline_module(
     name   = "CamlinternalFormat",
     struct = "camlinternalFormat.ml",
     sig    = "CamlinternalFormat_cmi",
@@ -442,10 +356,7 @@ boot_module(
     #     "//config:sig_src?"   : "camlinternalformat.mli",
     #     "//conditions:default": "CamlinternalFormat_cmi"
     # }),
-    opts   = ["-open", "Stdlib"] + [
-        "-w", "+A", "-w",
-        "-fragile-match",
-    ],
+    warnings = ["fragile-match"],
     deps   = [
         ":CamlinternalFormatBasics",
         # ":Stdlib",
@@ -458,14 +369,10 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     name = "CamlinternalFormat_cmi",
     src  = "camlinternalFormat.mli",
-    opts = [
-        "-open", "Stdlib",
-        "-w", "+A", "-w",
-        "-fragile-match"
-    ],
+    warnings = ["fragile-match"],
     deps   = [
         ":CamlinternalFormatBasics", #_cmi",
 
@@ -500,30 +407,26 @@ boot_signature(
 boot_module(
     name   = "CamlinternalFormatBasics",
     struct = "camlinternalFormatBasics.ml",
-    sig    = "CamlinternalFormatBasics_cmi",
-    opts   = ["-nopervasives"],
-    # primitives = PRIMITIVES,
-    # deps   = [],
+    sig    = "camlinternalFormatBasics.mli",
+    # sig    = select({
+    #     "//config:sig_src?": "camlinternalFormatBasics.mli",
+    #     "//conditions:default": "CamlinternalFormatBasics_cmi",
+    # }),
 )
 
 boot_signature(
     name = "CamlinternalFormatBasics_cmi",
     src  = "camlinternalFormatBasics.mli",
-    opts   = ["-nopervasives"],
-    # primitives = PRIMITIVES,
-    # deps   = [],
  )
 
-boot_module(
+baseline_module(
     name   = "CamlinternalLazy",
     struct = "camlinternalLazy.ml",
     sig    = select({
         "//config:sig_src?": "camlinternalLazy.mli",
         "//conditions:default": "CamlinternalLazy_cmi"
     }),
-    opts   = [
-        "-open", "Stdlib",
-    ] + select({
+    opts = select({
         # "//platforms/target:sys?": ["-afl-inst-ratio", "0"],
         "//conditions:default": []
     }),
@@ -534,18 +437,16 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     name = "CamlinternalLazy_cmi",
     src  = "camlinternalLazy.mli",
-    opts   = ["-open", "Stdlib"],
     deps   = [":Stdlib"],
 )
 
-boot_module(
+baseline_module(
     name   = "CamlinternalMod",
     struct = "camlinternalMod.ml",
     sig    = "CamlinternalMod_cmi",
-    opts   = ["-open", "Stdlib"],
     deps   = [
         ":CamlinternalOO", ## (CamlinternalOO)
         ":CamlinternalLazy", ## (CamlinternalOO)
@@ -555,28 +456,27 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     name = "CamlinternalMod_cmi",
     src  = "camlinternalMod.mli",
-    opts = ["-open", "Stdlib"],
     deps   = [
         # ":Stdlib",
         ":Stdlib.Obj",
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "CamlinternalOO",
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
-    opts   = ["-open", "Stdlib"] + select({
-        # "//platforms/target:vm?": [],
-        # "//platforms/target:sys?": [
-        #     "-inline", "0",
-        #     "-afl-inst-ratio", "0"
-        # ],
-        "//conditions:default": []
-    }),
+    # opts   = select({
+    #     # "//platforms/target:vm?": [],
+    #     # "//platforms/target:sys?": [
+    #     #     "-inline", "0",
+    #     #     "-afl-inst-ratio", "0"
+    #     # ],
+    #     "//conditions:default": []
+    # }),
     deps   = [
         # ":Stdlib",
         ":Stdlib.Sys",
@@ -589,10 +489,9 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     name = "CamlinternalOO_cmi",
     src  = "camlinternalOO.mli",
-    opts = ["-open", "Stdlib"],
     deps   = [
         ":Stdlib.Obj"
     ],
@@ -601,7 +500,7 @@ boot_signature(
 #########################################################
 ################  Namespaced Submodules  ################
 
-boot_module(
+baseline_module(
     name   = "Stdlib.Arg",
     ns    = ":Stdlib",
     struct = "arg.ml",
@@ -619,7 +518,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Arg_cmi",
     src  = "arg.mli",
@@ -635,7 +534,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Array",
     struct = "array.ml",
@@ -647,7 +546,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Array_cmi",
     src  = "array.mli",
@@ -657,12 +556,12 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.ArrayLabels",
     struct = "arrayLabels.ml",
     sig    = "Stdlib.ArrayLabels_cmi",
-    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
+    opts = MODULE_OPTS + LABEL_OPTS,
     deps   = [
         ":Stdlib.Array"
     ],
@@ -671,7 +570,7 @@ boot_module(
 ## WARNING: output name same as input name, so write to tmp dir:
 genrule(
     name = "array_labels_mli_awk",
-    outs = ["x/arrayLabels.mli"],
+    outs = ["_build/arrayLabels.mli"],
     srcs = ["arrayLabels.mli", "//stdlib:expand_module_aliases.awk"],
     cmd_bash  = " ".join([
         "awk -f $(location //stdlib:expand_module_aliases.awk)",
@@ -680,17 +579,17 @@ genrule(
     ]),
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.ArrayLabels_cmi",
-    src  = "x/arrayLabels.mli",
+    src  = "_build/arrayLabels.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Stdlib.Seq",
     ],
 )
 
-boot_module(
+baseline_module(
     struct = "atomic.ml",
     name   = "Stdlib.Atomic",
     ns    = ":Stdlib",
@@ -699,7 +598,7 @@ boot_module(
     deps   = [],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Atomic_cmi",
     src  = "atomic.mli",
@@ -709,7 +608,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Bigarray",
     struct = "bigarray.ml",
@@ -727,7 +626,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Bigarray_cmi",
     src  = "bigarray.mli",
@@ -742,7 +641,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Bool",
     struct = "bool.ml",
@@ -750,19 +649,19 @@ boot_module(
     opts = MODULE_OPTS,
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Bool_cmi",
     src  = "bool.mli",
     opts = SIG_OPTS,
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Buffer",
     struct = "buffer.ml",
     sig    = "Stdlib.Buffer_cmi",
-    opts = MODULE_OPTS + ["-w", "+A"],
+    opts = MODULE_OPTS,
     # + select({
     #     mode:native :-inline 3
     #     mode:bc: ["-w" "+A"]
@@ -777,7 +676,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Buffer_cmi",
     src  = "buffer.mli",
@@ -788,7 +687,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Bytes",
     struct = "bytes.ml",
@@ -803,7 +702,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Bytes_cmi",
     src  = "bytes.mli",
@@ -815,18 +714,18 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.BytesLabels",
     struct = "bytesLabels.ml",
     sig    = "Stdlib.BytesLabels_cmi",
-    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
+    opts = MODULE_OPTS + LABEL_OPTS,
     deps   = [
         ":Stdlib.Bytes",
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.BytesLabels_cmi",
     src  = "bytesLabels.mli",
@@ -837,7 +736,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Callback",
     struct = "callback.ml",
@@ -848,7 +747,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Callback_cmi",
     src  = "callback.mli",
@@ -858,7 +757,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Stdlib.Char",
     ns    = ":Stdlib",
     struct = "char.ml",
@@ -867,14 +766,14 @@ boot_module(
     deps   = [":Stdlib"],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Char_cmi",
     src  = "char.mli",
     opts = SIG_OPTS,
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Complex",
     struct = "complex.ml",
@@ -883,7 +782,7 @@ boot_module(
     deps   = ["Stdlib.Float"],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Complex_cmi",
     src  = "complex.mli",
@@ -891,7 +790,7 @@ boot_signature(
     deps   = [ ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Condition",
     struct = "condition.ml",
@@ -900,7 +799,7 @@ boot_module(
     deps   = [":Stdlib.Mutex"],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Condition_cmi",
     src  = "condition.mli",
@@ -908,7 +807,7 @@ boot_signature(
     deps   = [":Stdlib.Mutex_cmi"],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Digest",
     struct = "digest.ml",
@@ -921,7 +820,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Digest_cmi",
     src  = "digest.mli",
@@ -932,7 +831,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Domain",
     struct = "domain.ml",
@@ -950,7 +849,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Domain_cmi",
     src  = "domain.mli",
@@ -958,12 +857,13 @@ boot_signature(
     deps   = [ ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Effect",
     struct = "effect.ml",
     sig    = "Stdlib.Effect_cmi",
     opts = MODULE_OPTS,
+    warnings = ["41"],
     deps   = [
         "Stdlib.Callback",
         "Stdlib.Obj",
@@ -972,7 +872,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Effect_cmi",
     src  = "effect.mli",
@@ -980,7 +880,7 @@ boot_signature(
     deps   = [":Stdlib.Printexc_cmi"],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Either",
     struct = "either.ml",
@@ -992,7 +892,7 @@ boot_module(
     # data = ["//runtime:primitives"],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Either_cmi",
     src  = "either.mli",
@@ -1004,7 +904,7 @@ boot_signature(
     # data = ["//runtime:primitives"],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Ephemeron",
     struct = "ephemeron.ml",
@@ -1023,7 +923,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Ephemeron_cmi",
     src  = "ephemeron.mli",
@@ -1033,7 +933,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Filename",
     struct = "filename.ml",
@@ -1051,7 +951,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Filename_cmi",
     src  = "filename.mli",
@@ -1059,12 +959,12 @@ boot_signature(
     deps   = [":Stdlib"],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Float",
     struct = "float.ml",
     sig    = "Stdlib.Float_cmi",
-    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
+    opts = MODULE_OPTS + LABEL_OPTS,
     deps   = [
         ":Stdlib.Seq",
         ":Stdlib.List",
@@ -1072,7 +972,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Float_cmi",
     src  = "float.mli",
@@ -1083,12 +983,13 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Format",
     struct = "format.ml",
     sig    = "Stdlib.Format_cmi",
-    opts = MODULE_OPTS + ["-w", "+A", "-w", "-fragile-match"],
+    opts = MODULE_OPTS,
+    warnings = ["fragile-match"],
     deps   = [
         ":CamlinternalFormat",
         ":CamlinternalFormatBasics",
@@ -1107,11 +1008,12 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Format_cmi",
     src  = "format.mli",
-    opts = SIG_OPTS + ["-w", "+A", "-w", "-fragile-match"],
+    opts = SIG_OPTS,
+    warnings = ["fragile-match"],
     deps   = [
         ":Stdlib_cmi",
         ":Stdlib.Buffer_cmi",
@@ -1121,7 +1023,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Fun",
     struct = "fun.ml",
@@ -1132,7 +1034,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Fun_cmi",
     src  = "fun.mli",
@@ -1141,7 +1043,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Gc",
     struct = "gc.ml",
@@ -1155,7 +1057,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Gc_cmi",
     src  = "gc.mli",
@@ -1165,7 +1067,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Genlex",
     struct = "genlex.ml",
@@ -1181,7 +1083,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Genlex_cmi",
     src  = "genlex.mli",
@@ -1192,7 +1094,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Hashtbl",
     struct = "hashtbl.ml",
@@ -1213,7 +1115,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Hashtbl_cmi",
     src  = "hashtbl.mli",
@@ -1224,7 +1126,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.In_channel",
     struct = "in_channel.ml",
@@ -1235,7 +1137,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.In_channel_cmi",
     src  = "in_channel.mli",
@@ -1245,7 +1147,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Int",
     struct = "int.ml",
@@ -1256,7 +1158,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Int_cmi",
     src  = "int.mli",
@@ -1266,7 +1168,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Int32",
     struct = "int32.ml",
@@ -1278,7 +1180,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Int32_cmi",
     src  = "int32.mli",
@@ -1289,7 +1191,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Int64",
     struct = "int64.ml",
@@ -1300,7 +1202,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Int64_cmi",
     src  = "int64.mli",
@@ -1310,7 +1212,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Lazy",
     struct = "lazy.ml",
@@ -1325,7 +1227,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Lazy_cmi",
     src  = "lazy.mli",
@@ -1335,7 +1237,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Lexing",
     struct = "lexing.ml",
@@ -1351,7 +1253,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Lexing_cmi",
     src  = "lexing.mli",
@@ -1361,7 +1263,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Stdlib.List",
     ns    = ":Stdlib",
     struct = "list.ml",
@@ -1374,7 +1276,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.List_cmi",
     src  = "list.mli",
@@ -1385,18 +1287,18 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.ListLabels",
     struct = "listLabels.ml",
     sig    = "Stdlib.ListLabels_cmi",
-    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
+    opts = MODULE_OPTS + LABEL_OPTS,
     deps   = [
         ":Stdlib.List",
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.ListLabels_cmi",
     src  = "listLabels.mli",
@@ -1407,7 +1309,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Map",
     struct = "map.ml",
@@ -1419,7 +1321,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Map_cmi",
     src  = "map.mli",
@@ -1429,7 +1331,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Marshal",
     struct = "marshal.ml",
@@ -1440,7 +1342,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Marshal_cmi",
     src  = "marshal.mli",
@@ -1450,12 +1352,12 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.MoreLabels",
     struct = "moreLabels.ml",
     sig    = "Stdlib.MoreLabels_cmi",
-    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
+    opts = MODULE_OPTS + LABEL_OPTS,
     deps   = [
         ":Stdlib.Set",
         ":Stdlib.Map",
@@ -1463,7 +1365,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.MoreLabels_cmi",
     src  = "moreLabels.mli",
@@ -1478,12 +1380,12 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Mutex",
     struct = "mutex.ml",
     sig    = "Stdlib.Mutex_cmi",
-    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
+    opts = MODULE_OPTS,
     deps   = [
         # ":Stdlib.Set",
         # ":Stdlib.Map",
@@ -1491,7 +1393,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Mutex_cmi",
     src  = "mutex.mli",
@@ -1506,7 +1408,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Nativeint",
     struct = "nativeint.ml",
@@ -1518,7 +1420,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Nativeint_cmi",
     src  = "nativeint.mli",
@@ -1529,7 +1431,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Obj",
     struct = "obj.ml",
@@ -1542,7 +1444,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Obj_cmi",
     src  = "obj.mli",
@@ -1553,7 +1455,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     name   = "Stdlib.Oo",
     ns    = ":Stdlib",
     struct = "oo.ml",
@@ -1564,7 +1466,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     name = "Stdlib.Oo_cmi",
     ns   = ":Stdlib",
     src  = "oo.mli",
@@ -1576,7 +1478,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Option",
     struct = "option.ml",
@@ -1587,7 +1489,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Option_cmi",
     src  = "option.mli",
@@ -1597,7 +1499,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Out_channel",
     struct = "out_channel.ml",
@@ -1606,7 +1508,7 @@ boot_module(
     deps   = [":Stdlib.Fun"],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Out_channel_cmi",
     src  = "out_channel.mli",
@@ -1614,7 +1516,7 @@ boot_signature(
     deps   = [":Stdlib"],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Parsing",
     struct = "parsing.ml",
@@ -1628,7 +1530,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Parsing_cmi",
     src  = "parsing.mli",
@@ -1640,7 +1542,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Pervasives",
     struct = "pervasives.ml",
@@ -1656,7 +1558,7 @@ boot_module(
 #     visibility = ["//visibility:public"]
 # )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Printexc",
     struct = "printexc.ml",
@@ -1672,7 +1574,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Printexc_cmi",
     src  = "printexc.mli",
@@ -1682,12 +1584,13 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Printf",
     struct = "printf.ml",
     sig    = "Stdlib.Printf_cmi",
-    opts = MODULE_OPTS + ["-w", "+A", "-w", "-fragile-match"],
+    opts = MODULE_OPTS,
+    warnings = ["fragile-match"],
     deps   = [
         # ":CamlinternalFormatBasics",
         ":CamlinternalFormat",
@@ -1695,17 +1598,18 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Printf_cmi",
     src  = "printf.mli",
-    opts = SIG_OPTS + ["-w", "+A", "-w", "-fragile-match"],
+    opts = SIG_OPTS,
+    warnings = ["fragile-match"],
     deps   = [
         ":Stdlib.Buffer",
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Queue",
     struct = "queue.ml",
@@ -1717,7 +1621,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Queue_cmi",
     src  = "queue.mli",
@@ -1728,7 +1632,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Random",
     struct = "random.ml",
@@ -1750,7 +1654,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Random_cmi",
     src  = "random.mli",
@@ -1762,7 +1666,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Result",
     struct = "result.ml",
@@ -1774,7 +1678,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Result_cmi",
     src  = "result.mli",
@@ -1785,12 +1689,13 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Scanf",
     struct = "scanf.ml",
     sig    = "Stdlib.Scanf_cmi",
-    opts   = MODULE_OPTS + ["-w", "+A", "-w", "-fragile-match"],
+    opts   = MODULE_OPTS,
+    warnings = ["fragile-match"],
     # + select({
     #     mode:native  ["-inline", 9]
     # })
@@ -1806,20 +1711,19 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name  = "Stdlib.Scanf_cmi",
     src   = "scanf.mli",
-    opts  = SIG_OPTS + [
-        "-w", "+A", "-w", "-fragile-match"
-    ],
+    opts  = SIG_OPTS,
+    warnings = ["fragile-match"],
     deps  = [
         ":Stdlib_cmi",
         # ":CamlinternalFormatBasics_cmi",
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Semaphore",
     struct = "semaphore.ml",
@@ -1834,7 +1738,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name  = "Stdlib.Semaphore_cmi",
     src   = "semaphore.mli",
@@ -1843,7 +1747,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     struct = "seq.ml",
     name   = "Stdlib.Seq",
@@ -1856,7 +1760,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Seq_cmi",
     src  = "seq.mli",
@@ -1864,7 +1768,7 @@ boot_signature(
     deps   = [":Stdlib.Either_cmi"],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Set",
     struct = "set.ml",
@@ -1876,7 +1780,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Set_cmi",
     src  = "set.mli",
@@ -1886,7 +1790,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Stack",
     struct = "stack.ml",
@@ -1898,7 +1802,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Stack_cmi",
     src  = "stack.mli",
@@ -1908,12 +1812,12 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.StdLabels",
     struct = "stdLabels.ml",
     sig    = "Stdlib.StdLabels_cmi",
-    opts = MODULE_OPTS + ["-nolabels", "-no-alias-deps"],
+    opts = MODULE_OPTS + LABEL_OPTS,
     deps   = [
         ":Stdlib.StringLabels",
         ":Stdlib.ListLabels",
@@ -1922,7 +1826,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.StdLabels_cmi",
     src  = "stdLabels.mli",
@@ -1935,7 +1839,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Stream",
     struct = "stream.ml",
@@ -1950,7 +1854,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Stream_cmi",
     src  = "stream.mli",
@@ -1959,7 +1863,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.String",
     struct = "string.ml",
@@ -1970,7 +1874,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.String_cmi",
     src  = "string.mli",
@@ -1981,7 +1885,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.StringLabels",
     struct = "stringLabels.ml",
@@ -1992,18 +1896,18 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.StringLabels_cmi",
     src  = "stringLabels.mli",
-    opts = SIG_OPTS + LABEL_SIGOPTS,
+    opts = SIG_OPTS,
     deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Sys",
     struct = "sys.ml",
@@ -2019,7 +1923,7 @@ boot_module(
     opts = MODULE_OPTS,
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Sys_cmi",
     src  = "sys.mli",
@@ -2027,7 +1931,7 @@ boot_signature(
     deps = [":Stdlib"],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Uchar",
     struct = "uchar.ml",
@@ -2038,7 +1942,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Uchar_cmi",
     src  = "uchar.mli",
@@ -2048,7 +1952,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Unit",
     struct = "unit.ml",
@@ -2066,7 +1970,7 @@ boot_module(
     opts = MODULE_OPTS,
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Unit_cmi",
     src  = "unit.mli",
@@ -2075,7 +1979,7 @@ boot_signature(
     ],
 )
 
-boot_module(
+baseline_module(
     ns    = ":Stdlib",
     name   = "Stdlib.Weak",
     struct = "weak.ml",
@@ -2095,7 +1999,7 @@ boot_module(
     ],
 )
 
-boot_signature(
+baseline_signature(
     ns   = ":Stdlib",
     name = "Stdlib.Weak_cmi",
     src  = "weak.mli",
@@ -2134,7 +2038,6 @@ boot_signature(
 # $(HEADERPROGRAM)%$(O): \
 #   OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
 
-
 SYSPATHS_CMD = " ".join([
     "cat bazel-out/stable-status.txt | ",
     "grep \"STABLE_CAMLHEADER \" | ",
@@ -2170,31 +2073,49 @@ SYSPATHS_CMD = " ".join([
 ## IMPORTANT! For this to work, the following cli args must be passed:
 # --stamp
 # --workspace_status_command=$PWD/bzl/camlheader.sh
+
+## FIXME: select camlheader content: for running under Bazel, null, otherwise installation path,
+## not $(execpath //boot/bin:ocamlrun)?
 DEVPATHS_CMD = "\n".join([
     "cat bazel-out/stable-status.txt | ",
     "while read KEY VAL; do",
     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
-    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun) > $(location camlheader);\n",
-    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun)d > $(location camlheaderd);\n",
-    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun)i > $(location camlheaderi);\n",
+    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun) > $(location _build/camlheader);\n",
+    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun)d > $(location _build/camlheaderd);\n",
+    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun)i > $(location _build/camlheaderi);\n",
+    # "touch $(location camlheader);\n",
+    # "touch $(location camlheaderd);\n",
+    # "touch $(location camlheaderi);\n",
     "fi",
     "done",
 
-    "echo '#!$(execpath //boot/bin:ocamlrun)' > $(location target_camlheader);",
-    "echo '#!$(execpath //boot/bin:ocamlrun)d' > $(location target_camlheaderd);",
-    "echo '#!$(execpath //boot/bin:ocamlrun)i' > $(location target_camlheaderi);",
+    "echo '#!$(execpath //boot/bin:ocamlrun)' > $(location _build/target_camlheader);",
+    "echo '#!$(execpath //boot/bin:ocamlrun)d' > $(location _build/target_camlheaderd);",
+    "echo '#!$(execpath //boot/bin:ocamlrun)i' > $(location _build/target_camlheaderi);",
 ])
 
+boot_camlheaders(
+    name     = "camlheaders",
+    template = "camlheader.template",
+    runtimes  = [
+        "//runtime:ocamlrun",
+        # "//boot/bin:ocamlrun",
+        # "//boot/bin:ocamlrund",  # if we had this
+        # "//boot/bin:ocamlruni",
+    ],
+    prefix   = "$PWD",
+)
+
 genrule(
-    name = "camlheaders",
+    name = "Xcamlheaders",
     outs = [
-        "camlheader",
-        "camlheaderd",
-        "camlheaderi",
+        "_build/camlheader",
+        "_build/camlheaderd",
+        "_build/camlheaderi",
         # "camlheader_ur",
-        "target_camlheader",
-        "target_camlheaderd",
-        "target_camlheaderi"
+        "_build/target_camlheader",
+        "_build/target_camlheaderd",
+        "_build/target_camlheaderi"
     ],
     # srcs = [
     #     "//boot/bin:ocamlrun",

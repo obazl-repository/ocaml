@@ -23,6 +23,7 @@ def module_attrs():
         ),
 
         warnings = attr.string_list(
+            doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
 
         nocopts = attr.bool(
@@ -106,7 +107,6 @@ def module_attrs():
         #     default = "@ocaml//bootstrap/ns:resolver",
         # ),
 
-        _rule = attr.string( default = "boot_module" ),
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),

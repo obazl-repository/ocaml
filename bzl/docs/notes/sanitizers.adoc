@@ -1,0 +1,13 @@
+= sanitizers
+
+== macos
+
+At least two of the sanitizers are directly supported by the default Bazel cc toolchain on the Mac. All you need to do is pass `--features=<san>` or set the attribute on your target: `features=["<san"]`. Supported sanitizers:  `asan` (address sanitizer); `ubsan` (undefined behavior).
+
+The Zig toolchain on mac does not support these features.
+
+Clang on mac evidently supports thread sanitizer, but `--feature=tsan` does not work.
+
+Unfortunately it looks like memory sanitizer is unsupported (by clang on Mac).
+
+More info on using sanitizers on Mac:  link:https://developer.apple.com/documentation/xcode/diagnosing-memory-thread-and-crash-issues-early[Diagnosing memory, thread, and crash issues early]

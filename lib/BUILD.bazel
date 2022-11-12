@@ -1,10 +1,5 @@
-alias(
-    name = "camlrun",
-    actual = "//boot:camlrun"
-)
+load("//bzl/rules/macros:compiler.bzl", "compiler")
+load("//bzl/rules/macros:lexer.bzl", "lexer")
+load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
-alias(
-    name = "asmrun",
-    actual = "//boot:asmrun"
-)
-
+stdlib(stage  = "dev")

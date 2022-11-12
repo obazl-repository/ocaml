@@ -256,7 +256,7 @@ coreall: runtime
 
 runtime: stdlib/libcamlrun.$(A)
 
-make targets coldstart, bootstrap, coreboot
+make targets coldstart, bootstrap, cobaseline
 
 == coldstart
 

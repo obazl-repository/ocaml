@@ -1,5 +1,5 @@
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
      "BootInfo", "ModuleInfo",
@@ -7,11 +7,11 @@ load("//bzl:providers.bzl",
 
 load("//bzl:functions.bzl", "get_module_name")
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
-load("//bzl/rules/common:impl_common.bzl", "dsorder", "tmpdir")
+load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:options.bzl", "get_options")
 
 #####################
-def impl_module(ctx):
+def module_impl(ctx):
 
     debug = False
     # if ctx.label.name in ["Stdlib"]:
@@ -20,12 +20,38 @@ def impl_module(ctx):
     #     debug = True
         # fail("x")
 
-    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    # tc = ctx.exec_groups[ctx.attr._stage].toolchains[
+    #     "//toolchain/type:{}".format(ctx.attr._stage)
+    # ]
+    # tc = ctx.toolchains["//toolchain/type:boot"]
     # print("tc target_host: %s" % tc.target_host)
+
+    stage = ctx.attr._stage[BuildSettingInfo].value
+    # print("module _stage: %s" % stage)
+
+    workdir = "_{}/".format(stage)
+
+    tc = None
+    if stage == "boot":
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+    elif stage == "baseline":
+        tc = ctx.exec_groups["baseline"].toolchains[
+            "//boot/toolchain/type:baseline"]
+    elif stage == "dev":
+        tc = ctx.exec_groups["dev"].toolchains[
+            "//boot/toolchain/type:baseline"]
+    else:
+        print("UNHANDLED STAGE: %s" % stage)
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+
     if tc.target_host in ["vm"]:
         ext = ".cmo"
     else:
         ext = ".cmx"
+
+    ext = ".cmo" # for now
 
     ################################################################
     ################  OUTPUTS  ################
@@ -75,13 +101,13 @@ def impl_module(ctx):
         if ctx.file.sig.is_source:
             # need to symlink .mli, to match symlink of .ml
             sig_src = ctx.actions.declare_file(
-                tmpdir + module_name + ".mli"
+                workdir + module_name + ".mli"
             )
             sig_inputs.append(sig_src)
             ctx.actions.symlink(output = sig_src,
                                 target_file = ctx.file.sig)
 
-            action_output_cmi = ctx.actions.declare_file(tmpdir + module_name + ".cmi")
+            action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
             action_outputs.append(action_output_cmi)
             provider_output_cmi = action_output_cmi
             mli_dir = None
@@ -96,7 +122,7 @@ def impl_module(ctx):
             fail("ctx.file.sig without OcamlSignatureProvider")
 
     else: ## no sig, compiler will generate .cmi
-        action_output_cmi = ctx.actions.declare_file(tmpdir + module_name + ".cmi")
+        action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
         action_outputs.append(action_output_cmi)
         provider_output_cmi = action_output_cmi
         mli_dir = None
@@ -110,10 +136,10 @@ def impl_module(ctx):
             # structfile in src dir, make sure in same dir as sig
             if ctx.file.sig:
                 if ctx.file.sig.is_source:
-                    in_structfile = ctx.actions.declare_file(tmpdir + module_name + ".ml")
+                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                 else: # sig file is compiled .cmo
-                    in_structfile = ctx.actions.declare_file(tmpdir + module_name + ".ml")
+                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
             else: # no sig
                 in_structfile = ctx.file.struct
@@ -122,7 +148,7 @@ def impl_module(ctx):
             if ctx.file.sig:
                 if paths.dirname(ctx.file.struct.short_path) != mli_dir:
                     in_structfile = ctx.actions.declare_file(
-                        tmpdir + module_name + ".ml") # ctx.file.struct.basename)
+                        workdir + module_name + ".ml") # ctx.file.struct.basename)
                     ctx.actions.symlink(
                         output = in_structfile,
                         target_file = ctx.file.struct)
@@ -137,7 +163,7 @@ def impl_module(ctx):
             else:  ## no sig file
                 in_structfile = ctx.file.struct
     else:  ## namespaced
-        in_structfile = ctx.actions.declare_file(tmpdir + module_name + ".ml")
+        in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
         ctx.actions.symlink(
             output = in_structfile, target_file = ctx.file.struct
         )
@@ -145,7 +171,7 @@ def impl_module(ctx):
     # if ctx.label.name == "CamlinternalFormatBasics":
     #     fail("X")
 
-    out_cm_ = ctx.actions.declare_file(tmpdir + module_name + ext)
+    out_cm_ = ctx.actions.declare_file(workdir + module_name + ext)
     # sibling = new_cmi) # fname)
     if debug:
         print("OUT_CM_: %s" % out_cm_.path)
@@ -155,7 +181,7 @@ def impl_module(ctx):
 
     if not tc.target_host:
         # if not ctx.attr._rule.startswith("bootstrap"):
-        out_o = ctx.actions.declare_file(tmpdir + module_name + ".o",
+        out_o = ctx.actions.declare_file(workdir + module_name + ".o",
                                          sibling = out_cm_)
         action_outputs.append(out_o)
         # direct_linkargs.append(out_o)
@@ -268,18 +294,25 @@ def impl_module(ctx):
     #########################
     args = ctx.actions.args()
 
-    if tc.target_host in ["boot", "vm"]:
-        # if stage == bootstrap:
-        args.add_all(["-use-prims", tc.primitives])
+    args.add("-nostdlib")
+
+    if hasattr(ctx.attr, "_stdlib_resolver"):
+        includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
+        if tc.target_host in ["boot", "vm"]:
+            # if stage == bootstrap:
+            args.add_all(["-use-prims", tc.primitives])
+    else:
+        args.add("-nopervasives")
 
     if not ctx.attr.nocopts:
         args.add_all(tc.copts)
 
-    # if ctx.attr.warnings == []:
-    #     args.add_all(ctx.attr.warnings)
-    # else:
     args.add_all(tc.warnings[BuildSettingInfo].value)
 
+    for w in ctx.attr.warnings:
+        args.add_all(["-w",
+                      w if w.startswith("-")
+                      else "-" + w])
 
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
@@ -289,9 +322,14 @@ def impl_module(ctx):
     includes.extend(paths_depset.to_list())
 
     # if hasattr(ctx.attr._ns_resolver[OcamlNsResolverProvider], "resolver"):
-    if ns_resolver:
-        args.add("-no-alias-deps")
-        args.add("-open", ns)
+    # if ns_resolver:
+    #     args.add("-no-alias-deps")
+    #     args.add("-open", ns)
+
+    stdlib_resolver = []
+    if hasattr(ctx.attr, "_stdlib_resolver"):
+        stdlib_resolver.append(ctx.attr._stdlib_resolver[ModuleInfo].sig)
+        stdlib_resolver.append(ctx.attr._stdlib_resolver[ModuleInfo].struct)
 
     inputs_depset = depset(
         order = dsorder,
@@ -299,6 +337,7 @@ def impl_module(ctx):
         + sig_inputs
         + [in_structfile]
         + depsets.deps.mli
+        + stdlib_resolver
         ,
         transitive = []
         + [merge_depsets(depsets, "sigs"),

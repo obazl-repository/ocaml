@@ -1,3 +1,5 @@
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+
 load("//bzl:providers.bzl",
      "BootInfo",
      "new_deps_aggregator",
@@ -18,7 +20,23 @@ def impl_library(ctx):
     debug = False
     # print("**** NS_LIB {} ****************".format(ctx.label))
 
-    tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    stage = ctx.attr._stage[BuildSettingInfo].value
+    # print("library _stage: %s" % stage)
+
+    tc = None
+    if stage == "boot":
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
+    elif stage == "baseline":
+        tc = ctx.exec_groups["baseline"].toolchains[
+            "//boot/toolchain/type:baseline"]
+    elif stage == "dev":
+        tc = ctx.exec_groups["dev"].toolchains[
+            "//boot/toolchain/type:boot"]
+    else:
+        print("UNHANDLED STAGE: %s" % stage)
+        tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
 
     ################################################################
     ################  DEPS  ################

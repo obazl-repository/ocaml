@@ -1,0 +1,85 @@
+exports_files(["BUILD.bazel"])
+
+load(":BUILD.bzl", "toolchain_adapter", "stdlib_toolchain_adapter")
+
+##################
+toolchain_adapter(
+    name        = "boot",
+    build_host  = "boot",
+    target_host = "boot",
+    # compiler    = "//boot/bin:ocamlc.byte",
+    # lexer       = "//lex:ocamllex",
+    # yaccer      = "//yacc:ocamlyacc",
+    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
+    # runtime = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
+    copts       = [ ## compile opts (sigs/modules only)
+        "-strict-sequence",
+        # "-warn-error", "+A",
+        # "-nostdlib",  ## inserted by rule
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+    # camlheaders = [
+    #     "//stdlib:camlheaders"
+    #     # "//stdlib:camlheader", "//stdlib:target_camlheader",
+    #     # "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+    #     # "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+    # ],
+    # std_exit = "//stdlib:Std_exit"
+)
+
+##################
+toolchain_adapter(
+    name        = "baseline",
+    build_host  = "baseline",
+    target_host = "baseline",
+    # compiler    = "//boot/bin:ocamlc.byte",
+    # lexer       = "//lex:ocamllex",
+    # yaccer      = "//yacc:ocamlyacc",
+    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
+    # runtime = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
+    copts       = [ ## compile opts (sigs/modules only)
+        "-strict-sequence",
+        # "-warn-error", "+A",
+        "-nostdlib",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+    # camlheaders = [
+    #     "//stdlib:camlheaders"
+    #     # "//stdlib:camlheader", "//stdlib:target_camlheader",
+    #     # "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
+    #     # "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
+    # ],
+    # std_exit = "//stdlib:Std_exit"
+)
+
+################################################################
+##################
+stdlib_toolchain_adapter(
+    name        = "stdlib",
+    build_host  = "stdib",
+    target_host = "stdlib",
+)
+
+

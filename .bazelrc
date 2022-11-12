@@ -1,3 +1,7 @@
+build --config=show
+query --notool_deps
+query --noimplicit_deps
+
 ## always use these settings:
 build --incompatible_enable_cc_toolchain_resolution
 ## put it in ~/.bazelrc to enable for all bazel projects
@@ -7,9 +11,16 @@ common --color=yes
 common:show --subcommands=pretty_print
 common:show --verbose_failures
 
+## suppress INFO msgs etc. emitted by 'bazel run'
+run:q --ui_event_filters=-info
+run:q --ui_event_filters=-stdout
+run:q --ui_event_filters=-stderr
+run:q --noshow_progress
+
 #build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
-build --toolchain_resolution_debug=//toolchain/type:bootstrap
+#build --toolchain_resolution_debug=//toolchain/type:.*
+build --toolchain_resolution_debug=//boot/toolchain/type:.*
 
 ### testing:
 # --extra_execution_platforms: The platforms that are available as
@@ -66,7 +77,8 @@ common:linuxamd64_macamd64 --platforms=@zig_sdk//platform:macos_amd64
 ################################################################
 ## always stamp, it injects the absolute path of the workspace root
 # https://docs.bazel.build/versions/main/user-manual.html#flag--workspace_status_command
-build --stamp --workspace_status_command=$PWD/bzl/camlheader.sh
+build --stamp
+build --workspace_status_command=$PWD/bzl/camlheader.sh
 
 ################################################################
 ## OCaml platforms: boot, vm, sys

@@ -1,0 +1,87 @@
+= platforms
+
+The compilers are composed of:
+
+* *Runtime* The runtime, written in C, contains the primitives, the
+   memory manager, and... some other stuff. Runtimes are specified as
+   <os>_<arch>, e.g. `macos_amd64` or as `sys`, indicating "whatever
+   the local system architecture is".
+
+* *Executor* The executor is composed of two parts:
++
+  ** The *compiler* proper, and
+  ** The *command processor* or driver. The command processor is
+    resposible for accepting user requests and directing the
+    compiler's operations. For the standard compilers, user requests
+    are the arguments passed via the command line; for a service
+    working compiler, they would be protocol requests received from an
+    input stream.
++
+Executors are specified as `vm` or `sys`.
++
+* *Emitter* The emitter is responsible for emitting the compiled code.
+   There are two types: vm and sys.
+
+To specify a build target we need to specify all three parts.  The form is
+
+`<runtime>_<executor>_<emitter>`
+
+For example:
+
+* `ocamlc.byte` runs on the vm on the local system and emits bytecode.
+Its triple is `sys_vm_vm` on the localhost; on a remote host it would
+be `linux_arm64_vm_vm`, `macos_amd64_vm_vm`, etc.
+
+* `ocamlopt.byte` runs on the system and emits native (sys) code; its
+  triple is `sys_vm_sys` locally; explicitly
+  `macos_amd64_vm_macos_amd64`.
+  ** An `ocamlopt.byte` cross-compiler would be something like
+     `macos_amd64_vm_linux_amd64` - a vm running on a mac amd64 and
+     emitting code for linux_amd64.
+
+* `ocamlc.opt` runs natively and emits bytecode: `sys_sys_vm`, or
+  `macos_amd64_macos_amd64_vm`, meaning the runtime and the executor
+  both run natively and the emitter is `vm`.
+
+* `ocamopt.opt` runs natively and emits native code: `sys_sys_sys`.
+  ** An `ocamopt.opt` cross-compiler would run natively on the build
+     host and emit native code for a target host; for example:
+     `macos_amd64_macos_amd64_linux_amd64`.
+
+To support cross-compiling, OBazl uses Bazel platforms of the same
+structure. The available platforms are:
+
+* `//platforms:sys_vm_vm` - a vm->vm compiler for the local machine (`ocamlc.byte`). This is the default for bootstrapping.
+* `//platforms:sys_vm_sys` - a vm->sys compiler for the local machine (`ocamlopt.byte`).
+* `//platforms:sys_sys_sys` - a sys->sys compiler for the local machine (`ocamlopt.opt`).
+* `//platforms:sys_sys_vm` - a sys->vm compiler for the local machine (`ocamlc.opt`).
+
+
+* `macos_amd64_vm_vm` - build a runtime for macos and a vm->vm
+  compiler that runs on it (i.e. `ocamlc.byte` on mac amd64). When
+  passed with `--platforms=//platforms:macos_amd64_vm_vm` it sets the
+  following target constraints:
+
+    ** `@platforms//os:macos`       (defined by Bazel)
+    ** `@platforms//cpu:x86_64`  (defined by Bazel)
+    ** `//platforms/ocaml/executor:vm`                    (defined by OBazl)
+    ** `//platforms/ocaml/emitter:vm`                    (defined by OBazl)
+
+* `//platforms:macos_amd64_vm_sys` - produce a mac amd64 runtime and a vm compiler
+  that emits mac amd64 code, i.e. `ocamlopt.byte` for the mac.
+
+* `//platforms:macos_amd64_sys_vm` - produce a mac amd64 runtime and executor with
+  a vm emitter, i.e. `ocamlc.opt` for a mac.
+
+* `//platforms:macos_amd64_sys_sys` - produce a compiler that runs natively on a
+  mac amd64 and emits code for same, i.e. `ocamlopt.opt` for a mac.
+
+Similar permuttions for `linux` and `arm64`.
+
+Summary: first the os_cpu pair for the target platform, then the executor, then the emitter.
+
+
+
+
+
+

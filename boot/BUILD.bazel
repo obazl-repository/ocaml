@@ -1,8 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl", "boot_coldstart")
+# load("//bzl/rules/macros:compiler.bzl", "compiler")
+# load("//bzl/rules/macros:lexer.bzl", "lexer")
+load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
-exports_files(["ocamllex"])
+exports_files(["ocamlc", "ocamlc.sh", "ocamllex"])
 
 ## Package //boot contains pre-compiled OCaml executables (ocamlc,
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
@@ -31,14 +34,15 @@ sh_binary(
     srcs = ["clean.sh"]
 )
 
-
+################################################################
 sh_binary(
     name = "ocamlc.boot",
     srcs = ["ocamlc.sh"],
     data = [
         ":ocamlc",
-        ":ocamlrun.boot",
-        "//stdlib:camlheaders", # genrule, no dep on ocamlc.
+        "//runtime:ocamlrun",
+        "//stdlib:camlheaders",
+
         # We cannot depend on Std_exit on pain of circularity.
         # It depends on Stdlib, which is compiled by this tool.
         # "//stdlib:Std_exit"
@@ -54,13 +58,13 @@ sh_binary(
     srcs = ["ocamllex.sh"],
     data = [
         ":ocamllex",
-        ":ocamlrun.boot"
+        "//runtime:ocamlrun"
     ],
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
-# ocamlyacc is written in C, so no ocamlyacc.opt.
-alias(
-    name   = "ocamlyacc.boot",
-    actual = "//yacc:ocamlyacc"
-)
+stdlib(stage  = "boot")
+# alias(
+#     name   = "stdlib",
+#     actual = "//stdlib"
+# )
