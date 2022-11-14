@@ -6,6 +6,8 @@ See the link:https://github.com/ocaml/ocaml[upstream repository] for the origina
 
 ==== Quickstart
 
+WARNING: (11/14/22) These instructions are outdated.  Refreshed instructions will be posted soon.
+
 1. Install Bazel.  Recommendation: link:https://github.com/bazelbuild/bazelisk[Bazelisk]
 
 2. Clone link:https://github.com/obazl-repository/ocaml[this repo].
