@@ -1,5 +1,6 @@
-load("//bzl/rules/common:executable_impl.bzl", "impl_executable")
-load("//bzl/rules/common:executable_intf.bzl", "executable_attrs")
+load("//bzl/actions:executable_impl.bzl", "executable_impl")
+load("//bzl/attrs:executable_intf.bzl", "executable_attrs")
+
 # load("//bzl/rules/common:transitions.bzl", "executable_in_transition")
 
 ########################
@@ -10,28 +11,30 @@ load("//bzl/rules/common:executable_intf.bzl", "executable_attrs")
 
 #######################
 build_tool = rule(
-    implementation = impl_executable, ##_build_tool,
+    implementation = executable_impl,
     doc = "Links OCaml executable binary using the bootstrap toolchain",
 
     exec_groups = {
         "boot": exec_group(
             exec_compatible_with = [
-                "//platforms/ocaml/executor:vm?",
-                "//platforms/ocaml/emitter:vm?"
+                "//platform/constraints/ocaml/executor:vm?",
+                "//platform/constraints/ocaml/emitter:vm"
             ],
             toolchains = ["//boot/toolchain/type:boot"],
         ),
-        "baseline": exec_group(
-            exec_compatible_with = [
-                "//platforms/ocaml/executor:vm?",
-                "//platforms/ocaml/emitter:vm?"
-            ],
-            toolchains = ["//boot/toolchain/type:baseline"],
-        ),
+        # "baseline": exec_group(
+        #     exec_compatible_with = [
+        #         "//platform/constraints/ocaml/executor:vm?",
+        #         "//platform/constraints/ocaml/emitter:vm"
+        #     ],
+        #     toolchains = ["//boot/toolchain/type:baseline"],
+        # ),
     },
 
     attrs = dict(
         executable_attrs(),
+
+        # stage = attr.label(default = "//bzl:stage"),
 
         _rule = attr.string( default = "build_tool" ),
         # _allowlist_function_transition = attr.label(

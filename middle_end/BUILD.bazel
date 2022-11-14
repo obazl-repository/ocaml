@@ -15,8 +15,6 @@ MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 # ]
 SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
-STDLIB = ["//boot/lib:stdlib"]
-
 boot_library(
     name = "middle_end",
     manifest  = [
@@ -87,7 +85,7 @@ compiler_signature(
     name = "Backend_intf_cmi",
     src  = "backend_intf.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Symbol", ## (Middle_end Symbol)
         "//middle_end/flambda:Simple_value_approx_cmi",
         "//typing:Ident",
@@ -105,7 +103,7 @@ compiler_module(
     struct = "backend_var.ml",
     sig    = "Backend_var_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//typing:Ident",
         "//typing:Path",
         "//stdlib:Stdlib.Format",
@@ -122,7 +120,7 @@ compiler_signature(
     name = "Backend_var_cmi",
     src  = "backend_var.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//typing:Path_cmi",
         "//typing:Ident_cmi",
         "//stdlib:Stdlib.Format",
@@ -136,7 +134,7 @@ compiler_module(
     struct = "clambda.ml",
     sig    = "Clambda_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ":Backend_var", ## (Middle_end Backend_var)
         "//lambda:Debuginfo", ## (Lambda Debuginfo)
@@ -157,7 +155,7 @@ compiler_signature(
     name = "Clambda_cmi",
     src  = "clambda.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         ":Backend_var", ## (Middle_end Backend_var)
         "//lambda:Debuginfo",
@@ -177,7 +175,7 @@ compiler_module(
     struct = "clambda_primitives.ml",
     sig    = "Clambda_primitives_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Lambda",
         "//typing:Types",
         "//typing:Primitive",
@@ -189,7 +187,7 @@ compiler_signature(
     name = "Clambda_primitives_cmi",
     src  = "clambda_primitives.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//typing:Types",
         "//typing:Primitive",
         "//lambda:Lambda_cmi",
@@ -203,7 +201,7 @@ compiler_module(
     struct = "compilation_unit.ml",
     sig    = "Compilation_unit_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linkage_name", ## (Middle_end Linkage_name)
         "//stdlib:Stdlib.String",
         "//utils:Misc",
@@ -224,7 +222,7 @@ compiler_signature(
     name = "Compilation_unit_cmi",
     src  = "compilation_unit.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linkage_name", ## (Middle_end Linkage_name)
         "//utils:Identifiable",
         "//typing:Ident_cmi"
@@ -240,7 +238,7 @@ compiler_module(
     struct = "compilenv.ml",
     sig    = "Compilenv_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Symbol", ## (Middle_end Symbol)
         ":Linkage_name", ## (Middle_end Linkage_name)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -278,7 +276,7 @@ compiler_signature(
     name = "Compilenv_cmi",
     src  = "compilenv.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Symbol_cmi",
         ":Linkage_name_cmi",
         ":Compilation_unit_cmi",
@@ -299,7 +297,7 @@ compiler_module(
     struct = "convert_primitives.ml",
     sig    = "Convert_primitives_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//lambda:Printlambda",
         "//utils:Misc",
@@ -311,7 +309,7 @@ compiler_signature(
     name = "Convert_primitives_cmi",
     src  = "convert_primitives.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//parsing:Asttypes_cmi",
     ],
@@ -322,7 +320,7 @@ compiler_module(
     struct = "internal_variable_names.ml",
     sig    = "Internal_variable_names_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         "//lambda:Lambda",
         "//utils:Int_replace_polymorphic_compare",
@@ -337,7 +335,7 @@ compiler_signature(
     name = "Internal_variable_names_cmi",
     src  = "internal_variable_names.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Lambda_cmi"
     ],
     visibility = [
@@ -351,7 +349,7 @@ compiler_module(
     struct = "linkage_name.ml",
     sig    = "Linkage_name_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.String",
         "//utils:Int_replace_polymorphic_compare",
         "//utils:Identifiable",
@@ -368,7 +366,7 @@ compiler_signature(
     name = "Linkage_name_cmi",
     src  = "linkage_name.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Identifiable_cmi"
     ],
 )
@@ -378,7 +376,7 @@ compiler_module(
     struct = "printclambda.ml",
     sig    = "Printclambda_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
         ":Clambda", ## (Middle_end Clambda)
         ":Backend_var", ## (Middle_end Backend_var)
@@ -399,7 +397,7 @@ compiler_signature(
     name = "Printclambda_cmi",
     src  = "printclambda.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Clambda", ## (Middle_end Clambda)
         "//stdlib:Stdlib.Format",
     ],
@@ -410,7 +408,7 @@ compiler_module(
     struct = "printclambda_primitives.ml",
     sig    = "Printclambda_primitives_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//lambda:Printlambda", ## (Lambda Printlambda)
         "//lambda:Lambda", ## (Lambda Lambda)
@@ -426,7 +424,7 @@ compiler_signature(
     name = "Printclambda_primitives_cmi",
     src  = "printclambda_primitives.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//stdlib:Stdlib.Format",
         "//parsing:Asttypes_cmi",
@@ -438,7 +436,7 @@ compiler_module(
     struct = "semantics_of_primitives.ml",
     sig    = "Semantics_of_primitives_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
     ],
     visibility = ["//middle_end:__subpackages__"]
@@ -448,7 +446,7 @@ compiler_signature(
     name = "Semantics_of_primitives_cmi",
     src  = "semantics_of_primitives.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//parsing:Asttypes_cmi",
     ],
@@ -459,7 +457,7 @@ compiler_module(
     struct = "symbol.ml",
     sig    = "Symbol_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Variable", ## (Middle_end Variable)
         ":Linkage_name", ## (Middle_end Linkage_name)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -478,7 +476,7 @@ compiler_signature(
     name = "Symbol_cmi",
     src  = "symbol.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Variable", ## (Middle_end Variable)
         ":Linkage_name", ## (Middle_end Linkage_name)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
@@ -493,7 +491,7 @@ compiler_module(
     struct = "variable.ml",
     sig    = "Variable_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         ## (T)
@@ -512,7 +510,7 @@ compiler_signature(
     name = "Variable_cmi",
     src  = "variable.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Internal_variable_names", ## (Middle_end Internal_variable_names)
         ":Compilation_unit", ## (Middle_end Compilation_unit)
         "//utils:Identifiable",

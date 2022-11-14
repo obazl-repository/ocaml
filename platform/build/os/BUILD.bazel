@@ -1,0 +1,4 @@
+alias(name="linux?", actual="//platform/os:linux?")
+alias(name="macos?", actual="//platform/os:macos?")
+alias(name="windows?", actual="//platform/os:windows?")
+

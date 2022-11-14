@@ -101,7 +101,7 @@ If you do not explicitly set the host platform, then Bazel will
 automatically set the build host configuration by interrogating the
 system. If you do set the host platform, then Bazel will use it to
 select the toolchain. Try using `--config=linuxzig` and
-`--host_platform=//platforms/build:linux` with toolchain debugging
+`--host_platform=//platform/build:linux` with toolchain debugging
 enabled (in `.bazelrc`). You should see Bazel select Zig's linux
 toolchain, which will run on the mac but emit linux x86_64 code.
 
@@ -125,7 +125,7 @@ To build on a Mac targeting linux/x86_64 (aka linux/amd64):
     ProductName:	macOS
     ProductVersion:	12.6
     BuildVersion:	21G115
-    $ bazel build boot/bin:ocamlrun --config=mac_linuxamd64
+    $ bazel build boot/baseline:ocamlrun --config=mac_linuxamd64
     ...
     Target //runtime:ocamlrun up-to-date:
     bazel-bin/runtime/ocamlrun

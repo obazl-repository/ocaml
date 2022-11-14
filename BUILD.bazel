@@ -12,11 +12,11 @@ build_test(
         "//yacc:ocamlyacc",
         "//stdlib",
 
-        # "//boot/bin:ocamlc.byte",
-        # "//boot/bin:ocamlopt.byte",
-        # "//boot/bin:ocamllex",
-        # "//boot/bin:ocamlc.opt",
-        # "//boot/bin:ocamlopt.opt",
+        # "//boot/baseline:ocamlc.byte",
+        # "//boot/baseline:ocamlopt.byte",
+        # "//boot/baseline:ocamllex",
+        # "//boot/baseline:ocamlc.opt",
+        # "//boot/baseline:ocamlopt.opt",
 
         # ":Caml_tex",
         "//tools:cmpbyt",

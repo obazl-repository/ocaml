@@ -1,9 +1,0 @@
-package(default_visibility = ["//visibility:public"])
-
-alias(name = "amd65?", actual = "//platforms/cpu:amd64?")
-alias(name = "arm?",   actual = "//platforms/cpu:arm?")
-alias(name = "arm64?", actual = "//platforms/cpu:arm64?")
-alias(name = "i386?",  actual = "//platforms/cpu:i386?")
-alias(name = "power?", actual = "//platforms/cpu:power?")
-alias(name = "riscv?", actual = "//platforms/cpu:riscv?")
-alias(name = "s390x?", actual = "//platforms/cpu:s390x?")

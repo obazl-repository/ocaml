@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:public"])
+
+constraint_setting(name = "stage",
+                   default_constraint_value = ":boot")
+
+constraint_value(name = "boot" , constraint_setting = ":stage")
+config_setting  (name = "boot?", constraint_values=[":boot"])
+
+constraint_value(name = "baseline" , constraint_setting = ":stage")
+config_setting  (name = "baseline?", constraint_values=[":baseline"])
+
+constraint_value(name = "dev" , constraint_setting = ":stage")
+config_setting  (name = "dev?", constraint_values=[":dev"])
+
+constraint_value(name = "prod" , constraint_setting = ":stage")
+config_setting  (name = "prod?", constraint_values=[":prod"])

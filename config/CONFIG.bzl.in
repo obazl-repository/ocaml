@@ -116,10 +116,10 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 #
 # NEW_OCAMLRUN: constant runtime/ocamlrun
 #
-## OBazl: one build target (//boot/bin:ocamlrun) for the initial
+## OBazl: one build target (//boot/baseline:ocamlrun) for the initial
 ## (bootstrap) runtime (boot/ocamlrun, copied from runtime/ocamlrun),
 ## another (//bin:ocamlrun) for any updated runtime (i.e. if runtime
-## sources change). This a bootstrap toolchain using //boot/bin:ocamlrun
+## sources change). This a bootstrap toolchain using //boot/baseline:ocamlrun
 ## (the inital runtime), and a separate tool chain using the new
 ## runtime in //bin:ocamlrun.
 
@@ -137,10 +137,10 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 ## runs boot/ocamlc.opt (sys>vm compiler) if available
 ## otherwise runs boot/ocamlc under OCAMLRUN (boot/ocamlrun)
 #
-## OBazl: no need. Target //boot/bin:ocamlc delivers the vm>vm boot
-## compiler. Build target //boot/bin:ocamlc, with
-## --host_platform=//platforms/build:sys and
-## --platforms=//platforms/target:vm delivers the initial sys>vm
+## OBazl: no need. Target //boot/baseline:ocamlc delivers the vm>vm boot
+## compiler. Build target //boot/baseline:ocamlc, with
+## --host_platform=//platform/build:sys and
+## --platforms=//platform/target:vm delivers the initial sys>vm
 ## compiler.
 
 # CAMLC: a mess. the idea seems to be: use a *>vm compiler. Could be
@@ -151,7 +151,7 @@ INSTALL_BYTECODE_PROGRAMS = "@install_bytecode_programs@" == "true"
 ## target host setting (which can be set by passing a platform arg).
 ## So for example the stdlib target defaults to the vm>vm bootstrap
 ## toolchain. If you want to build stdlib with the sys>vm compiler,
-## pass --//platforms/target:sys and --//platforms/xtarget:vm.
+## pass --//platform/target:sys and --//platform/xtarget:vm.
 
 # Makefile:
 ## CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
@@ -220,7 +220,7 @@ BOOT_STDLIBFLAGS = ["-nostdlib"]
 # opts attrib:
 # compiler_module: OC_COMMON_CFLAGS, add OC_NATIVE_CFLAGS if target == sys
 # compiler_signature: OC_COMMON_CFLAGS for both vm and sys targets
-# BOOT_OCAMLRUN = "//boot/bin:ocamlrun"
+# BOOT_OCAMLRUN = "//boot/baseline:ocamlrun"
 # RUNTIME_OCAMLRUN = "//bin:ocamlrun"
 
 ################################################################
@@ -328,7 +328,7 @@ OC_NATIVE_CFLAGS = "@oc_native_cflags@".split(" ")
 OCNCF = "" # until we get this fixed
 # ?? PLATFORM_NATIVE_CFLAGS = select({
 PLATFORM_CFLAGS = select({
-    "//platforms/target:vm?": [],
+    "//platform/target:vm?": [],
     "//conditions:default": [] if OCNCF == "" else OCNCF.split(" ")
 })
 

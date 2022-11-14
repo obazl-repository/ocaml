@@ -16,7 +16,7 @@ A typical module:
 
 ################################################################
 
-Bootstrap toolchain (vm>vm):    --host_platform=//platforms:boot  --platforms=//platforms:vm
+Bootstrap toolchain (vm>vm):    --host_platform=//platform:boot  --platforms=//platform:vm
 
 ../runtime/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal -o stdlib__Either.cmi -c either.mli
 .
@@ -24,7 +24,7 @@ Bootstrap toolchain (vm>vm):    --host_platform=//platforms:boot  --platforms=//
 
 ################
 
-stage 1 vm>vm toolchain:  --host_platform=//platforms:vm  --platforms=//platform:vm
+stage 1 vm>vm toolchain:  --host_platform=//platform:vm  --platforms=//platform:vm
 
 ../boot/ocamlrun ../ocamlc -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error +A -bin-annot -nostdlib -principal   \
          -o stdlib__Either.cmi -c either.mli

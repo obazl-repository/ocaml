@@ -1,11 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//bzl:rules.bzl", "boot_coldstart")
-# load("//bzl/rules/macros:compiler.bzl", "compiler")
-# load("//bzl/rules/macros:lexer.bzl", "lexer")
+load("//bzl:rules.bzl", "boot_coldstart", "boot_import_tool")
+
 load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
-exports_files(["ocamlc", "ocamlc.sh", "ocamllex"])
+# exports_files(["ocamlc", "ocamllex"])
 
 ## Package //boot contains pre-compiled OCaml executables (ocamlc,
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
@@ -35,9 +34,18 @@ sh_binary(
 )
 
 ################################################################
+boot_import_tool(
+    name = "ocamlc.byte",
+    tool = "ocamlc",
+    data = [
+        "//runtime:ocamlrun",
+        # "//stdlib:camlheaders"
+    ],
+)
+
 sh_binary(
-    name = "ocamlc.boot",
-    srcs = ["ocamlc.sh"],
+    name = "ocamlc.sh",
+    srcs = ["ocamlc.byte.sh"],
     data = [
         ":ocamlc",
         "//runtime:ocamlrun",
@@ -53,9 +61,16 @@ sh_binary(
     ]
 )
 
+################################################################
+boot_import_tool(
+    name = "ocamllex.byte",
+    tool = "ocamllex",
+    data = ["//runtime:ocamlrun"],
+)
+
 sh_binary(
-    name = "ocamllex.boot",
-    srcs = ["ocamllex.sh"],
+    name = "ocamllex.sh",
+    srcs = ["ocamllex.byte.sh"],
     data = [
         ":ocamllex",
         "//runtime:ocamlrun"
@@ -63,7 +78,7 @@ sh_binary(
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
-stdlib(stage  = "boot")
+# stdlib(stage  = "boot")
 # alias(
 #     name   = "stdlib",
 #     actual = "//stdlib"

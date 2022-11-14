@@ -14,8 +14,8 @@ bazel build dev/bin:ocamlc
 
 SUBCOMMAND: # //runtime:camlrun [action 'Compiling runtime/alloc.c',
                                         configuration: 6273b5e192d35f676d88fcc61b780dbbc2aa02a521062fc32f544639 9a451b87078e,
-                                        execution platform: //platforms/build:boot]
+                                        execution platform: //platform/build:boot]
 
 SUBCOMMAND: # //dev/bin:ocamlc [action 'boot>boot linking boot_compiler: //dev/bin:ocamlc',
                                        configuration: 4c8d7eb49637e1ed8a83c321b6fffc252659826c6a5af39723 946ef86b33ae540ccea,
-                                       execution platform: //platforms/build:boot]
+                                       execution platform: //platform/build:boot]

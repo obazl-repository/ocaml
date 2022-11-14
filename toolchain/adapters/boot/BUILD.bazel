@@ -3,29 +3,29 @@ exports_files(["BUILD.bazel"])
 load(":BUILD.bzl", "boot_toolchain_adapter")
 
 ## The bootstrap compiler and lexer are precompiled vm>vm tools that
-## come with the distribution. Everything else in //boot/bin and
+## come with the distribution. Everything else in //boot/baseline and
 ## //boot/lib is compiled using those tools. Plus ocamlyacc which is
 ## implemented in C.
 
 ## Boot toolchain can only produce VM executables (vm>vm, vm>sys,
 ## vm>arm64, etc.).
 
-# To produce vm>sys pass --//platforms/xtarget:sys vm>sys is a cross
+# To produce vm>sys pass --//platform/xtarget:sys vm>sys is a cross
 # compiler, we produce it using a vm>vm compiler. so
-# --platforms=//platforms/target:vm selects the *>vm toolchain; we
+# --platforms=//platform/target:vm selects the *>vm toolchain; we
 # then need another arg (cross-compile target or xtarget) to tell the
 # selected toolchain what kind of output to emit.
 
 # only one selector for this tc: //toolchain/selectors:bootstrap
-# with build_host_constraints  = ["//platforms/build:boot?"],
+# with build_host_constraints  = ["//platform/build:boot?"],
 boot_toolchain_adapter(
     name        = "Xboot",
     build_host  = "boot",
     target_host = select({
         "//conditions:default": "vm"
     }),
-    compiler    = "//boot/bin:ocamlc.boot",
-    lexer       = "//boot/bin:ocamllex.boot",
+    compiler    = "//boot/baseline:ocamlc.boot",
+    lexer       = "//boot/baseline:ocamllex.boot",
     yacc        = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
     # tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
@@ -61,7 +61,7 @@ boot_toolchain_adapter(
     target_host = select({
         "//conditions:default": "vm"
     }),
-    compiler    = "//boot/bin:ocamlc.boot",
+    compiler    = "//boot/baseline:ocamlc.boot",
     lexer       = "//boot:ocamllex.boot",
     yacc        = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
@@ -97,8 +97,8 @@ boot_toolchain_adapter(
     name        = "vmsys",
     build_host  = "vmsys",
     target_host = "sys",
-    compiler    = "//boot/bin:ocamlc.boot",
-    lexer       = "//boot/bin:ocamllex.boot",
+    compiler    = "//boot/baseline:ocamlc.boot",
+    lexer       = "//boot/baseline:ocamllex.boot",
     yacc        = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
     # tool_runner = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun

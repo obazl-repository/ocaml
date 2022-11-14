@@ -40,7 +40,7 @@ def bootstrap_register_toolchains(installation = None, noocaml = None):
 
 #     # rebuilt bc compiler emits bytecode
 #     # "ocamlc": attr.label(
-#     #     default   = "//boot/bin:ocamlc",
+#     #     default   = "//boot/baseline:ocamlc",
 #     #     executable = False,
 #     #     allow_single_file = True,
 #     #     # cfg = "exec",

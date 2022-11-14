@@ -35,7 +35,7 @@ quasi-namespacing; OBazl does not need it. So e.g. the target to build
 
 === make coldstart
 
-Builds `runtime/ocamlrun`(Bazel target: `//boot/bin:ocamlrun`) and stdlib (Bazel: `//stdlib`)
+Builds `runtime/ocamlrun`(Bazel target: `//boot/baseline:ocamlrun`) and stdlib (Bazel: `//stdlib`)
 
 .root Makefile
 ```
@@ -191,7 +191,7 @@ build command is `bazel build toplevel:ocaml`
 * `ld.conf`- not needed for Bazel bootstrapping, only for deployment? STUBLIBDIR (ocaml/stublibs) to contain `dll*.so` files from `otherlibs`
 * `make -C runtime all` builds `ocamlrun`, `libcamlrun`, `sak`:
   ** `//runtime:camlrun` (`cc_library`)
-  ** `//boot/bin:ocamlrun` (`cc_binary`)
+  ** `//boot/baseline:ocamlrun` (`cc_binary`)
   ** `//runtime:sak.exe` (`cc_binary`)
   ** `//runtime:primitives_dat` (`genrule`) => `primitives`
 * `make -C stdlib ... all` => `//stdlib` (`boot_archive`)

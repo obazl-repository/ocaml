@@ -13,7 +13,7 @@ package(default_visibility = ["//visibility:public"])
 
 # label_flag(
 #     name = "boot.ocamlc",
-#     build_setting_default = "//boot/bin:ocamlc"
+#     build_setting_default = "//boot/baseline:ocamlc"
 #     # build_setting_default = "//runtime:ocamlc"
 # )
 
@@ -26,7 +26,7 @@ label_flag(
 
 label_flag(
     name = "ocamlrun",
-    build_setting_default = "//boot/bin:ocamlrun"
+    build_setting_default = "//boot/baseline:ocamlrun"
 )
 
 label_flag(

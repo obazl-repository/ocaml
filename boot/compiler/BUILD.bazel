@@ -14,25 +14,25 @@ boot_compiler(
     opts = [
         "-nostdlib"
     ] + select({
-        "//platforms/xtarget:sys?": [],
-        "//conditions:default": ["-compat-32"]
+        "//platform/xtarget:sys?": [],
+        "//conditions:default": [] # "-compat-32"]
     }),
     prologue = [
         "//compilerlibs:ocamlcommon",
     ] + select({
         # select on config_setting, not constraint value
         ## FIXME: should select on target not xtarget?
-        "//platforms/xtarget:sys?": ["//asmcomp:ocamloptcomp"],
-        "//platforms/xtarget:vm?": ["//bytecomp:ocamlbytecomp"],
+        "//platform/xtarget:sys?": ["//asmcomp:ocamloptcomp"],
+        "//platform/xtarget:vm?": ["//bytecomp:ocamlbytecomp"],
         "//conditions:default": ["//bytecomp:ocamlbytecomp"],
     }),
     main = select({
-        "//platforms/xtarget:sys?": "//driver:Optmain",
-        "//platforms/xtarget:vm?" : "//driver:Main",
+        "//platform/xtarget:sys?": "//driver:Optmain",
+        "//platform/xtarget:vm?" : "//driver:Main",
         "//conditions:default"    : "//driver:Main"
     }),
     use_prims = select({
-        "//platforms/target:sys?": False,
+        "//platform/target:sys?": False,
         "//conditions:default": True
     }),
     toolchains = ["//profile/system/local"]

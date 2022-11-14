@@ -505,7 +505,7 @@ compiler_module(
 ## root Makefile:
 # bytecomp/opcodes.ml: runtime/caml/instruct.h $(make_opcodes)
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opcodes < $< > $@
-## NEW_OCAMLRUN = //boot/bin:ocamlrun, we call it RUNTIME_OCAMLRUN
+## NEW_OCAMLRUN = //boot/baseline:ocamlrun, we call it RUNTIME_OCAMLRUN
 ## make_opcodes is //tools:make_opcodes
 
 ## macos make.log:
@@ -528,13 +528,13 @@ genrule(
     name  = "opcodes_ml",
     srcs  = ["//runtime/caml:instruct.h", "//tools:make_opcodes"],
     tools = [
-        "//boot/bin:ocamlrun", #  FIXME- makefile runs under runtime/ocamlrun
+        "//boot/baseline:ocamlrun", #  FIXME- makefile runs under runtime/ocamlrun
         # "//tools:make_opcodes" # no need to transition to exec target
     ],
     cmd   = " ".join([
         # "$(execpath {NEW_OCAMLRUN})".format(
         #     NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
-        "$(execpath //boot/bin:ocamlrun)",
+        "$(execpath //boot/baseline:ocamlrun)",
         "$(location //tools:make_opcodes)",
         "-opcodes",
         "< $(location //runtime/caml:instruct.h)",
@@ -562,13 +562,13 @@ genrule(
 
 # genrule(
 #     name  = "opcodes_mli",
-#     srcs  = ["opcodes.ml", "//boot/bin:ocamlc", "//stdlib"],
+#     srcs  = ["opcodes.ml", "//boot/baseline:ocamlc", "//stdlib"],
 #     outs  = ["opcodes.mli"],
-#     tools = ["//boot/bin:ocamlrun"],
+#     tools = ["//boot/baseline:ocamlrun"],
 #     cmd   = " ".join([
 #         # "STDLIB=echo `dirname $(location //stdlib)` &&",
-#         "$(execpath //boot/bin:ocamlrun)",
-#         "$(location //boot/bin:ocamlc)",
+#         "$(execpath //boot/baseline:ocamlrun)",
+#         "$(location //boot/baseline:ocamlc)",
 #         "-g -nostdlib -I boot -use-prims runtime/primitives",
 #         "-I bazel-out/darwin-fastbuild/bin/stdlib",
 #         "-i $(location opcodes.ml)",

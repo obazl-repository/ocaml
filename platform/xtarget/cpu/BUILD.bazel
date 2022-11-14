@@ -1,0 +1,9 @@
+package(default_visibility = ["//visibility:public"])
+
+alias(name = "amd65?", actual = "//platform/cpu:amd64?")
+alias(name = "arm?",   actual = "//platform/cpu:arm?")
+alias(name = "arm64?", actual = "//platform/cpu:arm64?")
+alias(name = "i386?",  actual = "//platform/cpu:i386?")
+alias(name = "power?", actual = "//platform/cpu:power?")
+alias(name = "riscv?", actual = "//platform/cpu:riscv?")
+alias(name = "s390x?", actual = "//platform/cpu:s390x?")

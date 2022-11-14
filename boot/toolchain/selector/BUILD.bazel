@@ -4,32 +4,96 @@ package(default_visibility=["//visibility:public"])
 
 exports_files(glob(["*.bazel"]))
 
+## NB: build_host_constraints must always include stage constraint.
+## otherwise tcs without stage constraint are eligible for selection
+## for platforms that declare a stage constraint value. (?)
+
+## i.e. the constraint values declared by platforms are just
+## declarations, not constraints on selection.
+
 toolchain_selector(
     name           = "boot",
     type           = "//boot/toolchain/type:boot",
     adapter        = "//boot/toolchain/adapter:boot",
     build_host_constraints  = [
-        "//boot/constraints/executor:vm",
-        "//boot/constraints/emitter:vm"
+        # platform: boot == sys_vm_vm + boot
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm",
+        "//platform/constraints/stage:boot"
+    ],
+    # the boot compiler can only emit bytecode, but
+    # the vm compilers it emits can themselves emit either
+    # (i.e. it can build only ocamlc.byte and ocamlopt.byte)
+    # therefore the target emitter is unconstrained.
+    # target_host_constraints = [
+    #     # platform: sys_vm_vm
+    #     "//platform/constraints/ocaml/target/executor:vm",
+    #     "//platform/constraints/ocaml/emitter:vm"
+    # ],
+)
+
+toolchain_selector(
+    name           = "vmvm",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:boot",
+    build_host_constraints  = [
+        # platform: sys_vm_vm
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm"
     ],
     target_host_constraints  = [
-        "//boot/constraints/executor:vm",
-        "//boot/constraints/emitter:vm"
+        # platform: sys_vm_vm
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm"
     ],
 )
+
+toolchain_selector(
+    name           = "vmsys",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:baseline",
+    build_host_constraints  = [
+        # platform: sys_vm_vm
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm"
+    ],
+    target_host_constraints  = [
+        # platform: sys_vm_sys
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:sys"
+    ],
+)
+
+# toolchain_selector(
+#     name           = "xvmsys",
+#     type           = "//boot/toolchain/type:boot",
+#     adapter        = "//boot/toolchain/adapter:baseline",
+#     build_host_constraints  = [
+#         # platform: sys_vm_vm
+#         "//platform/constraints/ocaml/executor:vm",
+#         "//platform/constraints/ocaml/emitter:vm"
+#     ],
+#     target_host_constraints  = [
+#         # platform: sys_vm_sys
+#         "//platform/constraints/ocaml/target/executor:vm",
+#         "//platform/constraints/ocaml/target/emitter:sys"
+#     ],
+# )
 
 toolchain_selector(
     name           = "baseline",
     type           = "//boot/toolchain/type:baseline",
     adapter        = "//boot/toolchain/adapter:baseline",
     build_host_constraints  = [
-        "//boot/constraints/executor:vm",
-        "//boot/constraints/emitter:vm"
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm",
+        # make this unselectable:
+        # "//platform/constraints/stage:prod",
     ],
-    target_host_constraints  = [
-        "//boot/constraints/executor:vm",
-        "//boot/constraints/emitter:vm"
-    ],
+    # target_host_constraints  = [
+    #     "//platform/constraints/ocaml/executor:vm",
+    #     "//platform/constraints/ocaml/emitter:vm"
+    # ],
 )
 
 toolchain_selector(
@@ -37,12 +101,12 @@ toolchain_selector(
     type           = "//boot/toolchain/type:stdlib",
     adapter        = "//boot/toolchain/adapter:stdlib",
     build_host_constraints  = [
-        "//boot/constraints/executor:vm",
-        "//boot/constraints/emitter:vm"
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm"
     ],
     target_host_constraints  = [
-        "//boot/constraints/executor:vm",
-        "//boot/constraints/emitter:vm"
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm"
     ],
 )
 

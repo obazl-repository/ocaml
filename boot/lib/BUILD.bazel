@@ -2,8 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
-# compile baseline stdlib with baseline compiler (//boot/bin:ocamlc.byte)
-stdlib(stage = "baseline")
+# compile baseline stdlib with baseline compiler (//boot/baseline:ocamlc.byte)
+# stdlib(stage = "baseline")
 
 alias(
     name   = "camlrun",

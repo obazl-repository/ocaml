@@ -14,8 +14,6 @@ MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 # ]
 SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
-STDLIB = ["//boot/lib:stdlib"]
-
 boot_library(
     name = "base_types",
     manifest  = [
@@ -59,7 +57,7 @@ compiler_module(
     struct = "closure_element.ml",
     sig    = "Closure_element_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Variable",
         "//utils:Int_replace_polymorphic_compare",
     ],
@@ -70,7 +68,7 @@ compiler_signature(
     name = "Closure_element_cmi",
     src  = "closure_element.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Variable",
         "//middle_end:Compilation_unit_cmi",
         "//stdlib:Stdlib.Set",
@@ -84,7 +82,7 @@ compiler_module(
     struct = "closure_id.ml",
     sig    = "Closure_id_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Closure_element",
         "//utils:Int_replace_polymorphic_compare",
     ],
@@ -98,7 +96,7 @@ compiler_signature(
     name = "Closure_id_cmi",
     src  = "closure_id.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Closure_element_cmi"
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
@@ -109,7 +107,7 @@ compiler_module(
     struct = "closure_origin.ml",
     sig    = "Closure_origin_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Closure_id",
         "//utils:Int_replace_polymorphic_compare",
     ],
@@ -120,7 +118,7 @@ compiler_signature(
     name = "Closure_origin_cmi",
     src  = "closure_origin.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Closure_id_cmi",
         "//middle_end:Compilation_unit_cmi",
         "//utils:Identifiable",
@@ -133,7 +131,7 @@ compiler_module(
     struct = "export_id.ml",
     sig    = "Export_id_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Id_types",
         "//middle_end:Compilation_unit",
         "//utils:Int_replace_polymorphic_compare",
@@ -146,7 +144,7 @@ compiler_signature(
     name = "Export_id_cmi",
     src  = "export_id.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Compilation_unit_cmi",
         "//utils:Identifiable",
     ],
@@ -158,7 +156,7 @@ compiler_module(
     struct = "id_types.ml",
     sig    = "Id_types_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Printf",
         "//utils:Int_replace_polymorphic_compare",
         "//stdlib:Stdlib.Int",
@@ -172,7 +170,7 @@ compiler_signature(
     name = "Id_types_cmi",
     src  = "id_types.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Identifiable_cmi",
         "//stdlib:Stdlib.Format",
     ]
@@ -183,7 +181,7 @@ compiler_module(
     struct = "mutable_variable.ml",
     sig    = "Mutable_variable_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Variable",
         "//utils:Int_replace_polymorphic_compare",
     ],
@@ -194,7 +192,7 @@ compiler_signature(
     name = "Mutable_variable_cmi",
     src  = "mutable_variable.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Variable_cmi",
         "//middle_end:Internal_variable_names_cmi",
         "//middle_end:Compilation_unit_cmi",
@@ -210,7 +208,7 @@ compiler_module(
     struct = "set_of_closures_id.ml",
     sig    = "Set_of_closures_id_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Id_types",
         "//middle_end:Compilation_unit",
         "//utils:Int_replace_polymorphic_compare",
@@ -223,7 +221,7 @@ compiler_signature(
     name = "Set_of_closures_id_cmi",
     src  = "set_of_closures_id.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Compilation_unit_cmi",
         "//utils:Identifiable",
     ],
@@ -235,7 +233,7 @@ compiler_module(
     struct = "set_of_closures_origin.ml",
     sig    = "Set_of_closures_origin_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Set_of_closures_id",
         "//utils:Int_replace_polymorphic_compare",
     ],
@@ -246,7 +244,7 @@ compiler_signature(
     name = "Set_of_closures_origin_cmi",
     src  = "set_of_closures_origin.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Set_of_closures_id_cmi",
         "//middle_end:Compilation_unit_cmi",
         "//utils:Identifiable",
@@ -259,7 +257,7 @@ compiler_module(
     struct = "static_exception.ml",
     sig    = "Static_exception_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Lambda",
         "//utils:Numbers",
         "//utils:Int_replace_polymorphic_compare",
@@ -271,7 +269,7 @@ compiler_signature(
     name = "Static_exception_cmi",
     src  = "static_exception.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Identifiable_cmi"
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
@@ -282,7 +280,7 @@ compiler_module(
     struct = "tag.ml",
     sig    = "Tag_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Obj",
         "//utils:Numbers",
@@ -297,7 +295,7 @@ compiler_signature(
     name = "Tag_cmi",
     src  = "tag.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Identifiable_cmi"
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
@@ -308,7 +306,7 @@ compiler_module(
     struct = "var_within_closure.ml",
     sig    = "Var_within_closure_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Closure_element",
         "//utils:Int_replace_polymorphic_compare",
     ],
@@ -322,7 +320,7 @@ compiler_signature(
     name = "Var_within_closure_cmi",
     src  = "var_within_closure.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [":Closure_element"],
+    deps   = [":Closure_element"],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 

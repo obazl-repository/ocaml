@@ -15,7 +15,7 @@ toolchain_selector(
     name           = "default",
     type           = "//toolchain/type:dev",
     adapter        = "//toolchain/adapters/boot:default",
-    # exec_compatible_with = ["//platforms:boot?"],
+    # exec_compatible_with = ["//platform:boot?"],
 )
 
 toolchain_selector(
@@ -23,10 +23,10 @@ toolchain_selector(
     type           = "//toolchain/type:dev",
     adapter        = "//toolchain/adapters/boot",
     build_host_constraints  = [
-        "//platforms/ocaml/executor:vm?",
-        # "//platforms/ocaml/emitter:vm?"
+        "//platform/constraints/ocaml/executor:vm",
+        # "//platform/constraints/ocaml/emitter:vm"
     ],
-    # target_host_constraints  = ["//platforms/target:vm?"],
+    # target_host_constraints  = ["//platform/target:vm"],
 )
 
 toolchain_selector(
@@ -34,10 +34,10 @@ toolchain_selector(
     type           = "//toolchain/type:dev",
     adapter        = "//toolchain/adapters/boot:vmsys",
     build_host_constraints  = [
-        "//platforms/ocaml/executor:vm?",
-        "//platforms/ocaml/emitter:vm?"
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm"
     ],
-    # target_host_constraints  = ["//platforms/target:sys?"],
+    # target_host_constraints  = ["//platform/target:sys"],
 )
 
 ################################################################
@@ -45,9 +45,9 @@ toolchain_selector(
     name           = "vm",
     type           = "//toolchain/type:baseline",
     adapter        = "//toolchain/adapters/baseline",
-    build_host_constraints  = ["//platforms/build:vm?"],
-    # target_host_constraints = ["//platforms/target:vm?"],
-    # toolchain_constraints   = ["//platforms/xtarget:sys?"]
+    build_host_constraints  = ["//platform/build:vm"],
+    # target_host_constraints = ["//platform/target:vm"],
+    # toolchain_constraints   = ["//platform/xtarget:sys"]
 )
 
 # ##########
@@ -55,16 +55,16 @@ toolchain_selector(
 #     name           = "vmsys",
 #     type           = "//toolchain/type:baseline",
 #     adapter        = "//toolchain/adapters:vmsys",
-#     build_host_constraints  = ["//platforms:vm?"],
-#     target_host_constraints  = ["//platforms:sys?"],
+#     build_host_constraints  = ["//platform:vm"],
+#     target_host_constraints  = ["//platform:sys"],
 # )
 
 # ##########
 # toolchain_selector(
 #     name           = "sysvm",
 #     toolchain = "//toolchain/adapters:vmsys",
-#     build_host_constraints  = ["//platforms:sys?"],
-#     target_host_constraints  = ["//platforms:vm?"],
+#     build_host_constraints  = ["//platform:sys"],
+#     target_host_constraints  = ["//platform:vm"],
 #     # toolchain_constraints = ["//runtime:standard?"],
 # )
 

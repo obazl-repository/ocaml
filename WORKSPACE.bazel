@@ -37,25 +37,41 @@ local_repository(
 register_execution_platforms(
     # "//dev/platforms:sys_vm_vm",
 
-    # "//platforms:boot",
-    # "//platforms:vm",
-    # "//platforms/build:vm",
-    # "//platforms:sys",
+    # "//platform:boot",
+    # "//platform:vm",
+    # "//platform/build:vm",
+    # "//platform:sys",
 
-    # "//platforms:sys_vm_vm",
-    "//boot/platforms:boot",
-    "//boot/platforms:baseline",
-    # "//platforms:default",
+    # IMPORTANT: ordered by constraint "strength" - more constraints
+    # before fewer.
+
+    "//platform/ocaml:boot", # sys_vm_vm + boot",
+    "//platform/ocaml:sys_vm_sys",
+
+    "//platform/ocaml:sys_vm_vm",
+
+    "//platform/ocaml/target:sys_vm_sys",
+
+    # "//platform/ocaml:sys_vm_vm",    # "//boot/platforms:baseline",
+    # "//platform:default",
 )
 
 # register_toolchains("@ocaml//toolchain/selectors/local:vmvm")
 register_toolchains(
+
     "//boot/toolchain/selector:boot",
-    "//boot/toolchain/selector:baseline",
+
+    "//boot/toolchain/selector:vmvm",
+    "//boot/toolchain/selector:vmsys",
+
+    # "//boot/toolchain/selector:xvmsys",
+
+    # "//boot/toolchain/selector:baseline",
+
     # "//boot/toolchain/selector:stdlib",
 
-    "//toolchain/selectors/boot:vmsys",
-    "//toolchain/selectors/boot:default",
+    # "//toolchain/selectors/boot:vmsys",
+    # "//toolchain/selectors/boot:default",
 
     # "//toolchain/selectors/boot",
 

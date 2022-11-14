@@ -199,8 +199,9 @@ compiler_module(
     struct = "cvt_emit.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
     deps   = [
-        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
         "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
     ],
@@ -242,7 +243,7 @@ boot_executable(
         ":Dumpobj"
     ],
     target_compatible_with = [
-        "//platforms/target:sys?"
+        "//platform/target:sys?"
     ]
 )
 
@@ -322,9 +323,9 @@ genrule(
     name = "gen_opnames",
     outs = ["opnames.ml"],
     srcs = ["//runtime/caml:instruct.h", ":make_opcodes"],
-    tools = ["//boot/bin:ocamlrun"],
+    tools = ["//boot/baseline:ocamlrun"],
     cmd   = " ".join([
-        "$(execpath //boot/bin:ocamlrun) $(location :make_opcodes)",
+        "$(execpath //boot/baseline:ocamlrun) $(location :make_opcodes)",
         "-opcodes < $(location //runtime/caml:instruct.h)",
         "> $@"
     ])
@@ -423,7 +424,7 @@ compiler_module(
 
 compiler_module(
     name   = "Dumpobj",
-    target_compatible_with = ["//platforms/target:sys?"],
+    target_compatible_with = ["//platform/target:sys?"],
     struct = "dumpobj.ml",
     opts = MODULE_OPTS,
     deps   = [
@@ -755,6 +756,7 @@ compiler_module(
 
 build_tool(
     name = "make_opcodes",
+    data = ["//stdlib:camlheaders"],
     main = ":Make_opcodes",
     visibility = ["//bytecomp:__pkg__"]
 )
@@ -764,7 +766,7 @@ compiler_module(
     struct = "make_opcodes.ml",
     nocopts = True,
     deps = [
-        # "//stdlib:Stdlib",
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Printf",

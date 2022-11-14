@@ -1,10 +1,10 @@
 
 label_setting(name="compiler",
-              build_setting_default = "//boot:ocamlc.boot",
+              build_setting_default = "//boot:ocamlc.byte",
               visibility = ["//visibility:public"])
 
 label_setting(name="lexer",
-              build_setting_default = "//boot:ocamllex.boot",
+              build_setting_default = "//boot:ocamllex.byte",
               visibility = ["//visibility:public"])
 
 label_setting(name="stdlib",

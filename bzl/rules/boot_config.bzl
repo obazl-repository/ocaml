@@ -1,21 +1,27 @@
-load("//config:CONFIG.bzl", "OCAML_BINDIR", "OCAML_LIBDIR")
+load("//config:CONFIG.bzl", "OCAML_BINDIR")
+load("//bzl:functions.bzl", "stage_name")
 
 ########################
 def _boot_config(ctx):
 
     o = ctx.outputs.out
 
-    tc = None
-    if ctx.attr._stage == "boot":
-        tc = ctx.exec_groups["boot"].toolchains[
+    tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
-    elif ctx.attr._stage == "boot":
-        tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
-    else:
-        # print("MISSING STAGE")
-        tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
+
+    workdir = "_{}/".format(stage_name(tc._stage))
+
+    # tc = None
+    # if ctx.attr._stage == "boot":
+    #     tc = ctx.exec_groups["boot"].toolchains[
+    #         "//boot/toolchain/type:boot"]
+    # elif ctx.attr._stage == "boot":
+    #     tc = ctx.exec_groups["boot"].toolchains[
+    #         "//boot/toolchain/type:boot"]
+    # else:
+    #     # print("MISSING STAGE")
+    #     tc = ctx.exec_groups["boot"].toolchains[
+    #         "//boot/toolchain/type:boot"]
 
     stdlib_dir = ""
     for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
@@ -56,13 +62,13 @@ boot_config = rule(
         "boot": exec_group(
             toolchains = ["//boot/toolchain/type:boot"],
         ),
-        "baseline": exec_group(
-            exec_compatible_with = [
-                "//platforms/ocaml/executor:vm?",
-                "//platforms/ocaml/emitter:vm?"
-            ],
-            toolchains = ["//boot/toolchain/type:baseline"],
-        ),
+        # "baseline": exec_group(
+        #     exec_compatible_with = [
+        #         "//platform/constraints/ocaml/executor:vm?",
+        #         "//platform/constraints/ocaml/emitter:vm"
+        #     ],
+        #     toolchains = ["//boot/toolchain/type:baseline"],
+        # ),
     },
 
     attrs = dict(
@@ -80,7 +86,7 @@ boot_config = rule(
         ),
         ocaml_bindir = attr.label(
             # allow_single_file = True,
-            # default = "//boot/bin"
+            # default = "//boot/baseline"
         ),
         ocaml_stdlib_dir = attr.label(
             allow_single_file = True,

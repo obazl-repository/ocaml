@@ -20,6 +20,21 @@ load("//bzl:providers.bzl",
 
 WARNING_FLAGS = "@1..3@5..28@30..39@43@46..47@49..57@61..62-40"
 
+######################
+def stage_name(_stage):
+    stage = _stage[BuildSettingInfo].value
+    if stage == 0:
+        workdir = "boot"
+    elif stage == 1:
+        workdir = "baseline"
+    elif stage == 2:
+        workdir = "dev"
+    elif stage == 3:
+        workdir = "prod"
+    else:
+        fail("exec UHANDLED STAGE: %s" % stage)
+    return workdir
+
 ###################################
 def submodule_from_label_string(s):
     """Derive module name from label string."""

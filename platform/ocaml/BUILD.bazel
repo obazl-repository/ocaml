@@ -1,0 +1,99 @@
+exports_files(["BUILD.bazel"])
+
+package(default_visibility = ["//visibility:public"])
+
+################################################################
+
+# WARNING: Build and target platform constraints must be mutually
+# exclusive!
+
+# The Bazel mechanism is designed for cross-compilation, not
+# cross-cross-compilation, which is what OCaml needs.
+
+# We need to know the target emitter, which is the emitter running on
+# the target, and keep it separate from the build emitter. For example
+# to use a vmvm compiler to build a vmsys compiler. The target arch
+# here is vm, so that is the build emitter, but the target emitter is
+# sys. The build tells us what to build (cmo or cmx) and the target
+# emitter tells us what to link (bytecomp or asmcomp).
+
+# If we don't keep these distinct in platforms, then we won't be able
+# to test for those constraints. For example, the build platform could
+# have //platform/constraints/ocaml/emitter:vm, meaning our build is
+# going to emit bytecode. If we're building a vm->sys commpiler, then
+# the target platform will set
+# //platform/constraints/ocaml/emitter:sys. Which means both
+# constraints would be satisfied, and we would have no way of knowing
+# which is for the build and which for the target. We can only test to
+# see if constraints are satisfied; there is no way that I know of the
+# determine _how_ they were satisified. That is, whether a constraint
+# was specified by an exec or a target platform. That makes sense,
+# since build/target are just roles, the same platform could be used
+# for either.
+
+# But for cross-cross-compilers we need to keep them separate, which
+# we do by making the role part of the constraint definition. Instead
+# of one //platform/constraints/ocaml/emitter:vm we have
+#     //platform/constraints/ocaml/build/emitter:vm
+#     //platform/constraints/ocaml/target/emitter:vm
+
+################################################################
+platform(name = "sys", parents = ["@local_config_platform//:host"])
+
+platform(name = "sys_vm", parents = [":sys"],
+         constraint_values = ["//platform/constraints/ocaml/executor:vm"])
+
+platform( ## only works on buildhost amd64
+    name = "amd64_vm",
+    constraint_values = [
+        "@platforms//cpu:x86_64",
+        "//platform/constraints/ocaml/executor:vm"])
+
+platform(name = "sys_vm_vm", parents = [":sys_vm"],
+         constraint_values = ["//platform/constraints/ocaml/emitter:vm"])
+
+# ocamlopt.byte
+platform(name = "sys_vm_sys", parents = [":sys_vm"],
+         constraint_values = ["//platform/constraints/ocaml/emitter:sys"])
+
+# dev stages: boot, baseline, dev, prod
+platform(
+    name = "boot", parents = [":sys_vm_vm"],
+    constraint_values = ["//platform/constraints/stage:boot"],
+    exec_compatible_with  = [
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm",
+        "//platform/constraints/stage:boot"
+    ]
+)
+
+platform(name = "sys_vm_vm_baseline", parents = [":sys_vm_vm"],
+         constraint_values = ["//platform/constraints/stage:baseline"])
+
+platform(name = "sys_vm_vm_dev", parents = [":sys_vm_vm"],
+         constraint_values = ["//platform/constraints/stage:dev"])
+
+################################################################
+platform(name = "sys_sys_sys",   # ocamlopt.opt
+         parents = ["@local_config_platform//:host"],
+         constraint_values = [
+             "//platform/constraints/ocaml/executor:sys",
+             "//platform/constraints/ocaml/emitter:sys"])
+
+platform(name = "sys_sys_vm",   # ocamlc.opt
+         parents = ["@local_config_platform//:host"],
+         constraint_values = [
+             # "@platforms//os:linux", "@platforms//cpu:x86_64",
+             "//platform/constraints/ocaml/executor:sys",
+             "//platform/constraints/ocaml/emitter:vm"])
+
+################################################################
+#### cross-platform cross-compilation
+# targeting a system other than the local host
+
+platform(name = "linux_amd64_vm_vm", # ocamlc.byte on amd64 runtime
+         parents = ["@local_config_platform//:host"],
+         constraint_values = [
+             "@platforms//os:linux", "@platforms//cpu:x86_64",
+             "//platform/constraints/ocaml/executor:vm",
+             "//platform/constraints/ocaml/emitter:vm"])

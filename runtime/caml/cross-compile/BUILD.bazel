@@ -36,8 +36,8 @@ genrule(
     name = "platform_s.h",
     outs = ["s.h"],
     srcs = select({
-        "//platforms/os:linux?": ["//runtime/caml:s.linux.h"],
-        "//platforms/os:macos?": ["//runtime/caml:s.macos.h"]
+        "//platform/os:linux?": ["//runtime/caml:s.linux.h"],
+        "//platform/os:macos?": ["//runtime/caml:s.macos.h"]
         # "//conditions:default": [],
     }),
     cmd  = "cp $(SRCS) $@",

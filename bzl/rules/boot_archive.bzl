@@ -1,27 +1,27 @@
 load("//bzl:providers.bzl", "BootInfo", "OcamlArchiveProvider")
 
-load("//bzl/rules/common:archive_intf.bzl", "archive_attrs")
-load("//bzl/rules/common:archive_impl.bzl", "impl_archive")
+load("//bzl/attrs:archive_attrs.bzl", "archive_attrs")
+load("//bzl/actions:archive_impl.bzl", "archive_impl")
 
 #####################
 boot_archive = rule(
-    implementation = impl_archive,
+    implementation = archive_impl,
     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
     exec_groups = {
         "boot": exec_group(
             exec_compatible_with = [
-                "//platforms/ocaml/executor:vm?",
-                "//platforms/ocaml/emitter:vm?"
+                "//platform/constraints/ocaml/executor:vm?",
+                "//platform/constraints/ocaml/emitter:vm"
             ],
             toolchains = ["//boot/toolchain/type:boot"],
         ),
-        "baseline": exec_group(
-            exec_compatible_with = [
-                "//platforms/ocaml/executor:vm?",
-                "//platforms/ocaml/emitter:vm?"
-            ],
-            toolchains = ["//boot/toolchain/type:baseline"],
-        ),
+        # "baseline": exec_group(
+        #     exec_compatible_with = [
+        #         "//platform/constraints/ocaml/executor:vm?",
+        #         "//platform/constraints/ocaml/emitter:vm"
+        #     ],
+        #     toolchains = ["//boot/toolchain/type:baseline"],
+        # ),
     },
 
     attrs = dict(

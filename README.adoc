@@ -19,14 +19,14 @@ link:BUILD.bazel[BUILD.bazel]. The main build targets are listed there.
 +
 5. Use Zig:  `$ bazel build boot/compiler --config=maczig` (or `--config=linuxzig`)
 
-6. Use a debug variant of the runtime (instead of `build boot/bin:ocamlrund`):
+6. Use a debug variant of the runtime (instead of `build boot/baseline:ocamlrund`):
 
-    $ bazel build boot/bin:ocamlrun -c dbg
+    $ bazel build boot/baseline:ocamlrun -c dbg
 
 6. Cross-compile:
 
-  a. mac->linux:  `$ bazel build boot/bin:ocamlrun --config=mac_linuxamd64`
-  a. linux->mac:  `$ bazel build boot/bin:ocamlrun --config=linuxamd64_macamd64`
+  a. mac->linux:  `$ bazel build boot/baseline:ocamlrun --config=mac_linuxamd64`
+  a. linux->mac:  `$ bazel build boot/baseline:ocamlrun --config=linuxamd64_macamd64`
 
 You can build and run executables under Bazel by using the `run` command instead of `build`; put arguments after `--`. For example:
 
@@ -255,7 +255,7 @@ The Bazel build program supports command-line options to control:
 ==== Baseline builds
 
 Baseline builds use the bootstrap toolchain. The build targets are in
-`//boot/bin` and `//boot/lib`.
+`//boot/baseline` and `//boot/lib`.
 
 The main build targets are listed in link:Build.bazel[Build.bazel].
 Target `//:toolchain` is a test target that builds all of them.

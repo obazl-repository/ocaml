@@ -6,9 +6,8 @@ load(":BUILD.bzl", "toolchain_adapter", "stdlib_toolchain_adapter")
 toolchain_adapter(
     name        = "boot",
     build_host  = "boot",
-    target_host = "boot",
-    # compiler    = "//boot/bin:ocamlc.byte",
-    # lexer       = "//lex:ocamllex",
+    compiler    = "//boot:ocamlc.byte",
+    lexer       = "//boot:ocamllex.byte",
     # yaccer      = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
     # runtime = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
@@ -29,21 +28,14 @@ toolchain_adapter(
     linkopts    = [],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
-    # camlheaders = [
-    #     "//stdlib:camlheaders"
-    #     # "//stdlib:camlheader", "//stdlib:target_camlheader",
-    #     # "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
-    #     # "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
-    # ],
-    # std_exit = "//stdlib:Std_exit"
 )
 
 ##################
 toolchain_adapter(
     name        = "baseline",
     build_host  = "baseline",
-    target_host = "baseline",
-    # compiler    = "//boot/bin:ocamlc.byte",
+    # target_host = "baseline",
+    compiler    = "//boot:ocamlc.byte",
     # lexer       = "//lex:ocamllex",
     # yaccer      = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
@@ -65,13 +57,35 @@ toolchain_adapter(
     linkopts    = [],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
-    # camlheaders = [
-    #     "//stdlib:camlheaders"
-    #     # "//stdlib:camlheader", "//stdlib:target_camlheader",
-    #     # "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
-    #     # "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
-    # ],
-    # std_exit = "//stdlib:Std_exit"
+)
+
+##################
+toolchain_adapter(
+    name        = "dev",
+    build_host  = "dev",
+    # target_host = "baseline",
+    compiler    = "//boot/baseline:ocamlc.byte",
+    # lexer       = "//lex:ocamllex",
+    # yaccer      = "//yacc:ocamlyacc",
+    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
+    # runtime = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
+    copts       = [ ## compile opts (sigs/modules only)
+        "-strict-sequence",
+        # "-warn-error", "+A",
+        "-nostdlib",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
 )
 
 ################################################################
@@ -79,7 +93,7 @@ toolchain_adapter(
 stdlib_toolchain_adapter(
     name        = "stdlib",
     build_host  = "stdib",
-    target_host = "stdlib",
+    # target_host = "stdlib",
 )
 
 

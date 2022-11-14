@@ -2,22 +2,22 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
+load("//bzl/rules/common:transitions.bzl",
+     "emitter_out_transition", "compiler_out_transition")
+
 ##########################################
 def _toolchain_adapter_impl(ctx):
 
-    copts = []
-    # if ctx.file.primitives:
-    #     copts.extend(["-use-prims", ctx.file.primitives.path])
-    # copts.extend(ctx.attr.copts)
-
     return [platform_common.ToolchainInfo(
-        # Public fields
         name                   = ctx.label.name,
+        _stage                 = ctx.attr._stage,
         build_host             = ctx.attr.build_host,
         target_host            = ctx.attr.target_host,
-        xtarget_host            = ctx.attr.xtarget_host,
+        _build_emitter        = ctx.attr._build_emitter,
+        _target_emitter        = ctx.attr._target_emitter,
+        xtarget_host           = ctx.attr.xtarget_host,
         ## vm
-        runtime            = ctx.file.runtime,
+        runtime                = ctx.file.runtime,
         vmargs                 = ctx.attr.vmargs,
         repl                   = ctx.file.repl,
         vmlibs                 = ctx.files.vmlibs,
@@ -25,13 +25,12 @@ def _toolchain_adapter_impl(ctx):
         ## runtime
         # stdlib                 = ctx.attr.stdlib,
         # std_exit               = ctx.attr.std_exit,
-        camlheaders            = ctx.files.camlheaders,
+        # camlheaders            = ctx.files.camlheaders,
         ## core tools
         compiler               = ctx.attr.compiler,
         copts                  = ctx.attr.copts,
         linkopts               = ctx.attr.linkopts,
         warnings               = ctx.attr.warnings,
-        primitives             = ctx.file.primitives,
         lexer                  = ctx.attr.lexer,
         yaccer                 = ctx.file.yaccer,
     )]
@@ -41,21 +40,29 @@ def _toolchain_adapter_impl(ctx):
 toolchain_adapter = rule(
     _toolchain_adapter_impl,
     attrs = {
-        # "_toolchain" : attr.label(
-        #     default = "//toolchain/adapters/boot"
-        # ),
+        "_stage" : attr.label( # int_flag
+            default = "//bzl:stage"
+        ),
 
         "build_host": attr.string(
             doc     = "OCaml host platform: vm (bytecode) or an arch.",
             default = "vm"
         ),
-        "target_host": attr.string(
+        "target_host": attr.label( # string
             doc     = "OCaml target platform: vm (bytecode) or an arch.",
-            default = "vm"
+            default = "//config:target_host"
         ),
-        "xtarget_host": attr.string(
+        "_build_emitter" : attr.label(
+            default = "//bzl:build_emitter",
+            # cfg = emitter_out_transition,
+        ),
+        "_target_emitter" : attr.label(
+            default = "//bzl:target_emitter",
+            # cfg = emitter_out_transition,
+        ),
+        "xtarget_host": attr.label(
             doc     = "Cross-cross target platform: vm (bytecode) or an arch.",
-            default = ""
+            # default = ""
         ),
 
         ## Virtual Machine
@@ -102,14 +109,10 @@ toolchain_adapter = rule(
         #     # cfg = "exec",
         # ),
 
-        "camlheaders": attr.label_list(
-            allow_files = True,
-            default = ["//stdlib:camlheaders"]
-            #     "//stdlib:camlheader", "//stdlib:target_camlheader",
-            #     "//stdlib:camlheaderd", "//stdlib:target_camlheaderd",
-            #     "//stdlib:camlheaderi", "//stdlib:target_camlheaderi"
-            # ],
-        ),
+        # "camlheaders": attr.label_list(
+        #     allow_files = True,
+        #     default = ["//stdlib:camlheaders"]
+        # ),
 
         ################################
         ## Core Tools
@@ -135,15 +138,8 @@ toolchain_adapter = rule(
 
         "copts" : attr.string_list(
         ),
-        "primitives" : attr.label(
-            ## label flag, settable by --//config:primitives=//foo/bar
-            default = "//config:primitives",
-            allow_single_file = True
-        ),
-        "warnings" : attr.label(
-            ## string list, settable by --//config:primitives=//foo/bar
+        "warnings" : attr.label( ## string list
             default = "//config:warnings",
-            # allow_single_file = True
         ),
         "linkopts" : attr.string_list(
         ),
@@ -157,15 +153,16 @@ toolchain_adapter = rule(
 
         ## https://bazel.build/docs/integrating-with-rules-cc
         ## hidden attr required to make find_cpp_toolchain work:
-        "_cc_toolchain": attr.label(
-            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
-        ),
+        # "_cc_toolchain": attr.label(
+        #     default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+        # ),
         # "_cc_opts": attr.string_list(
         #     default = ["-Wl,-no_compact_unwind"]
         # ),
+
         # "_allowlist_function_transition": attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+
     },
     # cfg = toolchain_in_transition,
     doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
@@ -194,7 +191,7 @@ def _stdlib_toolchain_adapter_impl(ctx):
         ## runtime
         stdlib                 = ctx.attr.stdlib,
         std_exit               = ctx.file.std_exit,
-        camlheaders            = ctx.files.camlheaders,
+        # camlheaders            = ctx.files.camlheaders,
     )]
 
 ###################################
@@ -216,10 +213,10 @@ stdlib_toolchain_adapter = rule(
             # cfg = "exec",
         ),
 
-        "camlheaders": attr.label_list(
-            allow_files = True,
-            default = ["//stdlib:camlheaders"]
-        ),
+        # "camlheaders": attr.label_list(
+        #     allow_files = True,
+        #     default = ["//stdlib:camlheaders"]
+        # ),
 
         "build_host": attr.string(
             doc     = "OCaml host platform: vm (bytecode) or an arch.",

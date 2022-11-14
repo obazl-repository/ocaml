@@ -20,10 +20,10 @@ load("//toolchain:transitions.bzl", "tool_out_transition")
 # compiler_out_transition = transition(
 #     implementation = _compiler_out_transition_impl,
 #     inputs = [
-#         "//platforms/ocaml/emitter",
+#         "//platform/constraints/ocaml/emitter",
 #     ],
 #     outputs = [
-#         "//platforms/ocaml/emitter",
+#         "//platform/constraints/ocaml/emitter",
 #     ]
 # )
 
@@ -34,7 +34,7 @@ def _toolchain_in_transition_impl(settings, attr):
     ## trying to make sure ocamlrun is only built once
 
     return {
-        "//bzl/toolchain:ocamlrun" : "//boot/bin:ocamlrun"
+        "//bzl/toolchain:ocamlrun" : "//boot/baseline:ocamlrun"
     }
 
 #######################

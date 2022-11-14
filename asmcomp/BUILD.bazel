@@ -18,13 +18,16 @@ load("//config:CONFIG.bzl",
      "IGNORE_MISSING_MLI",
      "PLATFORM_CFLAGS")
 
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+## warnings
+NAME_OUT_OF_SCOPE = "40"
+
+MODULE_OPTS = []
+# OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 # + [
 #     "-nostdlib"
 # ]
-SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-
-STDLIB = ["//boot/lib:stdlib"]
+SIG_OPTS    = []
+# OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 ## dev/test target, builds everything
 boot_archive(
@@ -200,7 +203,8 @@ compiler_module(
         "//config/arch:s390x"   : "//asmcomp/s390x:CSE.ml",
     }, no_match_error = "unknown arch"),
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         ":Cmm",
         ":CSEgen",
         ":Mach",
@@ -212,7 +216,8 @@ compiler_module(
     struct = "CSEgen.ml",
     sig    = "CSEgen_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         ":Cmm",
         ":Mach",
         ":Proc",
@@ -220,6 +225,7 @@ compiler_module(
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Array",
+        "//stdlib:CamlinternalOO"
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
@@ -231,7 +237,7 @@ compiler_signature(
     name = "CSEgen_cmi",
     src  = "CSEgen.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
         "//parsing:Asttypes_cmi",
@@ -243,7 +249,7 @@ compiler_module(
     struct = "afl_instrument.ml",
     sig    = "Afl_instrument_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Lambda",
         # "//middle_end:Backend_var",
         #FIXME: bug in deps mgmt, import archive containing Backend_var
@@ -260,7 +266,7 @@ compiler_signature(
     name = "Afl_instrument_cmi",
     src  = "afl_instrument.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//lambda:Debuginfo",
         "//parsing:Asttypes_cmi",
@@ -279,7 +285,7 @@ compiler_module(
         "//config/arch:s390x"   : "//asmcomp/s390x:arch.ml",
     }, no_match_error = "unknown arch"),
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Clflags"
     ],
 )
@@ -289,7 +295,7 @@ compiler_module(
     struct = "asmgen.ml",
     sig    = "Asmgen_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Split",
         ":Spill",
         ":Reg",
@@ -338,7 +344,7 @@ compiler_signature(
     name = "Asmgen_cmi",
     src  = "asmgen.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Emitaux",
         ":Cmm",
         "//stdlib:Stdlib.Format",
@@ -352,7 +358,7 @@ compiler_module(
     struct = "asmlibrarian.ml",
     sig    = "Asmlibrarian_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Asmlink",
         "//utils:Misc",
         "//parsing:Location",
@@ -374,7 +380,7 @@ compiler_signature(
     name = "Asmlibrarian_cmi",
     src  = "asmlibrarian.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmx_format_cmi",
         "//stdlib:Stdlib.Format",
     ],
@@ -385,7 +391,7 @@ compiler_module(
     struct = "asmlink.ml",
     sig    = "Asmlink_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Emitaux",
         ":Emit",
         ":Cmm_helpers",
@@ -417,7 +423,7 @@ compiler_signature(
     name = "Asmlink_cmi",
     src  = "asmlink.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmx_format_cmi",
         "//middle_end:Backend_intf_cmi",
         "//stdlib:Stdlib.Digest",
@@ -431,7 +437,7 @@ compiler_module(
     struct = "asmpackager.ml",
     sig    = "Asmpackager_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Asmlink",
         ":Asmgen",
         "//typing:Typemod",
@@ -468,7 +474,7 @@ compiler_signature(
     name = "Asmpackager_cmi",
     src  = "asmpackager.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
         "//typing:Env",
         "//file_formats:Cmx_format_cmi",
@@ -481,7 +487,7 @@ compiler_module(
     struct = "branch_relaxation.ml",
     sig    = "Branch_relaxation_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Linear",
         ":Cmm",
@@ -493,7 +499,7 @@ compiler_signature(
     name = "Branch_relaxation_cmi",
     src  = "branch_relaxation.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linear",
         ":Branch_relaxation_intf_cmi",
     ],
@@ -503,18 +509,17 @@ compiler_signature(
     name = "Branch_relaxation_intf_cmi",
     src  = "branch_relaxation_intf.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linear",
         ":Cmm",
     ],
-    # data = ["//runtime:primitives"]
 )
 
 # compiler_module(
 #     name   = "Branch_relaxation_intf",
 #     struct = "branch_relaxation_intf.ml",
 #     opts = MODULE_OPTS,
-#     deps   = STDLIB + [
+#     deps   = [
 #         ":Linear",
 #         ":Cmm",
 #         "//lambda:Debuginfo",
@@ -527,7 +532,7 @@ compiler_module(
     struct = "cmm.ml",
     sig    = "Cmm_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Lambda",
         ":Arch",
         "//utils:Targetint",
@@ -547,7 +552,7 @@ compiler_signature(
     name = "Cmm_cmi",
     src  = "cmm.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Lambda_cmi",
         "//utils:Targetint_cmi",
         "//lambda:Debuginfo",
@@ -561,7 +566,7 @@ compiler_module(
     struct = "cmm_helpers.ml",
     sig    = "Cmm_helpers_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Strmatch",
         ":Proc",
         ":Cmmgen_state",
@@ -598,7 +603,7 @@ compiler_signature(
     name = "Cmm_helpers_cmi",
     src  = "cmm_helpers.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//file_formats:Cmxs_format_cmi",
         "//lambda:Debuginfo",
         "//middle_end:Clambda",
@@ -616,7 +621,7 @@ compiler_module(
     struct = "cmm_invariants.ml",
     sig    = "Cmm_invariants_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//stdlib:Stdlib.Set",
         "//utils:Numbers",
@@ -630,7 +635,7 @@ compiler_signature(
     name = "Cmm_invariants_cmi",
     src  = "cmm_invariants.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//stdlib:Stdlib.Format",
     ],
@@ -641,7 +646,7 @@ compiler_module(
     struct = "cmmgen.ml",
     sig    = "Cmmgen_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Debuginfo",
         "//middle_end:Clambda",
         "//middle_end:Compilenv",
@@ -671,7 +676,7 @@ compiler_signature(
     name = "Cmmgen_cmi",
     src  = "cmmgen.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//parsing:Asttypes_cmi",
         "//middle_end:Clambda",
@@ -683,7 +688,7 @@ compiler_module(
     struct = "cmmgen_state.ml",
     sig    = "Cmmgen_state_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//stdlib:Stdlib.Queue",
         "//utils:Misc",
@@ -698,7 +703,7 @@ compiler_signature(
     name = "Cmmgen_state_cmi",
     src  = "cmmgen_state.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm_cmi",
         "//utils:Misc",
         "//middle_end:Clambda_cmi"
@@ -710,7 +715,7 @@ compiler_module(
     struct = "coloring.ml",
     sig    = "Coloring_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Proc",
         "//stdlib:Stdlib.Set",
@@ -727,7 +732,7 @@ compiler_signature(
     name = "Coloring_cmi",
     src  = "coloring.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
     ],
 )
 
@@ -736,7 +741,7 @@ compiler_module(
     struct = "comballoc.ml",
     sig    = "Comballoc_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Mach",
         "//stdlib:Stdlib.List",
@@ -751,7 +756,7 @@ compiler_signature(
     name = "Comballoc_cmi",
     src  = "comballoc.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
     ],
@@ -762,7 +767,7 @@ compiler_module(
     struct = "dataflow.ml",
     sig    = "Dataflow_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
         "//stdlib:Stdlib.List",
@@ -775,7 +780,7 @@ compiler_signature(
     name = "Dataflow_cmi",
     src  = "dataflow.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
     ],
@@ -786,7 +791,7 @@ compiler_module(
     struct = "deadcode.ml",
     sig    = "Deadcode_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Proc",
         ":Mach",
@@ -804,7 +809,7 @@ compiler_signature(
     name = "Deadcode_cmi",
     src  = "deadcode.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
     ],
@@ -828,7 +833,7 @@ compiler_module(
     }, no_match_error = "unknown arch"),
     sig = "Emit_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Proc",
         ":Branch_relaxation",
         ":Emitaux",
@@ -844,7 +849,7 @@ compiler_signature(
     name = "Emit_cmi",
     src  = "emit.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linear",
         ":Cmm",
     ],
@@ -856,7 +861,8 @@ compiler_module(
     struct = "emitaux.ml",
     sig    = "Emitaux_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         "//lambda:Debuginfo",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
@@ -881,7 +887,7 @@ compiler_signature(
     name = "Emitaux_cmi",
     src  = "emitaux.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linear_cmi",
         ":Emitenv_cmi",
         ":Cmm_cmi",
@@ -894,7 +900,7 @@ compiler_signature(
     name = "Emitenv_cmi",
     src  = "emitenv.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linear",
         ":Cmm",
     ],
@@ -905,7 +911,7 @@ compiler_module(
     struct = "interf.ml",
     sig    = "Interf_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Proc",
         ":Mach",
@@ -923,7 +929,7 @@ compiler_signature(
     name = "Interf_cmi",
     src  = "interf.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
     ],
@@ -934,7 +940,7 @@ compiler_module(
     struct = "interval.ml",
     sig    = "Interval_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Proc",
         ":Mach",
@@ -950,7 +956,7 @@ compiler_signature(
     name = "Interval_cmi",
     src  = "interval.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Mach",
         ":Cmm",
@@ -962,7 +968,7 @@ compiler_module(
     struct = "linear.ml",
     sig    = "Linear_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Mach",
         ":Cmm",
@@ -978,7 +984,7 @@ compiler_signature(
     name = "Linear_cmi",
     src  = "linear.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Mach",
         ":Cmm",
@@ -992,7 +998,8 @@ compiler_module(
     struct = "linearize.ml",
     sig    = "Linearize_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         ":Reg",
         ":Proc",
         ":Mach",
@@ -1012,7 +1019,7 @@ compiler_signature(
     name = "Linearize_cmi",
     src  = "linearize.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Linear",
         ":Cmm",
@@ -1024,7 +1031,8 @@ compiler_module(
     struct = "linscan.ml",
     sig    = "Linscan_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         ":Reg",
         ":Proc",
         ":Interval",
@@ -1040,7 +1048,7 @@ compiler_signature(
     name = "Linscan_cmi",
     src  = "linscan.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Interval"
     ],
 )
@@ -1050,7 +1058,7 @@ compiler_module(
     struct = "liveness.ml",
     sig    = "Liveness_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Proc",
         ":Printmach",
@@ -1067,7 +1075,7 @@ compiler_signature(
     name = "Liveness_cmi",
     src  = "liveness.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
     ],
@@ -1078,7 +1086,7 @@ compiler_module(
     struct = "mach.ml",
     sig    = "Mach_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
     ],
 )
@@ -1087,7 +1095,7 @@ compiler_signature(
     name = "Mach_cmi",
     src  = "mach.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg_cmi",
     ],
 )
@@ -1097,7 +1105,8 @@ compiler_module(
     struct = "polling.ml",
     sig    = "Polling_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         ":Mach",
         ":Dataflow",
         ":Cmm",
@@ -1112,7 +1121,7 @@ compiler_signature(
     name = "Polling_cmi",
     src  = "polling.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
         "//utils:Misc",
@@ -1124,7 +1133,7 @@ compiler_module(
     struct = "printcmm.ml",
     sig    = "Printcmm_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         ## (Targetint)
         "//stdlib:Stdlib.Printf",
@@ -1142,7 +1151,7 @@ compiler_signature(
     name = "Printcmm_cmi",
     src  = "printcmm.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format",
@@ -1155,7 +1164,7 @@ compiler_module(
     struct = "printlinear.ml",
     sig    = "Printlinear_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Printmach",
         ":Mach",
         ":Linear",
@@ -1171,7 +1180,7 @@ compiler_signature(
     name = "Printlinear_cmi",
     src  = "printlinear.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linear",
         ":Cmm",
         "//stdlib:Stdlib.Format",
@@ -1183,7 +1192,8 @@ compiler_module(
     struct = "printmach.ml",
     sig    = "Printmach_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         "//lambda:Debuginfo",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Format",
@@ -1205,7 +1215,7 @@ compiler_signature(
     name = "Printmach_cmi",
     src  = "printmach.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Mach",
         ":Interval"
@@ -1227,7 +1237,7 @@ compiler_module(
     }, no_match_error = "unknown arch"),
     sig    = "Proc_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Arch",
         ":Cmm",
         ":Mach",
@@ -1244,7 +1254,7 @@ compiler_signature(
     name = "Proc_cmi",
     src  = "proc.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg_cmi",
         ":Mach_cmi",
         ":Cmm_cmi",
@@ -1257,7 +1267,7 @@ compiler_module(
     struct = "reg.ml",
     sig    = "Reg_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Set",
@@ -1274,7 +1284,7 @@ compiler_signature(
     name = "Reg_cmi",
     src  = "reg.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.Map",
@@ -1295,7 +1305,7 @@ compiler_module(
     }, no_match_error = "unknown arch"),
     sig    = "Reload_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reloadgen",
         # ":Reg",
         # ":Mach",
@@ -1311,7 +1321,7 @@ compiler_signature(
     name = "Reload_cmi",
     src  = "reload.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
     ],
@@ -1322,13 +1332,17 @@ compiler_module(
     struct = "reloadgen.ml",
     sig    = "Reloadgen_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    use_prims = True,
+    deps   = [
         ":Reg",
         ":Mach",
         ":Cmm",
         "//utils:Misc",
         "//stdlib:Stdlib.List",
+        ## FIXME: Stdlib.Array should include CamlinternalOO in its
+        ## depgraph, so we should not need to list it here.
         "//stdlib:Stdlib.Array",
+        "//stdlib:CamlinternalOO",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1337,7 +1351,7 @@ compiler_signature(
     name = "Reloadgen_cmi",
     src  = "reloadgen.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Mach",
         ":Cmm",
@@ -1350,7 +1364,8 @@ compiler_module(
     struct = "schedgen.ml",
     sig    = "Schedgen_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         "//utils:Clflags",
         ":Cmm",
         ":Linear",
@@ -1362,6 +1377,7 @@ compiler_module(
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Array",
+        "//stdlib:CamlinternalOO"
         ## (Arch)
     ],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1371,7 +1387,7 @@ compiler_signature(
     name = "Schedgen_cmi",
     src  = "schedgen.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Linear",
         ":Cmm",
@@ -1391,7 +1407,7 @@ compiler_module(
     }, no_match_error = "unknown arch"),
     sig = "Scheduling_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//asmcomp:Schedgen",
     ],
     visibility = ["//asmcomp:__pkg__"]
@@ -1401,7 +1417,7 @@ compiler_signature(
     name = "Scheduling_cmi",
     src  = "scheduling.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Linear",
         ":Cmm",
     ],
@@ -1420,7 +1436,7 @@ compiler_module(
     }, no_match_error = "unknown arch"),
     sig = "Selection_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         ":Mach",
         ":Selectgen",
@@ -1433,7 +1449,8 @@ compiler_module(
     struct = "selectgen.ml",
     sig    = "Selectgen_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         "//stdlib:Stdlib.Int",
         ":Cmm",
         ":Mach",
@@ -1448,6 +1465,7 @@ compiler_module(
         "//lambda:Debuginfo",
         "//middle_end:Backend_var",
         "//stdlib:Stdlib.Array",
+        "//stdlib:CamlinternalOO",
         ## (Arch)
     # ] + select({
     #     "//config/arch:x86_64": [
@@ -1462,7 +1480,7 @@ compiler_signature(
     name = "Selectgen_cmi",
     src  = "selectgen.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Mach",
         ":Cmm",
@@ -1478,7 +1496,7 @@ compiler_signature(
     name = "Selection_cmi",
     src  = "selection.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
         "//utils:Misc",
@@ -1490,7 +1508,7 @@ compiler_module(
     struct = "spill.ml",
     sig    = "Spill_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Proc",
         ":Mach",
@@ -1510,7 +1528,7 @@ compiler_signature(
     name = "Spill_cmi",
     src  = "spill.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach_cmi",
         ":Cmm_cmi",
         ":Proc_cmi"
@@ -1522,7 +1540,7 @@ compiler_module(
     struct = "split.ml",
     sig    = "Split_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Reg",
         ":Mach",
         ":Cmm",
@@ -1536,7 +1554,7 @@ compiler_signature(
     name = "Split_cmi",
     src  = "split.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Mach",
         ":Cmm",
     ],
@@ -1547,7 +1565,7 @@ compiler_module(
     struct = "strmatch.ml",
     sig    = "Strmatch_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Debuginfo",
         "//middle_end:Backend_var",
         "//stdlib:Stdlib.Char",
@@ -1567,7 +1585,7 @@ compiler_signature(
     name = "Strmatch_cmi",
     src  = "strmatch.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Cmm",
         "//parsing:Asttypes_cmi",
         "//lambda:Debuginfo",
@@ -1578,7 +1596,7 @@ compiler_signature(
     name = "X86_ast_cmi",
     src  = "x86_ast.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
     ],
 )
 
@@ -1587,7 +1605,7 @@ compiler_module(
     struct = "x86_dsl.ml",
     sig    = "X86_dsl_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":X86_proc",
         "//stdlib:Stdlib.Int64",
     ],
@@ -1598,7 +1616,7 @@ compiler_signature(
     name = "X86_dsl_cmi",
     src  = "x86_dsl.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":X86_ast_cmi",
     ],
 )
@@ -1608,7 +1626,7 @@ compiler_module(
     struct = "x86_gas.ml",
     sig    = "X86_gas_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":X86_proc",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -1625,7 +1643,7 @@ compiler_signature(
     name = "X86_gas_cmi",
     src  = "x86_gas.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":X86_ast_cmi",
     ],
 )
@@ -1635,7 +1653,7 @@ compiler_module(
     struct = "x86_masm.ml",
     sig    = "X86_masm_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":X86_proc",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
@@ -1649,7 +1667,7 @@ compiler_signature(
     name = "X86_masm_cmi",
     src  = "x86_masm.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":X86_ast_cmi",
     ],
 )
@@ -1659,7 +1677,8 @@ compiler_module(
     struct = "x86_proc.ml",
     sig    = "X86_proc_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    warnings = [NAME_OUT_OF_SCOPE],
+    deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         "//utils:Misc",
@@ -1678,7 +1697,7 @@ compiler_signature(
     name = "X86_proc_cmi",
     src  = "x86_proc.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":X86_ast_cmi",
         "//stdlib:Stdlib.Buffer",
     ],

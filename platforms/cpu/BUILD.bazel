@@ -1,7 +1,0 @@
-config_setting(name = "amd65?", constraint_values = ["@//platforms/cpu"])
-config_setting(name = "arm?",   constraint_values = ["@//platforms/cpu"])
-config_setting(name = "arm64?", constraint_values = ["@//platforms/cpu"])
-config_setting(name = "i386?",  constraint_values = ["@//platforms/cpu"])
-config_setting(name = "power?", constraint_values = ["@//platforms/cpu"])
-config_setting(name = "riscv?", constraint_values = ["@//platforms/cpu"])
-config_setting(name = "s390x?", constraint_values = ["@//platforms/cpu"])

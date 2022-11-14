@@ -1,4 +1,0 @@
-alias(name="linux?", actual="//platforms/os:linux?")
-alias(name="macos?", actual="//platforms/os:macos?")
-alias(name="windows?", actual="//platforms/os:windows?")
-

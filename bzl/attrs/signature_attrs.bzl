@@ -8,10 +8,10 @@ def signature_attrs():
             allow_single_file = True,
         ),
 
-        _stage = attr.label(
-            doc = "bootstrap stage",
-            default = "//bzl:stage"
-        ),
+        # _stage = attr.label(
+        #     doc = "bootstrap stage",
+        #     default = "//bzl:stage"
+        # ),
 
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
@@ -21,24 +21,18 @@ def signature_attrs():
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
 
-        ## GLOBAL CONFIGURABLE DEFAULTS (all ppx_* rules)
-        # _debug           = attr.label(default = "@ocaml//debug"),
-        # _cmt             = attr.label(default = "@ocaml//cmt"),
-        # _keep_locs       = attr.label(default = "@ocaml//keep-locs"),
-        # _noassert        = attr.label(default = "@ocaml//noassert"),
-        # _opaque          = attr.label(default = "@ocaml//opaque"),
-        # _short_paths     = attr.label(default = "@ocaml//short-paths"),
-        # _strict_formats  = attr.label(default = "@ocaml//strict-formats"),
-        # _strict_sequence = attr.label(default = "@ocaml//strict-sequence"),
-        # _verbose         = attr.label(default = "@ocaml//verbose"),
-
-        # _mode       = attr.label(
-        #     default = "@ocaml//mode",
-        # ),
-
-        # _sdkpath = attr.label(
-        #     default = Label("@ocaml//:sdkpath") # ppx also uses this
-        # ),
+        use_prims = attr.bool( # overrides global _use_prims
+            doc = "Undocumented flag, heavily used in bootstrapping",
+            default = False
+        ),
+        _use_prims = attr.label( ## boolean
+            doc = "Undocumented flag, heavily used in bootstrapping",
+            default = "//runtime:use_prims"
+        ),
+        _primitives = attr.label( ## file
+            allow_single_file = True,
+            default = "//runtime:primitives.dat"
+        ),
 
         src = attr.label(
             doc = "A single .mli source file label",

@@ -5,26 +5,36 @@ package(default_visibility = ["//visibility:public"])
 load("//bzl:rules.bzl",
      "boot_archive",
      "compiler_module",
-     "boot_compiler"
+     "boot_compiler",
 )
 
-boot_compiler(
-    name = "ocamlc.byte",
-    stage = "dev",
-    exec_compatible_with = [
-        ## *>vm ???
+load("//bzl/rules/macros:compiler.bzl", "compiler")
+load("//bzl/rules/macros:lexer.bzl", "lexer")
+
+# compiler(
+#     name  = "ocamlc.byte",
+#     stage = "prod",
+#     build_host_constraints = [
+#         "//platform/constraints/ocaml/executor:vm",
+#         "//platform/constraints/ocaml/emitter:vm"
+#     ],
+#     target_host_constraints = [
+#         "//platform/constraints/ocaml/executor:vm",
+#         "//platform/constraints/ocaml/emitter:vm"
+#     ],
+# )
+
+lexer(
+    name  = "ocamllex.byte",
+    stage = "prod",
+    build_host_constraints = [
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm"
     ],
-    opts = [
-        "-nostdlib", "-compat-32",
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm"
     ],
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
-     ],
-    main = "//driver:Main",
-    visibility = [
-        "//visibility:public"
-    ]
 )
 
 sh_binary(
@@ -134,7 +144,7 @@ boot_compiler(
     stage = "dev",
     # goal is to produce vm>sys compiler, so we need a compiler that emits vm
     target_compatible_with = [
-        # "//platforms/target:vm?",
+        # "//platform/target:vm?",
     ],
     # toolchain will transition to bld>bld, either vmvm or sysys
     # xtarget:sys? selects this output
@@ -175,7 +185,7 @@ boot_compiler(  ## not yet supported
     name = "ocamlc.opt",
     stage = "dev",
     # goal is to produce sys>vm compiler, so we need a compiler that emits sys
-    target_compatible_with = ["//platforms/target:sys?"],
+    target_compatible_with = ["//platform/target:sys?"],
     # toolchain will transition to bld>bld, either vmvm or sysys
     #  we need to pass xtarget=sys (cross-exec platform) so the compile will be built correctly
     #  e.g. if we start with vmsys, transition is to vmvm with xtarget=sys, to produce vmsys compiler
@@ -199,8 +209,8 @@ boot_compiler(  ## not yet supported
 ## WARNING: This builds, but produces a bytecode executable. Awaiting
 ## work on toolchains and platforms to select the vm>sys compiler
 ## (aka ocamlopt.byte).
-## e.g. --platforms=//platforms/target:sys,
-## --platforms=//platforms/target:arm64, etc.
+## e.g. --platforms=//platform/target:sys,
+## --platforms=//platform/target:arm64, etc.
 
 ## make log:
 ## ./boot/ocamlrun ./ocamlopt

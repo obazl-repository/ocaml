@@ -15,8 +15,6 @@ MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 # ]
 SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
-STDLIB = ["//boot/lib:stdlib"]
-
 # obazl testing, build everything
 boot_archive(
     name = "flambda",
@@ -156,7 +154,7 @@ compiler_module(
     struct = "alias_analysis.ml",
     sig    = "Alias_analysis_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Flambda",
         "//middle_end/flambda:Allocated_const",
         "//middle_end:Variable",
@@ -174,7 +172,7 @@ compiler_signature(
     name = "Alias_analysis_cmi",
     src  = "alias_analysis.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end/flambda:Allocated_const",
@@ -191,7 +189,7 @@ compiler_module(
     struct = "allocated_const.ml",
     sig    = "Allocated_const_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Nativeint",
         "//stdlib:Stdlib.List",
@@ -206,7 +204,7 @@ compiler_signature(
     name = "Allocated_const_cmi",
     src  = "allocated_const.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
     ]
 )
@@ -216,7 +214,7 @@ compiler_module(
     struct = "augment_specialised_args.ml",
     sig    = "Augment_specialised_args_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Pass_wrapper",
         "//middle_end/flambda:Parameter",
@@ -243,7 +241,7 @@ compiler_signature(
     name = "Augment_specialised_args_cmi",
     src  = "augment_specialised_args.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Backend_intf_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
@@ -258,7 +256,7 @@ compiler_module(
     struct = "build_export_info.ml",
     sig    = "Build_export_info_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Traverse_for_exported_symbols",
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Invariant_params",
@@ -290,7 +288,7 @@ compiler_signature(
     name = "Build_export_info_cmi",
     src  = "build_export_info.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end/flambda:Export_info",
@@ -303,7 +301,7 @@ compiler_module(
     struct = "closure_conversion.ml",
     sig    = "Closure_conversion_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Lift_code",
         "//middle_end/flambda:Flambda_utils",
@@ -341,7 +339,7 @@ compiler_signature(
     name = "Closure_conversion_cmi",
     src  = "closure_conversion.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -355,7 +353,7 @@ compiler_module(
     struct = "closure_conversion_aux.ml",
     sig    = "Closure_conversion_aux_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Variable",
         "//middle_end:Symbol",
         "//middle_end/flambda/base_types:Static_exception",
@@ -374,7 +372,7 @@ compiler_signature(
     name = "Closure_conversion_aux_cmi",
     src  = "closure_conversion_aux.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Variable_cmi",
         "//middle_end:Symbol_cmi",
         "//middle_end/flambda/base_types:Static_exception_cmi",
@@ -388,7 +386,7 @@ compiler_module(
     struct = "closure_offsets.ml",
     sig    = "Closure_offsets_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Flambda_utils",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -403,7 +401,7 @@ compiler_signature(
     name = "Closure_offsets_cmi",
     src  = "closure_offsets.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end/flambda/base_types:Var_within_closure",
@@ -416,7 +414,7 @@ compiler_module(
     struct = "effect_analysis.ml",
     sig    = "Effect_analysis_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Flambda",
         "//middle_end:Semantics_of_primitives",
         "//middle_end:Clambda_primitives",
@@ -430,7 +428,7 @@ compiler_signature(
     name = "Effect_analysis_cmi",
     src  = "effect_analysis.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -442,7 +440,7 @@ compiler_module(
     struct = "export_info.ml",
     sig    = "Export_info_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -470,7 +468,7 @@ compiler_signature(
     name = "Export_info_cmi",
     src  = "export_info.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -492,7 +490,7 @@ compiler_module(
     struct = "export_info_for_pack.ml",
     sig    = "Export_info_for_pack_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Flambda_iterators",
         "//middle_end/flambda:Flambda",
@@ -515,7 +513,7 @@ compiler_signature(
     name = "Export_info_for_pack_cmi",
     src  = "export_info_for_pack.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Export_info_cmi",
         "//middle_end:Compilation_unit_cmi",
     ]
@@ -526,7 +524,7 @@ compiler_module(
     struct = "extract_projections.ml",
     sig    = "Extract_projections_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inline_and_simplify_aux",
@@ -546,7 +544,7 @@ compiler_signature(
     name = "Extract_projections_cmi",
     src  = "extract_projections.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inline_and_simplify_aux",
         "//middle_end/flambda:Flambda",
@@ -559,7 +557,7 @@ compiler_module(
     struct = "find_recursive_functions.ml",
     sig    = "Find_recursive_functions_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Flambda_utils",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -574,7 +572,7 @@ compiler_signature(
     name = "Find_recursive_functions_cmi",
     src  = "find_recursive_functions.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -587,7 +585,7 @@ compiler_module(
     struct = "flambda.ml",
     sig    = "Flambda_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Debuginfo",
         "//lambda:Printlambda",
         "//middle_end/flambda/base_types:Closure_id",
@@ -626,7 +624,7 @@ compiler_signature(
     name = "Flambda_cmi",
     src  = "flambda.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Allocated_const_cmi",
         ":Parameter_cmi",
         ":Projection_cmi",
@@ -654,7 +652,7 @@ compiler_module(
     struct = "flambda_invariants.ml",
     sig    = "Flambda_invariants_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Flambda_iterators",
@@ -686,7 +684,7 @@ compiler_signature(
     name = "Flambda_invariants_cmi",
     src  = "flambda_invariants.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -698,7 +696,7 @@ compiler_module(
     struct = "flambda_iterators.ml",
     sig    = "Flambda_iterators_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -712,7 +710,7 @@ compiler_signature(
     name = "Flambda_iterators_cmi",
     src  = "flambda_iterators.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -725,7 +723,7 @@ compiler_module(
     struct = "flambda_middle_end.ml",
     sig    = "Flambda_middle_end_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Un_anf",
         "//middle_end/flambda:Share_constants",
         "//middle_end/flambda:Remove_unused_program_constructs",
@@ -773,7 +771,7 @@ compiler_signature(
     name = "Flambda_middle_end_cmi",
     src  = "flambda_middle_end.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Clambda",
         "//middle_end:Backend_intf_cmi",
         "//stdlib:Stdlib.Format",
@@ -785,7 +783,7 @@ compiler_module(
     struct = "flambda_to_clambda.ml",
     sig    = "Flambda_to_clambda_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Un_anf",
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
@@ -827,7 +825,7 @@ compiler_signature(
     name = "Flambda_to_clambda_cmi",
     src  = "flambda_to_clambda.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end/flambda:Export_info",
@@ -842,7 +840,7 @@ compiler_module(
     struct = "flambda_utils.ml",
     sig    = "Flambda_utils_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Flambda_iterators",
@@ -876,7 +874,7 @@ compiler_signature(
     name = "Flambda_utils_cmi",
     src  = "flambda_utils.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Flambda",
@@ -898,7 +896,7 @@ compiler_module(
     struct = "freshening.ml",
     sig    = "Freshening_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Flambda_utils",
@@ -922,7 +920,7 @@ compiler_signature(
     name = "Freshening_cmi",
     src  = "freshening.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -940,7 +938,7 @@ compiler_module(
     struct = "import_approx.ml",
     sig    = "Import_approx_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Freshening",
@@ -967,7 +965,7 @@ compiler_signature(
     name = "Import_approx_cmi",
     src  = "import_approx.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -980,7 +978,7 @@ compiler_module(
     struct = "inconstant_idents.ml",
     sig    = "Inconstant_idents_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Flambda_utils",
@@ -1003,7 +1001,7 @@ compiler_signature(
     name = "Inconstant_idents_cmi",
     src  = "inconstant_idents.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -1019,7 +1017,7 @@ compiler_module(
     struct = "initialize_symbol_to_let_symbol.ml",
     sig    = "Initialize_symbol_to_let_symbol_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -1033,7 +1031,7 @@ compiler_signature(
     name = "Initialize_symbol_to_let_symbol_cmi",
     src  = "initialize_symbol_to_let_symbol.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
     ]
@@ -1044,7 +1042,7 @@ compiler_module(
     struct = "inline_and_simplify.ml",
     sig    = "Inline_and_simplify_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Unbox_specialised_args",
         "//middle_end/flambda:Unbox_free_vars_of_closures",
         "//middle_end/flambda:Unbox_closures",
@@ -1096,7 +1094,7 @@ compiler_signature(
     name = "Inline_and_simplify_cmi",
     src  = "inline_and_simplify.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inline_and_simplify_aux",
@@ -1112,7 +1110,7 @@ compiler_module(
     struct = "inline_and_simplify_aux.ml",
     sig    = "Inline_and_simplify_aux_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
@@ -1148,7 +1146,7 @@ compiler_signature(
     name = "Inline_and_simplify_aux_cmi",
     src  = "inline_and_simplify_aux.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//lambda:Debuginfo",
         "//middle_end/flambda/base_types:Closure_id",
         "//middle_end/flambda/base_types:Closure_origin",
@@ -1174,7 +1172,7 @@ compiler_module(
     struct = "inlining_cost.ml",
     sig    = "Inlining_cost_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda_iterators",
         "//middle_end/flambda:Flambda",
@@ -1199,7 +1197,7 @@ compiler_signature(
     name = "Inlining_cost_cmi",
     src  = "inlining_cost.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda_cmi",
         "//parsing:Asttypes_cmi",
@@ -1211,7 +1209,7 @@ compiler_module(
     struct = "inlining_decision.ml",
     sig    = "Inlining_decision_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
@@ -1235,7 +1233,7 @@ compiler_signature(
     name = "Inlining_decision_cmi",
     src  = "inlining_decision.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_decision_intf_cmi",
@@ -1251,7 +1249,7 @@ compiler_signature(
     name = "Inlining_decision_intf_cmi",
     src  = "inlining_decision_intf.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inline_and_simplify_aux",
@@ -1267,7 +1265,7 @@ compiler_module(
     struct = "inlining_stats.ml",
     sig    = "Inlining_stats_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Inlining_stats_types",
         "//stdlib:Stdlib.String",
         "//utils:Misc",
@@ -1285,7 +1283,7 @@ compiler_signature(
     name = "Inlining_stats_cmi",
     src  = "inlining_stats.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Inlining_stats_types",
         "//lambda:Debuginfo",
         "//middle_end/flambda/base_types:Closure_id",
@@ -1297,7 +1295,7 @@ compiler_module(
     struct = "inlining_stats_types.ml",
     sig    = "Inlining_stats_types_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Inlining_cost",
         "//stdlib:Stdlib.String",
         "//utils:Int_replace_polymorphic_compare",
@@ -1309,7 +1307,7 @@ compiler_signature(
     name = "Inlining_stats_types_cmi",
     src  = "inlining_stats_types.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Inlining_cost",
         "//stdlib:Stdlib.Format",
     ]
@@ -1320,7 +1318,7 @@ compiler_module(
     struct = "inlining_transforms.ml",
     sig    = "Inlining_transforms_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
@@ -1346,7 +1344,7 @@ compiler_signature(
     name = "Inlining_transforms_cmi",
     src  = "inlining_transforms.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_decision_intf_cmi",
@@ -1363,7 +1361,7 @@ compiler_module(
     struct = "invariant_params.ml",
     sig    = "Invariant_params_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Flambda_utils",
@@ -1384,7 +1382,7 @@ compiler_signature(
     name = "Invariant_params_cmi",
     src  = "invariant_params.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -1397,7 +1395,7 @@ compiler_module(
     struct = "lift_code.ml",
     sig    = "Lift_code_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda_iterators",
         "//middle_end/flambda:Flambda",
@@ -1415,7 +1413,7 @@ compiler_signature(
     name = "Lift_code_cmi",
     src  = "lift_code.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end:Variable",
@@ -1428,7 +1426,7 @@ compiler_module(
     struct = "lift_constants.ml",
     sig    = "Lift_constants_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inconstant_idents",
@@ -1457,7 +1455,7 @@ compiler_signature(
     name = "Lift_constants_cmi",
     src  = "lift_constants.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -1470,7 +1468,7 @@ compiler_module(
     struct = "lift_let_to_initialize_symbol.ml",
     sig    = "Lift_let_to_initialize_symbol_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda_utils",
         "//middle_end/flambda:Flambda",
@@ -1488,7 +1486,7 @@ compiler_signature(
     name = "Lift_let_to_initialize_symbol_cmi",
     src  = "lift_let_to_initialize_symbol.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -1501,7 +1499,7 @@ compiler_module(
     struct = "parameter.ml",
     sig    = "Parameter_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Variable",
         "//stdlib:Stdlib.List",
         "//utils:Int_replace_polymorphic_compare",
@@ -1513,7 +1511,7 @@ compiler_signature(
     name = "Parameter_cmi",
     src  = "parameter.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Compilation_unit_cmi",
         "//middle_end:Variable_cmi",
         "//utils:Identifiable_cmi"
@@ -1525,7 +1523,7 @@ compiler_module(
     struct = "pass_wrapper.ml",
     sig    = "Pass_wrapper_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Int_replace_polymorphic_compare",
         "//stdlib:Stdlib.Format",
         "//utils:Clflags"
@@ -1536,7 +1534,7 @@ compiler_signature(
     name = "Pass_wrapper_cmi",
     src  = "pass_wrapper.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
     ]
 )
@@ -1546,7 +1544,7 @@ compiler_module(
     struct = "projection.ml",
     sig    = "Projection_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
 # Error: Module `Closure_id' is unavailable (required by `Projection')
 # Target //:ocamlopt failed to build
         "//middle_end/flambda/base_types:Closure_id",
@@ -1564,7 +1562,7 @@ compiler_signature(
     name = "Projection_cmi",
     src  = "projection.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Variable_cmi",
         "//middle_end/flambda/base_types:Var_within_closure_cmi",
         "//utils:Identifiable",
@@ -1578,7 +1576,7 @@ compiler_module(
     struct = "ref_to_variables.ml",
     sig    = "Ref_to_variables_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda_iterators",
         "//middle_end/flambda:Flambda",
@@ -1596,7 +1594,7 @@ compiler_signature(
     name = "Ref_to_variables_cmi",
     src  = "ref_to_variables.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -1608,7 +1606,7 @@ compiler_module(
     struct = "remove_free_vars_equal_to_args.ml",
     sig    = "Remove_free_vars_equal_to_args_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Pass_wrapper",
         "//middle_end/flambda:Parameter",
@@ -1624,7 +1622,7 @@ compiler_signature(
     name = "Remove_free_vars_equal_to_args_cmi",
     src  = "remove_free_vars_equal_to_args.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//stdlib:Stdlib.Format",
@@ -1636,7 +1634,7 @@ compiler_module(
     struct = "remove_unused_arguments.ml",
     sig    = "Remove_unused_arguments_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Invariant_params",
@@ -1659,7 +1657,7 @@ compiler_signature(
     name = "Remove_unused_arguments_cmi",
     src  = "remove_unused_arguments.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end:Backend_intf_cmi",
@@ -1671,7 +1669,7 @@ compiler_module(
     struct = "remove_unused_closure_vars.ml",
     sig    = "Remove_unused_closure_vars_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Flambda_utils",
@@ -1688,7 +1686,7 @@ compiler_signature(
     name = "Remove_unused_closure_vars_cmi",
     src  = "remove_unused_closure_vars.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
     ]
@@ -1699,7 +1697,7 @@ compiler_module(
     struct = "remove_unused_program_constructs.ml",
     sig    = "Remove_unused_program_constructs_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
         "//middle_end/flambda:Effect_analysis",
@@ -1713,7 +1711,7 @@ compiler_signature(
     name = "Remove_unused_program_constructs_cmi",
     src  = "remove_unused_program_constructs.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
     ]
@@ -1724,7 +1722,7 @@ compiler_module(
     struct = "share_constants.ml",
     sig    = "Share_constants_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda_iterators",
         "//middle_end/flambda:Flambda",
@@ -1738,7 +1736,7 @@ compiler_signature(
     name = "Share_constants_cmi",
     src  = "share_constants.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
     ]
@@ -1749,7 +1747,7 @@ compiler_module(
     struct = "simple_value_approx.ml",
     sig    = "Simple_value_approx_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Inlining_cost",
@@ -1791,7 +1789,7 @@ compiler_signature(
     name = "Simple_value_approx_cmi",
     src  = "simple_value_approx.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Parameter",
         "//middle_end/flambda:Freshening",
@@ -1817,7 +1815,7 @@ compiler_module(
     struct = "simplify_boxed_integer_ops.ml",
     sig    = "Simplify_boxed_integer_ops_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Clambda_primitives",
         "//stdlib:Stdlib.Int32",
         "//stdlib:Stdlib.Int64",
@@ -1835,7 +1833,7 @@ compiler_signature(
     name = "Simplify_boxed_integer_ops_cmi",
     src  = "simplify_boxed_integer_ops.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         ":Simplify_boxed_integer_ops_intf_cmi",
         "//stdlib:Stdlib.Nativeint",
@@ -1848,7 +1846,7 @@ compiler_signature(
     name = "Simplify_boxed_integer_ops_intf_cmi",
     src  = "simplify_boxed_integer_ops_intf.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
@@ -1863,7 +1861,7 @@ compiler_module(
     struct = "simplify_common.ml",
     sig    = "Simplify_common_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
@@ -1877,7 +1875,7 @@ compiler_signature(
     name = "Simplify_common_cmi",
     src  = "simplify_common.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
@@ -1890,7 +1888,7 @@ compiler_module(
     struct = "simplify_primitives.ml",
     sig    = "Simplify_primitives_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simplify_common",
         "//middle_end/flambda:Simplify_boxed_integer_ops",
         "//middle_end/flambda:Simple_value_approx",
@@ -1919,7 +1917,7 @@ compiler_signature(
     name = "Simplify_primitives_cmi",
     src  = "simplify_primitives.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
        "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
@@ -1936,7 +1934,7 @@ compiler_module(
     struct = "traverse_for_exported_symbols.ml",
     sig    = "Traverse_for_exported_symbols_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda_iterators",
@@ -1959,7 +1957,7 @@ compiler_signature(
     name = "Traverse_for_exported_symbols_cmi",
     src  = "traverse_for_exported_symbols.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Simple_value_approx",
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
@@ -1977,7 +1975,7 @@ compiler_module(
     struct = "un_anf.ml",
     sig    = "Un_anf_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Symbol",
         "//middle_end:Semantics_of_primitives",
         "//middle_end:Printclambda",
@@ -1998,7 +1996,7 @@ compiler_signature(
     name = "Un_anf_cmi",
     src  = "un_anf.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Asttypes_cmi",
         "//middle_end:Symbol",
         "//middle_end:Clambda_cmi",
@@ -2011,7 +2009,7 @@ compiler_module(
     struct = "unbox_closures.ml",
     sig    = "Unbox_closures_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
         "//middle_end/flambda:Inline_and_simplify_aux",
@@ -2030,7 +2028,7 @@ compiler_signature(
     name = "Unbox_closures_cmi",
     src  = "unbox_closures.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
         "//middle_end/flambda:Inline_and_simplify_aux",
@@ -2044,7 +2042,7 @@ compiler_module(
     struct = "unbox_free_vars_of_closures.ml",
     sig    = "Unbox_free_vars_of_closures_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Pass_wrapper",
         "//middle_end/flambda:Inlining_cost",
@@ -2065,7 +2063,7 @@ compiler_signature(
     name = "Unbox_free_vars_of_closures_cmi",
     src  = "unbox_free_vars_of_closures.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
         "//middle_end/flambda:Inline_and_simplify_aux",
@@ -2078,7 +2076,7 @@ compiler_module(
     struct = "unbox_specialised_args.ml",
     sig    = "Unbox_specialised_args_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Invariant_params",
         "//middle_end/flambda:Inline_and_simplify_aux",
@@ -2095,7 +2093,7 @@ compiler_signature(
     name = "Unbox_specialised_args_cmi",
     src  = "unbox_specialised_args.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end/flambda:Projection",
         "//middle_end/flambda:Inlining_cost",
         "//middle_end/flambda:Inline_and_simplify_aux",

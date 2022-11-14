@@ -1,25 +1,25 @@
-load("//bzl/rules/common:lexer_intf.bzl", "lexer_attrs")
-load("//bzl/rules/common:lexer_impl.bzl", "impl_lexer")
+load("//bzl/attrs:lexer_attrs.bzl", "lexer_attrs")
+load("//bzl/actions:lexer_impl.bzl", "lexer_impl")
 
 #################
 boot_lexer = rule(
-    implementation = impl_lexer,
+    implementation = lexer_impl,
     doc = "Generates an OCaml source file from an ocamllex source file.",
     exec_groups = {
         "boot": exec_group(
             exec_compatible_with = [
-                "//platforms/ocaml/executor:vm?",
-                "//platforms/ocaml/emitter:vm?"
+                "//platform/constraints/ocaml/executor:vm?",
+                "//platform/constraints/ocaml/emitter:vm"
             ],
             toolchains = ["//boot/toolchain/type:boot"],
         ),
-        "baseline": exec_group(
-            exec_compatible_with = [
-                "//platforms/ocaml/executor:vm?",
-                "//platforms/ocaml/emitter:vm?"
-            ],
-            toolchains = ["//boot/toolchain/type:baseline"],
-        ),
+        # "baseline": exec_group(
+        #     exec_compatible_with = [
+        #         "//platform/constraints/ocaml/executor:vm?",
+        #         "//platform/constraints/ocaml/emitter:vm"
+        #     ],
+        #     toolchains = ["//boot/toolchain/type:baseline"],
+        # ),
     },
 
     attrs = dict(

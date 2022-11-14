@@ -18,6 +18,8 @@ exports_files(["expand_module_aliases.awk", "weak.ml", "weak.mli"])
 MODULE_OPTS = []
 SIG_OPTS    = []
 
+NO_CMI_FILE = "-49"
+
 LABEL_OPTS = ["-nolabels"]
 
 # Std_exit is at the bottom of this file.
@@ -67,13 +69,11 @@ stdlib_boot_module(
     sig    = "Stdlib_cmi", # doesn't work with stdlib.mli
     # use_prims = True,
     opts = [
+        "-nopervasives",
         "-no-alias-deps",
-        # "-pp", "awk -f expand_module_aliases.awk",
     ],
-    warnings = ["49"], # no-cmi-file
-    deps = [
-        ":CamlinternalFormatBasics",
-    ],
+    warnings = [NO_CMI_FILE],
+    deps = [":CamlinternalFormatBasics",],
     # pp_deps = ["//stdlib:expand_module_aliases.awk"],
 )
 
@@ -96,9 +96,10 @@ stdlib_boot_signature(
     name = "Stdlib_cmi",
     src  = "_build/stdlib.mli",
     opts = SIG_OPTS + [
+        "-nopervasives",
         "-no-alias-deps",
     ],
-    warnings = ["49"], # no-cmi-file
+    warnings = [NO_CMI_FILE],
     deps   = [
         ":CamlinternalFormatBasics", #_cmi",
     ],
@@ -139,6 +140,7 @@ stdlib_boot_module(
     name   = "CamlinternalFormatBasics",
     struct = "camlinternalFormatBasics.ml",
     sig    = "camlinternalFormatBasics.mli",
+    opts   = ["-nopervasives"]
     # sig    = select({
     #     "//config:sig_src?": "camlinternalFormatBasics.mli",
     #     "//conditions:default": "CamlinternalFormatBasics_cmi",
@@ -215,8 +217,8 @@ stdlib_boot_module(
         "//config:sig_src?": "camlinternalLazy.mli",
         "//conditions:default": "CamlinternalLazy_cmi"
     }),
-    opts = ["-open", "Stdlib"] + select({
-        # "//platforms/target:sys?": ["-afl-inst-ratio", "0"],
+    opts = select({
+        # "//platform/target:sys?": ["-afl-inst-ratio", "0"],
         "//conditions:default": []
     }),
     deps   = [
@@ -228,6 +230,7 @@ stdlib_boot_module(
 stdlib_boot_signature(
     name = "CamlinternalLazy_cmi",
     src  = "camlinternalLazy.mli",
+    deps = [":Stdlib_cmi"]
 )
 
 stdlib_boot_module(
@@ -259,8 +262,8 @@ stdlib_boot_module(
     sig    = "CamlinternalOO_cmi",
     opts = ["-open", "Stdlib"],
     # + select({
-    #     # "//platforms/target:vm?": [],
-    #     # "//platforms/target:sys?": [
+    #     # "//platform/target:vm?": [],
+    #     # "//platform/target:sys?": [
     #     #     "-inline", "0",
     #     #     "-afl-inst-ratio", "0"
     #     # ],
@@ -637,22 +640,11 @@ stdlib_module(
     name   = "Stdlib.Either",
     struct = "either.ml",
     sig    = "Stdlib.Either_cmi",
-    # opts = MODULE_OPTS,
-    # primitives = PRIMITIVES,
-    # deps   = [
-    # ],
-    # data = ["//runtime:primitives"],
 )
 
 stdlib_signature(
     name = "Stdlib.Either_cmi",
     src  = "either.mli",
-    # opts = SIG_OPTS,
-    # primitives = PRIMITIVES,
-    # deps   = [
-    #     # ":Stdlib"
-    # ],
-    # data = ["//runtime:primitives"],
 )
 
 stdlib_module(
@@ -1580,15 +1572,16 @@ stdlib_signature(
 stdlib_module(
     name   = "Stdlib.Sys",
     struct = "sys.ml",
-    # sig    = "Stdlib.Sys_cmi",
-    sig    = select({
-        "//config:sig_src?"   : "sys.mli",
-        "//conditions:default": ":Stdlib.Sys_cmi"
-    }),
-    deps    = select({
-        "//config:sig_src?"   : ["//stdlib:Stdlib"],
-        "//conditions:default": []
-    }),
+    sig    = "Stdlib.Sys_cmi",
+    # sig    = select({
+    #     "//config:sig_src?"   : "sys.mli",
+    #     "//conditions:default": ":Stdlib.Sys_cmi"
+    # }),
+    # deps    = select({
+    #     "//config:sig_src?"   : ["//stdlib:Stdlib"],
+    #     "//conditions:default": []
+    # }),
+
     opts = MODULE_OPTS,
 )
 
@@ -1737,23 +1730,23 @@ SYSPATHS_CMD = " ".join([
 # --workspace_status_command=$PWD/bzl/camlheader.sh
 
 ## FIXME: select camlheader content: for running under Bazel, null, otherwise installation path,
-## not $(execpath //boot/bin:ocamlrun)?
+## not $(execpath //boot/baseline:ocamlrun)?
 DEVPATHS_CMD = "\n".join([
     "cat bazel-out/stable-status.txt | ",
     "while read KEY VAL; do",
     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
-    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun) > $(location _build/camlheader);\n",
-    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun)d > $(location _build/camlheaderd);\n",
-    "echo '#!'$$VAL/$(execpath //boot/bin:ocamlrun)i > $(location _build/camlheaderi);\n",
+    "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun) > $(location _build/camlheader);\n",
+    "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)d > $(location _build/camlheaderd);\n",
+    "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)i > $(location _build/camlheaderi);\n",
     # "touch $(location camlheader);\n",
     # "touch $(location camlheaderd);\n",
     # "touch $(location camlheaderi);\n",
     "fi",
     "done",
 
-    "echo '#!$(execpath //boot/bin:ocamlrun)' > $(location _build/target_camlheader);",
-    "echo '#!$(execpath //boot/bin:ocamlrun)d' > $(location _build/target_camlheaderd);",
-    "echo '#!$(execpath //boot/bin:ocamlrun)i' > $(location _build/target_camlheaderi);",
+    "echo '#!$(execpath //boot/baseline:ocamlrun)' > $(location _build/target_camlheader);",
+    "echo '#!$(execpath //boot/baseline:ocamlrun)d' > $(location _build/target_camlheaderd);",
+    "echo '#!$(execpath //boot/baseline:ocamlrun)i' > $(location _build/target_camlheaderi);",
 ])
 
 boot_camlheaders(
@@ -1761,9 +1754,9 @@ boot_camlheaders(
     template = "camlheader.template",
     runtimes  = [
         "//runtime:ocamlrun",
-        # "//boot/bin:ocamlrun",
-        # "//boot/bin:ocamlrund",  # if we had this
-        # "//boot/bin:ocamlruni",
+        # "//boot/baseline:ocamlrun",
+        # "//boot/baseline:ocamlrund",  # if we had this
+        # "//boot/baseline:ocamlruni",
     ],
     prefix   = "$PWD",
 )
@@ -1780,11 +1773,11 @@ genrule(
         "_build/target_camlheaderi"
     ],
     # srcs = [
-    #     "//boot/bin:ocamlrun",
+    #     "//boot/baseline:ocamlrun",
     #     "//bzl/toolchain:ocamlrun"
     # ],
     srcs = [
-        "//boot/bin:ocamlrun",
+        "//boot/baseline:ocamlrun",
         "//bzl/toolchain:ocamlrun"
     ],
     cmd = DEVPATHS_CMD,
@@ -1890,6 +1883,7 @@ genrule(
 stdlib_boot_signature(
     name = "Std_exit_cmi",
     src  = "std_exit.mli",
+    deps = [":Stdlib"]
 )
 
 stdlib_boot_module(

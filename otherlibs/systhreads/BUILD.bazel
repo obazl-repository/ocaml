@@ -5,29 +5,29 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
-load("//config:CONFIG.bzl",
-     "ARCH", "MODEL", "SYSTEM",
-     "HOST", "ROOTDIR", "LIBDIR",
-     # "OC_CFLAGS",
-     "CFLAGS",
-     "OC_CPPFLAGS", "CPPFLAGS",
-     "OC_LDFLAGS", "LDFLAGS",
+# load("//config:CONFIG.bzl",
+#      "ARCH", "MODEL", "SYSTEM",
+#      "HOST", "ROOTDIR", "LIBDIR",
+#      # "OC_CFLAGS",
+#      "CFLAGS",
+#      "OC_CPPFLAGS", "CPPFLAGS",
+#      "OC_LDFLAGS", "LDFLAGS",
 
-     "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
-     "OUTPUTEXE", "MKEXE_FLAGS",
-     "BYTECCLIBS"
-     )
+#      "OC_CPPDEFINES", "OC_NATIVE_CPPDEFINES",
+#      "OUTPUTEXE", "MKEXE_FLAGS",
+#      "BYTECCLIBS"
+#      )
 
-COMPFLAGS = [
-    "-w", "+33..39",
-    "-warn-error", "+A",
-    ## -g
-    "-bin-annot",
-    "-safe-string"
-]
+# COMPFLAGS = [
+#     "-w", "+33..39",
+#     "-warn-error", "+A",
+#     ## -g
+#     "-bin-annot",
+#     "-safe-string"
+# ]
 
-MODULE_OPTS = ["-nostdlib"] + COMPFLAGS
-SIG_OPTS = ["-nostdlib"] + COMPFLAGS
+MODULE_OPTS = [] # ["-nostdlib"] + COMPFLAGS
+SIG_OPTS    = [] # ["-nostdlib"] + COMPFLAGS
 
 ################################################################
 # $(LIBNAME).cma: $(THREADS_BCOBJS)
@@ -216,7 +216,7 @@ cc_library(
         "st_posix.h",
         "st_stubs.c"
     ] + select({
-        "//platforms/os:windows_x86_64": ["st_win32.h"],
+        "//platform/os:windows_x86_64": ["st_win32.h"],
         "//conditions:default":         []
     }),
     copts = [
@@ -231,7 +231,7 @@ cc_library(
     ],
     linkopts = ["-lpthread"],
     deps = ["//runtime/caml:hdrs"],
-    defines = OC_CPPDEFINES + [
+    defines = [
         ## for now, just hardcode it
         # "TARGET_" + ARCH,
         # "MODEL_"  + MODEL,

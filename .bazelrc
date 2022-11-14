@@ -17,10 +17,10 @@ run:q --ui_event_filters=-stdout
 run:q --ui_event_filters=-stderr
 run:q --noshow_progress
 
-#build --toolchain_resolution_debug=.*
+build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 #build --toolchain_resolution_debug=//toolchain/type:.*
-build --toolchain_resolution_debug=//boot/toolchain/type:.*
+#build --toolchain_resolution_debug=//boot/toolchain/type:.*
 
 ### testing:
 # --extra_execution_platforms: The platforms that are available as
@@ -83,27 +83,54 @@ build --workspace_status_command=$PWD/bzl/camlheader.sh
 ################################################################
 ## OCaml platforms: boot, vm, sys
 
-build:boot --host_platform=//platforms/build:boot
-build:boot --platforms=//platforms/target:boot
+# default
+build --host_platform=//platform/ocaml:sys_vm_vm
+build --platforms=//platform/ocaml:sys_vm_vm
 
-build:dev --host_platform=//platforms/build:dev
-build:dev --platforms=//platforms/target:dev
+build:boot --host_platform=//platform/ocaml:boot
+build:boot --platforms=//platform/ocaml:boot
 
-build:vmvm --host_platform=//platforms/build:vm
-build:vmvm --platforms=//platforms/target:vm
+build:boot.ocamlopt.byte --host_platform=//platform/ocaml:boot
+build:boot.ocamlopt.byte --platforms=//platform/ocaml:sys_vm_sys
 
-build:sysvm --host_platform=//platforms/build:sys
-build:sysvm --platforms=//platforms/target:vm
+build:ocamlc --host_platform=//platform/ocaml:sys_vm_vm
+build:ocamlc --platforms=//platform/ocaml:sys_vm_vm
 
-build:vmsys --host_platform=//platforms/build:vm
-build:vmsys --platforms=//platforms/target:sys
+build:ocamlc.byte --host_platform=//platform/ocaml:sys_vm_vm
+build:ocamlc.byte --platforms=//platform/ocaml:sys_vm_vm
 
-build:syssys --host_platform=//platforms:sys
-build:syssys --platforms=//platforms:sys
+build:ocamlopt.byte --host_platform=//platform/ocaml:sys_vm_vm
+build:ocamlopt.byte --platforms=//platform/ocaml/target:sys_vm_sys
+-compat-32
+## to emit sys_sys, build host can be either sys_sys_sys or sys_vm_sys
+
+build:ocamlc.opt --host_platform=//platform/ocaml:sys_sys_sys
+build:ocamlc.opt --platforms=//platform/ocaml:sys_vm
+
+build:ocamlopt.opt --host_platform=//platform/ocaml:sys_sys_sys
+build:ocamlopt.opt --platforms=//platform/ocaml:sys_sys
+
+# build:boot --host_platform=//platform/build:boot
+# build:boot --platforms=//platform/target:boot
+
+build:dev --host_platform=//platform/build:dev
+build:dev --platforms=//platform/target:dev
+
+build:vmvm --host_platform=//platform/build:vm
+build:vmvm --platforms=//platform/target:vm
+
+build:sysvm --host_platform=//platform/build:sys
+build:sysvm --platforms=//platform/target:vm
+
+build:vmsys --host_platform=//platform/build:vm
+build:vmsys --platforms=//platform/target:sys
+
+build:syssys --host_platform=//platform:sys
+build:syssys --platforms=//platform:sys
 
 #### cross-compilation
-build:vmvmsys --host_platform=//platforms:vm
-build:vmvmsys --platforms=//platforms/xtarget=sys
+build:vmvmsys --host_platform=//platform:vm
+build:vmvmsys --platforms=//platform/xtarget=sys
 
 
 ################################################################

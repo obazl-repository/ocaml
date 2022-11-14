@@ -19,7 +19,7 @@ RUNTIME_DEFINES = select({
     "//config/mode:instrumented?": ["CAML_INSTR"],
     "//conditions:default": ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 }) + select({
-    ## WARNING: //platforms/vm just for -DDEBUG, not debugger mode (-c dbg)
+    ## WARNING: //platform/vm just for -DDEBUG, not debugger mode (-c dbg)
     ":DEBUG?": ["DEBUG"],
     "//conditions:default": []
 })
@@ -36,7 +36,7 @@ cc_library(
         "//runtime:common_c_sources",
         "//runtime:bytecode_only_c_sources"
     ] + select({
-    # "//platforms/target:vm?": ["//runtime:bytecode_only_c_sources"],
+    # "//platform/target:vm?": ["//runtime:bytecode_only_c_sources"],
     # "//conditions:default": ["//runtime:native_only_c_sources"],
     "//conditions:default": []
     }),
@@ -50,8 +50,8 @@ cc_library(
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
-        "//platforms/os:macos?": ["-std=c11"],
-        "//platforms/os:linux?": [],
+        "//platform/os:macos?": ["-std=c11"],
+        "//platform/os:linux?": [],
         "//conditions:default":  [] #"-std=c11"]
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
@@ -102,8 +102,8 @@ cc_library(
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
-        "//platforms/os:macos?": [], #"-std=c11"],
-        "//platforms/os:linux?": [],
+        "//platform/os:macos?": [], #"-std=c11"],
+        "//platform/os:linux?": [],
         "//conditions:default":  [] #"-std=c11"]
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
@@ -136,7 +136,7 @@ cc_library(
 # ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
 #               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
 # 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
-## level 0 - uses //boot/bin:ocamlc
+## level 0 - uses //boot/baseline:ocamlc
 # ocamlc_runtime(
 # boot_executable(
 #     name = "ocamlc",
@@ -191,7 +191,7 @@ cc_library(
 ## Bazel: arch must be set, by config setting to be determined.
 ## For now it's hardcoded as amd64 since I'm using a legacy Mac for dev.
 # RUNTIME_ASM_OBJECTS = select({
-#     "//platforms:windows_x86_32?": [ARCH + "nt.asm"],
+#     "//platform:windows_x86_32?": [ARCH + "nt.asm"],
 #     "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
 # })
 
@@ -223,10 +223,10 @@ filegroup(
         ]
     ) + select({
     ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
-    "//platforms/os:linux?": ["unix.c"],
-    "//platforms/os:macos?": ["unix.c"],
-    "//platforms:windows_x86_32?": ["win32.c"], # using bazel naming
-    # "//platforms:windows_x86_64?": [???]
+    "//platform/os:linux?": ["unix.c"],
+    "//platform/os:macos?": ["unix.c"],
+    "//platform:windows_x86_32?": ["win32.c"], # using bazel naming
+    # "//platform:windows_x86_64?": [???]
     "//conditions:default": []
     }),
     visibility = [
@@ -296,10 +296,10 @@ COMMON_C_SOURCES = [
     "weak.c"
 ] + select({
     ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
-    "//platforms/os:linux?": ["unix.c"],
-    "//platforms/os:macos?": ["unix.c"],
-    "//platforms:windows_x86_32?": ["win32.c"], # using bazel naming
-    # "//platforms:windows_x86_64?": [???]
+    "//platform/os:linux?": ["unix.c"],
+    "//platform/os:macos?": ["unix.c"],
+    "//platform:windows_x86_32?": ["win32.c"], # using bazel naming
+    # "//platform:windows_x86_64?": [???]
     "//conditions:default": []
 })
 
@@ -389,7 +389,7 @@ genrule(
 
 ## FIXME: do the cmp
 genrule(
-    outs  = ["primitives"],
+    outs  = ["primitives.dat"],
     name  = "primitives_dat",
     visibility = ["//visibility:public"],
     tools = [":gen_primitives.sh"],
@@ -421,19 +421,19 @@ genrule(
 genrule(
     outs  = ["prims.c"],
     name  = "prims_c",
-    srcs  = [":primitives"],
+    srcs  = [":primitives.dat"],
     cmd   = "\n".join([
-        "PRIMS=`cat $(location primitives)`;",
+        "PRIMS=`cat $(location primitives.dat)`;",
         # "echo PRIMS: $$PRIMS;",
 	    "echo '#define CAML_INTERNALS' > $@;",
         "echo '#include \"caml/mlvalues.h\"' >> $@;",
 	    "echo '#include \"caml/prims.h\"' >> $@;",
-        "sed -e 's/.*/extern value &();/' $(location :primitives) >> $@;",
+        "sed -e 's/.*/extern value &();/' $(location :primitives.dat) >> $@;",
         "echo 'c_primitive caml_builtin_cprim[] = {' >> $@;",
-        "sed -e 's/.*/  &,/' $(location :primitives) >> $@;",
+        "sed -e 's/.*/  &,/' $(location :primitives.dat) >> $@;",
         "echo '  0 };' >> $@;",
         "echo 'char * caml_names_of_builtin_cprim[] = {' >> $@;",
-        "sed -e 's/.*/  \"&\",/' $(location :primitives) >> $@;",
+        "sed -e 's/.*/  \"&\",/' $(location :primitives.dat) >> $@;",
         "echo '  0 };' >> $@"
     ]),
     visibility = [
@@ -508,14 +508,14 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
-        "//platforms/os:macos?": ["-std=c11"],
-        "//platforms/os:linux?": [],
+        "//platform/os:macos?": ["-std=c11"],
+        "//platform/os:linux?": [],
         "//conditions:default":  ["-std=c11"]
     }), # + CFLAGS + OC_CPPFLAGS,
     defines = RUNTIME_DEFINES,
     linkopts = ["$(OC_LDFLAGS)"] + select({
-        "//platforms/target:sys?": ["$(SYS_LINKLIBS)"],
-        "//platforms/target:vm?" : ["$(VM_LINKLIBS)"],
+        "//platform/target:sys?": ["$(SYS_LINKLIBS)"],
+        "//platform/target:vm?" : ["$(VM_LINKLIBS)"],
         "//conditions:default"   : ["$(VM_LINKLIBS)"],
     }),
     deps= [
@@ -549,7 +549,7 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
 #     ] + OC_CPPFLAGS,
 #     # + select({
 #     #     #FIXME: macos with compilation_mode == fastbuild
-#     #     "//platforms/os:macos_fastbuild?": ["-UDEBUG"],
+#     #     "//platform/os:macos_fastbuild?": ["-UDEBUG"],
 #     #     "//conditions:default": []
 #     # }),
 #     defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
@@ -665,8 +665,8 @@ cc_library(
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
-        "//platforms/os:macos?": [], #"-std=c11"],
-        "//platforms/os:linux?": [],
+        "//platform/os:macos?": [], #"-std=c11"],
+        "//platform/os:linux?": [],
         "//conditions:default":  [] #"-std=c11"]
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
@@ -768,6 +768,16 @@ config_setting(name = "asan?", flag_values = {":asan": "True"})
 bool_flag(name = "msan", build_setting_default = False)
 config_setting(name = "msan?", flag_values = {":msan": "True"})
 
+
+################
+bool_flag(name = "use_prims", build_setting_default = False,
+          visibility = ["//visibility:public"])
+config_setting(name = "use_prims?", flag_values = {":use_prims": "True"})
+
+label_flag(
+    name = "primitives",
+    build_setting_default = "//runtime:primitives.dat"
+)
 
 ################
 bool_flag(name = "fastbuild", build_setting_default = False)

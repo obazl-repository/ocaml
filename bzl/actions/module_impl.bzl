@@ -5,7 +5,7 @@ load("//bzl:providers.bzl",
      "BootInfo", "ModuleInfo",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
-load("//bzl:functions.bzl", "get_module_name")
+load("//bzl:functions.bzl", "get_module_name", "stage_name")
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:options.bzl", "get_options")
@@ -29,32 +29,45 @@ def module_impl(ctx, module_name):
     # tc = ctx.toolchains["//toolchain/type:boot"]
     # print("tc target_host: %s" % tc.target_host)
 
-    stage = ctx.attr._stage[BuildSettingInfo].value
+    # stage = ctx.attr._stage[BuildSettingInfo].value
     # print("module _stage: %s" % stage)
 
-    workdir = "_{}/".format(stage)
-
-    tc = None
-    if stage == "boot":
-        tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
-    elif stage == "baseline":
-        tc = ctx.exec_groups["baseline"].toolchains[
-            "//boot/toolchain/type:baseline"]
-    elif stage == "dev":
-        tc = ctx.exec_groups["dev"].toolchains[
-            "//boot/toolchain/type:baseline"]
-    else:
-        print("UNHANDLED STAGE: %s" % stage)
-        tc = ctx.exec_groups["boot"].toolchains[
+    tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    if tc.target_host in ["vm"]:
+    workdir = "_{}/".format(stage_name(tc._stage))
+
+    # workdir = "_{}/".format(stage)
+
+    # tc = None
+    # if stage == "boot":
+    #     tc = ctx.exec_groups["boot"].toolchains[
+    #         "//boot/toolchain/type:boot"]
+    # elif stage == "baseline":
+    #     tc = ctx.exec_groups["baseline"].toolchains[
+    #         "//boot/toolchain/type:baseline"]
+    # elif stage == "dev":
+    #     tc = ctx.exec_groups["dev"].toolchains[
+    #         "//boot/toolchain/type:baseline"]
+    # else:
+    #     print("UNHANDLED STAGE: %s" % stage)
+    #     tc = ctx.exec_groups["boot"].toolchains[
+    #         "//boot/toolchain/type:boot"]
+
+    # if //platform/constraints/ocaml/emitter:vm?
+
+    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    # print("BEMITTER: %s" % build_emitter)
+
+    target_emitter = tc._target_emitter[BuildSettingInfo].value
+    # print("TEMITTER: %s" % target_emitter)
+
+    if build_emitter == "vm":
         ext = ".cmo"
-    else:
+    elif build_emitter == "sys":
         ext = ".cmx"
-
-    ext = ".cmo" # for now
+    else:
+        fail("Bad build_emitter: %s" % build_emitter)
 
     ################################################################
     ################  OUTPUTS  ################
@@ -284,13 +297,28 @@ def module_impl(ctx, module_name):
     #########################
     args = ctx.actions.args()
 
-    if hasattr(ctx.attr, "_stdlib_resolver"):
-        includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
-        if tc.target_host in ["boot", "vm"]:
-            # if stage == bootstrap:
-            args.add_all(["-use-prims", tc.primitives])
+    ## ocamlrun
+    tool = None
+    for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+        if f.basename == "ocamlrun":
+            # print("LEX RF: %s" % f.path)
+            tool = f
+
+    # the bytecode executable
+    args.add(tc.compiler[DefaultInfo].files_to_run.executable.path)
+
+    if ctx.attr.use_prims == True:
+        args.add_all(["-use-prims", ctx.file._primitives.path])
     else:
-        args.add("-nopervasives")
+        if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
+            args.add_all(["-use-prims", ctx.attr._primitives])
+        else:
+            if ctx.attr._use_prims[BuildSettingInfo].value:
+                if not "-no-use-prims" in ctx.attr.opts:
+                    args.add_all(["-use-prims", ctx.attr._primitives])
+            else:
+                if  "-use-prims" in ctx.attr.opts:
+                    args.add_all(["-use-prims", ctx.attr._primitives])
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -307,6 +335,10 @@ def module_impl(ctx, module_name):
 
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
+
+    # rule stdlib_module has _stdlib_resolver
+    if hasattr(ctx.attr, "_stdlib_resolver"):
+        includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
 
     ################ Direct Deps ################
 
@@ -355,8 +387,8 @@ def module_impl(ctx, module_name):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tc.compiler[DefaultInfo].files_to_run,
-        # executable = tool,
+        executable = tool,
+        # executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs    = inputs_depset,
         outputs   = action_outputs,
@@ -365,7 +397,7 @@ def module_impl(ctx, module_name):
         # tools = [tool] + tool_args,
         mnemonic = "CompileBootstrapModule",
         progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
-            mode = tc.build_host + ">" + tc.target_host,
+            mode = tc.build_host + ">" + tc.target_host[BuildSettingInfo].value,
             rule=ctx.attr._rule,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,

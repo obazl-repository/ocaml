@@ -6,7 +6,7 @@ load("//bzl:providers.bzl",
      "new_deps_aggregator",
      "OcamlSignatureProvider")
 
-load("//bzl:functions.bzl", "get_module_name")
+load("//bzl:functions.bzl", "get_module_name", "stage_name")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -27,26 +27,31 @@ def signature_impl(ctx, module_name):
     basename = ctx.label.name
     from_name = basename[:1].capitalize() + basename[1:]
 
-    stage = ctx.attr._stage[BuildSettingInfo].value
-    # print("signature _stage: %s" % stage)
+    tc = ctx.exec_groups["boot"].toolchains[
+            "//boot/toolchain/type:boot"]
 
-    workdir = "_{}/".format(stage)
+    workdir = "_{}/".format(stage_name(tc._stage))
 
-    tc = None
-    if stage == "boot":
-        tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
-    elif stage == "baseline":
-        tc = ctx.exec_groups["baseline"].toolchains[
-            "//boot/toolchain/type:baseline"]
-    elif stage == "dev":
-        #FIXME
-        tc = ctx.exec_groups["dev"].toolchains[
-            "//boot/toolchain/type:boot"]
-    else:
-        print("UNHANDLED STAGE: %s" % stage)
-        tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
+    # stage = ctx.attr._stage[BuildSettingInfo].value
+    # print("signature _stage: %s" % tc._stage[BuildSettingInfo].value)
+
+    # workdir = "_{}/".format(stage)
+
+    # tc = None
+    # if stage == "boot":
+    #     tc = ctx.exec_groups["boot"].toolchains[
+    #         "//boot/toolchain/type:boot"]
+    # elif stage == "baseline":
+    #     tc = ctx.exec_groups["baseline"].toolchains[
+    #         "//boot/toolchain/type:baseline"]
+    # elif stage == "dev":
+    #     #FIXME
+    #     tc = ctx.exec_groups["dev"].toolchains[
+    #         "//boot/toolchain/type:boot"]
+    # else:
+    #     print("UNHANDLED STAGE: %s" % stage)
+    #     tc = ctx.exec_groups["boot"].toolchains[
+    #         "//boot/toolchain/type:boot"]
 
     ################
     includes   = []
@@ -185,13 +190,25 @@ def signature_impl(ctx, module_name):
     #########################
     args = ctx.actions.args()
 
-    if hasattr(ctx.attr, "_stdlib_resolver"):
-        includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
-        if tc.target_host in ["boot", "vm"]:
-            # if stage == bootstrap:
-            args.add_all(["-use-prims", tc.primitives])
+    ## ocamlrun
+    tool = None
+    for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+        if f.basename == "ocamlrun":
+            # print("LEX RF: %s" % f.path)
+            tool = f
+
+    # the bytecode executable
+    args.add(tc.compiler[DefaultInfo].files_to_run.executable.path)
+
+    if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
+            args.add_all(["-use-prims", ctx.attr._primitives])
     else:
-        args.add("-nopervasives")
+        if ctx.attr._use_prims[BuildSettingInfo].value:
+            if not "-no-use-prims" in ctx.attr.opts:
+                args.add_all(["-use-prims", ctx.attr._primitives])
+        else:
+            if  "-use-prims" in ctx.attr.opts:
+                args.add_all(["-use-prims", ctx.attr._primitives])
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -207,6 +224,9 @@ def signature_impl(ctx, module_name):
 
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
+
+    if hasattr(ctx.attr, "_stdlib_resolver"):
+        includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
 
     ccInfo_list = []
 
@@ -298,7 +318,8 @@ def signature_impl(ctx, module_name):
     ################  ACTION  ################
     ctx.actions.run(
         exec_group = "boot",
-        executable = tc.compiler[DefaultInfo].files_to_run,
+        executable = tool,
+        # executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_cmi],
@@ -309,7 +330,7 @@ def signature_impl(ctx, module_name):
         # tools = [tc.tool_runner, tc.compiler],
         mnemonic = "CompileOcamlSignature",
         progress_message = "{mode} compiling compiler_signature: {ws}//{pkg}:{tgt}".format(
-            mode = tc.build_host + ">" + tc.target_host,
+            mode = tc.build_host + ">" + tc.target_host[BuildSettingInfo].value,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
             tgt=ctx.label.name

@@ -1,5 +1,7 @@
 load("//bzl/rules:build_tool.bzl", _build_tool = "build_tool")
 
+load("//bzl/rules:boot_import_tool.bzl", _boot_import_tool = "boot_import_tool")
+
 load("//bzl/rules:boot_coldstart.bzl",
      _boot_coldstart = "boot_coldstart")
 
@@ -55,6 +57,7 @@ load("//bzl/rules:boot_compiler.bzl", _boot_compiler = "boot_compiler")
 # load("//bzl/rules:ocamlc_runtime.bzl", _ocamlc_runtime = "ocamlc_runtime")
 
 build_tool      = _build_tool
+boot_import_tool      = _boot_import_tool
 boot_coldstart      = _boot_coldstart
 boot_config      = _boot_config
 boot_archive      = _boot_archive

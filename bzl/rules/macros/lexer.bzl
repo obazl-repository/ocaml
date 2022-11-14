@@ -7,11 +7,19 @@ def lexer(name,
           stage = None,
           build_host_constraints = None,
           target_host_constraints = None,
-          opts = None,
+          opts = False,
+          use_prims = None,
           visibility = ["//visibility:public"]
           ):
 
     BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
+    if use_prims:
+        use_prims = select({
+            "//platform/target:vm?" : True,
+            "//platform/target:sys?": False,
+            "//conditions:default"   : True
+        })
+
 
     boot_compiler(
         name       = name,
@@ -19,15 +27,11 @@ def lexer(name,
         prologue   = ["//lex"],
         main       = "//lex:Main",
         opts       = select({
-            "//platforms/target:vm?" : BOOT_OPTS,
-            "//platforms/target:sys?": ["-nostdlib"],
+            "//platform/target:vm?" : BOOT_OPTS,
+            "//platform/target:sys?": ["-nostdlib"],
             "//conditions:default"   : BOOT_OPTS
         }),
-        use_prims  = select({
-            "//platforms/target:vm?" : True,
-            "//platforms/target:sys?": False,
-            "//conditions:default"   : True
-        }),
+        use_prims  = use_prims,
         visibility = ["//visibility:public"]
     )
 

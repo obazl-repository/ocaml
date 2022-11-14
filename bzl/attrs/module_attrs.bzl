@@ -9,25 +9,27 @@ def module_attrs():
 
     return dict(
 
-        primitives = attr.label(
-            allow_single_file = True,
-        ),
-
-        _stage = attr.label(
-            doc = "bootstrap stage",
-            default = "//bzl:stage"
-        ),
-
         opts = attr.string_list(
             doc = "List of OCaml options. Will override configurable default options."
+        ),
+        nocopts = attr.bool(
+            doc = "to disable use toolchain's copts"
         ),
 
         warnings = attr.string_list(
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
 
-        nocopts = attr.bool(
-            doc = "to disable use toolchain's copts"
+        use_prims = attr.bool( # overrides global _use_prims
+            doc = "Undocumented flag, heavily used in bootstrapping",
+        ),
+        _use_prims = attr.label( ## boolean
+            doc = "Undocumented flag, heavily used in bootstrapping",
+            default = "//runtime:use_prims"
+        ),
+        _primitives = attr.label( ## file
+            allow_single_file = True,
+            default = "//runtime:primitives.dat"
         ),
 
         ns = attr.label(
