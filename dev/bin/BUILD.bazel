@@ -19,7 +19,7 @@ load("//bzl/rules/macros:lexer.bzl", "lexer")
 
 ## endogenous compile: A > A (vm.vm > vm.vm)
 compiler(
-    name  = "ocamlc.byte",
+    name  = "ocamlc.dev",
     stage = "dev",
     build_host_constraints = [
         "//platform/constraints/ocaml/executor:vm",

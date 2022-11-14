@@ -368,11 +368,12 @@ boot_config(
     name   = "config_ml",
     out    = "config.ml",
     header = select({
-        "//config/stage:boot?" : ":config.fixed.ml",
-        "//config/stage:dev?"  : ":config.dev.ml",
-        "//config/stage:test?" : ":config.dev.ml",
+        "//config/stage:0?" : ":config.fixed.ml",
+        "//config/stage:1?"  : ":config.dev.ml",
+        "//config/stage:2?" : ":config.dev.ml",
         "//conditions:default" : ":config.generated.ml"
     }),
+    stdlib = "//stdlib",
     footer = "config.common.ml",
 )
 

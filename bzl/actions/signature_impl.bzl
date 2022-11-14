@@ -6,7 +6,8 @@ load("//bzl:providers.bzl",
      "new_deps_aggregator",
      "OcamlSignatureProvider")
 
-load("//bzl:functions.bzl", "get_module_name", "stage_name")
+load("//bzl:functions.bzl",
+     "get_module_name", "stage_name", "tc_compiler")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -30,7 +31,23 @@ def signature_impl(ctx, module_name):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    workdir = "_{}/".format(stage_name(tc._stage))
+    # workdir = "_{}/".format(stage_name(tc._stage))
+
+    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    # print("BEMITTER: %s" % build_emitter)
+
+    target_emitter = tc._target_emitter[BuildSettingInfo].value
+
+    if build_emitter == "vm":
+        ext = ".cmo"
+    elif build_emitter == "sys":
+        ext = ".cmx"
+    else:
+        fail("Bad build_emitter: %s" % build_emitter)
+
+    workdir = "_{b}{t}{stage}/".format(
+        b = build_emitter, t = target_emitter,
+        stage = tc._stage[BuildSettingInfo].value)
 
     # stage = ctx.attr._stage[BuildSettingInfo].value
     # print("signature _stage: %s" % tc._stage[BuildSettingInfo].value)
@@ -192,13 +209,13 @@ def signature_impl(ctx, module_name):
 
     ## ocamlrun
     tool = None
-    for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
         if f.basename == "ocamlrun":
             # print("LEX RF: %s" % f.path)
             tool = f
 
     # the bytecode executable
-    args.add(tc.compiler[DefaultInfo].files_to_run.executable.path)
+    args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
 
     if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
             args.add_all(["-use-prims", ctx.attr._primitives])
@@ -324,8 +341,8 @@ def signature_impl(ctx, module_name):
         inputs = inputs_depset,
         outputs = [out_cmi],
         tools = [
-            tc.compiler[DefaultInfo].default_runfiles.files,
-            tc.compiler[DefaultInfo].files_to_run
+            tc_compiler(tc)[DefaultInfo].default_runfiles.files,
+            tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         # tools = [tc.tool_runner, tc.compiler],
         mnemonic = "CompileOcamlSignature",

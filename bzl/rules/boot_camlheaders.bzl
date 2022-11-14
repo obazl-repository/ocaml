@@ -21,9 +21,24 @@ def _boot_camlheaders(ctx):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    workdir = "_{}/".format(stage_name(tc._stage))
-
+    # workdir = "_{}/".format(stage_name(tc._stage))
     # workdir = "_{}/".format(ctx.attr._stage[BuildSettingInfo].value)
+
+    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    # print("BEMITTER: %s" % build_emitter)
+
+    target_emitter = tc._target_emitter[BuildSettingInfo].value
+
+    if build_emitter == "vm":
+        ext = ".cmo"
+    elif build_emitter == "sys":
+        ext = ".cmx"
+    else:
+        fail("Bad build_emitter: %s" % build_emitter)
+
+    workdir = "_{b}{t}{stage}/".format(
+        b = build_emitter, t = target_emitter,
+        stage = tc._stage[BuildSettingInfo].value)
 
     outputs = []
     for f in ctx.files.runtimes:
@@ -48,8 +63,8 @@ def _boot_camlheaders(ctx):
         # )
 
         camlheader = ctx.actions.declare_file(workdir + "camlheader")
-        # print("Emitting camlheader: %s" % camlheader.path)
-        # print("  camlheader path: %s" % pfx + f.path)
+        print("Emitting camlheader: %s" % camlheader.path)
+        print("  camlheader path: %s" % pfx + f.path)
         ctx.actions.expand_template(
             output   = camlheader,
             template = ctx.file.template,
@@ -92,10 +107,10 @@ boot_camlheaders = rule(
     doc = "Generates camlheader files",
     exec_groups = {
         "boot": exec_group(
-            exec_compatible_with = [
-                "//platform/constraints/ocaml/executor:vm?",
-                "//platform/constraints/ocaml/emitter:vm"
-            ],
+            # exec_compatible_with = [
+            #     "//platform/constraints/ocaml/executor:vm?",
+            #     "//platform/constraints/ocaml/emitter:vm"
+            # ],
             toolchains = ["//boot/toolchain/type:boot"],
         ),
         # "baseline": exec_group(
@@ -108,7 +123,7 @@ boot_camlheaders = rule(
     },
 
     attrs = {
-        # "_stage"   : attr.label( default = "//bzl:stage" ),
+        # "_stage"   : attr.label( default = "//config/stage" ),
         "template" : attr.label(mandatory = True,allow_single_file=True),
         "runtimes" : attr.label_list(
             mandatory = True,

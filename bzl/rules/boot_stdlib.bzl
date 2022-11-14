@@ -11,10 +11,10 @@ boot_stdlib = rule(
     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
     exec_groups = {
         "boot": exec_group(
-            exec_compatible_with = [
-                "//platform/constraints/ocaml/executor:vm?",
-                "//platform/constraints/ocaml/emitter:vm"
-            ],
+            # exec_compatible_with = [
+            #     "//platform/constraints/ocaml/executor:vm?",
+            #     "//platform/constraints/ocaml/emitter:vm"
+            # ],
             toolchains = ["//boot/toolchain/type:boot"],
         ),
         # "baseline": exec_group(
@@ -30,7 +30,7 @@ boot_stdlib = rule(
         archive_attrs(),
 
         # only boot_stdlib and boot_compiler have a public 'stage' attr
-        stage = attr.label( default = "//bzl:stage" ),
+        # stage = attr.label( default = "//config/stage" ),
 
         _rule = attr.string( default = "boot_stdlib" ),
 

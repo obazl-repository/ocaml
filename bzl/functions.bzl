@@ -20,6 +20,12 @@ load("//bzl:providers.bzl",
 
 WARNING_FLAGS = "@1..3@5..28@30..39@43@46..47@49..57@61..62-40"
 
+##########################################
+def tc_compiler(tc): return tc.compiler[0]
+
+####################################
+def tc_lexer(tc): return tc.lexer[0]
+
 ######################
 def stage_name(_stage):
     stage = _stage[BuildSettingInfo].value

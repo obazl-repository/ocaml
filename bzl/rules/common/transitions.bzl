@@ -3,26 +3,68 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 ## exports: boot_toolchain_adapter (rule). includes stuff only
 ## used during bootstrapping, e.g. primitives.
 
-# ##################################################
-# def _toolchain_in_transition_impl(settings, attr):
-#     # print("toolchain_in_transition_impl")
+##################################################
+def _toolchain_in_transition_impl(settings, attr):
+    # sets the compiler
+    print("toolchain_in_transition_impl")
 
-#     ## trying to make sure ocamlrun is only built once
+    # set platforms
+    build_host  = settings["//command_line_option:host_platform"]
+    print("  host_platform: %s" % build_host)
 
-#     return {
-#         "//bzl/toolchain:ocamlrun" : "//boot/baseline:ocamlrun"
-#     }
+    target_host = settings["//command_line_option:platforms"]
+    print("  platforms: %s" % target_host)
 
-# #######################
-# toolchain_in_transition = transition(
-#     implementation = _toolchain_in_transition_impl,
-#     inputs = [
-#         "//bzl/toolchain:ocamlrun"
-#     ],
-#     outputs = [
-#         "//bzl/toolchain:ocamlrun"
-#     ]
-# )
+    # if hasattr(attr, "stage"):
+    #     print("  stage: %s" % attr.stage)
+    #     print("  bzl stage: %s" % settings["//config/stage"])
+    stage = settings["//config/stage"]
+    print("  stage: %s" % stage)
+
+    if stage == 0:
+        # no change
+        return {}
+
+    stage = stage - 1
+
+    if stage == 0:  # boot
+        compiler = "//boot:ocamlc.byte"
+        lexer = "//boot:ocamllex.boot"
+        # lexer = "//boot:ocamllex.boot"
+    elif stage == 1: # dev built by baseline tc
+        compiler = "//boot/baseline:baseline" # ocamlc.byte"
+        lexer = "//boot/baseline:ocamllex.byte"
+    elif stage == 2:
+        compiler = "//dev/bin:ocamlc.byte"
+        lexer = "//dev/bin:ocamllex.byte"
+    else:
+        fail("UNHANDLED COMPILER STAGE: %s" % stage)
+    # else:
+    #     fail("compiler missing attr: stage")
+
+    return {
+        "//config/stage"              : stage,
+        "//boot/toolchain:compiler": compiler,
+        "//boot/toolchain:lexer"   : lexer
+    }
+
+#######################
+toolchain_in_transition = transition(
+    implementation = _toolchain_in_transition_impl,
+    inputs = [
+        "//command_line_option:host_platform",
+        "//command_line_option:platforms",
+        "//config/stage",
+    ],
+    outputs = [
+        # "//command_line_option:host_platform",
+        # "//command_line_option:platforms"
+        "//config/stage",
+        "//boot/toolchain:compiler",
+        "//boot/toolchain:lexer",
+        # "//boot/toolchain:stdlib"
+    ]
+)
 
 ###################################################
 ###################################################
@@ -35,37 +77,60 @@ def _compiler_in_transition_impl(settings, attr):
     target_host = settings["//command_line_option:platforms"]
     print("  platforms: %s" % target_host)
 
+    stage = settings["//config/stage"]
+    print("  stage: %s" % stage)
 
-    if hasattr(attr, "stage"):
-        print("  stage: %s" % attr.stage)
-        print("  bzl stage: %s" % settings["//bzl:stage"])
-        _stage = attr.stage
-        if _stage == "boot":
-            # no change
-            stage    = 0
-            compiler = "//boot:ocamlc.boot"
-            lexer = "//boot:ocamllex.boot"
-        elif _stage == "baseline":
-            stage    = 0  # baseline built by boot tc
-            # stage = "boot"
-            compiler = "//boot:ocamlc.byte"
-            lexer = "//boot:ocamllex.byte"
-            # lexer = "//boot:ocamllex.boot"
-        elif _stage == "dev":
-            stage = 1  # dev built by baseline tc
-            compiler = "//boot/baseline:ocamlc.byte"
-            lexer = "//boot/baseline:ocamllex.byte"
-        elif _stage == "prod":
-            stage = 2  # prod built by dev tc
-            compiler = "//dev/bin:ocamlc.byte"
-            lexer = "//dev/bin:ocamllex.byte"
-        else:
-            fail("UNHANDLED COMPILER STAGE: %s" % stage)
+    if stage == 0:
+        # no change
+        return {}
+
+    stage = stage - 1
+
+    if stage == 0:  # boot
+        compiler = "//boot:ocamlc.byte"
+        lexer = "//boot:ocamllex.boot"
+        # lexer = "//boot:ocamllex.boot"
+    elif stage == 1: # dev built by baseline tc
+        compiler = "//boot/baseline/compiler:baseline" # ocamlc.byte"
+        lexer = "//boot/baseline/compiler:ocamllex.byte"
+    elif stage == 2:
+        compiler = "//boot/baseline/compiler:baseline" # ocamlc.byte"
+        lexer = "//boot/baseline/compiler:ocamllex.byte"
+        # compiler = "//dev/bin:ocamlc.dev"
+        # lexer = "//dev/bin:ocamllex.byte"
     else:
-        fail("compiler missing attr: stage")
+        fail("UNHANDLED COMPILER STAGE: %s" % stage)
+
+    # if hasattr(attr, "stage"):
+    #     print("  stage: %s" % attr.stage)
+    #     print("  bzl stage: %s" % settings["//config/stage"])
+    #     _stage = attr.stage
+    #     if _stage == "boot":
+    #         # no change
+    #         stage    = 0
+    #         compiler = "//boot:ocamlc.boot"
+    #         lexer = "//boot:ocamllex.boot"
+    #     elif _stage == "baseline":
+    #         stage    = 0  # baseline built by boot tc
+    #         # stage = "boot"
+    #         compiler = "//boot:ocamlc.byte"
+    #         lexer = "//boot:ocamllex.byte"
+    #         # lexer = "//boot:ocamllex.boot"
+    #     elif _stage == "dev":
+    #         stage = 1  # dev built by baseline tc
+    #         compiler = "//boot/baseline:ocamlc.byte"
+    #         lexer = "//boot/baseline:ocamllex.byte"
+    #     elif _stage == "prod":
+    #         stage = 2  # prod built by dev tc
+    #         compiler = "//dev/bin:ocamlc.byte"
+    #         lexer = "//dev/bin:ocamllex.byte"
+    #     else:
+    #         fail("UNHANDLED COMPILER STAGE: %s" % stage)
+    # else:
+    #     fail("compiler missing attr: stage")
 
     return {
-        "//bzl:stage"              : stage,
+        "//config/stage"              : stage,
         "//boot/toolchain:compiler": compiler,
         "//boot/toolchain:lexer"   : lexer
     }
@@ -73,14 +138,14 @@ def _compiler_in_transition_impl(settings, attr):
 compiler_in_transition = transition(
     implementation = _compiler_in_transition_impl,
     inputs  = [
-        "//bzl:stage",
+        "//config/stage",
         "//boot/toolchain:compiler",
         "//boot/toolchain:lexer",
         "//command_line_option:host_platform",
         "//command_line_option:platforms"
     ],
     outputs = [
-        "//bzl:stage",
+        "//config/stage",
         "//boot/toolchain:compiler",
         "//boot/toolchain:lexer"
     ]
@@ -94,7 +159,7 @@ def _stdlib_in_transition_impl(settings, attr):
     ## same code as compiler_in_transition?
     if hasattr(attr, "stage"):
         print("  stage: %s" % attr.stage)
-        print("  bzl stage: %s" % settings["//bzl:stage"])
+        print("  bzl stage: %s" % settings["//config/stage"])
         _stage = attr.stage
         if _stage == "boot":
             stage    = 0
@@ -117,7 +182,7 @@ def _stdlib_in_transition_impl(settings, attr):
         fail("stdlib missing attr: stage")
 
     return {
-        "//bzl:stage"              : stage,
+        "//config/stage"              : stage,
         "//boot/toolchain:compiler": compiler,
         "//boot/toolchain:lexer"   : lexer,
         "//boot/toolchain:stdlib"  : stdlib
@@ -130,13 +195,13 @@ stdlib_in_transition = transition(
     ## the compiler target.
     implementation = _stdlib_in_transition_impl,
     inputs  = [
-        "//bzl:stage",
+        "//config/stage",
         "//boot/toolchain:compiler",
         "//boot/toolchain:lexer",
         "//boot/toolchain:stdlib"
     ],
     outputs = [
-        "//bzl:stage",
+        "//config/stage",
         "//boot/toolchain:compiler",
         "//boot/toolchain:lexer",
         "//boot/toolchain:stdlib"
@@ -232,9 +297,9 @@ exe_deps_out_transition = transition(
 
 
 #####################################################
-def _compiler_out_transition_impl(settings, attr):
+def _tc_compiler_out_transition_impl(settings, attr):
 
-    print("compiler_out_transition")
+    print("tc_compiler_out_transition")
 
     build_host  = settings["//command_line_option:host_platform"]
     target_host = settings["//command_line_option:platforms"]
@@ -242,21 +307,57 @@ def _compiler_out_transition_impl(settings, attr):
 
     print("platforms: %s" % target_host)
 
-    return {} # nop
-    #     "//command_line_option:host_platform" : build_host,
-    #     "//command_line_option:platforms"     : target_host
-    # }
+    build_host  = settings["//command_line_option:host_platform"]
+    print("  host_platform: %s" % build_host)
+
+    target_host = settings["//command_line_option:platforms"]
+    print("  platforms: %s" % target_host)
+
+    stage = settings["//config/stage"]
+    print("  stage: %s" % stage)
+
+    if stage == 0:
+        # no change
+        return {}
+
+    stage = stage - 1
+
+    if stage == 0:  # boot
+        compiler = "//boot:ocamlc.boot"
+        lexer = "//boot:ocamllex.boot"
+    elif stage == 1: # dev built by baseline tc
+        compiler = "//boot/baseline/compiler:baseline" # ocamlc.byte"
+        # lexer = "//boot:ocamllex.boot"
+        lexer = "//boot/baseline/compiler:ocamllex.byte"
+    elif stage == 2:
+        compiler = "//boot/baseline/compiler:baseline" # ocamlc.byte"
+        # lexer = "//boot:ocamllex.boot"
+        lexer = "//boot/baseline/compiler:ocamllex.byte"
+        # compiler = "//dev/bin:ocamlc.dev"
+        # lexer = "//dev/bin:ocamllex.byte"
+    else:
+        fail("UNHANDLED COMPILER STAGE: %s" % stage)
+
+    return {
+        "//config/stage"              : stage,
+        "//boot/toolchain:compiler": compiler,
+        "//boot/toolchain:lexer"   : lexer
+    }
 
 #######################
-compiler_out_transition = transition(
-    implementation = _compiler_out_transition_impl,
+tc_compiler_out_transition = transition(
+    implementation = _tc_compiler_out_transition_impl,
     inputs = [
         "//command_line_option:host_platform",
-        "//command_line_option:platforms"
+        "//command_line_option:platforms",
+        "//config/stage",
+        "//boot/toolchain:compiler",
+        "//boot/toolchain:lexer"
     ],
     outputs = [
-        "//command_line_option:host_platform",
-        "//command_line_option:platforms"
+        "//config/stage",
+        "//boot/toolchain:compiler",
+        "//boot/toolchain:lexer"
     ]
 )
 
@@ -272,8 +373,8 @@ def _emitter_out_transition_impl(settings, attr):
     print("  platforms: %s" % target_host)
 
     return {
-        "//bzl:build_emitter": "arm64",
-        "//bzl:target_emitter": "amd64"
+        "//config/build/emitter": "arm64",
+        "//config/target/emitter": "amd64"
     }
 
 #######################
@@ -284,8 +385,8 @@ emitter_out_transition = transition(
         "//command_line_option:platforms"
     ],
     outputs = [
-        "//bzl:build_emitter",
-        "//bzl:target_emitter"
+        "//config/build/emitter",
+        "//config/target/emitter"
     ]
 )
 

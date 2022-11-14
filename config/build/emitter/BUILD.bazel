@@ -1,0 +1,42 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "int_flag", "int_setting",
+     "string_flag", "string_setting"
+)
+load("//config:BUILD.bzl", "emitter_setting")
+
+string_flag(
+    name = "emitter",
+    build_setting_default = "vm",
+    values = ["vm", "sys"],
+    visibility = ["//visibility:public"]
+)
+
+emitter_setting(
+    name = "build_emitter",
+    build_setting_default = "null",
+    emitter = select({
+        # if //config/emitter/build set, use it
+        # use use platform default
+        "//platform/constraints/ocaml/build/emitter:sys?": "sys",
+        "//platform/constraints/ocaml/build/emitter:vm?": "vm",
+    }),
+    visibility = ["//visibility:public"]
+)
+
+emitter_setting(
+    name = "target_emitter",
+    build_setting_default = "null",
+    emitter = select({
+        "//platform/constraints/ocaml/target/emitter:sys?": "sys",
+        "//platform/constraints/ocaml/target/emitter:vm?": "vm",
+    }),
+    visibility = ["//visibility:public"]
+)
+
+# string_setting(
+#     name = "emitter",
+#     values = ["vm", "sys", "amd64", "arm64"],
+#     build_setting_default = "vm",
+#     visibility = ["//visibility:public"]
+# )
+

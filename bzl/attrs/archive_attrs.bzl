@@ -13,7 +13,7 @@ def archive_attrs():
     return dict(
 
         # _stage = attr.label(
-        #     default = "//bzl:stage"
+        #     default = "//config/stage"
         # ),
 
         opts             = attr.string_list(

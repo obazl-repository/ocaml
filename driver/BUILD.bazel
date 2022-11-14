@@ -24,8 +24,6 @@ SIG_OPTS    = [] # OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # SIG_OPTS    = ROOT_MODULE_OPTS
 
-STDLIB = []
-
 # boot_archive(
 boot_library(
     name = "driver",
@@ -81,7 +79,7 @@ compiler_module(
     struct = "compenv.ml",
     sig    = "Compenv_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location",
         # "//stdlib:Stdlib.Arg",
         # "//stdlib:Stdlib.Filename",
@@ -111,7 +109,7 @@ compiler_signature(
     name = "Compenv_cmi",
     src  = "compenv.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
         "//utils:Clflags_cmi",
         "//stdlib:Stdlib.Arg",
@@ -123,7 +121,7 @@ compiler_module(
     struct = "compile.ml",
     sig    = "Compile_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Compile_common", ## (Driver Compile_common)
         "//typing:Typedtree",
         "//lambda:Translmod",
@@ -143,7 +141,7 @@ compiler_signature(
     name = "Compile_cmi",
     src  = "compile.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Compile_common", ## (Driver Compile_common)
         "//typing:Typedtree",
         "//bytecomp:Instruct_cmi",
@@ -157,7 +155,7 @@ compiler_module(
     struct = "compile_common.ml",
     sig    = "Compile_common_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Pparse", ## (Driver Pparse)
         ":Compmisc", ## (Driver Compmisc)
         ":Compenv", ## (Driver Compenv)
@@ -188,7 +186,7 @@ compiler_signature(
     name = "Compile_common_cmi",
     src  = "compile_common.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//typing:Typedtree_cmi",
         "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Format",
@@ -201,7 +199,7 @@ compiler_module(
     struct = "compmisc.ml",
     sig    = "Compmisc_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Compenv", ## (Driver Compenv)
         "//utils:Warnings",
         "//typing:Types",
@@ -229,7 +227,7 @@ compiler_signature(
     name = "Compmisc_cmi",
     src  = "compmisc.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
         "//typing:Env_cmi",
         "//utils:Clflags",
@@ -241,7 +239,7 @@ compiler_module(
     struct = "errors.ml",
     sig    = "Errors_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location"
     ],
     visibility = ["//bytecomp:__pkg__"]
@@ -251,7 +249,7 @@ compiler_signature(
     name = "Errors_cmi",
     src  = "errors.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
     ]
 )
@@ -260,7 +258,7 @@ compiler_module(
     name   = "Main",
     struct = "main.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
-    deps   = STDLIB + [
+    deps   = [
         ":Maindriver", ## (Driver Maindriver)
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Format",
@@ -277,7 +275,7 @@ compiler_module(
     struct = "main_args.ml",
     sig    = "Main_args_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Compenv", ## (Driver Compenv)
         "//utils:Warnings",
         "//stdlib:Stdlib.Sys",
@@ -307,7 +305,7 @@ compiler_signature(
     name = "Main_args_cmi",
     src  = "main_args.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Arg",
     ]
 )
@@ -317,7 +315,7 @@ compiler_module(
     struct = "maindriver.ml",
     sig    = "Maindriver_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Makedepend", ## (Driver Makedepend)
         ":Main_args", ## (Driver Main_args)
         ":Compmisc", ## (Driver Compmisc)
@@ -347,7 +345,7 @@ compiler_signature(
     name = "Maindriver_cmi",
     src  = "maindriver.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
     ]
 )
@@ -357,7 +355,7 @@ compiler_module(
     struct = "makedepend.ml",
     sig    = "Makedepend_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Depend",
         "//parsing:Lexer",
         "//parsing:Location",
@@ -390,7 +388,7 @@ compiler_signature(
     name = "Makedepend_cmi",
     src  = "makedepend.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib_cmi",
     ]
@@ -401,7 +399,7 @@ compiler_module(
     struct = "optcompile.ml",
     sig    = "Optcompile_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Compile_common", ## (Driver Compile_common)
         "//typing:Typedtree",
         "//lambda:Translmod",
@@ -423,7 +421,7 @@ compiler_signature(
     name = "Optcompile_cmi",
     src  = "optcompile.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Compile_common", ## (Driver Compile_common)
         "//typing:Typedtree",
         "//utils:Clflags",
@@ -436,7 +434,7 @@ compiler_module(
     struct = "opterrors.ml",
     sig    = "Opterrors_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Location"
     ],
     visibility = ["//asmcomp:__pkg__"]
@@ -446,7 +444,7 @@ compiler_signature(
     name = "Opterrors_cmi",
     src  = "opterrors.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//stdlib:Stdlib.Format",
     ]
 )
@@ -455,7 +453,7 @@ compiler_module(
     name   = "Optmain",
     struct = "optmain.ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
-    deps   = STDLIB + [
+    deps   = [
         ":Optmaindriver",
     ],
     visibility = [
@@ -471,7 +469,7 @@ compiler_module(
     struct = "optmaindriver.ml",
     sig    = "Optmaindriver_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         ":Optcompile", ## (Driver Optcompile)
         ":Makedepend", ## (Driver Makedepend)
         ":Main_args", ## (Driver Main_args)
@@ -505,7 +503,7 @@ compiler_signature(
     name = "Optmaindriver_cmi",
     src  = "optmaindriver.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//middle_end:Backend_intf_cmi",
         "//stdlib:Stdlib.Format",
     ]
@@ -516,7 +514,7 @@ compiler_module(
     struct = "pparse.ml",
     sig    = "Pparse_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//utils:Warnings",
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
@@ -546,7 +544,7 @@ compiler_signature(
     name = "Pparse_cmi",
     src  = "pparse.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
+    deps   = [
         "//parsing:Parsetree_cmi",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Format",

@@ -10,7 +10,7 @@ def executable_attrs():
     attrs = dict(
 
         # _stage = attr.label(
-        #     default = "//bzl:stage"
+        #     default = "//config/stage"
         # ),
 
         main = attr.label(

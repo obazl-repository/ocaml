@@ -8,7 +8,7 @@ load("//bzl:providers.bzl",
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
-load("//bzl:functions.bzl", "stage_name")
+load("//bzl:functions.bzl", "stage_name", "tc_compiler")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -24,7 +24,23 @@ def archive_impl(ctx):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    workdir = "_{}/".format(stage_name(tc._stage))
+    # workdir = "_{}/".format(stage_name(tc._stage))
+
+    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    # print("BEMITTER: %s" % build_emitter)
+
+    target_emitter = tc._target_emitter[BuildSettingInfo].value
+
+    if build_emitter == "vm":
+        ext = ".cmo"
+    elif build_emitter == "sys":
+        ext = ".cmx"
+    else:
+        fail("Bad build_emitter: %s" % build_emitter)
+
+    workdir = "_{b}{t}{stage}/".format(
+        b = build_emitter, t = target_emitter,
+        stage = tc._stage[BuildSettingInfo].value)
 
     # print("archive _stage: %s" % stage)
 
@@ -132,13 +148,13 @@ def archive_impl(ctx):
     args = ctx.actions.args()
 
     tool = None
-    for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
         if f.basename == "ocamlrun":
             # print("LEX RF: %s" % f.path)
             tool = f
 
     # the bytecode executable
-    args.add(tc.compiler[DefaultInfo].files_to_run.executable.path)
+    args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
 
     if hasattr(ctx.attr, "use_prims"):
         if ctx.attr.use_prims:
@@ -409,7 +425,7 @@ def archive_impl(ctx):
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
-        tools = [tc.compiler[DefaultInfo].files_to_run],
+        tools = [tc_compiler(tc)[DefaultInfo].files_to_run],
         mnemonic = mnemonic,
         progress_message = "{mode} archiving {rule}: @{ws}//{pkg}:{tgt}".format(
             mode = tc.build_host + ">" + tc.target_host[BuildSettingInfo].value,

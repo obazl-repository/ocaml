@@ -3,7 +3,9 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
 load("//bzl/rules/common:transitions.bzl",
-     "emitter_out_transition", "compiler_out_transition")
+     "emitter_out_transition",
+     "tc_compiler_out_transition",
+     "toolchain_in_transition")
 
 ##########################################
 def _toolchain_adapter_impl(ctx):
@@ -41,7 +43,7 @@ toolchain_adapter = rule(
     _toolchain_adapter_impl,
     attrs = {
         "_stage" : attr.label( # int_flag
-            default = "//bzl:stage"
+            default = "//config/stage"
         ),
 
         "build_host": attr.string(
@@ -53,11 +55,11 @@ toolchain_adapter = rule(
             default = "//config:target_host"
         ),
         "_build_emitter" : attr.label(
-            default = "//bzl:build_emitter",
+            default = "//config/build/emitter",
             # cfg = emitter_out_transition,
         ),
         "_target_emitter" : attr.label(
-            default = "//bzl:target_emitter",
+            default = "//config/target/emitter",
             # cfg = emitter_out_transition,
         ),
         "xtarget_host": attr.label(
@@ -120,14 +122,15 @@ toolchain_adapter = rule(
             default = "//boot/toolchain:compiler",
             allow_files = True,
             executable = True,
-            cfg = "exec"
-            # cfg = compiler_out_transition
+            # cfg = "exec"
+            cfg = tc_compiler_out_transition
         ),
 
         "lexer": attr.label(
             default = "//boot/toolchain:lexer",
             executable = True,
-            cfg = "exec",
+            # cfg = "exec",
+            cfg = tc_compiler_out_transition
         ),
 
         "yaccer": attr.label(
@@ -160,8 +163,8 @@ toolchain_adapter = rule(
         #     default = ["-Wl,-no_compact_unwind"]
         # ),
 
-        # "_allowlist_function_transition": attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
     # cfg = toolchain_in_transition,
@@ -181,60 +184,60 @@ toolchain_adapter = rule(
 
 ################################################################
 ##########################################
-def _stdlib_toolchain_adapter_impl(ctx):
+# def _stdlib_toolchain_adapter_impl(ctx):
 
-    return [platform_common.ToolchainInfo(
-        # Public fields
-        name                   = ctx.label.name,
-        build_host             = ctx.attr.build_host,
-        target_host            = ctx.attr.target_host,
-        ## runtime
-        stdlib                 = ctx.attr.stdlib,
-        std_exit               = ctx.file.std_exit,
-        # camlheaders            = ctx.files.camlheaders,
-    )]
+#     return [platform_common.ToolchainInfo(
+#         # Public fields
+#         name                   = ctx.label.name,
+#         build_host             = ctx.attr.build_host,
+#         target_host            = ctx.attr.target_host,
+#         ## runtime
+#         stdlib                 = ctx.attr.stdlib,
+#         std_exit               = ctx.file.std_exit,
+#         # camlheaders            = ctx.files.camlheaders,
+#     )]
 
-###################################
-## the rule interface
-stdlib_toolchain_adapter = rule(
-    _stdlib_toolchain_adapter_impl,
-    attrs = {
-        "stdlib": attr.label(
-            default   = "//boot/toolchain:stdlib",
-            executable = False,
-            # allow_single_file = True,
-            # cfg = "exec",
-        ),
+# ###################################
+# ## the rule interface
+# stdlib_toolchain_adapter = rule(
+#     _stdlib_toolchain_adapter_impl,
+#     attrs = {
+#         "stdlib": attr.label(
+#             default   = "//boot/toolchain:stdlib",
+#             executable = False,
+#             # allow_single_file = True,
+#             # cfg = "exec",
+#         ),
 
-        "std_exit": attr.label(
-            default = Label("//boot/toolchain:std_exit"),
-            executable = False,
-            allow_single_file = True,
-            # cfg = "exec",
-        ),
+#         "std_exit": attr.label(
+#             default = Label("//boot/toolchain:std_exit"),
+#             executable = False,
+#             allow_single_file = True,
+#             # cfg = "exec",
+#         ),
 
-        # "camlheaders": attr.label_list(
-        #     allow_files = True,
-        #     default = ["//stdlib:camlheaders"]
-        # ),
+#         # "camlheaders": attr.label_list(
+#         #     allow_files = True,
+#         #     default = ["//stdlib:camlheaders"]
+#         # ),
 
-        "build_host": attr.string(
-            doc     = "OCaml host platform: vm (bytecode) or an arch.",
-            default = "vm"
-        ),
-        "target_host": attr.string(
-            doc     = "OCaml target platform: vm (bytecode) or an arch.",
-            default = "vm"
-        ),
-        "xtarget_host": attr.string(
-            doc     = "Cross-cross target platform: vm (bytecode) or an arch.",
-            default = ""
-        ),
+#         "build_host": attr.string(
+#             doc     = "OCaml host platform: vm (bytecode) or an arch.",
+#             default = "vm"
+#         ),
+#         "target_host": attr.string(
+#             doc     = "OCaml target platform: vm (bytecode) or an arch.",
+#             default = "vm"
+#         ),
+#         "xtarget_host": attr.string(
+#             doc     = "Cross-cross target platform: vm (bytecode) or an arch.",
+#             default = ""
+#         ),
 
 
 
-    },
-    # cfg = toolchain_in_transition,
-    doc = "Defines a stdlib for bootstrapping the OCaml toolchain",
-    provides = [platform_common.ToolchainInfo],
-)
+#     },
+#     cfg = toolchain_in_transition,
+#     doc = "Defines a stdlib for bootstrapping the OCaml toolchain",
+#     provides = [platform_common.ToolchainInfo],
+# )

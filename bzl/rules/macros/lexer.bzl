@@ -4,7 +4,7 @@ load("//bzl:rules.bzl", "boot_compiler", "boot_executable")
 # bazel query --output=build //dev/bin:ocamllex.byte
 
 def lexer(name,
-          stage = None,
+          # stage = None,
           build_host_constraints = None,
           target_host_constraints = None,
           opts = False,
@@ -23,7 +23,7 @@ def lexer(name,
 
     boot_compiler(
         name       = name,
-        stage      = stage,
+        # stage      = stage,
         prologue   = ["//lex"],
         main       = "//lex:Main",
         opts       = select({

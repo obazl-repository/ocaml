@@ -35,7 +35,7 @@ sh_binary(
 
 ################################################################
 boot_import_tool(
-    name = "ocamlc.byte",
+    name = "ocamlc.boot",
     tool = "ocamlc",
     data = [
         "//runtime:ocamlrun",
@@ -63,7 +63,7 @@ sh_binary(
 
 ################################################################
 boot_import_tool(
-    name = "ocamllex.byte",
+    name = "ocamllex.boot",
     tool = "ocamllex",
     data = ["//runtime:ocamlrun"],
 )

@@ -19,10 +19,10 @@ dependencies under a single label, packaged in a
 
     exec_groups = {
         "boot": exec_group(
-            exec_compatible_with = [
-                "//platform/constraints/ocaml/executor:vm?",
-                "//platform/constraints/ocaml/emitter:vm"
-            ],
+            # exec_compatible_with = [
+            #     "//platform/constraints/ocaml/executor:vm?",
+            #     "//platform/constraints/ocaml/emitter:vm"
+            # ],
             toolchains = ["//boot/toolchain/type:boot"],
         ),
         # "baseline": exec_group(

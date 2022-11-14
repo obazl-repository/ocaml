@@ -5,7 +5,8 @@ load("//bzl:providers.bzl",
      "BootInfo", "ModuleInfo",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
-load("//bzl:functions.bzl", "get_module_name", "stage_name")
+load("//bzl:functions.bzl",
+     "get_module_name", "stage_name", "tc_compiler")
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:options.bzl", "get_options")
@@ -35,7 +36,22 @@ def module_impl(ctx, module_name):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    workdir = "_{}/".format(stage_name(tc._stage))
+    build_emitter = tc._build_emitter[BuildSettingInfo].value
+
+    # print("BEMITTER: %s" % build_emitter)
+
+    target_emitter = tc._target_emitter[BuildSettingInfo].value
+
+    if build_emitter == "vm":
+        ext = ".cmo"
+    elif build_emitter == "sys":
+        ext = ".cmx"
+    else:
+        fail("Bad build_emitter: %s" % build_emitter)
+
+    workdir = "_{b}{t}{stage}/".format(
+        b = build_emitter, t = target_emitter,
+        stage = tc._stage[BuildSettingInfo].value)
 
     # workdir = "_{}/".format(stage)
 
@@ -55,19 +71,6 @@ def module_impl(ctx, module_name):
     #         "//boot/toolchain/type:boot"]
 
     # if //platform/constraints/ocaml/emitter:vm?
-
-    build_emitter = tc._build_emitter[BuildSettingInfo].value
-    # print("BEMITTER: %s" % build_emitter)
-
-    target_emitter = tc._target_emitter[BuildSettingInfo].value
-    # print("TEMITTER: %s" % target_emitter)
-
-    if build_emitter == "vm":
-        ext = ".cmo"
-    elif build_emitter == "sys":
-        ext = ".cmx"
-    else:
-        fail("Bad build_emitter: %s" % build_emitter)
 
     ################################################################
     ################  OUTPUTS  ################
@@ -299,13 +302,13 @@ def module_impl(ctx, module_name):
 
     ## ocamlrun
     tool = None
-    for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
         if f.basename == "ocamlrun":
             # print("LEX RF: %s" % f.path)
             tool = f
 
     # the bytecode executable
-    args.add(tc.compiler[DefaultInfo].files_to_run.executable.path)
+    args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
 
     if ctx.attr.use_prims == True:
         args.add_all(["-use-prims", ctx.file._primitives.path])
@@ -392,7 +395,7 @@ def module_impl(ctx, module_name):
         arguments = [args],
         inputs    = inputs_depset,
         outputs   = action_outputs,
-        tools = [tc.compiler[DefaultInfo].files_to_run],
+        tools = [tc_compiler(tc)[DefaultInfo].files_to_run],
         # tools = [tc.tool_runner, tc.compiler],
         # tools = [tool] + tool_args,
         mnemonic = "CompileBootstrapModule",

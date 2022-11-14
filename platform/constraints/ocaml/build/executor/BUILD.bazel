@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+constraint_setting(name = "executor",
+                   default_constraint_value = ":vm?")
+
+## Executor is always vm or sys; the latter matches whatever the
+## runtime is (amd64 or whatever).
+
+constraint_value(name = "sys", constraint_setting = ":executor")
+alias(name = "sys?", actual = ":sys")
+
+constraint_value(name = "vm", constraint_setting = ":executor")
+alias(name = "vm?", actual = ":vm")

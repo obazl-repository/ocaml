@@ -1,13 +1,18 @@
 exports_files(["BUILD.bazel"])
 
-load(":BUILD.bzl", "toolchain_adapter", "stdlib_toolchain_adapter")
+load(":BUILD.bzl", "toolchain_adapter") # , "stdlib_toolchain_adapter")
+
+################################
+# boot toolchain only used to produce a new ocamlc.byte. no point in
+# producing the others, since they have to be recompiled anyway using
+# the new ocamlc.byte.
 
 ##################
 toolchain_adapter(
     name        = "boot",
     build_host  = "boot",
-    compiler    = "//boot:ocamlc.byte",
-    lexer       = "//boot:ocamllex.byte",
+    # compiler    = "//boot:ocamlc.byte",
+    # lexer       = "//boot:ocamllex.byte",
     # yaccer      = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
     # runtime = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
@@ -30,12 +35,16 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
+################################################################
+# baseline tc uses new ocamlc.byte (produced by boot tc) to recompile
+# the whole schmear.
+
 ##################
 toolchain_adapter(
     name        = "baseline",
     build_host  = "baseline",
     # target_host = "baseline",
-    compiler    = "//boot:ocamlc.byte",
+    compiler    = "//boot/baseline/compiler:baseline",
     # lexer       = "//lex:ocamllex",
     # yaccer      = "//yacc:ocamlyacc",
     ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
@@ -90,10 +99,10 @@ toolchain_adapter(
 
 ################################################################
 ##################
-stdlib_toolchain_adapter(
-    name        = "stdlib",
-    build_host  = "stdib",
-    # target_host = "stdlib",
-)
+# stdlib_toolchain_adapter(
+#     name        = "stdlib",
+#     build_host  = "stdib",
+#     # target_host = "stdlib",
+# )
 
 

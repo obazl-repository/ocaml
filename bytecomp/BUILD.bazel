@@ -528,13 +528,14 @@ genrule(
     name  = "opcodes_ml",
     srcs  = ["//runtime/caml:instruct.h", "//tools:make_opcodes"],
     tools = [
-        "//boot/baseline:ocamlrun", #  FIXME- makefile runs under runtime/ocamlrun
+        "//runtime:ocamlrun"
+        # "//boot/baseline:ocamlrun", #  FIXME- makefile runs under runtime/ocamlrun
         # "//tools:make_opcodes" # no need to transition to exec target
     ],
     cmd   = " ".join([
         # "$(execpath {NEW_OCAMLRUN})".format(
         #     NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
-        "$(execpath //boot/baseline:ocamlrun)",
+        "$(execpath //runtime:ocamlrun)",
         "$(location //tools:make_opcodes)",
         "-opcodes",
         "< $(location //runtime/caml:instruct.h)",

@@ -6,7 +6,7 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker"
 )
 
-load("//bzl:functions.bzl", "stage_name")
+load("//bzl:functions.bzl", "stage_name", "tc_compiler")
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
@@ -37,10 +37,26 @@ def executable_impl(ctx):  ## , tc):
     tc = ctx.exec_groups["boot"].toolchains[
         "//boot/toolchain/type:boot"]
 
-    if ctx.attr._rule == "boot_compiler":
-        workdir = "_{}/".format(ctx.attr.stage)
+    # if ctx.attr._rule == "boot_compiler":
+    #     workdir = "_{}/".format(ctx.attr.stage)
+    # else:
+    #     workdir = "_{}/".format(stage_name(tc._stage))
+
+    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    # print("BEMITTER: %s" % build_emitter)
+
+    target_emitter = tc._target_emitter[BuildSettingInfo].value
+
+    if build_emitter == "vm":
+        ext = ".cmo"
+    elif build_emitter == "sys":
+        ext = ".cmx"
     else:
-        workdir = "_{}/".format(stage_name(tc._stage))
+        fail("Bad build_emitter: %s" % build_emitter)
+
+    workdir = "_{b}{t}{stage}/".format(
+        b = build_emitter, t = target_emitter,
+        stage = tc._stage[BuildSettingInfo].value)
 
     # print("executable _stage: %s" % tc._stage)
 
@@ -147,13 +163,13 @@ def executable_impl(ctx):  ## , tc):
     args = ctx.actions.args()
 
     tool = None
-    for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
         if f.basename == "ocamlrun":
             # print("LEX RF: %s" % f.path)
             tool = f
 
     # the bytecode executable
-    args.add(tc.compiler[DefaultInfo].files_to_run.executable.path)
+    args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
 
     if hasattr(ctx.attr, "use_prims"):
         if ctx.attr.use_prims:
@@ -187,7 +203,7 @@ def executable_impl(ctx):  ## , tc):
     # includes.append(ctx.file._std_exit.dirname)
 
     # compiler_runfiles = []
-    # for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
     #     if rf.short_path.startswith("stdlib"):
     #         # print("STDLIB: %s" % rf)
     #         # args.add("-DFOOBAR")
@@ -235,8 +251,8 @@ def executable_impl(ctx):  ## , tc):
 
     args.add("-o", out_exe)
 
-    if tc.compiler[DefaultInfo].default_runfiles:
-        runfiles = tc.compiler[DefaultInfo].default_runfiles
+    if tc_compiler(tc)[DefaultInfo].default_runfiles:
+        runfiles = tc_compiler(tc)[DefaultInfo].default_runfiles
     else:
         runfiles = []
 
@@ -252,7 +268,7 @@ def executable_impl(ctx):  ## , tc):
         # compiler runfiles contain camlheader files & stdlib:
         # + ctx.files._camlheaders
         # + camlheader_deps
-        + tc.compiler[DefaultInfo].files_to_run
+        + tc_compiler(tc)[DefaultInfo].files_to_run
         + runfiles
         ,
         transitive = []
@@ -286,7 +302,7 @@ def executable_impl(ctx):  ## , tc):
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
 
-    # for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
     #     if rf.path.endswith("ocamlrun"):
     #         print("exec OCAMLRUN: %s" % rf)
 
@@ -294,11 +310,11 @@ def executable_impl(ctx):  ## , tc):
     ctx.actions.run(
         # env = env,
         executable = tool,
-        # executable = tc.compiler[DefaultInfo].files_to_run,
+        # executable = tc_compiler(tc)[DefaultInfo].files_to_run,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_exe],
-        tools = [tc.compiler[DefaultInfo].files_to_run],
+        tools = [tc_compiler(tc)[DefaultInfo].files_to_run],
         # tools = [tool] + tool_args,  # [tc.ocamlopt],
         mnemonic = mnemonic,
         progress_message = "{mode} linking {rule}: {ws}//{pkg}:{tgt}".format(
@@ -314,7 +330,7 @@ def executable_impl(ctx):  ## , tc):
     #### RUNFILE DEPS ####
 
     compiler_runfiles = []
-    for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
         if rf.short_path.startswith("stdlib"):
             # print("STDLIB: %s" % rf)
             compiler_runfiles.append(rf)

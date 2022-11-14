@@ -1,5 +1,7 @@
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+
 load("//config:CONFIG.bzl", "OCAML_BINDIR")
-load("//bzl:functions.bzl", "stage_name")
+load("//bzl:functions.bzl", "stage_name", "tc_compiler")
 
 ########################
 def _boot_config(ctx):
@@ -9,7 +11,23 @@ def _boot_config(ctx):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    workdir = "_{}/".format(stage_name(tc._stage))
+    # workdir = "_{}/".format(stage_name(tc._stage))
+
+    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    # print("BEMITTER: %s" % build_emitter)
+
+    target_emitter = tc._target_emitter[BuildSettingInfo].value
+
+    if build_emitter == "vm":
+        ext = ".cmo"
+    elif build_emitter == "sys":
+        ext = ".cmx"
+    else:
+        fail("Bad build_emitter: %s" % build_emitter)
+
+    workdir = "_{b}{t}{stage}/".format(
+        b = build_emitter, t = target_emitter,
+        stage = tc._stage[BuildSettingInfo].value)
 
     # tc = None
     # if ctx.attr._stage == "boot":
@@ -24,7 +42,7 @@ def _boot_config(ctx):
     #         "//boot/toolchain/type:boot"]
 
     stdlib_dir = ""
-    for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
         # print("RF: %s" % rf.path)
         if rf.short_path.startswith("stdlib"):
             stdlib_dir = rf.dirname
@@ -37,7 +55,7 @@ def _boot_config(ctx):
         output   = config_hdr,
         substitutions = {
             "{BINDIR}" : OCAML_BINDIR,
-            "{STDLIB}" : "bazel-bin/stdlib/_build"
+            "{STDLIB}" : ctx.file.stdlib.dirname
         }
     )
 
@@ -77,6 +95,9 @@ boot_config = rule(
         ),
         header = attr.label(
             allow_single_file = True,
+        ),
+        stdlib = attr.label(
+            allow_single_file = True
         ),
         footer = attr.label(
             allow_single_file = True

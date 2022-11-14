@@ -16,10 +16,10 @@ build_tool = rule(
 
     exec_groups = {
         "boot": exec_group(
-            exec_compatible_with = [
-                "//platform/constraints/ocaml/executor:vm?",
-                "//platform/constraints/ocaml/emitter:vm"
-            ],
+            # exec_compatible_with = [
+            #     "//platform/constraints/ocaml/executor:vm?",
+            #     "//platform/constraints/ocaml/emitter:vm"
+            # ],
             toolchains = ["//boot/toolchain/type:boot"],
         ),
         # "baseline": exec_group(
@@ -34,7 +34,7 @@ build_tool = rule(
     attrs = dict(
         executable_attrs(),
 
-        # stage = attr.label(default = "//bzl:stage"),
+        # stage = attr.label(default = "//config/stage"),
 
         _rule = attr.string( default = "build_tool" ),
         # _allowlist_function_transition = attr.label(

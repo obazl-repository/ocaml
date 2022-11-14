@@ -37,63 +37,141 @@ package(default_visibility = ["//visibility:public"])
 #     //platform/constraints/ocaml/build/emitter:vm
 #     //platform/constraints/ocaml/target/emitter:vm
 
+# The problem with this is that Bazel does "toolchain transitions",
+# which set the target platform equal to the build platform. Then we
+# would end up without target emitters. But that is detectible: as
+# long as we follow our discipline, a missing target emitter will
+# always mean a toolchain transition, so we can use the build emitter
+# as the target emitter.
+
+## UPDATE: including build/target role in the platform will not work.
+## The toolchain transitions make it implausible.
+
+# But maybe that's better anyway. Conceptually, the emitter is not
+# really part of the toolchain: each executor has two emitters and can
+# be configured to use either. So we do not want to make emitter part
+# of the tool definition. Only the runtime and executor are needed for
+# that.
+
+# Emitters and stages will be expressed as config settings rather than
+# platform constraints. This is a more faithful model: we use the same
+# compiler with varying configurations. Config settings configure the
+# build, not the platform.
+
+# This also simplifies things considerably. We only have two
+# platforms, sys_vm and sys_sys. The rest is configuration.
+
 ################################################################
 platform(name = "sys", parents = ["@local_config_platform//:host"])
 
 platform(name = "sys_vm", parents = [":sys"],
          constraint_values = ["//platform/constraints/ocaml/executor:vm"])
+platform(name = "sys_sys", parents = [":sys"],
+         constraint_values = ["//platform/constraints/ocaml/executor:sys"])
 
-platform( ## only works on buildhost amd64
-    name = "amd64_vm",
-    constraint_values = [
-        "@platforms//cpu:x86_64",
-        "//platform/constraints/ocaml/executor:vm"])
+# platform(name = "sys_vm_build", parents = [":sys"],
+#          constraint_values = ["//platform/constraints/ocaml/build/executor:vm"])
+# platform(name = "sys_vm_target", parents = [":sys"],
+#          constraint_values = ["//platform/constraints/ocaml/target/executor:vm"])
 
-platform(name = "sys_vm_vm", parents = [":sys_vm"],
-         constraint_values = ["//platform/constraints/ocaml/emitter:vm"])
+# platform(name = "sys_sys_build", parents = [":sys"],
+#          constraint_values = [
+#              "//platform/constraints/ocaml/build/executor:sys"])
+# platform(name = "sys_sys_target", parents = [":sys"],
+#          constraint_values = [
+#              "//platform/constraints/ocaml/target/executor:sys"])
+
+# ocamlc.byte
+# platform(name = "sys_vm_vm", parents = [":sys_vm"],
+#          constraint_values = ["//platform/constraints/ocaml/emitter:vm"])
+
+# platform(name = "sys_vm_vm_build", parents = [":sys_vm_build"],
+#          constraint_values = ["//platform/constraints/ocaml/build/emitter:vm"])
+# platform(name = "sys_vm_vm_target", parents = [":sys_vm_target"],
+#          constraint_values = ["//platform/constraints/ocaml/target/emitter:vm"])
 
 # ocamlopt.byte
-platform(name = "sys_vm_sys", parents = [":sys_vm"],
-         constraint_values = ["//platform/constraints/ocaml/emitter:sys"])
+# platform(name = "sys_vm_sys", parents = [":sys_vm"],
+#          constraint_values = ["//platform/constraints/ocaml/emitter:sys"])
 
-# dev stages: boot, baseline, dev, prod
-platform(
-    name = "boot", parents = [":sys_vm_vm"],
-    constraint_values = ["//platform/constraints/stage:boot"],
-    exec_compatible_with  = [
-        "//platform/constraints/ocaml/executor:vm",
-        "//platform/constraints/ocaml/emitter:vm",
-        "//platform/constraints/stage:boot"
-    ]
-)
+# platform(name = "sys_vm_sys_build", parents = [":sys_vm_build"],
+#          constraint_values = [
+#              "//platform/constraints/ocaml/build/emitter:sys"
+#          ])
+# platform(name = "sys_vm_sys_target", parents = [":sys_vm_target"],
+#          constraint_values = ["//platform/constraints/ocaml/target/emitter:sys"])
 
-platform(name = "sys_vm_vm_baseline", parents = [":sys_vm_vm"],
-         constraint_values = ["//platform/constraints/stage:baseline"])
+################
+# ocamlc.opt
+# platform(name = "sys_sys_vm_build", parents = [":sys_sys_build"],
+#          constraint_values = ["//platform/constraints/ocaml/build/emitter:vm"])
 
-platform(name = "sys_vm_vm_dev", parents = [":sys_vm_vm"],
-         constraint_values = ["//platform/constraints/stage:dev"])
+# platform(name = "sys_sys_vm_target", parents = [":sys_sys_target"],
+#          constraint_values = ["//platform/constraints/ocaml/target/emitter:vm"])
+
 
 ################################################################
-platform(name = "sys_sys_sys",   # ocamlopt.opt
-         parents = ["@local_config_platform//:host"],
-         constraint_values = [
-             "//platform/constraints/ocaml/executor:sys",
-             "//platform/constraints/ocaml/emitter:sys"])
+# dev stages: boot, baseline, dev, prod
 
-platform(name = "sys_sys_vm",   # ocamlc.opt
-         parents = ["@local_config_platform//:host"],
-         constraint_values = [
-             # "@platforms//os:linux", "@platforms//cpu:x86_64",
-             "//platform/constraints/ocaml/executor:sys",
-             "//platform/constraints/ocaml/emitter:vm"])
+## the boot platforms have six constraints: runtime (implicit),
+## executor, emitter, role (build or target), and stage.
+## role is encoded in the package label:
+##   //platform/constraints/ocaml/build
+##   //platform/constraints/ocaml/target
+
+# platform(
+#     name = "boot_build",
+#     parents = [":sys_vm_vm_build"],
+#     constraint_values = ["//platform/constraints/stage:boot"],
+#     # exec_compatible_with  = [
+#     #     "//platform/constraints/ocaml/build/executor:vm",
+#     #     "//platform/constraints/ocaml/build/emitter:vm",
+#     #     "//platform/constraints/stage:boot"
+#     # ]
+# )
+
+# platform(
+#     name = "boot_target",
+#     parents = [":sys_vm_vm_target"],
+#     constraint_values = ["//platform/constraints/stage:boot"],
+#     # exec_compatible_with  = [
+#     #     "//platform/constraints/ocaml/target/executor:vm",
+#     #     "//platform/constraints/ocaml/target/emitter:vm",
+#     #     "//platform/constraints/stage:boot"
+#     # ]
+# )
+
+################################################################
+# platform(name = "baseline_build", parents = [":sys_vm_vm_build"],
+#          constraint_values = ["//platform/constraints/stage:baseline"])
+
+# platform(name = "baseline_vm_vm_target", parents = [":sys_vm_vm_target"],
+#          constraint_values = ["//platform/constraints/stage:baseline"])
+
+# platform(name = "baseline_vm_sys_target", parents = [":sys_vm_sys_target"],
+#          constraint_values = ["//platform/constraints/stage:baseline"])
+
+################################################################
+# platform(name = "sys_sys_sys",   # ocamlopt.opt
+#          parents = ["@local_config_platform//:host"],
+#          constraint_values = [
+#              "//platform/constraints/ocaml/executor:sys",
+#              "//platform/constraints/ocaml/emitter:sys"])
+
+# platform(name = "sys_sys_vm",   # ocamlc.opt
+#          parents = ["@local_config_platform//:host"],
+#          constraint_values = [
+#              # "@platforms//os:linux", "@platforms//cpu:x86_64",
+#              "//platform/constraints/ocaml/executor:sys",
+#              "//platform/constraints/ocaml/emitter:vm"])
 
 ################################################################
 #### cross-platform cross-compilation
 # targeting a system other than the local host
 
-platform(name = "linux_amd64_vm_vm", # ocamlc.byte on amd64 runtime
-         parents = ["@local_config_platform//:host"],
-         constraint_values = [
-             "@platforms//os:linux", "@platforms//cpu:x86_64",
-             "//platform/constraints/ocaml/executor:vm",
-             "//platform/constraints/ocaml/emitter:vm"])
+# platform(name = "linux_amd64_vm_vm", # ocamlc.byte on amd64 runtime
+#          parents = ["@local_config_platform//:host"],
+#          constraint_values = [
+#              "@platforms//os:linux", "@platforms//cpu:x86_64",
+#              "//platform/constraints/ocaml/executor:vm",
+#              "//platform/constraints/ocaml/emitter:vm"])

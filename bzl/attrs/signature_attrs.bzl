@@ -10,7 +10,7 @@ def signature_attrs():
 
         # _stage = attr.label(
         #     doc = "bootstrap stage",
-        #     default = "//bzl:stage"
+        #     default = "//config/stage"
         # ),
 
         opts             = attr.string_list(

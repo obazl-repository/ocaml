@@ -3,7 +3,7 @@ def lexer_attrs():
     return dict(
         _stage = attr.label(
             doc = "bootstrap stage",
-            default = "//bzl:stage"
+            default = "//config/stage"
         ),
 
         src = attr.label(
@@ -13,10 +13,10 @@ def lexer_attrs():
         vmargs = attr.string_list(
             doc = "Args to pass to ocamlrun when it runs ocamllex.",
         ),
-        out = attr.output(
-            doc = """Output filename.""",
-            mandatory = True
-        ),
+        # out = attr.output(
+        #     doc = """Output filename.""",
+        #     mandatory = True
+        # ),
         opts = attr.string_list(
             doc = "Options"
         ),

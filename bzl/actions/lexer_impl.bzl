@@ -1,6 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:functions.bzl", "stage_name")
+load("//bzl:functions.bzl", "stage_name", "tc_lexer")
 
 ## make.log:
 # ./boot/ocamlrun ./boot/ocamllex -q lex/lexer.mll
@@ -30,7 +31,17 @@ def lexer_impl(ctx):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    workdir = "_{}/".format(stage_name(tc._stage))
+    # workdir = "_{}/".format(stage_name(tc._stage))
+
+    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    # print("BEMITTER: %s" % build_emitter)
+
+    target_emitter = tc._target_emitter[BuildSettingInfo].value
+
+    workdir = "_{b}{t}{stage}/".format(
+        b = build_emitter, t = target_emitter,
+        stage = tc._stage[BuildSettingInfo].value)
+
     # stage = ctx.attr._stage[BuildSettingInfo].value
     # print("module _stage: %s" % stage)
 
@@ -49,20 +60,14 @@ def lexer_impl(ctx):
     #     tc = ctx.exec_groups["boot"].toolchains[
     #         "//boot/toolchain/type:boot"]
 
-    if tc.target_host in ["boot", "baseline", "vm"]:
-        ext = ".cmo"
-    else:
-        ext = ".cmx"
-
     # env = {"PATH": get_sdkpath(ctx)}
 
-    # lexer_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
+    lexout_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
 
-    # lexer = ctx.actions.declare_file(lexer_fname)
-    lexout = ctx.outputs.out
+    lexout = ctx.actions.declare_file(workdir + lexout_fname)
 
     runner = None
-    for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    for rf in tc.compiler[0][DefaultInfo].default_runfiles.files.to_list():
         if rf.path.endswith("ocamlrun"):
             # print("lex OCAMLRUN: %s" % rf.path)
             runner = rf.path
@@ -71,18 +76,18 @@ def lexer_impl(ctx):
     args = ctx.actions.args()
 
     tool = None
-    for f in tc.lexer[DefaultInfo].default_runfiles.files.to_list():
+    for f in tc_lexer(tc)[DefaultInfo].default_runfiles.files.to_list():
         if f.basename == "ocamlrun":
             # print("LEX RF: %s" % f.path)
             tool = f
 
-    args.add(tc.lexer[DefaultInfo].files_to_run.executable.path)
+    args.add(tc_lexer(tc)[DefaultInfo].files_to_run.executable.path)
 
     inputs_depset = depset(
         direct = [
             ctx.file.src,
         ],
-        transitive = [tc.lexer[DefaultInfo].default_runfiles.files]
+        transitive = [tc_lexer(tc)[DefaultInfo].default_runfiles.files]
     )
 
     # args.add_all(tc.copts)
@@ -91,6 +96,8 @@ def lexer_impl(ctx):
     args.add_all(ctx.attr.vmargs)
 
     args.add_all(ctx.attr.opts)
+
+    args.add("-q")
 
     args.add("-o", lexout)
 
@@ -102,10 +109,10 @@ def lexer_impl(ctx):
         arguments = [args],
         inputs = inputs_depset,
         outputs = [lexout],
-        tools = tc.lexer[DefaultInfo].default_runfiles.files,
+        tools = tc_lexer(tc)[DefaultInfo].default_runfiles.files,
         mnemonic = "OcamlLex",
-        progress_message = "{mode} ocaml_lex: @{ws}//{pkg}:{tgt}".format(
-            mode = "TEST", # mode,
+        progress_message = "{mode} ocaml_lex: //{pkg}:{tgt}".format(
+            mode = tc.build_host + ">" + tc.target_host[BuildSettingInfo].value,
             ws  = ctx.label.workspace_name,
             pkg = ctx.label.package,
             tgt=ctx.label.name

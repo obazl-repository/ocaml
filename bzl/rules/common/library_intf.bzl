@@ -41,7 +41,7 @@ def library_attrs():
 
         _stage = attr.label(
             doc = "bootstrap stage",
-            default = "//bzl:stage"
+            default = "//config/stage"
         ),
 
         #FIXME: underscore

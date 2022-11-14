@@ -196,7 +196,7 @@ boot_executable(
 
 compiler_module(
     name   = "Cvt_emit",
-    struct = "cvt_emit.ml",
+    struct = "cvt_emit_ml",
     opts = MODULE_OPTS + IGNORE_MISSING_MLI,
     deps   = [
         "//stdlib:Stdlib.Lexing",
@@ -209,7 +209,6 @@ compiler_module(
 
 boot_lexer(
     name = "cvt_emit_ml",
-    out  = "cvt_emit.ml",
     src  = "cvt_emit.mll"
 )
 
@@ -763,7 +762,7 @@ build_tool(
 
 compiler_module(
     name   = "Make_opcodes",
-    struct = "make_opcodes.ml",
+    struct = "make_opcodes_ml",
     nocopts = True,
     deps = [
         "//stdlib:Stdlib",
@@ -776,10 +775,7 @@ compiler_module(
 
 boot_lexer(
     name = "make_opcodes_ml",
-    out  = "make_opcodes.ml",
     src  = "make_opcodes.mll",
-    opts = ["-q"]
-    # vmargs = ["-t", "-b"]
 )
 
 ################################################################

@@ -24,18 +24,18 @@ load("//bzl/rules/macros:lexer.bzl", "lexer")
 #     ],
 # )
 
-lexer(
-    name  = "ocamllex.byte",
-    stage = "prod",
-    build_host_constraints = [
-        "//platform/constraints/ocaml/executor:vm",
-        "//platform/constraints/ocaml/emitter:vm"
-    ],
-    target_host_constraints = [
-        "//platform/constraints/ocaml/executor:vm",
-        "//platform/constraints/ocaml/emitter:vm"
-    ],
-)
+# lexer(
+#     name  = "ocamllex.byte",
+#     stage = "prod",
+#     build_host_constraints = [
+#         "//platform/constraints/ocaml/executor:vm",
+#         "//platform/constraints/ocaml/emitter:vm"
+#     ],
+#     target_host_constraints = [
+#         "//platform/constraints/ocaml/executor:vm",
+#         "//platform/constraints/ocaml/emitter:vm"
+#     ],
+# )
 
 sh_binary(
     name = "ocamlc.run",
