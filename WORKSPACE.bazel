@@ -45,8 +45,16 @@ register_execution_platforms(
     # IMPORTANT: ordered by constraint "strength" - more constraints
     # before fewer.
 
-    "//platform/ocaml:sys_vm",
-    "//platform/ocaml:sys_sys"
+    "//platform/ocaml:sys_vm_vm",
+    "//platform/ocaml:sys_vm_sys",
+    "//platform/ocaml:sys_sys_sys",
+    "//platform/ocaml:sys_sys_vm",
+
+    # "//platform/ocaml:sys_sys_sys",
+    # "//platform/ocaml:sys_sys_vm"
+
+    # "//platform/ocaml:vm",
+    # "//platform/ocaml:sys",
 
     # "//platform/ocaml:boot_target", # sys_vm_vm + build + boot",
     # "//platform/ocaml:baseline_build",
@@ -57,7 +65,10 @@ register_execution_platforms(
 # register_toolchains("@ocaml//toolchain/selectors/local:vmvm")
 register_toolchains(
 
-    "//boot/toolchain/selector:boot",
+    "//boot/toolchain/selector:vmvm",
+    "//boot/toolchain/selector:vmsys",
+
+    # "//boot/toolchain/selector:boot",
 
     # "//boot/toolchain/selector:baseline",
     # "//boot/toolchain/selector:baseline_involute",

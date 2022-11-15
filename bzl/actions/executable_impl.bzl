@@ -37,26 +37,27 @@ def executable_impl(ctx):  ## , tc):
     tc = ctx.exec_groups["boot"].toolchains[
         "//boot/toolchain/type:boot"]
 
-    # if ctx.attr._rule == "boot_compiler":
-    #     workdir = "_{}/".format(ctx.attr.stage)
-    # else:
-    #     workdir = "_{}/".format(stage_name(tc._stage))
-
-    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
-    target_emitter = tc._target_emitter[BuildSettingInfo].value
+    target_executor = tc.target_executor[BuildSettingInfo].value
+    target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    if build_emitter == "vm":
-        ext = ".cmo"
-    elif build_emitter == "sys":
+    stage = tc._stage[BuildSettingInfo].value
+    print("module _stage: %s" % stage)
+
+    if stage == 2:
         ext = ".cmx"
     else:
-        fail("Bad build_emitter: %s" % build_emitter)
+        if target_executor == "vm":
+            ext = ".cmo"
+        elif target_executor == "sys":
+            ext = ".cmx"
+        else:
+            fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_emitter,
-        stage = tc._stage[BuildSettingInfo].value)
+        b = build_emitter, t = target_executor, stage = stage)
 
     # print("executable _stage: %s" % tc._stage)
 
@@ -121,6 +122,11 @@ def executable_impl(ctx):  ## , tc):
     afiles_depset  = depset(
         order=dsorder,
         transitive = [merge_depsets(depsets, "afiles")]
+    )
+
+    ofiles_depset  = depset(
+        order=dsorder,
+        transitive = [merge_depsets(depsets, "ofiles")]
     )
 
     archived_cmx_depset = depset(

@@ -33,21 +33,27 @@ def signature_impl(ctx, module_name):
 
     # workdir = "_{}/".format(stage_name(tc._stage))
 
-    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
-    target_emitter = tc._target_emitter[BuildSettingInfo].value
+    target_executor = tc.target_executor[BuildSettingInfo].value
+    target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    if build_emitter == "vm":
-        ext = ".cmo"
-    elif build_emitter == "sys":
+    stage = tc._stage[BuildSettingInfo].value
+    print("module _stage: %s" % stage)
+
+    if stage == 2:
         ext = ".cmx"
     else:
-        fail("Bad build_emitter: %s" % build_emitter)
+        if target_executor == "vm":
+            ext = ".cmo"
+        elif target_executor == "sys":
+            ext = ".cmx"
+        else:
+            fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_emitter,
-        stage = tc._stage[BuildSettingInfo].value)
+        b = build_emitter, t = target_executor, stage = stage)
 
     # stage = ctx.attr._stage[BuildSettingInfo].value
     # print("signature _stage: %s" % tc._stage[BuildSettingInfo].value)
@@ -189,6 +195,11 @@ def signature_impl(ctx, module_name):
         transitive = [merge_depsets(depsets, "afiles")]
     )
 
+    ofiles_depset  = depset(
+        order=dsorder,
+        transitive = [merge_depsets(depsets, "ofiles")]
+    )
+
     archived_cmx_depset = depset(
         order=dsorder,
         transitive = [merge_depsets(depsets, "archived_cmx")]
@@ -217,20 +228,22 @@ def signature_impl(ctx, module_name):
     # the bytecode executable
     args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
 
-    if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
-            args.add_all(["-use-prims", ctx.attr._primitives])
-    else:
-        if ctx.attr._use_prims[BuildSettingInfo].value:
-            if not "-no-use-prims" in ctx.attr.opts:
-                args.add_all(["-use-prims", ctx.attr._primitives])
-        else:
-            if  "-use-prims" in ctx.attr.opts:
-                args.add_all(["-use-prims", ctx.attr._primitives])
+    ## FIXME: -use-prims not needed for compilation?
+    # if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
+    #         args.add_all(["-use-prims", ctx.attr._primitives])
+    # else:
+    #     if ctx.attr._use_prims[BuildSettingInfo].value:
+    #         if not "-no-use-prims" in ctx.attr.opts:
+    #             args.add_all(["-use-prims", ctx.attr._primitives])
+    #     else:
+    #         if  "-use-prims" in ctx.attr.opts:
+    #             args.add_all(["-use-prims", ctx.attr._primitives])
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
 
-    args.add_all(tc.copts)
+    if not ctx.attr.nocopts:
+        args.add_all(tc.copts)
 
     args.add_all(tc.warnings[BuildSettingInfo].value)
 
@@ -374,6 +387,7 @@ def signature_impl(ctx, module_name):
         sigs     = sigs_depset,
         cli_link_deps = cli_link_deps_depset,
         afiles   = afiles_depset,
+        ofiles   = ofiles_depset,
         archived_cmx  = archived_cmx_depset,
         paths    = paths_depset,
 

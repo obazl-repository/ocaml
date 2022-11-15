@@ -11,23 +11,27 @@ def _boot_config(ctx):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    # workdir = "_{}/".format(stage_name(tc._stage))
-
-    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
-    target_emitter = tc._target_emitter[BuildSettingInfo].value
+    target_executor = tc.target_executor[BuildSettingInfo].value
+    target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    if build_emitter == "vm":
-        ext = ".cmo"
-    elif build_emitter == "sys":
+    stage = tc._stage[BuildSettingInfo].value
+    print("module _stage: %s" % stage)
+
+    if stage == 2:
         ext = ".cmx"
     else:
-        fail("Bad build_emitter: %s" % build_emitter)
+        if target_executor == "vm":
+            ext = ".cmo"
+        elif target_executor == "sys":
+            ext = ".cmx"
+        else:
+            fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_emitter,
-        stage = tc._stage[BuildSettingInfo].value)
+        b = build_emitter, t = target_executor, stage = stage)
 
     # tc = None
     # if ctx.attr._stage == "boot":

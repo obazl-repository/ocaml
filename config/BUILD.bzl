@@ -1,15 +1,33 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-EmitterInfo = provider(fields = ["emitter"])
+################################################################
+def _target_constraint_impl(ctx):
+    return BuildSettingInfo( value = ctx.attr.constraint )
 
-def _impl(ctx):
-    if ctx.attr.emitter in ["vm", "sys", "amd64", "arm64"]:
-        return BuildSettingInfo( value = ctx.attr.emitter )
-    else:
-        fail("Invalid emmiter value, must be vm, sys, amd64, or arm64: %s" % ctx.attr.emitter)
+target_constraint = rule(
+    implementation = _target_constraint_impl,
+    build_setting = config.string(flag = False),
+    attrs = dict( constraint = attr.string())
+)
+
+################################################################
+def _executor_impl(ctx):
+    return BuildSettingInfo( value = ctx.attr.executor )
+
+executor_setting = rule(
+    implementation = _executor_impl,
+    build_setting = config.string(flag = False),
+    attrs = dict(
+        executor = attr.string()
+    )
+)
+
+################################################################
+def _emitter_impl(ctx):
+    return BuildSettingInfo( value = ctx.attr.emitter )
 
 emitter_setting = rule(
-    implementation = _impl,
+    implementation = _emitter_impl,
     build_setting = config.string(flag = False),
     attrs = dict(
         emitter = attr.string()

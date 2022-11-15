@@ -2,24 +2,107 @@ exports_files(["BUILD.bazel"])
 
 load(":BUILD.bzl", "toolchain_adapter") # , "stdlib_toolchain_adapter")
 
-################################
-# boot toolchain only used to produce a new ocamlc.byte. no point in
-# producing the others, since they have to be recompiled anyway using
-# the new ocamlc.byte.
+##################
+toolchain_adapter(
+    name        = "vmvm",
+    # build_emitter = "//config/build/emitter:vm",
+    # target_emitter = "//config/build/emitter:vm",
+    copts       = [ ## compile opts (sigs/modules only)
+        "-nostdlib",  ## inserted by rule
+        "-strict-sequence",
+        # "-warn-error", "+A",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+)
 
+##################
+toolchain_adapter(
+    name        = "vmsys",
+    # build_emitter = "vm",
+    # target_emitter = "sys",
+    copts       = [ ## compile opts (sigs/modules only)
+        "-nostdlib",  ## inserted by rule
+        "-strict-sequence",
+        # "-warn-error", "+A",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+)
+
+# toolchain_adapter(
+#     name        = "sys",
+#     target_executor = "sys",
+#     copts       = [ ## compile opts (sigs/modules only)
+#         "-nostdlib",  ## inserted by rule
+#         "-strict-sequence",
+#         # "-warn-error", "+A",
+#     ] + select({
+#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//conditions:default": []
+#     }) + select({
+#         "//config:principal?" : ["-principal"],
+#         "//conditions:default": []
+#     }) + select({
+#         "//config:absname?" : ["-absname"],
+#         "//conditions:default": []
+#     }),
+#     linkopts    = [],
+#     # warnings  - use defaults
+#     # primitives  = "//runtime:primitives",
+# )
+
+toolchain_adapter(
+    name        = "sys_vm_sys__sys_sys_sys",
+    target_executor = "sys",
+    copts       = [ ## compile opts (sigs/modules only)
+        "-nostdlib",  ## inserted by rule
+        "-strict-sequence",
+        # "-warn-error", "+A",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+)
+
+################################################################
 ##################
 toolchain_adapter(
     name        = "boot",
-    build_host  = "boot",
-    # compiler    = "//boot:ocamlc.byte",
-    # lexer       = "//boot:ocamllex.byte",
-    # yaccer      = "//yacc:ocamlyacc",
-    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
-    # runtime = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
+    target_executor = "vm",
     copts       = [ ## compile opts (sigs/modules only)
+        "-nostdlib",  ## inserted by rule
         "-strict-sequence",
         # "-warn-error", "+A",
-        # "-nostdlib",  ## inserted by rule
     ] + select({
         "//config:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
@@ -34,75 +117,4 @@ toolchain_adapter(
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
-
-################################################################
-# baseline tc uses new ocamlc.byte (produced by boot tc) to recompile
-# the whole schmear.
-
-##################
-toolchain_adapter(
-    name        = "baseline",
-    build_host  = "baseline",
-    # target_host = "baseline",
-    compiler    = "//boot/baseline/compiler:baseline",
-    # lexer       = "//lex:ocamllex",
-    # yaccer      = "//yacc:ocamlyacc",
-    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
-    # runtime = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
-    copts       = [ ## compile opts (sigs/modules only)
-        "-strict-sequence",
-        # "-warn-error", "+A",
-        "-nostdlib",
-    ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
-        "//conditions:default": []
-    }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
-        "//conditions:default": []
-    }),
-    linkopts    = [],
-    # warnings  - use defaults
-    # primitives  = "//runtime:primitives",
-)
-
-##################
-toolchain_adapter(
-    name        = "dev",
-    build_host  = "dev",
-    # target_host = "baseline",
-    compiler    = "//boot/baseline:ocamlc.byte",
-    # lexer       = "//lex:ocamllex",
-    # yaccer      = "//yacc:ocamlyacc",
-    ##FIXME: ocamlrun not needed, it's embedded in the .boot tools
-    # runtime = "//boot:ocamlrun.boot",  # alias to //runtime:ocamlrun
-    copts       = [ ## compile opts (sigs/modules only)
-        "-strict-sequence",
-        # "-warn-error", "+A",
-        "-nostdlib",
-    ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
-        "//conditions:default": []
-    }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
-        "//conditions:default": []
-    }),
-    linkopts    = [],
-    # warnings  - use defaults
-    # primitives  = "//runtime:primitives",
-)
-
-################################################################
-##################
-# stdlib_toolchain_adapter(
-#     name        = "stdlib",
-#     build_host  = "stdib",
-#     # target_host = "stdlib",
-# )
-
 

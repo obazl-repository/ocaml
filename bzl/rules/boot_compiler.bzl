@@ -1,7 +1,7 @@
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_intf.bzl", "executable_attrs")
 
-load("//bzl/rules/common:transitions.bzl", "compiler_in_transition")
+# load("//bzl/rules/common:transitions.bzl", "compiler_in_transition")
 
 #####################
 boot_compiler = rule(

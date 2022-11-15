@@ -52,6 +52,10 @@ def executable_attrs():
             default = "//runtime:primitives.dat"
         ),
 
+        _runtime = attr.label(
+            default = "//runtime:asmrun"
+        ),
+
         ## The compiler always expects to find stdlib.cm{x}a (hardocded)
         _stdlib = attr.label(
             doc = "Stdlib",

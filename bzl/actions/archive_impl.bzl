@@ -16,7 +16,7 @@ load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
      "merge_depsets")
 
-load("//bzl/rules/common:transitions.bzl", "manifest_out_transition")
+# load("//bzl/rules/common:transitions.bzl", "manifest_out_transition")
 
 ###############################
 def archive_impl(ctx):
@@ -24,23 +24,27 @@ def archive_impl(ctx):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    # workdir = "_{}/".format(stage_name(tc._stage))
-
-    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
-    target_emitter = tc._target_emitter[BuildSettingInfo].value
+    target_executor = tc.target_executor[BuildSettingInfo].value
+    target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    if build_emitter == "vm":
-        ext = ".cmo"
-    elif build_emitter == "sys":
-        ext = ".cmx"
+    stage = tc._stage[BuildSettingInfo].value
+    print("module _stage: %s" % stage)
+
+    if stage == 2:
+        ext = ".cmxa"
     else:
-        fail("Bad build_emitter: %s" % build_emitter)
+        if target_executor == "vm":
+            ext = ".cma"
+        elif target_executor == "sys":
+            ext = ".cmxa"
+        else:
+            fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_emitter,
-        stage = tc._stage[BuildSettingInfo].value)
+        b = build_emitter, t = target_executor, stage = stage)
 
     # print("archive _stage: %s" % stage)
 
@@ -58,13 +62,6 @@ def archive_impl(ctx):
     #     print("UNHANDLED STAGE: %s" % stage)
     #     tc = ctx.exec_groups["boot"].toolchains[
     #         "//boot/toolchain/type:boot"]
-
-    if tc.target_host in ["boot", "dev", "vm"]:
-        ext = ".cma"
-    else:
-        ext = ".cmxa"
-
-    ext = ".cma" # for now
 
     debug = False # True
     # if ctx.label.name == "Bare_structs":
@@ -123,6 +120,11 @@ def archive_impl(ctx):
     afiles_depset  = depset(
         order=dsorder,
         transitive = [merge_depsets(depsets, "afiles")]
+    )
+
+    ofiles_depset  = depset(
+        order=dsorder,
+        transitive = [merge_depsets(depsets, "ofiles")]
     )
 
     archived_cmx_depset = depset(
@@ -405,6 +407,7 @@ def archive_impl(ctx):
         + [
             sigs_depset,
             afiles_depset,
+            ofiles_depset,
             archived_cmx_depset]
         # cli_link_deps_depset contains this archive, do not add to inputs
         + depsets.deps.cli_link_deps
@@ -493,6 +496,7 @@ def archive_impl(ctx):
         sigs     = sigs_depset,
         cli_link_deps = cli_link_deps_depset,
         afiles   = afiles_depset,
+        ofiles   = ofiles_depset,
         archived_cmx  = archived_cmx_depset,
         paths    = paths_depset,
 

@@ -62,12 +62,24 @@ package(default_visibility = ["//visibility:public"])
 # platforms, sys_vm and sys_sys. The rest is configuration.
 
 ################################################################
-platform(name = "sys", parents = ["@local_config_platform//:host"])
+platform(name = "sys_runtime", parents = ["@local_config_platform//:host"])
 
-platform(name = "sys_vm", parents = [":sys"],
+platform(name = "sys_vm", parents = [":sys_runtime"],
          constraint_values = ["//platform/constraints/ocaml/executor:vm"])
-platform(name = "sys_sys", parents = [":sys"],
+
+platform(name = "sys_vm_vm", parents = [":sys_vm"],
+         constraint_values = ["//platform/constraints/ocaml/emitter:vm"])
+platform(name = "sys_vm_sys", parents = [":sys_vm"],
+         constraint_values = ["//platform/constraints/ocaml/emitter:sys"])
+
+platform(name = "sys_sys", parents = [":sys_runtime"],
          constraint_values = ["//platform/constraints/ocaml/executor:sys"])
+alias(name = "sys", actual = ":sys_sys")
+
+platform(name = "sys_sys_vm", parents = [":sys_sys"],
+         constraint_values = ["//platform/constraints/ocaml/emitter:vm"])
+platform(name = "sys_sys_sys", parents = [":sys_sys"],
+         constraint_values = ["//platform/constraints/ocaml/emitter:sys"])
 
 # platform(name = "sys_vm_build", parents = [":sys"],
 #          constraint_values = ["//platform/constraints/ocaml/build/executor:vm"])

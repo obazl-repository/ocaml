@@ -7,7 +7,8 @@ load("//bzl:rules.bzl",
 
 load("//bzl/rules/macros:compiler.bzl", "compiler")
 load("//bzl/rules/macros:lexer.bzl", "lexer")
-load("//bzl/rules/macros:stdlib.bzl", "stdlib")
+
+# load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
 # This macro expands to three different boot_compiler targets:
 #   //baseline/compiler:baseline uses the boot compiler
@@ -17,30 +18,44 @@ load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
 ## uses boot compiler to produce baseline ocamlc.byte
 boot_compiler(
-    name                   = "baseline",
+    name                   = "compiler",
     # stage                  = "boot", # stage,
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp"
-    ],
-    main = "//driver:Main",
+    prologue = ["//compilerlibs:ocamlcommon"] + select({
+        "//platform/constraints/ocaml/emitter:sys?":
+        ["//asmcomp:ocamloptcomp"],
+
+        "//platform/constraints/ocaml/emitter:vm?":
+        ["//bytecomp:ocamlbytecomp"],
+    }),
+    main = select({
+        "//platform/constraints/ocaml/emitter:sys?":
+        "//driver:Optmain",
+
+        "//platform/constraints/ocaml/emitter:vm?":
+        "//driver:Main"
+    }),
+    # prologue = [
+    #     "//compilerlibs:ocamlcommon",
+    #     "//bytecomp:ocamlbytecomp"
+    # ],
+    # main = "//driver:Main",
     opts                   = [],
     # compatibility constraints ensure selection of boot toolchain
-    exec_compatible_with   = [
-        "//platform/constraints/ocaml/executor:vm",
+    # exec_compatible_with   = [
+    #     "//platform/constraints/ocaml/executor:vm",
 
-        # platform: boot_build == sys_vm_vm + build + boot
-        # "//platform/constraints/ocaml/build/executor:vm",
-        # "//platform/constraints/ocaml/build/emitter:vm",
-        # "//platform/constraints/stage:boot"
-    ],
-    target_compatible_with = [
-        "//platform/constraints/ocaml/executor:vm",
-        # platform: boot_target == sys_vm_vm + target + boot
-        # "//platform/constraints/ocaml/target/executor:vm",
-        # "//platform/constraints/ocaml/target/emitter:vm",
-        # "//platform/constraints/stage:boot"
-    ],
+    #     # platform: boot_build == sys_vm_vm + build + boot
+    #     # "//platform/constraints/ocaml/build/executor:vm",
+    #     # "//platform/constraints/ocaml/build/emitter:vm",
+    #     # "//platform/constraints/stage:boot"
+    # ],
+    # target_compatible_with = [
+    #     "//platform/constraints/ocaml/executor:vm",
+    #     # platform: boot_target == sys_vm_vm + target + boot
+    #     # "//platform/constraints/ocaml/target/executor:vm",
+    #     # "//platform/constraints/ocaml/target/emitter:vm",
+    #     # "//platform/constraints/stage:boot"
+    # ],
     visibility             = ["//visibility:public"]
 )
 boot_compiler(
@@ -125,7 +140,7 @@ boot_compiler(
 # )
 
 lexer(
-    name  = "ocamllex.byte",
+    name  = "lexer", ## ocamllex.byte",
     # stage = "baseline",
     build_host_constraints = [
         "//platform/constraints/ocaml/executor:vm",

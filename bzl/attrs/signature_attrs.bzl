@@ -16,6 +16,9 @@ def signature_attrs():
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
         ),
+        nocopts = attr.bool(
+            doc = "to disable use toolchain's copts"
+        ),
 
         warnings = attr.string_list(
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"

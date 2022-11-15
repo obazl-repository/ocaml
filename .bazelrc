@@ -84,33 +84,54 @@ build --workspace_status_command=$PWD/bzl/camlheader.sh
 ## OCaml platforms: boot, vm, sys
 
 # default
-build --host_platform=//platform/ocaml:sys_vm
+build --host_platform=//platform/ocaml:sys_vm_vm
 # default: build --//config/emitter/build:vm
-build --platforms=//platform/ocaml:sys_vm
+build --platforms=//platform/ocaml:sys_vm_vm
 # default: build --//config/emitter/target:vm
 
-build:boot --host_platform=//platform/ocaml:boot_build
-build:boot --platforms=//platform/ocaml:boot_target
+# build:boot --host_platform=//platform/ocaml:boot_build
+# build:boot --platforms=//platform/ocaml:boot_target
 
-build:boot.ocamlopt.byte --host_platform=//platform/ocaml:boot_build
-build:boot.ocamlopt.byte --platforms=//platform/ocaml:sys_vm_sys_target
+# build ocamlc.byte from ocamlc.byte
+build:ocamlc.byte --host_platform=//platform/ocaml:sys_vm_vm
+build:ocamlc.byte --platforms=//platform/ocaml:sys_vm_vm
 
-build:baseline_vmvm --host_platform=//platform/ocaml:baseline_build
-build:baseline_vmvm --platforms=//platform/ocaml:baseline_vm_vm_target
+# build ocamlopt.byte from ocamlc.byte
+build:ocamlopt.byte --host_platform=//platform/ocaml:sys_vm_vm
+build:ocamlopt.byte --platforms=//platform/ocaml:sys_vm_sys
+
+# build ocamlc.opt from ocamlopt.byte
+build:ocamlc.opt --host_platform=//platform/ocaml:sys_vm_sys
+build:ocamlc.opt --platforms=//platform/ocaml:sys_sys_vm
+
+# build ocamlopt.opt from ocamlopt.byte
+build:ocamlopt.opt --host_platform=//platform/ocaml:sys_vm_sys
+build:ocamlopt.opt --platforms=//platform/ocaml:sys_sys_sys
+
+# build ocamlc.opt from ocamlopt.opt
+build:socamlopt.opt --host_platform=//platform/ocaml:sys_sys_sys
+build:socamlopt.opt --platforms=//platform/ocaml:sys_sys_vm
+
+# build ocamlopt.opt from ocamlopt.opt
+build:socamlopt.opt --host_platform=//platform/ocaml:sys_sys_sys
+build:socamlopt.opt --platforms=//platform/ocaml:sys_sys_sys
+
+
+
 
 ################################################################
 # build:ocamlc --host_platform=//platform/ocaml:sys_vm_vm_build
 # build:ocamlc --platforms=//platform/ocaml:sys_vm_vm_target
 
-build:ocamlc.byte --host_platform=//platform/ocaml:sys_vm_vm_build
-build:ocamlc.byte --platforms=//platform/ocaml:sys_vm_vm_build
+# build:ocamlc.byte --host_platform=//platform/ocaml:sys_vm_vm_build
+# build:ocamlc.byte --platforms=//platform/ocaml:sys_vm_vm_build
 
-build:ocamlopt.byte --host_platform=//platform/ocaml:sys_vm_vm_build
-build:ocamlopt.byte --platforms=//platform/ocaml:sys_vm_sys_target
+# build:ocamlopt.byte --host_platform=//platform/ocaml:sys_vm_vm_build
+# build:ocamlopt.byte --platforms=//platform/ocaml:sys_vm_sys_target
 
 ## to emit sys_sys, build host can be either sys_sys_sys or sys_vm_sys
-build:ocamlc.opt --host_platform=//platform/ocaml:sys_vm_sys_build
-build:ocamlc.opt --platforms=//platform/ocaml:sys_sys_vm_target
+# build:ocamlc.opt --host_platform=//platform/ocaml:sys_vm_sys_build
+# build:ocamlc.opt --platforms=//platform/ocaml:sys_sys_vm_target
 
 # build:ocamlopt.opt --host_platform=//platform/ocaml:sys_sys_sys
 # build:ocamlopt.opt --platforms=//platform/ocaml:sys_sys

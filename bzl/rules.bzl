@@ -41,10 +41,6 @@ load("//bzl/rules:boot_lexer.bzl", _boot_lexer = "boot_lexer")
 load("//bzl/rules:boot_signature.bzl", _boot_signature = "boot_signature")
 load("//bzl/rules:compiler_signature.bzl", _compiler_signature = "compiler_signature")
 
-load("//bzl/rules:boot_stdlib.bzl",
-     _boot_stdlib = "boot_stdlib")
-
-
 # load("//bzl/rules:baseline_test.bzl",
 #      _baseline_test = "baseline_test")
 
@@ -75,7 +71,6 @@ boot_lexer = _boot_lexer
 boot_signature   = _boot_signature
 compiler_signature   = _compiler_signature
 # baseline_test   = _baseline_test
-boot_stdlib      = _boot_stdlib
 
 boot_compiler    = _boot_compiler
 # baseline_compiler    = _baseline_compiler

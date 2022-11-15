@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl", "boot_coldstart", "boot_import_tool")
 
-load("//bzl/rules/macros:stdlib.bzl", "stdlib")
+# load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
 # exports_files(["ocamlc", "ocamllex"])
 

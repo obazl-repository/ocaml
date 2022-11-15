@@ -27,7 +27,7 @@ boot_executable = rule(
         #     ],
         #     toolchains = ["//boot/toolchain/type:baseline"],
         # ),
-    },
+     },
 
     attrs = dict(
         executable_attrs(),

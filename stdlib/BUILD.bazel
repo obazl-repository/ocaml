@@ -39,6 +39,7 @@ boot_archive(
     name       = "stdlib",
     ## makefiles pass -use-prims. does that make sense, for an archive?
     manifest   = STDLIB_MANIFEST,
+    data = ["//runtime:asmrun"],
     visibility = ["//visibility:public"],
 )
 
@@ -139,7 +140,7 @@ genrule(
 stdlib_boot_module(
     name   = "CamlinternalFormatBasics",
     struct = "camlinternalFormatBasics.ml",
-    sig    = "camlinternalFormatBasics.mli",
+    sig    = "CamlinternalFormatBasics_cmi",
     opts   = ["-nopervasives"]
     # sig    = select({
     #     "//config:sig_src?": "camlinternalFormatBasics.mli",
@@ -150,6 +151,7 @@ stdlib_boot_module(
 stdlib_boot_signature(
     name = "CamlinternalFormatBasics_cmi",
     src  = "camlinternalFormatBasics.mli",
+    opts   = ["-nopervasives"]
  )
 
 

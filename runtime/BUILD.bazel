@@ -88,7 +88,8 @@ cc_library(
 ###########
 cc_library(
     name = "asmrun",
-    alwayslink = True, linkstatic = True,
+    # alwayslink = True,
+    linkstatic = True,
     srcs = [
         "//runtime:build_config.h",
         "//runtime:common_c_sources",
@@ -123,10 +124,11 @@ cc_library(
     deps = ["//runtime/caml:hdrs"],
     toolchains = ["//profile/system/local"],
     visibility = [
-        "//:__pkg__",
-        "//boot/lib:__pkg__",
-        "//dev/lib:__pkg__",
-        "//lib:__pkg__"
+        "//visibility:public"
+        # "//:__pkg__",
+        # "//boot/lib:__pkg__",
+        # "//dev/lib:__pkg__",
+        # "//lib:__pkg__"
     ],
 )
 

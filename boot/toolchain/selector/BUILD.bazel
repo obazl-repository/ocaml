@@ -4,34 +4,72 @@ package(default_visibility=["//visibility:public"])
 
 exports_files(glob(["*.bazel"]))
 
-## NB: build_host_constraints must always include stage constraint.
-## otherwise tcs without stage constraint are eligible for selection
-## for platforms that declare a stage constraint value. (?)
-
-## i.e. the constraint values declared by platforms are just
-## declarations, not constraints on selection.
-
-toolchain_selector(
-    name           = "boot",
+toolchain_selector(  ## ocamlc.byte, ocamlopt.byte from ocamlc.byte
+    name           = "vmvm",
     type           = "//boot/toolchain/type:boot",
-    adapter        = "//boot/toolchain/adapter:boot",
+    adapter        = "//boot/toolchain/adapter:vmvm",
     build_host_constraints  = [
         "//platform/constraints/ocaml/executor:vm",
-
-        # platform: boot_build == sys_vm_vm + build + boot
-        # "//platform/constraints/ocaml/build/executor:vm",
-        # "//platform/constraints/ocaml/build/emitter:vm",
-        # "//platform/constraints/stage:boot"
+        "//platform/constraints/ocaml/emitter:vm",
     ],
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:vm",
-
-        # platform: boot_target == sys_vm_vm + target + boot
-        # "//platform/constraints/ocaml/target/executor:vm",
-        # "//platform/constraints/ocaml/target/emitter:vm",
-        # "//platform/constraints/stage:boot"
+        # "//platform/constraints/ocaml/emitter:vm",
     ],
 )
+
+toolchain_selector(  ## ocamlc.opt, ocamlopt.opt from ocamlopt.byte
+    name           = "vmsys",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:vmsys",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:vm",
+    ],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys",
+        # "//platform/constraints/ocaml/emitter:vm",
+    ],
+)
+
+###################
+toolchain_selector(  ## ocamlc.opt from ocamlopt.byte
+    name           = "syssys",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:sys_vm_vm__sys_vm_sys",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:vm",
+        "//platform/constraints/ocaml/emitter:sys",
+    ],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys",
+    #     "//platform/constraints/ocaml/emitter:vm",
+    ],
+)
+
+################################################################
+# toolchain_selector(
+#     name           = "boot",
+#     type           = "//boot/toolchain/type:boot",
+#     adapter        = "//boot/toolchain/adapter:boot",
+#     build_host_constraints  = [
+#         "//platform/constraints/ocaml/executor:vm",
+
+#         # platform: boot_build == sys_vm_vm + build + boot
+#         # "//platform/constraints/ocaml/build/executor:vm",
+#         # "//platform/constraints/ocaml/build/emitter:vm",
+#         # "//platform/constraints/stage:boot"
+#     ],
+#     target_host_constraints = [
+#         "//platform/constraints/ocaml/executor:vm",
+
+#         # platform: boot_target == sys_vm_vm + target + boot
+#         # "//platform/constraints/ocaml/target/executor:vm",
+#         # "//platform/constraints/ocaml/target/emitter:vm",
+#         # "//platform/constraints/stage:boot"
+#     ],
+# )
+
 
 # toolchain_selector(
 #     name           = "baseline",

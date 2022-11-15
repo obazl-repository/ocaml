@@ -33,10 +33,10 @@ def lexer_impl(ctx):
 
     # workdir = "_{}/".format(stage_name(tc._stage))
 
-    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
-    target_emitter = tc._target_emitter[BuildSettingInfo].value
+    target_emitter = tc.target_emitter[BuildSettingInfo].value
 
     workdir = "_{b}{t}{stage}/".format(
         b = build_emitter, t = target_emitter,

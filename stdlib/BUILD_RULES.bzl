@@ -1,10 +1,77 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:providers.bzl", "BootInfo", "ModuleInfo")
+load("//bzl:providers.bzl", "BootInfo", "ModuleInfo", "OcamlArchiveProvider")
+
+load("//bzl/attrs:archive_attrs.bzl", "archive_attrs")
+load("//bzl/actions:archive_impl.bzl", "archive_impl")
+
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 load("//bzl/actions:module_impl.bzl", "module_impl")
+
 load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
 load("//bzl/actions:signature_impl.bzl", "signature_impl")
+
+load("//bzl/rules/common:transitions.bzl", "stdlib_in_transition")
+
+load(":BUILD.bzl", "STDLIB_MANIFEST")
+
+
+#####################
+boot_stdlib = rule(  # not used
+    implementation = archive_impl,
+    doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
+    exec_groups = {
+        "boot": exec_group(
+            # exec_compatible_with = [
+            #     "//platform/constraints/ocaml/executor:vm?",
+            #     "//platform/constraints/ocaml/emitter:vm"
+            # ],
+            toolchains = ["//boot/toolchain/type:boot"],
+        ),
+        # "baseline": exec_group(
+        #     exec_compatible_with = [
+        #         "//platform/constraints/ocaml/executor:vm?",
+        #         "//platform/constraints/ocaml/emitter:vm"
+        #     ],
+        #     toolchains = ["//boot/toolchain/type:baseline"],
+        # ),
+    },
+
+    attrs = dict(
+        archive_attrs(),
+
+        # only boot_stdlib and boot_compiler have a public 'stage' attr
+        # stage = attr.label( default = "//config/stage" ),
+
+        _rule = attr.string( default = "boot_stdlib" ),
+
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
+    ),
+    provides = [OcamlArchiveProvider, BootInfo],
+    cfg = stdlib_in_transition,
+    executable = False,
+    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    # toolchains = ["//toolchain/type:boot",
+    #               # "//toolchain/type:profile",
+    #               "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+#### macro ####
+def stdlib(stage = None,
+           build_host_constraints = None,
+           target_host_constraints = None,
+           visibility = ["//visibility:public"]
+           ):
+
+    boot_stdlib(
+        name       = "stdlib",
+        stage      = stage,
+        manifest   = STDLIB_MANIFEST,
+        visibility = visibility
+    )
+
 
 ################################################################
 def _stdlib_signature(ctx):
@@ -35,7 +102,7 @@ stdlib_signature = rule(
         signature_attrs(),
 
         _opts = attr.string_list(
-            default = ["-nostdlib"]
+            # default = ["-nostdlib"]  # in tc.copts
         ),
 
         _stdlib_resolver = attr.label(
@@ -83,7 +150,7 @@ stdlib_boot_signature = rule(
     attrs = dict(
         signature_attrs(),
         _opts = attr.string_list(
-            # default = ["-nostdlib"]
+            # default = ["-nostdlib", "-nopervasives"]
         ),
         # no _stdlib_resolver
         _rule = attr.string( default = "stdlib_boot_signature" ),
@@ -130,7 +197,7 @@ stdlib_module = rule(
         module_attrs(),
 
         _opts = attr.string_list(
-            default = ["-nostdlib"]
+            # default = ["-nostdlib"], # in tc.copts
         ),
 
         _stdlib_resolver = attr.label(
@@ -186,7 +253,10 @@ stdlib_boot_module = rule(
     },
     attrs = dict(
         module_attrs(),
-        _opts = attr.string_list( ),
+        _opts = attr.string_list(
+            # default = ["-nostdlib"] # in toolchain copts
+            ## CamlinternalFormatBasics.ml[i] add "-nopervasives"
+        ),
         # no _stdlib_resolver
         _rule = attr.string( default = "stdlib_boot_module" ),
     ),

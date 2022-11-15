@@ -30,28 +30,36 @@ def module_impl(ctx, module_name):
     # tc = ctx.toolchains["//toolchain/type:boot"]
     # print("tc target_host: %s" % tc.target_host)
 
-    # stage = ctx.attr._stage[BuildSettingInfo].value
-    # print("module _stage: %s" % stage)
+    tc = ctx.exec_groups["boot"].toolchains["//boot/toolchain/type:boot"]
 
-    tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
+    build_emitter = tc.build_emitter[BuildSettingInfo].value
+    # print("build_emitter: %s" % build_emitter)
 
-    build_emitter = tc._build_emitter[BuildSettingInfo].value
+    target_runtime = tc.target_runtime[BuildSettingInfo].value
+    target_executor = tc.target_executor[BuildSettingInfo].value
+    target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    # print("BEMITTER: %s" % build_emitter)
+    # print("target_runtime : %s" % target_runtime)
+    # print("target_executor: %s" % target_executor)
+    # print("target_emitter : %s" % target_emitter)
 
-    target_emitter = tc._target_emitter[BuildSettingInfo].value
+    # if ctx.label.name == "CamlinternalFormatBasics":
+    #     fail("C")
+    stage = tc._stage[BuildSettingInfo].value
+    print("module _stage: %s" % stage)
 
-    if build_emitter == "vm":
-        ext = ".cmo"
-    elif build_emitter == "sys":
+    if stage == 2:
         ext = ".cmx"
     else:
-        fail("Bad build_emitter: %s" % build_emitter)
+        if target_executor == "vm":
+            ext = ".cmo"
+        elif target_executor == "sys":
+            ext = ".cmx"
+        else:
+            fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_emitter,
-        stage = tc._stage[BuildSettingInfo].value)
+        b = build_emitter, t = target_executor, stage = stage)
 
     # workdir = "_{}/".format(stage)
 
@@ -197,9 +205,9 @@ def module_impl(ctx, module_name):
     # direct_linkargs.append(out_cm_)
     # default_outputs.append(out_cm_)
 
-    if not tc.target_host:
+    if ext == ".cmx":
         # if not ctx.attr._rule.startswith("bootstrap"):
-        out_o = ctx.actions.declare_file(workdir + module_name + ".o",
+        out_o = ctx.actions.declare_file(module_name + ".o",
                                          sibling = out_cm_)
         action_outputs.append(out_o)
         # direct_linkargs.append(out_o)
@@ -280,6 +288,18 @@ def module_impl(ctx, module_name):
         transitive = [merge_depsets(depsets, "afiles")]
     )
 
+    if ext == ".cmx":
+        ofiles_depset  = depset(
+            order=dsorder,
+            direct = [out_o],
+            transitive = [merge_depsets(depsets, "ofiles")]
+        )
+    else:
+        ofiles_depset  = depset(
+            order=dsorder,
+            transitive = [merge_depsets(depsets, "ofiles")]
+        )
+
     archived_cmx_depset = depset(
         order=dsorder,
         transitive = [merge_depsets(depsets, "archived_cmx")]
@@ -310,18 +330,19 @@ def module_impl(ctx, module_name):
     # the bytecode executable
     args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
 
-    if ctx.attr.use_prims == True:
-        args.add_all(["-use-prims", ctx.file._primitives.path])
-    else:
-        if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
-            args.add_all(["-use-prims", ctx.attr._primitives])
-        else:
-            if ctx.attr._use_prims[BuildSettingInfo].value:
-                if not "-no-use-prims" in ctx.attr.opts:
-                    args.add_all(["-use-prims", ctx.attr._primitives])
-            else:
-                if  "-use-prims" in ctx.attr.opts:
-                    args.add_all(["-use-prims", ctx.attr._primitives])
+    ## FIXME: -use-prims not needed for compilation?
+    # if ctx.attr.use_prims == True:
+    #     args.add_all(["-use-prims", ctx.file._primitives.path])
+    # else:
+    #     if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
+    #         args.add_all(["-use-prims", ctx.attr._primitives])
+    #     else:
+    #         if ctx.attr._use_prims[BuildSettingInfo].value:
+    #             if not "-no-use-prims" in ctx.attr.opts:
+    #                 args.add_all(["-use-prims", ctx.attr._primitives])
+    #         else:
+    #             if  "-use-prims" in ctx.attr.opts:
+    #                 args.add_all(["-use-prims", ctx.attr._primitives])
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -432,6 +453,7 @@ def module_impl(ctx, module_name):
         sigs     = sigs_depset,
         cli_link_deps = cli_link_deps_depset,
         afiles   = afiles_depset,
+        ofiles   = ofiles_depset,
         archived_cmx  = archived_cmx_depset,
         paths    = paths_depset,
     )

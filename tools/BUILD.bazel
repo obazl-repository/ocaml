@@ -191,6 +191,7 @@ boot_executable(
 boot_executable(
     name = "cvt_emit.exe",
     main = ":Cvt_emit",
+    opts = ["-I", "bazel-out/darwin-fastbuild/bin/runtime/"],
     visibility = ["//asmcomp:__subpackages__"]
 )
 

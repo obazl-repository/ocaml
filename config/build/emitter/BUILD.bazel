@@ -10,6 +10,12 @@ string_flag(
     values = ["vm", "sys"],
     visibility = ["//visibility:public"]
 )
+string_setting(
+    name = "vm",
+    build_setting_default = "vm",
+    values = ["vm", "sys"],
+    visibility = ["//visibility:public"]
+)
 
 emitter_setting(
     name = "build_emitter",

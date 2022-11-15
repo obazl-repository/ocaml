@@ -78,6 +78,8 @@ def aggregate_deps(ctx,
                 depset([target[ModuleInfo].struct]))
 
     depsets.deps.afiles.append(provider.afiles)
+    if provider.ofiles != []:
+        depsets.deps.ofiles.append(provider.ofiles)
     depsets.deps.archived_cmx.append(provider.archived_cmx)
     depsets.deps.paths.append(provider.paths)
 
@@ -121,7 +123,9 @@ def aggregate_deps(ctx,
 def merge_depsets(depsets, fld):
     # print("merging %s" % fld)
     # print("unmerged fld: %s" % getattr(depsets.deps, fld))
-    merged = depset(transitive = getattr(depsets.deps, fld))
-    # print("merged fld {f}: {m}".format(f=fld, m=merged))
-
-    return merged
+    deps = getattr(depsets.deps, fld)
+    if deps:
+        # print("DEPS: %s" % deps)
+        return depset(transitive = deps)
+    else:
+        return depset()

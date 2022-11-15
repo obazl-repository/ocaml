@@ -3,9 +3,9 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
 load("//bzl/rules/common:transitions.bzl",
-     "emitter_out_transition",
-     "tc_compiler_out_transition",
-     "toolchain_in_transition")
+     # "emitter_out_transition",
+     # "toolchain_in_transition",
+     "tc_compiler_out_transition")
 
 ##########################################
 def _toolchain_adapter_impl(ctx):
@@ -15,9 +15,11 @@ def _toolchain_adapter_impl(ctx):
         _stage                 = ctx.attr._stage,
         build_host             = ctx.attr.build_host,
         target_host            = ctx.attr.target_host,
-        _build_emitter        = ctx.attr._build_emitter,
-        _target_emitter        = ctx.attr._target_emitter,
-        xtarget_host           = ctx.attr.xtarget_host,
+        # _build_executor        = ctx.attr._build_executor,
+        build_emitter          = ctx.attr.build_emitter,
+        target_runtime         = ctx.attr.target_runtime,
+        target_executor        = ctx.attr.target_executor,
+        target_emitter         = ctx.attr.target_emitter,
         ## vm
         runtime                = ctx.file.runtime,
         vmargs                 = ctx.attr.vmargs,
@@ -54,18 +56,18 @@ toolchain_adapter = rule(
             doc     = "OCaml target platform: vm (bytecode) or an arch.",
             default = "//config:target_host"
         ),
-        "_build_emitter" : attr.label(
+        # "_build_executor" : attr.label(
+        #     default = "//config/build/executor",
+        # ),
+
+        "build_emitter" : attr.label(
             default = "//config/build/emitter",
             # cfg = emitter_out_transition,
         ),
-        "_target_emitter" : attr.label(
-            default = "//config/target/emitter",
-            # cfg = emitter_out_transition,
-        ),
-        "xtarget_host": attr.label(
-            doc     = "Cross-cross target platform: vm (bytecode) or an arch.",
-            # default = ""
-        ),
+
+        "target_runtime" : attr.label(default = "//config/target/runtime"),
+        "target_executor": attr.label(default = "//config/target/executor"),
+        "target_emitter" : attr.label(default = "//config/target/emitter"),
 
         ## Virtual Machine
         "runtime": attr.label(
@@ -181,63 +183,3 @@ toolchain_adapter = rule(
     ## executables need this to link cc stuff:
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"]
 )
-
-################################################################
-##########################################
-# def _stdlib_toolchain_adapter_impl(ctx):
-
-#     return [platform_common.ToolchainInfo(
-#         # Public fields
-#         name                   = ctx.label.name,
-#         build_host             = ctx.attr.build_host,
-#         target_host            = ctx.attr.target_host,
-#         ## runtime
-#         stdlib                 = ctx.attr.stdlib,
-#         std_exit               = ctx.file.std_exit,
-#         # camlheaders            = ctx.files.camlheaders,
-#     )]
-
-# ###################################
-# ## the rule interface
-# stdlib_toolchain_adapter = rule(
-#     _stdlib_toolchain_adapter_impl,
-#     attrs = {
-#         "stdlib": attr.label(
-#             default   = "//boot/toolchain:stdlib",
-#             executable = False,
-#             # allow_single_file = True,
-#             # cfg = "exec",
-#         ),
-
-#         "std_exit": attr.label(
-#             default = Label("//boot/toolchain:std_exit"),
-#             executable = False,
-#             allow_single_file = True,
-#             # cfg = "exec",
-#         ),
-
-#         # "camlheaders": attr.label_list(
-#         #     allow_files = True,
-#         #     default = ["//stdlib:camlheaders"]
-#         # ),
-
-#         "build_host": attr.string(
-#             doc     = "OCaml host platform: vm (bytecode) or an arch.",
-#             default = "vm"
-#         ),
-#         "target_host": attr.string(
-#             doc     = "OCaml target platform: vm (bytecode) or an arch.",
-#             default = "vm"
-#         ),
-#         "xtarget_host": attr.string(
-#             doc     = "Cross-cross target platform: vm (bytecode) or an arch.",
-#             default = ""
-#         ),
-
-
-
-#     },
-#     cfg = toolchain_in_transition,
-#     doc = "Defines a stdlib for bootstrapping the OCaml toolchain",
-#     provides = [platform_common.ToolchainInfo],
-# )
