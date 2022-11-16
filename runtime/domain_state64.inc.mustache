@@ -1,0 +1,17 @@
+{{#domain_states}}
+Store_{{name}} MACRO reg
+  mov [r14+{{offset}}], reg
+ENDM
+Load_{{name}} MACRO reg
+  mov reg, [r14+{{offset}}]
+ENDM
+Push_{{name}} MACRO
+  push [r14+{{offset}}]
+ENDM
+Pop_{{name}} MACRO
+  pop [r14+{{offset}}]
+ENDM
+Cmp_{{name}} MACRO reg
+  cmp reg, [r14+{{offset}}]
+ENDM
+{{/domain_states}}
