@@ -1,0 +1,9 @@
+
+let descriptions = [
+ {{#descriptions}}
+ { number = {{number}};
+   names = ["{{names}}"];
+   description = "{{description}}";
+   since = {{since}} };
+{{/descriptions}}
+]

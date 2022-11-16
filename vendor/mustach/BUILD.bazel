@@ -1,0 +1,34 @@
+cc_binary(
+    name = "mustach",
+    # alwayslink = True,
+    # linkstatic = True,
+    srcs = [
+        # COREOBJS := mustach.o mustach-wrap.o
+        "mustach.c", "mustach.h",
+        "mustach-wrap.c", "mustach-wrap.h",
+        "mustach-tool.c",
+        "mustach-cjson.c", "mustach-cjson.h",
+
+        "cjson/cJSON.c", "cjson/cJSON.h"
+    ],
+    copts = [
+        "-x", "c",
+        # "-Wall",
+        # "-pedantic",
+        "-I", "cjson",
+        "-DTOOL=MUSTACH_TOOL_CJSON"
+    ] + select({
+        "//platform/os:macos?": ["-std=c11"],
+        "//platform/os:linux?": [],
+        "//conditions:default":  [] #"-std=c11"]
+    }) + select({
+        "//config/mode:pedantic?": ["-pedantic"],
+        "//conditions:default":  []
+    }),
+    visibility = [
+        "//:__pkg__",
+        "//boot:__subpackages__",
+        "//lib:__pkg__"
+    ],
+)
+
