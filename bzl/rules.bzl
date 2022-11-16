@@ -1,4 +1,8 @@
+load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
+
 load("//bzl/rules:build_tool.bzl", _build_tool = "build_tool")
+load("//bzl/rules:ocaml_tool.bzl", _ocaml_tool = "ocaml_tool")
+load("//bzl/rules:build_module.bzl", _build_module = "build_module")
 
 load("//bzl/rules:boot_import_tool.bzl", _boot_import_tool = "boot_import_tool")
 
@@ -52,6 +56,9 @@ load("//bzl/rules:boot_compiler.bzl", _boot_compiler = "boot_compiler")
 # load("//bzl/rules:ocamlc_fixpoint.bzl", _ocamlc_fixpoint = "ocamlc_fixpoint")
 # load("//bzl/rules:ocamlc_runtime.bzl", _ocamlc_runtime = "ocamlc_runtime")
 
+cc_assemble = _cc_assemble
+ocaml_tool      = _ocaml_tool
+build_module      = _build_module
 build_tool      = _build_tool
 boot_import_tool      = _boot_import_tool
 boot_coldstart      = _boot_coldstart
