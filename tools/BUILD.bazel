@@ -15,27 +15,10 @@ exports_files([
     "check-parser-uptodate-or-warn.sh",
 ])
 
-load("//config:CONFIG.bzl",
-     # "TOOLS_MODULE_OPTS",
-     # "TOOLS_SIG_OPTS"
-     "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS",
-     "IGNORE_MISSING_MLI",
-     )
-
-# MODULE_OPTS/SIG_OPTS should include:
-# -nostdlib -g
-# -use-prims ../runtime /primitives
-# -absname -w +a-4-9-41-42-44-45-48-70
-# -strict-sequence -warn-error
-# +A -principal -strict-formats -bin-annot
+load("//config:CONFIG.bzl", "w") # warnings
 
 MODULE_OPTS = []
-# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-#     "-nostdlib",
-#     "-w", "-70"
-# ]
-SIG_OPTS    = [] # ["-nostdlib"] + OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+SIG_OPTS    = []
 
 ## first the executables. modules and sigs below.
 # programs_byte := \
@@ -198,7 +181,8 @@ boot_executable(
 compiler_module(
     name   = "Cvt_emit",
     struct = "cvt_emit_ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Printf",
@@ -312,8 +296,7 @@ compiler_module(
     name = "Opnames",
     struct = "opnames.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    warnings = [w.MISSING_MLI]
 )
 
 
@@ -413,7 +396,8 @@ genrule(
 compiler_module(
     name   = "Cmpbyt",
     struct = "cmpbyt.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
@@ -500,7 +484,8 @@ compiler_module(
 compiler_module(
     name   = "Objinfo",
     struct = "objinfo.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//stdlib:Stdlib.Sys",
         "//bytecomp:Symtable",
@@ -533,7 +518,8 @@ compiler_module(
 compiler_module(
     name   = "Ocamlcmt",
     struct = "ocamlcmt.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//typing:Untypeast",
         "//typing:Stypes",
@@ -561,7 +547,8 @@ compiler_module(
 compiler_module(
     name   = "Ocamlcp",
     struct = "ocamlcp.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
@@ -578,7 +565,8 @@ compiler_module(
 compiler_module(
     name   = "Ocamlcp_common",
     struct = "ocamlcp_common.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         # "//stdlib:Stdlib.Sys",
         # "//stdlib:Stdlib.String",
@@ -594,7 +582,8 @@ compiler_module(
 compiler_module(
     name   = "Ocamldep",
     struct = "ocamldep.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//driver:Makedepend"
     ],
@@ -603,7 +592,8 @@ compiler_module(
 compiler_module(
     name   = "Ocamlmklib",
     struct = "ocamlmklib.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
@@ -622,7 +612,8 @@ compiler_module(
 compiler_module(
     name   = "Ocamlmktop",
     struct = "ocamlmktop.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.List",
@@ -636,7 +627,8 @@ compiler_module(
 compiler_module(
     name   = "Ocamloptp",
     struct = "ocamloptp.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//driver:Compenv",
         "//driver:Main_args",
@@ -653,7 +645,8 @@ compiler_module(
 compiler_module(
     name   = "Ocamlprof",
     struct = "ocamlprof.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//parsing:Location",
         "//parsing:Parse",
@@ -677,7 +670,8 @@ compiler_module(
 compiler_module(
     name   = "Primreq",
     struct = "primreq.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//file_formats:Cmo_format_cmi",
         "//stdlib:Stdlib.Arg",
@@ -711,7 +705,8 @@ compiler_signature(
 compiler_module(
     name   = "Stripdebug",
     struct = "stripdebug.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//bytecomp:Bytesections",
         "//stdlib:Stdlib.Array",
@@ -771,7 +766,8 @@ compiler_module(
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Printf",
     ],
-    opts = ["-nostdlib"] + IGNORE_MISSING_MLI
+    opts = ["-nostdlib"],
+    warnings = [w.MISSING_MLI]
 )
 
 boot_lexer(

@@ -5,24 +5,12 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
-load("//config:CONFIG.bzl",
-     # "RUNTIME_OCAMLRUN",
-     "OC_COMMON_CFLAGS",
-     "IGNORE_MISSING_MLI",
-     "PLATFORM_CFLAGS"
-     # "OC_COMMON_CFLAGS",
-     # "OC_NATIVE_CFLAGS",
-     # "ROOT_MODULE_OPTS",
-     # "ROOT_SIG_OPTS"
-     )
+load("//config:CONFIG.bzl", "w")
 
-MODULE_OPTS = ["-w", "-40"] #OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-SIG_OPTS    = [] # OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-# MODULE_OPTS = OC_COMMON_CFLAGS
-# SIG_OPTS    = OC_COMMON_CFLAGS
+WARNINGS = [w.NAME_OUT_OF_SCOPE] # -40
+MODULE_OPTS = []
 
-# MODULE_OPTS = ROOT_MODULE_OPTS
-# SIG_OPTS    = ROOT_MODULE_OPTS
+SIG_OPTS    = []
 
 # boot_archive(
 boot_library(
@@ -121,6 +109,7 @@ compiler_module(
     struct = "compile.ml",
     sig    = "Compile_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Compile_common", ## (Driver Compile_common)
         "//typing:Typedtree",
@@ -155,6 +144,7 @@ compiler_module(
     struct = "compile_common.ml",
     sig    = "Compile_common_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Pparse", ## (Driver Pparse)
         ":Compmisc", ## (Driver Compmisc)
@@ -257,7 +247,8 @@ compiler_signature(
 compiler_module(
     name   = "Main",
     struct = "main.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+	warnings = [w.MISSING_MLI],
     deps   = [
         ":Maindriver", ## (Driver Maindriver)
         "//stdlib:Stdlib.Sys",
@@ -315,6 +306,7 @@ compiler_module(
     struct = "maindriver.ml",
     sig    = "Maindriver_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Makedepend", ## (Driver Makedepend)
         ":Main_args", ## (Driver Main_args)
@@ -355,6 +347,7 @@ compiler_module(
     struct = "makedepend.ml",
     sig    = "Makedepend_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Depend",
         "//parsing:Lexer",
@@ -399,6 +392,7 @@ compiler_module(
     struct = "optcompile.ml",
     sig    = "Optcompile_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Compile_common", ## (Driver Compile_common)
         "//typing:Typedtree",
@@ -452,7 +446,8 @@ compiler_signature(
 compiler_module(
     name   = "Optmain",
     struct = "optmain.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+	warnings = [w.MISSING_MLI],
     deps   = [
         ":Optmaindriver",
     ],
@@ -469,6 +464,7 @@ compiler_module(
     struct = "optmaindriver.ml",
     sig    = "Optmaindriver_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Optcompile", ## (Driver Optcompile)
         ":Makedepend", ## (Driver Makedepend)

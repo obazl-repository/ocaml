@@ -13,21 +13,13 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
-load("//config:CONFIG.bzl",
-     "OC_COMMON_CFLAGS",
-     "IGNORE_MISSING_MLI",
-     "PLATFORM_CFLAGS")
+load("//config:CONFIG.bzl", "w")
 
 ## warnings
 NAME_OUT_OF_SCOPE = "40"
 
 MODULE_OPTS = []
-# OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-# + [
-#     "-nostdlib"
-# ]
 SIG_OPTS    = []
-# OC_COMMON_CFLAGS + PLATFORM_CFLAGS
 
 ## dev/test target, builds everything
 boot_archive(
@@ -202,8 +194,8 @@ compiler_module(
         "//config/arch:riscv64"   : "//asmcomp/riscv:CSE.ml",
         "//config/arch:s390x"   : "//asmcomp/s390x:CSE.ml",
     }, no_match_error = "unknown arch"),
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
-    warnings = [NAME_OUT_OF_SCOPE],
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI, w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Cmm",
         ":CSEgen",
@@ -284,7 +276,8 @@ compiler_module(
         "//config/arch:riscv64"   : "//asmcomp/riscv:arch.ml",
         "//config/arch:s390x"   : "//asmcomp/s390x:arch.ml",
     }, no_match_error = "unknown arch"),
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         "//utils:Clflags"
     ],

@@ -5,12 +5,7 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
-load("//config:CONFIG.bzl",
-     # "RUNTIME_OCAMLRUN",
-     "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS",
-     "IGNORE_MISSING_MLI",
-     )
+load("//config:CONFIG.bzl", "w") # warnings struct
 
 exports_files([
     "bytesections.mli", "bytesections.ml",
@@ -22,14 +17,7 @@ exports_files([
 ])
 
 MODULE_OPTS = []
-# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-#     "-nostdlib"
-# ]
-
 SIG_OPTS    = []
-# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-#     "-nostdlib"
-# ]
 
 ## dev/test: build everthing
 boot_library(
@@ -491,7 +479,8 @@ compiler_module(
     name   = "Opcodes",
     struct = "opcodes.ml",
     # sig    = ":Opcodes_cmi",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         # "//stdlib:Stdlib"
     ],

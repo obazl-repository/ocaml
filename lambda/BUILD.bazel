@@ -276,12 +276,12 @@ genrule(
     srcs = [
         "generate_runtimedef.sh",
         "//runtime/caml:fail.h",
-        "//runtime:primitives.dat"
+        "//runtime:primitives_dat"
     ],
     cmd = " ".join([
         "$(location :generate_runtimedef.sh)",
         "$(location //runtime/caml:fail.h)",
-        "$(location //runtime:primitives.dat)",
+        "$(location //runtime:primitives_dat)",
         " > $@"
     ]),
     visibility = ["//visibility:public"]

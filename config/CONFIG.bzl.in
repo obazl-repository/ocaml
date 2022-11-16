@@ -754,6 +754,10 @@ flexdll_dirs = [@flexdll_dir@]
 WINDOWS_UNICODE = "@windows_unicode@" == "1"
 windows_unicode = @windows_unicode@ != 0
 
-IGNORE_MISSING_MLI = ["-w", "-70"]
-
 STDLIB_RESOLVER = ["//stdlib:Stdlib"]
+
+w = struct(
+    MISSING_MLI = "70",
+    NAME_OUT_OF_SCOPE = "40",
+    NO_CMI_FIE  = "49"
+)

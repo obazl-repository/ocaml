@@ -5,15 +5,8 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
-load("//config:CONFIG.bzl",
-     "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS")
-
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-# + [
-#     "-nostdlib"
-# ]
-SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+MODULE_OPTS = []
+SIG_OPTS    = []
 
 # obazl testing, build everything
 boot_archive(

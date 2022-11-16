@@ -12,13 +12,7 @@ load("//bzl:rules.bzl",
      "boot_library",
      "compiler_signature")
 
-load("//config:CONFIG.bzl",
-     # "ROOT_MODULE_OPTS",
-     # "ROOT_SIG_OPTS",
-     "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS",
-     "IGNORE_MISSING_MLI"
-     )
+load("//config:CONFIG.bzl", "w") # warnings
 
 exports_files([
     "btype.mli", "btype.ml",
@@ -37,15 +31,8 @@ exports_files([
 ])
 
 ##FIXME: -nostdlib in global
-MODULE_OPTS = ["-w", "-40"]
-# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-#     "-nostdlib"
-# ]
-
+MODULE_OPTS = []
 SIG_OPTS    = []
-# OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
-#     "-nostdlib"
-# ]
 
 boot_archive(
     name = "typing",
@@ -212,7 +199,8 @@ compiler_signature(
 compiler_module(
     name   = "Cmt2annot",
     struct = "cmt2annot.ml",
-    opts = MODULE_OPTS + IGNORE_MISSING_MLI,
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
     deps   = [
         ":Types",
         ":Typedtree",
@@ -241,6 +229,7 @@ compiler_module(
     struct = "ctype.ml",
     sig    = "Ctype_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Location",
         "//parsing:Longident",
@@ -304,7 +293,8 @@ compiler_module(
     name   = "Datarepr",
     struct = "datarepr.ml",
     sig    = "Datarepr_cmi",
-    opts = MODULE_OPTS + ["-w", "-40"],
+    opts = MODULE_OPTS,
+	warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.Array",
@@ -337,6 +327,7 @@ compiler_module(
     struct = "env.ml",
     sig    = "Env_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//file_formats:Cmi_format",
         "//parsing:Builtin_attributes",
@@ -412,6 +403,7 @@ compiler_module(
     struct = "envaux.ml",
     sig    = "Envaux_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.Format",
@@ -542,6 +534,7 @@ compiler_module(
     struct = "includecore.ml",
     sig    = "Includecore_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Builtin_attributes",
         "//stdlib:Stdlib.Format",
@@ -595,6 +588,7 @@ compiler_module(
     struct = "includemod.ml",
     sig    = "Includemod_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Builtin_attributes",
@@ -659,6 +653,7 @@ compiler_module(
     struct = "includemod_errorprinter.ml",
     sig    = "Includemod_errorprinter_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.Bytes",
@@ -707,6 +702,7 @@ compiler_module(
     struct = "mtype.ml",
     sig    = "Mtype_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Location",
         "//stdlib:Stdlib.List",
@@ -741,6 +737,7 @@ compiler_module(
     struct = "oprint.ml",
     sig    = "Oprint_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Pprintast",
         "//stdlib:Stdlib.Bytes",
@@ -791,6 +788,7 @@ compiler_module(
     struct = "parmatch.ml",
     sig    = "Parmatch_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Ast_helper",
         "//parsing:Location",
@@ -967,6 +965,7 @@ compiler_module(
     struct = "predef.ml",
     sig    = "Predef_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Ast_helper",
         "//parsing:Location",
@@ -1071,6 +1070,7 @@ compiler_module(
     struct = "printtyp.ml",
     sig    = "Printtyp_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Location",
         "//parsing:Longident",
@@ -1212,7 +1212,8 @@ compiler_module(
     name   = "Shape",
     struct = "shape.ml",
     sig    = "Shape_cmi",
-    opts = MODULE_OPTS + ["-w", "-40"],
+    opts = MODULE_OPTS,
+	warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Ident",
         ":Path",
@@ -1238,7 +1239,8 @@ compiler_module(
     name   = "Signature_group",
     struct = "signature_group.ml",
     sig    = "Signature_group_cmi",
-    opts = MODULE_OPTS + ["-w", "-40"],
+    opts = MODULE_OPTS,
+	warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Types",
         ":Ident",
@@ -1297,6 +1299,7 @@ compiler_module(
     struct = "subst.ml",
     sig    = "Subst_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//parsing:Ast_mapper",
         "//parsing:Location",
@@ -1426,6 +1429,7 @@ compiler_module(
     struct = "typeclass.ml",
     sig    = "Typeclass_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
@@ -1498,6 +1502,7 @@ compiler_module(
     struct = "typecore.ml",
     sig    = "Typecore_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
@@ -1581,6 +1586,7 @@ compiler_module(
     struct = "typedecl.ml",
     sig    = "Typedecl_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
 
         "//parsing:Ast_helper",
@@ -1711,6 +1717,7 @@ compiler_module(
     struct = "typedecl_separability.ml",
     sig    = "Typedecl_separability_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Types",
         ":Typedecl_properties",
@@ -1859,6 +1866,7 @@ compiler_module(
     struct = "typemod.ml",
     sig    = "Typemod_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//file_formats:Cmi_format",
         "//file_formats:Cmt_format",
