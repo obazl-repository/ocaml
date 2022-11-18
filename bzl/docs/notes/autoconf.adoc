@@ -1,0 +1,215 @@
+= autoconf
+
+
+== compilation
+
+=== compiler
+
+Properties:
+
+* sizeof:  int, long, long*, short, long long
+* bits (32 or 64)
+* arch64 (true or false)
+
+=== flags
+
+These are the flags at issue:
+
+* `-O2`  (mingw32-gcc, clang, gcc, msvc)
+* `-fno-strict-aliasing` (mingw32-gcc, clang, gcc)
+* `-fwrapv`  (mingw32-gcc, clang, gcc)
+* `-fno-common`  (clang, gcc)
+* `-fexcess-precision=standard`  (mingw32-gcc, gcc)
+* `-mms-bitfields`   (mingw32-gcc)
+* `-Wno-unused`   (mingw32-gcc)
+* `-nologo` (msvc)
+* `-Gy-` (msvc)
+* `-MD`  (msvc)
+* `-D_CRT_SECURE_NO_DEPRECATE` (msvc)
+* `-d2VolatileMetadata-`  (msvc)
+
+* `-mfpmath=sse`  (i686-*-mingw32)
+* `-msse2`   (i686-*-mingw32)
+
+xlc only:
+
+* `-O5`
+* `-qtune=balanced`
+* `-qnoipa`
+* `-qinline`
+
+sunc:
+
+* `-O4`
+* `-xc99=all`
+* `-D_XPG6`
+
+=== Defines
+
+* `-D__USE_MINGW_ANSI_STDIO=0`
+* `-DUNICODE`
+* `-D_UNICODE`
+* `-DWINDOWS_UNICODE=`
+* `-D_FILE_OFFSET_BITS=64`  (*-*-mingw32, *-pc-windows)
+* `HAS_FULL_THREAD_VARIABLES` - undefined for *-apple-darwin and *-mingw32 platforms)
+
+
+```
+# We select high optimization levels, provided we can turn off:
+# - strict type-based aliasing analysis (too risky for the OCaml runtime)
+# - strict no-overflow conditions on signed integer arithmetic
+#   (the OCaml runtime assumes Java-style behavior of signed integer arith.)
+# Concerning optimization level, -O3 is somewhat risky, so take -O2.
+# Concerning language version, recent enough versions of GCC and Clang
+# default to gnu11 (C11 + GNU extensions) or gnu17, which is fine.
+
+# Note: the vendor macro can not recognize MinGW because it calls the
+# C preprocessor directly so no compiler specific macro like __MING32__
+# is defined. We thus catch MinGW first by looking at host and examine
+# the vendor only as a fall-back. We could put tis part of the logic
+# in the macro itself, too
+AS_CASE([$host],
+  [*-*-mingw32],
+    [AS_CASE([$ocaml_cv_cc_vendor],
+      [gcc-[[01234]]-*],
+        [AC_MSG_ERROR(m4_normalize([This version of MinGW-w64 GCC is too old.
+          Please use GCC version 5 or above.]))],
+      [gcc-*],
+        [internal_cflags="-Wno-unused $cc_warnings \
+-fexcess-precision=standard"
+        # TODO: see whether the code can be fixed to avoid -Wno-unused
+        common_cflags="-O2 -fno-strict-aliasing -fwrapv -mms-bitfields"
+        internal_cppflags='-D__USE_MINGW_ANSI_STDIO=0 -DUNICODE -D_UNICODE'
+        internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
+        internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
+      [AC_MSG_ERROR([Unsupported C compiler for a MinGW-w64 build])])],
+  [AS_CASE([$ocaml_cv_cc_vendor],
+    [clang-*],
+      [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
+      internal_cflags="$cc_warnings -fno-common"],
+    [gcc-[[0123]]-*|gcc-4-[[0-8]]],
+      # No C11 support
+      [AC_MSG_ERROR(m4_normalize([This version of GCC is too old.
+        Please use GCC version 4.9 or above.]), 69)],
+    [gcc-*],
+      [common_cflags="-O2 -fno-strict-aliasing -fwrapv";
+      internal_cflags="$cc_warnings -fno-common -fexcess-precision=standard"],
+    [msvc-*],
+      [common_cflags="-nologo -O2 -Gy- -MD $cc_warnings"
+      common_cppflags="-D_CRT_SECURE_NO_DEPRECATE"
+      internal_cppflags='-DUNICODE -D_UNICODE'
+      OCAML_CL_HAS_VOLATILE_METADATA
+      AS_IF([test "x$cl_has_volatile_metadata" = "xtrue"],
+            [internal_cflags='-d2VolatileMetadata-'])
+      internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
+      internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
+    [xlc-*],
+      [common_cflags="-O5 -qtune=balanced -qnoipa -qinline";
+      internal_cflags="$cc_warnings"],
+    [sunc-*], # Optimization should be >= O4 to inline functions
+              # and prevent unresolved externals
+      [common_cflags="-O4 -xc99=all -D_XPG6 $CFLAGS";
+      internal_cflags="$cc_warnings"],
+    [common_cflags="-O"])])
+```
+
+== linking
+
+=== link flags
+
+* `-Wl,-no_compact_unwind`  (x86_64-*-darwin)
+* `-static-libgcc` (*-*-mingw32)
+* `-brtl` (xlc*, powerpc-ibm-aix*)
+* `-bexpfull` (xlc*, powerpc-ibm-aix*)
+* `-mbss-plt` (gcc*, powerpc-*-linux*)
+
+
+=== link libs
+
+* `-lm`
+* `-latomic` (if !arch64 and gcc)
+
+== headers
+
+* `math.h`
+* `unistd.h`
+* `stdint.h`
+* `pthread_np.h`
+* `dirent.h`
+* `sys/select.h`
+* `stdatomic.h`
+* `sys/mman.h`
+* `afunix.h` (windows)
+* `sys/types.h` (windows)
+* `sys/utime.h` (windows)
+* `termios.h`
+* `sys/utsname.h`
+* `local.h`  (*-pc-windows)
+* `xlocale.h`
+* `sys/shm.h`
+* `spawn.h`
+
+
+== functions
+
+
+
+== types
+
+* `off_t`
+*
+
+== sys stuff
+
+* endianness (le or be)
+
+* alignment: double, long, long long
+
+
+/usr/local/share/autoconf/autoconf/specific.m4
+
+ AC_DEFUN([AC_SYS_INTERPRETER],
+     61 [AC_CACHE_CHECK(whether @%:@! works in shell scripts, ac_cv_sys_interpreter,
+     62 [echo '#! /bin/cat
+     63 exit 69
+     64 ' >conftest
+     65 chmod u+x conftest
+     66 (SHELL=/bin/sh; export SHELL; ./conftest >/dev/null 2>&1)
+     67 if test $? -ne 69; then
+     68    ac_cv_sys_interpreter=yes
+     69 else
+     70    ac_cv_sys_interpreter=no
+     71 fi
+     72 rm -f conftest])
+     73 interpval=$ac_cv_sys_interpreter
+     74 ])
+
+== mk* variables
+
+Parameterize OCaml's compiler driver functionality. mkexe, mkdll, etc.
+
+=== mkexe
+
+=== mkdll
+
+* x86_64-apple-darwin:
+  ** `-shared -undefined dynamic_lookup -Wl,-no_compact_unwind -Wl,-w`
+
+* aarch64-apple-darwin*|arm64-apple-darwin*:
+  ** `-shared -undefined dynamic_lookup -Wl,-w`
+
+* powerpc-ibm-aix*:
+   ** xlc*:  `-qmkshrobj -G`
+
+* *-*-solaris*:
+  ** sharedlib_cflags=`-fPIC`, mkdll_flags=`-shared`, rpath=`-Wl,-rpath,`
+      mksharedlibrpath=`-Wl,-rpath,`
+
+*[*-*-linux*|*-*-freebsd[3-9]*|  etc. ...
+      [sharedlib_cflags="-fPIC"
+      ... various ...
+  AS_IF([test -z "$mkdll"],
+    [mkdll="\$(CC) $mkdll_flags"
+    mkdll_exp="$CC $mkdll_flags"])])
+
+

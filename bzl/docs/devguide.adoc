@@ -1,0 +1,8 @@
+= bazel dev guide
+
+IMPORTANT: The config_setting rule has a `constraint_values`
+attribute; buried in the doc (literally parenthesized) is this note:
+"The execution platform is not considered here." So a `config_setting`
+rule can be used to find and make decisions on _target_ platform
+constraints but not _build_ (i.e. "exec") platform constraints.
+

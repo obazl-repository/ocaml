@@ -1,0 +1,41 @@
+= domain_state
+
+`runtim/caml/domain_state.tbl``
+
+This is a header file. The protocol for inclusion is:
+
+```
+#define DOMAIN_STATE(c_type, name) ...
+#include "../runtime/caml/domain_state.tbl"
+#undef DOMAIN_STATE
+```
+
+Included in:
+
+* `asmcomp/arm64.S` and the other `.S` files in `asmcomp`
+
+* `runtime/caml/domain_state.h`
+
+* `utils/domainstate.ml.c`, `utils/domainstate.mli.c`
+
+
+Preprocessed using the CPP preprocessor configured by `./configure`:
+
+* `utils/domainstate.ml` produced by preprocessing
+
+  ** `utils/domainstate.ml.c` and `runtime/caml/domain_state.tbl`
+
+* `utils/domainstate.mli` produced by preprocessing
+
+  ** `utils/domainstate.mli.c` and `runtime/caml/domain_state.tbl`
+
+Preprocessed by awk to produce assembler code:
+
+* `runtime/domain_state64.inc` produced by:
+
+  ** `runtime/gen_domain_state64_inc.awk`
+  **  `runtime/caml/domain_state.tbl`
+
+Similar for `runtime/domain_state32.inc` and "nt" variants
+
+`domain_state64.inc` is included in `runtime/amd64nt.asm` (windows only?)

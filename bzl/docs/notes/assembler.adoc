@@ -1,0 +1,8 @@
+= assembler
+
+`.S` - assembly code that must be preprocessed (may include #include, #define etc.)
+
+`.s` - pure assembly code
+
+Rule `cc_assembler` uses the effective CC toolchain to run action
+PREPROCESS_ASSEMBLE_ACTION_NAME.

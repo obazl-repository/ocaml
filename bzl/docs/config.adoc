@@ -1,0 +1,332 @@
+= runtime config
+:toc: auto
+:toclevels: 3
+
+
+from config.ml:
+
+== platform
+
+```
+let architecture = {|amd64|}
+let model = {|default|}
+let system = {|macosx|}
+
+let ext_exe = {||}
+let ext_obj = "." ^ {|o|}
+let ext_asm = "." ^ {|s|}
+let ext_lib = "." ^ {|a|}
+let ext_dll = "." ^ {|so|}
+
+let host = {|x86_64-apple-darwin22.1.0|}
+let target = {|x86_64-apple-darwin22.1.0|}
+```
+
+== toolchain
+
+`let windows_unicode = 0 != 0`
+
+`let supports_shared_libraries = true`
+
+
+=== compiler
+
+Since the OCaml compiler can be used to compile C code, we need three
+sets of compiler info: one to build the compiler on the build host,
+one for the target, and one for the target compiler to use when it compiles C
+sources (`utils/ccomp.ml`).
+
+We should be able to obtain all of this from the Bazel CC toolchain.
+
+
+```
+let ccomp_type = {|cc|}
+let c_compiler = {|gcc|}
+let c_output_obj = {|-o |}
+let c_has_debug_prefix_map = true
+let as_has_debug_prefix_map = false
+```
+
+Used by `utils/ccomp.ml` to compile C files. Evidently only the
+`ocamlc_*flags` are used.
+
+```
+let ocamlc_cflags = {|-O2 -fno-strict-aliasing -fwrapv -pthread |}
+let ocamlc_cppflags = {|-D_FILE_OFFSET_BITS=64 |}
+(* #7678: ocamlopt uses these only to compile .c files, and the behaviour for
+          the two drivers should be identical. *)
+let ocamlopt_cflags = {|-O2 -fno-strict-aliasing -fwrapv -pthread  |}
+let ocamlopt_cppflags = {| -D_FILE_OFFSET_BITS=64 |}
+```
+
+==== compile options
+
+Mac: the Bazel tc adds:
+
+```
+-D_FORTIFY_SOURCE=1
+-fstack-protector
+-fcolor-diagnostics
+-fno-omit-frame-pointer
+
+-Wall
+-Wthread-safety
+-Wself-assign
+
+-O0
+-DDEBUG
+DEBUG_PREFIX_MAP_PWD=.
+-MD
+-MF
+-no-canonical-prefixes
+-pthread
+```
+
+Mac: the makefiles add:
+
+```
+-fno-strict-aliasing
+-fwrapv
+-pthread
+-Wall
+-Werror
+-fno-common
+-D_FILE_OFFSET_BITS=64
+-no-canonical-prefixes
+-Wno-builtin-macro-redefined
+```
+
+===== -D_FILE_OFFSET_BITS=64
+
+Not needed on 64 bit platforms?
+
+"This macro should only be selected if the system provides mechanisms
+for handling large files. On 64 bit systems this macro has no effect
+since the *64 functions are identical to the normal functions."
+
+link:https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html[Feature test macros]
+
+===== -fno-common
+
+GCC:
+
+```
+-fno-common
+In C, allocate even uninitialized global variables in the data section of the object file, rather than generating them as common blocks. This has the effect that if the same variable is declared (without extern) in two different compilations, you will get an error when you link them. The only reason this might be useful is if you wish to verify that the program will work on other systems which always work this way.
+```
+
+Clang:
+
+```
+-fcommon, -fno-common
+Place uninitialized global variables in a common block
+```
+
+===== -no-canonical-prefixes
+
+"-no-canonical-prefixes is a weird flag: In gcc, it controls whether realpath() is called on the path of the driver binary. It's needed to support some usecases where gcc is symlinked to, see https://gcc.gnu.org/ml/gcc/2011-"
+
+" By default, gcc calls realpath() on prefixes generated relative to
+> argv[0] in the gcc driver.  If gcc is held as a "symlink farm" the
+> realpath() makes it fail (absent a lot of messy -B, -L, -isytem and so
+> on).  It complains about not finding cc1 or cc1plus in libexec.
+>
+> -no-canonical-prefixes turns off realpath() to make gcc work cleanly
+> when stored this way." (link:https://gcc.gnu.org/legacy-ml/gcc/2011-01/msg00429.html[])
+
+===== -fomit-frame-pointer
+
+link:https://gcc.gnu.org/onlinedocs/gcc-3.4.0/gcc/Optimize-Options.html#Optimize%20Options[gcc]:
+
+```
+-fomit-frame-pointer
+Don't keep the frame pointer in a register for functions that don't need one. This avoids the instructions to save, set up and restore frame pointers; it also makes an extra register available in many functions. It also makes debugging impossible on some machines.
+```
+
+ARM: https://developer.arm.com/documentation/101754/0619/armclang-Reference/armclang-Command-line-Options/-fomit-frame-pointer---fno-omit-frame-pointer[Arm Compiler for Embedded Reference Guide] article on -fomit-frame-pointer.  Compiler "based on LLVM and Clang technology".
+
+===== -fstack-protector
+
+Clang only?
+
+===== -fstrict-aliasing
+
+link:https://stackoverflow.com/questions/98650/what-is-the-strict-aliasing-rule[What is the strict aliasing rule?] (SO)
+
+
+link:https://stackoverflow.com/questions/63796726/c-when-would-you-not-want-to-use-strict-aliasing[c when would you not want to use strict aliasing?] (SO)
+
+GCC:
+
+```
+-fstrict-aliasing
+Allows the compiler to assume the strictest aliasing rules applicable to the language being compiled. For C (and C++), this activates optimizations based on the type of expressions. In particular, an object of one type is assumed never to reside at the same address as an object of a different type, unless the types are almost the same.
+```
+
+
+```
+-Wstrict-aliasing
+This option is only active when -fstrict-aliasing is active. It warns about code which might break the strict aliasing rules that the compiler is using for optimization. The warning does not catch all cases, but does attempt to catch the more common pitfalls. It is included in -Wall.
+```
+
+link:https://stackoverflow.com/questions/1225741/performance-impact-of-fno-strict-aliasing[Performance impact of -fno-strict-aliasing]
+
+"This option can make your generated code a bit more lightweight and optimized than it is right now (think in the 1 to 5 percent range), but do not expect any big results."
+
+Clang: does not support `-fstrict-aliasing`? But does support the flags.
+
+===== -fwrapv
+
+GCC:
+
+```
+-fwrapv
+This option instructs the compiler to assume that signed arithmetic overflow of addition, subtraction and multiplication wraps around using twos-complement representation. This flag enables some optimizations and disables other. This option is enabled by default for the Java front-end, as required by the Java language specification.
+```
+
+===== -Wself-assign
+
+Clang only?
+
+===== -Wthread-safety
+
+Clang only?
+
+=== assembler
+
+`let asm = {|gcc -c -Wno-trigraphs|}`
+
+==== cfi
+
+`let asm_cfi_supported = true`
+
+Dwarf Call Frame Information
+
+link:https://en.wikipedia.org/wiki/DWARF[DWARF] - a standarized debugging format.
+
+
+link:https://sourceware.org/binutils/docs/as/CFI-directives.html#CFI-directives[CFI directives]
+
+
+link:https://stackoverflow.com/questions/29527623/in-assembly-code-how-cfi-directive-works[In assembly code, how .cfi directive works?] (SO):
+
+"The .cfi directives do not generate any assembly code. They are not executed and do not change the layout of your call frame at all."
+
+"Instead they tell the tools which need to unwind the stack (the debugger, the exception unwinder) about the structure of the frame (and how to unwind it). Those informations are not stored alongside of the instructions but in another section of the program (see Note 1)."
+
+=== archiver
+
+`let ar = {|ar|}`
+
+link:https://embeddedartistry.com/blog/2020/04/13/prefer-gcc-ar-to-ar-in-your-buildsystems/[https://embeddedartistry.com/blog/2020/04/13/prefer-gcc-ar-to-ar-in-your-buildsystems/]
+
+
+link:https://stackoverflow.com/questions/47910759/what-is-the-difference-between-ranlib-ar-and-ld-for-making-libraries[what is the difference between ranlib, ar, and ld for making librarie] (SO)
+
+==== thin archives
+
+link:https://maskray.me/blog/2022-01-16-archives-and-start-lib[Archives and --start-lib]
+
+=== indexer
+
+link:https://man7.org/linux/man-pages/man1/ranlib.1.html[ranlib]
+
+=== linker
+
+
+```
+
+let bytecomp_c_libraries = {| -lm  -lpthread|}
+let native_c_libraries = {| -lm  -lpthread|}
+
+let default_rpath = {||}
+let mksharedlibrpath = {||}
+
+let function_sections = false
+
+let with_frame_pointers = false
+
+let native_pack_linker = {|ld -r -arch x86_64 -o |}
+```
+
+Some link options are included iin the compiler command lines, see above.
+
+
+== build cmd lines
+
+(* bytecomp_c_compiler and native_c_compiler have been supported for a
+   long time and are retained for backwards compatibility.
+   For programs that don't need compatibility with older OCaml releases
+   the recommended approach is to use the constituent variables
+   c_compiler, ocamlc_cflags, ocamlc_cppflags etc., directly.
+*)
+
+let bytecomp_c_compiler =
+  c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags
+
+let native_c_compiler =
+  c_compiler ^ " " ^ ocamlopt_cflags ^ " " ^ ocamlopt_cppflags
+
+==== ocaml c compiler
+
+The command lines the OCaml compiler uses to build executables and
+libs from C sources are `mkexe`, `mkdll`, `mkmaindll`. They're
+generated by `./configure`.
+
+Under Bazel we should be able to write a custom rule that will obtain
+these flags from the selected CC toolchain, and write them to a file,
+as a preprocessing step.
+
+```
+let mkdll, mkexe, mkmaindll = cmd line strings, e.g.
+gcc -shared -undefined dynamic_lookup -Wl,-no_compact_unwind -Wl,-w
+```
+
+== optimizations
+
+GCC: link:https://gcc.gnu.org/onlinedocs/gcc-3.4.0/gcc/Optimize-Options.html#Optimize%20Options[Options That Control Optimization]
+
+
+=== compilation
+
+link:https://stackoverflow.com/questions/7857601/why-not-always-use-compiler-optimization[Why not always use compiler optimization?] (SO)
+
+
+
+==== LTO
+
+link:https://johnysswlab.com/link-time-optimizations-new-way-to-do-compiler-optimizations/[Link Time Optimizations: New Way to Do Compiler Optimizations]
+
+Gist:
+
+* Add option `-flto` to the invocation of compiler.
+* Add option `-flto` to the invocation of the linker.
+* Additionally, you need to add all options from the compiler invocations to the invocation of the linker. So if you called your compiler with `-march=i486 -O3 -fno-stack-protector`, you will need to pass the same options to the linker.
+
+link:https://stackoverflow.com/questions/42230141/how-to-write-lto-enabled-code[How to write LTO-enabled code?] (SO)
+
+link:https://stackoverflow.com/questions/26322946/how-to-detect-code-compiled-with-lto[How to detect code compiled with LTO?] (SO)
+
+link:https://stackoverflow.com/questions/51048414/clang-how-to-check-if-lto-was-performed?noredirect=1&lq=1[Clang: How to check if LTO was performed] (SO)
+
+link:https://gcc.gnu.org/onlinedocs/gccint/LTO-Overview.html[LTO Overview] (GCC)
+
+link:https://llvm.org/docs/LinkTimeOptimization.html[LLVM Link Time Optimization: Design and Implementation]
+
+https://stackoverflow.com/questions/23736507/is-there-a-reason-why-not-to-use-link-time-optimization-lto[Is there a reason why not to use link-time optimization (LTO)?] (SO) - "As of 2020, I would try to use LTO by default on any of my projects."
+
+==== thin LTO
+
+link:https://stackoverflow.com/questions/64954525/does-gcc-have-thin-lto[Does gcc have thin lto?]  (maybe outdated)
+
+== other
+
+
+
+let profinfo = false
+let profinfo_width = 0
+
+let systhread_supported = true
+
+let flexdll_dirs = []
+
