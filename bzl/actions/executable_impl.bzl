@@ -37,14 +37,22 @@ def executable_impl(ctx):  ## , tc):
     tc = ctx.exec_groups["boot"].toolchains[
         "//boot/toolchain/type:boot"]
 
-    build_emitter = tc.build_emitter[BuildSettingInfo].value
+    # build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
     target_executor = tc.target_executor[BuildSettingInfo].value
     target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
+    print("executable: %s" % ctx.label)
+    print("tc.name: %s" % tc.name)
+    print("tc.target_executor: %s" % target_executor)
+    print("tc.target_emitter : %s" % target_emitter)
+    print("host_platform: %s" % ctx.fragments.platform.host_platform)
+    print("platform: %s" % ctx.fragments.platform.platform)
+
     stage = tc._stage[BuildSettingInfo].value
     print("module _stage: %s" % stage)
+    # fail("XEX")
 
     if stage == 2:
         ext = ".cmx"
@@ -57,7 +65,7 @@ def executable_impl(ctx):  ## , tc):
             fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_executor, stage = stage)
+        b = target_executor, t = target_emitter, stage = stage)
 
     # print("executable _stage: %s" % tc._stage)
 
@@ -179,10 +187,11 @@ def executable_impl(ctx):  ## , tc):
 
     if hasattr(ctx.attr, "use_prims"):
         if ctx.attr.use_prims:
-            args.add_all(["-use-prims", ctx.attr._primitives])
+            args.add_all(["-use-prims",
+                          ctx.file._primitives])
     else:
-        if ctx.attr.use_prims[BuildSettingInfo].value:
-            args.add_all(["-use-prims", ctx.attr._primitives])
+        if ctx.attr._use_prims[BuildSettingInfo].value:
+            args.add_all(["-use-prims", ctx.file._primitives.path])
 
     # args.add_all(tc.linkopts)
 
@@ -305,6 +314,8 @@ def executable_impl(ctx):  ## , tc):
         mnemonic = "CompileBuildTool"
     elif ctx.attr._rule == "baseline_compiler":
         mnemonic = "CompileOcamlcKick"
+    elif ctx.attr._rule == "ocaml_tool":
+        mnemonic = "CompileOCamlTool"
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
 
@@ -371,11 +382,11 @@ def executable_impl(ctx):  ## , tc):
     )
 
     exe_provider = None
-    if ctx.attr._rule == "boot_compiler":
+    if ctx.attr._rule in ["boot_compiler"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "build_tool":
+    elif ctx.attr._rule in ["build_tool", "ocaml_tool"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
         exe_provider = OcamlExecutableMarker()

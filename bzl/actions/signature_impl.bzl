@@ -33,7 +33,7 @@ def signature_impl(ctx, module_name):
 
     # workdir = "_{}/".format(stage_name(tc._stage))
 
-    build_emitter = tc.build_emitter[BuildSettingInfo].value
+    # build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
     target_executor = tc.target_executor[BuildSettingInfo].value
@@ -53,7 +53,7 @@ def signature_impl(ctx, module_name):
             fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_executor, stage = stage)
+        b = target_executor, t = target_emitter, stage = stage)
 
     # stage = ctx.attr._stage[BuildSettingInfo].value
     # print("signature _stage: %s" % tc._stage[BuildSettingInfo].value)

@@ -3,10 +3,32 @@ exports_files(["BUILD.bazel"])
 load(":BUILD.bzl", "toolchain_adapter") # , "stdlib_toolchain_adapter")
 
 ##################
+# toolchain_adapter(
+#     name        = "vmvm",
+#     # # build_emitter = "//config/build/emitter:vm",
+#     # target_emitter = "//config/build/emitter:vm",
+#     copts       = [ ## compile opts (sigs/modules only)
+#         "-nostdlib",  ## inserted by rule
+#         "-strict-sequence",
+#         # "-warn-error", "+A",
+#     ] + select({
+#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//conditions:default": []
+#     }) + select({
+#         "//config:principal?" : ["-principal"],
+#         "//conditions:default": []
+#     }) + select({
+#         "//config:absname?" : ["-absname"],
+#         "//conditions:default": []
+#     }),
+#     linkopts    = [],
+#     # warnings  - use defaults
+#     # primitives  = "//runtime:primitives",
+# )
+
+##################
 toolchain_adapter(
-    name        = "vmvm",
-    # build_emitter = "//config/build/emitter:vm",
-    # target_emitter = "//config/build/emitter:vm",
+    name        = "vv_vv",
     copts       = [ ## compile opts (sigs/modules only)
         "-nostdlib",  ## inserted by rule
         "-strict-sequence",
@@ -26,11 +48,8 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-##################
 toolchain_adapter(
-    name        = "vmsys",
-    # build_emitter = "vm",
-    # target_emitter = "sys",
+    name        = "vv_vs",
     copts       = [ ## compile opts (sigs/modules only)
         "-nostdlib",  ## inserted by rule
         "-strict-sequence",
@@ -49,6 +68,70 @@ toolchain_adapter(
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
+
+toolchain_adapter(
+    name        = "vs_ss",
+    copts       = [ ## compile opts (sigs/modules only)
+        "-nostdlib",  ## inserted by rule
+        "-strict-sequence",
+        # "-warn-error", "+A",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+)
+
+toolchain_adapter(
+    name        = "vs_sv",
+    copts       = [ ## compile opts (sigs/modules only)
+        "-nostdlib",  ## inserted by rule
+        "-strict-sequence",
+        # "-warn-error", "+A",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+)
+
+# ##################
+# toolchain_adapter(
+#     name        = "vmsys",
+#     copts       = [ ## compile opts (sigs/modules only)
+#         "-nostdlib",  ## inserted by rule
+#         "-strict-sequence",
+#         # "-warn-error", "+A",
+#     ] + select({
+#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//conditions:default": []
+#     }) + select({
+#         "//config:principal?" : ["-principal"],
+#         "//conditions:default": []
+#     }) + select({
+#         "//config:absname?" : ["-absname"],
+#         "//conditions:default": []
+#     }),
+#     linkopts    = [],
+#     # warnings  - use defaults
+#     # primitives  = "//runtime:primitives",
+# )
 
 # toolchain_adapter(
 #     name        = "sys",

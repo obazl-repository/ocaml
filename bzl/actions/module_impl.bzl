@@ -32,16 +32,23 @@ def module_impl(ctx, module_name):
 
     tc = ctx.exec_groups["boot"].toolchains["//boot/toolchain/type:boot"]
 
-    build_emitter = tc.build_emitter[BuildSettingInfo].value
+    # build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("build_emitter: %s" % build_emitter)
+
+    print("host.host_platform: %s" % ctx.fragments.platform.host_platform)
+    print("host.platform: %s" % ctx.fragments.platform.platform)
+
+    print("target.host_platform: %s" % ctx.host_fragments.platform.host_platform)
+    print("target.platform: %s" % ctx.host_fragments.platform.platform)
 
     target_runtime = tc.target_runtime[BuildSettingInfo].value
     target_executor = tc.target_executor[BuildSettingInfo].value
     target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    # print("target_runtime : %s" % target_runtime)
-    # print("target_executor: %s" % target_executor)
-    # print("target_emitter : %s" % target_emitter)
+    print("target_runtime : %s" % target_runtime)
+    print("target_executor: %s" % target_executor)
+    print("target_emitter : %s" % target_emitter)
+    # fail("BB")
 
     # if ctx.label.name == "CamlinternalFormatBasics":
     #     fail("C")
@@ -59,7 +66,7 @@ def module_impl(ctx, module_name):
             fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_executor, stage = stage)
+        b = target_executor, t = target_emitter, stage = stage)
 
     # workdir = "_{}/".format(stage)
 
@@ -331,18 +338,18 @@ def module_impl(ctx, module_name):
     args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
 
     ## FIXME: -use-prims not needed for compilation?
-    # if ctx.attr.use_prims == True:
-    #     args.add_all(["-use-prims", ctx.file._primitives.path])
-    # else:
-    #     if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
-    #         args.add_all(["-use-prims", ctx.attr._primitives])
-    #     else:
-    #         if ctx.attr._use_prims[BuildSettingInfo].value:
-    #             if not "-no-use-prims" in ctx.attr.opts:
-    #                 args.add_all(["-use-prims", ctx.attr._primitives])
-    #         else:
-    #             if  "-use-prims" in ctx.attr.opts:
-    #                 args.add_all(["-use-prims", ctx.attr._primitives])
+    if ctx.attr.use_prims == True:
+        args.add_all(["-use-prims", ctx.file._primitives.path])
+    else:
+        if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
+            args.add_all(["-use-prims", ctx.attr._primitives])
+        else:
+            if ctx.attr._use_prims[BuildSettingInfo].value:
+                if not "-no-use-prims" in ctx.attr.opts:
+                    args.add_all(["-use-prims", ctx.attr._primitives])
+            else:
+                if  "-use-prims" in ctx.attr.opts:
+                    args.add_all(["-use-prims", ctx.attr._primitives])
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)

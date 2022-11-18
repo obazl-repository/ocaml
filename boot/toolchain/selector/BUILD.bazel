@@ -4,21 +4,86 @@ package(default_visibility=["//visibility:public"])
 
 exports_files(glob(["*.bazel"]))
 
-toolchain_selector(  ## ocamlc.byte, ocamlopt.byte from ocamlc.byte
-    name           = "vmvm",
+# toolchain_selector(  ## ocamlc.byte, ocamlopt.byte from ocamlc.byte
+#     name           = "vmvm",
+#     type           = "//boot/toolchain/type:boot",
+#     adapter        = "//boot/toolchain/adapter:vmvm",
+#     build_host_constraints  = [
+#         "//platform/constraints/ocaml/executor:vm",
+#         "//platform/constraints/ocaml/emitter:vm",
+#     ],
+#     target_host_constraints = [
+#         "//platform/constraints/ocaml/executor:vm",
+#         # "//platform/constraints/ocaml/emitter:vm",
+#     ],
+# )
+
+toolchain_selector(  ## ocamlopt.byte, rom ocamlc.byte
+    name           = "vv_vv",
     type           = "//boot/toolchain/type:boot",
-    adapter        = "//boot/toolchain/adapter:vmvm",
+    adapter        = "//boot/toolchain/adapter:vv_vv",
     build_host_constraints  = [
         "//platform/constraints/ocaml/executor:vm",
-        "//platform/constraints/ocaml/emitter:vm",
     ],
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:vm",
-        # "//platform/constraints/ocaml/emitter:vm",
     ],
+    target_host_configuration = [
+        # "//platform/constraints/ocaml/emitter:vm",
+        "//config/target/emitter:vm?"
+    ]
 )
 
-toolchain_selector(  ## ocamlc.opt, ocamlopt.opt from ocamlopt.byte
+toolchain_selector(  ## ocamlopt.byte, rom ocamlc.byte
+    name           = "vv_vs",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:vv_vs",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:vm"],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:vm"],
+    target_host_configuration = [
+        "//config/target/emitter:sys?"]
+)
+
+toolchain_selector(
+    name           = "vs_ss",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:vs_ss",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:vm"],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys"],
+    target_host_configuration = [
+        "//config/target/emitter:sys?"]
+)
+
+toolchain_selector(
+    name           = "vs_sv",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:vs_sv",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:vm"],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys"],
+    target_host_configuration = [
+        "//config/target/emitter:vm?"]
+)
+
+toolchain_selector(
+    name           = "sys_sysvm",
+    type           = "//boot/toolchain/type:boot",
+    adapter        = "//boot/toolchain/adapter:vm_vmsys",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:sys"],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys"],
+    target_host_configuration = [
+        "//config/target/emitter:vm?"]
+)
+
+## vmsys: vmvm to sysvm (ocamlc.opt), syssys (ocamlopt.opt)
+toolchain_selector(
     name           = "vmsys",
     type           = "//boot/toolchain/type:boot",
     adapter        = "//boot/toolchain/adapter:vmsys",

@@ -20,19 +20,9 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
-load("//config:CONFIG.bzl",
-     "CPP",
-     # "USE_PRIMS",
-     # "DATA_PRIMS",
-     "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS"
-     # "ROOT_MODULE_OPTS",
-     # "ROOT_SIG_OPTS"
-     )
+load("//config:CONFIG.bzl", "CPP", "w")
 
-load(":BUILD.bzl",
-     ## "CONFIG_MAP",
-     "write_config")
+load(":BUILD.bzl", "write_config")
 
 exports_files([ ## for //otherlibs/dynlink:Dynlink_compilerlibs
     "arg_helper.mli", "arg_helper.ml",
@@ -57,8 +47,8 @@ exports_files([ ## for //otherlibs/dynlink:Dynlink_compilerlibs
 ## root Makefile
 # CAMLC=$(BOOT_OCAMLC) -g -nostdlib -I boot -use-prims runtime/primitives
 
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-SIG_OPTS    = [] ## OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+MODULE_OPTS = []
+SIG_OPTS    = []
 
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # ##+ ["-I", "boot"]
@@ -99,7 +89,7 @@ boot_library(
         "Arg_helper",
         "Binutils",
         "Build_path_prefix_map",
-        "Ccomp",
+        # "Ccomp",
         "Clflags",
         "Config",
         "Consistbl",
@@ -137,7 +127,7 @@ boot_library(
         "Local_store",
         "Load_path",
         "Terminfo",
-        "Ccomp",
+        # "Ccomp",
         "Warnings",
         "Consistbl",
         "Strongly_connected_components",
@@ -339,6 +329,7 @@ compiler_module(
     sig    = "Config_cmi",
     opts = MODULE_OPTS,
     deps   = [ # [
+        "//config:Config_cc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Option", # if not bootstrapping?
@@ -484,6 +475,7 @@ compiler_module(
     struct = "diffing.ml",
     sig    = "Diffing_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Option",
@@ -510,6 +502,7 @@ compiler_module(
     struct = "diffing_with_keys.ml",
     sig    = "Diffing_with_keys_cmi",
     opts = MODULE_OPTS,
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Misc", ## (Utils Misc)
         ":Diffing", ## (Utils Diffing)

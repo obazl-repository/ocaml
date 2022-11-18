@@ -15,8 +15,8 @@ cc_build_profile(
     ARCH        = ARCH,
     MODEL       = "default",
     SYSTEM      = "macosx",
-    HOST        = "x86_64-apple-darwin21.6.0",
-    TARGET      = "x86_64-apple-darwin21.6.0",
+    HOST        = "x86_64-apple-darwin22.1.0",
+    TARGET      = "x86_64-apple-darwin22.1.0",
 
     PREFIX      = PREFIX,
     BINDIR      = "${exec_prefix}/bin",

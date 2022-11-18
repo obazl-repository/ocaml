@@ -529,9 +529,12 @@ ASPP = "@ASPP@"
 LIBTOOL = "@top_builddir@/libtool"
 
 ### How to invoke the C preprocessor through the C compiler
+# FIXME: do not use the configure stuff, go through the toolchain
+# discovered by Bazel.
 CPP = "@CPP@".split(" ")
 
 ### How to invoke ar
+## FIXME: use Bazel tc
 ARCMD = "@AR@"
 ar = "@AR@"
 

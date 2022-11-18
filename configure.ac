@@ -237,9 +237,11 @@ AC_CONFIG_FILES([stdlib/META])
 
 # Bazel
 AC_CONFIG_FILES([config/CONFIG.bzl])
+AC_CONFIG_FILES([config/config_sys.ml])
+AC_CONFIG_FILES([config/config.dev.ml])
+AC_CONFIG_FILES([config/config.ml.json])
 AC_CONFIG_FILES([profile/system/local/BUILD.bazel])
 AC_CONFIG_FILES([toolchain/profile/cc/local/BUILD.bazel])
-AC_CONFIG_FILES([utils/config.dev.ml])
 
 # Definitions related to the version of OCaml
 AC_DEFINE([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])

@@ -40,8 +40,8 @@ boot_module = rule(
     # cfg = compile_mode_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
-    # fragments = ["platform", "cpp"],
-    # host_fragments = ["platform",  "cpp"],
+    fragments = ["platform", "cpp"],
+    host_fragments = ["platform",  "cpp"],
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     # toolchains = [# "//toolchain/type:boot",
     #               # "//toolchain/type:profile",

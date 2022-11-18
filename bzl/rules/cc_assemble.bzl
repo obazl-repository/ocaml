@@ -1,18 +1,23 @@
 # from https://github.com/bazelbuild/rules_cc/blob/main/examples/my_c_compile/my_c_compile.bzl
 
-load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain", "use_cpp_toolchain")
-load("@rules_cc//cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
+# also https://github.com/bazelbuild/rules_cc/blob/main/examples/my_c_archive/my_c_archive.bzl
 
-MyCCompileInfo = provider(doc = "", fields = ["object"])
+load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain", "use_cpp_toolchain")
+load("@rules_cc//cc:action_names.bzl", "PREPROCESS_ASSEMBLE_ACTION_NAME")
+
+ACTION = PREPROCESS_ASSEMBLE_ACTION_NAME
 
 DISABLED_FEATURES = [
-    "module_maps",  # # copybara-comment-this-out-please
+    "module_maps",
 ]
 
 def _cc_assemble_impl(ctx):
     cc_toolchain = find_cpp_toolchain(ctx)
     source_file = ctx.file.src
-    output_file = ctx.actions.declare_file(ctx.label.name + ".o")
+    ofile = source_file.basename
+    ext   = source_file.extension
+    ofile = source_file.basename[:-(len(ext)+1)]
+    output_file = ctx.actions.declare_file(ofile + ".o")
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
@@ -21,7 +26,7 @@ def _cc_assemble_impl(ctx):
     )
     c_compiler_path = cc_common.get_tool_for_action(
         feature_configuration = feature_configuration,
-        action_name = C_COMPILE_ACTION_NAME,
+        action_name = ACTION,
     )
 
     copts = []
@@ -40,14 +45,31 @@ def _cc_assemble_impl(ctx):
         output_file = output_file.path,
         preprocessor_defines = depset(defines)
     )
+
+    # c_link_variables = cc_common.create_link_variables(
+    #     feature_configuration = feature_configuration,
+    #     cc_toolchain = cc_toolchain,
+    #     library_search_directories=None,
+    #     runtime_library_search_directories=None,
+    #     user_link_flags=None,
+    #     output_file=None,
+    #     param_file=None,
+    #     def_file=None,
+    #     is_using_linker=True,
+    #     is_linking_dynamic_library=False,
+    #     must_keep_debug=True,
+    #     use_test_only_flags=False,
+    #     is_static_linking_mode=True
+    # )
+
     command_line = cc_common.get_memory_inefficient_command_line(
         feature_configuration = feature_configuration,
-        action_name = C_COMPILE_ACTION_NAME,
+        action_name = ACTION,
         variables = c_compile_variables,
     )
     env = cc_common.get_environment_variables(
         feature_configuration = feature_configuration,
-        action_name = C_COMPILE_ACTION_NAME,
+        action_name = ACTION,
         variables = c_compile_variables,
     )
 
@@ -57,8 +79,6 @@ def _cc_assemble_impl(ctx):
 
     merged_contexts = cc_common.merge_compilation_contexts(
         compilation_contexts = cc_ccontexts)
-
-    print("Merged headers: %s" % merged_contexts.headers)
 
     ctx.actions.run(
         executable = c_compiler_path,
@@ -120,8 +140,10 @@ cc_assemble = rule(
         "defines": attr.string_list(),
         "deps": attr.label_list(),
 
-        "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+        "_cc_toolchain": attr.label(
+            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+        ),
     },
-    toolchains = use_cpp_toolchain(),  # copybara-use-repo-external-label
+    toolchains = use_cpp_toolchain(),
     fragments = ["cpp"],
 )

@@ -426,6 +426,7 @@ stdlib_module(
     struct = "bool.ml",
     sig    = "Stdlib.Bool_cmi",
     opts = MODULE_OPTS,
+    use_prims = True
 )
 
 stdlib_signature(

@@ -83,11 +83,34 @@ build --workspace_status_command=$PWD/bzl/camlheader.sh
 ################################################################
 ## OCaml platforms: boot, vm, sys
 
-# default
-build --host_platform=//platform/ocaml:sys_vm_vm
-# default: build --//config/emitter/build:vm
-build --platforms=//platform/ocaml:sys_vm_vm
-# default: build --//config/emitter/target:vm
+build --config=vv_vv
+
+build:vv_vv --host_platform=//platform/ocaml:sys_vm
+build:vv_vv --platforms=//platform/ocaml:sys_vm
+build:vv_vv --//config/target/emitter=vm
+
+build:vv_vs --host_platform=//platform/ocaml:sys_vm
+build:vv_vs --platforms=//platform/ocaml:sys_vm
+build:vv_vs --//config/target/emitter=sys
+
+build:vs_ss --host_platform=//platform/ocaml:sys_vm
+build:vs_ss --platforms=//platform/ocaml:sys_sys
+build:vs_ss --//config/target/emitter=sys
+
+build:vs_sv --host_platform=//platform/ocaml:sys_vm
+build:vs_sv --platforms=//platform/ocaml:sys_sys
+build:vs_sv --//config/target/emitter=vm
+
+build:ss_ss --host_platform=//platform/ocaml:sys_sys
+build:ss_ss --platforms=//platform/ocaml:sys_sys
+build:ss_ss --//config/target/emitter=sys
+
+build:ss_sv --host_platform=//platform/ocaml:sys_sys
+build:ss_sv --platforms=//platform/ocaml:sys_sys
+build:ss_sv --//config/target/emitter=vm
+
+# # default: build --//config/emitter/build:vm
+# # default: build --//config/emitter/target:vm
 
 # build:boot --host_platform=//platform/ocaml:boot_build
 # build:boot --platforms=//platform/ocaml:boot_target

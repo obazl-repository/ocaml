@@ -10,3 +10,5 @@ ensure this. So when you cross-compile, for example from Mac to Linux,
 you will see both the Mac local compiler used to compile such build
 tools, and the cross-compiler used to compile output for the foreign
 target.
+
+link:https://clang.llvm.org/docs/CrossCompilation.html[Cross-compilation using Clang]

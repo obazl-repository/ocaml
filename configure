@@ -3378,11 +3378,15 @@ ac_config_files="$ac_config_files stdlib/META"
 # Bazel
 ac_config_files="$ac_config_files config/CONFIG.bzl"
 
+ac_config_files="$ac_config_files config/config_sys.ml"
+
+ac_config_files="$ac_config_files config/config.dev.ml"
+
+ac_config_files="$ac_config_files config/config.ml.json"
+
 ac_config_files="$ac_config_files profile/system/local/BUILD.bazel"
 
 ac_config_files="$ac_config_files toolchain/profile/cc/local/BUILD.bazel"
-
-ac_config_files="$ac_config_files utils/config.dev.ml"
 
 
 # Definitions related to the version of OCaml
@@ -20665,9 +20669,11 @@ do
     "otherlibs/runtime_events/META") CONFIG_FILES="$CONFIG_FILES otherlibs/runtime_events/META" ;;
     "stdlib/META") CONFIG_FILES="$CONFIG_FILES stdlib/META" ;;
     "config/CONFIG.bzl") CONFIG_FILES="$CONFIG_FILES config/CONFIG.bzl" ;;
+    "config/config_sys.ml") CONFIG_FILES="$CONFIG_FILES config/config_sys.ml" ;;
+    "config/config.dev.ml") CONFIG_FILES="$CONFIG_FILES config/config.dev.ml" ;;
+    "config/config.ml.json") CONFIG_FILES="$CONFIG_FILES config/config.ml.json" ;;
     "profile/system/local/BUILD.bazel") CONFIG_FILES="$CONFIG_FILES profile/system/local/BUILD.bazel" ;;
     "toolchain/profile/cc/local/BUILD.bazel") CONFIG_FILES="$CONFIG_FILES toolchain/profile/cc/local/BUILD.bazel" ;;
-    "utils/config.dev.ml") CONFIG_FILES="$CONFIG_FILES utils/config.dev.ml" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "otherlibs/unix/META") CONFIG_FILES="$CONFIG_FILES otherlibs/unix/META" ;;
     "otherlibs/str/META") CONFIG_FILES="$CONFIG_FILES otherlibs/str/META" ;;

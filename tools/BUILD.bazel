@@ -4,11 +4,11 @@ load("//bzl:rules.bzl",
      "boot_executable",
      "boot_library",
      "boot_lexer",
+     "build_module",
      "build_tool",
      "compiler_module",
      "compiler_signature",
-
-     # "baseline_executable"
+     "ocaml_tool"
 )
 
 exports_files([
@@ -28,6 +28,10 @@ SIG_OPTS    = []
 # $(programs_byte:%=%$(EXE)):
 # 	$(CAMLC) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(filter-out %.cmi,$^)
 
+## OBazl divides these into two classes: build tools and ocaml tools.
+## The former are used only to build the compiler and tools, or for
+## use by compiler engineers; the latter are utilities designed for users.
+
 ################################################################
 # The dependency generator
 # OCAMLDEP = \
@@ -38,7 +42,7 @@ SIG_OPTS    = []
 # ocamldep$(EXE): $(OCAMLDEP)
 # ocamldep.opt$(EXE): $(call byte2native, $(OCAMLDEP))
 
-boot_executable(
+ocaml_tool(
     name = "ocamldep",
     main = ":Ocamldep",
     prologue = [
@@ -50,7 +54,7 @@ boot_executable(
 ################################################################
 # Profiling: https://ocaml.org/manual/profil.html
 # The OCaml profiling compilers: ocamlcp, ocamloptp, ocamlprof
-boot_executable(
+ocaml_tool(
     name = "ocamlprof",
     prologue = [
         "//utils:Config",
@@ -79,7 +83,7 @@ boot_executable(
     # toolchains = ["//toolchain/profile/ocaml"]
 )
 
-boot_executable(
+ocaml_tool(
     name = "ocamlcp",
     main = ":Ocamlcp",
     prologue = [
@@ -103,7 +107,8 @@ boot_executable(
     ]
 )
 
-boot_executable(
+# profiling compiler
+ocaml_tool(
     name = "ocamloptp",
     main = ":Ocamloptp",
     prologue = [
@@ -129,7 +134,7 @@ boot_executable(
 
 ################################################################
 # To help building mixed-mode libraries (OCaml + C)
-boot_executable(
+ocaml_tool(
     name = "ocamlmklib",
     main = ":Ocamlmklib",
     prologue = [
@@ -146,7 +151,7 @@ boot_executable(
 #        local_store.cmo load_path.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
 # ocamlmktop$(EXE): $(OCAMLMKTOP)
 # ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
-boot_executable(
+ocaml_tool(
     name = "ocamlmktop",
     main = ":Ocamlmktop",
     prologue = [
@@ -171,14 +176,15 @@ boot_executable(
 # $(cvt_emit): cvt_emit.cmo
 # 	$(CAMLC) $(LINKFLAGS) -o $@ $^
 
-boot_executable(
-    name = "cvt_emit.exe",
+##FIXME: this should only be built as a vm executable
+# ocaml_tool(
+build_tool(
+    name = "cvt_emit",
     main = ":Cvt_emit",
-    opts = ["-I", "bazel-out/darwin-fastbuild/bin/runtime/"],
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-compiler_module(
+build_module(
     name   = "Cvt_emit",
     struct = "cvt_emit_ml",
     opts = MODULE_OPTS,
@@ -199,7 +205,7 @@ boot_lexer(
 
 ################################################################
 # Reading cmt files
-boot_executable(
+ocaml_tool(
     name = "ocamlcmt",
     main = ":Ocamlcmt",
     prologue = [
@@ -216,8 +222,8 @@ boot_executable(
 #           opnames.cmo dumpobj.cmo
 # dumpobj$(EXE): $(DUMPOBJ)
 # dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
-## i.e. only native, no vm build
-boot_executable(
+
+build_tool(
     name = "dumpobj",
     main = ":Dumpobj",
     prologue = [
@@ -226,14 +232,11 @@ boot_executable(
         ":Opnames",
         ":Dumpobj"
     ],
-    target_compatible_with = [
-        "//platform/target:sys?"
-    ]
 )
 
 ################################################################
 ## ocamlobjinfo - Display info on compiled files
-boot_executable(
+ocaml_tool(
     name = "ocamlobjinfo",
     main = ":Objinfo",
     prologue = [
@@ -250,7 +253,7 @@ boot_executable(
 #         primreq.cmo
 # primreq$(EXE): $(PRIMREQ)
 # primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
-boot_executable(
+ocaml_tool(
     name = "primreq",
     main = ":Primreq",
     prologue = [
@@ -261,25 +264,9 @@ boot_executable(
 
 ################
 # Copy a bytecode executable, stripping debug info
-boot_executable(
+ocaml_tool(
     name = "stripdebug",
     main = ":Stripdebug",
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
-    ]
-)
-
-################
-# Compare two bytecode executables
-# CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
-#        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
-#        cmpbyt.cmo
-# cmpbyt$(EXE): $(CMPBYT)
-# cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
-boot_executable(
-    name = "cmpbyt",
-    main = ":Cmpbyt",
     prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
@@ -408,7 +395,7 @@ compiler_module(
 
 compiler_module(
     name   = "Dumpobj",
-    target_compatible_with = ["//platform/target:sys?"],
+    # target_compatible_with = ["//platform/target:sys?"],
     struct = "dumpobj.ml",
     opts = MODULE_OPTS,
     deps   = [
@@ -715,6 +702,22 @@ compiler_module(
         "//stdlib:Stdlib.Sys",
         "//utils:Misc",
     ],
+)
+
+################
+# Compare two bytecode executables
+# CMPBYT=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
+#        $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
+#        cmpbyt.cmo
+# cmpbyt$(EXE): $(CMPBYT)
+# cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
+build_tool(
+    name = "cmpbyt",
+    main = ":Cmpbyt",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+    ]
 )
 
 ################################################################

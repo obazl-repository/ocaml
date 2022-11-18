@@ -1,0 +1,308 @@
+{
+    "domain_states":
+    [
+        {
+            "type": "atomic_uintnat",
+            "name": "young_limit",
+            "offset": 0,
+            "docstring": "Minor heap limit. Typically young_limit == young_start, but this field is set by other domains to signal this domain by causing a spurious allocation failure."
+        },
+        {
+            "type": "value*",
+            "name": "young_ptr",
+            "offset": 8,
+            "docstring": "Minor heap pointer"
+        },
+        {
+            "type": "value*",
+            "name": "young_start",
+            "offset": 16,
+            "docstring": "Start of the minor heap"
+        },
+        {
+            "type": "value*",
+            "name": "young_end",
+            "offset": 24,
+            "docstring": "End of the minor heap. always(young_start <= young_ptr <= young_end)"
+        },
+        {
+            "type": "struct stack_info*",
+            "name": "current_stack",
+            "offset": 32,
+            "docstring": "Current stack"
+        },
+        {
+            "type": "void*",
+            "name": "exn_handler",
+            "offset": 40,
+            "docstring": "Pointer into the current stack"
+        },
+        {
+            "type": "int",
+            "name": "action_pending",
+            "offset": 48,
+            "docstring": "Whether we are due to start the processing of delayable pending actions. See runtime/signal.c."
+        },
+        {
+            "type": "struct c_stack_link*",
+            "name": "c_stack",
+            "offset": 56,
+            "docstring": "The C stack associated with this domain. Used by this domain to perform external calls."
+        },
+        {
+            "type": "struct stack_info**",
+            "name": "stack_cache",
+            "offset": 64,
+            "docstring": "This is a list of freelist buckets of stacks"
+        },
+        {
+            "type": "value*",
+            "name": "gc_regs_buckets",
+            "offset": 72,
+            "docstring": "Cache of free gc_regs buckets. Documented in fiber.h."
+        },
+        {
+            "type": "value*",
+            "name": "gc_regs",
+            "offset": 80,
+            "docstring": "Pointer to currently-used register bucket, or NULL. Documented in fiber.h."
+        },
+        {
+            "type": "struct caml_minor_tables*",
+            "name": "minor_tables",
+            "offset": 88
+        },
+        {
+            "type": "struct mark_stack*",
+            "name": "mark_stack",
+            "offset": 96,
+            "docstring": "Mark stack"
+        },
+        {
+            "type": "uintnat",
+            "name": "marking_done",
+            "offset": 104,
+            "docstring": "Is marking done for the current major cycle."
+        },
+        {
+            "type": "uintnat",
+            "name": "sweeping_done",
+            "offset": 112,
+            "docstring": "Is sweeping done for the current major cycle."
+        },
+        {
+            "type": "uintnat",
+            "name": "allocated_words",
+            "offset": 120
+        },
+        {
+            "type": "uintnat",
+            "name": "swept_words",
+            "offset": 128
+        },
+        {
+            "type": "intnat",
+            "name": "major_work_computed",
+            "offset": 136,
+            "docstring": "total work accumulated in this GC clock cycle (in words)"
+        },
+        {
+            "type": "intnat",
+            "name": "major_work_todo",
+            "offset": 144,
+            "docstring": "balance of work to do in this GC clock cycle (in words) positive: we need to do this amount of work to finish the slice negative: we have done more than we need and this is credit"
+        },
+        {
+            "type": "double",
+            "name": "major_gc_clock",
+            "offset": 152
+        },
+        {
+            "type": "struct caml__roots_block*",
+            "name": "local_roots",
+            "offset": 160
+        },
+        {
+            "type": "struct caml_ephe_info*",
+            "name": "ephe_info",
+            "offset": 168
+        },
+        {
+            "type": "struct caml_final_info*",
+            "name": "final_info",
+            "offset": 176
+        },
+        {
+            "type": "intnat",
+            "name": "backtrace_pos",
+            "offset": 184
+        },
+        {
+            "type": "intnat",
+            "name": "backtrace_active",
+            "offset": 192
+        },
+        {
+            "type": "backtrace_slot*",
+            "name": "backtrace_buffer",
+            "offset": 200
+        },
+        {
+            "type": "value",
+            "name": "backtrace_last_exn",
+            "offset": 208
+        },
+        {
+            "type": "intnat",
+            "name": "compare_unordered",
+            "offset": 216
+        },
+        {
+            "type": "uintnat",
+            "name": "oo_next_id_local",
+            "offset": 224
+        },
+        {
+            "type": "uintnat",
+            "name": "requested_major_slice",
+            "offset": 232
+        },
+        {
+            "type": "uintnat",
+            "name": "requested_minor_gc",
+            "offset": 240
+        },
+        {
+            "type": "atomic_uintnat",
+            "name": "requested_external_interrupt",
+            "offset": 248
+        },
+        {
+            "type": "int",
+            "name": "parser_trace",
+            "offset": 256,
+            "docstring": "See parsing.c"
+        },
+        {
+            "type": "asize_t",
+            "name": "minor_heap_wsz",
+            "offset": 264
+        },
+        {
+            "type": "struct caml_heap_state*",
+            "name": "shared_heap",
+            "offset": 272
+        },
+        {
+            "type": "int",
+            "name": "id",
+            "offset": 280
+        },
+        {
+            "type": "int",
+            "name": "unique_id",
+            "offset": 288
+        },
+        {
+            "type": "value",
+            "name": "dls_root",
+            "offset": 296,
+            "docstring": "Domain-local state"
+        },
+        {
+            "type": "double",
+            "name": "extra_heap_resources",
+            "offset": 304
+        },
+
+        {
+            "type": "double",
+            "name": "extra_heap_resources_minor",
+            "offset": 312
+        },
+        {
+            "type": "uintnat",
+            "name": "dependent_size",
+            "offset": 320
+        },
+        {
+            "type": "uintnat",
+            "name": "dependent_allocated",
+            "offset": 328
+        },
+        {
+            "type": "struct caml_extern_state*",
+            "name": "extern_state",
+            "offset": 336
+        },
+        {
+            "type": "struct caml_intern_state*",
+            "name": "intern_state",
+            "offset": 344
+        },
+
+        {
+            "type": "uintnat",
+            "name": "stat_minor_words",
+            "offset": 352
+        },
+        {
+            "type": "uintnat",
+            "name": "stat_promoted_words",
+            "offset": 360
+        },
+        {
+            "type": "uintnat",
+            "name": "stat_major_words",
+            "offset": 368
+        },
+        {
+            "type": "intnat",
+            "name": "stat_minor_collections",
+            "offset": 376
+        },
+        {
+            "type": "intnat",
+            "name": "stat_forced_major_collections",
+            "offset": 384
+        },
+        {
+            "type": "uintnat",
+            "name": "stat_blocks_marked",
+            "offset": 392
+        },
+        {
+            "type": "int",
+            "name": "inside_stw_handler",
+            "offset": 400,
+            "docstring": "whether or not a domain is inside of a stop-the-world handler this is used for several debug assertions inside of methods that can only be called from either in or outside this state."
+        },
+        {
+            "type": "intnat",
+            "name": "trap_sp_off",
+            "offset": 408
+        },
+        {
+            "type": "intnat",
+            "name": "trap_barrier_off",
+            "offset": 416
+        },
+        {
+            "type": "int64_t",
+            "name": "trap_barrier_block",
+            "offset": 424
+        },
+        {
+            "type": "struct caml_exception_context*",
+            "name": "external_raise",
+            "offset": 432,
+            "docstring": "Bytecode TLS vars, not used for native code"
+        },
+        {
+            "type": "extra_params_area",
+            "name": "extra_params",
+            "offset": 440,
+            "docstring": "This member must occur last, because it is an array, not a scalar"
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+load("//config:BUILD.bzl", "executor_setting")
+
+executor_setting(
+    name = "executor",
+    build_setting_default = "null",
+    executor = select({
+        "//platform/constraints/ocaml/executor:sys?": "sys",
+        "//platform/constraints/ocaml/executor:vm?": "vm",
+    }),
+    visibility = ["//visibility:public"]
+)

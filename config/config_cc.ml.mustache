@@ -1,0 +1,20 @@
+let ccomp_type = {|{{ccomptype}}|}
+let c_compiler = {|{{compiler}}|}
+let c_output_obj = {|{{outputobj}} |}
+let ocamlc_cflags = {|{{#c_compile_cmd_line}} {{{.}}}{{/c_compile_cmd_line}}|}
+let ocamlc_cppflags = {|{{#preprocess_assemble_cmd_line}}{{{.}}}{{/preprocess_assemble_cmd_line}}|}
+let ocamlopt_cflags = {|{{#c_compile_cmd_line}} {{{.}}}{{/c_compile_cmd_line}}|}
+let ocamlopt_cppflags = {|{{#preprocess_assemble_cmd_line}}{{{.}}}{{/preprocess_assemble_cmd_line}}|}
+let asm = {|{{compiler}} {{#assemble_cmd_line}} {{{.}}}{{/assemble_cmd_line}}|}
+
+let bytecomp_c_compiler =
+  c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags
+let native_c_compiler =
+  c_compiler ^ " " ^ ocamlopt_cflags ^ " " ^ ocamlopt_cppflags
+
+let ar = {|{{ar_executable}}|}
+
+let architecture = {|{{arch}}|}
+let model = {|{{model}}|}
+let system = {|{{system}}|}
+

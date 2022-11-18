@@ -19,7 +19,7 @@ OBazl partitions the output of `./configure` accordingly:
 The configuration information is communicated to build rules through
 Bazels _custom variable_ mechanism.
 
-=== config settings
+== config settings
 
 
 * `--//config:primitives=/path/to/primitives` - sets the file of
@@ -46,6 +46,88 @@ NB: example of file that needs this is asmcomp/reloadgen.ml. Compiled
   `["-w", "+a-4-9-41-42-44-45-48"]`
 
 
+== features
+
+
+
+==== -D_FILE_OFFSET_BITS=64
+
+Not needed on 64 bit platforms.
+
+"This macro should only be selected if the system provides mechanisms
+for handling large files. On 64 bit systems this macro has no effect
+since the *64 functions are identical to the normal functions."
+
+link:https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html[Feature test macros]
+
+==== -use-prims
+
+==== function_sections
+
+"Function sections" is a technique for reducing the size of the kernel image."  By eliminating dead code, apparently.
+
+(link:https://elinux.org/Function_sections[Function sections] elinux.org)
+
+link:https://www.vidarholen.net/contents/blog/?p=729[So what exactly is -ffunction-sections and how does it reduce binary size?]
+
+But: "When you specify these options, the assembler and linker will create larger object and executable files and will also be slower."
+
+link:https://gcc.gnu.org/onlinedocs/gcc-2.95.2/gcc_2.html#SEC10[Options that Control Optimization]
+
+
+==== data sections
+
+link:https://devzone.nordicsemi.com/f/nordic-q-a/48438/what-is--fdata-sections-in-gcc[What is -fdata-sections in gcc?]
+
+==== misc
+
+Thin archives, --start-lib, --end-lib: link:https://maskray.me/blog/2022-01-16-archives-and-start-lib[Archives and --start-lib]
+
 == C config
 
 C compile flags for specific files may be set on the command line using `--per_file_copt`.
+
+
+== new regime
+
+Distinct classes of config data.
+
+Features: ?
+
+* system config - produced by system interrogtion (./configure) -
++
+For example, a C header with #define macros like HAVE_UNISTD_H. OCaml
+uses `runtime/caml/s.h` for these C config items.
+
++
+* toolchain config - cflags, extensions, etc. Under Bazel these are
+  handled by the toolchain, and config settings; should not be
+  in ./configure.
+
+* build config - e.g. flambda enable, force_instrumented_runtime,
+  flat_float_array, etc. Also stuff like `--enable-mmap-map-stack`,
+  `--disable-stdlib-manpages`, etc..
++
+** These config items determined by user, not system interrogation - should not be in ./configure.
+** OTOH, whether such a feature may be platform- or toolchain-dependent, e.g. function-sections.
++
+* deployment config - e.g. libdir
+
+Problem: some config items controlled by the user via Bazel build
+settings must be communicated to the OCaml source files.  For
+example, `asmcomp/asmlink.ml` makes decisions based on the
+`function_sections` config item.
+
+Problem: some config items span two (or more?) categories.For example,
+`-ffunction-sections` is a user-controllable item, specifiable via
+something like `--//config/link:function_sections`. OTOH, not all
+toolchains support it, so system interrogation must discover that.
+
+
+Problem: we actually have two sets of config items. First we have
+those that control the build of the compiler. Then we have those that
+the compiler supports, i.e.those that configure a built compiler's
+operations. To continue the example, we can build the compiler with
+(or without) `-ffunction-sections`; users of the built compiler can
+tell it to emit code with or without `-ffunction-sections`.
+

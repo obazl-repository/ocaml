@@ -24,7 +24,7 @@ def archive_impl(ctx):
     tc = ctx.exec_groups["boot"].toolchains[
             "//boot/toolchain/type:boot"]
 
-    build_emitter = tc.build_emitter[BuildSettingInfo].value
+    # build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
     target_executor = tc.target_executor[BuildSettingInfo].value
@@ -44,7 +44,7 @@ def archive_impl(ctx):
             fail("Bad target_executor: %s" % target_executor)
 
     workdir = "_{b}{t}{stage}/".format(
-        b = build_emitter, t = target_executor, stage = stage)
+        b = target_executor, t = target_emitter, stage = stage)
 
     # print("archive _stage: %s" % stage)
 

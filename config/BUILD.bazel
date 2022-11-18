@@ -3,7 +3,68 @@ load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag",
      "string_list_flag")
 
+load("//bzl/rules:config_cc_toolchain.bzl", "config_cc_toolchain")
+load("//bzl/rules:config_sys.bzl", "config_sys")
+
+load("//bzl:rules.bzl",
+     "compiler_module",
+     "compiler_signature",
+)
 package(default_visibility = ["//visibility:public"])
+
+compiler_module(
+    name   = "Config_cc",
+    struct = "config_cc.ml",
+)
+
+genrule(
+    name = "__config_cc_ml__",
+    outs = ["config_cc.ml"],
+    srcs = [
+        "config_cc.json",
+        "config_cc.ml.mustache"
+    ],
+    tools = ["//vendor/mustach"],
+    cmd = " ".join([
+        "$(execpath //vendor/mustach)",
+        "$(location config_cc.json)",
+        "$(location config_cc.ml.mustache)",
+        ">",
+        "$@"
+    ]),
+    toolchains = ["//profile/system/local"],
+    visibility = ["//boot:__pkg__"]
+)
+
+config_cc_toolchain(
+    name = "config.cc",
+    out  = "config_cc.json"
+)
+
+config_sys(
+    name = "config.sys",
+    out  = "config_sys.json",
+)
+
+genrule(
+    name = "__config_ml__",
+    outs = ["config.ml"],
+    srcs = [
+        "config.ml.json",
+        "config.ml.mustache"
+    ],
+    tools = ["//vendor/mustach"],
+    cmd = " ".join([
+        "$(execpath //vendor/mustach)",
+        "$(location config.ml.json)",
+        "$(location config.ml.mustache)",
+        ">",
+        "$@"
+    ]),
+    toolchains = ["//profile/system/local"],
+    visibility = ["//boot:__pkg__"]
+)
+
 
         ## GLOBAL CONFIGURABLE DEFAULTS
         # _debug           = attr.label(default = "@ocaml//debug"),

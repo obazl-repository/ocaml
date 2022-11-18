@@ -16,7 +16,7 @@ def _toolchain_adapter_impl(ctx):
         build_host             = ctx.attr.build_host,
         target_host            = ctx.attr.target_host,
         # _build_executor        = ctx.attr._build_executor,
-        build_emitter          = ctx.attr.build_emitter,
+        # build_emitter          = ctx.attr.build_emitter,
         target_runtime         = ctx.attr.target_runtime,
         target_executor        = ctx.attr.target_executor,
         target_emitter         = ctx.attr.target_emitter,
@@ -60,10 +60,10 @@ toolchain_adapter = rule(
         #     default = "//config/build/executor",
         # ),
 
-        "build_emitter" : attr.label(
-            default = "//config/build/emitter",
-            # cfg = emitter_out_transition,
-        ),
+        # "build_emitter" : attr.label(
+        #     default = "//config/build/emitter",
+        #     # cfg = emitter_out_transition,
+        # ),
 
         "target_runtime" : attr.label(default = "//config/target/runtime"),
         "target_executor": attr.label(default = "//config/target/executor"),

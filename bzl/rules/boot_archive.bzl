@@ -30,8 +30,8 @@ boot_archive = rule(
     ),
     provides = [OcamlArchiveProvider, BootInfo],
     executable = False,
-    # fragments = ["platform", "cpp"],
-    # host_fragments = ["platform",  "cpp"],
+    fragments = ["platform", "cpp"],
+    host_fragments = ["platform",  "cpp"],
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     # toolchains = ["//toolchain/type:boot",
     #               # "//toolchain/type:profile",

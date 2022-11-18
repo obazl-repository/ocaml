@@ -4,7 +4,9 @@ load("@bazel_skylib//rules:common_settings.bzl",
 
 ## NB: config flags a settings, e.g. --//runtime:dbg, at bottom of file
 
-load("//bzl:rules.bzl", "boot_executable")
+load("//bzl:rules.bzl", "boot_executable", "cc_assemble")
+
+load("//config:CONFIG.bzl", "ARCH")
 
 exports_files(["gen_primitives.sh"] + glob(["*.c"]))
 
@@ -32,7 +34,7 @@ cc_library(
     name = "camlrun",
     alwayslink = True, linkstatic = True,
     srcs = [
-        "//runtime:build_config.h",
+        # "//runtime:build_config.h",
         "//runtime:common_c_sources",
         "//runtime:bytecode_only_c_sources"
     ] + select({
@@ -49,6 +51,10 @@ cc_library(
         "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
+
+        "-DOCAML_STDLIB_DIR=/foo/bar",
+        "-DHOST=foobar"
+
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
@@ -85,15 +91,18 @@ cc_library(
     ],
 )
 
+################################################################
 ###########
 cc_library(
     name = "asmrun",
     # alwayslink = True,
     linkstatic = True,
+    # linkshared = True,
     srcs = [
         "//runtime:build_config.h",
         "//runtime:common_c_sources",
-        "//runtime:native_only_c_sources"
+        "//runtime:native_only_c_sources",
+        ":asm"
     ],
     copts = [
         "-x", "c",
@@ -110,7 +119,7 @@ cc_library(
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
     }),
-    linkopts = ["$(OC_LDFLAGS)"],
+    linkopts = ["$(OC_LDFLAGS)", "-ffunction-sections"],
     defines = RUNTIME_DEFINES + [ # OC_NATIVE_DEFINES + [
     ] + select({
         # to unify camlrun and asmrun targets, need to select these:
@@ -121,7 +130,7 @@ cc_library(
             "SYS_$(SYSTEM)"
         ] #testing
     }),
-    deps = ["//runtime/caml:hdrs"],
+    deps = ["//runtime/caml:hdrs", ":asm"],
     toolchains = ["//profile/system/local"],
     visibility = [
         "//visibility:public"
@@ -132,73 +141,53 @@ cc_library(
     ],
 )
 
-### //runtime:ocamlc moved to //compilers:ocamlc
-## root Makefile:
-# The bytecode compiler
-# ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
-#               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
-# 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
-## level 0 - uses //boot/baseline:ocamlc
-# ocamlc_runtime(
-# boot_executable(
-#     name = "ocamlc",
-#     # exe  = "ocamlc",
-#     opts = ["-compat-32"],
-#     deps = [
-#         "//compilerlibs:ocamlcommon",
-#         "//bytecomp:ocamlbytecomp"
-#     ],
-#     visibility = ["//visibility:public"]
-# )
+cc_assemble(
+    name = "asm",
+    src = select({
+        "//platform:windows_x86_32?": ARCH + "nt.asm",
+        "//platform:windows_x86_64?": ARCH + "nt.asm",
+        "//conditions:default"      : ARCH + ".S"
+    }),
+    copts = [
+        "-Iruntime", # caml/m.h
+        "-I$(GENDIR)/runtime/caml/cross-compile", # s.h
+    ],
+    defines = RUNTIME_DEFINES + [
+        "NATIVE_CODE",
+        "TARGET_$(ARCH)",
+        "MODEL_$(MODEL)",
+        "SYS_$(SYSTEM)"
+    ],
+    deps = ["//runtime/caml:hdrs"],
+    toolchains = ["//profile/system/local"],
+)
 
-# ifeq "$(TOOLCHAIN)" "msvc"
-# ASM_EXT := asm
-# ASM_SOURCES := $(ARCH)nt.$(ASM_EXT)
-# else
-# ASM_EXT := S
-# ASM_SOURCES := $(ARCH).$(ASM_EXT)
-# endif
+################################################################
+# ARCH = "arm64"
+genrule(
+    name = "__asm__",
+    srcs = ["//runtime/caml:domain_state.json"] + select({
+        # "//platform:windows_x86_32?": [ARCH + "nt.asm.mustache"],
+        # "//platform:windows_x86_64?": [ARCH + "nt.asm.mustache"],
+        "//conditions:default"      : [
+            ARCH + ".S.mustache"
+        ]
+    }),
+    outs = [ARCH + ".S"],
+    tools = ["//vendor/mustach"],
+    cmd = " ".join([
+        "$(execpath //vendor/mustach)",
+        "$(location //runtime/caml:domain_state.json)",
+        "$(location {}.S.mustache)".format(ARCH),
+        ">",
+        "$@"
+    ]),
+    toolchains = ["//profile/system/local"],
+    visibility = ["//boot:__pkg__"]
+)
 
-## Makefile.build_config.in:
-## Platform-dependent assembler files to use to build the runtime
-# runtime_ASM_OBJECTS = $(addprefix runtime/,@runtime_asm_objects@)
-
-## configure.ac:
-# AS_CASE([$ccomptype],
-#   [msvc],
-#     [runtime_asm_objects=${arch}nt.${OBJEXT}],
-#   [runtime_asm_objects=${arch}.${OBJEXT}])
-
-## configure:
-# case $ccomptype in #(
-#   msvc) :
-#     runtime_asm_objects=${arch}nt.${OBJEXT} ;; #(
-#   *) :
-#     runtime_asm_objects=${arch}.${OBJEXT} ;;
-# esac
-
-##  ASPP: assembler w/preprocessor, default "$CC -c"
-# runtime/%.o: runtime/%.S
-# 	$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
-# runtime/%.d.o: runtime/%.S
-# 	$(ASPP) $(OC_ASPPFLAGS) $(OC_DEBUG_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
-# runtime/%.i.o: runtime/%.S
-# 	$(ASPP) $(OC_ASPPFLAGS) $(OC_INSTR_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
-# runtime/%_libasmrunpic.o: runtime/%.S
-# 	$(ASPP) $(OC_ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
-
-
-## OBJEXT: set by configure, but only 2 possibilities: .S or .asm
-## ARCH: arm | arm64 | i386 | amd64 | power | riscv | s390x
-## Bazel: arch must be set, by config setting to be determined.
-## For now it's hardcoded as amd64 since I'm using a legacy Mac for dev.
-# RUNTIME_ASM_OBJECTS = select({
-#     "//platform:windows_x86_32?": [ARCH + "nt.asm"],
-#     "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
-# })
-
+################################################################
 ## WARNING: on windows the build for asm files is different, see //Makefile
-
 filegroup(
     name = "common_c_sources",
     srcs = ["sync_posix.h"] + glob(
@@ -372,7 +361,7 @@ genrule(
     outs = ["build_config.h"],
     name = "build_config_h",
     tools = ["//runtime:sak.exe"],
-    srcs = ["//:Makefile.config", "//profile/system/local:BUILD.bazel"],
+    srcs = ["//profile/system/local:BUILD.bazel"],
     cmd  = " ".join([
         "STDLIBDIR=`$(location //runtime:sak.exe) encode-C-literal $(LIBDIR)`;",
 	    "echo '/* This file is generated from $(location //profile/system/local:BUILD.bazel) */' > $@;",
@@ -390,6 +379,8 @@ genrule(
   #   cp $^ $@
 
 ## FIXME: do the cmp
+## FIXME: custom rule, to insert stage-dependent workdir
+## or use sh_binary?
 genrule(
     outs  = ["primitives.dat"],
     name  = "primitives_dat",
@@ -423,19 +414,19 @@ genrule(
 genrule(
     outs  = ["prims.c"],
     name  = "prims_c",
-    srcs  = [":primitives.dat"],
+    srcs  = [":primitives_dat"],
     cmd   = "\n".join([
-        "PRIMS=`cat $(location primitives.dat)`;",
+        "PRIMS=`cat $(location primitives_dat)`;",
         # "echo PRIMS: $$PRIMS;",
 	    "echo '#define CAML_INTERNALS' > $@;",
         "echo '#include \"caml/mlvalues.h\"' >> $@;",
 	    "echo '#include \"caml/prims.h\"' >> $@;",
-        "sed -e 's/.*/extern value &();/' $(location :primitives.dat) >> $@;",
+        "sed -e 's/.*/extern value &();/' $(location :primitives_dat) >> $@;",
         "echo 'c_primitive caml_builtin_cprim[] = {' >> $@;",
-        "sed -e 's/.*/  &,/' $(location :primitives.dat) >> $@;",
+        "sed -e 's/.*/  &,/' $(location :primitives_dat) >> $@;",
         "echo '  0 };' >> $@;",
         "echo 'char * caml_names_of_builtin_cprim[] = {' >> $@;",
-        "sed -e 's/.*/  \"&\",/' $(location :primitives.dat) >> $@;",
+        "sed -e 's/.*/  \"&\",/' $(location :primitives_dat) >> $@;",
         "echo '  0 };' >> $@"
     ]),
     visibility = [
@@ -515,7 +506,11 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
         "//conditions:default":  ["-std=c11"]
     }), # + CFLAGS + OC_CPPFLAGS,
     defines = RUNTIME_DEFINES,
-    linkopts = ["$(OC_LDFLAGS)"] + select({
+    linkopts = [
+        "$(OC_LDFLAGS)",
+        "-ffunction-sections",
+        "-fdata-sections"
+    ] + select({
         "//platform/target:sys?": ["$(SYS_LINKLIBS)"],
         "//platform/target:vm?" : ["$(VM_LINKLIBS)"],
         "//conditions:default"   : ["$(VM_LINKLIBS)"],
@@ -690,6 +685,7 @@ cc_library(
     ],
 )
 
+
 ################################################################
 ## sak - swiss army knife. tool used for the build only.
 ##########
@@ -717,6 +713,7 @@ cc_binary(
     visibility = ["//runtime/caml:__pkg__"]
 )
 
+################################################################
 ################################################################
 load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@bazel_skylib//rules:common_settings.bzl",
@@ -778,7 +775,7 @@ config_setting(name = "use_prims?", flag_values = {":use_prims": "True"})
 
 label_flag(
     name = "primitives",
-    build_setting_default = "//runtime:primitives.dat"
+    build_setting_default = "//runtime:primitives_dat"
 )
 
 ################
@@ -801,3 +798,20 @@ string_list_flag(name = "args", build_setting_default = [],
                 "//boot:__subpackages__",
                 "//toolchain:__subpackages__"
             ])
+
+################################################################
+genrule(
+    name = "ds_awk",
+    outs = ["domain_state64.inc"],
+    srcs = [
+        "gen_domain_state64_inc.awk",
+        "//runtime/caml:domain_state.tbl"
+    ],
+    cmd_bash  = " ".join([
+        "awk -f",
+        "$(location gen_domain_state64_inc.awk)",
+        "$(location //runtime/caml:domain_state.tbl)",
+        "> $@"
+    ]),
+)
+

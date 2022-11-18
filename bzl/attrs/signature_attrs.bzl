@@ -34,7 +34,7 @@ def signature_attrs():
         ),
         _primitives = attr.label( ## file
             allow_single_file = True,
-            default = "//runtime:primitives.dat"
+            default = "//runtime:primitives_dat"
         ),
 
         src = attr.label(

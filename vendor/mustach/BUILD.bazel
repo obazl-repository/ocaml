@@ -26,9 +26,9 @@ cc_binary(
         "//conditions:default":  []
     }),
     visibility = [
-        "//:__pkg__",
-        "//boot:__subpackages__",
-        "//lib:__pkg__"
+        "//config:__pkg__",
+        "//runtime:__pkg__",
+        "//utils:__pkg__"
     ],
 )
 

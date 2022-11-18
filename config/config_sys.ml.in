@@ -1,0 +1,64 @@
+let bindir = {@QS@|@ocaml_bindir@|@QS@}
+
+let standard_library_default = {@QS@|@ocaml_libdir@|@QS@}
+
+let ccomp_type = {@QS@|@ccomptype@|@QS@}
+let c_compiler = {@QS@|@CC@|@QS@}
+let c_output_obj = {@QS@|@outputobj@|@QS@}
+let c_has_debug_prefix_map = @cc_has_debug_prefix_map@
+let as_has_debug_prefix_map = @as_has_debug_prefix_map@
+let ocamlc_cflags = {@QS@|@ocamlc_cflags@|@QS@}
+let ocamlc_cppflags = {@QS@|@ocamlc_cppflags@|@QS@}
+(* #7678: ocamlopt uses these only to compile .c files, and the behaviour for
+          the two drivers should be identical. *)
+let ocamlopt_cflags = {@QS@|@ocamlc_cflags@|@QS@}
+let ocamlopt_cppflags = {@QS@|@ocamlc_cppflags@|@QS@}
+let bytecomp_c_libraries = {@QS@|@bytecclibs@|@QS@}
+(* bytecomp_c_compiler and native_c_compiler have been supported for a
+   long time and are retained for backwards compatibility.
+   For programs that don't need compatibility with older OCaml releases
+   the recommended approach is to use the constituent variables
+   c_compiler, ocamlc_cflags, ocamlc_cppflags etc., directly.
+*)
+let bytecomp_c_compiler =
+  c_compiler ^ " " ^ ocamlc_cflags ^ " " ^ ocamlc_cppflags
+let native_c_compiler =
+  c_compiler ^ " " ^ ocamlopt_cflags ^ " " ^ ocamlopt_cppflags
+let native_c_libraries = {@QS@|@nativecclibs@|@QS@}
+let native_pack_linker = {@QS@|@PACKLD@|@QS@}
+let default_rpath = {@QS@|@rpath@|@QS@}
+let mksharedlibrpath = {@QS@|@mksharedlibrpath@|@QS@}
+let ar = {@QS@|@AR@|@QS@}
+let supports_shared_libraries = @supports_shared_libraries@
+
+(*
+  -ffunction-sections controlled by cc_library linkopts, but
+  asmcomp/asmlink.ml contains code that is conditional on it:
+  if !Clflags.function_sections then ...
+  i.e. there's more to it than whether the platform supports it.
+  the Cflags.function_sections flag should be set at build time, not
+  config time. *)
+let function_sections = @function_sections@
+
+let afl_instrument = @afl@
+
+let architecture = {@QS@|@arch@|@QS@}
+let model = {@QS@|@model@|@QS@}
+let system = {@QS@|@system@|@QS@}
+
+let asm = {@QS@|@AS@|@QS@}
+let asm_cfi_supported = @asm_cfi_supported@
+let with_frame_pointers = @frame_pointers@
+let profinfo = @profinfo@
+let profinfo_width = @profinfo_width@
+
+let ext_exe = {@QS@|@exeext@|@QS@}
+let ext_obj = "." ^ {@QS@|@OBJEXT@|@QS@}
+let ext_asm = "." ^ {@QS@|@S@|@QS@}
+let ext_lib = "." ^ {@QS@|@libext@|@QS@}
+let ext_dll = "." ^ {@QS@|@SO@|@QS@}
+
+let host = {@QS@|@host@|@QS@}
+let target = {@QS@|@target@|@QS@}
+
+let systhread_supported = @systhread_support@

@@ -1,4 +1,4 @@
-(* utils/config.dev.ml.  Generated from config.dev.ml.in by configure. *)
+(* config/config.dev.ml.  Generated from config.dev.ml.in by configure. *)
 #2 "utils/config.generated.ml.in"
 (**************************************************************************)
 (*                                                                        *)
@@ -101,8 +101,8 @@ let ext_asm = "." ^ {|s|}
 let ext_lib = "." ^ {|a|}
 let ext_dll = "." ^ {|so|}
 
-let host = {|x86_64-apple-darwin21.6.0|}
-let target = {|x86_64-apple-darwin21.6.0|}
+let host = {|x86_64-apple-darwin22.1.0|}
+let target = {|x86_64-apple-darwin22.1.0|}
 
 let systhread_supported = true
 

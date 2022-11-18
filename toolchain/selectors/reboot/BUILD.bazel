@@ -29,7 +29,7 @@ toolchain_selector(
     adapter        = "//toolchain/adapters/baseline",
     build_host_constraints  = ["//platform/build:vm?"],
     # target_host_constraints = ["//platform/target:vm?"],
-    # toolchain_constraints   = ["//platform/xtarget:sys?"]
+    # target_host_configuration   = ["//platform/xtarget:sys?"]
 )
 
 # ##########
@@ -47,7 +47,7 @@ toolchain_selector(
 #     toolchain = "//toolchain/adapters:vmsys",
 #     build_host_constraints  = ["//platform:sys?"],
 #     target_host_constraints  = ["//platform:vm?"],
-#     # toolchain_constraints = ["//runtime:standard?"],
+#     # target_host_configuration = ["//runtime:standard?"],
 # )
 
 toolchain_selector(
@@ -73,6 +73,6 @@ toolchain_selector(
 #     toolchain = "//toolchain/adapters:vmsys",
 #     build_host_constraints  = ["//platform:sys?"],
 #     target_host_constraints  = ["//platform:vm?"],
-#     # toolchain_constraints = ["//runtime:standard?"],
+#     # target_host_configuration = ["//runtime:standard?"],
 # )
 
