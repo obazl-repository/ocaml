@@ -19,6 +19,8 @@ load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 def signature_impl(ctx, module_name):
 
     debug = False
+    debug_bootstrap = False
+
     # if ctx.label.name in ["Pervasives"]
     #     debug = True
 
@@ -40,7 +42,9 @@ def signature_impl(ctx, module_name):
     target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
     stage = tc._stage[BuildSettingInfo].value
-    print("module _stage: %s" % stage)
+
+    if debug_bootstrap:
+        print("module _stage: %s" % stage)
 
     if stage == 2:
         ext = ".cmx"
@@ -239,6 +243,17 @@ def signature_impl(ctx, module_name):
     #         if  "-use-prims" in ctx.attr.opts:
     #             args.add_all(["-use-prims", ctx.attr._primitives])
 
+    # if ctx.label.name == "Dynlink_compilerlibs.Misc_cmi":
+    #     print("resolver sig: %s" %ctx.attr._resolver[ModuleInfo].sig)
+    #     print("resolver struct: %s" % ctx.attr._resolver[ModuleInfo].struct)
+
+    resolver = []
+    if hasattr(ctx.attr, "_resolver"):
+        resolver.append(ctx.attr._resolver[ModuleInfo].sig)
+        resolver.append(ctx.attr._resolver[ModuleInfo].struct)
+        ns = ctx.attr._resolver[ModuleInfo].struct.basename[:-4]
+        args.add_all(["-open", ns])
+
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
 
@@ -255,8 +270,8 @@ def signature_impl(ctx, module_name):
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
 
-    if hasattr(ctx.attr, "_stdlib_resolver"):
-        includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
+    if hasattr(ctx.attr, "_resolver"):
+        includes.append(ctx.attr._resolver[ModuleInfo].sig.dirname)
 
     ccInfo_list = []
 
@@ -316,22 +331,13 @@ def signature_impl(ctx, module_name):
     if ctx.files.data:
         direct_inputs.extend(ctx.files.data)
 
-    # if ctx.label.name == "Config_cmi":
-    #     print("depsets.deps.sigs: %s" % depsets.deps.sigs)
-    #     fail("x")
-
-    stdlib_resolver = []
-    if hasattr(ctx.attr, "_stdlib_resolver"):
-        stdlib_resolver.append(ctx.attr._stdlib_resolver[ModuleInfo].sig)
-        stdlib_resolver.append(ctx.attr._stdlib_resolver[ModuleInfo].struct)
-
     inputs_depset = depset(
         order = dsorder,
         direct = []
         + direct_inputs # + ctx.files._ns_resolver,
         # + [tc.compiler[DefaultInfo].files_to_run.executable],
         # + ctx.files.data if ctx.files.data else [],
-        + stdlib_resolver
+        + resolver
         ,
         transitive = []## indirect_inputs_depsets
         + [merge_depsets(depsets, "sigs"),

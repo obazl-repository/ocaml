@@ -10,6 +10,7 @@ load("//bzl/rules/common:impl_common.bzl", "tmpdir")
 ########################
 def _boot_camlheaders(ctx):
 
+    debug_bootstrap = False
     # NOTE: we only need to emit one file, since we do not build *d,
     # *i named variants.
 
@@ -26,7 +27,8 @@ def _boot_camlheaders(ctx):
     target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
     stage = tc._stage[BuildSettingInfo].value
-    print("module _stage: %s" % stage)
+    if debug_bootstrap:
+        print("module _stage: %s" % stage)
 
     if stage == 2:
         ext = ".cmx"
@@ -64,8 +66,11 @@ def _boot_camlheaders(ctx):
         # )
 
         camlheader = ctx.actions.declare_file(workdir + "camlheader")
-        print("Emitting camlheader: %s" % camlheader.path)
-        print("  camlheader path: %s" % pfx + f.path)
+
+        if debug_bootstrap:
+            print("Emitting camlheader: %s" % camlheader.path)
+            print("  camlheader path: %s" % pfx + f.path)
+
         ctx.actions.expand_template(
             output   = camlheader,
             template = ctx.file.template,

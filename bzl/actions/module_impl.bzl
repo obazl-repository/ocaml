@@ -18,6 +18,8 @@ def module_impl(ctx, module_name):
     from_name = basename[:1].capitalize() + basename[1:]
 
     debug = False
+    debug_bootstrap = False
+
     # if ctx.label.name in ["Stdlib"]:
     #     print("this: %s" % ctx.label) #.package + "/" + ctx.label.name)
     #     print("manifest: %s" % ctx.attr._manifest[BuildSettingInfo].value)
@@ -33,27 +35,30 @@ def module_impl(ctx, module_name):
     tc = ctx.exec_groups["boot"].toolchains["//boot/toolchain/type:boot"]
 
     # build_emitter = tc.build_emitter[BuildSettingInfo].value
-    # print("build_emitter: %s" % build_emitter)
 
-    print("host.host_platform: %s" % ctx.fragments.platform.host_platform)
-    print("host.platform: %s" % ctx.fragments.platform.platform)
+    # if debug_bootstrap:
+    #     print("build_emitter: %s" % build_emitter)
+    #     print("host.host_platform: %s" % ctx.fragments.platform.host_platform)
+    #     print("host.platform: %s" % ctx.fragments.platform.platform)
 
-    print("target.host_platform: %s" % ctx.host_fragments.platform.host_platform)
-    print("target.platform: %s" % ctx.host_fragments.platform.platform)
+    #     print("target.host_platform: %s" % ctx.host_fragments.platform.host_platform)
+    #     print("target.platform: %s" % ctx.host_fragments.platform.platform)
 
     target_runtime = tc.target_runtime[BuildSettingInfo].value
     target_executor = tc.target_executor[BuildSettingInfo].value
     target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    print("target_runtime : %s" % target_runtime)
-    print("target_executor: %s" % target_executor)
-    print("target_emitter : %s" % target_emitter)
-    # fail("BB")
+    # if debug_bootstrap:
+    #     print("target_runtime : %s" % target_runtime)
+    #     print("target_executor: %s" % target_executor)
+    #     print("target_emitter : %s" % target_emitter)
+    #     fail("BB")
 
     # if ctx.label.name == "CamlinternalFormatBasics":
     #     fail("C")
     stage = tc._stage[BuildSettingInfo].value
-    print("module _stage: %s" % stage)
+    if debug_bootstrap:
+        print("module _stage: %s" % stage)
 
     if stage == 2:
         ext = ".cmx"
@@ -342,14 +347,21 @@ def module_impl(ctx, module_name):
         args.add_all(["-use-prims", ctx.file._primitives.path])
     else:
         if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
-            args.add_all(["-use-prims", ctx.attr._primitives])
+            args.add_all(["-use-prims", ctx.file._primitives.path])
         else:
             if ctx.attr._use_prims[BuildSettingInfo].value:
                 if not "-no-use-prims" in ctx.attr.opts:
-                    args.add_all(["-use-prims", ctx.attr._primitives])
+                    args.add_all(["-use-prims", ctx.file._primitives.path])
             else:
                 if  "-use-prims" in ctx.attr.opts:
-                    args.add_all(["-use-prims", ctx.attr._primitives])
+                    args.add_all(["-use-prims", ctx.file._primitives.path])
+
+    resolver = []
+    if hasattr(ctx.attr, "_resolver"):
+        resolver.append(ctx.attr._resolver[ModuleInfo].sig)
+        resolver.append(ctx.attr._resolver[ModuleInfo].struct)
+        ns = ctx.attr._resolver[ModuleInfo].struct.basename[:-4]
+        args.add_all(["-open", ns])
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -367,18 +379,13 @@ def module_impl(ctx, module_name):
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
 
-    # rule stdlib_module has _stdlib_resolver
-    if hasattr(ctx.attr, "_stdlib_resolver"):
-        includes.append(ctx.attr._stdlib_resolver[ModuleInfo].sig.dirname)
+    # OCaml srcs use two namespaces, Stdlib and Dynlink_compilerlibs
+    if hasattr(ctx.attr, "_resolver"):
+        includes.append(ctx.attr._resolver[ModuleInfo].sig.dirname)
 
     ################ Direct Deps ################
 
     includes.extend(paths_depset.to_list())
-
-    stdlib_resolver = []
-    if hasattr(ctx.attr, "_stdlib_resolver"):
-        stdlib_resolver.append(ctx.attr._stdlib_resolver[ModuleInfo].sig)
-        stdlib_resolver.append(ctx.attr._stdlib_resolver[ModuleInfo].struct)
 
     inputs_depset = depset(
         order = dsorder,
@@ -386,7 +393,7 @@ def module_impl(ctx, module_name):
         + sig_inputs
         + [in_structfile]
         + depsets.deps.mli
-        + stdlib_resolver
+        + resolver
         ,
         transitive = []
         + [merge_depsets(depsets, "sigs"),

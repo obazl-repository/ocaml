@@ -365,7 +365,9 @@ boot_config(
         "//conditions:default" : ":config.generated.ml"
     }),
     stdlib = "//stdlib",
+    deps = ["//config:Config_cc"],
     footer = "config.common.ml",
+    visibility = ["//otherlibs/dynlink:__pkg__"]
 )
 
 # genrule(
@@ -623,6 +625,7 @@ compiler_signature(
     visibility = [
         "//middle_end:__subpackages__",
         "//middle_end/flambda/base_types:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
         "//utils:__pkg__"
     ]
 )
@@ -655,6 +658,7 @@ compiler_module(
     sig    = "Lazy_backtrack_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Either",
     ],
     visibility = [
@@ -668,6 +672,7 @@ compiler_signature(
     src  = "lazy_backtrack.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Either",
     ],
     visibility = ["//typing:__pkg__"]
@@ -873,6 +878,9 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//stdlib:Stdlib.Format",
+    ],
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
     ]
 )
 
@@ -995,5 +1003,8 @@ compiler_signature(
     deps   = [
         "//stdlib:Stdlib.Lexing_cmi",
         "//stdlib:Stdlib.Lazy_cmi",
+    ],
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
     ]
 )

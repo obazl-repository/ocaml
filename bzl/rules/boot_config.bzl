@@ -65,7 +65,7 @@ def _boot_config(ctx):
 
     ctx.actions.run_shell(
         outputs = [ctx.outputs.out],
-        inputs  = [config_hdr, ctx.file.footer],
+        inputs  = [config_hdr, ctx.file.footer] + ctx.files.deps,
         command = " ".join([
             "cat {} > {o};".format(config_hdr.path, o=ctx.outputs.out.path),
             "cat {} >> {o};".format(ctx.file.footer.path, o=ctx.outputs.out.path),
@@ -99,6 +99,9 @@ boot_config = rule(
         ),
         header = attr.label(
             allow_single_file = True,
+        ),
+        deps = attr.label_list(
+
         ),
         stdlib = attr.label(
             allow_single_file = True

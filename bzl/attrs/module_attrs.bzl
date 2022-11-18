@@ -29,7 +29,7 @@ def module_attrs():
         ),
         _primitives = attr.label( ## file
             allow_single_file = True,
-            default = "//runtime:primitives_dat"
+            default = "//runtime:primitives.dat"
         ),
 
         ns = attr.label(

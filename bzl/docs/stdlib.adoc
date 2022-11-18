@@ -1,0 +1,14 @@
+= stdlib
+
+The resolver `/stdlib:Stdlib` contains more than just module aliases
+for the namespace. It follows that other modules may depend on it for
+something other than resolving references to stdib submodules.  In general:
+
+* Stdlib submodules do not depend in the resolver
+
+So targets (including stdlib submodules) may depend on:
+
+  ** stdlib submodules but not the resolver
+  ** the stdlib resolver but not submodules
+  ** both
+

@@ -302,6 +302,7 @@ compiler_module(
     sig    = "Bytesections_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.List",
         "//utils:Config"
@@ -317,7 +318,7 @@ compiler_signature(
     name = "Bytesections_cmi",
     src  = "bytesections.mli",
     opts = SIG_OPTS,
-    deps   = [],
+    deps   = ["//stdlib:Stdlib"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -329,6 +330,7 @@ compiler_module(
     sig    = "Dll_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Obj",
@@ -349,8 +351,7 @@ compiler_signature(
     name = "Dll_cmi",
     src  = "dll.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ],
+    deps   = ["//stdlib:Stdlib"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -479,11 +480,9 @@ compiler_module(
     name   = "Opcodes",
     struct = "opcodes.ml",
     # sig    = ":Opcodes_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-open", "Stdlib"],
     warnings = [w.MISSING_MLI],
-    deps   = [
-        # "//stdlib:Stdlib"
-    ],
+    deps   = ["//stdlib:Stdlib"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",

@@ -105,7 +105,7 @@ stdlib_signature = rule(
             # default = ["-nostdlib"]  # in tc.copts
         ),
 
-        _stdlib_resolver = attr.label(
+        _resolver = attr.label(
             doc = "The commpiler always opens Stdlib, so everything depends on it.",
             default = "//stdlib:Stdlib"
         ),
@@ -200,7 +200,7 @@ stdlib_module = rule(
             # default = ["-nostdlib"], # in tc.copts
         ),
 
-        _stdlib_resolver = attr.label(
+        _resolver = attr.label(
             doc = "The commpiler always opens Stdlib, so everything depends on it.",
 
             default = "//stdlib:Stdlib"

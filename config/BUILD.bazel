@@ -15,6 +15,7 @@ package(default_visibility = ["//visibility:public"])
 compiler_module(
     name   = "Config_cc",
     struct = "config_cc.ml",
+    deps   = ["//stdlib:Stdlib"]
 )
 
 genrule(
