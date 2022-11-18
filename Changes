@@ -39,7 +39,7 @@ Working version
 - #11102: Speed up register allocation by permanently spilling registers
   (Stephen Dolan, review by Xavier Leroy)
 
-- #11418: RISC-V multicore support.
+- #11418, #11708: RISC-V multicore support.
   (Nicolás Ojeda Bär, review by KC Sivaramakrishnan)
 
 - #11686: Better spilling heuristic for the Linear Scan allocator for more
@@ -129,6 +129,10 @@ Working version
 
 ### Compiler user-interface and warnings:
 
+- #10009: Improve the error reported by mismatched struct/sig and =/: in module
+  and module type bindings.
+  (Jules Aguillon, review by Gabriel Scherer)
+
 - #11530: Include kinds in kind mismatch error message.
   (Leonhard Markert, review by Gabriel Scherer and Florian Angeletti)
 
@@ -176,11 +180,21 @@ Working version
   opened for checking
   (Hugo Heuzard, review by Nicolás Ojeda Bär)
 
+- #11569: Remove hash type encoding
+  (Hyunggyu Jang, review by Gabriel Scherer and Florian Angeletti)
+
+- #11568: Encode inline record types in Path.t
+  (Leo White and Hyunggyu Jang, review by Gabriel Scherer)
+
 ### Build system:
 - #11590: Allow installing to a destination path containing spaces.
    (Élie Brami, review by Sébastien Hinderer and David Allsopp)
 
 ### Bug fixes:
+
+- #10664, #11600: Unsoundness in the typing of polymorphic methods
+  involving polymorphic variants
+  (Jacques Garrigue, report by Mike Shulman, review by Gabriel Scherer)
 
 - #11302, #11412: `ocamlc` and `ocamlopt` should not remove generated files
   when they are not regular files.
@@ -202,6 +216,13 @@ Working version
 - #11630: Use correct location when reporting record labels with non-existent
   paths.
   (Nicolás Ojeda Bär, report by Jason Gross, review by Gabriel Scherer)
+
+- #11727: Ensure push_defaults can push past module patterns, fixing an
+  currying optimisation accidentally disabled by #10340.
+  (Stephen Dolan, review by Gabriel Scherer)
+
+- #11732: Ensure that types from packed modules are always generalised
+  (Stephen Dolan and Leo White, review by Jacques Garrigue)
 
 OCaml 5.0
 ---------
