@@ -150,15 +150,31 @@ def module_impl(ctx, module_name):
             provider_output_cmi = action_output_cmi
             mli_dir = None
         elif OcamlSignatureProvider in ctx.attr.sig:
+            # in case sig was compiled into a tmp dir (e.g. _build) to avoid nameclash,
+            # symlink here
             sigProvider = ctx.attr.sig[OcamlSignatureProvider]
             provider_output_cmi = sigProvider.cmi
             provider_output_mli = sigProvider.mli
             sig_inputs.append(provider_output_cmi)
             sig_inputs.append(provider_output_mli)
             mli_dir = paths.dirname(provider_output_mli.short_path)
+            ## force module name to match compiled cmi
+            extlen = len(ctx.file.sig.extension)
+            module_name = ctx.file.sig.basename[:-(extlen + 1)]
         else:
-            fail("ctx.file.sig without OcamlSignatureProvider")
+            # generated sigfile, e.g. by cp, rename, link
+            # need to symlink .mli, to match symlink of .ml
+            sig_src = ctx.actions.declare_file(
+                workdir + module_name + ".mli"
+            )
+            sig_inputs.append(sig_src)
+            ctx.actions.symlink(output = sig_src,
+                                target_file = ctx.file.sig)
 
+            action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+            action_outputs.append(action_output_cmi)
+            provider_output_cmi = action_output_cmi
+            mli_dir = None
     else: ## no sig, compiler will generate .cmi
         action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
         action_outputs.append(action_output_cmi)
@@ -176,7 +192,17 @@ def module_impl(ctx, module_name):
                 if ctx.file.sig.is_source:
                     in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-                else: # sig file is compiled .cmo
+                elif OcamlSignatureProvider in ctx.attr.sig:
+                    # sig file is compiled .cmo
+                    # force name of module to match compiled sig
+                    extlen = len(ctx.file.sig.extension)
+                    module_name = ctx.file.sig.basename[:-(extlen + 1)]
+                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                    print("lbl: %s" % ctx.label)
+                    print("IN STRUCTFILE: %s" % in_structfile)
+                else:
+                    # generated sigfile
                     in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
             else: # no sig
@@ -184,20 +210,32 @@ def module_impl(ctx, module_name):
         else: # structfile is generated, e.g. by ocamllex or a genrule.
             # make sure it's in same dir as mli/cmi IF we have ctx.file.sig
             if ctx.file.sig:
-                if paths.dirname(ctx.file.struct.short_path) != mli_dir:
-                    in_structfile = ctx.actions.declare_file(
-                        workdir + module_name + ".ml") # ctx.file.struct.basename)
-                    ctx.actions.symlink(
-                        output = in_structfile,
-                        target_file = ctx.file.struct)
-                    if debug:
-                        print("symlinked {src} => {dst}".format(
-                            src = ctx.file.struct, dst = in_structfile))
-                else:
-                    if debug:
-                        print("not symlinking src: {src}".format(
-                            src = ctx.file.struct.path))
-                    in_structfile = ctx.file.struct
+                if ctx.file.sig.is_source:
+                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                    if paths.dirname(ctx.file.struct.short_path) != mli_dir:
+                        in_structfile = ctx.actions.declare_file(
+                            workdir + module_name + ".ml") # ctx.file.struct.basename)
+                        ctx.actions.symlink(
+                            output = in_structfile,
+                            target_file = ctx.file.struct)
+                        if debug:
+                            print("symlinked {src} => {dst}".format(
+                                src = ctx.file.struct, dst = in_structfile))
+                    else:
+                        if debug:
+                            print("not symlinking src: {src}".format(
+                                src = ctx.file.struct.path))
+                            in_structfile = ctx.file.struct
+                else: # sig file is compiled .cmo
+                    print("xxxxxxxxxxxxxxxx %s" % ctx.label)
+                    # force name of module to match compiled sig
+                    extlen = len(ctx.file.sig.extension)
+                    module_name = ctx.file.sig.basename[:-(extlen + 1)]
+                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                    print("lbl: %s" % ctx.label)
+                    print("IN STRUCTFILE: %s" % in_structfile)
             else:  ## no sig file
                 in_structfile = ctx.file.struct
     else:  ## namespaced
@@ -238,9 +276,10 @@ def module_impl(ctx, module_name):
         # fail("X")
 
     if ctx.attr.sig: #FIXME
-        if not ctx.file.sig.is_source:
+        if OcamlSignatureProvider in ctx.attr.sig:
             depsets = aggregate_deps(ctx, ctx.attr.sig, depsets, manifest)
         else:
+            # either is_source or generated
             depsets.deps.mli.append(ctx.file.sig)
 
     for dep in ctx.attr.deps:
