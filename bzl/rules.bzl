@@ -1,3 +1,4 @@
+load("//bzl/rules:mustache.bzl", _mustache = "mustache")
 load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
 load("//bzl/rules:build_tool.bzl", _build_tool = "build_tool")
@@ -56,6 +57,7 @@ load("//bzl/rules:boot_compiler.bzl", _boot_compiler = "boot_compiler")
 # load("//bzl/rules:ocamlc_fixpoint.bzl", _ocamlc_fixpoint = "ocamlc_fixpoint")
 # load("//bzl/rules:ocamlc_runtime.bzl", _ocamlc_runtime = "ocamlc_runtime")
 
+mustache    = _mustache
 cc_assemble = _cc_assemble
 ocaml_tool      = _ocaml_tool
 build_module      = _build_module

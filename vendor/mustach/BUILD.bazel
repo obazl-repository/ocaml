@@ -6,7 +6,7 @@ cc_binary(
         # COREOBJS := mustach.o mustach-wrap.o
         "mustach.c", "mustach.h",
         "mustach-wrap.c", "mustach-wrap.h",
-        "mustach-tool.c",
+        "main.c",
         "mustach-cjson.c", "mustach-cjson.h",
 
         "cjson/cJSON.c", "cjson/cJSON.h"
