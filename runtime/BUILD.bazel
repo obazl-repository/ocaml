@@ -46,6 +46,7 @@ cc_library(
     }),
     copts = [
         "-x", "c",
+        "-Iruntime/caml",
         "-I$(GENDIR)/runtime", # caml/instruct.h
         "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
@@ -95,6 +96,7 @@ cc_library(
     ],
     copts = [
         "-x", "c",
+        "-Iruntime/caml",
         "-I$(GENDIR)/runtime", # build_config.h
         "-I$(GENDIR)/runtime/caml", # instruct.h
         "$(OC_CFLAGS)",

@@ -25,6 +25,16 @@ exports_files(glob(["**"]))
 # )
 
 mustache(
+    name = "domain_state_h",
+    out  = "domain_state.h",
+    json = "domain_state.json",
+    template = "domain_state.h.mustache",
+    visibility = [
+        "//runtime:__subpackages__"
+    ]
+)
+
+mustache(
     name = "instruct_h",
     out  = "instruct.h",
     json = "//bytecomp:opcodes.json",
@@ -70,21 +80,15 @@ genrule(
     ]
 )
 
-## WARNING: if you build with make, these generated files will be
-## generated and placed in the source tree, so when you then build
-## with Bazel you'll get an error about file already existing.
-## In that case just delete the generated files in runtime/.
-
-## this is the baseline target, w/o cross-compile support. file 's.h'
-## is platform-dependent, so if we want cross-compiling we need
-## special handling, see below.
 cc_library(
     name = "hdrs",
     hdrs = glob(
         ["*.h"]
     ) + [
-        "domain_state.tbl",
-        ":s.h", ":opnames.h", ":jumptbl.h"
+        ":domain_state.h",
+        ":jumptbl.h",
+        ":opnames.h",
+        ":s.h"
     ],
     include_prefix = "caml",
     visibility = ["//visibility:public"]

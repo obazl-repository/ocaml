@@ -23,7 +23,7 @@
     "with_flambda_invariants": @flambda_invariants@,
     "with_cmm_invariants": @cmm_invariants@,
     "windows_unicode": @windows_unicode@,
-    "force_instrumented_runtime": @force_instrumented_runtime@,
+    "force_instrumented_runtime": @instrumented_runtime@,
     "flat_float_array": @flat_float_array@,
     "function_sections": @function_sections@,
     "afl_instrument": @afl@,

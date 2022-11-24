@@ -23,7 +23,7 @@
     "with_flambda_invariants": false,
     "with_cmm_invariants": false,
     "windows_unicode": 0,
-    "force_instrumented_runtime": @force_instrumented_runtime@,
+    "force_instrumented_runtime": true,
     "flat_float_array": true,
     "function_sections": false,
     "afl_instrument": false,
