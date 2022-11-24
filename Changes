@@ -155,6 +155,10 @@ Working version
 - #11653: Add the -no-absname option to ocamlc, ocamlopt and ocamldep.
   (Abiola Abdulsalam, review by Sébastien Hinderer and Florian Angeletti)
 
+- #11696: Add the -no-g option to ocamlc and ocamlopt.
+  (Abiola Abdulsalam, review by Sébastien Hinderer, Nicolás Ojeda Bär and
+  Florian Angeletti)
+
 ### Internal/compiler-libs changes:
 - #11027: Separate typing counter-examples from type_pat into retype_pat;
   type_pat is no longer in CPS.
@@ -763,6 +767,10 @@ OCaml 5.0
 - #11662, #11673: fix a memory leak when using Dynlink,
   the bug was only present in development version of OCaml 5.
   (Stephen Dolan, report by Andre Maroneze, review by Gabriel Scherer)
+
+- #11737: Fix segfault condition in Unix.stat under Windows in the presence of
+  multiple threads.
+  (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
 
 OCaml 4.14.0 (28 March 2022)
 ----------------------------
