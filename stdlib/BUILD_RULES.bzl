@@ -123,7 +123,7 @@ stdlib_signature = rule(
 ################################################################
 def _stdlib_boot_signature(ctx):
 
-    if ctx.label.name == "Std_exit":
+    if ctx.label.name == "Std_exit_cmi":
         module_name = "std_exit"
     else:
         (this, extension) = paths.split_extension(ctx.file.src.basename)
@@ -197,6 +197,7 @@ stdlib_module = rule(
         module_attrs(),
 
         _opts = attr.string_list(
+            # default = ["-nopervasives"]
             # default = ["-nostdlib"], # in tc.copts
         ),
 

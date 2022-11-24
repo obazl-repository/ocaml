@@ -321,7 +321,7 @@ compiler_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         ## (Compiler_pass)
         "//middle_end:Compilenv",
         "//utils:Clflags",
@@ -360,7 +360,7 @@ compiler_module(
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
         "//middle_end/flambda:Export_info",
-        "//utils:Config",
+        "//config:Config",
         "//middle_end:Compilenv",
         "//utils:Clflags",
         "//middle_end:Clambda",
@@ -403,7 +403,7 @@ compiler_module(
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Digest",
         ## (Consistbl)
-        "//utils:Config",
+        "//config:Config",
         "//middle_end:Compilenv",
         "//utils:Clflags",
         "//middle_end:Clambda",
@@ -450,7 +450,7 @@ compiler_module(
         "//middle_end/flambda:Export_info_for_pack",
         "//middle_end/flambda:Export_info",
         "//typing:Env",
-        "//utils:Config",
+        "//config:Config",
         "//middle_end:Compilenv",
         "//middle_end:Compilation_unit",
         "//middle_end/closure:Closure_middle_end",
@@ -578,7 +578,7 @@ compiler_module(
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Int",
         "//lambda:Debuginfo",
-        "//utils:Config",
+        "//config:Config",
         "//middle_end:Compilenv",
         "//utils:Clflags",
         ## (Clambda_primitives)
@@ -654,7 +654,7 @@ compiler_module(
         "//typing:Primitive",
         "//typing:Types",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Misc",
         ":Afl_instrument",
         ":Cmm",
@@ -724,9 +724,7 @@ compiler_module(
 compiler_signature(
     name = "Coloring_cmi",
     src  = "coloring.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ],
+    opts = SIG_OPTS + ["-nopervasives"],
 )
 
 compiler_module(
@@ -739,7 +737,7 @@ compiler_module(
         ":Mach",
         "//stdlib:Stdlib.List",
         "//lambda:Debuginfo",
-        "//utils:Config",
+        "//config:Config",
         "//stdlib:Stdlib.Array",
         ## (Arch)
     ],
@@ -868,7 +866,7 @@ compiler_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         ":Arch",
         ":Cmm",
         ## (Scoped_location)
@@ -1588,9 +1586,7 @@ compiler_signature(
 compiler_signature(
     name = "X86_ast_cmi",
     src  = "x86_ast.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ],
+    opts = SIG_OPTS + ["-nopervasives"],
 )
 
 compiler_module(
@@ -1608,7 +1604,7 @@ compiler_module(
 compiler_signature(
     name = "X86_dsl_cmi",
     src  = "x86_dsl.mli",
-    opts = SIG_OPTS,
+    opts = SIG_OPTS + ["-nopervasives"],
     deps   = [
         ":X86_ast_cmi",
     ],
@@ -1637,6 +1633,7 @@ compiler_signature(
     src  = "x86_gas.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
         ":X86_ast_cmi",
     ],
 )
@@ -1661,6 +1658,7 @@ compiler_signature(
     src  = "x86_masm.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
         ":X86_ast_cmi",
     ],
 )
@@ -1677,7 +1675,7 @@ compiler_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
         "//stdlib:Stdlib.Char",
         "//utils:Ccomp",

@@ -9,63 +9,78 @@ load("//bzl/rules:config_sys.bzl", "config_sys")
 load("//bzl:rules.bzl",
      "compiler_module",
      "compiler_signature",
+     "mustache"
 )
 package(default_visibility = ["//visibility:public"])
 
+compiler_signature(
+    name = "Config_cmi",
+    src  = "config.mli",
+    deps   = ["//stdlib:Stdlib"],
+    visibility = [
+        "//otherlibs/dynlink:__pkg__",
+        "//utils:__pkg__",
+    ]
+)
+
 compiler_module(
-    name   = "Config_cc",
-    struct = "config_cc.ml",
+    name   = "Config",
+    struct = "config.ml",
+    sig    = "Config_cmi",
+    deps   = [ # [
+        # "//config:Config_cc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Option", # if not bootstrapping?
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys"
+    ],
+    visibility = [
+        "//asmcomp:__subpackages__",
+        "//bytecomp:__pkg__",
+        "//driver:__pkg__",
+        "//file_formats:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end:__subpackages__",
+        "//otherlibs/dynlink:__pkg__",
+        "//parsing:__pkg__",
+        "//tools:__pkg__",
+        "//toplevel:__subpackages__",
+        "//typing:__pkg__",
+        "//utils:__pkg__",
+        "//compilerlibs:__pkg__"
+    ]
+)
+
+mustache(
+    name = "__config_ml__",
+    out      = "config.ml",
+    template = "config.ml.mustache",
+    json     = "config.ml.json"
+)
+
+compiler_module(
+    name   = "Config_cc_toolchain",
+    struct = "config_cc_toolchain.ml",
     deps   = ["//stdlib:Stdlib"]
 )
 
-genrule(
+mustache(
     name = "__config_cc_ml__",
-    outs = ["config_cc.ml"],
-    srcs = [
-        "config_cc.json",
-        "config_cc.ml.mustache"
-    ],
-    tools = ["//vendor/mustach"],
-    cmd = " ".join([
-        "$(execpath //vendor/mustach)",
-        "$(location config_cc.json)",
-        "$(location config_cc.ml.mustache)",
-        ">",
-        "$@"
-    ]),
-    toolchains = ["//profile/system/local"],
-    visibility = ["//boot:__pkg__"]
+    out  = "config_cc_toolchain.ml",
+    json = "config_cc_toolchain.json",
+    template = "config_cc_toolchain.ml.mustache"
 )
 
 config_cc_toolchain(
-    name = "config.cc",
-    out  = "config_cc.json"
+    name = "config.cc_toolchain",
+    out  = "config_cc_toolchain.json"
 )
 
 config_sys(
     name = "config.sys",
     out  = "config_sys.json",
 )
-
-genrule(
-    name = "__config_ml__",
-    outs = ["config.ml"],
-    srcs = [
-        "config.ml.json",
-        "config.ml.mustache"
-    ],
-    tools = ["//vendor/mustach"],
-    cmd = " ".join([
-        "$(execpath //vendor/mustach)",
-        "$(location config.ml.json)",
-        "$(location config.ml.mustache)",
-        ">",
-        "$@"
-    ]),
-    toolchains = ["//profile/system/local"],
-    visibility = ["//boot:__pkg__"]
-)
-
 
         ## GLOBAL CONFIGURABLE DEFAULTS
         # _debug           = attr.label(default = "@ocaml//debug"),

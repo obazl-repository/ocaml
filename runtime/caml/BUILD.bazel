@@ -1,3 +1,7 @@
+load("//bzl:rules.bzl",
+     "mustache"
+)
+
 exports_files(glob(["**"]))
 
 # filegroup(
@@ -8,88 +12,9 @@ exports_files(glob(["**"]))
 #     visibility = ["//runtime/caml/cross-compile:__pkg__"]
 # )
 
-alias(
-    name = "hdrs",
-    actual = "//runtime/caml/cross-compile:hdrs",
-    visibility = [
-        "//boot:__pkg__",
-        "//runtime:__pkg__",
-        "//otherlibs/systhreads:__pkg__",
-        "//otherlibs/unix:__pkg__",
-        "//yacc:__pkg__"
-    ],
-)
-
-## WARNING: if you build with make, these generated files will be
-## generated and placed in the source tree, so when you then build
-## with Bazel you'll get an error about file already existing.
-## In that case just delete the generated files in runtime/.
-
-## this is the baseline target, w/o cross-compile support. file 's.h'
-## is platform-dependend, so if we want cross-compiling we need
-## special handling, see below.
-cc_library(
-    name = "hdr_srcs",
-    # hdrs = [
-    #     "domain_state.tbl",
-    #     # ## generated files:
-    #     ":opnames.h",
-    #     ":jumptbl.h",
-    # ] + glob(["*.h"]),
-    hdrs = glob(
-        ["*.h"], exclude=["s.h", "opnames.h", "jumptbl.h"]
-    ) + ["domain_state.tbl"],
-    include_prefix = "caml",
-    visibility = ["//visibility:public"]
-)
-
-# genrule(
-#     outs = ["opnames.h"],
-#     name = "opnames_h",
-#     srcs = ["//runtime/caml:instruct.h"],
-#     cmd  = " ".join([
-# 	    # tr is for windows only?
-#         # 	tr -d '\r' < $< | \
-#         "cat $(location //runtime/caml:instruct.h) | ",
-# 	    "sed -e '/\\/\\*/d' ",
-# 	    "-e '/^#/d'",
-# 	    "-e 's/enum /static char * names_of_/' ",
-# 	    "-e 's/{$$/[] = {/' ",
-# 	    "-e 's/\\([[:upper:]][[:upper:]_0-9]*\\)/\"\\1\"/g' > $@"
-#     ]),
-#     visibility = ["//runtime/caml/cross-compile:__pkg__"]
-# )
-
-# genrule(
-#     name = "jumptbl_h",
-#     outs = ["jumptbl.h"],
-#     srcs = ["//runtime/caml:instruct.h"],
-#     cmd  = " ".join([
-# 	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
-# 	    "sed -n -e '/^  /s/ \\([A-Z]\\)/ \\&\\&lbl_\\1/gp' ",
-# 	    "-e '/^}/q' > $@"
-#     ]),
-#     visibility = ["//runtime/caml/cross-compile:__pkg__"]
-# )
-
-### hack for cross-compiling. we cannot overwrite s.h by s.linux.h or
-### s.macos.h, so we have to copy everything into another directory.
-# cc_library(
-#     name = "xhdrs",
-#     hdrs = [
-#         ":all",
-#         ":opnames.h",
-#         ":jumptbl.h",
-#         ":s_h",
-#     ] + glob(["*.h"], exclude=["s.h"]),
-#     include_prefix = "caml/x",
-#     copts = [
-#         "-I",
-#         "caml/x"
-#         # "runtime/caml/x"
-#     ],
-#     # hdrs = ["domain_state.tbl"],
-#     # static_library = ...,
+# alias(
+#     name = "hdrs",
+#     actual = "//runtime/caml/cross-compile:hdrs",
 #     visibility = [
 #         "//boot:__pkg__",
 #         "//runtime:__pkg__",
@@ -99,57 +24,68 @@ cc_library(
 #     ],
 # )
 
-# genrule(
-#     name = "all_hdrs",
-#     outs = ["x/domain_state.tbl"],
-#     srcs = ["domain_state.tbl"],
-#     cmd  = " ".join([
-#         "cp $(location domain_state.tbl) $@"
-#     ])
-# )
+mustache(
+    name = "instruct_h",
+    out  = "instruct.h",
+    json = "//bytecomp:opcodes.json",
+    template = "instruct.h.mustache",
+    visibility = [
+        "//runtime:__subpackages__"
+    ]
+)
 
-# genrule(
-#     outs = ["x/domain_state.tbl"],
-#     name = "xdomain_state_tbl",
-#     srcs = ["domain_state.tbl"],
-#     cmd  = " ".join([
-#         "cp $(location domain_state.tbl) $@"
-#     ])
-# )
+mustache(
+    name = "jumptbl_h",
+    out  = "jumptbl.h",
+    json = "//bytecomp:opcodes.json",
+    template = "jumptbl.h.mustache",
+    visibility = [
+        # "//runtime:__subpackages__"
+    ]
+)
 
-# genrule(
-#     outs = ["x/opnames.h"],
-#     name = "xopnames_h",
-#     srcs = ["//runtime/caml:instruct.h"],
-#     cmd  = " ".join([
-# 	    # tr is for windows only?
-#         # 	tr -d '\r' < $< | \
-#         "cat $(location //runtime/caml:instruct.h) | ",
-# 	    "sed -e '/\\/\\*/d' ",
-# 	    "-e '/^#/d'",
-# 	    "-e 's/enum /static char * names_of_/' ",
-# 	    "-e 's/{$$/[] = {/' ",
-# 	    "-e 's/\\([[:upper:]][[:upper:]_0-9]*\\)/\"\\1\"/g' > $@"
-#     ])
-# )
+mustache(
+    name = "opnames_h",
+    out  = "opnames.h",
+    json = "//bytecomp:opcodes.json",
+    template = "opnames.h.mustache",
+    visibility = [
+        # "//runtime:__subpackages__"
+    ]
+)
 
-# genrule(
-#     name = "xjumptbl_h",
-#     outs = ["x/jumptbl.h"],
-#     srcs = ["//runtime/caml:instruct.h"],
-#     cmd  = " ".join([
-# 	    "tr -d '\\r' < $(location //runtime/caml:instruct.h) | ",
-# 	    "sed -n -e '/^  /s/ \\([A-Z]\\)/ \\&\\&lbl_\\1/gp' ",
-# 	    "-e '/^}/q' > $@"
-#     ])
-# )
+genrule(
+    name = "platform_s.h",
+    outs = ["s.h"],
+    srcs = select({
+        # FIXME: if targethost = buildhost, use s.local.h
+        "//platform/os:linux?": ["//runtime/caml:s.linux.h"],
+        "//platform/os:macos?": ["//runtime/caml:s.macos.h"]
+        # "//conditions:default": [],
+    }),
+    cmd  = "cp $(SRCS) $@", #FIXME: symlink?
+    visibility = [
+        "//runtime:__pkg__",
+        "//utils:__pkg__"
+    ]
+)
 
-# genrule(
-#     name = "s_h",
-#     outs = ["x/s.h"],
-#     srcs = ["s.h", "s.linux.h"],
-#     cmd  = " ".join([
-# 	    "cp $(location s.linux.h) $@"
-#     ])
-# )
+## WARNING: if you build with make, these generated files will be
+## generated and placed in the source tree, so when you then build
+## with Bazel you'll get an error about file already existing.
+## In that case just delete the generated files in runtime/.
 
+## this is the baseline target, w/o cross-compile support. file 's.h'
+## is platform-dependent, so if we want cross-compiling we need
+## special handling, see below.
+cc_library(
+    name = "hdrs",
+    hdrs = glob(
+        ["*.h"]
+    ) + [
+        "domain_state.tbl",
+        ":s.h", ":opnames.h", ":jumptbl.h"
+    ],
+    include_prefix = "caml",
+    visibility = ["//visibility:public"]
+)

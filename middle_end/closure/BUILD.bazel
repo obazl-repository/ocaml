@@ -51,7 +51,7 @@ compiler_module(
         "//stdlib:Stdlib.Int32",
         "//typing:Ident",
         "//typing:Env",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Array",

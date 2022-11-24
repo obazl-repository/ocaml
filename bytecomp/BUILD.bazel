@@ -3,6 +3,7 @@ load("//bzl:rules.bzl",
      "boot_library",
      "compiler_module",
      "compiler_signature",
+     "mustache"
 )
 
 load("//config:CONFIG.bzl", "w") # warnings struct
@@ -13,7 +14,8 @@ exports_files([
     "instruct.mli", "instruct.ml",
     "meta.mli", "meta.ml",
     ## genrule: "opcodes.ml"
-    "symtable.mli", "symtable.ml"
+    "symtable.mli", "symtable.ml",
+    "opcodes.json"
 ])
 
 MODULE_OPTS = []
@@ -106,17 +108,21 @@ boot_archive(
 # )
 
 ################################################################
-## for ocamlcommmon archive:
+## for //compilerlibs:ocamlcommmon archive:
 # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
-boot_library(
+boot_archive(
+# boot_library(
     name = "ocamlcommon",
     manifest  = [
-        "//driver:Compenv",
-        "//driver:Compile_common",
-        "//driver:Compmisc",
-        "//driver:Main_args",
-        "//driver:Makedepend",
-        "//driver:Pparse",
+        ## we could aggregate the driver modules here,
+        ## but instead we define //driver:ocamlcommon,
+        ## so //compilerlibs:ocamlcommon must depend on both.
+        # "//driver:Compenv",
+        # "//driver:Compile_common",
+        # "//driver:Compmisc",
+        # "//driver:Main_args",
+        # "//driver:Makedepend",
+        # "//driver:Pparse",
         ":Bytesections",
         ":Dll",
         ":Meta",
@@ -152,7 +158,7 @@ compiler_module(
         "//typing:Subst",
         "//typing:Types",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Misc",
         ":Instruct",
     ],
@@ -186,7 +192,7 @@ compiler_module(
         "//utils:Load_path",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Format",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
     ],
     visibility = [
@@ -232,7 +238,7 @@ compiler_module(
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
         "//utils:Consistbl",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
         "//stdlib:Stdlib.Char",
         "//utils:Ccomp",
@@ -278,7 +284,7 @@ compiler_module(
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
         "//typing:Env",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
     ],
     visibility = ["//driver:__pkg__"]
@@ -305,7 +311,7 @@ compiler_module(
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.List",
-        "//utils:Config"
+        "//config:Config"
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -337,7 +343,7 @@ compiler_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Binutils",
         "//stdlib:Stdlib.Array",
     ],
@@ -376,7 +382,7 @@ compiler_module(
         "//typing:Ident",
         "//typing:Primitive",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Misc",
         ":Bytegen",
         ":Instruct",
@@ -510,27 +516,35 @@ compiler_module(
 # ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I bytecomp -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c bytecomp/opcodes.mli
 # ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I bytecomp -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c bytecomp/opcodes.ml
 
-## Run make_opcodes executable under "new" ocamlrun:
-genrule(
-    outs  = ["opcodes.ml"],
-    name  = "opcodes_ml",
-    srcs  = ["//runtime/caml:instruct.h", "//tools:make_opcodes"],
-    tools = [
-        "//runtime:ocamlrun"
-        # "//boot/baseline:ocamlrun", #  FIXME- makefile runs under runtime/ocamlrun
-        # "//tools:make_opcodes" # no need to transition to exec target
-    ],
-    cmd   = " ".join([
-        # "$(execpath {NEW_OCAMLRUN})".format(
-        #     NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
-        "$(execpath //runtime:ocamlrun)",
-        "$(location //tools:make_opcodes)",
-        "-opcodes",
-        "< $(location //runtime/caml:instruct.h)",
-        "> $@"
-    ]),
-    visibility = ["//visibility:public"]
+mustache(
+    out  = "opcodes.ml",
+    name = "opcodes_ml",
+    json = "opcodes.json",
+    template = "opcodes.ml.mustache",
 )
+
+## Run make_opcodes executable under "new" ocamlrun:
+# genrule(
+#     outs  = ["opcodes.ml"],
+#     name  = "opcodes_ml",
+#     srcs  = ["//runtime/caml:instruct.h", "//tools:make_opcodes"],
+#     tools = [
+#         "//runtime:ocamlrun"
+#         # "//boot/baseline:ocamlrun", #  FIXME- makefile runs under runtime/ocamlrun
+#         # "//tools:make_opcodes" # no need to transition to exec target
+#     ],
+#     cmd   = " ".join([
+#         # "$(execpath {NEW_OCAMLRUN})".format(
+#         #     NEW_OCAMLRUN = RUNTIME_OCAMLRUN),
+#         "$(execpath //runtime:ocamlrun)",
+#         "$(location //tools:make_opcodes)",
+#         "-opcodes",
+#         # "-opnames",
+#         "< $(location //runtime/caml:instruct.h)",
+#         "> $@"
+#     ]),
+#     visibility = ["//visibility:public"]
+# )
 
 ## NB: the makefile extracts the mli file using ocamlc -i
 # the rules don't seem to work for that
@@ -619,7 +633,7 @@ compiler_module(
         "//typing:Ident",
         "//typing:Predef",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Misc",
         ":Bytesections",
         ":Dll",

@@ -18,6 +18,7 @@ load("//bzl:rules.bzl",
      "boot_library",
      "compiler_module",
      "compiler_signature",
+     "mustache"
 )
 
 load("//config:CONFIG.bzl", "CPP", "w")
@@ -91,7 +92,7 @@ boot_library(
         "Build_path_prefix_map",
         # "Ccomp",
         "Clflags",
-        "Config",
+        "//config:Config",
         "Consistbl",
         "Diffing",
         "Diffing_with_keys",
@@ -112,35 +113,34 @@ boot_library(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
+# boot_archive(
 boot_library(
     name = "ocamlcommon",
     # mode = "bytecode",
     manifest  = [
-        ## list from compilerlibs/Makefile.compilerlibs UTILS
-        "Build_path_prefix_map",
-        "Misc",
-        "Identifiable",
-        "Numbers",
-        "Arg_helper",
-        "Clflags",
-        "Profile",
-        "Local_store",
-        "Load_path",
-        "Terminfo",
-        # "Ccomp",
-        "Warnings",
-        "Consistbl",
-        "Strongly_connected_components",
-        "Targetint",
-        "Int_replace_polymorphic_compare",
-        "Domainstate",
-        "Binutils",
-        "Lazy_backtrack",
-        "Diffing",
-        "Diffing_with_keys",
-        ## Misc and Config make inconsistent assumptions over Config iface
-        ## No idea why
-        "Config",
+        ## list from compilerlibs/Makefile.compilerlibs
+        ## ":Config" moved to //config/Config
+        ":Arg_helper",
+        ":Binutils",
+        ":Build_path_prefix_map",
+        ":Ccomp",
+        ":Clflags",
+        ":Consistbl",
+        ":Diffing",
+        ":Diffing_with_keys",
+        ":Domainstate",
+        ":Identifiable",
+        ":Int_replace_polymorphic_compare",
+        ":Lazy_backtrack",
+        ":Load_path",
+        ":Local_store",
+        ":Misc",
+        ":Numbers",
+        ":Profile",
+        ":Strongly_connected_components",
+        ":Targetint",
+        ":Terminfo",
+        ":Warnings",
     ],
     visibility = ["//compilerlibs:__pkg__"]
 )
@@ -252,7 +252,7 @@ compiler_module(
         ":Profile", ## (Utils Profile)
         ":Misc", ## (Utils Misc)
         ":Load_path", ## (Utils Load_path)
-        ":Config", ## (Utils Config)
+        "//config:Config", ## (Utils Config)
         ":Clflags", ## (Utils Clflags)
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
@@ -287,7 +287,7 @@ compiler_module(
         ":Profile", ## (Utils Profile)
         ":Numbers", ## (Utils Numbers)
         ":Misc", ## (Utils Misc)
-        ":Config", ## (Utils Config)
+        "//config:Config", ## (Utils Config)
         ":Arg_helper", ## (Utils Arg_helper)
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -323,52 +323,53 @@ compiler_signature(
     visibility = ["//driver:__pkg__"]
 )
 
-compiler_module(
-    name   = "Config",
-    struct = "config.ml",
-    sig    = "Config_cmi",
-    opts = MODULE_OPTS,
-    deps   = [ # [
-        "//config:Config_cc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Option", # if not bootstrapping?
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys"
-    ],
-    visibility = [
-        "//asmcomp:__subpackages__",
-        "//bytecomp:__pkg__",
-        "//driver:__pkg__",
-        "//file_formats:__pkg__",
-        "//lambda:__pkg__",
-        "//middle_end:__subpackages__",
-        "//otherlibs/dynlink:__pkg__",
-        "//parsing:__pkg__",
-        "//tools:__pkg__",
-        "//toplevel:__subpackages__",
-        "//typing:__pkg__"
-    ]
-)
+# moved to //config:Config
+# compiler_module(
+#     name   = "Config",
+#     struct = "config.ml",
+#     sig    = "Config_cmi",
+#     opts = MODULE_OPTS,
+#     deps   = [ # [
+#         # "//config:Config_cc",
+#         "//stdlib:Stdlib.List",
+#         "//stdlib:Stdlib.Printf",
+#         "//stdlib:Stdlib.Option", # if not bootstrapping?
+#         "//stdlib:Stdlib.String",
+#         "//stdlib:Stdlib.Sys"
+#     ],
+#     visibility = [
+#         "//asmcomp:__subpackages__",
+#         "//bytecomp:__pkg__",
+#         "//driver:__pkg__",
+#         "//file_formats:__pkg__",
+#         "//lambda:__pkg__",
+#         "//middle_end:__subpackages__",
+#         "//otherlibs/dynlink:__pkg__",
+#         "//parsing:__pkg__",
+#         "//tools:__pkg__",
+#         "//toplevel:__subpackages__",
+#         "//typing:__pkg__"
+#     ]
+# )
 
 ## //Makefile
 # utils/config.ml: \
 #   utils/config_$(if $(filter true,$(IN_COREBOOT_CYCLE)),boot,main).ml
 # 	cp $< $@
-boot_config(
-    name   = "config_ml",
-    out    = "config.ml",
-    header = select({
-        "//config/stage:0?" : ":config.fixed.ml",
-        "//config/stage:1?"  : ":config.dev.ml",
-        "//config/stage:2?" : ":config.dev.ml",
-        "//conditions:default" : ":config.generated.ml"
-    }),
-    stdlib = "//stdlib",
-    deps = ["//config:Config_cc"],
-    footer = "config.common.ml",
-    visibility = ["//otherlibs/dynlink:__pkg__"]
-)
+# boot_config(
+#     name   = "config_ml",
+#     out    = "config.ml",
+#     header = select({
+#         "//config/stage:0?" : ":config.fixed.ml",
+#         "//config/stage:1?"  : ":config.dev.ml",
+#         "//config/stage:2?" : ":config.dev.ml",
+#         "//conditions:default" : ":config.generated.ml"
+#     }),
+#     stdlib = "//stdlib",
+#     deps = ["//config:Config_cc"],
+#     footer = "config.common.ml",
+#     visibility = ["//otherlibs/dynlink:__pkg__"]
+# )
 
 # genrule(
 #     outs   = ["config.ml"],
@@ -423,21 +424,21 @@ boot_config(
 #     ])
 # )
 
-compiler_signature(
-    name = "Config_cmi",
-    src  = "config.mli",
-    opts = SIG_OPTS,
-    deps   = [ # [
-        # "//stdlib:Stdlib.List",
-        # "//stdlib:Stdlib.Printf",
-        # "//stdlib:Stdlib.String",
-        # "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib"
-    ],
-    visibility = [
-        "//otherlibs/dynlink:__pkg__",
-    ]
-)
+# compiler_signature(
+#     name = "Config_cmi",
+#     src  = "config.mli",
+#     opts = SIG_OPTS,
+#     deps   = [ # [
+#         # "//stdlib:Stdlib.List",
+#         # "//stdlib:Stdlib.Printf",
+#         # "//stdlib:Stdlib.String",
+#         # "//stdlib:Stdlib.Sys",
+#         "//stdlib:Stdlib"
+#     ],
+#     visibility = [
+#         "//otherlibs/dynlink:__pkg__",
+#     ]
+# )
 
 compiler_module(
     name   = "Consistbl",
@@ -538,24 +539,34 @@ compiler_module(
     visibility = ["//asmcomp:__subpackages__"]
 )
 
-genrule(
+mustache(
     name = "domainstate_ml",
-    outs = ["domainstate.ml"],
-    srcs = [
-        ":domainstate.ml.c",
-        "//runtime/caml:config.h",
-        "//runtime/caml:m.h",
-        "//runtime/caml:s.h",
-        "//runtime/caml:domain_state.tbl"
-    ],
-    cmd = " ".join([
-        "HDRS=`dirname $(location //runtime/caml:config.h)`",
-        "&&",
-        "{} -I $$HDRS $(location :domainstate.ml.c) > $@".format(
-            " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
-        )
-    ])
+    out  = "domainstate.ml",
+    json = "//runtime/caml:domain_state.json",
+    template = "domainstate.ml.mustache"
 )
+
+# genrule(
+#     name = "domainstate_ml",
+#     outs = ["domainstate.ml"],
+#     srcs = [
+#         ":domainstate.ml.c",
+#         "//runtime/caml:domain_state.tbl"
+#         ## NB: these hdrs are only needed by #includes in
+#         ## domainstate.ml.c, they make no contrib to generating
+#         ## domainstate.ml
+#         "//runtime/caml:config.h",
+#         "//runtime/caml:m.h",
+#         "//runtime/caml:s.h",
+#     ],
+#     cmd = " ".join([
+#         "HDRS=`dirname $(location //runtime/caml:config.h)`",
+#         "&&",
+#         "{} -I $$HDRS $(location :domainstate.ml.c) > $@".format(
+#             " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
+#         )
+#     ])
+# )
 
 compiler_signature(
     name = "Domainstate_cmi",
@@ -564,24 +575,31 @@ compiler_signature(
     deps   = ["//stdlib:Stdlib"]
 )
 
-genrule(
+mustache(
     name = "domainstate_mli",
-    outs = ["domainstate.mli"],
-    srcs = [
-        ":domainstate.mli.c",
-        "//runtime/caml:config.h",
-        "//runtime/caml:m.h",
-        "//runtime/caml:s.h",
-        "//runtime/caml:domain_state.tbl"
-    ],
-    cmd = " ".join([
-        "HDRS=`dirname $(location //runtime/caml:config.h)`",
-        "&&",
-        "{} -I $$HDRS $(location :domainstate.mli.c) > $@".format(
-            " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
-        )
-    ])
+    out  = "domainstate.mli",
+    json = "//runtime/caml:domain_state.json",
+    template = "domainstate.mli.mustache"
 )
+
+# genrule(
+#     name = "domainstate_mli",
+#     outs = ["domainstate.mli"],
+#     srcs = [
+#         ":domainstate.mli.c",
+#         "//runtime/caml:config.h",
+#         "//runtime/caml:m.h",
+#         "//runtime/caml:s.h",
+#         "//runtime/caml:domain_state.tbl"
+#     ],
+#     cmd = " ".join([
+#         "HDRS=`dirname $(location //runtime/caml:config.h)`",
+#         "&&",
+#         "{} -I $$HDRS $(location :domainstate.mli.c) > $@".format(
+#             " ".join(CPP) ## CPP = ["gcc", "-E", "-P"]
+#         )
+#     ])
+# )
 
 ## //Makefile
 # utils/domainstate.ml: utils/domainstate.ml.c runtime/caml/domain_state.tbl
@@ -686,7 +704,7 @@ compiler_module(
     deps   = [
         ":Misc", ## (Utils Misc)
         ":Local_store", ## (Utils Local_store)
-        ":Config", ## (Utils Config)
+        "//config:Config", ## (Utils Config)
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.List",
@@ -747,7 +765,7 @@ compiler_module(
     sig    = "Misc_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Config", ## (Utils Config)
+        "//config:Config", ## (Utils Config)
         ":Build_path_prefix_map", ## (Utils Build_path_prefix_map)
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
@@ -791,7 +809,7 @@ compiler_signature(
     src  = "misc.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Config_cmi",
+        "//config:Config_cmi",
         ":Build_path_prefix_map",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Set",

@@ -32,7 +32,7 @@ def executable_attrs():
         ),
 
         opts             = attr.string_list(
-            doc          = "List of OCaml options. Will override configurable default options."
+            # default = ["-nopervasives"]
         ),
 
         warnings         = attr.string_list(
@@ -57,6 +57,7 @@ def executable_attrs():
         ),
 
         ## The compiler always expects to find stdlib.cm{x}a (hardocded)
+        ## UNLESS -nopervasives?
         _stdlib = attr.label(
             doc = "Stdlib",
             default = "//stdlib", # archive, not resolver

@@ -26,14 +26,28 @@ ModuleInfo, _new_moduleinfo = provider(
     doc = "foo",
     fields = {
         "sig"   : "One .cmi file",
-        "struct": "One .cmo or .cmx file"
+        "struct": "One .cmo or .cmx file",
     },
     init = _ModuleInfo_init
 )
 
+##############################################################
+def _NsResolverInfo_init(*, sigs = None, structs = None):
+    return { "sigs" : sigs, "structs": structs }
+
+NsResolverInfo, _new_nsresolverinfo = provider(
+    fields = {
+        "sigs"   : "depset of .cmi files",
+        "structs": "depsetof .cmo or .cmx files",
+    },
+    init = _NsResolverInfo_init
+)
+
+
 ##########################
 def _BootInfo_init(*,
                    sigs          = [],
+                   structs       = [],
                    cli_link_deps = [],
                    afiles        = [],
                    ofiles        = [],
@@ -47,6 +61,7 @@ def _BootInfo_init(*,
                         ):
     return {
         "sigs"          : sigs,
+        "structs"       : structs,
         "cli_link_deps" : cli_link_deps,
         "afiles"        : afiles,
         "ofiles"        : ofiles,
@@ -59,6 +74,7 @@ BootInfo, _new_ocamlbootinfo = provider(
     doc = "foo",
     fields = {
         "sigs"          : "Depset of .cmi files. always added to inputs, never to cmd line.",
+        "structs"       : "Depset of unarchived .cmo or .cmx files.",
         "cli_link_deps" : "Depset of cm[x]a and cm[x|o] files to be added to inputs and link cmd line (executables and archives).",
         "afiles"        : "Depset of the .a files that go with .cmxa files",
         "ofiles"        : "Depset of the .o files that go with .cmx files",
@@ -87,6 +103,7 @@ def new_deps_aggregator():
     return DepsAggregator(
         deps = BootInfo(
             sigs          = [],
+            structs       = [],
             cli_link_deps = [],
             afiles        = [],
             ofiles        = [],

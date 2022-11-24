@@ -35,11 +35,12 @@ LABEL_OPTS = ["-nolabels"]
 # stdlib.cm[x]a - this is hardcoded.
 
 # stdlib_archive(
+#boot_library(
 boot_archive(
     name       = "stdlib",
     ## makefiles pass -use-prims. does that make sense, for an archive?
     manifest   = STDLIB_MANIFEST,
-    data = ["//runtime:asmrun"],
+    # data = ["//runtime:asmrun"],
     visibility = ["//visibility:public"],
 )
 
@@ -425,7 +426,7 @@ stdlib_module(
     name   = "Stdlib.Bool",
     struct = "bool.ml",
     sig    = "Stdlib.Bool_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS,  #  + ["-nopervasives"],
     use_prims = True
 )
 
@@ -1892,10 +1893,11 @@ stdlib_boot_signature(
 stdlib_boot_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
-    sig    = select({
-        "//config:sig_src?": "std_exit.mli",
-        "//conditions:default": "Std_exit_cmi"
-    }),
+    sig    = ":Std_exit_cmi",
+    # sig    = select({
+    #     "//config:sig_src?": "std_exit.mli",
+    #     "//conditions:default": "Std_exit_cmi"
+    # }),
     opts = ["-open", "Stdlib"],
     deps = [":Stdlib"]
 )

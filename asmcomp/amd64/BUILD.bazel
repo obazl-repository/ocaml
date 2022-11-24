@@ -12,12 +12,12 @@ exports_files([
  ## fixme: find a way to use the toolchain, w/o bootstrapping
 genrule(
     name = "emit_ml",
-    srcs = ["emit.mlp", "//tools:cvt_emit"],
+    srcs = ["emit.mlp", "//tools:cvt_emit.exe"],
     outs = ["emit.ml"],
     tools = ["//boot/baseline:ocamlrun"],
     cmd  = "\n".join([
 	    "echo '# 1 \"amd64/emit.mlp\"' > $@;",
-        "$(execpath //boot/baseline:ocamlrun) $(location //tools:cvt_emit) < $(location :emit.mlp) >> $@"
+        "$(execpath //boot/baseline:ocamlrun) $(location //tools:cvt_emit.exe) < $(location :emit.mlp) >> $@"
     ]),
     visibility = ["//asmcomp:__pkg__"]
 )

@@ -112,11 +112,11 @@ def executable_impl(ctx):  ## , tc):
 
     manifest = []
 
-    if ctx.attr.main:
-        depsets = aggregate_deps(ctx, ctx.attr.main, depsets, manifest)
-
     for dep in ctx.attr.prologue:
         aggregate_deps(ctx, dep, depsets, manifest)
+
+    if ctx.attr.main:
+        depsets = aggregate_deps(ctx, ctx.attr.main, depsets, manifest)
 
     sigs_depset = depset(
         order=dsorder,
@@ -198,10 +198,14 @@ def executable_impl(ctx):  ## , tc):
     _options = get_options(rule, ctx)
     args.add_all(_options)
 
-    if ctx.attr.warnings == [  ]:
-        args.add_all(ctx.attr.warnings)
-    else:
-        args.add_all(tc.warnings[BuildSettingInfo].value)
+    for w in ctx.attr.warnings:
+        args.add_all(["-w",
+                      w if w.startswith("-")
+                      else "-" + w])
+    # if ctx.attr.warnings == [  ]:
+    #     args.add_all(ctx.attr.warnings)
+    # else:
+    #     args.add_all(tc.warnings[BuildSettingInfo].value)
 
     data_inputs = []
     # if ctx.attr.data:
@@ -211,10 +215,12 @@ def executable_impl(ctx):  ## , tc):
         #     includes.append(f.dirname)
 
     includes = []
-    # for path in paths_depset.to_list():
-    #     includes.append(path)
+    for path in paths_depset.to_list():
+        includes.append(path)
 
-    includes.append(ctx.file._stdlib.dirname)
+    if ctx.file._stdlib:
+        includes.append(ctx.file._stdlib.dirname)
+
     # includes.append(ctx.file._std_exit.dirname)
 
     # compiler_runfiles = []
@@ -237,8 +243,6 @@ def executable_impl(ctx):  ## , tc):
     #     # includes.append(f.dirname)
     #     camlheader_deps.append(f)
 
-    args.add_all(includes, before_each="-I", uniquify=True)
-
     ## To get cli args in right order, we need then merged depset of
     ## all deps. Then we use the manifest to filter.
 
@@ -249,6 +253,8 @@ def executable_impl(ctx):  ## , tc):
         direct = ctx.files.prologue, #  + [ctx.file.main],
         transitive = [cli_link_deps_depset]
     )
+
+    args.add_all(includes, before_each="-I", uniquify=True)
 
     for dep in filtering_depset.to_list():
         if dep in manifest:

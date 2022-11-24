@@ -32,13 +32,21 @@ boot_library(
     ],
 )
 
-## defined in compilerlibs/Makefile.compilerlibs as COMP_CMI
+## defined in compilerlibs/Makefile.compilerlibs as COMP_CMI WARNING:
+## these should NOT be listed in COMP or COMP_CMI, since they are deps
+## of the other stuff listed there. E.g. the file_formats cmi deps in
+## COMP are actually direct deps of the bytecode modules also listed
+## in COMP. So they are not needed as direct deps of ocamlcommon.
+## Similarly, the Cmi/Cmt format modules are deps of modules in
+## typing.
 boot_library(
     name = "ocamlcommon",
     manifest  = [
-        ":Cmo_format_cmi",
-        ":Cmx_format_cmi",
-        ":Cmxs_format_cmi",
+        ":Cmi_format",
+        ":Cmt_format",
+        # ":Cmo_format_cmi",
+        # ":Cmx_format_cmi",
+        # ":Cmxs_format_cmi",
     ],
     visibility = ["//compilerlibs:__pkg__"]
 )
@@ -55,7 +63,7 @@ compiler_module(
         "//parsing:Location",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Digest",
-        "//utils:Config",
+        "//config:Config",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -118,7 +126,7 @@ compiler_module(
         "//parsing:Lexer",
         "//typing:Env",
         "//stdlib:Stdlib.Digest",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
         "//stdlib:Stdlib.Array",
     ],
@@ -190,7 +198,7 @@ compiler_module(
         "//asmcomp:Linear",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Digest",
-        "//utils:Config",
+        "//config:Config",
         "//asmcomp:Cmm"
     ],
     visibility = ["//asmcomp:__pkg__"]

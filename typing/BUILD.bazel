@@ -89,6 +89,7 @@ boot_archive(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
+# boot_archive(
 boot_library(
     name = "ocamlcommon",
     manifest  = [
@@ -138,9 +139,10 @@ boot_library(
         ":Typetexp",
         ":Untypeast",
 
-        # ":Annot_cmi",
-        # ":Outcometree_cmi",
-
+        ## NB: these should not really be in this manifest, but they
+        ## are direct deps of some of the component modules, so we
+        ## need to add them so that linking will work. They would not
+        ## be added to link cmds automatically otherwise.
         "//file_formats:Cmi_format",
         "//file_formats:Cmt_format"
     ],
@@ -807,7 +809,7 @@ compiler_module(
         "//stdlib:Stdlib.Seq",
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.String",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Lazy_backtrack",
         "//utils:Misc",
         "//utils:Warnings",
@@ -931,7 +933,7 @@ compiler_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Consistbl",
         "//utils:Lazy_backtrack",
         "//utils:Load_path",
@@ -1601,7 +1603,7 @@ compiler_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Diffing_with_keys",
         "//utils:Lazy_backtrack",
         "//utils:Misc",
@@ -1730,7 +1732,7 @@ compiler_module(
         "//parsing:Location",
         "//stdlib:Stdlib.List",
         "//utils:Lazy_backtrack",
-        "//utils:Config",
+        "//config:Config",
     ]
 )
 
@@ -1887,7 +1889,7 @@ compiler_module(
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Lazy_backtrack",
         "//utils:Load_path",
         "//utils:Misc",
@@ -1961,7 +1963,7 @@ compiler_module(
         "//parsing:Longident",
         "//stdlib:Stdlib.List",
         "//utils:Lazy_backtrack",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
     ],
     visibility = ["//lambda:__pkg__"]
@@ -2002,7 +2004,7 @@ compiler_module(
         "//utils:Identifiable",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Format",
-        "//utils:Config",
+        "//config:Config",
     ],
     visibility = [
         "//asmcomp:__pkg__",

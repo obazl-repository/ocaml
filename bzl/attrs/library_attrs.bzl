@@ -1,6 +1,7 @@
 load("//bzl:providers.bzl",
      "CompilationModeSettingProvider",
      "ModuleInfo",
+     "OcamlArchiveProvider",
      "OcamlLibraryMarker",
      "OcamlNsResolverProvider",
      "OcamlSignatureProvider")
@@ -64,7 +65,7 @@ def library_attrs():
             # cfg = manifest_out_transition,
 
             providers = [
-                # [OcamlArchiveProvider],
+                [OcamlArchiveProvider],
                 [OcamlLibraryMarker],
                 [ModuleInfo],
                 [OcamlNsResolverProvider],

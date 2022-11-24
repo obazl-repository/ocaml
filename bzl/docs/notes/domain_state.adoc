@@ -1,6 +1,6 @@
 = domain_state
 
-`runtim/caml/domain_state.tbl``
+`runtime/caml/domain_state.tbl``
 
 This is a header file. The protocol for inclusion is:
 

@@ -291,7 +291,7 @@ ocaml_module(
         ":Actions", ## (Ocamltest Actions)
         "//stdlib:Stdlib.Printf",
         "//utils:Misc",
-        "//utils:Config",
+        "//config:Config",
         "//file_formats:Cmo_format_cmi",
         "//utils:Clflags",
         "//stdlib:Stdlib.Array",

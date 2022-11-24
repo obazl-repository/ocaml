@@ -2,7 +2,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
-     "BootInfo", "ModuleInfo",
+     "BootInfo", "ModuleInfo", "NsResolverInfo",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
 load("//bzl:functions.bzl",
@@ -128,12 +128,6 @@ def module_impl(ctx, module_name):
     cmifile = None
     sig_src = None
 
-    ## get_module_name decides if this module is in a namespace
-    ## and if so adds ns prefix
-    # (from_name, ns, module_name) = get_module_name(ctx, ctx.file.struct)
-    # print("module_name: %s" % module_name)
-    # print("ns: %s" % ns)
-
     sig_inputs = []
     if ctx.attr.sig:
         if ctx.file.sig.is_source:
@@ -199,8 +193,8 @@ def module_impl(ctx, module_name):
                     module_name = ctx.file.sig.basename[:-(extlen + 1)]
                     in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-                    print("lbl: %s" % ctx.label)
-                    print("IN STRUCTFILE: %s" % in_structfile)
+                    # print("lbl: %s" % ctx.label)
+                    # print("IN STRUCTFILE: %s" % in_structfile)
                 else:
                     # generated sigfile
                     in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
@@ -228,14 +222,14 @@ def module_impl(ctx, module_name):
                                 src = ctx.file.struct.path))
                             in_structfile = ctx.file.struct
                 else: # sig file is compiled .cmo
-                    print("xxxxxxxxxxxxxxxx %s" % ctx.label)
+                    # print("xxxxxxxxxxxxxxxx %s" % ctx.label)
                     # force name of module to match compiled sig
                     extlen = len(ctx.file.sig.extension)
                     module_name = ctx.file.sig.basename[:-(extlen + 1)]
                     in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-                    print("lbl: %s" % ctx.label)
-                    print("IN STRUCTFILE: %s" % in_structfile)
+                    # print("lbl: %s" % ctx.label)
+                    # print("IN STRUCTFILE: %s" % in_structfile)
             else:  ## no sig file
                 in_structfile = ctx.file.struct
     else:  ## namespaced
@@ -243,9 +237,6 @@ def module_impl(ctx, module_name):
         ctx.actions.symlink(
             output = in_structfile, target_file = ctx.file.struct
         )
-
-    # if ctx.label.name == "CamlinternalFormatBasics":
-    #     fail("X")
 
     out_cm_ = ctx.actions.declare_file(workdir + module_name + ext)
     # sibling = new_cmi) # fname)
@@ -281,6 +272,9 @@ def module_impl(ctx, module_name):
         else:
             # either is_source or generated
             depsets.deps.mli.append(ctx.file.sig)
+            # FIXME: add cmi to depsets
+            if provider_output_cmi:
+                depsets.deps.cmi.append(provider_output_cmi)
 
     for dep in ctx.attr.deps:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
@@ -288,6 +282,8 @@ def module_impl(ctx, module_name):
         ## a sibling submodule? If it is a sibling it goes in
         ## archived_cmx, or if it is a cmo we drop it since it will be
         ## archived. If it is not a sibling it goes in cli_link_deps.
+
+    #FIXME: add this path (see below)
 
     ## The problem is we do not know where whether this module is to
     ## be archived. It is the boot_archive rule that must decide how
@@ -395,12 +391,21 @@ def module_impl(ctx, module_name):
                 if  "-use-prims" in ctx.attr.opts:
                     args.add_all(["-use-prims", ctx.file._primitives.path])
 
-    resolver = []
+    resolver = None
+    resolver_deps = []
     if hasattr(ctx.attr, "_resolver"):
-        resolver.append(ctx.attr._resolver[ModuleInfo].sig)
-        resolver.append(ctx.attr._resolver[ModuleInfo].struct)
-        ns = ctx.attr._resolver[ModuleInfo].struct.basename[:-4]
-        args.add_all(["-open", ns])
+        resolver = ctx.attr._resolver[ModuleInfo]
+        resolver_deps.append(resolver.sig)
+        resolver_deps.append(resolver.struct)
+        nsname = resolver.struct.basename[:-4]
+        args.add_all(["-open", nsname])
+
+    if ctx.label.name == "CamlinternalFormatBasics":
+        print("in_structfile: %s" % in_structfile)
+        print("out_cm_: %s" % out_cm_)
+        print("resolver: %s" % resolver)
+        print("rdeps: %s" % resolver_deps if resolver else [])
+        # fail("X")
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -432,7 +437,7 @@ def module_impl(ctx, module_name):
         + sig_inputs
         + [in_structfile]
         + depsets.deps.mli
-        + resolver
+        + resolver_deps
         ,
         transitive = []
         + [merge_depsets(depsets, "sigs"),
@@ -495,12 +500,31 @@ def module_impl(ctx, module_name):
     defaultInfo = DefaultInfo(
         files = default_depset
     )
+    providers = [defaultInfo]
 
-    moduleInfo_depset = depset([provider_output_cmi, out_cm_])
+    moduleInfo_depset = depset(
+        direct= [provider_output_cmi, out_cm_],
+    )
     moduleInfo = ModuleInfo(
         sig    = provider_output_cmi,
-        struct = out_cm_
+        struct = out_cm_,
+
     )
+    providers.append(moduleInfo)
+
+    if hasattr(ctx.attr, "_resolver"):
+        resolver = ctx.attr._resolver[ModuleInfo]
+        nsResolverInfo = NsResolverInfo(
+            sigs   = depset(
+                direct = [resolver.sig],
+                # transitive = ... depsets.deps.resolvers
+            ),
+            structs = depset(
+                direct = [resolver.struct],
+                # transitive = ... depsets.deps.resolvers
+            )
+        )
+        providers.append(nsResolverInfo)
 
     bootProvider = BootInfo(
         sigs     = sigs_depset,
@@ -510,12 +534,7 @@ def module_impl(ctx, module_name):
         archived_cmx  = archived_cmx_depset,
         paths    = paths_depset,
     )
-
-    providers = [
-        defaultInfo,
-        bootProvider,
-        moduleInfo
-    ]
+    providers.append(bootProvider)
 
     ################
     outputGroupInfo = OutputGroupInfo(

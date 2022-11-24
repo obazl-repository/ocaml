@@ -111,7 +111,7 @@ ocaml_module(
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
         "//typing:Env",
-        "//utils:Config",
+        "//config:Config",
         "//driver:Compmisc",
         "//utils:Clflags",
     ]
@@ -149,7 +149,7 @@ ocaml_module(
         "//driver:Main_args",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//driver:Compenv",
         "//stdlib:Stdlib.Arg",
     ]
@@ -291,7 +291,7 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
     ]
 )
 
@@ -690,7 +690,7 @@ ocaml_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int",
-        "//utils:Config",
+        "//config:Config",
         "//stdlib:Stdlib.Array",
     ]
 )

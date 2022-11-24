@@ -17,7 +17,7 @@ run:q --ui_event_filters=-stdout
 run:q --ui_event_filters=-stderr
 run:q --noshow_progress
 
-build --toolchain_resolution_debug=.*
+# build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 #build --toolchain_resolution_debug=//toolchain/type:.*
 #build --toolchain_resolution_debug=//boot/toolchain/type:.*

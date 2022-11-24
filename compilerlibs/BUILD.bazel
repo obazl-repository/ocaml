@@ -22,16 +22,19 @@ load("//bzl:rules.bzl",
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
 ## no //middle_end stuff:
-# boot_library(
-boot_archive(
+boot_library(
+# boot_archive(
     name = "ocamlcommon",
     opts = ["-linkall"],
     manifest  = [
+        "//config:Config",
         "//bytecomp:ocamlcommon",
+        "//driver:ocamlcommon",
+        # "//file_formats:ocamlcommon",
+        "//utils:ocamlcommon",
         "//lambda:ocamlcommon",
         "//parsing:ocamlcommon",
         "//typing:ocamlcommon",
-        "//utils:ocamlcommon",
     ],
     visibility = [
         "//bin:__pkg__",  # the new compiler

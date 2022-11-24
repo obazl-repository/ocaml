@@ -68,7 +68,7 @@ exports_files(["topeval.ml", "topmain.ml", "trace.ml"])
 #         "//typing:Typemod",
 #         "//typing:Types",
 #         "//utils:Clflags",
-#         "//utils:Config",
+#         "//config:Config",
 #         "//utils:Load_path",
 #         "//utils:Misc",
 #         "//utils:Warnings",

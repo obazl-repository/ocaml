@@ -20,8 +20,8 @@ let standard_library_default = {|{{standard_library_default}}|}
 let ccomp_type = {|{{ccomp_type}}|}
 let c_compiler = {|{{c_compiler}}|}
 let c_output_obj = {|{{c_output_obj}}|}
-let c_has_debug_prefix_map = {{c_has_debug_prefix_map}},
-let as_has_debug_prefix_map = {{as_has_debug_prefix_map}},
+let c_has_debug_prefix_map = {{c_has_debug_prefix_map}}
+let as_has_debug_prefix_map = {{as_has_debug_prefix_map}}
 let ocamlc_cflags = {|{{ocamlc_cflags}}|}
 let ocamlc_cppflags = {|{{ocamlc_cppflags}}|}
 (* #7678: ocamlopt uses these only to compile .c files, and the behaviour for
@@ -42,7 +42,7 @@ let native_pack_linker = {|{{native_pack_linker}}|}
 let default_rpath = {|{{default_rpath}}|}
 let mksharedlibrpath = {|{{mksharedlibrpath}}|}
 let ar = {|{{ar}}|}
-let supports_shared_libraries = {|{{supports_shared_libraries}}|}
+let supports_shared_libraries = {{supports_shared_libraries}}
 let mkdll, mkexe, mkmaindll =
   if Sys.win32 || Sys.cygwin && supports_shared_libraries then
     let flexlink =
@@ -60,23 +60,23 @@ let mkdll, mkexe, mkmaindll =
     let flags = " -chain " ^ flexdll_chain ^ " " ^ flexlink_flags in
     flexlink ^ flags ^ {|{{mkdll_ldflags_exp}}|},
     flexlink ^ " -exe" ^ flags
-      ^ {@QS@| @mkexe_extra_flags}}|} ^ {|{{mkexe_ldflags_exp}}|},
+      ^ {| {{mkexe_extra_flags}}|} ^ {|{{mkexe_ldflags_exp}}|},
     flexlink ^ " -maindll" ^ flags ^ {|{{mkdll_ldflags_exp}}|}
   else
     {|{{mkdll_exp}}|},
     {|{{mkexe_exp}}|},
     {|{{mkmaindll_exp}}|}
 
-let flambda = {{flambda}},
-let with_flambda_invariants = {{with_flambda_invariants}},
-let with_cmm_invariants = {{with_cmm_invariants}},
+let flambda = {{flambda}}
+let with_flambda_invariants = {{with_flambda_invariants}}
+let with_cmm_invariants = {{with_cmm_invariants}}
 let windows_unicode = {{windows_unicode}} != 0
-let force_instrumented_runtime = {{force_instrumented_runtime}},
+let force_instrumented_runtime = {{force_instrumented_runtime}}
 
-let flat_float_array = {{flat_float_array}},
+let flat_float_array = {{flat_float_array}}
 
-let function_sections = {{function_sections}},
-let afl_instrument = {{afl_instrument}},
+let function_sections = {{function_sections}}
+let afl_instrument = {{afl_instrument}}
 
 let architecture = {|{{architecture}}|}
 let model = {|{{model}}|}

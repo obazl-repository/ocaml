@@ -57,7 +57,7 @@ ocaml_tool(
 ocaml_tool(
     name = "ocamlprof",
     prologue = [
-        "//utils:Config",
+        "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
         "//utils:Identifiable",
@@ -87,7 +87,7 @@ ocaml_tool(
     name = "ocamlcp",
     main = ":Ocamlcp",
     prologue = [
-        "//utils:Config",
+        "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
         "//utils:Profile",
@@ -112,7 +112,7 @@ ocaml_tool(
     name = "ocamloptp",
     main = ":Ocamloptp",
     prologue = [
-        "//utils:Config",
+        "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
         "//utils:Profile",
@@ -138,7 +138,7 @@ ocaml_tool(
     name = "ocamlmklib",
     main = ":Ocamlmklib",
     prologue = [
-        "//utils:Config",
+        "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
     ]
@@ -155,7 +155,7 @@ ocaml_tool(
     name = "ocamlmktop",
     main = ":Ocamlmktop",
     prologue = [
-        "//utils:Config",
+        "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
         "//utils:Identifiable",
@@ -179,7 +179,7 @@ ocaml_tool(
 ##FIXME: this should only be built as a vm executable
 # ocaml_tool(
 build_tool(
-    name = "cvt_emit",
+    name = "cvt_emit.exe",
     main = ":Cvt_emit",
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -240,10 +240,19 @@ ocaml_tool(
     name = "ocamlobjinfo",
     main = ":Objinfo",
     prologue = [
+        # "//stdlib",
+        # "//utils:Ccomp",
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         "//middle_end:ocamlmiddleend",
-    ]
+    ],
+    opts = [
+        "-linkall",
+        "-nostdlib",
+        "-I", "bazel-out/darwin-fastbuild/bin/utils/_vmvm1",
+        "-I", "bazel-out/darwin-fastbuild/bin/driver/_vmvm1"
+    ],
+    # warnings = [w.MODULE_LINKED_TWICE]
 )
 
 ################################################################
@@ -412,7 +421,7 @@ compiler_module(
         "//bytecomp:Instruct",
         "//typing:Ident",
         "//stdlib:Stdlib.Hashtbl",
-        "//utils:Config",
+        "//config:Config",
         # "//file_formats:Cmo_format_cmi",
         "//bytecomp:Bytesections",
         # "//parsing:Asttypes_cmi",
@@ -589,7 +598,7 @@ compiler_module(
         "//utils:Misc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Arg",
@@ -605,7 +614,7 @@ compiler_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Ccomp",
         "//stdlib:Stdlib.Array",
     ],
@@ -663,7 +672,7 @@ compiler_module(
         "//file_formats:Cmo_format_cmi",
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.List",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Misc",
     ],
 )
@@ -756,6 +765,10 @@ build_tool(
     name = "make_opcodes",
     data = ["//stdlib:camlheaders"],
     main = ":Make_opcodes",
+    prologue = [
+        # "//stdlib:Std_exit",
+        "//stdlib"
+    ],
     visibility = ["//bytecomp:__pkg__"]
 )
 

@@ -1,9 +1,9 @@
-load("//bzl/rules/common:library_impl.bzl", "impl_library")
-load("//bzl/rules/common:library_intf.bzl", "library_attrs")
+load("//bzl/actions:library_impl.bzl", "library_impl")
+load("//bzl/attrs:library_attrs.bzl", "library_attrs")
 
 #####################
 boot_library = rule(
-    implementation = impl_library, ## _boot_library,
+    implementation = library_impl,
     doc = """Aggregates a collection of modules and/or signatures.
 An `boot_library` is a collection of modules packaged into an OBazl
 target; it is not a single binary file. It is a OBazl convenience rule

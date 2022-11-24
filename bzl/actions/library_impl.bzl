@@ -17,7 +17,7 @@ load("//bzl/rules/common:DEPS.bzl",
 ## and pass them on.
 
 ######################
-def impl_library(ctx):
+def library_impl(ctx):
 
     debug = False
     # print("**** NS_LIB {} ****************".format(ctx.label))
@@ -62,6 +62,10 @@ def impl_library(ctx):
         order=dsorder,
         transitive = [merge_depsets(depsets, "sigs")])
 
+    structs_depset = depset(
+        order=dsorder,
+        transitive = [merge_depsets(depsets, "structs")])
+
     cli_link_deps_depset = depset(
         order = dsorder,
         transitive = [merge_depsets(depsets, "cli_link_deps")]
@@ -82,7 +86,16 @@ def impl_library(ctx):
         transitive = [merge_depsets(depsets, "paths")]
     )
 
-    inputs_depset = depset(ctx.files.manifest)
+    # if ctx.label == Label("@//typing:ocamlcommon"):
+    #     print("sigs: %s" % sigs_depset)
+    #     print("cli_link_deps: %s" % cli_link_deps_depset)
+    #     # fail()
+
+    inputs_depset = depset(
+        ctx.files.manifest,
+        # transitive = [cli_link_deps_depset]
+    )
+
     # for f in ctx.files.manifest:
     #     inputs_depset.append(f)
 
@@ -128,6 +141,7 @@ def impl_library(ctx):
 
     bootProvider = BootInfo(
         sigs     = sigs_depset,
+        structs  = structs_depset,
         cli_link_deps = cli_link_deps_depset,
         afiles   = afiles_depset,
         archived_cmx  = archived_cmx_depset,

@@ -53,7 +53,7 @@ ocaml_module(
         "//stdlib:Stdlib.Filename",
         "//typing:Env",
         ## (Dynlink)
-        "//utils:Config",
+        "//config:Config",
         "//driver:Compmisc",
         "//middle_end:Compilenv",
         ## (Closure_middle_end)

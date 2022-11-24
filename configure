@@ -3356,8 +3356,6 @@ ac_config_files="$ac_config_files utils/config.generated.ml"
 
 ac_config_headers="$ac_config_headers runtime/caml/m.h"
 
-ac_config_headers="$ac_config_headers runtime/caml/s.h"
-
 ac_config_headers="$ac_config_headers runtime/caml/version.h"
 
 ac_config_files="$ac_config_files compilerlibs/META"
@@ -3379,6 +3377,8 @@ ac_config_files="$ac_config_files config/config.dev.ml"
 ac_config_files="$ac_config_files config/config.ml.json"
 
 ac_config_files="$ac_config_files profile/system/local/BUILD.bazel"
+
+ac_config_headers="$ac_config_headers runtime/caml/s.local.h"
 
 ac_config_files="$ac_config_files toolchain/profile/cc/local/BUILD.bazel"
 
@@ -20643,7 +20643,6 @@ do
     "ocamltest/ocamltest_config.ml") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.ml" ;;
     "utils/config.generated.ml") CONFIG_FILES="$CONFIG_FILES utils/config.generated.ml" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
-    "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
     "runtime/caml/version.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/version.h" ;;
     "compilerlibs/META") CONFIG_FILES="$CONFIG_FILES compilerlibs/META" ;;
     "otherlibs/dynlink/META") CONFIG_FILES="$CONFIG_FILES otherlibs/dynlink/META" ;;
@@ -20654,6 +20653,7 @@ do
     "config/config.dev.ml") CONFIG_FILES="$CONFIG_FILES config/config.dev.ml" ;;
     "config/config.ml.json") CONFIG_FILES="$CONFIG_FILES config/config.ml.json" ;;
     "profile/system/local/BUILD.bazel") CONFIG_FILES="$CONFIG_FILES profile/system/local/BUILD.bazel" ;;
+    "runtime/caml/s.local.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.local.h" ;;
     "toolchain/profile/cc/local/BUILD.bazel") CONFIG_FILES="$CONFIG_FILES toolchain/profile/cc/local/BUILD.bazel" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "otherlibs/unix/META") CONFIG_FILES="$CONFIG_FILES otherlibs/unix/META" ;;

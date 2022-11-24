@@ -761,6 +761,7 @@ STDLIB_RESOLVER = ["//stdlib:Stdlib"]
 
 w = struct(
     MISSING_MLI = "70",
+    MODULE_LINKED_TWICE = "31",
     NAME_OUT_OF_SCOPE = "40",
     NO_CMI_FIE  = "49"
 )

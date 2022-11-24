@@ -12,3 +12,6 @@ tools, and the cross-compiler used to compile output for the foreign
 target.
 
 link:https://clang.llvm.org/docs/CrossCompilation.html[Cross-compilation using Clang]
+
+
+link:https://github.com/ocaml/ocaml/issues/4303#issuecomment-1274375011[Wish: Support for cross-compilation #4303]

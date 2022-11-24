@@ -1,0 +1,50 @@
+= labeled apis
+
+
+== -nolabels
+
+=== example: Unix, UnixLabels
+
+unix.ml:  `external execv : string -> string array -> 'a = "caml_unix_execv"`
+
+unix.mli:  `val execv : string -> string array -> 'a`
+
+unixLabels.ml:  `include Unix`
+
+unixLabels.mli:  `val execv : prog:string -> args:string array -> 'a`
+
+The problem: the (internal) api of unix.ml does not conform to the
+public api of unixLabels.mli, and since unixLabels.ml imports unix.ml,
+we get:
+
+```
+The implementation bazel-out/darwin-fastbuild/bin/otherlibs/unix/_vmvm1/UnixLabels.ml
+       does not match the interface bazel-out/darwin-fastbuild/bin/otherlibs/unix/_vmvm1/UnixLabels.cmi:
+  Values do not match:
+          val execv : string -> string array -> 'a
+        is not included in
+          val execv : prog:string -> args:string array -> 'a
+```
+
+NOTE: In this case `include Unix` must go through `unix.cmi`, since
+`Unix` is a _module_ name, not the name of an implementation (`.ml`)
+file. So the error message means not that the type in `unix.ml` is
+(directly) the problem, but that the type exposed in `unix.mli` is. Of
+course, for the _module_ `Unix` to compile, the two type expressions
+(in unix.ml and unix.mli) must match. But technically its the one in
+`unix.mli` that matters (fails to match the one in unixLabels.mli). (The
+`external` tag in `unix.ml` does not affect the type.)
+
+Which means that, without further intervention, there is no way to
+share an implementation across labeled and unlabeled APIs. Which would
+be a shame, since labels do not really affect types.
+
+The `-nolabels` compile option addresses this situation. Compiling
+unixLabels.ml with `-nolabels` tells the compiler to _ignore_ the
+labels in the API, that is, in the `.cmi` file used for compilation.
+
+What if we go the other way around? Use labels in our implementation
+file, but then try to compile with an unlabeled API (.cmi file)?
+
+IOW we have two options for supporting both labelled and unlabelled
+APIs for the same struct: implement the struct with or without labels.

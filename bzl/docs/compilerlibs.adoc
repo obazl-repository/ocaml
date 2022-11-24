@@ -1,0 +1,294 @@
+= compilerlibs
+:toc: auto
+:toclevels: 3
+
+The `compilerlibs` directory contains no sources. The Makefile (`compilerlibs/Makefile.compilerlibs`) defines key build targets: the bytecode and native libs for:
+
+* `ocamlcommon`
+* `ocamlbytecomp`
+* `ocamlmiddleend`
+* `ocamloptcomp`
+* `ocampltoplevel`
+
+
+== The Makefile-based build
+
+The Makefile defines variables aggregating module dependencies from
+various other directories, then references them in the build rules for
+the above-listed libraries.
+
+* `UTILS` - modules in `utils/`
+* `UTILS_CMI` - empty
+* `PARSING` - modules in `parsing/`
+* `PARSING_CMI` - two sigs, `parsing/asttypes.cmi`, `parsing/parsetree.cmi`
+* `TYPING` - modules from
+  ** `typing/`
+  ** `file_formats/` - two modules,  `cmi_format.cmo`, `cmt_format.cmo`
+* `TYPING_CMI` - two sigs, `typing/annot.cmi`, `typing/outcomtree.cmi`
+* `LAMBDA` - modules from `/lambda`
+* `LAMBDA_CMI` - empty
+* `COMP` - modules from `bytecomp/` and `driver/`
+* `COMP_CMI` - sigs from `file_formats/`
+  ** `file_formats/cmo_format.cmi`
+  ** `file_formats/cmx_format.cmi`
+  ** `file_formats/cmxs_format.cmi`
+
+* `COMMON` - combines `UTILS`, `PARSING`, `TYPING`, `LAMBDA`, and `COMP` above
+* `COMMON_CMI` - combines the `_CMI` vars above
+
+* `BYTECOMP` - modules from `bytecomp/` and `driver/`
+* `BYTECOMP_CMI` - empty
+
+* `INTEL_ASM` - `X86_*` modules from `asmcomp/`
+* `INTEL_ASM_CMI` - `asmcomp/X86_ast.cmi`
+
+* `ARCH_SPECIFIC_ASMCOMP` - set to `INTEL_ASM` for i386, amd64, otherwise empty
+* `ARCH_SPECIFIC_ASMCOMP_CMI`  set to `INTEL_ASM_CMI` for i386, amd64, otherwise empty
+
+* `ASMCOMP` - modules from:
+  ** `asmcomp/` plus `ARCH_SPECIFIC_ASMCOMP`
+  ** `file_formats/linear_format.cmo`
+  ** `driver/`
+* `ASMCOMP_CMI` set to $(ARCH_SPECIFIC_ASMCOMP_CMI)
+
+* `MIDDLE_END_CLOSURE` -
+  ** `middle_end/closure/closure.cmo`
+  ** `middle_end/closure/closure_middle_end.cmo`
+* `MIDDLE_END_CLOSURE_CMI` - empty
+
+* `MIDDLE_END_FLAMBDA` - modules from `middle_end/flambda/`
+* `MIDDLE_END_FLAMBDA_CMI` - two cmi files from `middle_end/flambda/`
+
+* `MIDDLE_END` - modules from
+  ** `middle_end/`
+  ** `middle_end/flambda/`
+  ** `middle_end/flambda/base_types/`
+  ** `MIDDLE_END_CLOSURE` defined above
+  ** `MIDDLE_END_FLAMBDA` defined above
+* `MIDDLE_END_CMI` - `middle_end/backend_intf.cmi` plus
+  ** `MIDDLE_END_CLOSURE_CMI`
+  ** `MIDDLE_END_FLAMBDA_CMI`
+
+* `OPTCOMP`- combines `MIDDLE_END` and `ASMCOMP`
+* `OPTCOMP_CMI`- combines `MIDDLE_END_CMI` and `ASMCOMP_CMI`
+
+* `TOPLEVEL`
+* `TOPLEVEL_CMI`
+
+* `OPTTOPLEVEL`
+* `OPTTOPLEVEL_CMI`
+
+* `TOPLEVEL_SHARED_MLIS` - `topeval.mli`,  `trace.mli`, `topmain.mli`
+* `TOPLEVEL_SHARED_CMIS` - `$(TOPLEVEL_SHARED_MLIS:%.mli=%.cmi)`
+* `TOPLEVEL_SHARED_ARTEFACTS`
+  ** `$(TOPLEVEL_SHARED_MLIS)`
+  ** `$(TOPLEVEL_SHARED_CMIS)`
+
+* `ALL_CONFIG_CMO` - `utils/config_main.cmo`, `utils/config_boot.cmo`
+
+
+The remainder of `Makefile.compilerlibs` consists of build rules. The
+rules for the key targets are:
+
+* `compilerlibs/ocamlcommon.cma` depends on:
+  ** `COMMON_CMI`
+  ** `ALL_CONFIG_CMO`
+  ** `COMMON`
+
+* `compilerlibs/ocamlcommon.cmxa` depends on:
+  ** `COMMON_CMI`
+  ** `$(COMMON:.cmo=.cmx)`
+
+* `compilerlibs/ocamlbytecomp.cma` depends on:
+  ** `BYTECOMP_CMI`
+  ** `BYTECOMP`
+
+* `compilerlibs/ocamlbytecomp.cmxa` depends on:
+  ** `BYTECOMP_CMI`
+  ** `$(BYTECOMP:.cmo=.cmx)`
+
+
+* `compilerlibs/ocamlmiddleend.cma` depends on
+  ** `MIDDLE_END_CMI`
+  ** `MIDDLE_END`
+
+* `compilerlibs/ocamlmiddleend.cmxa` depens on
+  ** `MIDDLE_END_CMI`
+  ** `$(MIDDLE_END:%.cmo=%.cmx)`
+
+* `compilerlibs/ocamloptcomp.cma` depends on:
+  ** `OPTCOMP_CMI`
+  ** `OPTCOMP`
+
+* `compilerlibs/ocamloptcomp.cmxa` depends on:
+  ** `OPTCOMP_CMI`
+  ** `$(OPTCOMP:.cmo=.cmx)`
+
+* `compilerlibs/ocamltoplevel.cma` depends on:
+  ** `TOPLEVEL_CMI`
+  ** `TOPLEVEL`
+
+* `compilerlibs/ocamltoplevel.cmxa` depends on:
+  ** `OPTTOPLEVEL_CMI`
+  ** `$(OPTTOPLEVEL:.cmo=.cmx)`
+
+== The OBazl build
+
+The aggregating variables defined by the Makefile effectively define
+_libraries_ of modules and signatures, a library being nothing more
+than an aggregator. Such libraries are first-class build targets in
+OBazl, supported by the `boot_library` build rule. We can use that
+rule to build these libraries "where they live", so to speak; then
+other build targets can depend on the target label.
+
+OBazl maintains a clear distinction between `library` and `archive`.
+An archive is effectively a way of packaging a library. The
+`boot_library` rule produces the collection of modules (and/or
+signatures) listed in its `manifest` attribute; the `boot_archive`
+rule produces an OCaml archive (`.cma` or `.cmxa`) of the modules
+listed in its `manifest` attribute.
+
+Take for example the `PARSING` variable. It aggregates build targets
+in the `parsing` directory. We place a `BUILD.bazel` file in that
+directory, which turns it into a Bazel _package_, with label
+`//parsing`. We then write a `boot_library` target corresponding to
+the `PARSING` variable:
+
+```
+boot_library(
+    name = "parsing",
+    manifest  = [
+        ":Ast_helper",
+        ":Ast_invariants",
+        ":Ast_iterator",
+        ":Ast_mapper",
+        ":Attr_helper",
+        ":Builtin_attributes",
+        ":CamlinternalMenhirLib",
+        ":Depend",
+        ":Docstrings",
+        ":Lexer",
+        ":Location",
+        ":Longident",
+        ":Parse",
+        ":Parser",
+        ":Pprintast",
+        ":Printast",
+        ":Syntaxerr",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
+```
+
+Each of the entries in the `manifest` attribute refers to a target in
+the same package; e.g. `:Ast_helper` is short-hand for
+`//parsing:Ast_helper`, which is defined, further down in
+`parsing/BUILD.bazel`, using the `compiler_module` rule that emits
+`Ast_helper.cmo` (or `Ast_helper.cmx` if tell Bazel to target the
+"native" platform).
+
+The end result is that this `//parsing:parsing` target (abbreviated
+`parsing`) produces the list of `.cmo` (or `.cmx`) files listed in the
+Makefile's definition of `PARSING`. Now our `ocamlcommon` archive
+target can depend on this `boot_library` target instead of depending
+separately on each module in the `PARSING` variable.
+
+But we can even better. The `ocamlcommon` archive depends on
+variable `COMMON`, which sums variables `UTILS`, `PARSING`, `TYPING`,
+`LAMBDA`, and `COMP`. For each of these we can define the
+corresponding `boot_library` target in the relevant directory, giving
+us targets:
+
+* `//utils:utils`
+* `//parsing:parsing`
+* etc.
+
+But some of these variables are "hybrids": they aggregate from
+multiple directories. For example:
+
+* `TYPING` is almost all targets in `typing`, but adds two targets from `file_formats/`
+* `COMP` aggregates targets in `bytecomp` and `driver`, and there is
+no `comp` directory, so we cannot define target `//comp:comp`.
+
+NOTE: As it turns out, some of these hybrid aggregates are
+unnecessary, at least with Bazel. For example the .cmi files in `COMP`
+are dependencies of the `bytecomp` modules also listed in `COMP`; they
+are not needed to build `//compilerlibs:ocamlcommon`, and at least
+with OBazl they are already expressed in the targets of the
+`//bytecomp` package. Since deps are transitive in OBazl, they will
+automatically be included in `//compilerlibs:ocamlcommon`, and
+available to the `//tools:ocamlobjinfo` target, for example.
+
+NOTE: The cmi deps are only dependencies of other cmi targets, not
+module targets. Example: `//bytecomp:Symtable_cmi` depends on
+`//file_formats:Cmo_format_cmi`. Note that it would make no sense for
+a module to depend on such an interface, since there is no
+`cmo_format.ml` struct to go with it to make a module. Modules only
+depend on modules.
+
+
+There are several ways to handle this. But first notice that these
+aggregates are all in the service of producing target `ocamlcommon`.
+So we can add clarity by naming the Bazel targets accordingly. Instead
+of `//parsing:parsing`, we will define `//parsing:ocamlcommon`, for
+example. Similarly for all the others, so our `ocamlcommon` target
+will depend on a collection of `:ocamlcommon` targets across several
+packages. That is, each dependency of `//compilerlibs:ocamlcommon` will have target
+name `:ocamlcommon` but a different package name:
+`//utils:ocamlcommon`, `//parsing:ocamlcommon`, etc.
+
+For `COMP`, since we do not have a `comp/` directory, and furthermore
+the targets it aggregates in `bytecomp/` and `driver/` are mutually
+independent. So we can disaggregate, and define targets in `bytecomp``
+and `driver/`:
+
+* `//bytecomp:ocamlcommon` provides the five modules in `bytecomp/`
+  aggregated by `COMP`, and
+* `//driver:ocamlcommon` provides the six modules in `driver/` aggregated by `COMP`
+
+Then the archive target `//compilerlibs:ocamlcommon` will depend on
+these two `:ocamlcommon` targets rather than one `:comp` target.
+
+Variable `TYPING` is also a hybrid, aggregating a few dozen targets in
+`typing/` plus two targets in `file_formats/`. But unlike `COMP`, in
+involves cross-directory dependencies: many of the modules in
+`typing/` depend on `file_formats:Cmi_format` or
+`file_formats:Cmt_format`.
+
+ We could define
+`//file_formats:ocamlcommon` for these, but unfortunately some
+`file_formats/` targets are also used in `COMP_CMI` and `ASMCOMP`.
+
+The easy way to handle this is to _not_ define
+`//file_formats:ocamlcommon`, and instead simply depend on those
+`file_formats` targets in the other `:ocamlcommon` targets; for
+example, we can add those two targets as dependencies of
+`//typing:ocamlcommon`, and add `//file_formats:Linear_format` as a
+direct dependency of `//asmcomp:ocamlcommon`.
+
+But notice that both `TYPING` and `COMP_CMI` are only used as part of
+`COMMON`, which is only used to build `//compilerlibs:ocamlcommon`.
+
+
+
+The result is that our target for building `ocamlcommon.cma/cmxa`
+looks like this, in `compilerlibs/BUILD.bazel`:
+
+```
+boot_archive(
+    name = "ocamlcommon",
+    opts = ["-linkall"],
+    manifest  = [
+        "//config:Config",
+        "//bytecomp:ocamlcommon",
+        "//driver:ocamlcommon",
+        "//utils:ocamlcommon",
+        "//lambda:ocamlcommon",
+        "//parsing:ocamlcommon",
+        "//typing:ocamlcommon",
+    ],
+    visibility = [
+      ... targets restricting visibity of this target ...
+    ]
+)
+```

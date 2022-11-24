@@ -4,11 +4,11 @@ load("@bazel_skylib//rules:common_settings.bzl",
 
 ## NB: config flags a settings, e.g. --//runtime:dbg, at bottom of file
 
-load("//bzl:rules.bzl", "boot_executable", "cc_assemble")
+load("//bzl:rules.bzl", "boot_executable", "cc_assemble", "mustache")
 
 load("//config:CONFIG.bzl", "ARCH")
 
-exports_files(["gen_primitives.sh"] + glob(["*.c"]))
+exports_files(["gen_primitives.sh", "sync_posix.h"] + glob(["*.c"]))
 
 OPTIMIZATION_FLAGS = select({
     ":dbg?": ["-O0", "-g3"], # -Wall -Werror
@@ -36,7 +36,9 @@ cc_library(
     srcs = [
         # "//runtime:build_config.h",
         "//runtime:common_c_sources",
-        "//runtime:bytecode_only_c_sources"
+        "//runtime:bytecode_only_c_sources",
+        "//runtime/caml:instruct.h",
+        # "//runtime/caml:s.h"
     ] + select({
     # "//platform/target:vm?": ["//runtime:bytecode_only_c_sources"],
     # "//conditions:default": ["//runtime:native_only_c_sources"],
@@ -44,17 +46,10 @@ cc_library(
     }),
     copts = [
         "-x", "c",
-        # "-Wall",
-        # "-pedantic",
-        "-I$(GENDIR)/runtime", # build_config.h
-        ## for platform-dependend s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        "-I$(GENDIR)/runtime", # caml/instruct.h
+        "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
-
-        "-DOCAML_STDLIB_DIR=/foo/bar",
-        "-DHOST=foobar"
-
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
@@ -62,12 +57,8 @@ cc_library(
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    }) + select({
-        # "//runtime:asan?": ["-I", "runtime", "-fsanitize=address"],
-        "//conditions:default":  []
     })
     ,
-    # + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
     linkopts = ["$(OC_LDFLAGS)"]
     + select({
         # "//runtime:msan?": ["-fsanitize=leak", "-fPIE", "-pie"],
@@ -78,12 +69,8 @@ cc_library(
     })
     ,
     defines = RUNTIME_DEFINES,
-    deps = [
-        "//runtime/caml:hdrs"
-    ],
-    toolchains = [
-        "//profile/system/local"
-    ],
+    deps = ["//runtime/caml:hdrs"],
+    toolchains = ["//profile/system/local"],
     visibility = [
         "//:__pkg__",
         "//boot:__subpackages__",
@@ -102,13 +89,14 @@ cc_library(
         "//runtime:build_config.h",
         "//runtime:common_c_sources",
         "//runtime:native_only_c_sources",
+        # "//runtime/caml:instruct.h",
+        "//runtime/caml:s.h",
         ":asm"
     ],
     copts = [
         "-x", "c",
         "-I$(GENDIR)/runtime", # build_config.h
-        ## for platform-dependend s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        "-I$(GENDIR)/runtime/caml", # instruct.h
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
@@ -150,7 +138,7 @@ cc_assemble(
     }),
     copts = [
         "-Iruntime", # caml/m.h
-        "-I$(GENDIR)/runtime/caml/cross-compile", # s.h
+        "-I$(GENDIR)/runtime/caml",
     ],
     defines = RUNTIME_DEFINES + [
         "NATIVE_CODE",
@@ -158,32 +146,23 @@ cc_assemble(
         "MODEL_$(MODEL)",
         "SYS_$(SYSTEM)"
     ],
-    deps = ["//runtime/caml:hdrs"],
+    deps = [
+        "//runtime/caml:hdrs"
+    ],
     toolchains = ["//profile/system/local"],
 )
 
 ################################################################
 # ARCH = "arm64"
-genrule(
+mustache(
     name = "__asm__",
-    srcs = ["//runtime/caml:domain_state.json"] + select({
-        # "//platform:windows_x86_32?": [ARCH + "nt.asm.mustache"],
-        # "//platform:windows_x86_64?": [ARCH + "nt.asm.mustache"],
-        "//conditions:default"      : [
-            ARCH + ".S.mustache"
-        ]
+    out  = ARCH + ".S",
+    json = "//runtime/caml:domain_state.json",
+    template = select({
+        # "//platform:windows_x86_32?": ARCH + "nt.asm.mustache",
+        # "//platform:windows_x86_64?": ARCH + "nt.asm.mustache",
+        "//conditions:default"      : ARCH + ".S.mustache"
     }),
-    outs = [ARCH + ".S"],
-    tools = ["//vendor/mustach"],
-    cmd = " ".join([
-        "$(execpath //vendor/mustach)",
-        "$(location //runtime/caml:domain_state.json)",
-        "$(location {}.S.mustache)".format(ARCH),
-        ">",
-        "$@"
-    ]),
-    toolchains = ["//profile/system/local"],
-    visibility = ["//boot:__pkg__"]
 )
 
 ################################################################
@@ -495,9 +474,6 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
     }),
     copts = [
         "-x", "c",
-        "-Iruntime",  # expose caml/*.h
-        "-I$(GENDIR)/runtime", # build_config.h
-        "-I$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
@@ -698,8 +674,7 @@ cc_binary(
     name = "sak.exe",
     srcs = ["sak.c"],
     copts = [
-        ## for platform-dependent s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile",
+        "-I", "$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ],

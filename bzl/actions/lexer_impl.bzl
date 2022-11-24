@@ -65,7 +65,7 @@ def lexer_impl(ctx):
 
     lexout_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
 
-    lexout = ctx.actions.declare_file(workdir + lexout_fname)
+    lexout = ctx.actions.declare_file(lexout_fname)
 
     runner = None
     for rf in tc.compiler[0][DefaultInfo].default_runfiles.files.to_list():

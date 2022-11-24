@@ -37,18 +37,21 @@ boot_library(
     ]
 )
 
-# boot_library(
-#     name = "ocamlcommon",
-#     manifest  = [
-#         ":Compenv",
-#         ":Compile_common",
-#         ":Compmisc",
-#         ":Main_args",
-#         ":Makedepend",
-#         ":Pparse",
-#     ],
-#     visibility = ["//compilerlibs:__pkg__"]
-# )
+## for //compilerlibs:ocamlcommmon archive:
+# defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
+# boot_archive(
+boot_library(
+    name = "ocamlcommon",
+    manifest  = [
+        ":Compenv",
+        ":Compile_common",
+        ":Compmisc",
+        ":Main_args",
+        ":Makedepend",
+        ":Pparse",
+    ],
+    visibility = ["//compilerlibs:__pkg__"]
+)
 
 ## compilerlibs/Makefile.compilerlibs
 # boot_library(
@@ -81,7 +84,7 @@ compiler_module(
         # "//stdlib:Stdlib.Sys",
         "//utils:Ccomp",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Misc",
         "//utils:Profile",
         "//utils:Warnings",
@@ -164,7 +167,7 @@ compiler_module(
         "//typing:Includemod",
         "//stdlib:Stdlib.Format",
         "//typing:Env",
-        "//utils:Config",
+        "//config:Config",
         ## (Compiler_pass)
         "//utils:Clflags",
         "//parsing:Builtin_attributes",
@@ -203,7 +206,7 @@ compiler_module(
         "//typing:Ident",
         "//stdlib:Stdlib.Format",
         "//typing:Env",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
     ],
     visibility = [
@@ -280,7 +283,7 @@ compiler_module(
         "//stdlib:Stdlib.Format",
         ## (Float_arg_helper)
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         ## (Compiler_pass)
         "//utils:Clflags",
         "//stdlib:Stdlib.Arg",
@@ -321,7 +324,7 @@ compiler_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
         "//bytecomp:Bytepackager",
         ## (Bytelink)
@@ -366,7 +369,7 @@ compiler_module(
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Misc",
         ":Compenv",
         ":Pparse",
@@ -402,7 +405,7 @@ compiler_module(
         "//lambda:Printlambda",
         "//utils:Misc",
         "//middle_end/flambda:Flambda_middle_end",
-        "//utils:Config",
+        "//config:Config",
         "//middle_end:Compilenv",
         "//middle_end/closure:Closure_middle_end",
         "//utils:Clflags",
@@ -481,7 +484,7 @@ compiler_module(
         "//middle_end/flambda:Import_approx",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//middle_end:Compilenv",
         "//utils:Clflags",
         "//asmcomp:Asmpackager",
@@ -523,7 +526,7 @@ compiler_module(
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Clflags",
         "//utils:Ccomp",
         "//parsing:Ast_mapper",

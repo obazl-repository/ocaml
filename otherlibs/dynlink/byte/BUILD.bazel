@@ -35,7 +35,7 @@ exports_files(["dynlink.ml"])
 #         ## (Dynlink_compilerlibs)
 #         "//bytecomp:Dll",
 #         "//stdlib:Stdlib.Digest",
-#         "//utils:Config",
+#         "//config:Config",
 #         "//file_formats:Cmo_format_cmi",
 #         "//stdlib:Stdlib.Char",
 #     ]

@@ -37,8 +37,8 @@ exports_files([
 # of //parsing:CamlinternalMenhirLib we would have something like
 # //boot/menhir:Ocaml.MenhirLib
 
-#boot_library(
-boot_archive(
+boot_library(
+# boot_archive(
     name = "parsing",
     manifest  = [
         ":Ast_helper",
@@ -62,6 +62,7 @@ boot_archive(
     visibility = ["//compilerlibs:__pkg__"]
 )
 
+# boot_archive(
 boot_library(
     name = "ocamlcommon",
     manifest  = [
@@ -194,7 +195,7 @@ compiler_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Sys",
         "//utils:Clflags",
-        "//utils:Config",
+        "//config:Config",
         "//utils:Load_path",
         "//utils:Misc",
         ":Ast_helper",

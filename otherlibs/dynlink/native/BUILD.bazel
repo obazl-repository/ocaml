@@ -25,7 +25,7 @@ exports_files(["dynlink.ml"])
 #         "//stdlib:Stdlib.List", #
 #         "//stdlib:Stdlib.Obj", #
 #         "//stdlib:Stdlib.Printexc", #
-#         "//utils:Config", #
+#         "//config:Config", #
 #         ":Dynlink", ## (Otherlibs Dynlink Dynlink_common)
 #         ":Dynlink", ## (Otherlibs Dynlink Dynlink_types)
 #         ## (Dynlink_compilerlibs)

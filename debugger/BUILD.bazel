@@ -475,7 +475,7 @@ ocaml_module(
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Filename",
-        "//utils:Config",
+        "//config:Config",
         "//file_formats:Cmi_format",
         "//utils:Clflags",
         ## (Callback)
@@ -506,7 +506,7 @@ ocaml_module(
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Filename",
         ## (Envaux)
-        "//utils:Config",
+        "//config:Config",
     ]
 )
 

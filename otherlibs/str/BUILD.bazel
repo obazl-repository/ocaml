@@ -7,8 +7,6 @@ load("//bzl:rules.bzl",
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-STDLIB = ["//boot/lib:stdlib"]
-
 # LIBNAME=str
 # COBJS=strstubs.$(O)
 # CLIBNAME=camlstr
@@ -30,15 +28,16 @@ compiler_module(
     struct = "str.ml",
     sig    = "Str_cmi",
     opts = MODULE_OPTS,
-    deps   = STDLIB + [
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Buffer",
+    deps   = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Domain",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.String",
     ],
     visibility = ["//tools:__pkg__"]
 )
@@ -49,8 +48,7 @@ compiler_signature(
     name = "Str_cmi",
     src  = "str.mli",
     opts = SIG_OPTS,
-    deps   = STDLIB + [
-    ]
+    deps   = ["//stdlib:Stdlib"]
 )
 
 ################################################################
@@ -64,7 +62,7 @@ cc_library(
     srcs = [
         "strstubs.c",
         "//runtime/caml:alloc.h",
-        "//runtime/caml:compatibility.h",
+        "//runtime/caml:camlatomic.h",
         "//runtime/caml:config.h",
         "//runtime/caml:domain.h",
         "//runtime/caml:domain_state.h",
@@ -74,6 +72,7 @@ cc_library(
         "//runtime/caml:misc.h",
         "//runtime/caml:mlvalues.h",
         "//runtime/caml:s.h",
+        "//runtime/caml:signals.h",
     ],
     copts = ["-I", "runtime", "-I", "runtime/caml"],
     hdrs = ["//runtime/caml:domain_state.tbl"]

@@ -38,8 +38,8 @@ boot_library(
 
 ## defined in compilerlibs/Makefile.compilerlibs
 ## used by //compilerlibs:ocamlmiddleend and //compilerlibs:ocamloptcomp
-# boot_library(
-boot_archive(
+boot_library(
+#boot_archive(
     name = "ocamlmiddleend",
     manifest  = [
         ## NB: the makefiles take pains to put stuff in order, across
@@ -260,7 +260,7 @@ compiler_module(
         "//middle_end/flambda:Export_info",
         "//typing:Env",
         "//stdlib:Stdlib.Digest",
-        "//utils:Config",
+        "//config:Config",
         "//middle_end/flambda/base_types:Closure_id",
         "//utils:Clflags",
         "//stdlib:Stdlib.Buffer",
