@@ -1,22 +1,13 @@
+load("//asmcomp:BUILD_RULES.bzl", "cvt_emit")
+
 exports_files([
     "arch.ml", "CSE.ml", "proc.ml",
     "reload.ml", "scheduling.ml", "selection.ml"
 ])
 
-# # root Makefile:
-# asmcomp/emit.ml: asmcomp/$(ARCH)/emit.mlp $(cvt_emit)
-# 	echo \# 1 \"$(ARCH)/emit.mlp\" > $@
-# 	$(OCAMLRUN) $(cvt_emit) < $< >> $@ \
-# 	|| { rm -f $@; exit 2; }
-
-genrule(
+cvt_emit(
     name = "emit_ml",
-    srcs = ["emit.mlp", "//tools:cvt_emit.exe"],
-    outs = ["emit.ml"],
-    tools = ["//boot/baseline:ocamlrun"], ## fixme: find a way to use the toolchain
-    cmd  = "\n".join([
-	    "echo '# 1 \"i386/emit.mlp\"' > $@;",
-        "$(execpath //boot/baseline:ocamlrun) $(location //tools:cvt_emit.exe) < $(location :emit.mlp) >> $@"
-    ]),
+    src  = "emit.mlp",
+    out  = "emit.ml",
     visibility = ["//asmcomp:__pkg__"]
 )

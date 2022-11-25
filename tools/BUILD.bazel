@@ -179,7 +179,7 @@ ocaml_tool(
 ##FIXME: this should only be built as a vm executable
 # ocaml_tool(
 build_tool(
-    name = "cvt_emit.exe",
+    name = "cvt_emit.tool",
     main = ":Cvt_emit",
     visibility = ["//asmcomp:__subpackages__"]
 )
