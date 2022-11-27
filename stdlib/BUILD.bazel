@@ -84,16 +84,30 @@ stdlib_boot_module(
 # input filename is the same as the output filename. Ditto for
 # stdlib.mli.
 
-genrule(
-    name = "stdlib_ml_awk",
-    outs = ["stdlib.ml"], ## FIXME
-    srcs = ["stdlib.raw.ml", "//stdlib:expand_module_aliases.awk"],
-    cmd_bash  = " ".join([
-        "awk -f $(location //stdlib:expand_module_aliases.awk)",
-        "$(location :stdlib.raw.ml)",
-        "> $@"
-    ]),
+mustache(
+    name = "stdlib_ml",
+    out  = "stdlib.ml",
+    json = "stdlib.json",
+    template = "stdlib.ml.mustache"
 )
+
+mustache(
+    name = "stdlib_mli",
+    out  = "stdlib.mli",
+    json = "stdlib.json",
+    template = "stdlib.mli.mustache"
+)
+
+# genrule(
+#     name = "stdlib_ml_awk",
+#     outs = ["stdlib.ml"], ## FIXME
+#     srcs = ["stdlib.raw.ml", "//stdlib:expand_module_aliases.awk"],
+#     cmd_bash  = " ".join([
+#         "awk -f $(location //stdlib:expand_module_aliases.awk)",
+#         "$(location :stdlib.raw.ml)",
+#         "> $@"
+#     ]),
+# )
 
 stdlib_boot_signature(
     name = "Stdlib_cmi",
@@ -118,16 +132,16 @@ stdlib_boot_signature(
 #     ]),
 # )
 
-genrule(
-    name = "stdlib_mli_awk",
-    outs = ["stdlib.mli"],
-    srcs = ["stdlib.raw.mli", "//stdlib:expand_module_aliases.awk"],
-    cmd_bash  = " ".join([
-        "awk -f $(location //stdlib:expand_module_aliases.awk)",
-        "$(location :stdlib.raw.mli)",
-        "> $@"
-    ]),
-)
+# genrule(
+#     name = "stdlib_mli_awk",
+#     outs = ["stdlib.mli"],
+#     srcs = ["stdlib.raw.mli", "//stdlib:expand_module_aliases.awk"],
+#     cmd_bash  = " ".join([
+#         "awk -f $(location //stdlib:expand_module_aliases.awk)",
+#         "$(location :stdlib.raw.mli)",
+#         "> $@"
+#     ]),
+# )
 
 ################################################################
 ############  Non-namespaced Components of Stdlib ##############
