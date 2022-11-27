@@ -67,7 +67,7 @@ boot_archive(
 #stdlib_resolver(
 stdlib_boot_module(
     name   = "Stdlib",
-    struct = "_build/stdlib.ml",
+    struct = "stdlib.ml",
     sig    = "Stdlib_cmi", # doesn't work with stdlib.mli
     # use_prims = True,
     opts = [
@@ -86,24 +86,25 @@ stdlib_boot_module(
 
 genrule(
     name = "stdlib_ml_awk",
-    outs = ["_build/stdlib.ml"], ## FIXME
-    srcs = ["stdlib.ml", "//stdlib:expand_module_aliases.awk"],
+    outs = ["stdlib.ml"], ## FIXME
+    srcs = ["stdlib.raw.ml", "//stdlib:expand_module_aliases.awk"],
     cmd_bash  = " ".join([
-        "awk -f $(location //stdlib:expand_module_aliases.awk) $(location :stdlib.ml)",
+        "awk -f $(location //stdlib:expand_module_aliases.awk)",
+        "$(location :stdlib.raw.ml)",
         "> $@"
     ]),
 )
 
 stdlib_boot_signature(
     name = "Stdlib_cmi",
-    src  = "_build/stdlib.mli",
+    src  = "stdlib.mli",
     opts = SIG_OPTS + [
         "-nopervasives",
         "-no-alias-deps",
     ],
     warnings = [NO_CMI_FILE],
     deps   = [
-        ":CamlinternalFormatBasics", #_cmi",
+        ":CamlinternalFormatBasics_cmi",
     ],
 )
 
@@ -119,10 +120,11 @@ stdlib_boot_signature(
 
 genrule(
     name = "stdlib_mli_awk",
-    outs = ["_build/stdlib.mli"],
-    srcs = ["stdlib.mli", "//stdlib:expand_module_aliases.awk"],
+    outs = ["stdlib.mli"],
+    srcs = ["stdlib.raw.mli", "//stdlib:expand_module_aliases.awk"],
     cmd_bash  = " ".join([
-        "awk -f $(location //stdlib:expand_module_aliases.awk) $(location :stdlib.mli)",
+        "awk -f $(location //stdlib:expand_module_aliases.awk)",
+        "$(location :stdlib.raw.mli)",
         "> $@"
     ]),
 )
@@ -353,25 +355,24 @@ stdlib_module(
     ],
 )
 
-## WARNING: output name same as input name, so write to tmp dir:
-genrule(
-    name = "array_labels_mli_awk",
-    outs = ["_build/arrayLabels.mli"],
-    srcs = ["arrayLabels.mli", "//stdlib:expand_module_aliases.awk"],
-    cmd_bash  = " ".join([
-        "awk -f $(location //stdlib:expand_module_aliases.awk)",
-        "$(location :arrayLabels.mli)",
-        "> $@"
-    ]),
-)
-
 stdlib_signature(
     name = "Stdlib.ArrayLabels_cmi",
-    src  = "_build/arrayLabels.mli",
+    src  = "arrayLabels.mli",
     opts = SIG_OPTS,
     deps   = [
         ":Stdlib.Seq",
     ],
+)
+
+genrule(
+    name = "array_labels_mli_awk",
+    outs = ["arrayLabels.mli"],
+    srcs = ["arrayLabels.raw.mli", "//stdlib:expand_module_aliases.awk"],
+    cmd_bash  = " ".join([
+        "awk -f $(location //stdlib:expand_module_aliases.awk)",
+        "$(location :arrayLabels.raw.mli)",
+        "> $@"
+    ]),
 )
 
 stdlib_module(
