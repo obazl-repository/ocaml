@@ -30,8 +30,6 @@
 #include "caml/fiber.h"
 #include "caml/domain.h"
 
-#include "primitives.h"
-
 CAMLexport value caml_alloc (mlsize_t wosize, tag_t tag)
 {
   value result;
@@ -286,20 +284,20 @@ CAMLprim value caml_alloc_dummy(value size)
 }
 
 /* [size] is a [value] representing number of words (fields) */
-CAMLprim_alloc_dummy_function(value size,value arity)
+CAMLprim value caml_alloc_dummy_function(value size,value arity)
 {
   /* the arity argument is used by the js_of_ocaml runtime */
   return caml_alloc_dummy(size);
 }
 
 /* [size] is a [value] representing number of floats. */
-CAMLprim_alloc_dummy_float (value size)
+CAMLprim value caml_alloc_dummy_float (value size)
 {
   mlsize_t wosize = Long_val(size) * Double_wosize;
   return caml_alloc (wosize, 0);
 }
 
-CAMLprim_alloc_dummy_infix(value vsize, value voffset)
+CAMLprim value caml_alloc_dummy_infix(value vsize, value voffset)
 {
   mlsize_t wosize = Long_val(vsize), offset = Long_val(voffset);
   value v = caml_alloc(wosize, Closure_tag);
@@ -316,7 +314,7 @@ CAMLprim_alloc_dummy_infix(value vsize, value voffset)
   return v;
 }
 
-CAMLprim_update_dummy(value dummy, value newval)
+CAMLprim value caml_update_dummy(value dummy, value newval)
 {
   mlsize_t size, i;
   tag_t tag;

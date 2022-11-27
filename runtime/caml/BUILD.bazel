@@ -40,7 +40,8 @@ mustache(
     json = "//bytecomp:opcodes.json",
     template = "instruct.h.mustache",
     visibility = [
-        "//runtime:__subpackages__"
+        "//runtime:__subpackages__",
+        "//tools:__pkg__"
     ]
 )
 

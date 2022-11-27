@@ -38,7 +38,7 @@ cc_library(
         "//runtime:common_c_sources",
         "//runtime:bytecode_only_c_sources",
         "//runtime/caml:instruct.h",
-        # "//runtime/caml:s.h"
+        ":primitives.h"
     ] + select({
     # "//platform/target:vm?": ["//runtime:bytecode_only_c_sources"],
     # "//conditions:default": ["//runtime:native_only_c_sources"],
@@ -90,9 +90,10 @@ cc_library(
         "//runtime:build_config.h",
         "//runtime:common_c_sources",
         "//runtime:native_only_c_sources",
+        ":asm",
         # "//runtime/caml:instruct.h",
         "//runtime/caml:s.h",
-        ":asm"
+        ":primitives.h"
     ],
     copts = [
         "-x", "c",
@@ -174,6 +175,7 @@ filegroup(
     srcs = ["sync_posix.h"] + glob(
         include = ["*.c"],
         exclude = [
+            "alloc.original.c",
             "backtrace_byt.c",
             "backtrace_nat.c",
             "clambda_checks.c",
@@ -184,7 +186,7 @@ filegroup(
             "frame_descriptors.c",
             "instrtrace.c",
             "interp.c",
-            "main.c",
+            # "main.c",
             "prims.c", ## in case a make build writes it to srcs
             "sak.c",
             "signals_nat.c",
@@ -207,73 +209,73 @@ filegroup(
     ]
 )
 
-COMMON_C_SOURCES = [
-    "addrmap.c",
-    "afl.c",
-    "alloc.c",
-    "array.c",
-    "backtrace.c",
-    "bigarray.c",
-    "callback.c",
-    "codefrag.c",
-    "compare.c",
-    "custom.c",
-    "debugger.c",
-    "domain.c",
-    "dynlink.c",
-    "extern.c",
-    "fiber.c",
-    "finalise.c",
-    "floats.c",
-    "gc_ctrl.c",
-    "gc_stats.c",
-    "globroots.c",
-    "hash.c",
-    "intern.c",
-    "ints.c",
-    "io.c",
-    "lexing.c",
-    "lf_skiplist.c",
+# COMMON_C_SOURCES = [
+#     "addrmap.c",
+#     "afl.c",
+#     "alloc.c",
+#     "array.c",
+#     "backtrace.c",
+#     "bigarray.c",
+#     "callback.c",
+#     "codefrag.c",
+#     "compare.c",
+#     "custom.c",
+#     "debugger.c",
+#     "domain.c",
+#     "dynlink.c",
+#     "extern.c",
+#     "fiber.c",
+#     "finalise.c",
+#     "floats.c",
+#     "gc_ctrl.c",
+#     "gc_stats.c",
+#     "globroots.c",
+#     "hash.c",
+#     "intern.c",
+#     "ints.c",
+#     "io.c",
+#     "lexing.c",
+#     "lf_skiplist.c",
 
-    ## if we compile main.c into libcamlrun.a zig will fail to find main
-    ## entry point.
+#     ## if we compile main.c into libcamlrun.a zig will fail to find main
+#     ## entry point.
 
-    ## but main is not really appropriate for a library anyway. but
-    ## then why is it shared with both bc and native? why does the
-    ## latter need it?
+#     ## but main is not really appropriate for a library anyway. but
+#     ## then why is it shared with both bc and native? why does the
+#     ## latter need it?
 
-    # "main.c",
+#     # "main.c",
 
-    "major_gc.c",
-    "md5.c",
-    "memory.c",
-    "memprof.c",
-    "meta.c",
-    "minor_gc.c",
-    "misc.c",
-    "obj.c",
-    "parsing.c",
-    "platform.c",
-    "printexc.c",
-    "prng.c",
-    "roots.c",
-    "runtime_events.c",
-    "shared_heap.c",
-    "signals.c",
-    "skiplist.c",
-    "startup_aux.c",
-    "str.c",
-    "sync.c", "sync_posix.h",
-    "sys.c",
-    "weak.c"
-] + select({
-    ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
-    "//platform/os:linux?": ["unix.c"],
-    "//platform/os:macos?": ["unix.c"],
-    "//platform:windows_x86_32?": ["win32.c"], # using bazel naming
-    # "//platform:windows_x86_64?": [???]
-    "//conditions:default": []
-})
+#     "major_gc.c",
+#     "md5.c",
+#     "memory.c",
+#     "memprof.c",
+#     "meta.c",
+#     "minor_gc.c",
+#     "misc.c",
+#     "obj.c",
+#     "parsing.c",
+#     "platform.c",
+#     "printexc.c",
+#     "prng.c",
+#     "roots.c",
+#     "runtime_events.c",
+#     "shared_heap.c",
+#     "signals.c",
+#     "skiplist.c",
+#     "startup_aux.c",
+#     "str.c",
+#     "sync.c", "sync_posix.h",
+#     "sys.c",
+#     "weak.c"
+# ] + select({
+#     ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
+#     "//platform/os:linux?": ["unix.c"],
+#     "//platform/os:macos?": ["unix.c"],
+#     "//platform:windows_x86_32?": ["win32.c"], # using bazel naming
+#     # "//platform:windows_x86_64?": [???]
+#     "//conditions:default": []
+# })
 
 filegroup(
     name = "instrtrace",
@@ -288,7 +290,7 @@ filegroup(
             "fail_byt.c",
             "fix_code.c",
             "interp.c",
-            "main.c",
+            # "main.c",
             "startup_byt.c",
         ],
     visibility = [
@@ -302,7 +304,7 @@ BYTECODE_ONLY_C_SOURCES = [
     "fail_byt.c",
     "fix_code.c",
     "interp.c",
-    "main.c",
+    # "main.c",
     "startup_byt.c"
 ]
 
@@ -317,7 +319,7 @@ filegroup(
         "fail_nat.c",
         "frame_descriptors.c",
         "startup_nat.c",
-        "signals_nat.c"
+        "signals_nat.c",
     ],
     visibility = [
         "//boot:__pkg__",
@@ -362,59 +364,90 @@ genrule(
 ## FIXME: do the cmp
 ## FIXME: custom rule, to insert stage-dependent workdir
 ## or use sh_binary?
-genrule(
-    outs  = ["primitives.dat"],
-    name  = "primitives_dat",
-    visibility = ["//visibility:public"],
-    tools = [":gen_primitives.sh"],
-    cmd   = " ".join([
-        "$(location :gen_primitives.sh) > $@;"
-    ]),
-    ## script depends on these (Bazel: runfiles):
-    ##FIXME: use filegroups above?
-    srcs  = [
-        "alloc.c", "array.c", "compare.c", "extern.c", "floats.c",
-        "gc_ctrl.c", "hash.c", "intern.c", "interp.c", "ints.c", "io.c",
-        "lexing.c", "md5.c", "meta.c", "memprof.c", "obj.c", "parsing.c",
-        "signals.c", "str.c", "sys.c", "callback.c", "weak.c",
-        "finalise.c", "domain.c", "platform.c", "fiber.c", "memory.c",
-        "startup_aux.c", "runtime_events.c", "sync.c", "dynlink.c",
-        "backtrace_byt.c", "backtrace.c", "afl.c", "bigarray.c", "prng.c",
-    ]
-)
-
-## TODO: obazl_rules_mustache
-# mustache_lines(
-#     name = "prims_c",
-#     out  = "prims.c",
-#     template = "prims.mustache",
-#     data     = "prims.c",
+# genrule(
+#     outs  = ["primitives.dat"],
+#     name  = "primitives_dat",
+#     visibility = ["//visibility:public"],
+#     tools = [":gen_primitives.sh"],
+#     cmd   = " ".join([
+#         "$(location :gen_primitives.sh) > $@;"
+#     ]),
+#     ## script depends on these (Bazel: runfiles):
+#     ##FIXME: use filegroups above?
+#     srcs  = [
+#         "alloc.c", "array.c", "compare.c", "extern.c", "floats.c",
+#         "gc_ctrl.c", "hash.c", "intern.c", "interp.c", "ints.c", "io.c",
+#         "lexing.c", "md5.c", "meta.c", "memprof.c", "obj.c", "parsing.c",
+#         "signals.c", "str.c", "sys.c", "callback.c", "weak.c",
+#         "finalise.c", "domain.c", "platform.c", "fiber.c", "memory.c",
+#         "startup_aux.c", "runtime_events.c", "sync.c", "dynlink.c",
+#         "backtrace_byt.c", "backtrace.c", "afl.c", "bigarray.c", "prng.c",
+#     ]
 # )
 
-# prims.c : primitives
-genrule(
-    outs  = ["prims.c"],
-    name  = "prims_c",
-    srcs  = [":primitives_dat"],
-    cmd   = "\n".join([
-        "PRIMS=`cat $(location primitives_dat)`;",
-        # "echo PRIMS: $$PRIMS;",
-	    "echo '#define CAML_INTERNALS' > $@;",
-        "echo '#include \"caml/mlvalues.h\"' >> $@;",
-	    "echo '#include \"caml/prims.h\"' >> $@;",
-        "sed -e 's/.*/extern value &();/' $(location :primitives_dat) >> $@;",
-        "echo 'c_primitive caml_builtin_cprim[] = {' >> $@;",
-        "sed -e 's/.*/  &,/' $(location :primitives_dat) >> $@;",
-        "echo '  0 };' >> $@;",
-        "echo 'char * caml_names_of_builtin_cprim[] = {' >> $@;",
-        "sed -e 's/.*/  \"&\",/' $(location :primitives_dat) >> $@;",
-        "echo '  0 };' >> $@"
-    ]),
-    visibility = [
-        "//boot:__pkg__",
-        "//bin:__pkg__"
-    ]
+mustache(
+    name = "ints_c",
+    out  = "ints.c",
+    template = "ints.c.mustache",
+    json     = "primitives.json",
 )
+
+mustache(
+    name = "primitives_dat",
+    out  = "primitives.dat",
+    template = "primitives.dat.mustache",
+    json     = "primitives.json",
+    visibility = ["//visibility:public"]
+    #     "//bytecomp:__pkg__",
+    #     "//config:__pkg__",
+    #     "//driver:__pkg__",
+    #     "//lambda:__pkg__",
+    #     "//lex:__pkg__",
+    #     "//parsing:__pkg__",
+    #     "//stdlib:__pkg__",
+    #     "//typing:__pkg__",
+    #     "//utils:__pkg__",
+    # ],
+)
+
+mustache(
+    name = "primitives_h",
+    out  = "primitives.h",
+    template = "primitives.h.mustache",
+    json     = "primitives.json",
+)
+
+mustache(
+    name = "prims_c",
+    out  = "prims.c",
+    template = "prims.c.mustache",
+    json     = "primitives.json",
+)
+
+# prims.c : primitives
+# genrule(
+#     outs  = ["prims.c"],
+#     name  = "prims_c",
+#     srcs  = [":primitives_dat"],
+#     cmd   = "\n".join([
+#         "PRIMS=`cat $(location primitives_dat)`;",
+#         # "echo PRIMS: $$PRIMS;",
+# 	    "echo '#define CAML_INTERNALS' > $@;",
+#         "echo '#include \"caml/mlvalues.h\"' >> $@;",
+# 	    "echo '#include \"caml/prims.h\"' >> $@;",
+#         "sed -e 's/.*/extern value &();/' $(location :primitives_dat) >> $@;",
+#         "echo 'c_primitive caml_builtin_cprim[] = {' >> $@;",
+#         "sed -e 's/.*/  &,/' $(location :primitives_dat) >> $@;",
+#         "echo '  0 };' >> $@;",
+#         "echo 'char * caml_names_of_builtin_cprim[] = {' >> $@;",
+#         "sed -e 's/.*/  \"&\",/' $(location :primitives_dat) >> $@;",
+#         "echo '  0 };' >> $@"
+#     ]),
+#     visibility = [
+#         "//boot:__pkg__",
+#         "//bin:__pkg__"
+#     ]
+# )
 
 ## FIXME: to build multiple "versions" (e.g. libcamlrun, libcamlrund,
 ## etc.) we can either support multiple targets, or one target
