@@ -1,0 +1,39 @@
+package(default_visibility = ["//visibility:public"])
+
+load("//bzl:rules.bzl",
+     "boot_archive",
+     "boot_compiler",
+     "compiler_module")
+
+load("//bzl/rules/macros:lexer.bzl", "lexer")
+
+alias(
+    name = "lexer",
+    actual = "//lex:ocamllex"
+)
+
+# lexer(
+#     name  = "lexer", ## ocamllex.byte",
+#     # stage = "baseline",
+#     build_host_constraints = [
+#         "//platform/constraints/ocaml/executor:vm_executor",
+#         "//platform/constraints/ocaml/emitter:vm_emitter"
+#     ],
+#     target_host_constraints = [
+#         "//platform/constraints/ocaml/executor:vm_executor",
+#         "//platform/constraints/ocaml/emitter:vm_emitter"
+#     ],
+# )
+
+# alias( # implemented in C, so no byte/opt versions.
+#     name   = "ocamlyacc",
+#     actual = "//yacc:ocamlyacc",
+#     # target_compatible_with = ["//platform/target:boot?"]
+# )
+
+# alias( # implemented in C, so no byte/opt versions.
+#     name   = "ocamlrun",
+#     actual = "//runtime:ocamlrun",
+# )
+
+# stdlib(stage  = "baseline")
