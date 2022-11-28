@@ -1,0 +1,38 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag",
+     "string_flag", "string_setting")
+
+string_flag( name = "emitter",
+             values = ["vm", "sys", "unspecified"],
+             build_setting_default = "unspecified",
+             visibility = [
+                 "//toolchain/adapter:__subpackages__"
+             ])
+
+config_setting(name = "vm?", flag_values = {":emitter": "vm"})
+config_setting(name = "sys?", flag_values = {":emitter": "sys"})
+config_setting(name = "unspecified?", flag_values = {":emitter": "unspecified"})
+
+# target_emitter_constraint(
+#     name = "xemitter",
+#     build_setting_default = "null",
+#     constraint = select({
+#         "//platform/constraints/ocaml/emitter:sys_emitter?": "sys",
+#         "//platform/constraints/ocaml/emitter:vm_emitter?": "vm",
+#         "//conditions:default": "NULL"
+#     }),
+#     visibility = ["//visibility:public"]
+# )
+
+# load("//config:BUILD.bzl", "emitter_setting")
+
+# emitter_setting(
+#     name = "emitter",
+#     build_setting_default = "null",
+#     emitter = select({
+#         "//platform/constraints/ocaml/build/emitter:sys?": "sys",
+#         "//platform/constraints/ocaml/build/emitter:vm?": "vm",
+#         "//conditions:default": None
+#     }),
+#     visibility = ["//visibility:public"]
+# )

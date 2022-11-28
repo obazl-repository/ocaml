@@ -1,0 +1,45 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
+
+config_setting(name = "one", define_values = {"foo": "true"})
+config_setting(name = "two", define_values = {"bar": "false"})
+config_setting(name = "three", define_values = {"baz": "more_false"})
+
+selects.config_setting_group(
+    name = "ult_sys?",
+    match_all = [
+        ## constraint config settings match targets:
+        # "//platform/constraints/ocaml/executor:sys_executor?",
+        # "//config/target/executor:sys?",
+        "//config/target/emitter:sys?",
+        "//config/stage:-1?"
+    ]
+)
+
+selects.config_setting_group(
+    name = "baseline_vm?",
+    match_all = [
+        ## constraint config settings match targets:
+        "//platform/constraints/ocaml/executor:vm_executor?",
+        # "//config/target/emitter:vm?",
+        "//config/stage:2?"
+    ]
+)
+
+selects.config_setting_group(
+    name = "baseline_sys?",
+    match_all = [
+        ## constraint config settings match targets:
+        "//platform/constraints/ocaml/executor:sys_executor?",
+        # "//config/target/emitter:sys?",
+        "//config/stage:2?"
+    ]
+)
+
+selects.config_setting_group(
+    name = "vm?",
+    match_all = [
+        "//platform/constraints/ocaml/executor:vm_executor?",
+        # "//config/target/executor:vm?",
+        "//config/stage:-1?"
+    ]
+)

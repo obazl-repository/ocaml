@@ -1,0 +1,12 @@
+load("//config:BUILD.bzl", "target_runtime_constraint")
+
+target_runtime_constraint(
+    name = "runtime",
+    build_setting_default = "null",
+    constraint = select({
+        "//platform/constraints/ocaml/target/runtime:macos_amd64?": "macos_amd64",
+        "//platform/constraints/ocaml/target/runtime:linux?": "linux",
+        "//conditions:default": None
+    }),
+    visibility = ["//visibility:public"]
+)
