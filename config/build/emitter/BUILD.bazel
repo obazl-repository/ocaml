@@ -23,8 +23,8 @@ emitter_setting(
     emitter = select({
         # if //config/emitter/build set, use it
         # use use platform default
-        "//platform/constraints/ocaml/build/emitter:sys?": "sys",
-        "//platform/constraints/ocaml/build/emitter:vm?": "vm",
+        "//platform/constraints/ocaml/build/emitter:sys_emitter?": "sys",
+        "//platform/constraints/ocaml/build/emitter:vm_emitter?": "vm",
     }),
     visibility = ["//visibility:public"]
 )
@@ -33,8 +33,8 @@ emitter_setting(
     name = "target_emitter",
     build_setting_default = "null",
     emitter = select({
-        "//platform/constraints/ocaml/target/emitter:sys?": "sys",
-        "//platform/constraints/ocaml/target/emitter:vm?": "vm",
+        "//platform/constraints/ocaml/target/emitter:sys_emitter?": "sys",
+        "//platform/constraints/ocaml/target/emitter:vm_emitter?": "vm",
     }),
     visibility = ["//visibility:public"]
 )

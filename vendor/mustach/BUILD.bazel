@@ -29,6 +29,7 @@ cc_binary(
         "//bytecomp:__pkg__",
         "//config:__pkg__",
         "//runtime:__subpackages__",
+        "//stdlib:__pkg__",
         "//utils:__pkg__"
     ],
 )

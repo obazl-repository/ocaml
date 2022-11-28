@@ -1,9 +1,8 @@
 build --config=show
-query --notool_deps
-query --noimplicit_deps
+# query --notool_deps
+# query --noimplicit_deps
 
 ## always use these settings:
-build --incompatible_enable_cc_toolchain_resolution
 ## put it in ~/.bazelrc to enable for all bazel projects
 
 ## maybe also put these in ~/.bazelrc, or ./config/user.bazelrc
@@ -17,7 +16,9 @@ run:q --ui_event_filters=-stdout
 run:q --ui_event_filters=-stderr
 run:q --noshow_progress
 
-# build --toolchain_resolution_debug=.*
+## now the default: build --incompatible_override_toolchain_transition
+build --incompatible_enable_cc_toolchain_resolution
+build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
 #build --toolchain_resolution_debug=//toolchain/type:.*
 #build --toolchain_resolution_debug=//boot/toolchain/type:.*
@@ -35,6 +36,7 @@ run:q --noshow_progress
 # constraint-values are in effect. IOW --host_platform sets the action
 # configuration.
 
+################################################################
 #### alternate toolchain: pass tc and profile if needed
 
 ## Zig
@@ -46,13 +48,25 @@ common:maczig --extra_toolchains=@zig_sdk//toolchain:darwin_amd64
 ## so we need to pass a customized tc profile
 common:linuxzig --extra_toolchains=@zig_sdk//toolchain:linux_amd64_gnu.2.28,//toolchain/profile/selector/cc/linux:zig
 
+################################################################
 #### cross-builds: currently for runtimes only
 #### specify target platform and 1 toolchain per host (?)
 #### plus target profile if needed (zig needs it)
 
 ### macos > linux using zig tc (requires custom tc profile)
-common:mac_linuxamd64 --extra_toolchains=@zig_sdk//toolchain:linux_amd64_gnu.2.31,//toolchain/profile/selector/cc/linux:zig
-common:mac_linuxamd64 --platforms=@zig_sdk//platform:linux_amd64
+common:mac_linuxamd64 --extra_toolchains=@zig_sdk//toolchain:darwin_amd64,@zig_sdk//toolchain:linux_amd64_gnu.2.31,//toolchain/profile/selector/cc/linux:zig
+
+# this platform is insufficient, it won't pick out an ocaml tc:
+# common:mac_linuxamd64 --platforms=@zig_sdk//platform:linux_amd64
+
+build:mac_linuxamd64 --host_platform=//platform/ocaml/local:sys_vm
+
+# WARNING: --platforms only supports a single target platform: using the first option //platform/ocaml/amd64/linux:sys_vm
+build:mac_linuxamd64 --platforms=//platform/ocaml/amd64/linux:sys_vm
+# platform expresses target runtime and executor; since each executor
+# has two emitters, one must be expressed separately, as a
+# config_setting:
+build:mac_linuxamd64 --//config/target/emitter=vm
 
 ### linux > macos using zig
 common:linuxamd64_macamd64 --extra_toolchains=@zig_sdk//toolchain:darwin_amd64,//toolchain/profile/selector/cc/macos
@@ -83,81 +97,86 @@ build --workspace_status_command=$PWD/bzl/camlheader.sh
 ################################################################
 ## OCaml platforms: boot, vm, sys
 
-build --config=vv_vv
+build --config=ocamlc.byte
 
-build:vv_vv --host_platform=//platform/ocaml:sys_vm
-build:vv_vv --platforms=//platform/ocaml:sys_vm
-build:vv_vv --//config/target/emitter=vm
+## vv_vv
+build:ocamlc.byte --host_platform=//platform/ocaml/local:sys_vm
+build:ocamlc.byte --platforms=//platform/ocaml/local:sys_vm
+build:ocamlc.byte --//config/target/emitter=vm
 
-build:vv_vs --host_platform=//platform/ocaml:sys_vm
-build:vv_vs --platforms=//platform/ocaml:sys_vm
-build:vv_vs --//config/target/emitter=sys
+## vv_vs
+build:ocamlopt.byte --host_platform=//platform/ocaml/local:sys_vm
+build:ocamlopt.byte --platforms=//platform/ocaml/local:sys_vm
+build:ocamlopt.byte --//config/target/emitter=sys
 
-build:vs_ss --host_platform=//platform/ocaml:sys_vm
-build:vs_ss --platforms=//platform/ocaml:sys_sys
+build:vs_ss --host_platform=//platform/ocaml/local:sys_vm
+build:vs_ss --platforms=//platform/ocaml/local:sys_sys
 build:vs_ss --//config/target/emitter=sys
 
-build:vs_sv --host_platform=//platform/ocaml:sys_vm
-build:vs_sv --platforms=//platform/ocaml:sys_sys
+build:vs_sv --host_platform=//platform/ocaml/local:sys_vm
+build:vs_sv --platforms=//platform/ocaml/local:sys_sys
 build:vs_sv --//config/target/emitter=vm
 
-build:ss_ss --host_platform=//platform/ocaml:sys_sys
-build:ss_ss --platforms=//platform/ocaml:sys_sys
-build:ss_ss --//config/target/emitter=sys
+## ss_ss
+build:ocamlopt.opt --host_platform=//platform/ocaml/local:sys_sys
+build:ocamlopt.opt --extra_execution_platforms=//platform/ocaml/local:sys_sys
+build:ocamlopt.opt --platforms=//platform/ocaml/local:sys_sys
+build:ocamlopt.opt --//config/target/emitter=sys
 
-build:ss_sv --host_platform=//platform/ocaml:sys_sys
-build:ss_sv --platforms=//platform/ocaml:sys_sys
-build:ss_sv --//config/target/emitter=vm
+## ss_sv
+build:ocamlc.opt --host_platform=//platform/ocaml/local:sys_sys
+build:ocamlc.opt --platforms=//platform/ocaml/local:sys_sys
+build:ocamlc.opt --//config/target/emitter=vm
 
 # # default: build --//config/emitter/build:vm
 # # default: build --//config/emitter/target:vm
 
-# build:boot --host_platform=//platform/ocaml:boot_build
-# build:boot --platforms=//platform/ocaml:boot_target
+# build:boot --host_platform=//platform/ocaml/local:boot_build
+# build:boot --platforms=//platform/ocaml/local:boot_target
 
 # build ocamlc.byte from ocamlc.byte
-build:ocamlc.byte --host_platform=//platform/ocaml:sys_vm_vm
-build:ocamlc.byte --platforms=//platform/ocaml:sys_vm_vm
+# build:ocamlc.byte --host_platform=//platform/ocaml/local:sys_vm_vm
+# build:ocamlc.byte --platforms=//platform/ocaml/local:sys_vm_vm
 
-# build ocamlopt.byte from ocamlc.byte
-build:ocamlopt.byte --host_platform=//platform/ocaml:sys_vm_vm
-build:ocamlopt.byte --platforms=//platform/ocaml:sys_vm_sys
+# # build ocamlopt.byte from ocamlc.byte
+# build:ocamlopt.byte --host_platform=//platform/ocaml/local:sys_vm_vm
+# build:ocamlopt.byte --platforms=//platform/ocaml/local:sys_vm_sys
 
-# build ocamlc.opt from ocamlopt.byte
-build:ocamlc.opt --host_platform=//platform/ocaml:sys_vm_sys
-build:ocamlc.opt --platforms=//platform/ocaml:sys_sys_vm
+# # build ocamlc.opt from ocamlopt.byte
+# build:ocamlc.opt --host_platform=//platform/ocaml/local:sys_vm_sys
+# build:ocamlc.opt --platforms=//platform/ocaml/local:sys_sys_vm
 
-# build ocamlopt.opt from ocamlopt.byte
-build:ocamlopt.opt --host_platform=//platform/ocaml:sys_vm_sys
-build:ocamlopt.opt --platforms=//platform/ocaml:sys_sys_sys
+# # build ocamlopt.opt from ocamlopt.byte
+# build:ocamlopt.opt --host_platform=//platform/ocaml/local:sys_vm_sys
+# build:ocamlopt.opt --platforms=//platform/ocaml/local:sys_sys_sys
 
-# build ocamlc.opt from ocamlopt.opt
-build:socamlopt.opt --host_platform=//platform/ocaml:sys_sys_sys
-build:socamlopt.opt --platforms=//platform/ocaml:sys_sys_vm
+# # build ocamlc.opt from ocamlopt.opt
+# build:socamlopt.opt --host_platform=//platform/ocaml/local:sys_sys_sys
+# build:socamlopt.opt --platforms=//platform/ocaml/local:sys_sys_vm
 
-# build ocamlopt.opt from ocamlopt.opt
-build:socamlopt.opt --host_platform=//platform/ocaml:sys_sys_sys
-build:socamlopt.opt --platforms=//platform/ocaml:sys_sys_sys
+# # build ocamlopt.opt from ocamlopt.opt
+# build:socamlopt.opt --host_platform=//platform/ocaml/local:sys_sys_sys
+# build:socamlopt.opt --platforms=//platform/ocaml/local:sys_sys_sys
 
 
 
 
 ################################################################
-# build:ocamlc --host_platform=//platform/ocaml:sys_vm_vm_build
-# build:ocamlc --platforms=//platform/ocaml:sys_vm_vm_target
+# build:ocamlc --host_platform=//platform/ocaml/local:sys_vm_vm_build
+# build:ocamlc --platforms=//platform/ocaml/local:sys_vm_vm_target
 
-# build:ocamlc.byte --host_platform=//platform/ocaml:sys_vm_vm_build
-# build:ocamlc.byte --platforms=//platform/ocaml:sys_vm_vm_build
+# build:ocamlc.byte --host_platform=//platform/ocaml/local:sys_vm_vm_build
+# build:ocamlc.byte --platforms=//platform/ocaml/local:sys_vm_vm_build
 
-# build:ocamlopt.byte --host_platform=//platform/ocaml:sys_vm_vm_build
-# build:ocamlopt.byte --platforms=//platform/ocaml:sys_vm_sys_target
+# build:ocamlopt.byte --host_platform=//platform/ocaml/local:sys_vm_vm_build
+# build:ocamlopt.byte --platforms=//platform/ocaml/local:sys_vm_sys_target
 
 ## to emit sys_sys, build host can be either sys_sys_sys or sys_vm_sys
-# build:ocamlc.opt --host_platform=//platform/ocaml:sys_vm_sys_build
-# build:ocamlc.opt --platforms=//platform/ocaml:sys_sys_vm_target
+# build:ocamlc.opt --host_platform=//platform/ocaml/local:sys_vm_sys_build
+# build:ocamlc.opt --platforms=//platform/ocaml/local:sys_sys_vm_target
 
-# build:ocamlopt.opt --host_platform=//platform/ocaml:sys_sys_sys
-# build:ocamlopt.opt --platforms=//platform/ocaml:sys_sys
+# build:ocamlopt.opt --host_platform=//platform/ocaml/local:sys_sys_sys
+# build:ocamlopt.opt --platforms=//platform/ocaml/local:sys_sys
 
 # build:boot --host_platform=//platform/build:boot
 # build:boot --platforms=//platform/target:boot

@@ -1,13 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
 constraint_setting(name = "executor",
-                   default_constraint_value = ":vm?")
+                   default_constraint_value = ":vm_executor")
 
 ## Executor is always vm or sys; the latter matches whatever the
 ## runtime is (amd64 or whatever).
 
-constraint_value(name = "sys", constraint_setting = ":executor")
-alias(name = "sys?", actual = ":sys")
+constraint_value(name = "sys_executor", constraint_setting = ":executor")
+alias(name = "sys_executor?", actual = ":sys_executor")
 
-constraint_value(name = "vm", constraint_setting = ":executor")
-alias(name = "vm?", actual = ":vm")
+constraint_value(name = "vm_executor", constraint_setting = ":executor")
+alias(name = "vm_executor?", actual = ":vm_executor")

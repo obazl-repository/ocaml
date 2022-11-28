@@ -40,33 +40,12 @@ let native_c_compiler = {|{{native_c_compiler}}|}
 let native_c_libraries = {|{{native_c_libs}}|}
 let native_pack_linker = {|{{native_pack_linker}}|}
 let default_rpath = {|{{default_rpath}}|}
+let mkdll= {|{{mkdll}}|}
+let mkexe= {|{{{mkexe}}}|}
+let mkmaindll= {|{{mkmaindll}}|}
 let mksharedlibrpath = {|{{mksharedlibrpath}}|}
 let ar = {|{{ar}}|}
 let supports_shared_libraries = {{supports_shared_libraries}}
-let mkdll, mkexe, mkmaindll =
-  if Sys.win32 || Sys.cygwin && supports_shared_libraries then
-    let flexlink =
-      let flexlink =
-        Option.value ~default:"flexlink" (Sys.getenv_opt "OCAML_FLEXLINK")
-      in
-      let f i =
-        let c = flexlink.[i] in
-        if c = '/' && Sys.win32 then '\\' else c
-      in
-      String.init (String.length flexlink) f
-    in
-    let flexdll_chain = {|{{flexdll_chain}}|} in
-    let flexlink_flags = {|{{flexlink_flags}}|} in
-    let flags = " -chain " ^ flexdll_chain ^ " " ^ flexlink_flags in
-    flexlink ^ flags ^ {|{{mkdll_ldflags_exp}}|},
-    flexlink ^ " -exe" ^ flags
-      ^ {| {{mkexe_extra_flags}}|} ^ {|{{mkexe_ldflags_exp}}|},
-    flexlink ^ " -maindll" ^ flags ^ {|{{mkdll_ldflags_exp}}|}
-  else
-    {|{{mkdll_exp}}|},
-    {|{{mkexe_exp}}|},
-    {|{{mkmaindll_exp}}|}
-
 let flambda = {{flambda}}
 let with_flambda_invariants = {{with_flambda_invariants}}
 let with_cmm_invariants = {{with_cmm_invariants}}

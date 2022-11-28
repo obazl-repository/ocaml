@@ -67,6 +67,9 @@ def aggregate_deps(ctx,
         depsets.deps.sigs.append(
             depset([target[ModuleInfo].sig]))
 
+        if target[ModuleInfo].ofile:
+            depsets.deps.ofiles.append(depset([target[ModuleInfo].ofile]))
+
         if archiving:
             if target not in archive_manifest:
                 depsets.deps.cli_link_deps.append(

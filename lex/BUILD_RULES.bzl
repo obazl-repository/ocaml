@@ -1,7 +1,10 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:functions.bzl", "stage_name", "tc_lexer")
+load("//bzl:functions.bzl", "get_workdir", "tc_lexer")
+
+# rule: ocamllex: builds the lexer
+# rule: lex runs the lexer
 
 ## make.log:
 # ./boot/ocamlrun ./boot/ocamllex -q lex/lexer.mll
@@ -10,8 +13,9 @@ load("//bzl:functions.bzl", "stage_name", "tc_lexer")
 
 # ./boot/ocamlrun ./ocamlopt -nostdlib -I ./stdlib -I otherlibs/dynlink  -o lex/ocamllex.opt lex/cset.cmx lex/syntax.cmx lex/parser.cmx lex/lexer.cmx lex/table.cmx lex/lexgen.cmx lex/compact.cmx lex/common.cmx lex/output.cmx lex/outputbis.cmx lex/main.cmx
 
-########## RULE:  OCAML_INTERFACE  ################
-def lexer_impl(ctx):
+################################################################
+## ocamllex runner: lex()
+def _lex_impl(ctx):
 
     debug = False
     if (ctx.label.name == "_Impl"):
@@ -22,50 +26,12 @@ def lexer_impl(ctx):
 
     # mode = ctx.attr.mode
 
-    # tc = ctx.exec_groups[ctx.attr._stage].toolchains[
-    #     "//toolchain/type:{}".format(ctx.attr._stage)
-    # ]
-    # tc = ctx.toolchains["//toolchain/type:boot"]
-
-
-    tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
-
-    # workdir = "_{}/".format(stage_name(tc._stage))
-
-    # build_emitter = tc.build_emitter[BuildSettingInfo].value
-    # print("BEMITTER: %s" % build_emitter)
-
-    target_emitter = tc.target_emitter[BuildSettingInfo].value
-    target_executor = tc.target_executor[BuildSettingInfo].value
-
-    workdir = "_{b}{t}{stage}/".format(
-        b = target_executor, t = target_emitter,
-        stage = tc._stage[BuildSettingInfo].value)
-
-    # stage = ctx.attr._stage[BuildSettingInfo].value
-    # print("module _stage: %s" % stage)
-
-    # tc = None
-    # if stage == "boot":
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # elif stage == "baseline":
-    #     tc = ctx.exec_groups["baseline"].toolchains[
-    #         "//boot/toolchain/type:baseline"]
-    # elif stage == "dev":
-    #     tc = ctx.exec_groups["dev"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # else:
-    #     print("UNHANDLED STAGE: %s" % stage)
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-
-    # env = {"PATH": get_sdkpath(ctx)}
+    tc = ctx.toolchains["//toolchain/type:boot"]
+    (stage, executor, emitter, workdir) = get_workdir(tc)
 
     lexout_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
 
-    lexout = ctx.actions.declare_file(lexout_fname)
+    # lexout = ctx.actions.declare_file(lexout_fname)
 
     runner = None
     for rf in tc.compiler[0][DefaultInfo].default_runfiles.files.to_list():
@@ -100,7 +66,7 @@ def lexer_impl(ctx):
 
     args.add("-q")
 
-    args.add("-o", lexout)
+    args.add("-o", ctx.outputs.out)
 
     args.add(ctx.file.src)
 
@@ -109,7 +75,7 @@ def lexer_impl(ctx):
         executable = tool,
         arguments = [args],
         inputs = inputs_depset,
-        outputs = [lexout],
+        outputs = [ctx.outputs.out],
         tools = tc_lexer(tc)[DefaultInfo].default_runfiles.files,
         mnemonic = "OcamlLex",
         progress_message = "{mode} ocaml_lex: //{pkg}:{tgt}".format(
@@ -120,4 +86,62 @@ def lexer_impl(ctx):
         )
     )
 
-    return [DefaultInfo(files = depset(direct = [lexout]))]
+    return [DefaultInfo(files = depset(direct = [ctx.outputs.out]))]
+
+#################
+lex = rule(
+    implementation = _lex_impl,
+    doc = "Generates an OCaml source file from an ocamllex source file.",
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         # exec_compatible_with = [
+    #         #     "//platform/constraints/ocaml/executor:vm_executor?",
+    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
+    #         # ],
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
+        # "baseline": exec_group(
+        #     exec_compatible_with = [
+        #         "//platform/constraints/ocaml/executor:vm_executor?",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
+        #     ],
+        #     toolchains = ["//toolchain/type:baseline"],
+        # ),
+    # },
+
+    attrs = dict(
+        _stage = attr.label(
+            doc = "bootstrap stage",
+            default = "//config/stage"
+        ),
+
+        src = attr.label(
+            doc = "A single .mll source file label",
+            allow_single_file = [".mll"]
+        ),
+
+        out = attr.output(
+            mandatory = True,
+        ),
+
+        vmargs = attr.string_list(
+            doc = "Args to pass to ocamlrun when it runs ocamllex.",
+        ),
+        # out = attr.output(
+        #     doc = """Output filename.""",
+        #     mandatory = True
+        # ),
+        opts = attr.string_list(
+            doc = "Options"
+        ),
+        # mode       = attr.string(
+        #     default = "bytecode",
+        # ),
+        _rule = attr.string( default = "ocaml_lex" )
+    ),
+    executable = False,
+    # fragments = ["cpp"],
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)

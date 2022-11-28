@@ -1,15 +1,15 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//config:CONFIG.bzl", "OCAML_BINDIR")
-load("//bzl:functions.bzl", "stage_name", "tc_compiler")
+load("//bzl:functions.bzl", "tc_compiler")
 
 ########################
 def _boot_config(ctx):
 
     o = ctx.outputs.out
 
-    tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:boot"]
 
     # build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
@@ -17,7 +17,10 @@ def _boot_config(ctx):
     target_executor = tc.target_executor[BuildSettingInfo].value
     target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    stage = tc._stage[BuildSettingInfo].value
+    stage = int(tc._stage[BuildSettingInfo].value)
+    workdir = "_{b}{t}{s}/".format(
+        b = target_executor, t = target_emitter, s = (stage))
+
     print("module _stage: %s" % stage)
 
     if stage == 2:
@@ -30,20 +33,17 @@ def _boot_config(ctx):
         else:
             fail("Bad target_executor: %s" % target_executor)
 
-    workdir = "_{b}{t}{stage}/".format(
-        b = target_executor, t = target_emitter, stage = stage)
-
     # tc = None
     # if ctx.attr._stage == "boot":
     #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
+    #         "//toolchain/type:boot"]
     # elif ctx.attr._stage == "boot":
     #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
+    #         "//toolchain/type:boot"]
     # else:
     #     # print("MISSING STAGE")
     #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
+    #         "//toolchain/type:boot"]
 
     stdlib_dir = ""
     for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
@@ -80,18 +80,18 @@ boot_config = rule(
     implementation = _boot_config,
 
     doc = "Builds boot toolchain and installs in .bootstrap/",
-    exec_groups = {
-        "boot": exec_group(
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm?",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor?",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
 
     attrs = dict(
         out = attr.output(
@@ -120,5 +120,8 @@ boot_config = rule(
             allow_single_file = True,
             default = "//stdlib:Std_exit"
         )
-    )
+    ),
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )

@@ -1,10 +1,11 @@
 load("//bzl:rules.bzl",
+     "boot_compiler",
      "boot_executable",
      "compiler_module",
-     "boot_lexer",
      "compiler_signature",
      "boot_library",
 )
+load(":BUILD_RULES.bzl", "lex")
 
 load("//config:CONFIG.bzl",
      # "OC_COMMON_CFLAGS",
@@ -83,6 +84,26 @@ SIG_OPTS    =  ["-strict-formats"]
 #     }),
 #     visibility = ["//visibility:public"]
 # )
+
+BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
+
+boot_compiler(
+    name       = "ocamllex",
+    # stage      = stage,
+    prologue   = [":lex"],
+    main       = ":Main",
+    # opts       = select({
+    #     "//platform/target:vm?" : BOOT_OPTS,
+    #     "//platform/target:sys?": ["-nostdlib"],
+    #     "//conditions:default"   : BOOT_OPTS
+    # }),
+    use_prims = select({
+        "//platform/target:vm?" : True,
+        "//platform/target:sys?": False,
+        "//conditions:default"   : True
+    }),
+    visibility = ["//visibility:public"]
+)
 
 boot_library(
     name = "lex",
@@ -172,6 +193,7 @@ compiler_signature(
     src  = "cset.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
     ]
 )
 
@@ -186,10 +208,10 @@ compiler_module(
     visibility = ["//file_formats:__pkg__"]
 )
 
-boot_lexer(
+lex(
     name = "lexer_ml",
-    # out  = "lexer.ml",
-    src  = "lexer.mll"
+    src  = "lexer.mll",
+    out  = "lexer.ml",
 )
 
 compiler_signature(
@@ -238,6 +260,7 @@ compiler_module(
     sig    = "Main_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Lexing",
@@ -266,6 +289,7 @@ compiler_signature(
     src  = "main.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
         # ":Syntax_cmi", ## (Lex Syntax)
         # ":Lexgen_cmi", ## (Lex Lexgen)
         # ":Compact_cmi", ## (Lex Compact)
@@ -403,6 +427,7 @@ compiler_signature(
     src  = "table.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
     ]
 )
 

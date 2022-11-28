@@ -10,9 +10,9 @@ load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
      "compiler_module",
-     "boot_lexer",
      "compiler_signature",
 )
+load("//lex:BUILD_RULES.bzl", "lex")
 
 MODULE_OPTS = []
 SIG_OPTS    = []
@@ -432,10 +432,10 @@ compiler_module(
     ]
 )
 
-boot_lexer(
+lex(
     name = "lexer_ml",
-    # out  = "lexer.ml",
-    src  = "lexer.mll"
+    src  = "lexer.mll",
+    out  = "lexer.ml",
 )
 
 compiler_signature(

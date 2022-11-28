@@ -12,6 +12,9 @@ implemented as a configuration transition..."
 
 This seems to be a little more up to date:  link:https://bazel.build/extending/toolchains#toolchain-resolution[Toolchain resolution]
 
+WARNING: CLI options ` --extra_execution_platforms` and `--host_platform` do not have the same effect.
+
+
 
 https://bazel.build/reference/be/common-definitions#common-attributes
 

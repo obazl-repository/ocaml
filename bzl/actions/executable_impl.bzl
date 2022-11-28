@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 load("//bzl:providers.bzl",
      "new_deps_aggregator",
@@ -6,7 +7,7 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker"
 )
 
-load("//bzl:functions.bzl", "stage_name", "tc_compiler")
+load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
@@ -34,83 +35,20 @@ def executable_impl(ctx):  ## , tc):
     # tc = ctx.toolchains["//toolchain/type:boot"]
     # print("boot tc: %s" % tc)
 
-    tc = ctx.exec_groups["boot"].toolchains[
-        "//boot/toolchain/type:boot"]
+    cc_toolchain = find_cpp_toolchain(ctx)
 
-    # build_emitter = tc.build_emitter[BuildSettingInfo].value
-    # print("BEMITTER: %s" % build_emitter)
-
-    target_executor = tc.target_executor[BuildSettingInfo].value
-    target_emitter  = tc.target_emitter[BuildSettingInfo].value
-
-    print("executable: %s" % ctx.label)
-    print("tc.name: %s" % tc.name)
-    print("tc.target_executor: %s" % target_executor)
-    print("tc.target_emitter : %s" % target_emitter)
-    print("host_platform: %s" % ctx.fragments.platform.host_platform)
-    print("platform: %s" % ctx.fragments.platform.platform)
-
-    stage = tc._stage[BuildSettingInfo].value
-    print("module _stage: %s" % stage)
-    # fail("XEX")
-
-    if stage == 2:
-        ext = ".cmx"
-    else:
-        if target_executor == "vm":
-            ext = ".cmo"
-        elif target_executor == "sys":
-            ext = ".cmx"
-        else:
-            fail("Bad target_executor: %s" % target_executor)
-
-    workdir = "_{b}{t}{stage}/".format(
-        b = target_executor, t = target_emitter, stage = stage)
-
-    # print("executable _stage: %s" % tc._stage)
-
-    # if tc._stage == 0:
-    #     workdir = "_boot/"
-    # elif tc._stage == 1:
-    #     workdir = "_baseline/"
-    # elif tc._stage == 2:
-    #     workdir = "_dev/"
-    # elif tc._stage == 3:
-    #     workdir = "_prod/"
-    # else:
-    #     fail("exec UHANDLED STAGE: %s" % tc._stage)
-
-   # if hasattr(attr, "stage"):
-   #      stage = ctx.attr.stage
-   #  else:
-   #      stage = ctx.attr._stage[BuildSettingInfo].value
-
-    # tc = None
-    # if stage == "boot":
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # elif stage == "baseline":
-    #     tc = ctx.exec_groups["baseline"].toolchains[
-    #         "//boot/toolchain/type:baseline"]
-    # elif stage == "dev":
-    #     tc = ctx.exec_groups["dev"].toolchains[
-    #         "//boot/toolchain/type:baseline"]
-    # else:
-    #     print("UNHANDLED STAGE: %s" % stage)
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-
-    # print("xtc boot tc: %s" % tc)
-    # fail("X")
-
-    # xtc = ctx.exec_groups["boot"].toolchains["//boot/toolchain/type:boot"]
-    # print("xtc boot tc: %s" % xtc)
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:boot"]
+    (stage, executor, emitter, workdir) = get_workdir(tc)
 
     ################################################################
     ################  DEPS  ################
     depsets = new_deps_aggregator()
 
     manifest = []
+
+    aggregate_deps(ctx, ctx.attr._stdlib, depsets, manifest)
+    aggregate_deps(ctx, ctx.attr._std_exit, depsets, manifest)
 
     for dep in ctx.attr.prologue:
         aggregate_deps(ctx, dep, depsets, manifest)
@@ -162,6 +100,10 @@ def executable_impl(ctx):  ## , tc):
 
     out_exe = ctx.actions.declare_file(workdir + ctx.label.name)
 
+    runtime = []
+    if ctx.file._runtime:
+        runtime.append(ctx.file._runtime)
+
     ####  flags and options for bootstrapping executables
 
     ## some examples from mac make log:
@@ -176,24 +118,38 @@ def executable_impl(ctx):  ## , tc):
     #########################
     args = ctx.actions.args()
 
-    tool = None
-    for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-        if f.basename == "ocamlrun":
-            # print("LEX RF: %s" % f.path)
-            tool = f
+    executable = None
+    if executor == "vm":
+        ## ocamlrun
+        for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+            if f.basename == "ocamlrun":
+                # print("LEX RF: %s" % f.path)
+                executable = f
+            # the bytecode executable
+        args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    else:
+        executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
-    # the bytecode executable
-    args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    args.add("-o", out_exe)
 
+    use_prims = False
     if hasattr(ctx.attr, "use_prims"):
         if ctx.attr.use_prims:
-            args.add_all(["-use-prims",
-                          ctx.file._primitives])
+            use_prims = True
     else:
         if ctx.attr._use_prims[BuildSettingInfo].value:
-            args.add_all(["-use-prims", ctx.file._primitives.path])
+            use_prims = True
+
+    if use_prims:
+        args.add_all(["-use-prims", ctx.file._primitives.path])
+        primitives_depset = [depset([ctx.file._primitives])]
+    else:
+        primitives_depset = []
 
     # args.add_all(tc.linkopts)
+
+    # if ext == ".cmx":
+    #     args.add("-dstartup")
 
     _options = get_options(rule, ctx)
     args.add_all(_options)
@@ -210,11 +166,14 @@ def executable_impl(ctx):  ## , tc):
     data_inputs = []
     # if ctx.attr.data:
     #     data_inputs = [depset(direct = ctx.files.data)]
-    data_inputs = [depset(direct = ctx.files._camlheaders)]
-        # for f in ctx.files.data:
-        #     includes.append(f.dirname)
+    if ctx.files._camlheaders:
+        data_inputs = [depset(direct = ctx.files._camlheaders)]
 
     includes = []
+    print("CAMLHEADERS: %s" % ctx.files._camlheaders)
+    for hdr in ctx.files._camlheaders:
+        includes.append(hdr.dirname)
+
     for path in paths_depset.to_list():
         includes.append(path)
 
@@ -222,6 +181,11 @@ def executable_impl(ctx):  ## , tc):
         includes.append(ctx.file._stdlib.dirname)
 
     # includes.append(ctx.file._std_exit.dirname)
+
+    ##FIXME: if we're building a sys compiler we need to add
+    ## libasmrun.a to runfiles, and if we're using a sys compiler we
+    ## need to add libasmrun.a to in puts and add its dir to search
+    ## path (-I).
 
     # compiler_runfiles = []
     # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
@@ -254,6 +218,10 @@ def executable_impl(ctx):  ## , tc):
         transitive = [cli_link_deps_depset]
     )
 
+    if ctx.file._runtime:
+        # args.add(ctx.file._runtime.path)
+        includes.append(ctx.file._runtime.dirname)
+
     args.add_all(includes, before_each="-I", uniquify=True)
 
     for dep in filtering_depset.to_list():
@@ -270,12 +238,12 @@ def executable_impl(ctx):  ## , tc):
     if ctx.file.main:
         args.add(ctx.file.main)
 
-    args.add("-o", out_exe)
-
+    runfiles = []
+    runfiles.append(ctx.file._primitives)
     if tc_compiler(tc)[DefaultInfo].default_runfiles:
-        runfiles = tc_compiler(tc)[DefaultInfo].default_runfiles
-    else:
-        runfiles = []
+        runfiles.append(tc_compiler(tc)[DefaultInfo].default_runfiles)
+    # else:
+    #     runfiles = []
 
     ## action input deps sources:
     ##  a. the target attributes
@@ -284,26 +252,42 @@ def executable_impl(ctx):  ## , tc):
 
     inputs_depset = depset(
         direct = []
-        + [ctx.file._std_exit, ctx.file._stdlib]
+        + [ctx.file._std_exit]
         + [ctx.file.main] if ctx.file.main else []
-        # compiler runfiles contain camlheader files & stdlib:
+        # compiler runfiles *should* contain camlheader files & stdlib:
         # + ctx.files._camlheaders
         # + camlheader_deps
+        + tc
         + tc_compiler(tc)[DefaultInfo].files_to_run
         + runfiles
         ,
         transitive = []
-        + [depset(ctx.files._camlheaders)]
+        + [depset(
+            ctx.files._camlheaders + [ctx.file._runtime]
+            + [ctx.file._stdlib]
+        )]
         #FIXME: primitives should be provided by target, not tc?
         # + [depset([tc.primitives])] # if tc.primitives else []
         + [
             sigs_depset,
             cli_link_deps_depset,
-            archived_cmx_depset
+            archived_cmx_depset,
+            ofiles_depset,
+            afiles_depset
         ]
+        + primitives_depset
+        + [cc_toolchain.all_files]
         # + data_inputs
         # + [depset(action_inputs_ccdep_filelist)]
     )
+    print("lbl: %s" % ctx.label)
+    print("ARCHIVED CMX: %s" % archived_cmx_depset)
+    print("AFILES: %s" % afiles_depset)
+    print("stdlib: %s" % ctx.file._stdlib.path)
+    if ctx.label.name == "cvt_emit.byte":
+        if ctx.file._stdlib.dirname.endswith("2"):
+            print("inputs %s" % inputs_depset)
+            # fail()
 
     # for dep in inputs_depset.to_list():
     #     print("XDEP: %s" % dep)
@@ -331,17 +315,19 @@ def executable_impl(ctx):  ## , tc):
 
     ################
     ctx.actions.run(
-        # env = env,
-        executable = tool,
-        # executable = tc_compiler(tc)[DefaultInfo].files_to_run,
+        env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+               "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+        executable = executable,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_exe],
-        tools = [tc_compiler(tc)[DefaultInfo].files_to_run],
-        # tools = [tool] + tool_args,  # [tc.ocamlopt],
+        tools = [
+            tc_compiler(tc)[DefaultInfo].default_runfiles.files,
+            tc_compiler(tc)[DefaultInfo].files_to_run
+        ],
         mnemonic = mnemonic,
-        progress_message = "{mode} linking {rule}: {ws}//{pkg}:{tgt}".format(
-            mode = tc.build_host + ">" + tc.target_host[BuildSettingInfo].value,
+        progress_message = "stage {s} linking {rule}: {ws}//{pkg}:{tgt}".format(
+            s = stage,
             rule = ctx.attr._rule,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,

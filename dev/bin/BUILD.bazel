@@ -22,12 +22,12 @@ compiler(
     name  = "ocamlc.dev",
     stage = "dev",
     build_host_constraints = [
-        "//platform/constraints/ocaml/executor:vm",
-        "//platform/constraints/ocaml/emitter:vm"
+        "//platform/constraints/ocaml/executor:vm_executor",
+        "//platform/constraints/ocaml/emitter:vm_emitter"
     ],
     target_host_constraints = [
-        "//platform/constraints/ocaml/executor:vm",
-        "//platform/constraints/ocaml/emitter:sys"
+        "//platform/constraints/ocaml/executor:vm_executor",
+        "//platform/constraints/ocaml/emitter:sys_emitter"
     ],
 )
 
@@ -35,12 +35,12 @@ lexer(
     name  = "ocamllex.byte",
     stage = "dev",
     build_host_constraints = [
-        "//platform/constraints/ocaml/executor:vm",
-        "//platform/constraints/ocaml/emitter:vm"
+        "//platform/constraints/ocaml/executor:vm_executor",
+        "//platform/constraints/ocaml/emitter:vm_emitter"
     ],
     target_host_constraints = [
-        "//platform/constraints/ocaml/executor:vm",
-        "//platform/constraints/ocaml/emitter:vm"
+        "//platform/constraints/ocaml/executor:vm_executor",
+        "//platform/constraints/ocaml/emitter:vm_emitter"
     ],
 )
 

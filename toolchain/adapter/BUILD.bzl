@@ -1,5 +1,5 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-
+# load("//config:BUILD.bzl", "TargetInfo")
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
 load("//bzl/rules/common:transitions.bzl",
@@ -18,7 +18,7 @@ def _toolchain_adapter_impl(ctx):
         # _build_executor        = ctx.attr._build_executor,
         # build_emitter          = ctx.attr.build_emitter,
         target_runtime         = ctx.attr.target_runtime,
-        target_executor        = ctx.attr.target_executor,
+        target_executor        = ctx.attr.target_executor, # [TargetInfo],
         target_emitter         = ctx.attr.target_emitter,
         ## vm
         runtime                = ctx.file.runtime,
@@ -100,7 +100,7 @@ toolchain_adapter = rule(
 
         #### runtime stuff ####
         # "stdlib": attr.label(
-        #     default   = "//boot/toolchain:stdlib",
+        #     default   = "//toolchain:stdlib",
         #     executable = False,
         #     # allow_single_file = True,
         #     # cfg = "exec",
@@ -121,7 +121,7 @@ toolchain_adapter = rule(
         ################################
         ## Core Tools
         "compiler": attr.label(
-            default = "//boot/toolchain:compiler",
+            default = "//toolchain:compiler",
             allow_files = True,
             executable = True,
             # cfg = "exec"
@@ -129,7 +129,7 @@ toolchain_adapter = rule(
         ),
 
         "lexer": attr.label(
-            default = "//boot/toolchain:lexer",
+            default = "//toolchain:lexer",
             executable = True,
             # cfg = "exec",
             cfg = tc_compiler_out_transition
@@ -169,7 +169,7 @@ toolchain_adapter = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
-    # cfg = toolchain_in_transition,
+    # cfg = tc_compiler_out_transition, # toolchain_in_transition,
     doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
     provides = [platform_common.ToolchainInfo],
 

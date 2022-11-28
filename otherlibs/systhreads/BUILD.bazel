@@ -231,7 +231,7 @@ cc_library(
         # "MODEL_"  + MODEL,
         # "SYS_"    + SYSTEM
     ] +select({
-        "//platform/constraints/ocaml/emitter:sys?": ["NATIVE_CODE"],
+        "//platform/constraints/ocaml/emitter:sys_emitter?": ["NATIVE_CODE"],
         "//conditions:default": []
     # }) + select({
     #     "//config/arch:amd64": ["TARGET_amd64"],

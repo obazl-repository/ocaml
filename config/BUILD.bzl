@@ -1,11 +1,21 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 ################################################################
-def _target_constraint_impl(ctx):
+def _target_executor_constraint_impl(ctx):
     return BuildSettingInfo( value = ctx.attr.constraint )
 
-target_constraint = rule(
-    implementation = _target_constraint_impl,
+target_executor_constraint = rule(
+    implementation = _target_executor_constraint_impl,
+    build_setting = config.string(flag = False),
+    attrs = dict( constraint = attr.string())
+)
+
+################################################################
+def _target_runtime_constraint_impl(ctx):
+    return BuildSettingInfo( value = ctx.attr.constraint )
+
+target_runtime_constraint = rule(
+    implementation = _target_runtime_constraint_impl,
     build_setting = config.string(flag = False),
     attrs = dict( constraint = attr.string())
 )

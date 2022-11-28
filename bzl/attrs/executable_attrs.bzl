@@ -4,6 +4,8 @@ load("//bzl:providers.bzl",
      "OcamlLibraryMarker",
 )
 
+load("//bzl/rules/common:transitions.bzl", "runtime_out_transition")
+
 #######################
 def executable_attrs():
 
@@ -49,11 +51,15 @@ def executable_attrs():
         ),
         _primitives = attr.label( ## file
             allow_single_file = True,
-            default = "//runtime:primitives_dat"
+            default = "//runtime:primitives.dat"
         ),
 
         _runtime = attr.label(
-            default = "//runtime:asmrun"
+            allow_single_file = True,
+            default = "//runtime:asmrun",
+            executable = False,
+            cfg = runtime_out_transition
+            # default = "//config/runtime" # label flag set by transition
         ),
 
         ## The compiler always expects to find stdlib.cm{x}a (hardocded)
@@ -74,7 +80,7 @@ def executable_attrs():
 
         _camlheaders = attr.label_list(
             allow_files = True,
-            default = ["//stdlib:camlheaders"]
+            default = ["//config:camlheaders"]
         ),
 
         exe  = attr.string(
@@ -110,9 +116,13 @@ def executable_attrs():
         # _debug           = attr.label(default = "@ocaml//debug"),
 
         _rule = attr.string( default  = "ocaml_executable" ),
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
+
+        _cc_toolchain = attr.label(
+            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+        ),
     )
 
     return attrs

@@ -3,13 +3,14 @@ package(default_visibility = ["//visibility:public"])
 load("//bzl:rules.bzl",
      "boot_executable",
      "boot_library",
-     "boot_lexer",
+     # "boot_lexer",
      "build_module",
      "build_tool",
      "compiler_module",
      "compiler_signature",
      "ocaml_tool"
 )
+load("//lex:BUILD_RULES.bzl", "lex")
 
 exports_files([
     "check-parser-uptodate-or-warn.sh",
@@ -176,11 +177,18 @@ ocaml_tool(
 # $(cvt_emit): cvt_emit.cmo
 # 	$(CAMLC) $(LINKFLAGS) -o $@ $^
 
-##FIXME: this should only be built as a vm executable
+##FIXME: this should only be built as a vm executable and run once
 # ocaml_tool(
 build_tool(
-    name = "cvt_emit.tool",
+    name = "cvt_emit.byte",
     main = ":Cvt_emit",
+    opts = [
+        "-nostdlib",
+        "-verbose"
+    ],
+    exec_compatible_with   = [
+        "//platform/constraints/ocaml/build/executor:vm_executor",
+    ],
     visibility = ["//asmcomp:__subpackages__"]
 )
 
@@ -198,9 +206,10 @@ build_module(
     ],
 )
 
-boot_lexer(
+lex(
     name = "cvt_emit_ml",
-    src  = "cvt_emit.mll"
+    src  = "cvt_emit.mll",
+    out  = "cvt_emit.ml"
 )
 
 ################################################################
@@ -223,14 +232,13 @@ ocaml_tool(
 # dumpobj$(EXE): $(DUMPOBJ)
 # dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
 
-build_tool(
+ocaml_tool(
     name = "dumpobj",
     main = ":Dumpobj",
     prologue = [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         ":Opnames",
-        ":Dumpobj"
     ],
 )
 
@@ -290,25 +298,24 @@ ocaml_tool(
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
 compiler_module(
     name = "Opnames",
-    struct = "opnames.ml",
+    struct = "//bytecomp:opnames.ml",
     opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI]
+    warnings = [w.MISSING_MLI],
+    deps = ["//stdlib:Stdlib"]
 )
 
-
-# ./runtime/ocamlrun tools/make_opcodes -opcodes < runtime/caml/instruct.h > bytecomp/opcodes.ml
-
-genrule(
-    name = "gen_opnames",
-    outs = ["opnames.ml"],
-    srcs = ["//runtime/caml:instruct.h", ":make_opcodes"],
-    tools = ["//boot/baseline:ocamlrun"],
-    cmd   = " ".join([
-        "$(execpath //boot/baseline:ocamlrun) $(location :make_opcodes)",
-        "-opcodes < $(location //runtime/caml:instruct.h)",
-        "> $@"
-    ])
-)
+## moved to bytecode:opnames.ml
+# genrule(
+#     name = "gen_opnames",
+#     outs = ["opnames.ml"],
+#     srcs = ["//runtime/caml:instruct.h", ":make_opcodes"],
+#     tools = ["//boot/baseline:ocamlrun"],
+#     cmd   = " ".join([
+#         "$(execpath //boot/baseline:ocamlrun) $(location :make_opcodes)",
+#         "-opnames < $(location //runtime/caml:instruct.h)",
+#         "> $@"
+#     ])
+# )
 
 ################################################################
 # LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
@@ -720,7 +727,7 @@ compiler_module(
 #        cmpbyt.cmo
 # cmpbyt$(EXE): $(CMPBYT)
 # cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
-build_tool(
+ocaml_tool(
     name = "cmpbyt",
     main = ":Cmpbyt",
     prologue = [
@@ -755,41 +762,47 @@ build_tool(
 ## run:
 # ./runtime/ocamlrun tools/make_opcodes -opcodes < runtime/caml/instruct.h > bytecomp/opcodes.ml
 
+## WARNING: make_opcodes replaced by mustache templating,
+## see //bytecomp:opcodes_ml, //bytecomp:opnames_ml,
+## //runtime/caml:instruct_h, //runtime/caml:jumptbl_h,
+## //runtime/caml:opnames_h
+
 # baseline_executable(
 #     name = "baseline_opcodes",
 #     main = ":Make_opcodes",
 #     visibility = ["//bytecomp:__pkg__"]
 # )
 
-build_tool(
-    name = "make_opcodes",
-    data = ["//stdlib:camlheaders"],
-    main = ":Make_opcodes",
-    prologue = [
-        # "//stdlib:Std_exit",
-        "//stdlib"
-    ],
-    visibility = ["//bytecomp:__pkg__"]
-)
+# build_tool(
+#     name = "make_opcodes",
+#     data = ["//stdlib:camlheaders"],
+#     main = ":Make_opcodes",
+#     prologue = [
+#         # "//stdlib:Std_exit",
+#         "//stdlib"
+#     ],
+#     visibility = ["//bytecomp:__pkg__"]
+# )
 
-compiler_module(
-    name   = "Make_opcodes",
-    struct = "make_opcodes_ml",
-    nocopts = True,
-    deps = [
-        "//stdlib:Stdlib",
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Printf",
-    ],
-    opts = ["-nostdlib"],
-    warnings = [w.MISSING_MLI]
-)
+# compiler_module(
+#     name   = "Make_opcodes",
+#     struct = "make_opcodes_ml",
+#     nocopts = True,
+#     deps = [
+#         "//stdlib:Stdlib",
+#         "//stdlib:Stdlib.Arg",
+#         "//stdlib:Stdlib.Lexing",
+#         "//stdlib:Stdlib.Printf",
+#     ],
+#     opts = ["-nostdlib"],
+#     warnings = [w.MISSING_MLI]
+# )
 
-boot_lexer(
-    name = "make_opcodes_ml",
-    src  = "make_opcodes.mll",
-)
+# lex(
+#     name = "make_opcodes_ml",
+#     src  = "make_opcodes.mll",
+#     out  = "make_opcodes.ml",
+# )
 
 ################################################################
 load("@bazel_skylib//rules:build_test.bzl", "build_test")

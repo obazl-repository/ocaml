@@ -1,30 +1,9 @@
 exports_files(["BUILD.bazel"])
 
-load(":BUILD.bzl", "toolchain_adapter") # , "stdlib_toolchain_adapter")
+load("//toolchain/adapter:BUILD.bzl", "toolchain_adapter")
 
-##################
-# toolchain_adapter(
-#     name        = "vmvm",
-#     # # build_emitter = "//config/build/emitter:vm",
-#     # target_emitter = "//config/build/emitter:vm",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
+## NB: these are all the same, but for debugging they need different
+## names. Use aliases?
 
 ##################
 toolchain_adapter(
@@ -111,53 +90,8 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-# ##################
-# toolchain_adapter(
-#     name        = "vmsys",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
-# toolchain_adapter(
-#     name        = "sys",
-#     target_executor = "sys",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
 toolchain_adapter(
-    name        = "sys_vm_sys__sys_sys_sys",
-    target_executor = "sys",
+    name        = "ss_ss",
     copts       = [ ## compile opts (sigs/modules only)
         "-nostdlib",  ## inserted by rule
         "-strict-sequence",
@@ -177,11 +111,8 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-################################################################
-##################
 toolchain_adapter(
-    name        = "boot",
-    target_executor = "vm",
+    name        = "ss_sv",
     copts       = [ ## compile opts (sigs/modules only)
         "-nostdlib",  ## inserted by rule
         "-strict-sequence",

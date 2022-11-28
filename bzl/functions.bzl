@@ -27,19 +27,44 @@ def tc_compiler(tc): return tc.compiler[0]
 def tc_lexer(tc): return tc.lexer[0]
 
 ######################
-def stage_name(_stage):
-    stage = _stage[BuildSettingInfo].value
-    if stage == 0:
-        workdir = "boot"
-    elif stage == 1:
-        workdir = "baseline"
-    elif stage == 2:
-        workdir = "dev"
-    elif stage == 3:
-        workdir = "prod"
+def get_workdir(tc):
+    # build_emitter = tc.build_emitter[BuildSettingInfo].value
+    target_executor = tc.target_executor[BuildSettingInfo].value
+    target_emitter  = tc.target_emitter[BuildSettingInfo].value
+    stage = int(tc._stage[BuildSettingInfo].value)
+
+    ## WARNING: final (3rd) stage is always -1 (default for //config/stage)
+
+    if stage in [0, 1]:
+        workdir = "_boot/"
+    elif stage < 0:
+        workdir = "_stable/"
     else:
-        fail("exec UHANDLED STAGE: %s" % stage)
-    return workdir
+        workdir = "_{b}{t}{s}/".format(
+            b = target_executor, t = target_emitter, s = (stage - 1))
+
+    # first stage always has vm executor
+    if stage in [0, 1]:
+        executor = "vm"
+    elif stage == 2:
+        executor = "vm"
+    elif target_executor == "vm":
+        # ext = ".cmo"
+        executor = "vm"
+    elif target_executor == "sys":
+        # ext = ".cmx"
+        executor = "sys"
+    else:
+        fail("Bad target_executor: %s" % target_executor)
+
+    # if target_executor == "vm":
+    #     ext = ".cmo"
+    # elif target_executor == "sys":
+    #     ext = ".cmx"
+    # else:
+    #     fail("Bad target_executor: %s" % target_executor)
+
+    return stage, executor, target_emitter, workdir
 
 ###################################
 def submodule_from_label_string(s):

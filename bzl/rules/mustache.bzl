@@ -42,12 +42,14 @@ mustache = rule(
         ),
         "_tool": attr.label(
             allow_single_file = True,
+            executable = True,
+            cfg = "exec",
             default = "//vendor/mustach"
         ),
         # "_cc_toolchain": attr.label(
         #     default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
         # ),
     },
-    # toolchains = use_cpp_toolchain(),
+    toolchains = use_cpp_toolchain(),
     # fragments = ["cpp", "platform"],
 )

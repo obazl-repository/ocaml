@@ -43,18 +43,18 @@ def _dynlink_signature(ctx):
 dynlink_signature = rule(
     implementation = _dynlink_signature,
     doc = "Sig rule for bootstrapping ocaml compilers",
-    exec_groups = {
-        "boot": exec_group(
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
     attrs = dict(
         signature_attrs(),
 
@@ -68,12 +68,12 @@ dynlink_signature = rule(
 
         _rule = attr.string( default = "dynlink_signature" ),
     ),
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
-    # toolchains = [
-    #     # "//toolchain/type:boot",
-    #     "@bazel_tools//tools/cpp:toolchain_type"
-    # ]
+    # fragments = ["cpp"],
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
 ################################################################
@@ -89,22 +89,22 @@ def _dynlink_module(ctx):
 dynlink_module = rule(
     implementation = _dynlink_module,
     doc = "Compiles a module with the bootstrap compiler.",
-    exec_groups = {
-        "boot": exec_group(
-            # exec_compatible_with = [
-            #     "//platform/constraints/ocaml/build/executor:vm",
-            #     "//platform/constraints/ocaml/build/emitter:vm"
-            # ],
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         # exec_compatible_with = [
+    #         #     "//platform/constraints/ocaml/build/executor:vm_executor",
+    #         #     "//platform/constraints/ocaml/build/emitter:vm_emitter"
+    #         # ],
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
     attrs = dict(
         module_attrs(),
 
@@ -123,8 +123,8 @@ dynlink_module = rule(
     executable = False,
     # fragments = ["platform", "cpp"],
     # host_fragments = ["platform",  "cpp"],
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    # toolchains = [# "//toolchain/type:boot",
-    #               # "//toolchain/type:profile",
-    #               "@bazel_tools//tools/cpp:toolchain_type"]
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )

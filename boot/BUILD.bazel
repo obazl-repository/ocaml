@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//bzl:rules.bzl", "boot_coldstart", "boot_import_tool")
+load("//bzl:rules.bzl", "boot_coldstart", "boot_import_vm_executable")
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
@@ -34,13 +34,10 @@ sh_binary(
 )
 
 ################################################################
-boot_import_tool(
+boot_import_vm_executable(
     name = "ocamlc.boot",
     tool = "ocamlc",
-    data = [
-        "//runtime:ocamlrun",
-        # "//stdlib:camlheaders"
-    ],
+    # runtime = "//runtime:ocamlrun"
 )
 
 sh_binary(
@@ -62,10 +59,10 @@ sh_binary(
 )
 
 ################################################################
-boot_import_tool(
+boot_import_vm_executable(
     name = "ocamllex.boot",
     tool = "ocamllex",
-    data = ["//runtime:ocamlrun"],
+    # runtime = "//runtime:ocamlrun"
 )
 
 sh_binary(

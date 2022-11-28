@@ -118,6 +118,7 @@ config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
 bool_flag( name = "absname", build_setting_default = True)
 config_setting(name = "absname?", flag_values = {":absname": "True"})
 
+label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
 
 label_flag( name = "primitives",
             build_setting_default = "//runtime:primitives")

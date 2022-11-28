@@ -48,8 +48,8 @@ compiler_signature(
 compiler_module(
     name   = "UnixLabels",
     struct = "unixLabels.ml",
-    sig    = "_build/unixLabels.mli",
-    # sig    = "UnixLabels_cmi",
+    # sig    = "unixLabels.mli",
+    sig    = "UnixLabels_cmi",
     opts = MODULE_OPTS + [
         "-nolabels" # ignore labels in the cmi file
     ],
@@ -60,7 +60,7 @@ compiler_module(
 
 compiler_signature(
     name = "UnixLabels_cmi",
-    src  = "_build/unixLabels.mli",
+    src  = "unixLabels.mli",
     opts = SIG_OPTS,
     deps   = [
         "//stdlib:Stdlib",
@@ -73,12 +73,12 @@ compiler_signature(
 
 genrule(
     name = "unixLabels_mli_awk",
-    outs = ["_build/unixLabels.mli"],
-    srcs = ["unixLabels.mli",
+    outs = ["unixLabels.mli"],
+    srcs = ["unixLabels.raw.mli",
             "//stdlib:expand_module_aliases.awk"],
     cmd_bash  = " ".join([
         "awk -f $(location //stdlib:expand_module_aliases.awk)",
-        "$(location :unixLabels.mli)",
+        "$(location :unixLabels.raw.mli)",
         "> $@"
     ]),
 )

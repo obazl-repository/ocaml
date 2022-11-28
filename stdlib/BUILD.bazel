@@ -3,7 +3,8 @@ load("//bzl:rules.bzl",
      "boot_camlheaders",
      "boot_library",
      "boot_module",
-     "boot_signature")
+     "boot_signature",
+     "mustache")
 
 load(":BUILD_RULES.bzl",
      "stdlib_boot_module", "stdlib_module",
@@ -76,7 +77,6 @@ stdlib_boot_module(
     ],
     warnings = [NO_CMI_FILE],
     deps = [":CamlinternalFormatBasics",],
-    # pp_deps = ["//stdlib:expand_module_aliases.awk"],
 )
 
 # WARNING: if we run this as a separate task (instead of passing the
@@ -556,6 +556,7 @@ stdlib_signature(
     name = "Stdlib.Char_cmi",
     src  = "char.mli",
     opts = SIG_OPTS,
+    deps   = [":Stdlib_cmi"],
 )
 
 stdlib_module(
@@ -1712,37 +1713,37 @@ stdlib_signature(
 # $(HEADERPROGRAM)%$(O): \
 #   OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
 
-SYSPATHS_CMD = " ".join([
-    "cat bazel-out/stable-status.txt | ",
-    "grep \"STABLE_CAMLHEADER \" | ",
-    "cut -d ' ' -f 2 - ",
-    "> $(location camlheader);",
+# SYSPATHS_CMD = " ".join([
+#     "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_CAMLHEADER \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location camlheader);",
 
-        "cat bazel-out/stable-status.txt | ",
-    "grep \"STABLE_TARGET_CAMLHEADER \" | ",
-    "cut -d ' ' -f 2 - ",
-    "> $(location target_camlheader);",
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_TARGET_CAMLHEADER \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location target_camlheader);",
 
-        "cat bazel-out/stable-status.txt | ",
-    "grep \"STABLE_CAMLHEADERD \" | ",
-    "cut -d ' ' -f 2 - ",
-    "> $(location camlheaderd);",
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_CAMLHEADERD \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location camlheaderd);",
 
-        "cat bazel-out/stable-status.txt | ",
-    "grep STABLE_TARGET_CAMLHEADERD | ",
-    "cut -d ' ' -f 2 - ",
-    "> $(location target_camlheaderd);",
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep STABLE_TARGET_CAMLHEADERD | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location target_camlheaderd);",
 
-        "cat bazel-out/stable-status.txt | ",
-    "grep \"STABLE_CAMLHEADERI \" | ",
-    "cut -d ' ' -f 2 - ",
-    "> $(location camlheaderi);",
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_CAMLHEADERI \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location camlheaderi);",
 
-        "cat bazel-out/stable-status.txt | ",
-    "grep \"STABLE_TARGET_CAMLHEADERI \" | ",
-    "cut -d ' ' -f 2 - ",
-    "> $(location target_camlheaderi);",
-])
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_TARGET_CAMLHEADERI \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location target_camlheaderi);",
+# ])
 
 ## IMPORTANT! For this to work, the following cli args must be passed:
 # --stamp
@@ -1750,59 +1751,56 @@ SYSPATHS_CMD = " ".join([
 
 ## FIXME: select camlheader content: for running under Bazel, null, otherwise installation path,
 ## not $(execpath //boot/baseline:ocamlrun)?
-DEVPATHS_CMD = "\n".join([
-    "cat bazel-out/stable-status.txt | ",
-    "while read KEY VAL; do",
-    "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
-    "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun) > $(location _build/camlheader);\n",
-    "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)d > $(location _build/camlheaderd);\n",
-    "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)i > $(location _build/camlheaderi);\n",
-    # "touch $(location camlheader);\n",
-    # "touch $(location camlheaderd);\n",
-    # "touch $(location camlheaderi);\n",
-    "fi",
-    "done",
+# DEVPATHS_CMD = "\n".join([
+#     "cat bazel-out/stable-status.txt | ",
+#     "while read KEY VAL; do",
+#     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
+#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun) > $(location _build/camlheader);\n",
+#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)d > $(location _build/camlheaderd);\n",
+#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)i > $(location _build/camlheaderi);\n",
+#     # "touch $(location camlheader);\n",
+#     # "touch $(location camlheaderd);\n",
+#     # "touch $(location camlheaderi);\n",
+#     "fi",
+#     "done",
 
-    "echo '#!$(execpath //boot/baseline:ocamlrun)' > $(location _build/target_camlheader);",
-    "echo '#!$(execpath //boot/baseline:ocamlrun)d' > $(location _build/target_camlheaderd);",
-    "echo '#!$(execpath //boot/baseline:ocamlrun)i' > $(location _build/target_camlheaderi);",
-])
+#     "echo '#!$(execpath //boot/baseline:ocamlrun)' > $(location _build/target_camlheader);",
+#     "echo '#!$(execpath //boot/baseline:ocamlrun)d' > $(location _build/target_camlheaderd);",
+#     "echo '#!$(execpath //boot/baseline:ocamlrun)i' > $(location _build/target_camlheaderi);",
+# ])
 
 boot_camlheaders(
     name     = "camlheaders",
     template = "camlheader.template",
-    runtimes  = [
-        "//runtime:ocamlrun",
-        # "//boot/baseline:ocamlrun",
-        # "//boot/baseline:ocamlrund",  # if we had this
-        # "//boot/baseline:ocamlruni",
-    ],
-    prefix   = "$PWD",
+    # runtime  = "//runtime:ocamlrun",
+    # target_compatible_with = [
+    #     "//platform/constraints/ocaml/executor:vm_executor"
+    # ]
 )
 
-genrule(
-    name = "Xcamlheaders",
-    outs = [
-        "_build/camlheader",
-        "_build/camlheaderd",
-        "_build/camlheaderi",
-        # "camlheader_ur",
-        "_build/target_camlheader",
-        "_build/target_camlheaderd",
-        "_build/target_camlheaderi"
-    ],
-    # srcs = [
-    #     "//boot/baseline:ocamlrun",
-    #     "//bzl/toolchain:ocamlrun"
-    # ],
-    srcs = [
-        "//boot/baseline:ocamlrun",
-        "//bzl/toolchain:ocamlrun"
-    ],
-    cmd = DEVPATHS_CMD,
-    stamp = True,
-    visibility = ["//visibility:public"]
-)
+# genrule(
+#     name = "Xcamlheaders",
+#     outs = [
+#         "_build/camlheader",
+#         "_build/camlheaderd",
+#         "_build/camlheaderi",
+#         # "camlheader_ur",
+#         "_build/target_camlheader",
+#         "_build/target_camlheaderd",
+#         "_build/target_camlheaderi"
+#     ],
+#     # srcs = [
+#     #     "//boot/baseline:ocamlrun",
+#     #     "//bzl/toolchain:ocamlrun"
+#     # ],
+#     srcs = [
+#         "//boot/baseline:ocamlrun",
+#         "//bzl/toolchain:ocamlrun"
+#     ],
+#     cmd = DEVPATHS_CMD,
+#     stamp = True,
+#     visibility = ["//visibility:public"]
+# )
 
 ################################################################
 ## cmigroup used by `//promote` targets

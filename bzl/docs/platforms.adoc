@@ -64,8 +64,8 @@ structure. The available platforms are:
 
     ** `@platforms//os:macos`       (defined by Bazel)
     ** `@platforms//cpu:x86_64`  (defined by Bazel)
-    ** `//platform/constraints/ocaml/executor:vm`                    (defined by OBazl)
-    ** `//platform/constraints/ocaml/emitter:vm`                    (defined by OBazl)
+    ** `//platform/constraints/ocaml/executor:vm_executor`                    (defined by OBazl)
+    ** `//platform/constraints/ocaml/emitter:vm_emitter`                    (defined by OBazl)
 
 * `//platform:macos_amd64_vm_sys` - produce a mac amd64 runtime and a vm compiler
   that emits mac amd64 code, i.e. `ocamlopt.byte` for the mac.

@@ -6,7 +6,7 @@ load("//bzl:providers.bzl",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
 load("//bzl:functions.bzl",
-     "get_module_name", "stage_name", "tc_compiler")
+     "get_module_name", "get_workdir", "tc_compiler")
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:options.bzl", "get_options")
@@ -29,68 +29,78 @@ def module_impl(ctx, module_name):
     # tc = ctx.exec_groups[ctx.attr._stage].toolchains[
     #     "//toolchain/type:{}".format(ctx.attr._stage)
     # ]
-    # tc = ctx.toolchains["//toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+
+    tc = ctx.toolchains["//toolchain/type:boot"]
     # print("tc target_host: %s" % tc.target_host)
 
-    tc = ctx.exec_groups["boot"].toolchains["//boot/toolchain/type:boot"]
+    (stage, executor, emitter, workdir) = get_workdir(tc)
 
-    # build_emitter = tc.build_emitter[BuildSettingInfo].value
+    if executor == "vm":
+        ext = ".cmo"
+    else:
+        ext = ".cmx"
 
-    # if debug_bootstrap:
-    #     print("build_emitter: %s" % build_emitter)
-    #     print("host.host_platform: %s" % ctx.fragments.platform.host_platform)
-    #     print("host.platform: %s" % ctx.fragments.platform.platform)
+    # target_runtime = tc.target_runtime[BuildSettingInfo].value
+    # target_executor = tc.target_executor[BuildSettingInfo].value
+    # target_emitter  = tc.target_emitter[BuildSettingInfo].value
+    # stage = int(tc._stage[BuildSettingInfo].value)
 
-    #     print("target.host_platform: %s" % ctx.host_fragments.platform.host_platform)
-    #     print("target.platform: %s" % ctx.host_fragments.platform.platform)
-
-    target_runtime = tc.target_runtime[BuildSettingInfo].value
-    target_executor = tc.target_executor[BuildSettingInfo].value
-    target_emitter  = tc.target_emitter[BuildSettingInfo].value
-
-    # if debug_bootstrap:
-    #     print("target_runtime : %s" % target_runtime)
-    #     print("target_executor: %s" % target_executor)
-    #     print("target_emitter : %s" % target_emitter)
-    #     fail("BB")
-
-    # if ctx.label.name == "CamlinternalFormatBasics":
-    #     fail("C")
-    stage = tc._stage[BuildSettingInfo].value
     if debug_bootstrap:
         print("module _stage: %s" % stage)
+    # workdir = "_{b}{t}{stage}/".format(
+    #     b = target_executor, t = target_emitter, stage = (stage -  1))
 
-    if stage == 2:
-        ext = ".cmx"
-    else:
-        if target_executor == "vm":
-            ext = ".cmo"
-        elif target_executor == "sys":
-            ext = ".cmx"
-        else:
-            fail("Bad target_executor: %s" % target_executor)
+    # if stage == 2:
+    #     ext = ".cmx"
+    # elset:
 
-    workdir = "_{b}{t}{stage}/".format(
-        b = target_executor, t = target_emitter, stage = stage)
+    ## set ext based on compiler capabilities
+    ## how do we discover those?
+    ## if the compiler emitter is vm, then vm, else sys
+    ## this should match buildhost emitter?
+    ## problem is mismatch between e.g. ss_ss toolchain and the
+    ## compiler it contains.
+
+
+    # if target_executor != target_emitter:
+    #     fail("mismatch")
+
+    # if stage < 2:
+    #     ext = ".cmo"
+    # elif target_executor == "vm":
+    #     ext = ".cmo"
+    #     # if target_emitter == "vm":
+    #     #     ext = ".cmo"
+    #     # else:
+    #     #     ext = ".cmo"
+    # elif target_executor == "sys":
+    #     ext = ".cmx"
+    #     # if target_emitter == "sys":
+    #     #     ext = ".cmx"
+    #     # else:
+    #     #     ext = ".cmx"
+    # else:
+    #     fail("Bad target_executor: %s" % target_executor)
 
     # workdir = "_{}/".format(stage)
 
     # tc = None
     # if stage == "boot":
     #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
+    #         "//toolchain/type:boot"]
     # elif stage == "baseline":
     #     tc = ctx.exec_groups["baseline"].toolchains[
-    #         "//boot/toolchain/type:baseline"]
+    #         "//toolchain/type:baseline"]
     # elif stage == "dev":
     #     tc = ctx.exec_groups["dev"].toolchains[
-    #         "//boot/toolchain/type:baseline"]
+    #         "//toolchain/type:baseline"]
     # else:
     #     print("UNHANDLED STAGE: %s" % stage)
     #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
+    #         "//toolchain/type:boot"]
 
-    # if //platform/constraints/ocaml/emitter:vm?
+    # if //platform/constraints/ocaml/emitter:vm_emitter?
 
     ################################################################
     ################  OUTPUTS  ################
@@ -104,7 +114,7 @@ def module_impl(ctx, module_name):
 
     ################
     includes   = []
-    # default_outputs    = [] # just the cmx/cmo files, for efaultInfo
+    default_outputs    = [] # .cmo or .cmx+.o, for DefaultInfo
     action_outputs   = [] # .cmx, .cmi, .o
     # direct_linkargs = []
     # old_cmi = None
@@ -244,13 +254,17 @@ def module_impl(ctx, module_name):
         print("OUT_CM_: %s" % out_cm_.path)
     action_outputs.append(out_cm_)
     # direct_linkargs.append(out_cm_)
-    # default_outputs.append(out_cm_)
+    default_outputs.append(out_cm_)
 
+    moduleInfo_ofile = None
     if ext == ".cmx":
         # if not ctx.attr._rule.startswith("bootstrap"):
-        out_o = ctx.actions.declare_file(module_name + ".o",
-                                         sibling = out_cm_)
+        out_o = ctx.actions.declare_file(workdir + module_name + ".o")
+                                         # sibling = out_cm_)
         action_outputs.append(out_o)
+        default_outputs.append(out_o)
+        moduleInfo_ofile = out_o
+        # print("OUT_O: %s" % out_o)
         # direct_linkargs.append(out_o)
 
     ################################################################
@@ -367,29 +381,35 @@ def module_impl(ctx, module_name):
     #########################
     args = ctx.actions.args()
 
-    ## ocamlrun
-    tool = None
-    for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-        if f.basename == "ocamlrun":
-            # print("LEX RF: %s" % f.path)
-            tool = f
+    executable = None
+    if executor == "vm":
+        ## ocamlrun
+        for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+            if f.basename == "ocamlrun":
+                # print("LEX RF: %s" % f.path)
+                executable = f
+            # the bytecode executable
+        args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    else:
+        executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
-    # the bytecode executable
-    args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    # if ext == ".cmx":
+    #     args.add("-verbose")
 
     ## FIXME: -use-prims not needed for compilation?
-    if ctx.attr.use_prims == True:
-        args.add_all(["-use-prims", ctx.file._primitives.path])
-    else:
-        if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
+    if ext == ".cmo":
+        if ctx.attr.use_prims == True:
             args.add_all(["-use-prims", ctx.file._primitives.path])
         else:
-            if ctx.attr._use_prims[BuildSettingInfo].value:
-                if not "-no-use-prims" in ctx.attr.opts:
-                    args.add_all(["-use-prims", ctx.file._primitives.path])
+            if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
+                args.add_all(["-use-prims", ctx.file._primitives.path])
             else:
-                if  "-use-prims" in ctx.attr.opts:
-                    args.add_all(["-use-prims", ctx.file._primitives.path])
+                if ctx.attr._use_prims[BuildSettingInfo].value:
+                    if not "-no-use-prims" in ctx.attr.opts:
+                        args.add_all(["-use-prims", ctx.file._primitives.path])
+                else:
+                    if  "-use-prims" in ctx.attr.opts:
+                        args.add_all(["-use-prims", ctx.file._primitives.path])
 
     resolver = None
     resolver_deps = []
@@ -466,20 +486,23 @@ def module_impl(ctx, module_name):
         args.add("-impl", in_structfile) # structfile)
         args.add("-o", out_cm_)
 
+    # print("ACTION_OUTPUTS: %s" % action_outputs)
     ################
     ctx.actions.run(
         # env = env,
-        executable = tool,
+        executable = executable,
         # executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs    = inputs_depset,
         outputs   = action_outputs,
-        tools = [tc_compiler(tc)[DefaultInfo].files_to_run],
-        # tools = [tc.tool_runner, tc.compiler],
-        # tools = [tool] + tool_args,
+        tools = [
+            tc_compiler(tc)[DefaultInfo].default_runfiles.files,
+            tc_compiler(tc)[DefaultInfo].files_to_run
+        ],
         mnemonic = "CompileBootstrapModule",
-        progress_message = "{mode} compiling {rule}: {ws}//{pkg}:{tgt}".format(
-            mode = tc.build_host + ">" + tc.target_host[BuildSettingInfo].value,
+        progress_message = "stage {s}({wd}): compiling {rule}: {ws}//{pkg}:{tgt}".format(
+            s = stage,
+            wd = workdir,
             rule=ctx.attr._rule,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
@@ -492,7 +515,8 @@ def module_impl(ctx, module_name):
 
     default_depset = depset(
         order = dsorder,
-        direct = [out_cm_], ## default_outputs,
+        # only output one file; for cmx, get .o from ModuleInfo
+        direct = [out_cm_], # default_outputs,
         # transitive = [depset(direct=default_outputs)]
         # transitive = bottomup_ns_files + [depset(direct=default_outputs)]
     )
@@ -503,13 +527,15 @@ def module_impl(ctx, module_name):
     providers = [defaultInfo]
 
     moduleInfo_depset = depset(
+        ## FIXME: add ofile?
         direct= [provider_output_cmi, out_cm_],
     )
     moduleInfo = ModuleInfo(
         sig    = provider_output_cmi,
         struct = out_cm_,
-
+        ofile  = moduleInfo_ofile
     )
+
     providers.append(moduleInfo)
 
     if hasattr(ctx.attr, "_resolver"):

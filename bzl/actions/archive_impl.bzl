@@ -3,12 +3,13 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
      "BootInfo",
+     "ModuleInfo",
      "new_deps_aggregator",
      "OcamlArchiveProvider")
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
-load("//bzl:functions.bzl", "stage_name", "tc_compiler")
+load("//bzl:functions.bzl", "tc_compiler", "get_workdir")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -20,54 +21,16 @@ load("//bzl/rules/common:DEPS.bzl",
 
 ###############################
 def archive_impl(ctx):
-
-    tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
-
-    # build_emitter = tc.build_emitter[BuildSettingInfo].value
-    # print("BEMITTER: %s" % build_emitter)
-
-    target_executor = tc.target_executor[BuildSettingInfo].value
-    target_emitter  = tc.target_emitter[BuildSettingInfo].value
-
-    stage = tc._stage[BuildSettingInfo].value
-    print("module _stage: %s" % stage)
-
-    if stage == 2:
-        ext = ".cmxa"
-    else:
-        if target_executor == "vm":
-            ext = ".cma"
-        elif target_executor == "sys":
-            ext = ".cmxa"
-        else:
-            fail("Bad target_executor: %s" % target_executor)
-
-    workdir = "_{b}{t}{stage}/".format(
-        b = target_executor, t = target_emitter, stage = stage)
-
-    # print("archive _stage: %s" % stage)
-
-    # if stage == "boot":
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # elif stage == "baseline":
-    #     tc = ctx.exec_groups["baseline"].toolchains[
-    #         "//boot/toolchain/type:baseline"]
-    # elif stage == "dev":
-    #     #FIXME
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # else:
-    #     print("UNHANDLED STAGE: %s" % stage)
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-
     debug = False # True
-    # if ctx.label.name == "Bare_structs":
-    #     debug = True #False
 
-    # env = {"PATH": get_sdkpath(ctx)}
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:boot"]
+    (stage, executor, emitter, workdir) = get_workdir(tc)
+
+    if executor == "vm":
+        ext = ".cma"
+    else:
+        ext = ".cmxa"
 
     ################################################################
     ################  OUTPUTS: out_archive  ################
@@ -90,9 +53,11 @@ def archive_impl(ctx):
     # paths_direct.append(archive_file.dirname)
     action_outputs.append(out_archive)
 
-    if not tc.target_host:
+    afile = []
+    if ext == ".cmxa":
         archive_a_filename = archive_name + ".a"
         archive_a_file = ctx.actions.declare_file(workdir + archive_a_filename)
+        afile.append(archive_a_file)
         # paths_direct.append(archive_a_file.dirname)
         action_outputs.append(archive_a_file)
 
@@ -105,7 +70,12 @@ def archive_impl(ctx):
         manifest.append(dep[DefaultInfo].files)
 
     for dep in ctx.attr.manifest:
+        # if ctx.label == Label("@//compilerlibs:ocamlcommon"):
+        #     print("dep[ModuleInfo]: %s" % dep[BootInfo])
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
+
+    # if ctx.label == Label("@//compilerlibs:ocamlcommon"):
+    #     print("ofiles: %s" % depsets.deps.ofiles)
 
     sigs_depset = depset(
         order=dsorder,
@@ -113,7 +83,7 @@ def archive_impl(ctx):
 
     cli_link_deps_depset = depset(
         order = dsorder,
-        direct = [out_archive],
+        # direct = [out_archive],
         transitive = [merge_depsets(depsets, "cli_link_deps")]
     )
 
@@ -149,14 +119,17 @@ def archive_impl(ctx):
     #########################
     args = ctx.actions.args()
 
-    tool = None
-    for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-        if f.basename == "ocamlrun":
-            # print("LEX RF: %s" % f.path)
-            tool = f
-
-    # the bytecode executable
-    args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    executable = None
+    if executor == "vm":
+        ## ocamlrun
+        for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+            if f.basename == "ocamlrun":
+                # print("LEX RF: %s" % f.path)
+                executable = f
+            # the bytecode executable
+        args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    else:
+        executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
     if hasattr(ctx.attr, "use_prims"):
         if ctx.attr.use_prims:
@@ -397,6 +370,8 @@ def archive_impl(ctx):
 
     for dep in filtering_depset.to_list():
         if dep in manifest:
+            # if ctx.label == Label("@//compilerlibs:ocamlcommon"):
+            #     print("DEP: %s" % dep)
             args.add(dep)
 
     args.add_all(includes, before_each="-I", uniquify=True)
@@ -424,14 +399,17 @@ def archive_impl(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tool,
+        executable = executable,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
-        tools = [tc_compiler(tc)[DefaultInfo].files_to_run],
+        tools = [
+            tc_compiler(tc)[DefaultInfo].default_runfiles.files,
+            tc_compiler(tc)[DefaultInfo].files_to_run
+        ],
         mnemonic = mnemonic,
-        progress_message = "{mode} archiving {rule}: @{ws}//{pkg}:{tgt}".format(
-            mode = tc.build_host + ">" + tc.target_host[BuildSettingInfo].value,
+        progress_message = "stage {s} archiving {rule}: @{ws}//{pkg}:{tgt}".format(
+            s = stage,
             rule = ctx.attr._rule,
             ws  = ctx.label.workspace_name,
             pkg = ctx.label.package,
@@ -490,6 +468,18 @@ def archive_impl(ctx):
 
     ocamlArchiveProvider = OcamlArchiveProvider(
         # manifest = manifest_depset
+    )
+
+    cli_link_deps_depset = depset(
+        order = dsorder,
+        direct = [out_archive],
+        transitive = [merge_depsets(depsets, "cli_link_deps")]
+    )
+
+    afiles_depset  = depset(
+        order=dsorder,
+        direct = afile,
+        transitive = [merge_depsets(depsets, "afiles")]
     )
 
     bootProvider = BootInfo(

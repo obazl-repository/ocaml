@@ -70,10 +70,10 @@ config_setting(
 compiler_module(
     name   = "Dynlink",
     struct = select({
-        "//platform/constraints/ocaml/emitter:vm?":
+        "//platform/constraints/ocaml/emitter:vm_emitter?":
         "//otherlibs/dynlink/byte:dynlink.ml",
 
-        "//platform/constraints/ocaml/emitter:sys?":
+        "//platform/constraints/ocaml/emitter:sys_emitter?":
         "//otherlibs/dynlink/native:dynlink.ml",
     }),
     sig    = "Dynlink_cmi",
@@ -92,7 +92,7 @@ compiler_module(
         ":Dynlink_common",
         ":Dynlink_types",
     ] + select({
-        "//platform/constraints/ocaml/emitter:vm?": [
+        "//platform/constraints/ocaml/emitter:vm_emitter?": [
             "//bytecomp:Dll",
             "//bytecomp:Meta",
             "//bytecomp:Opcodes",
@@ -105,7 +105,7 @@ compiler_module(
             "Dynlink_compilerlibs.Misc",
             ## (LongString)
         ],
-        "//platform/constraints/ocaml/emitter:sys?": [
+        "//platform/constraints/ocaml/emitter:sys_emitter?": [
             "//file_formats:Cmxs_format",
             "//stdlib:Stdlib.Filename",
         ]

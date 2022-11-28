@@ -5,7 +5,7 @@ load("//bzl/rules:build_tool.bzl", _build_tool = "build_tool")
 load("//bzl/rules:ocaml_tool.bzl", _ocaml_tool = "ocaml_tool")
 load("//bzl/rules:build_module.bzl", _build_module = "build_module")
 
-load("//bzl/rules:boot_import_tool.bzl", _boot_import_tool = "boot_import_tool")
+load("//bzl/rules:boot_import_vm_executable.bzl", _boot_import_vm_executable = "boot_import_vm_executable")
 
 load("//bzl/rules:boot_coldstart.bzl",
      _boot_coldstart = "boot_coldstart")
@@ -38,7 +38,7 @@ load("//bzl/rules:boot_library.bzl",
 # load("//bzl/rules:bootstrap_preprocess.bzl",
 #      _bootstrap_preprocess = "bootstrap_preprocess")
 
-load("//bzl/rules:boot_lexer.bzl", _boot_lexer = "boot_lexer")
+# load("//bzl/rules:boot_lexer.bzl", _boot_lexer = "boot_lexer")
 
 # load("//bzl/rules:bootstrap_repl.bzl",
 #      _bootstrap_repl = "bootstrap_repl")
@@ -62,7 +62,7 @@ cc_assemble = _cc_assemble
 ocaml_tool      = _ocaml_tool
 build_module      = _build_module
 build_tool      = _build_tool
-boot_import_tool      = _boot_import_tool
+boot_import_vm_executable      = _boot_import_vm_executable
 boot_coldstart      = _boot_coldstart
 boot_config      = _boot_config
 boot_archive      = _boot_archive
@@ -74,7 +74,7 @@ boot_module      = _boot_module
 compiler_module      = _compiler_module
 # bootstrap_ns = _bootstrap_ns
 # bootstrap_preprocess  = _bootstrap_preprocess
-boot_lexer = _boot_lexer
+# boot_lexer = _boot_lexer
 
 # bootstrap_repl   = _bootstrap_repl
 boot_signature   = _boot_signature

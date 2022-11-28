@@ -22,8 +22,8 @@ load("//bzl:rules.bzl",
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
 ## no //middle_end stuff:
-boot_library(
-# boot_archive(
+# boot_library(
+boot_archive(
     name = "ocamlcommon",
     opts = ["-linkall"],
     manifest  = [

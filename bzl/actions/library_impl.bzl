@@ -1,9 +1,8 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl:functions.bzl", "stage_name")
-
 load("//bzl:providers.bzl",
      "BootInfo",
+     "ModuleInfo",
      "new_deps_aggregator",
      "OcamlLibraryMarker")
 
@@ -12,6 +11,8 @@ load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
      "merge_depsets")
+
+load("//bzl:functions.bzl", "get_workdir")
 
 ## Library targets do not produce anything, they just merge their deps
 ## and pass them on.
@@ -22,28 +23,14 @@ def library_impl(ctx):
     debug = False
     # print("**** NS_LIB {} ****************".format(ctx.label))
 
-    tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:boot"]
+    (stage, executor, emitter, workdir) = get_workdir(tc)
 
-    workdir = "_{}/".format(stage_name(tc._stage))
-
-    # stage = ctx.attr._stage[BuildSettingInfo].value
-    # # print("library _stage: %s" % stage)
-
-    # tc = None
-    # if stage == "boot":
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # elif stage == "baseline":
-    #     tc = ctx.exec_groups["baseline"].toolchains[
-    #         "//boot/toolchain/type:baseline"]
-    # elif stage == "dev":
-    #     tc = ctx.exec_groups["dev"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # else:
-    #     print("UNHANDLED STAGE: %s" % stage)
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
+    if executor == "vm":
+        ext = ".cmo"
+    else:
+        ext = ".cmx"
 
     ################################################################
     ################  DEPS  ################
@@ -54,7 +41,11 @@ def library_impl(ctx):
         manifest.append(dep[DefaultInfo].files)
 
     for dep in ctx.attr.manifest:
+        # if ctx.label == Label("@//bytecomp:ocamlcommon"):
+        #     print("dep[ModuleInfo]: %s" % dep[ModuleInfo])
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
+    # if ctx.label == Label("@//bytecomp:ocamlcommon"):
+    #     fail()
 
     ################################
     ## merge BootInfo deps
@@ -69,6 +60,11 @@ def library_impl(ctx):
     cli_link_deps_depset = depset(
         order = dsorder,
         transitive = [merge_depsets(depsets, "cli_link_deps")]
+    )
+
+    ofiles_depset  = depset(
+        order=dsorder,
+        transitive = [merge_depsets(depsets, "ofiles")]
     )
 
     afiles_depset  = depset(
@@ -143,6 +139,7 @@ def library_impl(ctx):
         sigs     = sigs_depset,
         structs  = structs_depset,
         cli_link_deps = cli_link_deps_depset,
+        ofiles   = ofiles_depset,
         afiles   = afiles_depset,
         archived_cmx  = archived_cmx_depset,
         paths    = paths_depset,

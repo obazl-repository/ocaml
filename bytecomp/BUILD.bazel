@@ -52,13 +52,13 @@ boot_library(
 
 boot_archive(
     name = "ocamlbytecomp",
-    opts = select({
-        "//bzl/toolchain:boot": [],
-        "//bzl/toolchain:bc_bc": [],
-        "//bzl/toolchain:n_bc": [],
-        "//bzl/toolchain:bc_n": [],
-        "//bzl/toolchain:n_n": []
-    }),
+    # opts = select({
+    #     "//bzl/toolchain:boot": [],
+    #     "//bzl/toolchain:bc_bc": [],
+    #     "//bzl/toolchain:n_bc": [],
+    #     "//bzl/toolchain:bc_n": [],
+    #     "//bzl/toolchain:n_n": []
+    # }),
     manifest  = [
         ":Bytegen",
         ":Bytelibrarian",
@@ -110,8 +110,7 @@ boot_archive(
 ################################################################
 ## for //compilerlibs:ocamlcommmon archive:
 # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
-boot_archive(
-# boot_library(
+boot_library(
     name = "ocamlcommon",
     manifest  = [
         ## we could aggregate the driver modules here,
@@ -521,6 +520,14 @@ mustache(
     name = "opcodes_ml",
     json = "opcodes.json",
     template = "opcodes.ml.mustache",
+)
+
+mustache(
+    out  = "opnames.ml",
+    name = "opnames_ml",
+    json = "opcodes.json",
+    template = "opnames.ml.mustache",
+    visibility = ["//tools:__pkg__"]
 )
 
 ## Run make_opcodes executable under "new" ocamlrun:

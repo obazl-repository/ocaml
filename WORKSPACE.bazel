@@ -35,59 +35,62 @@ local_repository(
 # in --platform, --host_platform, and --execution_platforms options.
 
 register_execution_platforms(
-    # "//dev/platforms:sys_vm_vm",
-
-    # "//platform:boot",
-    # "//platform:vm",
-    # "//platform/build:vm",
-    # "//platform:sys",
-
     # IMPORTANT: ordered by constraint "strength" - more constraints
     # before fewer.
 
-    "//platform/ocaml:sys_vm",
-    "//platform/ocaml:sys_sys",
+    # "//platform/ocaml/local:sys_sys",
+    # "//platform/ocaml/local:sys_vm",
 
-    # "//platform/ocaml:sys_vm_vm",
-    # "//platform/ocaml:sys_vm_sys",
-    # "//platform/ocaml:sys_sys_sys",
-    # "//platform/ocaml:sys_sys_vm",
-
-
-    # "//platform/ocaml:vm",
-    # "//platform/ocaml:sys",
-
-    # "//platform/ocaml:boot_target", # sys_vm_vm + build + boot",
-    # "//platform/ocaml:baseline_build",
-
-    # "//platform/ocaml:sys_vm_vm_build",
+    # cross
+    # "//platform/ocaml/amd64/linux:sys_vm_vm",
+    # "//platform/ocaml/amd64/linux:sys_vm",
 )
 
-# register_toolchains("@ocaml//toolchain/selectors/local:vmvm")
 register_toolchains(
 
-    "//boot/toolchain/selector:vv_vv",
-    "//boot/toolchain/selector:vv_vs",
+    ## cross-platform toolchains
+    "//toolchain/selector/local/vm/target/amd64/linux:vv_vv",
+    "//toolchain/selector/local/vm/target/amd64/linux:vv_vs",
+    "//toolchain/selector/local/vm/target/amd64/linux:vs_ss",
+    "//toolchain/selector/local/vm/target/amd64/linux:vs_sv",
 
-    "//boot/toolchain/selector:vs_ss",
-    "//boot/toolchain/selector:vs_sv",
+    "//toolchain/selector/local/vm/target/amd64/linux:ss_ss",
+    "//toolchain/selector/local/vm/target/amd64/linux:ss_sv",
+    "//toolchain/selector/local/vm/target/amd64/linux:sv_vv",
+    "//toolchain/selector/local/vm/target/amd64/linux:sv_vs",
 
-    # "//boot/toolchain/selector:vmvm",
-    # "//boot/toolchain/selector:vmsys",
+    ## endo-toolchains
+    "//toolchain/selector/local/vm/target/local:vv_vv",
+    "//toolchain/selector/local/vm/target/local:vv_vs",
 
-    # "//boot/toolchain/selector:boot",
+    "//toolchain/selector/local/vm/target/local:ss_ss",
+    "//toolchain/selector/local/vm/target/local:ss_sv",
 
-    # "//boot/toolchain/selector:baseline",
-    # "//boot/toolchain/selector:baseline_involute",
+    # "//toolchain/selector/local:vs_ss",
+    # "//toolchain/selector/local:vs_sv",
 
-    # "//boot/toolchain/selector:vmvm",
-    # "//boot/toolchain/selector:vmsys",
+    # "//toolchain/selector/local:vv_vv",
 
-    # "//boot/toolchain/selector:xvmsys",
+    # "//toolchain/selector/local:vm_executor",
+    # "//toolchain/selector/local:*_executor",
 
-    # "//boot/toolchain/selector:baseline",
 
-    # "//boot/toolchain/selector:stdlib",
+    # "//toolchain/selector:vmvm",
+    # "//toolchain/selector:vmsys",
+
+    # "//toolchain/selector:boot",
+
+    # "//toolchain/selector:baseline",
+    # "//toolchain/selector:baseline_involute",
+
+    # "//toolchain/selector:vmvm",
+    # "//toolchain/selector:vmsys",
+
+    # "//toolchain/selector:xvmsys",
+
+    # "//toolchain/selector:baseline",
+
+    # "//toolchain/selector:stdlib",
 
     # "//toolchain/selectors/boot:vmsys",
     # "//toolchain/selectors/boot:default",
@@ -99,13 +102,13 @@ register_toolchains(
     # "//toolchain/selectors/baseline:vm",
 
 
-    # "//toolchain/selectors:dev",
-    # "//toolchain/selectors:vmsys",
+    # "//toolchain/selector:dev",
+    # "//toolchain/selector:vmsys",
 
-    # "//toolchain/selectors:default",
+    # "//toolchain/selector:default",
 
-    # "//toolchain/selectors:dbg",
-    # "//toolchain/selectors:instrumented",
+    # "//toolchain/selector:dbg",
+    # "//toolchain/selector:instrumented",
 
     ## toolchain profiles - locals must come first
     "//toolchain/profile/selector/cc/local:linux",

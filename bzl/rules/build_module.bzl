@@ -16,22 +16,22 @@ def _build_module(ctx):
 build_module = rule(
     implementation = _build_module,
     doc = "Compiles a module with the bootstrap compiler.",
-    exec_groups = {
-        "boot": exec_group(
-            # exec_compatible_with = [
-            #     "//platform/constraints/ocaml/executor:vm?",
-            #     "//platform/constraints/ocaml/emitter:vm"
-            # ],
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         # exec_compatible_with = [
+    #         #     "//platform/constraints/ocaml/executor:vm_executor?",
+    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
+    #         # ],
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm?",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor?",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
     attrs = dict(
         module_attrs(),
         # _stdlib_resolver = attr.label(
@@ -46,8 +46,8 @@ build_module = rule(
     executable = False,
     # fragments = ["platform", "cpp"],
     # host_fragments = ["platform",  "cpp"],
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    # toolchains = [# "//toolchain/type:boot",
-    #               # "//toolchain/type:profile",
-    #               "@bazel_tools//tools/cpp:toolchain_type"]
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )

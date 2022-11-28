@@ -16,62 +16,19 @@ load("//bzl/rules/common:transitions.bzl", "stdlib_in_transition")
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
 
-#####################
-boot_stdlib = rule(  # not used
-    implementation = archive_impl,
-    doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
-    exec_groups = {
-        "boot": exec_group(
-            # exec_compatible_with = [
-            #     "//platform/constraints/ocaml/executor:vm?",
-            #     "//platform/constraints/ocaml/emitter:vm"
-            # ],
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm?",
-        #         "//platform/constraints/ocaml/emitter:vm"
-        #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
-        # ),
-    },
-
-    attrs = dict(
-        archive_attrs(),
-
-        # only boot_stdlib and boot_compiler have a public 'stage' attr
-        # stage = attr.label( default = "//config/stage" ),
-
-        _rule = attr.string( default = "boot_stdlib" ),
-
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
-    ),
-    provides = [OcamlArchiveProvider, BootInfo],
-    cfg = stdlib_in_transition,
-    executable = False,
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    # toolchains = ["//toolchain/type:boot",
-    #               # "//toolchain/type:profile",
-    #               "@bazel_tools//tools/cpp:toolchain_type"]
-)
-
 #### macro ####
-def stdlib(stage = None,
-           build_host_constraints = None,
-           target_host_constraints = None,
-           visibility = ["//visibility:public"]
-           ):
+# def stdlib(stage = None,
+#            build_host_constraints = None,
+#            target_host_constraints = None,
+#            visibility = ["//visibility:public"]
+#            ):
 
-    boot_stdlib(
-        name       = "stdlib",
-        stage      = stage,
-        manifest   = STDLIB_MANIFEST,
-        visibility = visibility
-    )
-
+#     boot_stdlib(
+#         name       = "stdlib",
+#         stage      = stage,
+#         manifest   = STDLIB_MANIFEST,
+#         visibility = visibility
+#     )
 
 ################################################################
 def _stdlib_signature(ctx):
@@ -86,18 +43,18 @@ def _stdlib_signature(ctx):
 stdlib_signature = rule(
     implementation = _stdlib_signature,
     doc = "Sig rule for bootstrapping ocaml compilers",
-    exec_groups = {
-        "boot": exec_group(
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
     attrs = dict(
         signature_attrs(),
 
@@ -114,10 +71,9 @@ stdlib_signature = rule(
     ),
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
-    # toolchains = [
-    #     # "//toolchain/type:boot",
-    #     "@bazel_tools//tools/cpp:toolchain_type"
-    # ]
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
 ################################################################
@@ -135,18 +91,18 @@ def _stdlib_boot_signature(ctx):
 stdlib_boot_signature = rule(
     implementation = _stdlib_boot_signature,
     doc = "Sig rule for bootstrapping stdlib",
-    exec_groups = {
-        "boot": exec_group(
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
     attrs = dict(
         signature_attrs(),
         _opts = attr.string_list(
@@ -155,12 +111,11 @@ stdlib_boot_signature = rule(
         # no _stdlib_resolver
         _rule = attr.string( default = "stdlib_boot_signature" ),
     ),
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
-    # toolchains = [
-    #     # "//toolchain/type:boot",
-    #     "@bazel_tools//tools/cpp:toolchain_type"
-    # ]
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
 ################################################################
@@ -177,22 +132,22 @@ def _stdlib_module(ctx):
 stdlib_module = rule(
     implementation = _stdlib_module,
     doc = "Compiles a module with the bootstrap compiler.",
-    exec_groups = {
-        "boot": exec_group(
-            # exec_compatible_with = [
-            #     "//platform/constraints/ocaml/build/executor:vm",
-            #     "//platform/constraints/ocaml/build/emitter:vm"
-            # ],
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         # exec_compatible_with = [
+    #         #     "//platform/constraints/ocaml/build/executor:vm_executor",
+    #         #     "//platform/constraints/ocaml/build/emitter:vm_emitter"
+    #         # ],
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
     attrs = dict(
         module_attrs(),
 
@@ -213,10 +168,10 @@ stdlib_module = rule(
     executable = False,
     # fragments = ["platform", "cpp"],
     # host_fragments = ["platform",  "cpp"],
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    # toolchains = [# "//toolchain/type:boot",
-    #               # "//toolchain/type:profile",
-    #               "@bazel_tools//tools/cpp:toolchain_type"]
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
 ################################################################
@@ -224,7 +179,8 @@ stdlib_module = rule(
 ######################
 def _stdlib_boot_module(ctx):
 
-    if ctx.label.name == "Std_exit":
+    if ctx.file.struct == "std_exit.ml":
+    # if ctx.label.name == "Std_exit":
         module_name = "std_exit"
     else:
         (this, extension) = paths.split_extension(ctx.file.struct.basename)
@@ -236,22 +192,22 @@ def _stdlib_boot_module(ctx):
 stdlib_boot_module = rule(
     implementation = _stdlib_boot_module,
     doc = "Compiles a non-namespace module in stdlib pkg.",
-    exec_groups = {
-        "boot": exec_group(
-            # exec_compatible_with = [
-            #     "//platform/constraints/ocaml/executor:vm",
-            #     "//platform/constraints/ocaml/emitter:vm"
-            # ],
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         # exec_compatible_with = [
+    #         #     "//platform/constraints/ocaml/executor:vm_executor",
+    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
+    #         # ],
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
     attrs = dict(
         module_attrs(),
         _opts = attr.string_list(
@@ -266,8 +222,51 @@ stdlib_boot_module = rule(
     executable = False,
     # fragments = ["platform", "cpp"],
     # host_fragments = ["platform",  "cpp"],
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    # toolchains = [# "//toolchain/type:boot",
-    #               # "//toolchain/type:profile",
-    #               "@bazel_tools//tools/cpp:toolchain_type"]
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )
+
+#####################
+# boot_stdlib = rule(  # not used
+#     implementation = archive_impl,
+#     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
+#     exec_groups = {
+#         "boot": exec_group(
+#             # exec_compatible_with = [
+#             #     "//platform/constraints/ocaml/executor:vm_executor?",
+#             #     "//platform/constraints/ocaml/emitter:vm_emitter"
+#             # ],
+#             toolchains = ["//toolchain/type:boot"],
+#         ),
+#         # "baseline": exec_group(
+#         #     exec_compatible_with = [
+#         #         "//platform/constraints/ocaml/executor:vm_executor?",
+#         #         "//platform/constraints/ocaml/emitter:vm_emitter"
+#         #     ],
+#         #     toolchains = ["//toolchain/type:baseline"],
+#         # ),
+#     },
+
+#     attrs = dict(
+#         archive_attrs(),
+
+#         # only boot_stdlib and boot_compiler have a public 'stage' attr
+#         # stage = attr.label( default = "//config/stage" ),
+
+#         _rule = attr.string( default = "boot_stdlib" ),
+
+#         _allowlist_function_transition = attr.label(
+#             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+#         ),
+#     ),
+#     provides = [OcamlArchiveProvider, BootInfo],
+#     cfg = stdlib_in_transition,
+#     executable = False,
+#     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+#     # toolchains = ["//toolchain/type:boot",
+#     #               # ## //toolchain/type:profile,",
+#     #               "@bazel_tools//tools/cpp:toolchain_type"]
+# )
+

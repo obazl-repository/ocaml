@@ -1,8 +1,10 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl:functions.bzl", "stage_name")
+load("//bzl:functions.bzl", "get_workdir")
 
 load("//bzl/rules/common:impl_common.bzl", "tmpdir")
+
+load("//bzl/rules/common:transitions.bzl", "runtime_out_transition")
 
 # incoming transition to ensure this is only built once.
 # use ctx.actions.expand_template, six times
@@ -19,32 +21,18 @@ def _boot_camlheaders(ctx):
     # for f in ctx.attr.runtimes:
     #     print("RF: %s" % f[DefaultInfo].default_runfiles.symlinks.to_list())
     pfx = ""
-    tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:boot"]
 
-    # build_emitter = tc.build_emitter[BuildSettingInfo].value
-    target_executor = tc.target_executor[BuildSettingInfo].value
-    target_emitter  = tc.target_emitter[BuildSettingInfo].value
+    (stage, executor, emitter, workdir) = get_workdir(tc)
 
-    stage = tc._stage[BuildSettingInfo].value
-    if debug_bootstrap:
-        print("module _stage: %s" % stage)
-
-    if stage == 2:
-        ext = ".cmx"
+    if executor == "vm":
+        ext = ".cmo"
     else:
-        if target_executor == "vm":
-            ext = ".cmo"
-        elif target_executor == "sys":
-            ext = ".cmx"
-        else:
-            fail("Bad target_executor: %s" % target_executor)
-
-    workdir = "_{b}{t}{stage}/".format(
-        b = target_executor, t = target_emitter, stage = stage)
+        ext = ".cmx"
 
     outputs = []
-    for f in ctx.files.runtimes:
+    # for f in ctx.file.runtime:
 
         # write a template file with abs path to ws root
         # o = ctx.actions.declare_file("_build/camlheader")
@@ -65,40 +53,42 @@ def _boot_camlheaders(ctx):
         #     }
         # )
 
-        camlheader = ctx.actions.declare_file(workdir + "camlheader")
+    camlheader = ctx.actions.declare_file(workdir + "camlheader")
 
-        if debug_bootstrap:
-            print("Emitting camlheader: %s" % camlheader.path)
-            print("  camlheader path: %s" % pfx + f.path)
+    runtime = ctx.file._runtime
 
-        ctx.actions.expand_template(
-            output   = camlheader,
-            template = ctx.file.template,
-            substitutions = {"PATH": pfx + f.path})
-        outputs.append(camlheader)
+    if debug_bootstrap:
+        print("Emitting camlheader: %s" % camlheader.path)
+        print("  camlheader path: %s" % pfx + runtime.path)
 
-        camlheaderd = ctx.actions.declare_file(workdir + "camlheaderd")
-        # print("Emitting camlheaderd: %s" % camlheaderd.path)
-        ctx.actions.expand_template(
-            output   = camlheaderd,
-            template = ctx.file.template,
-            substitutions = {"PATH": pfx + f.path + "d"})
-        outputs.append(camlheaderd)
+    ctx.actions.expand_template(
+        output   = camlheader,
+        template = ctx.file.template,
+        substitutions = {"PATH": pfx + runtime.path})
+    outputs.append(camlheader)
 
-        camlheaderi = ctx.actions.declare_file(workdir + "camlheaderi")
-        # print("Emitting camlheaderi: %s" % camlheaderi.path)
-        ctx.actions.expand_template(
-            output   = camlheaderi,
-            template = ctx.file.template,
-            substitutions = {"PATH": pfx + f.path + "i"})
-        outputs.append(camlheaderi)
+    camlheaderd = ctx.actions.declare_file(workdir + "camlheaderd")
+    # print("Emitting camlheaderd: %s" % camlheaderd.path)
+    ctx.actions.expand_template(
+        output   = camlheaderd,
+        template = ctx.file.template,
+        substitutions = {"PATH": pfx + runtime.path + "d"})
+    outputs.append(camlheaderd)
+
+    camlheaderi = ctx.actions.declare_file(workdir + "camlheaderi")
+    # print("Emitting camlheaderi: %s" % camlheaderi.path)
+    ctx.actions.expand_template(
+        output   = camlheaderi,
+        template = ctx.file.template,
+        substitutions = {"PATH": pfx + runtime.path + "i"})
+    outputs.append(camlheaderi)
 
     ctx.actions.do_nothing(
         mnemonic = "CamlHeaders"
     )
 
     runfiles = ctx.runfiles(
-        files = ctx.files.runtimes
+        files = [ctx.file._runtime]
     )
 
     defaultInfo = DefaultInfo(
@@ -111,34 +101,42 @@ def _boot_camlheaders(ctx):
 boot_camlheaders = rule(
     implementation = _boot_camlheaders,
     doc = "Generates camlheader files",
-    exec_groups = {
-        "boot": exec_group(
-            # exec_compatible_with = [
-            #     "//platform/constraints/ocaml/executor:vm?",
-            #     "//platform/constraints/ocaml/emitter:vm"
-            # ],
-            toolchains = ["//boot/toolchain/type:boot"],
-        ),
+    # exec_groups = {
+    #     "boot": exec_group(
+    #         # exec_compatible_with = [
+    #         #     "//platform/constraints/ocaml/executor:vm_executor?",
+    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
+    #         # ],
+    #         toolchains = ["//toolchain/type:boot"],
+    #     ),
         # "baseline": exec_group(
         #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm?",
-        #         "//platform/constraints/ocaml/emitter:vm"
+        #         "//platform/constraints/ocaml/executor:vm_executor?",
+        #         "//platform/constraints/ocaml/emitter:vm_emitter"
         #     ],
-        #     toolchains = ["//boot/toolchain/type:baseline"],
+        #     toolchains = ["//toolchain/type:baseline"],
         # ),
-    },
+    # },
 
     attrs = {
         # "_stage"   : attr.label( default = "//config/stage" ),
         "template" : attr.label(mandatory = True,allow_single_file=True),
-        "runtimes" : attr.label_list(
-            mandatory = True,
-            allow_files=True
+        "_runtime" : attr.label(
+            allow_single_file=True,
+            default = "//runtime:ocamlrun",
+            executable = True,
+            cfg = runtime_out_transition,
         ),
-        "prefix"   : attr.string(mandatory = False),
+        # "prefix"   : attr.string(mandatory = False),
         "suffix"   : attr.string(mandatory = False),
         "_wsfile": attr.label(
             allow_single_file = True,
-            default = "@//:BUILD.bazel")
-    }
+            default = "@//:BUILD.bazel"),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+    },
+    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:boot",
+                  # ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
 )

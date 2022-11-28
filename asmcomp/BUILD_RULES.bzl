@@ -1,5 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
+load("//bzl/rules/common:transitions.bzl", "runtime_out_transition")
+
 # incoming transition to ensure this is only built once.
 # use ctx.actions.expand_template, six times
 
@@ -24,6 +26,8 @@ def _cvt_emit(ctx):
     # args = ctx.actions.args()
     # args.add(ctx.file._tool)
     # args.add_all([">", ctx.outputs.out.path])
+
+    ## FIXME: don't use ocamlrun to run a sys executable!
 
     ctx.actions.run_shell(
         mnemonic = "CvtEmit",
@@ -62,14 +66,17 @@ cvt_emit = rule(
         ),
         "_tool" : attr.label(
             allow_single_file=True,
-            default = "//tools:cvt_emit.tool"
+            default = "//tools:cvt_emit.byte"
         ),
         "_executor": attr.label(
             allow_single_file = True,
             default = "//runtime:ocamlrun",
             executable = True,
-            cfg = "exec",
+            cfg = runtime_out_transition,
         ),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+
     },
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     toolchains = ["//toolchain/type:boot",

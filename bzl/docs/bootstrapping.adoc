@@ -73,6 +73,8 @@ Toolchains:
 
 == References
 
+link:https://github.com/ocaml/ocaml/pull/11290[Add more information to BOOTSTRAP.adoc #11290]
+
 link:https://github.com/ocaml/ocaml/pull/11149[Make the bootstrap process repeatable #11149] (OCaml)
 
 bootstrap cycles in bazel: https://gist.github.com/rrbutani/f5d80af864e67d873ae4491111d9dcce
@@ -83,4 +85,5 @@ another, without transitions:  https://gist.github.com/rrbutani/4ef90cf0e87304c1
 
 
 https://github.com/bazelbuild/bazel/issues/11584
+
 

@@ -7,7 +7,7 @@ load("//bzl:providers.bzl",
      "OcamlSignatureProvider")
 
 load("//bzl:functions.bzl",
-     "get_module_name", "stage_name", "tc_compiler")
+     "get_module_name", "get_workdir", "tc_compiler")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -30,55 +30,14 @@ def signature_impl(ctx, module_name):
     basename = ctx.label.name
     from_name = basename[:1].capitalize() + basename[1:]
 
-    tc = ctx.exec_groups["boot"].toolchains[
-            "//boot/toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:boot"]
 
-    # workdir = "_{}/".format(stage_name(tc._stage))
-
-    # build_emitter = tc.build_emitter[BuildSettingInfo].value
-    # print("BEMITTER: %s" % build_emitter)
-
-    target_executor = tc.target_executor[BuildSettingInfo].value
-    target_emitter  = tc.target_emitter[BuildSettingInfo].value
-
-    stage = tc._stage[BuildSettingInfo].value
-
-    if debug_bootstrap:
-        print("module _stage: %s" % stage)
-
-    if stage == 2:
-        ext = ".cmx"
+    (stage, executor, emitter, workdir) = get_workdir(tc)
+    if executor == "vm":
+        ext = ".cmo"
     else:
-        if target_executor == "vm":
-            ext = ".cmo"
-        elif target_executor == "sys":
-            ext = ".cmx"
-        else:
-            fail("Bad target_executor: %s" % target_executor)
-
-    workdir = "_{b}{t}{stage}/".format(
-        b = target_executor, t = target_emitter, stage = stage)
-
-    # stage = ctx.attr._stage[BuildSettingInfo].value
-    # print("signature _stage: %s" % tc._stage[BuildSettingInfo].value)
-
-    # workdir = "_{}/".format(stage)
-
-    # tc = None
-    # if stage == "boot":
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # elif stage == "baseline":
-    #     tc = ctx.exec_groups["baseline"].toolchains[
-    #         "//boot/toolchain/type:baseline"]
-    # elif stage == "dev":
-    #     #FIXME
-    #     tc = ctx.exec_groups["dev"].toolchains[
-    #         "//boot/toolchain/type:boot"]
-    # else:
-    #     print("UNHANDLED STAGE: %s" % stage)
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//boot/toolchain/type:boot"]
+        ext = ".cmx"
 
     ################
     includes   = []
@@ -222,15 +181,17 @@ def signature_impl(ctx, module_name):
     #########################
     args = ctx.actions.args()
 
-    ## ocamlrun
-    tool = None
-    for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-        if f.basename == "ocamlrun":
-            # print("LEX RF: %s" % f.path)
-            tool = f
-
-    # the bytecode executable
-    args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    executable = None
+    if executor == "vm":
+        ## ocamlrun
+        for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+            if f.basename == "ocamlrun":
+                # print("LEX RF: %s" % f.path)
+                executable = f
+            # the bytecode executable
+        args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    else:
+        executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
     ## FIXME: -use-prims not needed for compilation?
     # if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
@@ -353,9 +314,7 @@ def signature_impl(ctx, module_name):
     ##########################################
     ################  ACTION  ################
     ctx.actions.run(
-        exec_group = "boot",
-        executable = tool,
-        # executable = tc.compiler[DefaultInfo].files_to_run,
+        executable = executable,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_cmi],
@@ -363,10 +322,10 @@ def signature_impl(ctx, module_name):
             tc_compiler(tc)[DefaultInfo].default_runfiles.files,
             tc_compiler(tc)[DefaultInfo].files_to_run
         ],
-        # tools = [tc.tool_runner, tc.compiler],
         mnemonic = "CompileOcamlSignature",
-        progress_message = "{mode} compiling compiler_signature: {ws}//{pkg}:{tgt}".format(
-            mode = tc.build_host + ">" + tc.target_host[BuildSettingInfo].value,
+        progress_message = "stage {s}({wd}): compiling compiler_signature: {ws}//{pkg}:{tgt}".format(
+            s = stage,
+            wd = workdir,
             ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
             pkg = ctx.label.package,
             tgt=ctx.label.name
