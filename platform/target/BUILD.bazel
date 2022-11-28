@@ -1,0 +1,39 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+# string_flag(name = "target", build_setting_default = "boot",
+#             values = ["boot", "vm", "sys"],
+#             visibility = ["//visibility:public"])
+# config_setting(name = "boot?", flag_values = {":target": "boot"},
+#                visibility = ["//visibility:public"])
+# config_setting(name = "vm?", flag_values = {":target": "vm"},
+#                visibility = ["//visibility:public"])
+# config_setting(name = "sys?", flag_values = {":target": "sys"},
+#                visibility = ["//visibility:public"])
+
+# ? suffix: constraint_value
+# no suffix: platform
+
+alias(name = "boot", actual = "//platform:boot")
+alias(name = "boot?", actual = "//platform:boot?")
+
+alias(name = "vm", actual = "//platform:vm")
+alias(name = "vm?", actual = "//platform:vm?")
+
+alias(name = "sys", actual = "//platform:sys")
+alias(name = "sys?", actual = "//platform:sys?")
+
+################################################################
+alias(name = "linux_amd64?", actual = "//platform:linux_amd64?")
+alias(name = "macos_amd64?", actual = "//platform:macos_amd64?")
+
+alias(name = "linux_x86_64?", actual = "//platform:linux_x86_64?")
+alias(name = "macos_x86_64?", actual = "//platform:macos_x86_64?")
+
+alias(name = "linux_x86_32?", actual = "//platform:linux_x86_32?")
+alias(name = "macos_x86_32?", actual = "//platform:macos_x86_32?")
+
+alias(name = "linux_arm64?", actual = "//platform:linux_arm64?")
+alias(name = "macos_arm64?", actual = "//platform:macos_arm64?")
+
