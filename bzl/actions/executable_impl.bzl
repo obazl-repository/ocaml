@@ -280,13 +280,13 @@ def executable_impl(ctx):  ## , tc):
         # + data_inputs
         # + [depset(action_inputs_ccdep_filelist)]
     )
-    print("lbl: %s" % ctx.label)
-    print("ARCHIVED CMX: %s" % archived_cmx_depset)
-    print("AFILES: %s" % afiles_depset)
-    print("stdlib: %s" % ctx.file._stdlib.path)
-    if ctx.label.name == "cvt_emit.byte":
-        if ctx.file._stdlib.dirname.endswith("2"):
-            print("inputs %s" % inputs_depset)
+    # print("lbl: %s" % ctx.label)
+    # print("ARCHIVED CMX: %s" % archived_cmx_depset)
+    # print("AFILES: %s" % afiles_depset)
+    # print("stdlib: %s" % ctx.file._stdlib.path)
+    # if ctx.label.name == "cvt_emit.byte":
+    #     if ctx.file._stdlib.dirname.endswith("2"):
+    #         print("inputs %s" % inputs_depset)
             # fail()
 
     # for dep in inputs_depset.to_list():

@@ -3,7 +3,7 @@
 # executable - in this case, adding the runtime to boot/ocamlc and
 # boot/ocamllex.
 
-load("//bzl/rules/common:transitions.bzl", "runtime_out_transition")
+load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
 
 ########################
 def _boot_import_vm_executable(ctx):
@@ -37,7 +37,7 @@ boot_import_vm_executable = rule(
             allow_single_file = True,
             default = "//runtime:ocamlrun",
             executable = True,
-            cfg = runtime_out_transition
+            cfg = reset_config_transition
         ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),

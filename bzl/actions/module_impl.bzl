@@ -500,7 +500,7 @@ def module_impl(ctx, module_name):
             tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = "CompileBootstrapModule",
-        progress_message = "stage {s}({wd}): compiling {rule}: {ws}//{pkg}:{tgt}".format(
+        progress_message = "{ws}//{pkg}:{tgt} compiling {rule}, stage {s}({wd})".format(
             s = stage,
             wd = workdir,
             rule=ctx.attr._rule,

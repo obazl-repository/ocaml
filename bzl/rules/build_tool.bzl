@@ -3,7 +3,7 @@
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//bzl/rules/common:transitions.bzl", "build_tool_in_transition")
+load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
 
 ########################
 # def _build_tool(ctx):
@@ -45,7 +45,7 @@ build_tool = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
     ),
-    cfg = build_tool_in_transition,
+    cfg = reset_config_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:boot",

@@ -1,88 +1,20 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 #####################################################
-def _runtime_out_transition_impl(settings, attr):
+## reset_config_transition
+# reset stage to 0 (_boot) so runtime is only built once
 
-    print("runtime_out_transition")
-
-    # build_host  = settings["//command_line_option:host_platform"]
-    # print("  host_platform: %s" % build_host)
-
-    # extra_execution_platforms = settings["//command_line_option:extra_execution_platforms"]
-    # print("  extra_execution_platforms: %s" % extra_execution_platforms)
-
-    # target_host = settings["//command_line_option:platforms"]
-    # print(" platforms: %s" % target_host)
-
-    # if target executor is sys then set //config/runtime to libasmrun
-
-    # # if build_host == Label("@//platform/ocaml/local:sys_sys"):
-    # if extra_execution_platforms == Label("@//platform/ocaml/local:sys_sys"):
-    #     print("SWAPPING BUILD HOST")
-    #     host_platform = Label("//platform/ocaml/local:sys_vm")
-    #     extra_execution_platforms = Label("//platform/ocaml/local:sys_vm")
-    #     target_platform = Label("//platform/ocaml/local:sys_vm")
-    # else:
-    #     host_platform = build_host
-    #     extra_execution_platforms = extra_execution_platforms
-    #     target_platform = target_host
-
-    # print("target_executor: %s" % settings["//config/target/executor"])
-
-    # stage = int(settings["//config/stage"])
-
-    ## always reset to baseline so we only build once
+def _reset_config_transition_impl(settings, attr):
     return {
-        "//config/stage": 0,
-        "//toolchain:compiler": "//boot/baseline/compiler:compiler",
-        "//toolchain:lexer"   : "//boot/baseline/lexer"
+        "//config/stage"       : 0,
+        "//toolchain:compiler" : "//boot:ocamlc.boot",
+        "//toolchain:lexer"    : "//boot:ocamllex.boot"
     }
 
 #######################
-runtime_out_transition = transition(
-    implementation = _runtime_out_transition_impl,
+reset_config_transition = transition(
+    implementation = _reset_config_transition_impl,
     inputs = [],
-    outputs = [
-        "//config/stage",
-        "//toolchain:compiler",
-        "//toolchain:lexer"
-    ]
-)
-
-###################################################
-def _build_tool_in_transition_impl(settings, attr):
-    print("build_tool_in_transition")
-
-    build_host  = settings["//command_line_option:host_platform"]
-    print("  host_platform: %s" % build_host)
-
-    target_host = settings["//command_line_option:platforms"]
-    print("  platforms: %s" % target_host)
-
-    stage = settings["//config/stage"]
-    print("  {l} stage: {s}".format(
-        l = attr.name, s = stage))
-
-    stage    = 0
-    compiler = "//boot:ocamlc.boot"
-    lexer    = "//boot:ocamllex.boot"
-
-    return {
-        "//config/stage"       : stage,
-        "//toolchain:compiler" : compiler,
-        "//toolchain:lexer"    : lexer
-    }
-
-######################################
-build_tool_in_transition = transition(
-    implementation = _build_tool_in_transition_impl,
-    inputs  = [
-        "//config/stage",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//command_line_option:host_platform",
-        "//command_line_option:platforms"
-    ],
     outputs = [
         "//config/stage",
         "//toolchain:compiler",

@@ -4,7 +4,7 @@ load("//bzl:providers.bzl",
      "OcamlLibraryMarker",
 )
 
-load("//bzl/rules/common:transitions.bzl", "runtime_out_transition")
+load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
 
 #######################
 def executable_attrs():
@@ -58,7 +58,7 @@ def executable_attrs():
             allow_single_file = True,
             default = "//runtime:asmrun",
             executable = False,
-            cfg = runtime_out_transition
+            cfg = reset_config_transition
             # default = "//config/runtime" # label flag set by transition
         ),
 

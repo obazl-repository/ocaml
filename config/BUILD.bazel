@@ -33,7 +33,9 @@ compiler_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Option", # if not bootstrapping?
         "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys"
+        "//stdlib:Stdlib.Sys",
+
+        # "//stdlib"
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -52,11 +54,25 @@ compiler_module(
     ]
 )
 
+## TODO: custom rule, to extract stdlib dir w/workdir and insert into
+## Config. a mustache rule won't do since the stdlib dir changes with
+## each stage of the bootstrap? Or figure out how to make the mustache
+## rule depend on //stdlib. More generally the Config should reflect
+## the configuration of the current build stage, since additional
+## config settings may depend on boot stage. With the makefiles we get
+## one Config, derived from ./configure.
+#
+## One option would be to convert config.ml.json itself to a template
+## with "standard_library_default": "{{stdlib_dir}}". Then we would
+## need to run mustache twice, once to generate config.ml.json, then
+## to generate config.ml. Or for the first step we could use
+## ctx.actions.expand_template.
 mustache(
     name = "__config_ml__",
     out      = "config.ml",
     template = "config.ml.mustache",
-    json     = "config.ml.json"
+    json     = "config.ml.json",
+    # stdlib = "//stdlib"
 )
 
 compiler_module(

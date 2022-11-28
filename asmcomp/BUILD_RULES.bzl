@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl/rules/common:transitions.bzl", "runtime_out_transition")
+load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
 
 # incoming transition to ensure this is only built once.
 # use ctx.actions.expand_template, six times
@@ -72,7 +72,7 @@ cvt_emit = rule(
             allow_single_file = True,
             default = "//runtime:ocamlrun",
             executable = True,
-            cfg = runtime_out_transition,
+            cfg = reset_config_transition,
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),

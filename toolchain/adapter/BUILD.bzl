@@ -75,7 +75,7 @@ toolchain_adapter = rule(
             allow_single_file = True,
             executable = True,
             cfg = "exec"
-            # cfg = runtime_out_transition
+            # cfg = reset_config_transition
         ),
 
         "vmargs": attr.label( ## string list

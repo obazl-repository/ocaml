@@ -14,23 +14,23 @@ load("//bzl/rules/macros:lexer.bzl", "lexer")
 #   //baseline/compiler:prod uses the dev compiler
 # compiler( name  = "compilers" )
 
-## if stage < 2 then force emit vm_vm
-## else follow emitter setting
+## select emitter:
+## if stage < 2 then set vm emitter
+## if stage == 2, then emitter == target executor
 
 boot_compiler(
     name                   = "compiler",
     prologue = ["//compilerlibs:ocamlcommon"] + select({
-        # if tgt exec = sys then penultimate = vm->sys
-        "//config/target:penult_sys_vm?": ["//bytecomp:ocamlbytecomp"],
-        "//config/target:penult_sys_sys?": ["//asmcomp:ocamloptcomp"],
+        "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],
+        "//config/target:baseline_sys?": ["//asmcomp:ocamloptcomp"],
         "//config/target:ult_sys?": ["//asmcomp:ocamloptcomp"],
 
         "//conditions:default": ["//bytecomp:ocamlbytecomp"]
     }),
     main = select({
+        "//config/target:baseline_vm?": "//driver:Main",
+        "//config/target:baseline_sys?": "//driver:Optmain",
         "//config/target:ult_sys?": "//driver:Optmain",
-        "//config/target:penult_sys_vm?": "//driver:Main",
-        "//config/target:penult_sys_sys?": "//driver:Optmain",
 
         "//conditions:default": "//driver:Main"
     }),

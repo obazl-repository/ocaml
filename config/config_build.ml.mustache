@@ -1,25 +1,5 @@
-(* @configure_input@ *)
-#2 "utils/config.generated.ml.in"
-(**************************************************************************)
-(*                                                                        *)
-(*                                 OCaml                                  *)
-(*                                                                        *)
-(*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           *)
-(*                                                                        *)
-(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
-(*     en Automatique.                                                    *)
-(*                                                                        *)
-(*   All rights reserved.  This file is distributed under the terms of    *)
-(*   the GNU Lesser General Public License version 2.1, with the          *)
-(*   special exception on linking described in the file LICENSE.          *)
-(*                                                                        *)
-(**************************************************************************)
-
-(* This file is included in config_main.ml during the build rather
-   than compiled on its own *)
-
-let c_has_debug_prefix_map = @cc_has_debug_prefix_map@
-let as_has_debug_prefix_map = @as_has_debug_prefix_map@
+These are user-controlled features, not feature-test outputs, and
+should be set via CLI config flags rather than ./configure
 
 let bytecomp_c_libraries = {@QS@|@bytecclibs@|@QS@}
 (* bytecomp_c_compiler and native_c_compiler have been supported for a
@@ -43,6 +23,8 @@ let afl_instrument = false
 AFL_INSTRUMENT = "@afl@" == "true"
 afl_instrument = "@afl@" == "true"
 
+# upcase: used as #define macro
+# dncase: fld in Config module
 FLAT_FLOAT_ARRAY = "@flat_float_array@" == "true"
 flat_float_array = "@flat_float_array@" == "true"
 
