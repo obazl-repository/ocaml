@@ -65,9 +65,6 @@ ARCH = "@arch@"
 # controlling test compile for machine-depedent code
 ARCH64 = "@arch64@" == "true"
 
-# Endianness for this architecture - not used anywhere in the sources
-ENDIANNESS = "@endianness@"
-
 ### Name of architecture model for the native-code compiler.
 ### Some architectures come in several slightly different flavors
 ### that share a common code generator. This variable tailors the
