@@ -11,7 +11,7 @@ load("//bzl/actions:module_impl.bzl", "module_impl")
 load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
 load("//bzl/actions:signature_impl.bzl", "signature_impl")
 
-load("//bzl/rules/common:transitions.bzl", "stdlib_in_transition")
+# load("//bzl/rules/common:transitions.bzl", "stdlib_in_transition")
 
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 

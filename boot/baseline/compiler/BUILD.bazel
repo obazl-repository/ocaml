@@ -8,18 +8,14 @@ load("//bzl:rules.bzl",
 # load("//bzl/rules/macros:compiler.bzl", "compiler")
 load("//bzl/rules/macros:lexer.bzl", "lexer")
 
-# This macro expands to three different boot_compiler targets:
-#   //baseline/compiler:baseline uses the boot compiler
-#   //baseline/compiler:dev uses the baseline compiler
-#   //baseline/compiler:prod uses the dev compiler
-# compiler( name  = "compilers" )
-
 ## select emitter:
 ## if stage < 2 then set vm emitter
 ## if stage == 2, then emitter == target executor
 
 boot_compiler(
     name                   = "compiler",
+    # opts = ["-OCAMLLIB", "$(OCAMLLIB)"],
+    # toolchains = ["//profile/system/local"],
     prologue = ["//compilerlibs:ocamlcommon"] + select({
         "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],
         "//config/target:baseline_sys?": ["//asmcomp:ocamloptcomp"],
@@ -39,7 +35,6 @@ boot_compiler(
     #     "//bytecomp:ocamlbytecomp"
     # ],
     # main = "//driver:Main",
-    opts                   = [],
     # compatibility constraints ensure selection of boot toolchain
     # exec_compatible_with   = [
     #     "//platform/constraints/ocaml/executor:vm_executor",

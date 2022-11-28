@@ -179,149 +179,149 @@ tc_compiler_out_transition = transition(
 
 ###################################################
 ###################################################
-def _compiler_in_transition_impl(settings, attr):
-    print("compiler_in_transition")
+# def _compiler_in_transition_impl(settings, attr):
+#     print("compiler_in_transition")
 
-    build_host  = settings["//command_line_option:host_platform"]
-    print("  host_platform: %s" % build_host)
+#     build_host  = settings["//command_line_option:host_platform"]
+#     print("  host_platform: %s" % build_host)
 
-    target_host = settings["//command_line_option:platforms"]
-    print("  platforms: %s" % target_host)
+#     target_host = settings["//command_line_option:platforms"]
+#     print("  platforms: %s" % target_host)
 
-    # target constraint predicates:
-    print("xxxx: %s" % "//platform/constraints/ocaml/emitter:sys_emitter?")
+#     # target constraint predicates:
+#     print("xxxx: %s" % "//platform/constraints/ocaml/emitter:sys_emitter?")
 
 
-    stage = settings["//config/stage"]
-    print("  stage: %s" % stage)
+#     stage = settings["//config/stage"]
+#     print("  stage: %s" % stage)
 
-    if stage == 0:
-        # no change
-        return {}
+#     if stage == 0:
+#         # no change
+#         return {}
 
-    # stage = stage
+#     # stage = stage
 
-    # if stage == 0:  # boot
-    #     compiler = "//boot:ocamlc.byte"
-    #     lexer = "//boot:ocamllex.boot"
-    #     # lexer = "//boot:ocamllex.boot"
-    # elif stage == 1: # dev built by baseline tc
-    #     compiler = "//boot/baseline/compiler:compiler" # ocamlc.byte"
-    #     lexer = "//boot/baseline:lexer"
-    # elif stage == 2:
-    #     compiler = "//boot/baseline/compiler:compiler" # ocamlc.byte"
-    #     lexer = "//boot/baseline/lexer"
-    #     # compiler = "//dev/bin:ocamlc.dev"
-    #     # lexer = "//dev/bin:ocamllex.byte"
-    # else:
-    #     fail("UNHANDLED COMPILER STAGE: %s" % stage)
+#     # if stage == 0:  # boot
+#     #     compiler = "//boot:ocamlc.byte"
+#     #     lexer = "//boot:ocamllex.boot"
+#     #     # lexer = "//boot:ocamllex.boot"
+#     # elif stage == 1: # dev built by baseline tc
+#     #     compiler = "//boot/baseline/compiler:compiler" # ocamlc.byte"
+#     #     lexer = "//boot/baseline:lexer"
+#     # elif stage == 2:
+#     #     compiler = "//boot/baseline/compiler:compiler" # ocamlc.byte"
+#     #     lexer = "//boot/baseline/lexer"
+#     #     # compiler = "//dev/bin:ocamlc.dev"
+#     #     # lexer = "//dev/bin:ocamllex.byte"
+#     # else:
+#     #     fail("UNHANDLED COMPILER STAGE: %s" % stage)
 
-    # if hasattr(attr, "stage"):
-    #     print("  stage: %s" % attr.stage)
-    #     print("  bzl stage: %s" % settings["//config/stage"])
-    #     _stage = attr.stage
-    #     if _stage == "boot":
-    #         # no change
-    #         stage    = 0
-    #         compiler = "//boot:ocamlc.boot"
-    #         lexer = "//boot:ocamllex.boot"
-    #     elif _stage == "baseline":
-    #         stage    = 0  # baseline built by boot tc
-    #         # stage = "boot"
-    #         compiler = "//boot:ocamlc.byte"
-    #         lexer = "//boot:ocamllex.byte"
-    #         # lexer = "//boot:ocamllex.boot"
-    #     elif _stage == "dev":
-    #         stage = 1  # dev built by baseline tc
-    #         compiler = "//boot/baseline:ocamlc.byte"
-    #         lexer = "//boot/baseline:ocamllex.byte"
-    #     elif _stage == "prod":
-    #         stage = 2  # prod built by dev tc
-    #         compiler = "//dev/bin:ocamlc.byte"
-    #         lexer = "//dev/bin:ocamllex.byte"
-    #     else:
-    #         fail("UNHANDLED COMPILER STAGE: %s" % stage)
-    # else:
-    #     fail("compiler missing attr: stage")
+#     # if hasattr(attr, "stage"):
+#     #     print("  stage: %s" % attr.stage)
+#     #     print("  bzl stage: %s" % settings["//config/stage"])
+#     #     _stage = attr.stage
+#     #     if _stage == "boot":
+#     #         # no change
+#     #         stage    = 0
+#     #         compiler = "//boot:ocamlc.boot"
+#     #         lexer = "//boot:ocamllex.boot"
+#     #     elif _stage == "baseline":
+#     #         stage    = 0  # baseline built by boot tc
+#     #         # stage = "boot"
+#     #         compiler = "//boot:ocamlc.byte"
+#     #         lexer = "//boot:ocamllex.byte"
+#     #         # lexer = "//boot:ocamllex.boot"
+#     #     elif _stage == "dev":
+#     #         stage = 1  # dev built by baseline tc
+#     #         compiler = "//boot/baseline:ocamlc.byte"
+#     #         lexer = "//boot/baseline:ocamllex.byte"
+#     #     elif _stage == "prod":
+#     #         stage = 2  # prod built by dev tc
+#     #         compiler = "//dev/bin:ocamlc.byte"
+#     #         lexer = "//dev/bin:ocamllex.byte"
+#     #     else:
+#     #         fail("UNHANDLED COMPILER STAGE: %s" % stage)
+#     # else:
+#     #     fail("compiler missing attr: stage")
 
-    return {}
-    #     "//config/stage"              : stage,
-    #     "//toolchain:compiler": compiler,
-    #     "//toolchain:lexer"   : lexer
-    # }
+#     return {}
+#     #     "//config/stage"              : stage,
+#     #     "//toolchain:compiler": compiler,
+#     #     "//toolchain:lexer"   : lexer
+#     # }
 
-compiler_in_transition = transition(
-    implementation = _compiler_in_transition_impl,
-    inputs  = [
-        "//config/stage",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//command_line_option:host_platform",
-        "//command_line_option:platforms"
-    ],
-    outputs = [
-        # "//config/stage",
-        # "//toolchain:compiler",
-        # "//toolchain:lexer"
-    ]
-)
+# compiler_in_transition = transition(
+#     implementation = _compiler_in_transition_impl,
+#     inputs  = [
+#         "//config/stage",
+#         "//toolchain:compiler",
+#         "//toolchain:lexer",
+#         "//command_line_option:host_platform",
+#         "//command_line_option:platforms"
+#     ],
+#     outputs = [
+#         # "//config/stage",
+#         # "//toolchain:compiler",
+#         # "//toolchain:lexer"
+#     ]
+# )
 
 # ###################################################
 # ###################################################
-def _stdlib_in_transition_impl(settings, attr):
-    print("stdlib_in_transition")
+# def _stdlib_in_transition_impl(settings, attr):
+#     print("stdlib_in_transition")
 
-    ## same code as compiler_in_transition?
-    if hasattr(attr, "stage"):
-        print("  stage: %s" % attr.stage)
-        print("  bzl stage: %s" % settings["//config/stage"])
-        _stage = attr.stage
-        if _stage == "boot":
-            stage    = 0
-            compiler = "//boot:ocamlc.boot"
-            lexer = "//boot:ocamllex.boot"
-            stdlib = "//stdlib" # //boot:stdlib
-        elif stage == "baseline":
-            stage    = 1
-            compiler = "//boot:ocamlc.boot"
-            lexer = "//boot:ocamllex.boot"
-            stdlib = "//boot:stdlib"
-        elif stage == "dev":
-            stage    = 1
-            compiler = "//boot/baseline:ocamlc.byte"
-            lexer = "//boot/baseline:ocamllex.byte"
-            stdlib = "//boot/baseline:stdlib"
-        else:
-            fail("UNHANDLED STDLIB STAGE: %s" % stage)
-    else:
-        fail("stdlib missing attr: stage")
+#     ## same code as compiler_in_transition?
+#     if hasattr(attr, "stage"):
+#         print("  stage: %s" % attr.stage)
+#         print("  bzl stage: %s" % settings["//config/stage"])
+#         _stage = attr.stage
+#         if _stage == "boot":
+#             stage    = 0
+#             compiler = "//boot:ocamlc.boot"
+#             lexer = "//boot:ocamllex.boot"
+#             stdlib = "//stdlib" # //boot:stdlib
+#         elif stage == "baseline":
+#             stage    = 1
+#             compiler = "//boot:ocamlc.boot"
+#             lexer = "//boot:ocamllex.boot"
+#             stdlib = "//boot:stdlib"
+#         elif stage == "dev":
+#             stage    = 1
+#             compiler = "//boot/baseline:ocamlc.byte"
+#             lexer = "//boot/baseline:ocamllex.byte"
+#             stdlib = "//boot/baseline:stdlib"
+#         else:
+#             fail("UNHANDLED STDLIB STAGE: %s" % stage)
+#     else:
+#         fail("stdlib missing attr: stage")
 
-    return {
-        "//config/stage"              : stage,
-        "//toolchain:compiler": compiler,
-        "//toolchain:lexer"   : lexer,
-        "//toolchain:stdlib"  : stdlib
-    }
+#     return {
+#         "//config/stage"              : stage,
+#         "//toolchain:compiler": compiler,
+#         "//toolchain:lexer"   : lexer,
+#         "//toolchain:stdlib"  : stdlib
+#     }
 
-##################################
-stdlib_in_transition = transition(
-    ## we need this in case stdlib is built directly. if it's built as
-    ## a compiler dep, then the transition has already been made by
-    ## the compiler target.
-    implementation = _stdlib_in_transition_impl,
-    inputs  = [
-        "//config/stage",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:stdlib"
-    ],
-    outputs = [
-        "//config/stage",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:stdlib"
-    ]
-)
+# ##################################
+# stdlib_in_transition = transition(
+#     ## we need this in case stdlib is built directly. if it's built as
+#     ## a compiler dep, then the transition has already been made by
+#     ## the compiler target.
+#     implementation = _stdlib_in_transition_impl,
+#     inputs  = [
+#         "//config/stage",
+#         "//toolchain:compiler",
+#         "//toolchain:lexer",
+#         "//toolchain:stdlib"
+#     ],
+#     outputs = [
+#         "//config/stage",
+#         "//toolchain:compiler",
+#         "//toolchain:lexer",
+#         "//toolchain:stdlib"
+#     ]
+# )
 
 # ################################################################
 # def _compile_deps_out_transition_impl(settings, attr):

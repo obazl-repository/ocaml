@@ -38,6 +38,7 @@ def _cc_build_profile_impl(ctx):
             "BINDIR"      : ctx.attr.BINDIR,
             "EXEC_PREFIX" : ctx.attr.EXEC_PREFIX,
             "LIBDIR"      : ctx.attr.LIBDIR,
+            # "OCAMLLIB"    : ctx.file.OCAMLLIB.dirname
         }),
     ]
 
@@ -54,6 +55,7 @@ cc_build_profile = rule(
         "BINDIR"      : attr.string(),
         "EXEC_PREFIX" : attr.string(),
         "LIBDIR"      : attr.string(),
+        # "OCAMLLIB"    : attr.label(allow_single_file=True),
     },
     doc = "Exposes selected cc_toolchain_profile fields.",
     provides = [platform_common.TemplateVariableInfo],
