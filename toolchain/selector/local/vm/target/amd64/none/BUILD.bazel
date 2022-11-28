@@ -1,0 +1,5 @@
+#  # For platforms with no OS, like microcontrollers.
+# constraint_value(
+#     name = "none",
+#     constraint_setting = ":os",
+# )

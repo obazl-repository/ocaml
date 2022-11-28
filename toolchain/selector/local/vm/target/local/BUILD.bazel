@@ -1,0 +1,111 @@
+load("//toolchain/selector:BUILD.bzl", "toolchain_selector")
+
+package(default_visibility=["//visibility:public"])
+
+exports_files(glob(["*.bazel"]))
+
+toolchain_selector(  ## ocamlopt.byte, rom ocamlc.byte
+    name           = "vv_vv",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:vv_vv",
+    build_host_constraints  = [
+        # build runtime: local
+        "//platform/constraints/ocaml/executor:vm_executor",
+        # build emitter: matches target executor
+    ],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:vm_executor",
+    ],
+    target_host_configuration = ["//config/target/emitter:vm?"]
+)
+
+toolchain_selector(
+    name           = "vv_vs",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:vv_vs",
+    build_host_constraints  = [
+        # build runtime: local
+        "//platform/constraints/ocaml/executor:vm_executor"],
+        # build emitter: matches target executor
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:vm_executor"],
+    target_host_configuration = ["//config/target/emitter:sys?"]
+)
+
+toolchain_selector(
+    name           = "vs_ss",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:vs_ss",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:vm_executor"
+        # buildhost emitter == targethost executor == sys
+    ],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys_executor"],
+    target_host_configuration = ["//config/target/emitter:sys?"]
+)
+
+toolchain_selector(
+    name           = "vs_sv",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:vs_sv",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:vm_executor"],
+        # buildhost emitter == targethost executor == sys
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys_executor"],
+    target_host_configuration = ["//config/target/emitter:vm?"]
+)
+
+################################################################
+toolchain_selector(
+    name           = "ss_ss",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:ss_ss",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:sys_executor",
+        # buildhost emitter == targethost executor == sys
+    ],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys_executor"],
+    target_host_configuration = ["//config/target/emitter:sys?"]
+)
+
+toolchain_selector(
+    name           = "ss_sv",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:ss_sv",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:sys_executor",
+        # buildhost emitter == targethost executor == sys
+    ],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:sys_executor"],
+    target_host_configuration = ["//config/target/emitter:vm?"]
+)
+################################################################
+toolchain_selector(
+    name           = "sv_vv",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:sys_vm_vm__sys_vm_sys",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:sys_executor",
+        # buildhost emitter == targethost executor == vm
+    ],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:vm_executor"],
+    target_host_configuration = ["//config/target/emitter:vm?"]
+)
+
+toolchain_selector(
+    name           = "sv_vs",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:vm_vmsys",
+    build_host_constraints  = [
+        "//platform/constraints/ocaml/executor:sys_executor",
+        # buildhost emitter == targethost executor == vm
+    ],
+    target_host_constraints = [
+        "//platform/constraints/ocaml/executor:vm_executor"],
+    target_host_configuration = ["//config/target/emitter:sys?"]
+)
