@@ -70,7 +70,7 @@ toolchain_selector(
 toolchain_selector(
     name           = "ss_ss",
     type           = "//toolchain/type:boot",
-    adapter        = "//toolchain/adapter:sys_vm_vm__sys_vm_sys",
+    adapter        = "//toolchain/adapter:ss_ss",
     build_host_constraints  = [
         "//platform/constraints/ocaml/executor:sys_executor",
         # buildhost emitter == targethost executor == sys
@@ -85,7 +85,7 @@ toolchain_selector(
 toolchain_selector(
     name           = "ss_sv",
     type           = "//toolchain/type:boot",
-    adapter        = "//toolchain/adapter:vm_vmsys",
+    adapter        = "//toolchain/adapter:ss_sv",
     build_host_constraints  = [
         "//platform/constraints/ocaml/executor:sys_executor",
         # buildhost emitter == targethost executor == sys
@@ -100,7 +100,7 @@ toolchain_selector(
 toolchain_selector(
     name           = "sv_vv",
     type           = "//toolchain/type:boot",
-    adapter        = "//toolchain/adapter:sys_vm_vm__sys_vm_sys",
+    adapter        = "//toolchain/adapter:sv_vv",
     build_host_constraints  = [
         "//platform/constraints/ocaml/executor:sys_executor",
         # buildhost emitter == targethost executor == vm
@@ -115,7 +115,7 @@ toolchain_selector(
 toolchain_selector(
     name           = "sv_vs",
     type           = "//toolchain/type:boot",
-    adapter        = "//toolchain/adapter:vm_vmsys",
+    adapter        = "//toolchain/adapter:sv_vs",
     build_host_constraints  = [
         "//platform/constraints/ocaml/executor:sys_executor",
         # buildhost emitter == targethost executor == vm
