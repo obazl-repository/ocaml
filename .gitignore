@@ -334,5 +334,6 @@ META
 bazel-*
 config/CONFIG.bzl
 runtime/caml/s.local.h
+profile/cc/local/BUILD.bazel
 toolchain/profile/cc/local/BUILD.bazel
 *.log

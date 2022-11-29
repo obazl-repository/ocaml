@@ -12,9 +12,26 @@ load("//bzl/rules/macros:lexer.bzl", "lexer")
 ## if stage < 2 then set vm emitter
 ## if stage == 2, then emitter == target executor
 
+## WARNING: obsolete.  use //bin:ocamlcc instead
 boot_compiler(
     name                   = "compiler",
-    # opts = ["-OCAMLLIB", "$(OCAMLLIB)"],
+    opts = [
+        "-verbose",
+    ],
+    cc_linkopts = [
+        "verbose", #linux: --verbose; mac: -v (undocumented)
+    ] + select({
+        "@platforms//os:macos": [
+            # "-Wl,-v", # prints config, search paths
+            # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
+            "-t", # -Wl-v plus logs each file the linker loads.
+            # "-why_load" # Log why each object file in a static library
+            #             # is loaded. That is, what symbol was needed.
+            ],
+        "@platforms//os:linux": [
+            ##FIXME: depends on linker used (bfd, gold, etc.)
+        ]
+    }),
     # toolchains = ["//profile/system/local"],
     prologue = ["//compilerlibs:ocamlcommon"] + select({
         "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],

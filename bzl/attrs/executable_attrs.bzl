@@ -33,9 +33,7 @@ def executable_attrs():
             # cfg = exe_deps_out_transition,
         ),
 
-        opts             = attr.string_list(
-            # default = ["-nopervasives"]
-        ),
+        opts             = attr.string_list( ),
 
         warnings         = attr.string_list(
             doc          = "List of OCaml warning options. Will override configurable default options."

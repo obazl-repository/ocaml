@@ -1,6 +1,8 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+load(":BUILD.bzl", "progress_msg")
+
 load("//bzl:providers.bzl",
      "BootInfo", "ModuleInfo", "NsResolverInfo",
      "new_deps_aggregator", "OcamlSignatureProvider")
@@ -500,14 +502,7 @@ def module_impl(ctx, module_name):
             tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = "CompileBootstrapModule",
-        progress_message = "{ws}//{pkg}:{tgt} compiling {rule}, stage {s}({wd})".format(
-            s = stage,
-            wd = workdir,
-            rule=ctx.attr._rule,
-            ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
-            pkg = ctx.label.package,
-            tgt=ctx.label.name,
-        )
+        progress_message = progress_msg(stage, workdir, ctx)
     )
 
     #############################################

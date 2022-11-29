@@ -1,6 +1,8 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
+load(":BUILD.bzl", "progress_msg")
+
 load("//bzl:providers.bzl",
      "new_deps_aggregator",
      "OcamlExecutableMarker",
@@ -153,6 +155,14 @@ def executable_impl(ctx):  ## , tc):
 
     _options = get_options(rule, ctx)
     args.add_all(_options)
+
+    if ctx.attr.cc_linkopts:
+        for lopt in ctx.attr.cc_linkopts:
+            if lopt == "verbose":
+                # if platform == mac:
+                args.add_all(["-ccopt", "-Wl,-v"])
+            else:
+                args.add_all(["-ccopt", lopt])
 
     for w in ctx.attr.warnings:
         args.add_all(["-w",
@@ -326,13 +336,7 @@ def executable_impl(ctx):  ## , tc):
             tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = mnemonic,
-        progress_message = "stage {s} linking {rule}: {ws}//{pkg}:{tgt}".format(
-            s = stage,
-            rule = ctx.attr._rule,
-            ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
-            pkg = ctx.label.package,
-            tgt = ctx.label.name,
-        )
+        progress_message = progress_msg(stage, workdir, ctx)
     )
     ################
 

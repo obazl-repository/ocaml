@@ -11,6 +11,9 @@ load("//bzl:rules.bzl",
      "compiler_signature",
      "mustache"
 )
+load(":BUILD_RULES.bzl",
+     "config_ml", "OCamlCcToolchainInfo", "config_cc_toolchain")
+
 package(default_visibility = ["//visibility:public"])
 
 compiler_signature(
@@ -73,6 +76,18 @@ mustache(
     template = "config.ml.mustache",
     json     = "config.ml.json",
     # stdlib = "//stdlib"
+)
+
+config_ml( ## FIXME: name
+    name     = "__config_ml_json__",
+    out      = "config.ml.json",
+    template = "config.ml.json.tplt",
+    tc       = ":config.cc"
+)
+
+config_cc_toolchain(
+    name = "config.cc",
+    out  = "config_cc.json"
 )
 
 compiler_module(

@@ -1,5 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
+load(":BUILD.bzl", "progress_msg")
+
 load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
@@ -323,13 +325,7 @@ def signature_impl(ctx, module_name):
             tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = "CompileOcamlSignature",
-        progress_message = "stage {s}({wd}): compiling compiler_signature: {ws}//{pkg}:{tgt}".format(
-            s = stage,
-            wd = workdir,
-            ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,
-            pkg = ctx.label.package,
-            tgt=ctx.label.name
-        )
+        progress_message = progress_msg(stage, workdir, ctx)
     )
 
     #############################################

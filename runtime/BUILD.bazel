@@ -84,7 +84,7 @@ cc_library(
 cc_library(
     name = "asmrun",
     # alwayslink = True,
-    linkstatic = True,
+    # linkstatic = True,
     # linkshared = True,
     srcs = [
         # "//runtime:build_config.h",

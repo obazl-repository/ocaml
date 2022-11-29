@@ -1,6 +1,8 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+load(":BUILD.bzl", "progress_msg")
+
 load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
@@ -408,13 +410,7 @@ def archive_impl(ctx):
             tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = mnemonic,
-        progress_message = "stage {s} archiving {rule}: @{ws}//{pkg}:{tgt}".format(
-            s = stage,
-            rule = ctx.attr._rule,
-            ws  = ctx.label.workspace_name,
-            pkg = ctx.label.package,
-            tgt=ctx.label.name,
-        )
+        progress_message = progress_msg(stage, workdir, ctx)
     )
 
     ###################

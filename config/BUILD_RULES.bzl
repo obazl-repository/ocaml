@@ -319,3 +319,39 @@ config_cc_toolchain = rule(
     toolchains = use_cpp_toolchain(),
     fragments = ["apple", "cpp", "platform"],
 )
+
+################################################################
+def _config_ml_impl(ctx):
+
+    linker    = ctx.attr.tc[OCamlCcToolchainInfo].c_compiler_path
+    link_args = " ".join(
+        ctx.attr.tc[OCamlCcToolchainInfo].cpp_link_exe_cmd_line
+    )
+
+    ctx.actions.expand_template(
+        template = ctx.file.template,
+        output   = ctx.outputs.out,
+        substitutions = {
+            "BAZEL_LINK_CMD": linker + " " + link_args
+        }
+    )
+
+    return [
+        DefaultInfo(files = depset([ctx.outputs.out])),
+    ]
+
+####################
+config_ml = rule(
+    implementation = _config_ml_impl,
+    attrs = {
+        "out": attr.output(mandatory = True),
+        "template": attr.label(
+            allow_single_file = True,
+            mandatory  = True
+        ),
+        "tc" : attr.label(
+            allow_single_file = True,
+            mandatory = True
+        ),
+    },
+)

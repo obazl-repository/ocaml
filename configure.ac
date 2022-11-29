@@ -37,6 +37,7 @@ CONFIGURE_ARGS="$*"
 # rely on $CFLAGS because these cannot be processed by flexlink (and are not
 # passed)
 mkexe_cmd='$(CC)'
+mkexe_args=''
 mkexe_cflags='$(OC_CFLAGS) $(CFLAGS)'
 mkexe_extra_flags=''
 mkexe_via_cc_extra_cmd=''
@@ -126,6 +127,11 @@ AC_SUBST([outputobj])
 AC_SUBST([syslib])
 AC_SUBST([fpic])
 AC_SUBST([mkexe])
+AC_SUBST([mkexe_args])
+AC_SUBST([common_cflags])
+AC_SUBST([mkexe_cflags])
+AC_SUBST([mkexe_extra_flags])
+AC_SUBST([mkexe_ldflags])
 AC_SUBST([mkexe_exp])
 AC_SUBST([mkexedebugflag])
 AC_SUBST([mkexe_extra_flags])
@@ -237,7 +243,7 @@ AC_CONFIG_FILES([stdlib/META])
 AC_CONFIG_FILES([config/CONFIG.bzl])
 AC_CONFIG_FILES([config/config_sys.ml])
 AC_CONFIG_FILES([config/config.dev.ml])
-AC_CONFIG_FILES([config/config.ml.json])
+AC_CONFIG_FILES([config/config.ml.json.tplt])
 AC_CONFIG_FILES([profile/system/local/BUILD.bazel])
 AC_CONFIG_HEADERS([runtime/caml/s.local.h])
 AC_CONFIG_FILES([toolchain/profile/cc/local/BUILD.bazel])
@@ -2254,11 +2260,11 @@ AC_CONFIG_COMMANDS_PRE([
   mkexe="$mkexe_cmd"
   mkexe_exp="$mkexe_cmd_exp"
   AS_IF([test -n "$mkexe_cflags"],
-    [mkexe="$mkexe $mkexe_cflags"
-    mkexe_exp="$mkexe_exp $common_cflags $CFLAGS"])
+    [mkexe="$mkexe $mkexe_cflags",
+    mkexe_exp="$mkexe_exp $common_cflags $CFLAGS", mkexe_args="$mkexe_args $common_cflags $CFLAGS"])
   AS_IF([test -n "$mkexe_extra_flags"],
-    [mkexe="$mkexe $mkexe_extra_flags"
-    mkexe_exp="$mkexe_exp $mkexe_extra_flags"])
+    [mkexe="$mkexe $mkexe_extra_flags",
+     mkexe_exp="$mkexe_exp $mkexe_extra_flags", mkexe_args="$mkexe_args $mkexe_cflags"])
   # If $mkexe_ldflags_prefix is given, apply it to $oc_ldflags and $oc_dllflags
   # and ensure that LDFLAGS is passed using it. This is used for flexlink. where
   # linker flags need to be prefixed with -link.
@@ -2300,6 +2306,7 @@ ${mkdll_ldflags}"
   ])
   mkexe="$mkexe $mkexe_ldflags"
   mkexe_exp="$mkexe_exp $mkexe_ldflags_exp"
+  mkexe_args="$mkexe_args $mkexe_ldflags_exp"
   mkdll="$mkdll $mkdll_ldflags"
   mkdll_exp="$mkdll_exp $mkdll_ldflags_exp"
   mkmaindll="$mkmaindll $mkdll_ldflags_exp"
