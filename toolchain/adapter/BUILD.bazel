@@ -132,3 +132,45 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
+toolchain_adapter(
+    name        = "sv_vv",
+    copts       = [ ## compile opts (sigs/modules only)
+        "-nostdlib",  ## inserted by rule
+        "-strict-sequence",
+        # "-warn-error", "+A",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+)
+
+toolchain_adapter(
+    name        = "sv_vs",
+    copts       = [ ## compile opts (sigs/modules only)
+        "-nostdlib",  ## inserted by rule
+        "-strict-sequence",
+        # "-warn-error", "+A",
+    ] + select({
+        "//config:bin-annot?" : ["-bin-annot"],
+        "//conditions:default": []
+    }) + select({
+        "//config:principal?" : ["-principal"],
+        "//conditions:default": []
+    }) + select({
+        "//config:absname?" : ["-absname"],
+        "//conditions:default": []
+    }),
+    linkopts    = [],
+    # warnings  - use defaults
+    # primitives  = "//runtime:primitives",
+)
+
