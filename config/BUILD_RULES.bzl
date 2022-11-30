@@ -66,9 +66,16 @@ def _config_cc_toolchain_impl(ctx):
     # or use cpu ( == darwin_x86_64)
     if tc.cpu.endswith("x86_64"):
         config_map["arch"] = "amd64"
+    elif  tc.cpu == "k8":
+        config_map["arch"] = "amd64"
+    else:
+        config_map["arch"] = "unknown"
     if tc.cpu.startswith("darwin"):
         config_map["model"] = "default"
         config_map["system"] = "macosx"
+    else:
+        config_map["model"] = "default"
+        config_map["system"] = "linux" ## FIXME
     config_map["ccomptype"] = "msvc" if tc.compiler == "msvc" else "cc"
     config_map["compiler"] = tc.compiler
     if tc.compiler == "msvc":

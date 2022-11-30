@@ -12,6 +12,21 @@ boot_compiler(
     name = "ocamlcc",
     opts = [
         "-verbose",
+        ## for testing:
+        # "-cc", "gcc",  ## cancels mkexe
+        # "-ccopt", "-B/usr/bin",
+        # "-ccopt", "-B/usr/lib",
+        # "-ccopt", "-B/usr/lib/gcc/x86_64-linux-gnu/9",
+        # "-ccopt", "-fuse-ld=gold",
+        # "-ccopt", "-fno-use-linker-plugin",
+        # "-ccopt", "-Wl,-no-as-needed",
+        # "-ccopt", "-Wl,-z,relro,-z,now",
+        # "-ccopt", "-pass-exit-codes",
+        # "-ccopt", "-lstdc++",
+        # ## linklibs not needed on macos:
+        # "-cclib", "-lm",
+        # "-cclib", "-ldl",
+        # "-cclib", "-lpthread"
     ],
     cc_linkopts = select({
         "@platforms//os:macos": [

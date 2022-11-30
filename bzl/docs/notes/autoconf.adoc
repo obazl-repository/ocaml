@@ -16,20 +16,37 @@ Properties:
 These are the flags at issue:
 
 * `-O2`  (mingw32-gcc, clang, gcc, msvc)
-* `-fno-strict-aliasing` (mingw32-gcc, clang, gcc)
-* `-fwrapv`  (mingw32-gcc, clang, gcc)
-* `-fno-common`  (clang, gcc)
-* `-fexcess-precision=standard`  (mingw32-gcc, gcc)
+* `-fno-strict-aliasing` (mingw32-gcc, clang, gcc) "-fstrict-aliasing activates optimizations based on the type of expressions."
+* `-fwrapv` (mingw32-gcc, clang, gcc) "instructs the compiler to
+  assume that signed arithmetic overflow of addition, subtraction and
+  multiplication wraps around using twos-complement representation.
+  This flag enables some optimizations and disables others."
+* `-fno-common` (clang, gcc) - "The default is -fno-common, which
+  specifies that the compiler places uninitialized global variables in
+  the BSS section of the object file... -fcommon places uninitialized
+  global variables in a common block..."
+* `-fexcess-precision=standard` (mingw32-gcc, gcc) "option allows
+  further control over excess precision on machines where
+  floating-point operations occur in a format with more precision or
+  range than the IEEE standard and interchange floating-point
+  types...When compiling C... if -fexcess-precision=standard is
+  specified then excess precision follows the rules specified in ISO
+  C99 or C++;"
+
+mingw32:
+
+* `-Wno-unused`   (mingw32-gcc) disable all `-Wunused-foo` warnings; "note that -Wall implies -Wunused"
 * `-mms-bitfields`   (mingw32-gcc)
-* `-Wno-unused`   (mingw32-gcc)
+* `-mfpmath=sse`  (i686-*-mingw32)
+* `-msse2`   (i686-*-mingw32)
+
+msvc:
+
 * `-nologo` (msvc)
 * `-Gy-` (msvc)
 * `-MD`  (msvc)
 * `-D_CRT_SECURE_NO_DEPRECATE` (msvc)
 * `-d2VolatileMetadata-`  (msvc)
-
-* `-mfpmath=sse`  (i686-*-mingw32)
-* `-msse2`   (i686-*-mingw32)
 
 xlc only:
 

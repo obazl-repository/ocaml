@@ -54,7 +54,7 @@ def executable_attrs():
 
         ## FIXME: runtime depends on target_executor
         _runtime = attr.label(
-            allow_single_file = True,
+            # allow_single_file = True,
             default = "//runtime:asmrun",
             executable = False,
             cfg = reset_config_transition

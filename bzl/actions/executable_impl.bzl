@@ -103,8 +103,8 @@ def executable_impl(ctx):  ## , tc):
     out_exe = ctx.actions.declare_file(workdir + ctx.label.name)
 
     runtime = []
-    if ctx.file._runtime:
-        runtime.append(ctx.file._runtime)
+    for f in ctx.files._runtime:
+        runtime.append(f)
 
     ####  flags and options for bootstrapping executables
 
@@ -228,9 +228,9 @@ def executable_impl(ctx):  ## , tc):
         transitive = [cli_link_deps_depset]
     )
 
-    if ctx.file._runtime:
+    for f in ctx.files._runtime:
         # args.add(ctx.file._runtime.path)
-        includes.append(ctx.file._runtime.dirname)
+        includes.append(f.dirname)
 
     args.add_all(includes, before_each="-I", uniquify=True)
 
@@ -273,7 +273,7 @@ def executable_impl(ctx):  ## , tc):
         ,
         transitive = []
         + [depset(
-            ctx.files._camlheaders + [ctx.file._runtime]
+            ctx.files._camlheaders + ctx.files._runtime
             + [ctx.file._stdlib]
         )]
         #FIXME: primitives should be provided by target, not tc?

@@ -807,9 +807,13 @@ oc_cflags
 toolchain
 ccomptype
 mkexe_via_cc_ldflags
-mkexe_extra_flags
 mkexedebugflag
 mkexe_exp
+mkexe_ldflags
+mkexe_extra_flags
+mkexe_cflags
+common_cflags
+mkexe_args
 mkexe
 fpic
 syslib
@@ -3151,6 +3155,7 @@ CONFIGURE_ARGS="$*"
 # rely on $CFLAGS because these cannot be processed by flexlink (and are not
 # passed)
 mkexe_cmd='$(CC)'
+mkexe_args=''
 mkexe_cflags='$(OC_CFLAGS) $(CFLAGS)'
 mkexe_extra_flags=''
 mkexe_via_cc_extra_cmd=''
@@ -3228,6 +3233,11 @@ OCAML_VERSION_SHORT=5.1
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
+
+
+
+
+
 
 
 
@@ -3374,7 +3384,7 @@ ac_config_files="$ac_config_files config/config_sys.ml"
 
 ac_config_files="$ac_config_files config/config.dev.ml"
 
-ac_config_files="$ac_config_files config/config.ml.json"
+ac_config_files="$ac_config_files config/config.ml.json.tplt"
 
 ac_config_files="$ac_config_files profile/system/local/BUILD.bazel"
 
@@ -19672,13 +19682,13 @@ fi
   mkexe_exp="$mkexe_cmd_exp"
   if test -n "$mkexe_cflags"
 then :
-  mkexe="$mkexe $mkexe_cflags"
-    mkexe_exp="$mkexe_exp $common_cflags $CFLAGS"
+  mkexe="$mkexe $mkexe_cflags",
+    mkexe_exp="$mkexe_exp $common_cflags $CFLAGS", mkexe_args="$mkexe_args $common_cflags $CFLAGS"
 fi
   if test -n "$mkexe_extra_flags"
 then :
-  mkexe="$mkexe $mkexe_extra_flags"
-    mkexe_exp="$mkexe_exp $mkexe_extra_flags"
+  mkexe="$mkexe $mkexe_extra_flags",
+     mkexe_exp="$mkexe_exp $mkexe_extra_flags", mkexe_args="$mkexe_args $mkexe_cflags"
 fi
   # If $mkexe_ldflags_prefix is given, apply it to $oc_ldflags and $oc_dllflags
   # and ensure that LDFLAGS is passed using it. This is used for flexlink. where
@@ -19736,6 +19746,7 @@ fi
 fi
   mkexe="$mkexe $mkexe_ldflags"
   mkexe_exp="$mkexe_exp $mkexe_ldflags_exp"
+  mkexe_args="$mkexe_args $mkexe_ldflags_exp"
   mkdll="$mkdll $mkdll_ldflags"
   mkdll_exp="$mkdll_exp $mkdll_ldflags_exp"
   mkmaindll="$mkmaindll $mkdll_ldflags_exp"
@@ -20651,7 +20662,7 @@ do
     "config/CONFIG.bzl") CONFIG_FILES="$CONFIG_FILES config/CONFIG.bzl" ;;
     "config/config_sys.ml") CONFIG_FILES="$CONFIG_FILES config/config_sys.ml" ;;
     "config/config.dev.ml") CONFIG_FILES="$CONFIG_FILES config/config.dev.ml" ;;
-    "config/config.ml.json") CONFIG_FILES="$CONFIG_FILES config/config.ml.json" ;;
+    "config/config.ml.json.tplt") CONFIG_FILES="$CONFIG_FILES config/config.ml.json.tplt" ;;
     "profile/system/local/BUILD.bazel") CONFIG_FILES="$CONFIG_FILES profile/system/local/BUILD.bazel" ;;
     "runtime/caml/s.local.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.local.h" ;;
     "toolchain/profile/cc/local/BUILD.bazel") CONFIG_FILES="$CONFIG_FILES toolchain/profile/cc/local/BUILD.bazel" ;;

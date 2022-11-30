@@ -84,7 +84,7 @@ cc_library(
 cc_library(
     name = "asmrun",
     # alwayslink = True,
-    # linkstatic = True,
+    linkstatic = True,
     # linkshared = True,
     srcs = [
         # "//runtime:build_config.h",
@@ -95,6 +95,10 @@ cc_library(
         "//runtime/caml:s.h",
         ":primitives.h"
     ],
+    # features = [
+    #     "-supports_pic",    # disable pic
+    #     "fully_static_link" # TODO: explore
+    # ],
     copts = [
         "-x", "c",
         "-Iruntime/caml",
@@ -499,18 +503,32 @@ mustache(
 
 cc_binary( ##FIXME: move this to //runtime and use an alias here
     name = "ocamlrun",
+    linkstatic = True,
     srcs = [
         ":prims.c",
+        "//runtime:common_c_sources",
+        "//runtime:bytecode_only_c_sources",
+        "//runtime/caml:instruct.h",
+        ":primitives.h"
     ] + select({
-        # add instrtrace if mode is debug on any platform, or
-        # fastbuild on macos (where Bazel adds -DDEBUG)
         ":trace?": ["//runtime:instrtrace"],
         "//conditions:default": []
     }),
+    # srcs = [
+    #     ":prims.c",
+    # ] + select({
+    #     # add instrtrace if mode is debug on any platform, or
+    #     # fastbuild on macos (where Bazel adds -DDEBUG)
+    #     ":trace?": ["//runtime:instrtrace"],
+    #     "//conditions:default": []
+    # }),
     copts = [
         "-x", "c",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime", # caml/instruct.h
+        "-I$(GENDIR)/runtime/caml",
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
@@ -521,13 +539,14 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
         "$(OC_LDFLAGS)",
         "-ffunction-sections",
         "-fdata-sections"
-    ] + select({
-        "//platform/target:sys?": ["$(SYS_LINKLIBS)"],
-        "//platform/target:vm?" : ["$(VM_LINKLIBS)"],
-        "//conditions:default"   : ["$(VM_LINKLIBS)"],
-    }),
+    ],
+    # ] + select({
+    #     "//platform/target:sys?": ["$(SYS_LINKLIBS)"],
+    #     "//platform/target:vm?" : ["$(VM_LINKLIBS)"],
+    #     "//conditions:default"   : ["$(VM_LINKLIBS)"],
+    # }),
     deps= [
-        ":camlrun",
+        # ":camlrun",
         "//runtime/caml:hdrs"
     ],
     toolchains = ["//profile/system/local"],

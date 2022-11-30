@@ -12,6 +12,12 @@ Several sub-classes:
 * build config (preferential - how the user wants the compilers to be configured)
 * deployment config (preferential) - how the user wants stuff installed
 
+And more:
+
+* cc build toolchain config - for the cc toolchain used to build the compilers
+* ocaml_cc tc config - the config used by OCaml when it uses the cc tc to compile, assemble, or link (e.g. mkexe etc.)
+* ocaml toolchain config (= build config?)
+
 The `./configure` script emits several classes of config data: toolchain and system.
 
 * toolchain config is stuff like compile and link flags. determined by finding and interrogating the tools.

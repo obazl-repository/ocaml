@@ -1,0 +1,322 @@
+= linking
+
+== configuration
+
+The link configs set by ./configure script do not involve feature
+detection; they just express some default settings (`-fwrapv`, etc. -
+see notes/autoconf.adoc).
+
+The Bazel toolchain(s) do feature detection. For example Bazel knows
+about some linkers, and will configure the CC toolchain to use the
+gold linker if it is available. It will also generate CLI args
+appropriate to the tc, e.g. `"-Wl,-z,relro,-z,now"` for linux.
+
+=== linklibs
+
+Both: -ldl, -lpthread
+
+Linux: -ldl
+
+In Makefile.config: ./configure sets
+BYTECCLIBS=@bytecclibs@
+NATIVECCLIBS=@nativecclibs@
+
+They're always the same: `-lm -ldl -lpthread` on linux, `-lm -lpthread` on mac.
+
+BYTECCLIBS is used to link:
+
+* `ocamlc.opt`
+  ** macos: linklibs not needed, compiles ok w/o. why? they're incorporated into libSystem
+  ** linux: needs all three (dynamic linking). TODO: try fully-static-linking?
+* `ocamlrun` (and its variant ocamlruns, ocamlrund, ocamlruni)
+* `libcamlrun_shared.so`
+
+Mac: at least on the lastest macos there is no separate libm on mac. libm.tbd is a link to libSystem.tbd. Ditto for libdl.tbd and pthread.tbd.
+
+NATIVECCLIBS is used to link:
+
+* `libasmrun_shared.so`
+
+Neither is used to link:
+
+* `ocamlc.byte`
+* `ocamlopt.byte`
+* `ocamlopt.opt`
+* static runtimes:
+  * `libcamlrun.a` and its variants
+    ** `libcamlrund.a`
+    ** `libcamlruni.a`
+    ** `libcamlrun_pic.a`
+    ** `libcamlrun_non_shared.a`
+  * `libasmrun.a` and its variants
+    ** `libasmrund.a`
+    ** `libasmruni.a`
+    ** `libasmrun_pic.a`
+
+The linklibs are not needed for the bytecode compilers, because they
+are linked into `ocamlrun`. Why are they not needed for the static libs?
+
+
+Q: why is BYTECCLIBS used to link `ocamlc.opt` but not `ocamlopt.opt`?
+
+A: ocamlbytecomp.cmxa needs them?
+
+Also sets:
+
+```
+ DYNLINKOPTS=@DLLIBS@    ## linux:  -ldl
+ NATDYNLINK=@natdynlink@   ## boolean
+ NATDYNLINKOPTS=@natdynlinkopts@   ## linux: -Wl,-E
+```
+
+For linux, NATDYNLINK = '-ldl'; for macos, its unset.
+
+OCAML_NATDYNLINKOPTS is set to `-ccopt "$(NATDYNLINKOPTS)"` if NATDYNLINK is true
+
+But it is only used in compilerlibs/Makefile.compilerlibs, where it is
+used to link `ocamlbytecomp.cmxa` - which is odd since it is `-Wl,-E`
+in linux.  Guess: ocaml uses this to create `ocamlbytecomp.a`?
+
+But that makes no sense - `-Wl, -E` is used for "creating a
+dynamically linked executable".
+
+Under Bazel we do not need this, since our
+rules can detect the build and target platforms.
+
+
+== linux
+
+=== asmrun
+
+//runtime:asmrun
+
+Static: libasmrun.a, libasmrun_pic.a - no -lm, -ldl, -pthred
+
+Shared: libasmrun_shared.so - -lm, -ldl, -lpthread
+
+Bazel link params file:
+
+```
+rcsD
+bazel-out/k8-fastbuild/bin/runtime/libasmrun.a
+bazel-out/k8-fastbuild/bin/runtime/amd64.o
+bazel-out/k8-fastbuild/bin/runtime/_objs/asmrun/addrmap.pic.o
+bazel-out/k8-fastbuild/bin/runtime/_objs/asmrun/afl.pic.o
+...
+bazel-out/k8-fastbuild/bin/runtime/_objs/asmrun/fail_nat.pic.o
+bazel-out/k8-fastbuild/bin/runtime/_objs/asmrun/frame_descriptors.pic.o
+bazel-out/k8-fastbuild/bin/runtime/_objs/asmrun/startup_nat.pic.o
+bazel-out/k8-fastbuild/bin/runtime/_objs/asmrun/signals_nat.pic.o
+```
+
+
+
+=== ocamlrun
+
+//runtime:ocamlrun
+
+Linux: -lm, -ldl, -lpthread
+
+Mac: no -ldl
+
+Linux link options set by configure:
+
+* `-O2`
+* `-fno-strict-aliasing`
+* `-fwrapv`
+* `-pthread`
+* `-Wl,-E` - add all (dynamic) symbols to dynamic symbol table (so callbacks will work).  --export-dynamic
+
+Note that these are all determined by build requirements/preferences; they are not derived by feature detection.
+
+Bazel-generated params file:
+
+```
+-o
+bazel-out/k8-fastbuild/bin/runtime/ocamlrun
+-Wl,-S
+-fuse-ld=gold
+-Wl,-no-as-needed
+-Wl,-z,relro,-z,now
+-B/usr/bin
+-pass-exit-codes
+bazel-out/k8-fastbuild/bin/runtime/_objs/ocamlrun/prims.pic.o
+...
+bazel-out/k8-fastbuild/bin/runtime/_objs/ocamlrun/startup_byt.pic.o
+--verbose
+-fno-use-ld=gold
+-Wl,-E
+-fno-use-linker-plugin
+-ldl
+-lm
+-ldl
+-lpthread
+-lstdc++
+-lm
+```
+
+GCC search paths:
+
+```
+l$ gcc -print-search-dirs
+install: /usr/lib/gcc/x86_64-linux-gnu/9/
+programs: =/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/bin/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/bin/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/bin/
+libraries: =/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/lib/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/lib/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib/:/lib/x86_64-linux-gnu/9/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/9/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../x86_64-linux-gnu/lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../:/lib/:/usr/lib/
+```
+
+Note that the paths include the version dir `/9`; that's because gcc uses `collect2` to set the paths, and it adds those in the gcc search path.  The linker alone does not include those dirs:
+
+ld search paths:
+
+```
+$ ld --verbose | grep SEARCH_DIR | tr -s ' ;' \\012
+SEARCH_DIR("=/usr/local/lib/x86_64-linux-gnu")
+SEARCH_DIR("=/lib/x86_64-linux-gnu")
+SEARCH_DIR("=/usr/lib/x86_64-linux-gnu")
+SEARCH_DIR("=/usr/lib/x86_64-linux-gnu64")
+SEARCH_DIR("=/usr/local/lib64")
+SEARCH_DIR("=/lib64")
+SEARCH_DIR("=/usr/lib64")
+SEARCH_DIR("=/usr/local/lib")
+SEARCH_DIR("=/lib")
+SEARCH_DIR("=/usr/lib")
+SEARCH_DIR("=/usr/x86_64-linux-gnu/lib64")
+SEARCH_DIR("=/usr/x86_64-linux-gnu/lib")
+```
+
+link:https://gcc.gnu.org/onlinedocs/gccint/Collect2.html[collect2] is
+at ` /usr/lib/gcc/x86_64-linux-gnu/9/collect2`. Note: "The program
+collect2 is installed as ld in the directory where the passes of the
+compiler are installed." However, in my (Ubuntu) system, ld is a
+symlink to `x86_64-linux-gnu-ld`, which is a link to
+`x86_64-linux-gnu-ld.bfd`, which is not a link; maybe it contains
+collect2.
+
+Adding `["-ccopt", "-L/usr/lib/gcc/x86_64-linux-gnu/9"]` to the ocaml
+rule resolves the missing `-lgcc` and `-lgcc_s` libs, but we still get
+a missing `crtbeginS.o`.
+.
+
+
+Verbose OCaml output, pass opts = ["-verbose"]:
+
+```
++ as  -o '/tmp/camlstartup4773a2.o' '/tmp/camlstartupe57c48.s'
++ gcc -O2 -fno-strict-aliasing -fwrapv -pthread   -Wl,-E  -o 'bazel-out/k8-fastbuild/bin/boot/baseline/compiler/_stable/compiler'  '-Lbazel-out/k8-fastbuild/bin/stdlib/_stable' '-Lbazel-out/k8-fastbuild/bin/config/_stable' '-Lbazel-out/k8-fastbuild/bin/bytecomp/_stable' '-Lbazel-out/k8-fastbuild/bin/utils/_stable' '-Lbazel-out/k8-fastbuild/bin/parsing/_stable' '-Lbazel-out/k8-fastbuild/bin/typing/_stable' '-Lbazel-out/k8-fastbuild/bin/lambda/_stable' '-Lbazel-out/k8-fastbuild/bin/file_formats/_stable' '-Lbazel-out/k8-fastbuild/bin/driver/_stable' '-Lbazel-out/k8-fastbuild/bin/compilerlibs/_stable' '-Lbazel-out/k8-fastbuild-ST-6b0459ceabb9/bin/runtime' '-L/usr/local/lib/ocaml' -Wl,--verbose '/tmp/camlstartup4773a2.o' 'bazel-out/k8-fastbuild/bin/stdlib/_stable/std_exit.o' 'bazel-out/k8-fastbuild/bin/driver/_stable/Main.o' 'bazel-out/k8-fastbuild/bin/bytecomp/_stable/ocamlbytecomp.a' 'bazel-out/k8-fastbuild/bin/compilerlibs/_stable/ocamlcommon.a' 'bazel-out/k8-fastbuild/bin/stdlib/_stable/stdlib.a' 'bazel-out/k8-fastbuild-ST-6b0459ceabb9/bin/runtime/libasmrun.a'
+```
+
+
+Verbose linker output: pass `linkopts = ["--verbose"]` for a cc rule;
+for an ocaml rule, pass `opts = ["-ccopt", "-Wl,--verbose"]`. This is
+needed for the final link step in building native compilers.
+
+With `opts = ["-verbose", "-ccopt", "-Wl,--verbose"]`
+
+```
+gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.1)
+COMPILER_PATH=/usr/bin/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/bin/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-o' 'bazel-out/k8-fastbuild/bin/runtime/ocamlrun' '-B' '/usr/bin' '-v' '-fno-use-ld=gold' '-fno-use-linker-plugin' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/9/collect2 --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o bazel-out/k8-fastbuild/bin/runtime/ocamlrun /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o -L/usr/bin -L/usr/lib/gcc/x86_64-linux-gnu/9 -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/9/../../.. @/tmp/ccp12Csm -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-o' 'bazel-out/k8-fastbuild/bin/runtime/ocamlrun' '-B' '/usr/bin' '-v' '-fno-use-ld=gold' '-fno-use-linker-plugin' '-mtune=generic' '-march=x86-64'
+```
+
+With `-Wl,--verbose`:
+
+```
+ld: cannot find crtbeginS.o: No such file or directory
+ld: cannot find -lgcc
+ld: cannot find -lgcc_s
+File "caml_startup", line 1:
+Error: Error during linking (exit code 1)
+GNU ld (GNU Binutils for Ubuntu) 2.34
+  Supported emulations:
+   elf_x86_64
+   elf32_x86_64
+   elf_i386
+   elf_iamcu
+   elf_l1om
+   elf_k1om
+   i386pep
+   i386pe
+using internal linker script:
+==================================================
+/* Script for -pie -z combreloc -z separate-code -z relro -z now */
+/* Copyright (C) 2014-2020 Free Software Foundation, Inc.
+   Copying and distribution of this script, with or without modification,
+   are permitted in any medium without royalty provided the copyright
+   notice and this notice are preserved.  */
+OUTPUT_FORMAT("elf64-x86-64", "elf64-x86-64",
+	      "elf64-x86-64")
+OUTPUT_ARCH(i386:x86-64)
+ENTRY(_start)
+SEARCH_DIR("=/usr/local/lib/x86_64-linux-gnu"); SEARCH_DIR("=/lib/x86_64-linux-gnu"); SEARCH_DIR("=/usr/lib/x86_64-linux-gnu"); SEARCH_DIR("=/usr/lib/x86_64-linux-gnu64"); SEARCH_DIR("=/usr/local/lib64"); SEARCH_DIR("=/lib64"); SEARCH_DIR("=/usr/lib64"); SEARCH_DIR("=/usr/local/lib"); SEARCH_DIR("=/lib"); SEARCH_DIR("=/usr/lib"); SEARCH_DIR("=/usr/x86_64-linux-gnu/lib64"); SEARCH_DIR("=/usr/x86_64-linux-gnu/lib");
+SECTIONS
+... tons of stuff ...
+==================================================
+ld: mode elf_x86_64
+attempt to open /lib/x86_64-linux-gnu/Scrt1.o succeeded
+/lib/x86_64-linux-gnu/Scrt1.o
+attempt to open /lib/x86_64-linux-gnu/crti.o succeeded
+/lib/x86_64-linux-gnu/crti.o
+attempt to open crtbeginS.o failed
+attempt to open /tmp/camlstartup279dd7.o succeeded
+/tmp/camlstartup279dd7.o
+attempt to open bazel-out/k8-fastbuild/bin/stdlib/_stable/std_exit.o succeeded
+bazel-out/k8-fastbuild/bin/stdlib/_stable/std_exit.o
+...
+attempt to open bazel-out/k8-fastbuild/bin/bytecomp/_stable/ocamlbytecomp.a succeeded
+bazel-out/k8-fastbuild/bin/bytecomp/_stable/ocamlbytecomp.a
+(bazel-out/k8-fastbuild/bin/bytecomp/_stable/ocamlbytecomp.a)Instruct.o
+(bazel-out/k8-fastbuild/bin/bytecomp/_stable/ocamlbytecomp.a)Bytegen.o
+...
+attempt to open bazel-out/k8-fastbuild/bin/stdlib/_stable/libgcc.so failed
+attempt to open bazel-out/k8-fastbuild/bin/stdlib/_stable/libgcc.a failed
+...
+... and so on...
+attempt to open /lib/x86_64-linux-gnu/libc.so succeeded
+opened script file /lib/x86_64-linux-gnu/libc.so
+/lib/x86_64-linux-gnu/libc.so
+opened script file /lib/x86_64-linux-gnu/libc.so
+attempt to open /lib/x86_64-linux-gnu/libc.so.6 succeeded
+/lib/x86_64-linux-gnu/libc.so.6
+attempt to open /usr/lib/x86_64-linux-gnu/libc_nonshared.a succeeded
+/usr/lib/x86_64-linux-gnu/libc_nonshared.a
+(/usr/lib/x86_64-linux-gnu/libc_nonshared.a)elf-init.oS
+(/usr/lib/x86_64-linux-gnu/libc_nonshared.a)stat64.oS
+attempt to open /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 succeeded
+/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+```
+
+NOTE: OCaml issues the call to gcc, not Bazel. As the log shows, the
+search path does not include the dirs from gcc's search path. I
+*think* this means that gcc did not use collect2. In any case, Bazel
+does not know about those search paths, so it may be those libs are
+not found because we did not tell Bazel about their dirs.
+
+When run under Bazel, OCaml link commands ("mkexe") call gcc, but gcc
+does not use `collect2`, so the needed directories are not in the
+search path. Check this by adding the verbose flag to the
+`//boot/baseline/compiler` target as directed above.
+
+== macos
+
+Linker: ld
+
+Options for introspecting the linker
+* `-why_load` Log why each object file in a static library is loaded. That is, what symbol was needed.  Also called -whyload for compatibility.
+* `-why_live symbol_name` Logs a chain of references to symbol_name.
+  Only applicable with -dead_strip . It can help debug why something
+  that you think should be dead strip removed is not removed. See
+  -exported_symbols_list for syntax and use of wildcards.
+* `-print_statistics` Logs information about the amount of memory and time the linker used.
+* `-t` Logs each file (object, archive, or dylib) the linker loads.  Useful for debugging problems with search paths where the wrong library is loaded.
+* `-order_file_statistics` Logs information about the processing of a -order_file.
+* `-map map_file_path` Writes a map file to the specified path which details all symbols and their addresses in the output image.
+
+
+== misc
+
+-pthread v. -lpthread:  link:https://stackoverflow.com/questions/23250863/difference-between-pthread-and-lpthread-while-compiling[]
+
+Summary: use -pthread, it enables macros. -lpthread just links the lib.

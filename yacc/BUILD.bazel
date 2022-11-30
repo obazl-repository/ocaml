@@ -11,13 +11,16 @@ load("//config:CONFIG.bzl",
 
 cc_binary(
     name = "ocamlyacc",
+    linkstatic = True,
     srcs = [
         "closure.c", "error.c", "lalr.c", "lr0.c",
         "main.c", "mkpar.c", "output.c", "reader.c",
         "skeleton.c", "symtab.c", "verbose.c", "warshall.c",
         "version.h", "defs.h",
     ],
+    features = ["no_legacy_features"],
     copts = [
+        "-x", "c",
         # "-fno-strict-aliasing",
         # "-fwrapv",
         "$(OC_CFLAGS)",
