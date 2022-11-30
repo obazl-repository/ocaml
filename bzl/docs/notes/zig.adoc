@@ -1,0 +1,15 @@
+= zig
+
+
+== linking
+
+=== macos
+
+zig bundles its own linker(s).  They're in the same dir as the compiler (c++), i.e. external/zig_sdk/tools
+
+* ld.lld
+* ld64.lld  (== zig tool?)
+* lld-link  (llvm linker)
+* wasm-ld
+
+

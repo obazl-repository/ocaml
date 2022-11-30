@@ -5,12 +5,15 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain", "use_cpp_toolchain")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 
+## exports rules: config_cc_toolchain, config_mkexe
+
 DISABLED_FEATURES = [
     "module_maps",
 ]
 
 OCamlCcToolchainInfo = provider()
 
+###################################
 def _config_cc_toolchain_impl(ctx):
 
     config_map = {}
@@ -34,6 +37,8 @@ def _config_cc_toolchain_impl(ctx):
     config_map["NM"] = ctx.var["NM"]
     if ctx.var.get("OBJCOPY"):
         config_map["OBJCOPY"] = ctx.var["OBJCOPY"]
+    else:
+        config_map["OBJCOPY"] = None
     config_map["STRIP"] = ctx.var["STRIP"]
     config_map["TARGET_CPU"] = ctx.var["TARGET_CPU"]
 
@@ -328,18 +333,17 @@ config_cc_toolchain = rule(
 )
 
 ################################################################
-def _config_ml_impl(ctx):
+def _config_mkexe_impl(ctx):
 
     linker    = ctx.attr.tc[OCamlCcToolchainInfo].c_compiler_path
-    link_args = " ".join(
-        ctx.attr.tc[OCamlCcToolchainInfo].cpp_link_exe_cmd_line
-    )
+    arglist = ctx.attr.tc[OCamlCcToolchainInfo].cpp_link_exe_cmd_line + ctx.attr.linkopts
+    linkargs = " ".join(arglist)
 
     ctx.actions.expand_template(
         template = ctx.file.template,
         output   = ctx.outputs.out,
         substitutions = {
-            "BAZEL_LINK_CMD": linker + " " + link_args
+            "BAZEL_LINK_CMD": linker + " " + linkargs
         }
     )
 
@@ -348,8 +352,8 @@ def _config_ml_impl(ctx):
     ]
 
 ####################
-config_ml = rule(
-    implementation = _config_ml_impl,
+config_mkexe = rule(
+    implementation = _config_mkexe_impl,
     attrs = {
         "out": attr.output(mandatory = True),
         "template": attr.label(
@@ -360,5 +364,7 @@ config_ml = rule(
             allow_single_file = True,
             mandatory = True
         ),
+        "linkopts": attr.string_list(
+        )
     },
 )

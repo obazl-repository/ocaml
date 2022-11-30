@@ -147,7 +147,17 @@ cc_assemble(
     copts = [
         "-Iruntime", # caml/m.h
         "-I$(GENDIR)/runtime/caml",
-    ],
+    ] + select({
+        # zig tc:
+        # "panic: Darwin is handled separately via std.zig.system.darwin module"
+        ## might get this on ventura, the zig tc has not caught up
+        ## to remedy:
+        # "//platform/target/os:macos?": [
+        #     "-target", "native-macos.14"  ## zig only
+        #     ## "-x86_64-macos-none" ## non-zig
+        # ],
+        "//conditions:default": []
+    }),
     defines = RUNTIME_DEFINES + [
         "NATIVE_CODE",
         "TARGET_$(ARCH)",

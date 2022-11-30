@@ -1,32 +1,23 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_compiler",
-     "compiler_module")
-
-# load("//bzl/rules/macros:compiler.bzl", "compiler")
-load("//bzl/rules/macros:lexer.bzl", "lexer")
+load("//bzl:rules.bzl", "boot_compiler")
 
 boot_compiler(
     name = "ocamlcc",
     opts = [
-        "-verbose",
-        ## for testing:
+        # "-verbose",
+        ## for testing (linux):
         # "-cc", "gcc",  ## cancels mkexe
         # "-ccopt", "-B/usr/bin",
         # "-ccopt", "-B/usr/lib",
         # "-ccopt", "-B/usr/lib/gcc/x86_64-linux-gnu/9",
+        ## bazel-generated args:
         # "-ccopt", "-fuse-ld=gold",
         # "-ccopt", "-fno-use-linker-plugin",
         # "-ccopt", "-Wl,-no-as-needed",
         # "-ccopt", "-Wl,-z,relro,-z,now",
         # "-ccopt", "-pass-exit-codes",
         # "-ccopt", "-lstdc++",
-        # ## linklibs not needed on macos:
-        # "-cclib", "-lm",
-        # "-cclib", "-ldl",
-        # "-cclib", "-lpthread"
     ] + select({
         "//platform/target/os:linux?": [
             "-cclib", "-lm",
@@ -36,54 +27,32 @@ boot_compiler(
         "//conditions:default": []
     }),
     cc_linkopts = select({
-        "@platforms//os:macos": [
+        "@platforms//os:macos": [ ## FIXME: default tc, not zig
             # "-Wl,-v", # prints config, search paths
             # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
             # "-t", # -Wl-v plus logs each file the linker loads.
             # "-why_load" # Log why each object file in a static library
             #             # is loaded. That is, what symbol was needed.
+            ## zig linker opts
+            # "-v",
             ],
         "@platforms//os:linux": [
-            "-Wl,--verbose"
+            # "-Wl,--verbose"
             ##FIXME: depends on linker used (bfd, gold, etc.)
         ]
     }),
-    # toolchains = ["//profile/system/local"],
     prologue = ["//compilerlibs:ocamlcommon"] + select({
         "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],
         "//config/target:baseline_sys?": ["//asmcomp:ocamloptcomp"],
         "//config/target:ult_sys?": ["//asmcomp:ocamloptcomp"],
-
         "//conditions:default": ["//bytecomp:ocamlbytecomp"]
     }),
     main = select({
         "//config/target:baseline_vm?": "//driver:Main",
         "//config/target:baseline_sys?": "//driver:Optmain",
         "//config/target:ult_sys?": "//driver:Optmain",
-
         "//conditions:default": "//driver:Main"
     }),
-    # prologue = [
-    #     "//compilerlibs:ocamlcommon",
-    #     "//bytecomp:ocamlbytecomp"
-    # ],
-    # main = "//driver:Main",
-    # compatibility constraints ensure selection of boot toolchain
-    # exec_compatible_with   = [
-    #     "//platform/constraints/ocaml/executor:vm_executor",
-
-    #     # platform: boot_build == sys_vm_vm + build + boot
-    #     # "//platform/constraints/ocaml/build/executor:vm_executor",
-    #     # "//platform/constraints/ocaml/build/emitter:vm_emitter",
-    #     # "//platform/constraints/stage:boot"
-    # ],
-    # target_compatible_with = [
-    #     "//platform/constraints/ocaml/executor:vm_executor",
-    #     # platform: boot_target == sys_vm_vm + target + boot
-    #     # "//platform/constraints/ocaml/target/executor:vm_executor",
-    #     # "//platform/constraints/ocaml/target/emitter:vm_emitter",
-    #     # "//platform/constraints/stage:boot"
-    # ],
     visibility             = ["//visibility:public"]
 )
 

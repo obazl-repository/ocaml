@@ -422,13 +422,6 @@ def module_impl(ctx, module_name):
         nsname = resolver.struct.basename[:-4]
         args.add_all(["-open", nsname])
 
-    if ctx.label.name == "CamlinternalFormatBasics":
-        print("in_structfile: %s" % in_structfile)
-        print("out_cm_: %s" % out_cm_)
-        print("resolver: %s" % resolver)
-        print("rdeps: %s" % resolver_deps if resolver else [])
-        # fail("X")
-
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
 

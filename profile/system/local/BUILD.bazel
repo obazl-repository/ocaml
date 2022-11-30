@@ -22,6 +22,5 @@ cc_build_profile(
     BINDIR      = "${exec_prefix}/bin",
     EXEC_PREFIX = EXEC_PREFIX,
     LIBDIR      = LIBDIR,
-    # OCAMLLIB    = "//stdlib",
     visibility  = ["//visibility:public"]
 )

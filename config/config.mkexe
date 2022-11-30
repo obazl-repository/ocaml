@@ -1,0 +1,42 @@
+mac ./configure-generated: "gcc -O2 -fno-strict-aliasing -fwrapv -pthread  -Wl,-no_compact_unwind "
+
+mac bazel generated:
+  "c_compiler_path": "external/local_config_cc/wrapped_clang",
+  "compiler": "compiler",
+  "compiler_executable": "external/local_config_cc/cc_wrapper.sh",
+  "cpp_link_exe_cmd_line": [
+            "-lc++",
+            "-fobjc-link-runtime",
+            "-headerpad_max_install_names",
+            "-no-canonical-prefixes",
+            "-target",
+            "x86_64-apple-macosx13.0",
+            "-lc++",
+            "-target",
+            "x86_64-apple-macosx13.0"
+    ],
+
+to add: -export-dynamic? to match linux cmd args?
+
+" Preserves all global symbols in main executables during LTO.  Without this option, Link Time Optimization is allowed to inline and remove global functions. This option is used when a main executable may load a plug-in which requires certain symbols from the main executable."
+
+linux ./configure-generated: "gcc -O2 -fno-strict-aliasing -fwrapv -pthread -Wl,-E"
+
+-Wl,-E == --export-dynamic.  Mac equiv: -export-dynamic
+
+"When creating a dynamically linked executable, using the -E option or the --export-dynamic option causes the linker to add all symbols to the dynamic symbol table."
+
+linux bazel link exe cmd:
+  "C_COMPILER": "compiler",
+  "c_compiler_path": "/usr/bin/gcc"
+  "compiler": "compiler",
+  "compiler_executable": "/usr/bin/gcc",
+  "cpp_link_exe_cmd_line": [
+                "-fuse-ld=gold",
+                "-Wl,-no-as-needed",
+                "-Wl,-z,relro,-z,now",
+                "-B/usr/bin",
+                "-pass-exit-codes",
+                "-lstdc++",
+                "-lm"
+        ],

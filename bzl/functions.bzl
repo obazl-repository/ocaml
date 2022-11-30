@@ -38,7 +38,16 @@ def get_workdir(tc):
     if stage in [0, 1]:
         workdir = "_boot/"
     elif stage < 0:
-        workdir = "_stable/"
+        if target_executor == "sys":
+            if target_emitter == "sys":
+                workdir = "_ocamlopt.opt/"
+            else:
+                workdir = "_ocamlc.opt/"
+        else:
+            if target_emitter == "sys":
+                workdir = "_ocamlopt.byte/"
+            else:
+                workdir = "_ocamlc.byte/"
     else:
         workdir = "_{b}{t}{s}/".format(
             b = target_executor, t = target_emitter, s = (stage - 1))

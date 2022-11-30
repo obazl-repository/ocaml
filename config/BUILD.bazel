@@ -12,7 +12,7 @@ load("//bzl:rules.bzl",
      "mustache"
 )
 load(":BUILD_RULES.bzl",
-     "config_ml", "OCamlCcToolchainInfo", "config_cc_toolchain")
+     "config_mkexe", "OCamlCcToolchainInfo", "config_cc_toolchain")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -78,11 +78,35 @@ mustache(
     # stdlib = "//stdlib"
 )
 
-config_ml( ## FIXME: name
+config_mkexe(
     name     = "__config_ml_json__",
     out      = "config.ml.json",
     template = "config.ml.json.tplt",
-    tc       = ":config.cc"
+    tc       = ":config.cc",
+    linkopts = select({
+        "//platform/target/os:linux?": [
+            ## .configure emits these, we ignore since they are compile opts
+            # "-O2",
+            # "-fno-strict-aliasing",
+            # "-fwrapv"
+            # "-pthread"
+            "-Wl,-E"
+        ],
+        "//platform/target/os:macos?": [
+            # "-O2", "-fno-strict-aliasing",
+            # "-fwrapv",
+            # "-Wl,-no_compact_unwind" ##FIXME: not for zig tc
+        ],
+
+        ## zig link options
+        # --emit-static-lib Enable linker job to emit a static library.
+        # -fapple-link-rtlib Force linking the clang builtins runtime library
+        # -shared-libsan Dynamically link the sanitizer runtime
+        # -static-libsan Statically link the sanitizer runtime
+        # -Wl,<arg> Pass the comma separated arguments in <arg> to the linke
+        # -Xlinker <arg> Pass <arg> to the linker
+        "//conditions:default": []
+    })
 )
 
 config_cc_toolchain(
@@ -148,6 +172,10 @@ config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
 
 bool_flag( name = "absname", build_setting_default = True)
 config_setting(name = "absname?", flag_values = {":absname": "True"})
+
+bool_flag( name = "flat_float_array", build_setting_default = True)
+config_setting(name = "flat_float_array?",
+               flag_values = {":flat_float_array": "True"})
 
 label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
 

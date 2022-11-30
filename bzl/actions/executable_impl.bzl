@@ -180,7 +180,7 @@ def executable_impl(ctx):  ## , tc):
         data_inputs = [depset(direct = ctx.files._camlheaders)]
 
     includes = []
-    print("CAMLHEADERS: %s" % ctx.files._camlheaders)
+    # print("CAMLHEADERS: %s" % ctx.files._camlheaders)
     for hdr in ctx.files._camlheaders:
         includes.append(hdr.dirname)
 

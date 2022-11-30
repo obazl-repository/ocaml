@@ -25,23 +25,23 @@ reset_config_transition = transition(
 #####################################################
 def _tc_compiler_out_transition_impl(settings, attr):
 
-    print("tc_compiler_out_transition")
-    print("tc name: %s" % attr.name)
+    # print("tc_compiler_out_transition")
+    # print("tc name: %s" % attr.name)
 
     target_executor = settings["//config/target/executor"]
-    print("target_executor setting: %s" % target_executor)
-    print("attr.target_executor: %s" % attr.target_executor)
+    # print("target_executor setting: %s" % target_executor)
+    # print("attr.target_executor: %s" % attr.target_executor)
     target_emitter = settings["//config/target/emitter"]
-    print("target_emitter: %s" % target_emitter)
+    # print("target_emitter: %s" % target_emitter)
 
     build_host  = settings["//command_line_option:host_platform"]
-    print("  host_platform: %s" % build_host)
+    # print("  host_platform: %s" % build_host)
 
     extra_execution_platforms = settings["//command_line_option:extra_execution_platforms"]
-    print("  extra_execution_platforms: %s" % extra_execution_platforms)
+    # print("  extra_execution_platforms: %s" % extra_execution_platforms)
 
     target_host = settings["//command_line_option:platforms"]
-    print(" platforms: %s" % target_host)
+    # print(" platforms: %s" % target_host)
 
     # NB: default for //config/stage is -1. this transition decrements
     # it until it hits 0. This means that the builds go from 0 up, and
@@ -60,23 +60,26 @@ def _tc_compiler_out_transition_impl(settings, attr):
 
     ## if target executor = vm:
     if ((stage < 0) and (attr.name in ["vv_vv", "vv_vs", "sv_vv", "sv_vs"])):
-        stage = 1 # 2 stages, 1 and -1
-        compiler = "//boot/baseline/compiler:compiler"
-        lexer = "//boot/baseline/lexer"
+        stage = 1
+        compiler = "//bin:ocamlcc"
+        lexer    = "//lex:ocamllex"
+        # compiler = "//boot/baseline/compiler:compiler"
+        # lexer = "//boot/baseline/lexer"
     ## if target executor = sys:
     elif ((stage < 0) and (attr.name in ["ss_ss", "ss_sv", "vs_ss", "vs_sv"])):
-        stage = 2 # 3 stages, 1, 2, -1
-        compiler = "//boot/baseline/compiler:compiler"
-        lexer = "//boot/baseline/lexer"
-    elif stage == 0:  # boot
+        stage = 2
+        compiler = "//bin:ocamlcc"
+        lexer    = "//lex:ocamllex"
+    elif stage == 0:
         compiler = "//boot:ocamlc.boot"
-        lexer = "//boot:ocamllex.boot"
-    elif stage == 1: # dev built by baseline tc
-        compiler = "//boot/baseline/compiler:compiler" # ocamlc.byte"
-        lexer = "//boot/baseline/lexer"
+        lexer    = "//boot:ocamllex.boot"
+        # workdir  = "_boot"
+    elif stage == 1:
+        compiler = "//bin:ocamlcc"
+        lexer    = "//lex:ocamllex"
     elif stage == 2:
-        compiler = "//boot/baseline/compiler:compiler" # ocamlc.byte"
-        lexer = "//boot/baseline/lexer"
+        compiler = "//bin:ocamlcc"
+        lexer    = "//lex:ocamllex"
     else:
         print("stage t: %s" % type(stage))
         fail("UNHANDLED COMPILER STAGE: %s" % stage)
@@ -206,11 +209,11 @@ tc_compiler_out_transition = transition(
 #     #     lexer = "//boot:ocamllex.boot"
 #     #     # lexer = "//boot:ocamllex.boot"
 #     # elif stage == 1: # dev built by baseline tc
-#     #     compiler = "//boot/baseline/compiler:compiler" # ocamlc.byte"
+#     #     compiler = "//bin:ocamlcc" # ocamlc.byte"
 #     #     lexer = "//boot/baseline:lexer"
 #     # elif stage == 2:
-#     #     compiler = "//boot/baseline/compiler:compiler" # ocamlc.byte"
-#     #     lexer = "//boot/baseline/lexer"
+#     #     compiler = "//bin:ocamlcc" # ocamlc.byte"
+#     #     lexer = "//lex:ocamllex"
 #     #     # compiler = "//dev/bin:ocamlc.dev"
 #     #     # lexer = "//dev/bin:ocamllex.byte"
 #     # else:
