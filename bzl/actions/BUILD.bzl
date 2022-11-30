@@ -1,5 +1,5 @@
 def progress_msg(stage, workdir, ctx):
-    progress_message = "{wd}: {ws}//{pkg}:{tgt} compiling {rule}, stage {s}".format(
+    msg = "{wd}: {ws}//{pkg}:{tgt} compiling {rule}, stage {s}".format(
         s = stage,
         wd = workdir,
         rule=ctx.attr._rule,
@@ -7,3 +7,4 @@ def progress_msg(stage, workdir, ctx):
         pkg = ctx.label.package,
         tgt=ctx.label.name,
     )
+    return msg
