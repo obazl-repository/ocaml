@@ -336,6 +336,6 @@ config/CONFIG.bzl
 config/config.ml.json.tplt
 config/config_sys.ml
 runtime/caml/s.local.h
-profile/cc/local/BUILD.bazel
+profile/system/local/BUILD.bazel
 toolchain/profile/cc/local/BUILD.bazel
 *.log
