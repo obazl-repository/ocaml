@@ -333,6 +333,7 @@ META
 ## Bazel
 bazel-*
 config/CONFIG.bzl
+config/config.ml.json.tplt
 runtime/caml/s.local.h
 profile/cc/local/BUILD.bazel
 toolchain/profile/cc/local/BUILD.bazel
