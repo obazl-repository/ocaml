@@ -502,7 +502,7 @@ mustache(
 # these two variables. (OCAMLRUN NEW_OCAMLRUN)
 # NEW_OCAMLRUN only used for running 'make_opcodes', in tools and bytecomp.
 
-cc_binary( ##FIXME: move this to //runtime and use an alias here
+cc_binary(
     name = "ocamlrun",
     linkstatic = True,
     srcs = [
@@ -540,7 +540,10 @@ cc_binary( ##FIXME: move this to //runtime and use an alias here
         "$(OC_LDFLAGS)",
         "-ffunction-sections",
         "-fdata-sections"
-    ],
+    ] + select({
+        "//platform/target/os:linux?": ["-lm", "-ldl", "-lpthread"],
+        "//conditions:default": []
+    }),
     # ] + select({
     #     "//platform/target:sys?": ["$(SYS_LINKLIBS)"],
     #     "//platform/target:vm?" : ["$(VM_LINKLIBS)"],
