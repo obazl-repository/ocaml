@@ -27,7 +27,14 @@ boot_compiler(
         # "-cclib", "-lm",
         # "-cclib", "-ldl",
         # "-cclib", "-lpthread"
-    ],
+    ] + select({
+        "//platform/target/os:linux?": [
+            "-cclib", "-lm",
+            "-cclib", "-ldl",
+            "-cclib", "-lpthread",
+        ],
+        "//conditions:default": []
+    }),
     cc_linkopts = select({
         "@platforms//os:macos": [
             # "-Wl,-v", # prints config, search paths
