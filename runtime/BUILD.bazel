@@ -32,7 +32,8 @@ RUNTIME_DEFINES = select({
 ## "ocaml_runtime".
 cc_library(
     name = "camlrun",
-    alwayslink = True, linkstatic = True,
+    # alwayslink = True,
+    linkstatic = True,
     srcs = [
         # "//runtime:build_config.h",
         "//runtime:common_c_sources",
