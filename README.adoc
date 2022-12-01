@@ -1,4 +1,4 @@
-= OCamlCC:  Bazel-enabled OCaml toolchain
+= OCamlCC:  Bazel-enabled OCaml toolchain (PoC, alpha)
 :toc: auto
 :toclevels: 3
 
