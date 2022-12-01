@@ -853,7 +853,7 @@ config_setting(name = "INSTR_TRACE?",
 config_setting(name = "DEBUG_TRACE?",
                ## THROW AN EXCEPTION
                flag_values = {
-                   ":INSTR_TRACE": "True",
+                   ":INSTRUCTION_TRACE": "True",
                    ":DEBUG": "True"
                }
                )
