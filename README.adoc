@@ -1,4 +1,4 @@
-= OCaml: Proof-of-Concept OBazl Build
+= OCamlCC:  Bazel-enabled OCaml toolchain
 :toc: auto
 :toclevels: 3
 
