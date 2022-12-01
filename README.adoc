@@ -14,29 +14,20 @@ WARNING: (11/14/22) These instructions are outdated.  Refreshed instructions wil
 
 3. `cd` into the root directory of the cloned repo and run configure: `$ ./configure`
 
-4. Build the principal tools: `$ bazel test :toolchain`
-+
-Target `:toolchain` builds all main targets; it's defined in
-link:BUILD.bazel[BUILD.bazel]. The main build targets are listed there.
-+
-5. Use Zig:  `$ bazel build boot/compiler --config=maczig` (or `--config=linuxzig`)
+4. Build the Big Four compiler variants:
 
-6. Use a debug variant of the runtime (instead of `build boot/baseline:ocamlrund`):
+  a. `$ bazel build bin:ocamlcc --config=ocamlc.byte`
+  b. `$ bazel build bin:ocamlcc --config=ocamlopt.byte`
+  c. `$ bazel build bin:ocamlcc --config=ocamlc.opt`
+  d. `$ bazel build bin:ocamlcc --config=ocamlopt.opt`
 
-    $ bazel build boot/baseline:ocamlrun -c dbg
+To build debug or instrumented variants add `--//runtime:DEBUG`,
+`--//runtime:CAML_INSTR`. See link:bzl/docs/debugging.adoc[debugging]
+for more info.
 
-6. Cross-compile:
+The build scripts for the tools, using alternate CC toolchains, and
+cross-compiling has not yet been updated to use the new toolchain/platform discipline.
 
-  a. mac->linux:  `$ bazel build boot/baseline:ocamlrun --config=mac_linuxamd64`
-  a. linux->mac:  `$ bazel build boot/baseline:ocamlrun --config=linuxamd64_macamd64`
-
-You can build and run executables under Bazel by using the `run` command instead of `build`; put arguments after `--`. For example:
-
-     $ bazel run boot/compiler --config=maczig -- -version
-
-To get more verbose output pass `--config=show`
-
-See link:bzl/docs/usage.adoc[usage] for more information.
 
 == Overview
 
@@ -93,7 +84,7 @@ link:https://obazl.github.io/docs_obazl/[The OBazl Toolsuite] - outdated but sti
 
 The minimal Bazel build program needed to produce usable versions of the core compilers and tools.
 
-Core compilers: `ocamlc.byte`, `ocamlc.opt`, `ocamlopt.byte`, `ocamlopt.opt`.
+The Big Four compilers: `ocamlc.byte`, `ocamlc.opt`, `ocamlopt.byte`, `ocamlopt.opt`.
 
 Core tools: bytecode and native versions of: `ocamllex`, `ocamlyacc`, `ocamlobjinfo`, etc.
 
@@ -205,7 +196,7 @@ build things. Instead it is provided by separate rulesets such as:
 ** link:https://github.com/bazelbuild/rules_pkg[rules_pkg]
 ** link:https://github.com/vaticle/bazel-distribution[bazel-distribution]
 
-== Status  (2022/11/8)
+== Status  (2022/11/30)
 
 === Legacy versions
 
@@ -223,11 +214,14 @@ stage2 `ocamlc`.  This mechanism is still under development.
 
 All the compilers and tools build.
 
-=== bazel/trunk
+=== bazel/trunk, bazel/dev
 
 The main branch of this repository is `bazel/trunk`; it tracks the
 `trunk` branch of the upstream repository (and so may be outdated at
 any given point in time).
+
+The `bazel/dev` is where development happens.
+
 
 ==== Configuration
 
@@ -254,17 +248,28 @@ The Bazel build program supports command-line options to control:
   renaming) can be used to control whether or not `.mli` files are
   separately compiled, if the build targets are configured to use it.  For an example see target link:https://github.com/obazl-repository/ocaml/blob/1cef348aa2fd3536883169ad8b371d5c36870736/stdlib/BUILD.bazel#L2320-L2328[Stdlib.Weak].
 
-==== Baseline builds
+==== Bootstrapping [New]
 
-Baseline builds use the bootstrap toolchain. The build targets are in
-`//boot/baseline` and `//boot/lib`.
+The legacy makefile-based build defines multiple targets, one for each
+of the Big Four compilers, and more for variants.
 
-The main build targets are listed in link:Build.bazel[Build.bazel].
-Target `//:toolchain` is a test target that builds all of them.
+The Bazel build has a single compiler target, `//bin:ocamlcc`. Build
+variants are selected by passing arguments controlling build and
+target platforms and some other build parameters, as noted above in
+the Quickstart section.
 
-Docs and the debugger are not yet bazelized.
+Building proceeds in stages. The first ("boot") stage uses the
+precompiled compiler (`boot/ocamlc`) to build a new `ocamlc.byte`. The
+next stage uses the new compiler to build `ocamlopt.byte`. If the
+ultimate target is a native compiler, then there is a third stage that
+uses the new `ocamlopt.byte` to build either `ocamlc.opt` or
+`ocamlopt.opt`.
+
+Each stage is built from the previous stage.
 
 ==== Cross-builds
+
+NOTE: Cross-compiling has not yet been adapted to use the new bootstrapping discipline.
 
 Cross-compilation of the runtimes works: you can build a Linux x86_64
 runtime on a MacOS x86_64 build host, for example. Cross-compilation
@@ -324,7 +329,7 @@ two distinct build protocols.
 The legacy build system defines a different build target for each
 compiler type: `ocamlc.byte`, `ocamlc.opt`, `ocamlopt.byte`, and
 `ocamlopt.opt`, and similarly for other tools. The Bazel program
-treats these as build variants of a single target: `//boot/compiler`.
+treats these as build variants of a single target: `//bin:ocamlcc`.
 The variant built is controlled by configuration settings that may be
 passed on the command line or saved in a `.bazelrc` file.
 
@@ -363,16 +368,17 @@ In this case OBazl instead defines a single target,
 example, to build a debug version of `libocamlrun.a`:
 
 ```
-    $ bazel build runtime:camlrun -c dbg
+    $ bazel build runtime:camlrun --//runtime:DEBUG
 ```
 
 To build an instrumented version:
 
 ```
-    $ bazel build runtime:camlrun --//runtime=instr
+    $ bazel build runtime:camlrun --//runtime:INSTRUMENT
 ```
 
-NOTE: the pic and shared versions are not supported in the baseline OBazl version.
+NOTE: the current OBazl version does not provide a means of specifying
+some build variations, e.g. .pic or shared.
 
 === Bootstrapping a Bootstrap Compiler [[bootstrapp]]
 
