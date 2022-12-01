@@ -4,9 +4,9 @@
 
 See the link:https://github.com/ocaml/ocaml[upstream repository] for the original OCaml README.
 
-==== Quickstart
+Latest doc changes: 11/30/2022
 
-WARNING: (11/14/22) These instructions are outdated.  Refreshed instructions will be posted soon.
+==== Quickstart
 
 1. Install Bazel.  Recommendation: link:https://github.com/bazelbuild/bazelisk[Bazelisk]
 
