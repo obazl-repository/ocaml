@@ -17,7 +17,7 @@
 
 /* Trace the instructions executed */
 
-#ifdef DEBUG
+#ifdef INSTR_TRACE
 
 #include <stdio.h>
 #include <string.h>
@@ -188,4 +188,4 @@ caml_trace_accu_sp_file (value accu, value * sp, code_t prog, asize_t proglen,
   fflush (f);
 }
 
-#endif /* DEBUG */
+#endif /* INSTR_TRACE */

@@ -43,7 +43,7 @@
 /* The table of primitives */
 struct ext_table caml_prim_table;
 
-#ifdef DEBUG
+#ifdef INSTR_TRACE
 /* The names of primitives (for instrtrace.c) */
 struct ext_table caml_prim_name_table;
 #endif
@@ -186,7 +186,7 @@ void caml_build_primitive_table(char_os * lib_path,
       open_shared_lib(p);
   /* Build the primitive table */
   caml_ext_table_init(&caml_prim_table, 0x180);
-#ifdef DEBUG
+#ifdef INSTR_TRACE
   caml_ext_table_init(&caml_prim_name_table, 0x180);
 #endif
   for (q = req_prims; *q != 0; q += strlen(q) + 1) {
@@ -194,7 +194,7 @@ void caml_build_primitive_table(char_os * lib_path,
     if (prim == NULL)
           caml_fatal_error("unknown C primitive `%s'", q);
     caml_ext_table_add(&caml_prim_table, (void *) prim);
-#ifdef DEBUG
+#ifdef INSTR_TRACE
     caml_ext_table_add(&caml_prim_name_table, caml_stat_strdup(q));
 #endif
   }
@@ -211,12 +211,12 @@ void caml_build_primitive_table_builtin(void)
 {
   int i;
   caml_ext_table_init(&caml_prim_table, 0x180);
-#ifdef DEBUG
+#ifdef INSTR_TRACE
   caml_ext_table_init(&caml_prim_name_table, 0x180);
 #endif
   for (i = 0; caml_builtin_cprim[i] != 0; i++) {
     caml_ext_table_add(&caml_prim_table, (void *) caml_builtin_cprim[i]);
-#ifdef DEBUG
+#ifdef INSTR_TRACE
     caml_ext_table_add(&caml_prim_name_table,
                        caml_stat_strdup(caml_names_of_builtin_cprim[i]));
 #endif

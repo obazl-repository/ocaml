@@ -1,1 +1,137 @@
 = debugging
+
+Debugging is a little bit complicated because the term is overloaded and ambiguous:
+
+* The `NDEBUG` macro means "disable" assertions; it does not mean "don't debug"
+* For C code a `DEBUG` macro is commonly used for some user-defined notion of "debug"
+* Building code for use with a debugger is orthogonal to building with
+  `-DDEBUG` or other macro-based conditionals. Options `-g` and
+  `-DDEBUG` have nothing to do with each other
+* The OCaml tools involve two distinct debuggable entities: the C
+  runtime and the OCaml compiler and tools proper.
+
+This gives us the following options:
+
+* Build with `DEBUG` enabled or disabled (a "debug build" of the c runtime)
+* Build with or without `-g` for cc targets (a "debugger build" of the c runtime)
+* Build OCaml sources with or without `-g` (a debugger build of the OCaml target)
+* Build with `-DNDEBUG` (disable assertions, usually only for optimized builds)
+
+Bazel supports three "compilation modes"; they're apparently for cc
+code but build rules for other languages can piggy-back on them:
+
+* fastbuild - the build is optimized for build speed. `-NDEBUG` is
+  *not* defined. Quirk: on macos, `-DDEBUG` is defined, which is a
+  *problem for OCaml; more on this below.
+
+* dbg - `-g` is passed (for cc targets), `-O0` etc.
+
+* opt - `-DNDEBUG` is defined, -O2, etc.
+
+Additional flags may be involved but that's the gist of it.
+
+Since we have two debuggables, we potentially have two compilation
+modes. For example, we might want to build an optimized C runtime but
+a debug version of the OCaml compiler.  Or vice-versa.
+
+Furthermore:
+
+* the runtime can be built with or without instruction tracing
+(runtime/instrtrace.c), which however is conditional on `-DDEBUG`.
+* `DEBUG_TRACE` was introduced by OBazl for reasons I forget; it
+  controls small bits of code in `intrerp.c`
+
+[WARNING]
+====
+The configurations sketched below are not fully implemented.
+See `runtime/BUILD.bazel`. For now we have:
+
+* `--//runtime:DEBUG` - build the debug version of the runtime (with `-DDEBUG`) (ocamlrund etc.)
+* `--//runtime:INSTRUCTION_TRACE` - enable instruction tracing (with `-DINSTR_TRACE`) (independent of `--//runtime:DEBUG`)
+* `--//runtime:INSTRUMENT` - build the instrumented version of the runtime (ocamlruni etc.)
+
+Independently:
+
+* `--//runtime:dbg` - build the runtime with `-g`, for running under  debugger
+
+
+====
+
+== Bazel `compilation_mode`
+
+To see the effect of `-c` (i.e. `--compilation_mode`), run
+
+    $ bazel aquery runtime:ocamlrun --config=ocamlc.byte -c <mode>
+
+with `--subcommands=pretty_print` enabled (in `.bazelrc` or `.config/user.bazelrc`).
+
+The OBazl rules for building the OCaml toolchain use the
+compilation_mode setting as follows:
+
+=== fastbuild
+
+Prioritizes build speed. This is the default. Its effect depends on the platform and toolchain.
+
+* macos: sets `-Wall`, `-Wthread-safety`, `-Wself-assign`,
+  `-fno-omit-frame-pointer`, `-O0`, `-DDEBUG`, `'DEBUG_PREFIX_MAP_PWD=.'`
+* linux: sets `-fstack-protector`, `-Wall`,
+  `-Wunused-but-set-parameter`, `-Wno-free-nonheap-object`,
+  `-fno-omit-frame-pointer`; does not set `-O`
+
+Also sets linker options appropriately.
+
+The cc_binary and cc_library targets in `//runtime` (and `//yacc`
+  elsewhere) detect this mode and set `-UDEBUG`, to counteract the
+  `-DDEBUG` set by Bazel. This is because `DEBUG` means "build debug
+  version of the runtime", and we want the user to be able to control
+  this independent of Bazel compilation mode.
+
+Runtime subvariant builds (i.e. `ocamlrund`, `ocamlruni`, etc. in the
+legacy build) are controlled by command line options:
+
+* `--//runtime:DEBUG` - sets `-DDEBUG`
+* `--//runtime:INSTRUMENT` - sets `-DCAML_INSTR`
+
+* `--//runtime:INSTRUCTION_TRACE`  - adds `instrtrace.c` to ocamlrun build, sets `-DINSTR_TRCE`
++
+NOTE: This is a change from the upstream sources. To make instruction
+tracing independent of the debug build, `#ifdef DEBUG` was changed to
+`#ifdef INSTR_TRACE` in a few places in `runtime/dynlink.c`,
+`runtime/caml/prims.h`, `runtime/interp.c`, and
+`runtime/instrtrace.c`, and a guard `#ifndef THREADED_CODE` was added
+in `runtime/interp.c`. This makes it possible to build a debug runtime
+without `instrtrace.c`. I have no idea if that would actually be
+useful. But its possible.
+
+=== dbg
+
+Build for the debugger.
+
+* `-c dbg` - sets `-O0`, `-g` (macos)
+
+Since there are two debuggers involved (one for C, one for OCaml),
+there are several ways we can configure things. This is currently not
+settled.
+
+One is to make `-c dbg` enable debugging for both the runtime and OCaml.
+
+The other is to define CLI options for controlling them independently. For example:
+
+* `--//runtime:dbg`  - sets `-O0`, `-g3`. We could easily allow the user to specify the debug level, e.g. `--//runtime/dbg=2` or similar
+
+* `--//config/ocaml:dbg` or the like, to enable OCaml debugging.
+
+Then to make a debugger build for OCaml but not the runtime we could run something like:
+
+* `--no//runtime:dbg --//config/ocaml:dbg`
+
+but since `--no/runtime:dbg` would be the default it could be omitted.
+
+
+=== opt
+
+
+
+* `-c opt`
+
+macos: `-DNDEBUG`, `-g0`, `-O2`, etc.

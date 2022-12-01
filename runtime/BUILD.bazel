@@ -18,11 +18,16 @@ OPTIMIZATION_FLAGS = select({
 # IN_CAML_RUNTIME only used in domain_state.h
 RUNTIME_DEFINES = select({
     # for both vm and sys runtimes
-    "//config/mode:instrumented?": ["CAML_INSTR"],
+    # ":instrumented?": ["CAML_INSTR"],
+    ":CAML_INSTR?": ["CAML_INSTR"],
+    ## FIXME: does CAML_INSTR really override these?
     "//conditions:default": ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"]
 }) + select({
-    ## WARNING: //platform/vm just for -DDEBUG, not debugger mode (-c dbg)
     ":DEBUG?": ["DEBUG"],
+    # ":trace?": ["DEBUG"],
+    "//conditions:default": []
+}) + select({
+    ":INSTR_TRACE?": ["INSTR_TRACE"],
     "//conditions:default": []
 })
 
@@ -59,7 +64,13 @@ cc_library(
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    })
+    }) + select({
+        ":fastbuild?": [
+            # Bazel adds -DDEBUG on macos; why?
+            "-UDEBUG"
+        ],
+        "//conditions:default":  []
+    }) + OPTIMIZATION_FLAGS
     ,
     linkopts = ["$(OC_LDFLAGS)"]
     + select({
@@ -114,7 +125,14 @@ cc_library(
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    }),
+    }) + select({
+        ":fastbuild?": [
+            # Bazel adds -DDEBUG on macos; why?
+            "-UDEBUG"
+        ],
+        "//conditions:default":  []
+    }) + OPTIMIZATION_FLAGS
+    ,
     linkopts = ["$(OC_LDFLAGS)", "-ffunction-sections"],
     defines = RUNTIME_DEFINES + [ # OC_NATIVE_DEFINES + [
     ] + select({
@@ -291,12 +309,6 @@ filegroup(
 #     # "//platform:windows_x86_64?": [???]
 #     "//conditions:default": []
 # })
-
-filegroup(
-    name = "instrtrace",
-    srcs = ["instrtrace.c"],
-    visibility = ["//boot:__pkg__"]
-)
 
 filegroup(
     name = "bytecode_only_c_sources",
@@ -522,17 +534,14 @@ cc_binary(
         "//runtime/caml:instruct.h",
         ":primitives.h"
     ] + select({
-        ":trace?": ["//runtime:instrtrace"],
+        # ":trace?": ["//runtime:instrtrace"],
+        # FIXME: in INSTR_TRACE and DEBUG, throw an exception
+        ":INSTR_TRACE?": [
+            "instrtrace.c"
+            # ":instrtrace"
+        ],
         "//conditions:default": []
     }),
-    # srcs = [
-    #     ":prims.c",
-    # ] + select({
-    #     # add instrtrace if mode is debug on any platform, or
-    #     # fastbuild on macos (where Bazel adds -DDEBUG)
-    #     ":trace?": ["//runtime:instrtrace"],
-    #     "//conditions:default": []
-    # }),
     copts = [
         "-x", "c",
         "$(OC_CFLAGS)",
@@ -544,8 +553,14 @@ cc_binary(
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
         "//conditions:default":  ["-std=c11"]
-    }), # + CFLAGS + OC_CPPFLAGS,
-    defines = RUNTIME_DEFINES,
+    }) + select({
+        ":fastbuild?": ["-UDEBUG"], # Bazel adds -DDEBUG on macos; why?
+        "//conditions:default":  []
+    # }) + select({
+    #     ":INSTR_TRACE?": ["-DINSTR_TRACE"],
+    #     "//conditions:default":  []
+    }) + OPTIMIZATION_FLAGS,
+    local_defines = RUNTIME_DEFINES,
     linkopts = [
         "$(OC_LDFLAGS)",
         "-ffunction-sections",
@@ -566,6 +581,30 @@ cc_binary(
     toolchains = ["//profile/system/local"],
     visibility = ["//visibility:public"],
 )
+
+# ## need this separately so we can do -DDEBUG for it only
+# cc_library(
+#     name = "instrtrace",
+#     srcs = [
+#         "instrtrace.c",
+#         "//runtime/caml:instruct.h",
+#         ":prims.c",
+#         ":primitives.h"
+#     ],
+#     copts = [
+#         "$(OC_CFLAGS)",
+#         "$(OC_CPPFLAGS)",
+#         "-Iruntime/caml",
+#         "-I$(GENDIR)/runtime", # caml/instruct.h
+#         "-I$(GENDIR)/runtime/caml",
+#     ],
+#     local_defines = ["DEBUG"],
+#     deps= [
+#         # ":camlrun",
+#         "//runtime/caml:hdrs"
+#     ],
+#     toolchains = ["//profile/system/local"],
+# )
 
 ################################################################
 ## problem: makefiles set different options for bytecode and native
@@ -712,7 +751,7 @@ cc_library(
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
-    }), # + CFLAGS + OC_CPPFLAGS + OPTIMIZATION_FLAGS,
+    }) + OPTIMIZATION_FLAGS,
     linkopts = ["$(OC_LDFLAGS)"],
     defines = RUNTIME_DEFINES + [
         "NATIVE_CODE",
@@ -767,7 +806,7 @@ string_flag(name = "runtime",
             values = [
                 "std", # standard
                 "dbg", # debug
-                "instr"  # instrumented
+                "instrument"
             ],
             visibility = ["//visibility:public"]
             )
@@ -783,7 +822,8 @@ selects.config_setting_group(
     match_any = [":vmdbg?", "//config/compilation_mode:dbg?"],
 )
 
-config_setting(name = "instrumented?", flag_values = {":runtime": "instr"},
+config_setting(name = "instrumented?",
+               flag_values = {":runtime": "instrumented"},
                visibility = ["//visibility:public"])
 
 
@@ -791,18 +831,45 @@ config_setting(name = "instrumented?", flag_values = {":runtime": "instr"},
 
 bool_flag(name = "DEBUG", build_setting_default = False)
 config_setting(name = "DEBUG?", flag_values = {":DEBUG": "True"})
+config_setting(name = "NODEBUG?", flag_values = {":DEBUG": "False"})
+
+config_setting(
+    name = "fastbuild?",
+    values = {"compilation_mode": "fastbuild"},
+    ## used to cancel -DDEBUG (default on mac fastbuild)
+    flag_values = {
+        ":DEBUG": "False",
+        # ":INSTR_TRACE": "False"
+    }
+)
+
+bool_flag(name = "INSTRUMENT", build_setting_default = False)
+config_setting(name = "CAML_INSTR?", flag_values = {":INSTRUMENT": "True"})
+
+## WARNING: INSTR_TRACE  and DEBUG and THREADED_CODE in interp.c
+bool_flag(name = "INSTRUCTION_TRACE", build_setting_default = False)
+config_setting(name = "INSTR_TRACE?",
+               flag_values = {":INSTRUCTION_TRACE": "True"})
+config_setting(name = "DEBUG_TRACE?",
+               ## THROW AN EXCEPTION
+               flag_values = {
+                   ":INSTR_TRACE": "True",
+                   ":DEBUG": "True"
+               }
+               )
+
 
 bool_flag(name = "trace", build_setting_default = False)
 config_setting(name = "trace?", flag_values = {":trace": "True"})
 
-selects.config_setting_group(
-    name = "DEBUG_TRACE?",
-    match_any = [
-        ":trace?",
-        ":DEBUG?",
-        "//config/compilation_mode:dbg?"
-    ],
-)
+# selects.config_setting_group(
+#     name = "INSTR_TRACE?",
+#     match_any = [
+#         ":trace?",
+#         ":DEBUG?",
+#         # "//config/compilation_mode:dbg?"
+#     ],
+# )
 
 #### sanitizers
 bool_flag(name = "asan", build_setting_default = False)
@@ -825,16 +892,16 @@ label_flag(
 bool_flag(name = "fastbuild", build_setting_default = False)
 config_setting(name = "vmfastbuild?", flag_values = {":fastbuild": "True"})
 selects.config_setting_group(
-    name = "fastbuild?",
+    name = "xfastbuild?",
     match_any = [":vmfastbuild?",
                  "//config/compilation_mode:fastbuild?"],
 )
 
-config_setting(
-    name = "instrtrace?",
-    values = {"compilation_mode":"fastbuild"},
-    constraint_values = ["@platforms//os:macos"]
-)
+# config_setting(
+#     name = "instrtrace?",
+#     values = {"compilation_mode":"fastbuild"},
+#     constraint_values = ["@platforms//os:macos"]
+# )
 
 string_list_flag(name = "args", build_setting_default = [],
             visibility = [

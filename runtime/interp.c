@@ -24,7 +24,9 @@
 #include "caml/debugger.h"
 #include "caml/fail.h"
 #include "caml/fix_code.h"
+#ifdef INSTR_TRACE
 #include "caml/instrtrace.h"
+#endif
 #include "caml/instruct.h"
 #include "caml/interp.h"
 #include "caml/major_gc.h"
@@ -59,7 +61,7 @@ sp is a local copy of the global variable Caml_state->extern_sp. */
 #    define Jumptbl_base 0
 #    define jumptbl_base ((char *) 0)
 #  endif
-#  ifdef DEBUG
+#  ifdef INSTR_TRACE
 #    define Next goto next_instr
 #  else
 #    define Next goto *(void *)(jumptbl_base + *pc++)
@@ -236,8 +238,10 @@ Caml_inline void check_trap_barrier_for_effect
 #endif
 #endif
 
-#ifdef DEBUG_TRACE
+#ifndef THREADED_CODE
+#ifdef INSTR_TRACE
 static __thread intnat caml_bcodcount;
+#endif
 #endif
 
 static value raise_unhandled_effect;
@@ -342,7 +346,7 @@ value caml_interprete(code_t prog, asize_t prog_size)
   accu = Val_int(0);
 
 #ifdef THREADED_CODE
-#ifdef DEBUG_TRACE
+#ifdef INSTR_TRACE
  next_instr:
   if (caml_icount-- == 0) caml_stop_here ();
   CAMLassert(Stack_base(domain_state->current_stack) <= sp);
@@ -351,7 +355,7 @@ value caml_interprete(code_t prog, asize_t prog_size)
   goto *(void *)(jumptbl_base + *pc++); /* Jump to the first instruction */
 #else
   while(1) {
-#ifdef DEBUG_TRACE
+#ifdef INSTR_TRACE
     caml_bcodcount++;
     if (caml_icount-- == 0) caml_stop_here ();
     if (caml_params->trace_level>1)
