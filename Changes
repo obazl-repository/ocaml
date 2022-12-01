@@ -115,7 +115,16 @@ Working version
 - #11475: Make Unix terminal interface bindings domain-safe
   (Olivier Nicole and Xavier Leroy, review by Xavier Leroy)
 
+- #11775: Unix.write on a non-blocking socket under Windows will return normally
+  if the write blocks after some data has already been written (as otherwise
+  there is no way of knowing how much data has been written before
+  blocking). The same behaviour was already present under Unix.
+  (Nicolás Ojeda Bär, review by David Allsopp)
+
 ### Tools:
+
+- #1172: fix ocamlyacc's handling of raw string literals
+  (Demi Marie Obenour)
 
 - #9290: Add a directive to switch off debugging in toplevel.
   This allows to see optimized bytecode with -dlambda.
@@ -124,6 +133,9 @@ Working version
 - #11166: ocamllex: the union of two character sets "cset1 | cset2" can now be
   used in any context where a character set is expected.
   (Nicolás Ojeda Bär, Martin Jambon, review by Sébastien Hinderer)
+
+- #11774: ocamlyacc: fail if there is an I/O error
+  (Demi Marie Obenour)
 
 ### Manual and documentation:
 
@@ -238,6 +250,9 @@ Working version
 
 - #11732: Ensure that types from packed modules are always generalised
   (Stephen Dolan and Leo White, review by Jacques Garrigue)
+
+- #11776: Extend environment with functor parameters in `strengthen_lazy`.
+  (Chris Casinghino and Luke Maurer, review by Gabriel Scherer)
 
 OCaml 5.0
 ---------
