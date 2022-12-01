@@ -1,0 +1,72 @@
+= staged builds
+
+The legacy build system defines different targets for the different
+compiler variants: one for `ocamlc.byte`, one for
+`ocamlopt.byte`, etc.
+
+Under Bazel we have one parameterized build target: `//bin:ocamlcc`
+(which may be shortened to `bin:ocamlcc`). The variants are built in
+stages as described below.
+
+The required arguments are:
+
+* build platform
+* target platform
+* target emitter (vm or sys)
+
+These are abbreviated using Bazel's `--config` feature, so the commands are:
+
+  a. `$ bazel build bin:ocamlcc --config=ocamlc.byte`
+  b. `$ bazel build bin:ocamlcc --config=ocamlopt.byte`
+  c. `$ bazel build bin:ocamlcc --config=ocamlc.opt`
+  d. `$ bazel build bin:ocamlcc --config=ocamlopt.opt`
+
+The `--config` settings are in `.bazelrc`; for example:
+
+```
+build:ocamlc.byte --host_platform=//platform/ocaml/local:sys_vm
+build:ocamlc.byte --platforms=//platform/ocaml/local:sys_vm
+build:ocamlc.byte --//config/target/emitter=vm
+```
+
+Partial details regarding these settings may be found at
+link:platforms.adoc[platforms].
+
+== stage 1
+
+The first stage of all compiler builds uses the precompiled
+`boot/ocamlc` to build a new `ocamlc.byte` compiler.
+
+To build the new compiler the stdlib and all other required code is
+also compiled by `boot/ocamlc`.
+
+The workdir is `_boot`
+
+== stage 2
+
+Since `boot/ocamlc` may be out of date, the new `ocamlc.byte` built by
+it in stage 1 is also out of date.
+
+Stage 2 uses the new `ocamlc.byte` compiler built by stage 1 to build
+one of:
+
+* `ocamlc.byte`
+* `ocamlopt.byte`
+
+
+The stage 2 `ocamlc.byte` is built by the stage 1 `ocamlc.byte`, which
+first (re)builds the stdlib and other code. So it is built entirely
+from the source code from the distribution, by a compiler also built
+from the sources.  So it should not require another build.
+
+Ditto for stage 2 `ocamlopt.byte`.
+
+The work dirs are named after the targets: `_ocamlc.byte/` and `_ocamlopt.byte`.
+
+== stage 3
+
+Building the native compilers `ocamlc.opt` and `ocamlopt.opt` requires
+an addition build stage. Stage 3 uses the `ocamlopt.byte` compiler
+built by stage 2 to build them.
+
+CAUTION: 

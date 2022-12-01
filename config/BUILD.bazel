@@ -78,6 +78,10 @@ mustache(
     # stdlib = "//stdlib"
 )
 
+# this is a singleton rule whose only job is to inject the link
+# command derived from the selected cc toolchain (in variable
+# BAZEL_LINK_CMD) into config.ml.json.tplt, yielding config.ml.json,
+# which is used above to generate config.ml.
 config_mkexe(
     name     = "__config_ml_json__",
     out      = "config.ml.json",
@@ -195,6 +199,7 @@ config_setting(
     ]
 )
 
+## FIXME: rename //config/ocaml:verbose
 bool_flag( name = "verbose", build_setting_default = False)
 
 ################################################################

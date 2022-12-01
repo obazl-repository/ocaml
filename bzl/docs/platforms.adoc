@@ -26,6 +26,25 @@ To specify a build target we need to specify all three parts.  The form is
 
 `<runtime>_<executor>_<emitter>`
 
+[NOTE]
+====
+The build source code uses the following abbreviations:
+
+* `vv` - vm executor and emitter: `ocamlc.byte`
+* `vs` - vm executor, sys emitter:  `ocamlopt.byte`
+* `ss` - sys executor, sys emitter: `ocamlopt.opt`
+* `sv` - sys executor, vm emitter: `ocamlc.opt`
+
+Currently the runtime is assumed to be `sys`, i.e. we're not
+cross-compiling,
+
+These abbreviations are used in toolchain and platform definitions for conciseness.
+
+For example, using `ocamlc.byte` to build `ocamlopt.byte` implies
+build platform `vv` and target platform `vs`.
+
+====
+
 For example:
 
 * `ocamlc.byte` runs on the vm on the local system and emits bytecode.

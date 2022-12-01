@@ -6,7 +6,43 @@ See the link:https://github.com/ocaml/ocaml[upstream repository] for the origina
 
 Latest doc changes: 11/30/2022
 
-==== Quickstart
+== News (12/01/2023)
+
+* New name: `ocamlcc` - the OCaml Compiler Collection. Analogous to
+  `GCC`, the GNU Compiler Collection. Not only do we have multiple
+  compilers - `ocamlc.byte`, `ocamlopt.byte`, etc., the compilers
+  themselves may serve to drive a C toolchain, to compile, assemble,
+  and link C code.
+
+* Platforms and toolchains have been revised to support recursive (staged) builds.
+
+* Recursive builds. Well, at least quasi-recursive. There is only one
+  target for building a compiler, `bin:ocamlcc`; to build the
+  compiler, this target needs a compiler, which it gets from a
+  toolchain, which depends on `bin:ocamlc`, which needs a
+  compiler, ... recursively, until we get to the base case, the
+  precompiled `boot/ocamlc` compiler. So the boot compiler
+  (`boot/ocamlc`) builds the stage 1 compiler which builds the stage 2
+  compiler which builds the stage 3 compiler. See
+  link:bzl/docs/staged_builds.adoc[Staged builds].
+
+* Revised configuration logic. The goal is to eliminate dependency on
+  autotools (`./configure`). This is very much a Work-In-Progress; the
+  code is in link:config[//config] and
+  link:bzl/docs/notes/autoconf.adoc[notes/autoconf].
+
+* Use the link command from the Bazel CC toolchain. OBazl now uses
+  information from the cc toolchain selected (and configured) by Bazel
+  to set the command string used by OCaml to run the C linker
+  (`Config.mkexe`). For more info see
+  link:bzl/docs/ocaml_cc_config.adoc[ocaml_cc_config]. [TODO: same
+  thing for the assemble command `Config.asm`]
+
+* Revised link:bzl/docs/preprocessing.adoc[preprocessing]. OBazl eliminates shell scripts and tools,
+  instead using a template engine written in portable C to generate
+  code.
+
+== Quickstart
 
 1. Install Bazel.  Recommendation: link:https://github.com/bazelbuild/bazelisk[Bazelisk]
 

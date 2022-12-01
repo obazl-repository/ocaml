@@ -39,7 +39,7 @@ def options(ws):
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."
         ),
-        ## GLOBAL CONFIGURABLE DEFAULTS (all ppx_* rules)
+
         _debug           = attr.label(default = ws + "//debug"),
         _cmt             = attr.label(default = ws + "//cmt"),
         _keep_locs       = attr.label(default = ws + "//keep-locs"),
@@ -182,11 +182,11 @@ def get_options(rule, ctx):
                 if not "-strict-sequence" in ctx.attr.opts: # avoid dup, use the one in opts
                     options.append("-strict-sequence")
 
-    # if hasattr(ctx.attr, "_verbose"):
-    #     if ctx.attr._verbose[OcamlVerboseFlagProvider].value:
-    #         if not "-no-verbose" in ctx.attr.opts:
-    #             if not "-verbose" in ctx.attr.opts: # avoid dup, use the one in opts
-    #                 options.append("-verbose")
+    if hasattr(ctx.attr, "_verbose"):
+        if ctx.attr._verbose[BuildSettingInfo].value:
+            if not "-no-verbose" in ctx.attr.opts:
+                if not "-verbose" in ctx.attr.opts: # avoid dup, use the one in opts
+                    options.append("-verbose")
 
     ################################################################
     if hasattr(ctx.attr, "_thread"):

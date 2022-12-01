@@ -28,6 +28,8 @@ The `./configure` script emits several classes of config data: toolchain and sys
 
 OBazl partitions the output of `./configure` accordingly:
 
+WARNING: outdated. Most of the config stuff is now in link:/config[//config]
+
 * `//toolchain/profile/cc` and its subdirectories contain toolchain configuration data
 * `//profile/system` contains system configuration data; for example
   `//profile/system/local` for the local system, and, for

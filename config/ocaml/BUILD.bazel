@@ -1,0 +1,64 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "bool_setting",
+     "string_flag",
+     "string_list_flag")
+
+load("//bzl/rules:config_cc_toolchain.bzl", "config_cc_toolchain")
+load("//bzl/rules:config_sys.bzl", "config_sys")
+
+package(default_visibility = ["//visibility:public"])
+
+# bool_flag( name = "debug", build_setting_default = False)
+# config_setting(name = "debug?", flag_values = {":debug": "True"})
+
+# bool_flag( name = "instrumented", build_setting_default = False)
+# config_setting(name = "instrumented?", flag_values = {":instrumented": "True"})
+
+bool_flag( name = "bin-annot", build_setting_default = True)
+config_setting(name = "bin-annot?", flag_values = {":bin-annot": "True"})
+
+bool_flag( name = "principal", build_setting_default = True)
+config_setting(name = "principal?", flag_values = {":principal": "True"})
+
+bool_flag( name = "sig_src", build_setting_default = False)
+config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
+
+bool_flag( name = "absname", build_setting_default = True)
+config_setting(name = "absname?", flag_values = {":absname": "True"})
+
+bool_flag( name = "flat_float_array", build_setting_default = True)
+config_setting(name = "flat_float_array?",
+               flag_values = {":flat_float_array": "True"})
+
+label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
+
+label_flag( name = "primitives",
+            build_setting_default = "//runtime:primitives")
+
+string_list_flag(name = "warnings",
+                 build_setting_default = [
+                     # "-w", "+a-4-9-41-42-44-45-48",
+                     "-warn-error", "+A"])
+
+bool_flag( name = "verbose", build_setting_default = False)
+
+################################################################
+##FIXME: what is the optimal way to select for flambda?
+bool_flag(
+    name = "flambda",
+    build_setting_default = False,
+    visibility = ["//visibility:public"]
+)
+config_setting(
+    name = "flambda?",
+    flag_values = {":flambda": "True"},
+)
+
+################################################################
+config_setting(
+    name = "pic",
+    constraint_values = [
+        # "//config/pic" blah blah
+        "@platforms//os:linux",
+    ]
+)

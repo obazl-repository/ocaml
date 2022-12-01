@@ -19,7 +19,7 @@
     "mkdll": "@mkdll_exp@",
     "mkexe": "@mkexe@",
     "mkexe_args": "@mkexe_args@",
-    "mkexe_cmd": "BAZEL_LINK_CMD @mkexe_args@",
+    "mkexe_cmd": "BAZEL_LINK_CMD",
     "mkexe_exp": "@mkexe_exp@",
     "mkexe_cflags":  "@mkexe_cflags@",
     "mkexe_extra_flags":  "@mkexe_extra_flags@",

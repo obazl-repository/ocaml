@@ -395,9 +395,6 @@ def module_impl(ctx, module_name):
     else:
         executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
-    # if ext == ".cmx":
-    #     args.add("-verbose")
-
     ## FIXME: -use-prims not needed for compilation?
     if ext == ".cmo":
         if ctx.attr.use_prims == True:

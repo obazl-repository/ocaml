@@ -96,7 +96,7 @@ def module_attrs():
             # cfg = ocaml_module_cc_deps_out_transition
         ),
 
-        _verbose = attr.label(default = "//config:verbose"),
+        _verbose = attr.label(default = "//config/ocaml:verbose"),
 
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath") # ppx also uses this

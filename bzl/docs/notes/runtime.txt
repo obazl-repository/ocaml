@@ -1,0 +1,65 @@
+### //runtime:ocamlc moved to //compilers:ocamlc
+## root Makefile:
+# The bytecode compiler
+# ocamlc$(EXE): compilerlibs/ocamlcommon.cma \
+#               compilerlibs/ocamlbytecomp.cma $(BYTESTART)
+# 	$(CAMLC) $(LINKFLAGS) -compat-32 -o $@ $^
+## level 0 - uses //boot/baseline:ocamlc
+# ocamlc_runtime(
+# boot_executable(
+#     name = "ocamlc",
+#     # exe  = "ocamlc",
+#     opts = ["-compat-32"],
+#     deps = [
+#         "//compilerlibs:ocamlcommon",
+#         "//bytecomp:ocamlbytecomp"
+#     ],
+#     visibility = ["//visibility:public"]
+# )
+
+# ifeq "$(TOOLCHAIN)" "msvc"
+# ASM_EXT := asm
+# ASM_SOURCES := $(ARCH)nt.$(ASM_EXT)
+# else
+# ASM_EXT := S
+# ASM_SOURCES := $(ARCH).$(ASM_EXT)
+# endif
+
+## Makefile.build_config.in:
+## Platform-dependent assembler files to use to build the runtime
+# runtime_ASM_OBJECTS = $(addprefix runtime/,@runtime_asm_objects@)
+
+## configure.ac:
+# AS_CASE([$ccomptype],
+#   [msvc],
+#     [runtime_asm_objects=${arch}nt.${OBJEXT}],
+#   [runtime_asm_objects=${arch}.${OBJEXT}])
+
+## configure:
+# case $ccomptype in #(
+#   msvc) :
+#     runtime_asm_objects=${arch}nt.${OBJEXT} ;; #(
+#   *) :
+#     runtime_asm_objects=${arch}.${OBJEXT} ;;
+# esac
+
+##  ASPP: assembler w/preprocessor, default "$CC -c"
+# runtime/%.o: runtime/%.S
+# 	$(ASPP) $(OC_ASPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+# runtime/%.d.o: runtime/%.S
+# 	$(ASPP) $(OC_ASPPFLAGS) $(OC_DEBUG_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+# runtime/%.i.o: runtime/%.S
+# 	$(ASPP) $(OC_ASPPFLAGS) $(OC_INSTR_CPPFLAGS) -o $@ $< || $(ASPP_ERROR)
+# runtime/%_libasmrunpic.o: runtime/%.S
+# 	$(ASPP) $(OC_ASPPFLAGS) $(SHAREDLIB_CFLAGS) -o $@ $<
+
+
+## OBJEXT: set by configure, but only 2 possibilities: .S or .asm
+## ARCH: arm | arm64 | i386 | amd64 | power | riscv | s390x
+## Bazel: arch must be set, by config setting to be determined.
+## For now it's hardcoded as amd64 since I'm using a legacy Mac for dev.
+RUNTIME_ASM_OBJECTS = select({
+    "//platform:windows_x86_32?": [ARCH + "nt.asm"],
+    "//conditions:default": [ARCH + ".S"] # e.g. amd64.S
+})
+

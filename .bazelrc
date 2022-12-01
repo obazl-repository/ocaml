@@ -1,4 +1,3 @@
-# build --config=show
 # query --notool_deps
 # query --noimplicit_deps
 
