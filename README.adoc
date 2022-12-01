@@ -6,7 +6,7 @@ See the link:https://github.com/ocaml/ocaml[upstream repository] for the origina
 
 Latest doc changes: 11/30/2022
 
-== News (12/01/2023)
+== News (12/01/2022)
 
 * New name: `ocamlcc` - the OCaml Compiler Collection. Analogous to
   `GCC`, the GNU Compiler Collection. Not only do we have multiple
@@ -28,15 +28,16 @@ Latest doc changes: 11/30/2022
 
 * Revised configuration logic. The goal is to eliminate dependency on
   autotools (`./configure`). This is very much a Work-In-Progress; the
-  code is in link:config[//config] and
+  code is in link:config[//config]. For more info see
   link:bzl/docs/notes/autoconf.adoc[notes/autoconf].
 
 * Use the link command from the Bazel CC toolchain. OBazl now uses
   information from the cc toolchain selected (and configured) by Bazel
   to set the command string used by OCaml to run the C linker
   (`Config.mkexe`). For more info see
-  link:bzl/docs/ocaml_cc_config.adoc[ocaml_cc_config]. [TODO: same
-  thing for the assemble command `Config.asm`]
+  link:bzl/docs/ocaml_cc_config.adoc[ocaml_cc_config] and
+  link:bzl/docs/notes/linking.adoc[notes/linking]. [TODO: same thing
+  for the assemble command `Config.asm`]
 
 * Revised link:bzl/docs/preprocessing.adoc[preprocessing]. OBazl eliminates shell scripts and tools,
   instead using a template engine written in portable C to generate
@@ -232,7 +233,7 @@ build things. Instead it is provided by separate rulesets such as:
 ** link:https://github.com/bazelbuild/rules_pkg[rules_pkg]
 ** link:https://github.com/vaticle/bazel-distribution[bazel-distribution]
 
-== Status  (2022/11/30)
+== Status  (12/01/2022)
 
 === Legacy versions
 
@@ -284,7 +285,7 @@ The Bazel build program supports command-line options to control:
   renaming) can be used to control whether or not `.mli` files are
   separately compiled, if the build targets are configured to use it.  For an example see target link:https://github.com/obazl-repository/ocaml/blob/1cef348aa2fd3536883169ad8b371d5c36870736/stdlib/BUILD.bazel#L2320-L2328[Stdlib.Weak].
 
-==== Bootstrapping [New]
+==== Bootstrapping [New 12/01/2022]
 
 The legacy makefile-based build defines multiple targets, one for each
 of the Big Four compilers, and more for variants.
@@ -305,7 +306,7 @@ Each stage is built from the previous stage.
 
 ==== Cross-builds
 
-NOTE: Cross-compiling has not yet been adapted to use the new bootstrapping discipline.
+NOTE: 12/01/2022: Cross-compiling has not yet been adapted to use the new bootstrapping discipline.
 
 Cross-compilation of the runtimes works: you can build a Linux x86_64
 runtime on a MacOS x86_64 build host, for example. Cross-compilation
@@ -326,6 +327,9 @@ WARNING: You must run `./configure` before running Bazel builds.
 Just some notes to help the reader of the code:
 
 === Notation and Terminology
+
+12/01/2022: obsolete terminology, see instead
+link:bzl/docs/platforms.adoc[platforms]
 
 * *bootstrap compiler* (aka boot compiler) - the precompiled `ocamlc`
   compiler that comes with the distribution, or one produced by the
@@ -694,3 +698,5 @@ The first thing built after the runtime and stdlib is a new `ocamlc` compiler.
 `utils/config.ml` - special role. Dynamically created from either
 `confg_boot.ml` or `config_main.ml`, depending on flag
 `IN_COREBOOT_CYCLE`.
+
+WARNING: the config stuff is now in link:config[//config]
