@@ -6,6 +6,8 @@ load("//bzl:rules.bzl",
      "mustache"
 )
 
+package(default_visibility = ["//visibility:public"])
+
 load("//config:CONFIG.bzl", "w") # warnings struct
 
 exports_files([
@@ -173,7 +175,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        ":Instruct",
+        ":Instruct_cmi",
     ],
 )
 
@@ -205,7 +207,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//file_formats:Cmo_format_cmi",
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Format_cmi",
     ],
 )
 
@@ -252,9 +254,9 @@ compiler_signature(
     src  = "bytelink.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Symtable",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Format",
+        ":Symtable_cmi",
+        "//utils:Misc_cmi",
+        "//stdlib:Stdlib.Format_cmi",
         "//file_formats:Cmo_format_cmi",
     ],
 )
@@ -295,8 +297,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//file_formats:Cmo_format_cmi",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
+        "//typing:Ident_cmi",
+        "//stdlib:Stdlib.Format_cmi",
         "//typing:Env_cmi"
     ],
 )
@@ -323,7 +325,7 @@ compiler_signature(
     name = "Bytesections_cmi",
     src  = "bytesections.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib"],
+    deps   = ["//stdlib:Stdlib_cmi"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -356,7 +358,7 @@ compiler_signature(
     name = "Dll_cmi",
     src  = "dll.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib"],
+    deps   = ["//stdlib:Stdlib_cmi"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -403,9 +405,9 @@ compiler_signature(
     deps   = [
         "//parsing:Asttypes_cmi",
         "//file_formats:Cmo_format_cmi",
-        "//typing:Ident",
-        "//utils:Misc",
-        ":Instruct",
+        "//typing:Ident_cmi",
+        "//utils:Misc_cmi",
+        ":Instruct_cmi",
     ],
 )
 
@@ -434,11 +436,11 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//lambda:Lambda_cmi",
-        "//typing:Types",
-        "//typing:Subst",
-        "//parsing:Location",
-        "//typing:Ident",
-        "//typing:Env",
+        "//typing:Types_cmi",
+        "//typing:Subst_cmi",
+        "//parsing:Location_cmi",
+        "//typing:Ident_cmi",
+        "//typing:Env_cmi",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -466,8 +468,8 @@ compiler_signature(
     src  = "meta.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Instruct",
-        "//stdlib:Stdlib.Obj",
+        ":Instruct_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
@@ -613,8 +615,8 @@ compiler_signature(
     src  = "printinstr.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Instruct",
-        "//stdlib:Stdlib.Format",
+        ":Instruct_cmi",
+        "//stdlib:Stdlib.Format_cmi",
     ],
 )
 
@@ -661,11 +663,11 @@ compiler_signature(
     deps   = [
         "//file_formats:Cmo_format_cmi",
         "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Obj",
-        "//typing:Ident",
-        "//utils:Misc",
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
+        "//typing:Ident_cmi",
+        "//utils:Misc_cmi",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__"

@@ -69,11 +69,11 @@ compiler_signature(
     src  = "closure_element.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end:Variable",
+        "//middle_end:Variable_cmi",
         "//middle_end:Compilation_unit_cmi",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Map",
-        "//utils:Identifiable",
+        "//stdlib:Stdlib.Set_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//utils:Identifiable_cmi",
     ]
 )
 
@@ -99,7 +99,9 @@ compiler_signature(
     deps   = [
         ":Closure_element_cmi"
     ],
-    visibility = ["//middle_end/flambda:__pkg__"]
+    visibility = [
+        "//middle_end:__subpackages__"
+    ]
 )
 
 compiler_module(
@@ -121,7 +123,7 @@ compiler_signature(
     deps   = [
         ":Closure_id_cmi",
         "//middle_end:Compilation_unit_cmi",
-        "//utils:Identifiable",
+        "//utils:Identifiable_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -146,7 +148,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//middle_end:Compilation_unit_cmi",
-        "//utils:Identifiable",
+        "//utils:Identifiable_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -172,7 +174,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//utils:Identifiable_cmi",
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Format_cmi",
     ]
 )
 
@@ -196,9 +198,9 @@ compiler_signature(
         "//middle_end:Variable_cmi",
         "//middle_end:Internal_variable_names_cmi",
         "//middle_end:Compilation_unit_cmi",
-        "//utils:Identifiable",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
+        "//utils:Identifiable_cmi",
+        "//typing:Ident_cmi",
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -223,7 +225,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//middle_end:Compilation_unit_cmi",
-        "//utils:Identifiable",
+        "//utils:Identifiable_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -247,7 +249,7 @@ compiler_signature(
     deps   = [
         ":Set_of_closures_id_cmi",
         "//middle_end:Compilation_unit_cmi",
-        "//utils:Identifiable",
+        "//utils:Identifiable_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -320,7 +322,7 @@ compiler_signature(
     name = "Var_within_closure_cmi",
     src  = "var_within_closure.mli",
     opts = SIG_OPTS,
-    deps   = [":Closure_element"],
+    deps   = [":Closure_element_cmi"],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
 

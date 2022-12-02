@@ -259,8 +259,8 @@ compiler_signature(
     src  = "afl_instrument.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm",
-        "//lambda:Debuginfo",
+        ":Cmm_cmi",
+        "//lambda:Debuginfo_cmi",
         "//parsing:Asttypes_cmi",
     ],
 )
@@ -338,10 +338,10 @@ compiler_signature(
     src  = "asmgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Emitaux",
-        ":Cmm",
-        "//stdlib:Stdlib.Format",
-        "//middle_end:Clambda",
+        ":Emitaux_cmi",
+        ":Cmm_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//middle_end:Clambda_cmi",
         "//middle_end:Backend_intf_cmi"
     ],
 )
@@ -375,7 +375,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//file_formats:Cmx_format_cmi",
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Format_cmi",
     ],
 )
 
@@ -419,8 +419,8 @@ compiler_signature(
     deps   = [
         "//file_formats:Cmx_format_cmi",
         "//middle_end:Backend_intf_cmi",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
         "//utils:Misc_cmi",
     ],
 )
@@ -468,8 +468,8 @@ compiler_signature(
     src  = "asmpackager.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
+        "//stdlib:Stdlib.Format_cmi",
+        "//typing:Env_cmi",
         "//file_formats:Cmx_format_cmi",
         "//middle_end:Backend_intf_cmi",
     ],
@@ -493,7 +493,7 @@ compiler_signature(
     src  = "branch_relaxation.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear",
+        ":Linear_cmi",
         ":Branch_relaxation_intf_cmi",
     ],
 )
@@ -503,8 +503,8 @@ compiler_signature(
     src  = "branch_relaxation_intf.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear",
-        ":Cmm",
+        ":Linear_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -548,10 +548,13 @@ compiler_signature(
     deps   = [
         "//lambda:Lambda_cmi",
         "//utils:Targetint_cmi",
-        "//lambda:Debuginfo",
+        "//lambda:Debuginfo_cmi",
         "//middle_end:Backend_var_cmi",
         "//parsing:Asttypes_cmi",
     ],
+    visibility = [
+        "//file_formats:__pkg__",
+    ]
 )
 
 compiler_module(
@@ -597,15 +600,16 @@ compiler_signature(
     src  = "cmm_helpers.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//file_formats:Cmx_format_cmi",
         "//file_formats:Cmxs_format_cmi",
-        "//lambda:Debuginfo",
-        "//middle_end:Clambda",
+        "//lambda:Debuginfo_cmi",
+        "//middle_end:Clambda_cmi",
         "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Nativeint",
-        "//typing:Primitive",
-        ":Cmm",
-        ":Cmmgen_state",
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Nativeint_cmi",
+        "//typing:Primitive_cmi",
+        ":Cmm_cmi",
+        ":Cmmgen_state_cmi",
     ],
 )
 
@@ -629,8 +633,8 @@ compiler_signature(
     src  = "cmm_invariants.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm",
-        "//stdlib:Stdlib.Format",
+        ":Cmm_cmi",
+        "//stdlib:Stdlib.Format_cmi",
     ],
 )
 
@@ -670,9 +674,9 @@ compiler_signature(
     src  = "cmmgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm",
+        ":Cmm_cmi",
         "//parsing:Asttypes_cmi",
-        "//middle_end:Clambda",
+        "//middle_end:Clambda_cmi",
     ],
 )
 
@@ -698,7 +702,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Cmm_cmi",
-        "//utils:Misc",
+        "//utils:Misc_cmi",
         "//middle_end:Clambda_cmi"
     ],
 )
@@ -748,8 +752,8 @@ compiler_signature(
     src  = "comballoc.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -772,8 +776,8 @@ compiler_signature(
     src  = "dataflow.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -801,8 +805,8 @@ compiler_signature(
     src  = "deadcode.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -841,8 +845,8 @@ compiler_signature(
     src  = "emit.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear",
-        ":Cmm",
+        ":Linear_cmi",
+        ":Cmm_cmi",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -882,8 +886,8 @@ compiler_signature(
         ":Linear_cmi",
         ":Emitenv_cmi",
         ":Cmm_cmi",
-        "//stdlib:Stdlib.Format",
-        "//lambda:Debuginfo",
+        "//stdlib:Stdlib.Format_cmi",
+        "//lambda:Debuginfo_cmi",
     ],
 )
 
@@ -892,8 +896,8 @@ compiler_signature(
     src  = "emitenv.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear",
-        ":Cmm",
+        ":Linear_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -921,8 +925,8 @@ compiler_signature(
     src  = "interf.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -948,9 +952,9 @@ compiler_signature(
     src  = "interval.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg",
-        ":Mach",
-        ":Cmm",
+        ":Reg_cmi",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -976,10 +980,10 @@ compiler_signature(
     src  = "linear.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg",
-        ":Mach",
-        ":Cmm",
-        "//lambda:Debuginfo",
+        ":Reg_cmi",
+        ":Mach_cmi",
+        ":Cmm_cmi",
+        "//lambda:Debuginfo_cmi",
     ],
     visibility = ["//file_formats:__pkg__"]
 )
@@ -1011,9 +1015,9 @@ compiler_signature(
     src  = "linearize.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Linear",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Linear_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -1040,7 +1044,7 @@ compiler_signature(
     src  = "linscan.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Interval"
+        ":Interval_cmi"
     ],
 )
 
@@ -1067,8 +1071,8 @@ compiler_signature(
     src  = "liveness.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -1113,9 +1117,9 @@ compiler_signature(
     src  = "polling.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
-        "//utils:Misc",
+        ":Mach_cmi",
+        ":Cmm_cmi",
+        "//utils:Misc_cmi",
     ],
 )
 
@@ -1145,8 +1149,8 @@ compiler_signature(
     deps   = [
         ":Cmm",
         "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Format",
-        "//lambda:Debuginfo",
+        "//stdlib:Stdlib.Format_cmi",
+        "//lambda:Debuginfo_cmi",
     ],
 )
 
@@ -1172,9 +1176,9 @@ compiler_signature(
     src  = "printlinear.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear",
-        ":Cmm",
-        "//stdlib:Stdlib.Format",
+        ":Linear_cmi",
+        ":Cmm_cmi",
+        "//stdlib:Stdlib.Format_cmi",
     ],
 )
 
@@ -1207,9 +1211,9 @@ compiler_signature(
     src  = "printmach.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg",
-        ":Mach",
-        ":Interval"
+        ":Reg_cmi",
+        ":Mach_cmi",
+        ":Interval_cmi"
     ],
 )
 
@@ -1277,9 +1281,9 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Cmm",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Map",
-        "//middle_end:Backend_var",
+        "//stdlib:Stdlib.Set_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//middle_end:Backend_var_cmi",
     ],
 )
 
@@ -1313,8 +1317,8 @@ compiler_signature(
     src  = "reload.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -1343,9 +1347,9 @@ compiler_signature(
     src  = "reloadgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg",
-        ":Mach",
-        ":Cmm",
+        ":Reg_cmi",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -1379,9 +1383,9 @@ compiler_signature(
     src  = "schedgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Linear",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Linear_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -1409,8 +1413,8 @@ compiler_signature(
     src  = "scheduling.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear",
-        ":Cmm",
+        ":Linear_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -1472,14 +1476,13 @@ compiler_signature(
     src  = "selectgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg",
-        ":Mach",
-        ":Cmm",
-        "//utils:Misc",
-        "//lambda:Debuginfo",
-        "//middle_end:Backend_var",
+        ":Reg_cmi",
+        ":Mach_cmi",
+        ":Cmm_cmi",
+        "//utils:Misc_cmi",
+        "//lambda:Debuginfo_cmi",
+        "//middle_end:Backend_var_cmi",
         "//parsing:Asttypes_cmi",
-        ## (Arch)
     ],
 )
 
@@ -1488,9 +1491,9 @@ compiler_signature(
     src  = "selection.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
-        "//utils:Misc",
+        ":Mach_cmi",
+        ":Cmm_cmi",
+        "//utils:Misc_cmi",
     ],
 )
 
@@ -1546,8 +1549,8 @@ compiler_signature(
     src  = "split.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -1577,9 +1580,9 @@ compiler_signature(
     src  = "strmatch.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm",
+        ":Cmm_cmi",
         "//parsing:Asttypes_cmi",
-        "//lambda:Debuginfo",
+        "//lambda:Debuginfo_cmi",
     ],
 )
 
@@ -1633,7 +1636,7 @@ compiler_signature(
     src  = "x86_gas.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib",
+        "//stdlib:Stdlib_cmi",
         ":X86_ast_cmi",
     ],
 )
@@ -1658,7 +1661,7 @@ compiler_signature(
     src  = "x86_masm.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib",
+        "//stdlib:Stdlib_cmi",
         ":X86_ast_cmi",
     ],
 )
@@ -1690,7 +1693,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":X86_ast_cmi",
-        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Buffer_cmi",
     ],
 )
 

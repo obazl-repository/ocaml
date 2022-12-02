@@ -65,7 +65,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//middle_end:Clambda",
+        "//middle_end:Clambda_cmi",
         "//middle_end:Backend_intf_cmi",
     ]
 )
@@ -98,9 +98,9 @@ compiler_signature(
     src  = "closure_middle_end.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end:Clambda", ## (Middle_end Clambda)
+        "//middle_end:Clambda_cmi",
         "//middle_end:Backend_intf_cmi", ## (Middle_end Backend_intf)
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Format_cmi",
     ]
 )
 

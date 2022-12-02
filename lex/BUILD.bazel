@@ -147,8 +147,8 @@ compiler_signature(
     src  = "common.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax", ## (Lex Syntax)
-        ":Lexgen", ## (Lex Lexgen)
+        ":Syntax_cmi",
+        ":Lexgen_cmi",
     ]
 )
 
@@ -171,8 +171,8 @@ compiler_signature(
     src  = "compact.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax_cmi", ## (Lex Syntax)
-        ":Lexgen_cmi", ## (Lex Lexgen)
+        ":Syntax_cmi",
+        ":Lexgen_cmi",
     ]
 )
 
@@ -193,7 +193,7 @@ compiler_signature(
     src  = "cset.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib",
+        "//stdlib:Stdlib_cmi",
     ]
 )
 
@@ -219,7 +219,7 @@ compiler_signature(
     src  = "lexer.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Parser"
+        ":Parser_cmi"
     ]
 )
 
@@ -250,7 +250,7 @@ compiler_signature(
     src  = "lexgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax_cmi", ## (Lex Syntax)
+        ":Syntax_cmi",
     ]
 )
 
@@ -289,11 +289,7 @@ compiler_signature(
     src  = "main.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib",
-        # ":Syntax_cmi", ## (Lex Syntax)
-        # ":Lexgen_cmi", ## (Lex Lexgen)
-        # ":Compact_cmi", ## (Lex Compact)
-        # ":Common_cmi", ## (Lex Common)
+        "//stdlib:Stdlib_cmi",
     ]
 )
 
@@ -319,10 +315,10 @@ compiler_signature(
     src  = "output.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax_cmi", ## (Lex Syntax)
-        ":Lexgen_cmi", ## (Lex Lexgen)
-        ":Compact_cmi", ## (Lex Compact)
-        ":Common_cmi", ## (Lex Common)
+        ":Syntax_cmi",
+        ":Lexgen_cmi",
+        ":Compact_cmi",
+        ":Common_cmi",
     ]
 )
 
@@ -348,9 +344,9 @@ compiler_signature(
     src  = "outputbis.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax_cmi", ## (Lex Syntax)
-        ":Lexgen_cmi", ## (Lex Lexgen)
-        ":Common_cmi", ## (Lex Common)
+        ":Syntax_cmi",
+        ":Lexgen_cmi",
+        ":Common_cmi",
     ]
 )
 
@@ -373,8 +369,8 @@ compiler_signature(
     src  = "parser.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax",
-        "//stdlib:Stdlib.Lexing",
+        ":Syntax_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
     ]
 )
 
@@ -408,7 +404,7 @@ compiler_signature(
     src  = "syntax.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cset_cmi", ## (Lex Cset)
+        ":Cset_cmi",
     ]
 )
 
@@ -427,7 +423,7 @@ compiler_signature(
     src  = "table.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib",
+        "//stdlib:Stdlib_cmi",
     ]
 )
 

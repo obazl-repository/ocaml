@@ -5,7 +5,7 @@ load("//bzl:rules.bzl", "boot_compiler")
 boot_compiler(
     name = "ocamlcc",
     opts = [
-        "-verbose",
+        # "-verbose",
         ## for testing (linux):
         # "-cc", "gcc",  ## cancels mkexe
         # "-ccopt", "-B/usr/bin",

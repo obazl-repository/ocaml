@@ -195,21 +195,6 @@ def signature_impl(ctx, module_name):
     else:
         executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
-    ## FIXME: -use-prims not needed for compilation?
-    # if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
-    #         args.add_all(["-use-prims", ctx.attr._primitives])
-    # else:
-    #     if ctx.attr._use_prims[BuildSettingInfo].value:
-    #         if not "-no-use-prims" in ctx.attr.opts:
-    #             args.add_all(["-use-prims", ctx.attr._primitives])
-    #     else:
-    #         if  "-use-prims" in ctx.attr.opts:
-    #             args.add_all(["-use-prims", ctx.attr._primitives])
-
-    # if ctx.label.name == "Dynlink_compilerlibs.Misc_cmi":
-    #     print("resolver sig: %s" %ctx.attr._resolver[ModuleInfo].sig)
-    #     print("resolver struct: %s" % ctx.attr._resolver[ModuleInfo].struct)
-
     resolver = []
     if hasattr(ctx.attr, "_resolver"):
         resolver.append(ctx.attr._resolver[ModuleInfo].sig)

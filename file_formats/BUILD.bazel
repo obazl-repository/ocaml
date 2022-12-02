@@ -77,10 +77,10 @@ compiler_signature(
     src  = "cmi_format.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Types",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Digest",
+        "//typing:Types_cmi",
+        "//utils:Misc_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Digest_cmi",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -95,8 +95,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//utils:Misc_cmi",
-        "//typing:Ident",
-        "//lambda:Lambda"
+        "//typing:Ident_cmi",
+        "//lambda:Lambda_cmi"
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -141,13 +141,13 @@ compiler_signature(
     src  = "cmt_format.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmi_format",
-        "//typing:Types",
+        ":Cmi_format_cmi",
+        "//typing:Types_cmi",
         "//typing:Typedtree_cmi",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//typing:Env",
-        "//stdlib:Stdlib.Digest",
+        "//utils:Misc_cmi",
+        "//parsing:Location_cmi",
+        "//typing:Env_cmi",
+        "//stdlib:Stdlib.Digest_cmi",
     ],
     visibility = [
         "//tools:__pkg__",
@@ -161,7 +161,7 @@ compiler_signature(
     deps   = [
         "//utils:Misc_cmi",
         "//middle_end/flambda:Export_info_cmi",
-        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Digest_cmi",
         "//middle_end:Clambda_cmi"
     ],
     visibility = [
@@ -177,7 +177,7 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//utils:Misc_cmi",
-        "//stdlib:Stdlib.Digest"
+        "//stdlib:Stdlib.Digest_cmi"
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -211,7 +211,7 @@ compiler_signature(
     deps   = [
         "//asmcomp:Linear_cmi",
         "//stdlib:Stdlib.Digest_cmi",
-        "//asmcomp:Cmm"
+        "//asmcomp:Cmm_cmi"
     ]
 )
 

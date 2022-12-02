@@ -39,6 +39,8 @@ def executable_attrs():
             doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
+        _verbose = attr.label(default = "//config/ocaml:verbose"),
+
         use_prims = attr.bool( # overrides global _use_prims
             doc = "Undocumented flag, heavily used in bootstrapping",
             default = False

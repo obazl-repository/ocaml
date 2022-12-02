@@ -36,7 +36,8 @@ LABEL_OPTS = ["-nolabels"]
 # stdlib.cm[x]a - this is hardcoded.
 
 # stdlib_archive(
-#boot_library(
+# boot_library won't work because the compiler is hard-coded to expect stdlib.cma
+## boot_library(
 boot_archive(
     name       = "stdlib",
     ## makefiles pass -use-prims. does that make sense, for an archive?

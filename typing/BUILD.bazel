@@ -14,6 +14,8 @@ load("//bzl:rules.bzl",
 
 load("//config:CONFIG.bzl", "w") # warnings
 
+package(default_visibility = ["//visibility:public"])
+
 exports_files([
     "btype.mli", "btype.ml",
     "datarepr.mli", "datarepr.ml",
@@ -155,7 +157,7 @@ compiler_signature(
     src  = "annot.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Location"
+        "//parsing:Location_cmi"
     ],
     visibility = ["//tools:__pkg__"]
 )
@@ -192,8 +194,8 @@ compiler_signature(
     src  = "btype.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Path",
+        ":Types_cmi",
+        ":Path_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )
@@ -279,15 +281,15 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//parsing:Location",
-        "//parsing:Longident",
-        ":Btype",
-        ":Env",
-        ":Errortrace",
-        ":Ident",
-        ":Path",
-        ":Type_immediacy",
-        ":Types",
+        "//parsing:Location_cmi",
+        "//parsing:Longident_cmi",
+        ":Btype_cmi",
+        ":Env_cmi",
+        ":Errortrace_cmi",
+        ":Ident_cmi",
+        ":Path_cmi",
+        ":Type_immediacy_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -318,9 +320,9 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        ":Types",
-        ":Path",
-        ":Ident",
+        ":Types_cmi",
+        ":Path_cmi",
+        ":Ident_cmi",
     ]
 )
 
@@ -380,22 +382,24 @@ compiler_signature(
     deps   = [
         "//file_formats:Cmi_format_cmi",
         "//parsing:Asttypes_cmi",
-        "//parsing:Location",
-        "//parsing:Longident",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.String",
-        "//utils:Load_path",
-        "//utils:Misc",
-        "//utils:Warnings",
-        ":Ident",
-        ":Path",
-        ":Subst",
-        ":Types",
+        "//parsing:Location_cmi",
+        "//parsing:Longident_cmi",
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.String_cmi",
+        "//utils:Load_path_cmi",
+        "//utils:Misc_cmi",
+        "//utils:Warnings_cmi",
+        ":Ident_cmi",
+        ":Path_cmi",
+        ":Subst_cmi",
+        ":Types_cmi",
     ],
     visibility = [
+        "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
+        "//file_formats:__pkg__",
         "//lambda:__pkg__",
     ]
 )
@@ -427,10 +431,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Format",
-        ":Env",
-        ":Path",
-        ":Subst",
+        "//stdlib:Stdlib.Format_cmi",
+        ":Env_cmi",
+        ":Path_cmi",
+        ":Subst_cmi",
     ]
 )
 
@@ -453,9 +457,9 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Format",
-        ":Path",
-        ":Types",
+        "//stdlib:Stdlib.Format_cmi",
+        ":Path_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -492,11 +496,14 @@ compiler_signature(
     src  = "ident.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
-        "//utils:Identifiable",
+        "//stdlib:Stdlib.Format_cmi",
+        "//utils:Identifiable_cmi",
     ],
     visibility = [
-        "//middle_end:__pkg__",
+        "//bytecomp:__pkg__",
+        "//driver:__pkg__",
+        "//file_formats:__pkg__",
+        "//middle_end:__subpackages__",
         "//lambda:__pkg__"
     ]
 )
@@ -522,12 +529,12 @@ compiler_signature(
     src  = "includeclass.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Location",
-        "//stdlib:Stdlib.Format",
-        ":Ctype",
-        ":Env",
-        ":Printtyp",
-        ":Types",
+        "//parsing:Location_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        ":Ctype_cmi",
+        ":Env_cmi",
+        ":Printtyp_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -570,18 +577,18 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//parsing:Location",
-        "//parsing:Longident",
+        "//parsing:Location_cmi",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Format_cmi",
         "//utils:Diffing_with_keys_cmi",
-        ":Env",
-        ":Errortrace",
-        ":Ident",
-        ":Path",
-        ":Type_immediacy",
-        ":Typedtree",
-        ":Types",
+        ":Env_cmi",
+        ":Errortrace_cmi",
+        ":Ident_cmi",
+        ":Path_cmi",
+        ":Type_immediacy_cmi",
+        ":Typedtree_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -633,20 +640,20 @@ compiler_signature(
     src  = "includemod.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Location",
-        "//parsing:Longident",
+        "//parsing:Location_cmi",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Map",
-        "//utils:Diffing",
-        "//utils:Diffing_with_keys",
-        ":Ctype",
-        ":Env",
-        ":Ident",
-        ":Includecore",
-        ":Path",
-        ":Typedtree",
-        ":Types",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//utils:Diffing_cmi",
+        "//utils:Diffing_with_keys_cmi",
+        ":Ctype_cmi",
+        ":Env_cmi",
+        ":Ident_cmi",
+        ":Includecore_cmi",
+        ":Path_cmi",
+        ":Typedtree_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -687,15 +694,15 @@ compiler_signature(
     src  = "includemod_errorprinter.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Longident",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Format",
-        ":Env",
-        ":Ident",
-        ":Includemod",
-        ":Path",
-        ":Typedtree",
-        ":Types",
+        "//stdlib:Stdlib.Format_cmi",
+        ":Env_cmi",
+        ":Ident_cmi",
+        ":Includemod_cmi",
+        ":Path_cmi",
+        ":Typedtree_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -727,10 +734,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        ":Env",
-        ":Ident",
-        ":Path",
-        ":Types",
+        ":Env_cmi",
+        ":Ident_cmi",
+        ":Path_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -776,8 +783,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Format",
-        ":Type_immediacy",
+        "//stdlib:Stdlib.Format_cmi",
+        ":Type_immediacy_cmi",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -836,14 +843,14 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//parsing:Location",
-        "//parsing:Longident",
+        "//parsing:Location_cmi",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Hashtbl",
-        ":Env",
-        ":Path",
-        ":Typedtree",
-        ":Types",
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        ":Env_cmi",
+        ":Path_cmi",
+        ":Typedtree_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -877,12 +884,15 @@ compiler_signature(
     src  = "path.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.Set",
-        ":Ident",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//stdlib:Stdlib.Set_cmi",
+        ":Ident_cmi",
     ],
-    visibility = ["//middle_end:__pkg__"]
+    visibility = [
+        "//lambda:__pkg__",
+        "//middle_end:__pkg__"
+    ]
 )
 
 compiler_module(
@@ -910,12 +920,12 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//parsing:Longident",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        ":Ident",
-        ":Path",
-        ":Typedtree",
-        ":Types",
+        ":Ident_cmi",
+        ":Path_cmi",
+        ":Typedtree_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -952,13 +962,13 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//file_formats:Cmi_format_cmi",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Format",
-        "//utils:Consistbl",
+        "//parsing:Location_cmi",
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//utils:Consistbl_cmi",
         "//utils:Lazy_backtrack_cmi",
-        "//utils:Misc",
-        ":Types",
+        "//utils:Misc_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -975,7 +985,6 @@ compiler_module(
         ":Btype",
         ":Ident",
         ":Path",
-        ":Shape",
         ":Type_immediacy",
         ":Types",
     ],
@@ -994,11 +1003,9 @@ compiler_signature(
     src  = "predef.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//parsing:Parsetree_cmi",
-        ":Ident",
-        ":Path",
-        ":Types",
+        ":Ident_cmi",
+        ":Path_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -1030,9 +1037,14 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//parsing:Location",
+        "//parsing:Location_cmi",
         "//parsing:Parsetree_cmi",
         ":Outcometree_cmi",
+    ],
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end:__pkg__"
     ]
 )
 
@@ -1059,11 +1071,11 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//parsing:Longident",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Format",
-        ":Path",
-        ":Typedtree",
+        "//stdlib:Stdlib.Format_cmi",
+        ":Path_cmi",
+        ":Typedtree_cmi",
     ]
 )
 
@@ -1122,15 +1134,15 @@ compiler_signature(
     src  = "printtyp.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Path",
+        ":Types_cmi",
+        ":Path_cmi",
         ":Outcometree_cmi",
-        ":Ident",
-        ":Errortrace",
-        ":Env",
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Format",
+        ":Ident_cmi",
+        ":Errortrace_cmi",
+        ":Env_cmi",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
+        "//stdlib:Stdlib.Format_cmi",
         "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
     ]
@@ -1169,12 +1181,12 @@ compiler_signature(
     src  = "printtyped.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Typedtree",
-        ":Path",
+        ":Typedtree_cmi",
+        ":Path_cmi",
         "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//stdlib:Stdlib.Format",
+        "//parsing:Longident_cmi",
+        "//stdlib:Stdlib.Format_cmi",
     ]
 )
 
@@ -1201,12 +1213,12 @@ compiler_signature(
     src  = "rec_check.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Typedtree",
-        ":Path",
-        ":Ident",
+        ":Typedtree_cmi",
+        ":Path_cmi",
+        ":Ident_cmi",
         "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
+        "//parsing:Longident_cmi",
     ]
 )
 
@@ -1257,8 +1269,8 @@ compiler_signature(
     src  = "signature_group.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        "//stdlib:Stdlib.Seq",
+        ":Types_cmi",
+        "//stdlib:Stdlib.Seq_cmi",
     ]
 )
 
@@ -1287,12 +1299,12 @@ compiler_signature(
     src  = "stypes.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Typedtree",
-        ":Path",
+        ":Typedtree_cmi",
+        ":Path_cmi",
         ":Annot_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//parsing:Location",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
     ]
 )
 
@@ -1333,11 +1345,11 @@ compiler_signature(
     src  = "subst.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Path",
-        ":Ident",
+        ":Types_cmi",
+        ":Path_cmi",
+        ":Ident_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Location",
+        "//parsing:Location_cmi",
     ]
 )
 
@@ -1363,11 +1375,11 @@ compiler_signature(
     src  = "tast_iterator.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Typedtree",
-        ":Path",
-        ":Env",
+        ":Typedtree_cmi",
+        ":Path_cmi",
+        ":Env_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
+        "//parsing:Longident_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )
@@ -1395,11 +1407,11 @@ compiler_signature(
     src  = "tast_mapper.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Typedtree",
-        ":Path",
-        ":Env",
+        ":Typedtree_cmi",
+        ":Path_cmi",
+        ":Env_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
+        "//parsing:Longident_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )
@@ -1485,17 +1497,17 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//parsing:Location",
-        "//parsing:Longident",
+        "//parsing:Location_cmi",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Format",
-        ":Ctype",
-        ":Env",
-        ":Errortrace",
-        ":Ident",
-        ":Path",
-        ":Typedtree",
-        ":Types",
+        "//stdlib:Stdlib.Format_cmi",
+        ":Ctype_cmi",
+        ":Env_cmi",
+        ":Errortrace_cmi",
+        ":Ident_cmi",
+        ":Path_cmi",
+        ":Typedtree_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -1570,15 +1582,15 @@ compiler_signature(
     src  = "typecore.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Typedtree",
-        ":Path",
-        ":Ident",
-        ":Errortrace",
-        ":Env",
+        ":Types_cmi",
+        ":Typedtree_cmi",
+        ":Path_cmi",
+        ":Ident_cmi",
+        ":Errortrace_cmi",
+        ":Env_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//parsing:Location",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )
@@ -1639,21 +1651,21 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Asttypes_cmi",
-        "//parsing:Location",
-        "//parsing:Longident",
+        "//parsing:Location_cmi",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Format",
-        "//utils:Diffing_with_keys",
-        ":Env",
-        ":Errortrace",
-        ":Ident",
-        ":Includecore",
-        ":Path",
-        ":Typedecl_immediacy",
-        ":Typedecl_separability",
-        ":Typedecl_variance",
-        ":Typedtree",
-        ":Types",
+        # "//stdlib:Stdlib.Format_cmi",
+        # "//utils:Diffing_with_keys_cmi",
+        ":Env_cmi",
+        ":Errortrace_cmi",
+        ":Ident_cmi",
+        ":Includecore_cmi",
+        ":Path_cmi",
+        ":Typedecl_immediacy_cmi",
+        ":Typedecl_separability_cmi",
+        ":Typedecl_variance_cmi",
+        ":Typedtree_cmi",
+        ":Types_cmi",
     ]
 )
 
@@ -1678,12 +1690,12 @@ compiler_signature(
     src  = "typedecl_immediacy.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Typedecl_properties",
-        ":Type_immediacy",
-        ":Ident",
-        ":Env",
-        "//parsing:Location",
+        ":Types_cmi",
+        ":Typedecl_properties_cmi",
+        ":Type_immediacy_cmi",
+        ":Ident_cmi",
+        ":Env_cmi",
+        "//parsing:Location_cmi",
     ]
 )
 
@@ -1708,9 +1720,9 @@ compiler_signature(
     src  = "typedecl_properties.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Ident",
-        ":Env",
+        ":Types_cmi",
+        ":Ident_cmi",
+        ":Env_cmi",
     ]
 )
 
@@ -1741,11 +1753,11 @@ compiler_signature(
     src  = "typedecl_separability.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Typedecl_properties",
-        ":Ident",
-        ":Env",
-        "//parsing:Location",
+        ":Types_cmi",
+        ":Typedecl_properties_cmi",
+        ":Ident_cmi",
+        ":Env_cmi",
+        "//parsing:Location_cmi",
     ]
 )
 
@@ -1768,8 +1780,8 @@ compiler_signature(
     src  = "typedecl_unboxed.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Env",
+        ":Types_cmi",
+        ":Env_cmi",
     ]
 )
 
@@ -1800,15 +1812,15 @@ compiler_signature(
     src  = "typedecl_variance.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Typedtree",
-        ":Typedecl_properties",
-        ":Path",
-        ":Ident",
-        ":Env",
+        ":Types_cmi",
+        ":Typedtree_cmi",
+        ":Typedecl_properties_cmi",
+        ":Path_cmi",
+        ":Ident_cmi",
+        ":Env_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//parsing:Location",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )
@@ -1846,14 +1858,14 @@ compiler_signature(
     src  = "typedtree.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Primitive",
-        ":Path",
-        ":Ident",
-        ":Env",
+        ":Types_cmi",
+        ":Primitive_cmi",
+        ":Path_cmi",
+        ":Ident_cmi",
+        ":Env_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//parsing:Location",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
         "//parsing:Asttypes_cmi",
     ],
     visibility = [
@@ -1928,17 +1940,17 @@ compiler_signature(
     src  = "typemod.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Typedtree",
-        ":Typedecl",
-        ":Path",
-        ":Includemod",
-        ":Ident",
-        ":Env",
+        ":Types_cmi",
+        ":Typedtree_cmi",
+        ":Typedecl_cmi",
+        ":Path_cmi",
+        ":Includemod_cmi",
+        ":Ident_cmi",
+        ":Env_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//file_formats:Cmi_format",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
+        "//file_formats:Cmi_format_cmi",
     ]
 )
 
@@ -1974,14 +1986,14 @@ compiler_signature(
     src  = "typeopt.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Typedtree",
-        ":Path",
-        ":Env",
+        ":Types_cmi",
+        ":Typedtree_cmi",
+        ":Path_cmi",
+        ":Env_cmi",
         "//lambda:Lambda_cmi",
         "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
+        "//parsing:Longident_cmi",
     ]
 )
 
@@ -2025,13 +2037,18 @@ compiler_signature(
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Parsetree_cmi",
-        ":Ident",
-        ":Path",
-        ":Primitive",
+        ":Ident_cmi",
+        ":Path_cmi",
+        ":Primitive_cmi",
         ":Shape_cmi",
-        ":Type_immediacy",
+        ":Type_immediacy_cmi",
     ],
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//bytecomp:__pkg__",
+        "//file_formats:__pkg__",
+        "//lambda:__pkg__",
+        "//middle_end:__pkg__"
+    ]
 )
 
 compiler_module(
@@ -2072,15 +2089,15 @@ compiler_signature(
     src  = "typetexp.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Types",
-        ":Typedtree",
-        ":Path",
-        ":Errortrace",
-        ":Env",
+        ":Types_cmi",
+        ":Typedtree_cmi",
+        ":Path_cmi",
+        ":Errortrace_cmi",
+        ":Env_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Format",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
+        "//stdlib:Stdlib.Format_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )
@@ -2142,11 +2159,11 @@ compiler_signature(
     src  = "untypeast.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Typedtree",
-        ":Path",
+        ":Typedtree_cmi",
+        ":Path_cmi",
         "//parsing:Parsetree_cmi",
-        "//parsing:Longident",
-        "//parsing:Location",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )

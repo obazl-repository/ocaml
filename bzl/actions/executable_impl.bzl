@@ -189,6 +189,8 @@ def executable_impl(ctx):  ## , tc):
 
     if ctx.file._stdlib:
         includes.append(ctx.file._stdlib.dirname)
+    # for f in ctx.files._stdlib:
+    #     includes.append(f)
 
     # includes.append(ctx.file._std_exit.dirname)
 
@@ -275,6 +277,7 @@ def executable_impl(ctx):  ## , tc):
         + [depset(
             ctx.files._camlheaders + ctx.files._runtime
             + [ctx.file._stdlib]
+            # + ctx.files._stdlib
         )]
         #FIXME: primitives should be provided by target, not tc?
         # + [depset([tc.primitives])] # if tc.primitives else []

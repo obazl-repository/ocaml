@@ -435,6 +435,11 @@ def module_impl(ctx, module_name):
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
 
+    merged_input_depsets = [merge_depsets(depsets, "sigs")]
+    if ext == ".cmx":
+        merged_input_depsets.append(merge_depsets(depsets, "cli_link_deps"))
+        merged_input_depsets.append(archived_cmx_depset)
+
     # OCaml srcs use two namespaces, Stdlib and Dynlink_compilerlibs
     if hasattr(ctx.attr, "_resolver"):
         includes.append(ctx.attr._resolver[ModuleInfo].sig.dirname)
@@ -452,9 +457,7 @@ def module_impl(ctx, module_name):
         + resolver_deps
         ,
         transitive = []
-        + [merge_depsets(depsets, "sigs"),
-           merge_depsets(depsets, "cli_link_deps")]
-        + [archived_cmx_depset]
+        + merged_input_depsets
         # + ns_deps
         # + bottomup_ns_inputs
     )

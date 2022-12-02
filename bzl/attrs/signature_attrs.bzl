@@ -3,11 +3,6 @@ def signature_attrs():
 
     return dict(
 
-        primitives = attr.label(
-            # default = "//runtime:primitives",
-            allow_single_file = True,
-        ),
-
         # _stage = attr.label(
         #     doc = "bootstrap stage",
         #     default = "//config/stage"
@@ -24,18 +19,27 @@ def signature_attrs():
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
 
-        use_prims = attr.bool( # overrides global _use_prims
-            doc = "Undocumented flag, heavily used in bootstrapping",
-            default = False
-        ),
-        _use_prims = attr.label( ## boolean
-            doc = "Undocumented flag, heavily used in bootstrapping",
-            default = "//runtime:use_prims"
-        ),
-        _primitives = attr.label( ## file
-            allow_single_file = True,
-            default = "//runtime:primitives_dat"
-        ),
+        _verbose = attr.label(default = "//config/ocaml:verbose"),
+
+        # primitives never needed for sigs?
+
+        # primitives = attr.label(
+        #     # default = "//runtime:primitives",
+        #     allow_single_file = True,
+        # ),
+
+        # use_prims = attr.bool( # overrides global _use_prims
+        #     doc = "Undocumented flag, heavily used in bootstrapping",
+        #     default = False
+        # ),
+        # _use_prims = attr.label( ## boolean
+        #     doc = "Undocumented flag, heavily used in bootstrapping",
+        #     default = "//runtime:use_prims"
+        # ),
+        # _primitives = attr.label( ## file
+        #     allow_single_file = True,
+        #     default = "//runtime:primitives_dat"
+        # ),
 
         src = attr.label(
             doc = "A single .mli source file label",
