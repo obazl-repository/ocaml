@@ -8,7 +8,7 @@ load("//bzl:rules.bzl", "boot_executable", "cc_assemble", "mustache")
 
 load("//config:CONFIG.bzl", "ARCH")
 
-exports_files(["gen_primitives.sh", "sync_posix.h"] + glob(["*.c"]))
+exports_files(["gen_primitives.sh", "primitives.json", "sync_posix.h"] + glob(["*.c"]))
 
 OPTIMIZATION_FLAGS = select({
     ":dbg?": ["-O0", "-g3"], # -Wall -Werror

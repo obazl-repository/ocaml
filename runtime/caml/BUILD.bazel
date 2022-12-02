@@ -46,6 +46,14 @@ mustache(
 )
 
 mustache(
+    name = "fail_h",
+    out  = "fail.h",
+    json = "//runtime:primitives.json",
+    template = "fail.h.mustache",
+    visibility = ["//lambda:__pkg__"]
+)
+
+mustache(
     name = "jumptbl_h",
     out  = "jumptbl.h",
     json = "//bytecomp:opcodes.json",
@@ -87,6 +95,7 @@ cc_library(
         ["*.h"]
     ) + [
         ":domain_state.h",
+        ":fail.h",
         ":jumptbl.h",
         ":opnames.h",
         ":s.h"

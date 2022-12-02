@@ -1,6 +1,5 @@
 {
-  "primitives":
-     [
+    "primitives": [
         {"prim": "abs_float", "src": "floats.c"},
         {"prim": "acos_float", "src": "floats.c"},
         {"prim": "acosh_float", "src": "floats.c"},
@@ -417,7 +416,7 @@
         {"prim": "weak_get", "src": "weak.c"},
         {"prim": "weak_get_copy", "src": "weak.c"},
         {"prim": "weak_set", "src": "weak.c"}
-     ],
+    ],
     "int64": [
         {"prim": "add", "src": "ints.c"},
         {"prim": "and", "src": "ints.c"},
@@ -428,5 +427,20 @@
         {"prim": "or", "src": "ints.c"},
         {"prim": "sub", "src": "ints.c"},
         {"prim": "xor", "src": "ints.c"}
-     ]
+    ],
+    "exceptions": [
+        {"macro": "OUT_OF_MEMORY_EXN", "sn": 0, "name": "Out_of_memory"},
+        {"macro": "SYS_ERROR_EXN", "sn": 1, "name": "Sys_error" },
+        {"macro": "FAILURE_EXN", "sn":  2, "name": "Failure" },
+        {"macro": "INVALID_EXN", "sn":  3, "name": "Invalid_argument" },
+        {"macro": "END_OF_FILE_EXN", "sn": 4, "name": "End_of_file" },
+        {"macro": "ZERO_DIVIDE_EXN", "sn": 5, "name": "Division_by_zero" },
+        {"macro": "NOT_FOUND_EXN", "sn": 6, "name": "Not_found" },
+        {"macro": "MATCH_FAILURE_EXN", "sn": 7, "name": "Match_failure" },
+        {"macro": "STACK_OVERFLOW_EXN", "sn": 8, "name": "Stack_overflow" },
+        {"macro": "SYS_BLOCKED_IO", "sn": 9, "name": "Sys_blocked_io" },
+        {"macro": "ASSERT_FAILURE_EXN", "sn": 10, "name": "Assert_failure" },
+        {"macro": "UNDEFINED_RECURSIVE_MODULE_EXN",
+         "sn": 11, "name": "Undefined_recursive_module" }
+    ]
 }
