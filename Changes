@@ -18,6 +18,11 @@ Working version
 
 ### Runtime system:
 
+- #11641: Restore Cygwin port. Add GC messages for address space reservations
+  when OCAMLRUNPARAM option v includes 0x1000.
+  (David Allsopp, review by Xavier Leroy, Guillaume Munch-Maccagnoni
+  and Gabriel Scherer)
+
 - #11743: Speed up weak array operations
   (KC Sivaramakrishnan, review by François Bobot and Sadiq Jaffer)
 
@@ -257,6 +262,15 @@ Working version
 OCaml 5.0
 ---------
 
+- #10831: Multicore OCaml
+  (Enguerrand Decorne, Stephen Dolan, Tom Kelly, Sadiq Jaffer,
+  Anil Madhavapeddy, Sudha Parimala, KC Sivaramakrishnan,
+  Leo White, the Tarides multicore team,
+  review by Florian Angeletti, Damien Doligez, Xavier Leroy,
+  Guillaume Munch-Maccagnoni, Olivier Nicole, Nicolás Ojeda Bär,
+  Gabriel Scherer, the OCaml core development team, and many
+  other valued reviewers.)
+
 ### Language features:
 
 ### Runtime system:
@@ -283,9 +297,6 @@ OCaml 5.0
   (Sadiq Jaffer, review by Anil Madhavapeddy, Enguerrand Decorne,
   Richard Warburton, Gabriel Scherer, Sabine Schmaltz, Florian Angeletti,
   Patrick Ferris, Tom Kelly)
-
-- #10831: Multicore OCaml
-  (The multicore team, caml-devel and more)
 
 * #10723: do not use `-flat-namespace` linking for macOS.
   (Carlo Cabrera, review by Damien Doligez)
@@ -798,6 +809,11 @@ OCaml 5.0
 - #11737: Fix segfault condition in Unix.stat under Windows in the presence of
   multiple threads.
   (Marc Lasson, Nicolás Ojeda Bär, review by Gabriel Scherer and David Allsopp)
+
+- #11533, #11534: follow synonyms again in #show_module_type
+  (this had stopped working in 4.14.0)
+  (Gabriel Scherer, review by Jacques Garrigue and Florian Angeletti,
+   report by Yaron Minsky)
 
 OCaml 4.14.0 (28 March 2022)
 ----------------------------
