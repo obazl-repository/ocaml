@@ -5,10 +5,16 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 # reset stage to 0 (_boot) so runtime is only built once
 
 def _reset_config_transition_impl(settings, attr):
+    print("reset_config_transition: %s" % attr.name)
     return {
-        "//config/stage"       : 0,
+        # "//toolchain/target/executor": "boot",
+        # "//toolchain/target/emitter" : "boot",
+
+        "//config/target/executor": "boot",
+        "//config/target/emitter" : "boot",
+
         "//toolchain:compiler" : "//boot:ocamlc.boot",
-        "//toolchain:lexer"    : "//boot:ocamllex.boot"
+        "//toolchain:lexer"    : "//boot:ocamllex.boot",
     }
 
 #######################
@@ -16,104 +22,202 @@ reset_config_transition = transition(
     implementation = _reset_config_transition_impl,
     inputs = [],
     outputs = [
-        "//config/stage",
+        # "//toolchain/target/executor",
+        # "//toolchain/target/emitter",
+
+        "//config/target/executor",
+        "//config/target/emitter",
+
         "//toolchain:compiler",
-        "//toolchain:lexer"
+        "//toolchain:lexer",
     ]
 )
 
 #####################################################
 def _tc_compiler_out_transition_impl(settings, attr):
 
-    # print("tc_compiler_out_transition")
-    # print("tc name: %s" % attr.name)
+    ## called for tc.compiler and tc.lexer
+    ## so we should see this twice per config
 
-    target_executor = settings["//config/target/executor"]
-    # print("target_executor setting: %s" % target_executor)
-    # print("attr.target_executor: %s" % attr.target_executor)
-    target_emitter = settings["//config/target/emitter"]
-    # print("target_emitter: %s" % target_emitter)
+    debug = True
 
-    build_host  = settings["//command_line_option:host_platform"]
-    # print("  host_platform: %s" % build_host)
+    if debug:
+        print("ENTRY: tc_compiler_out_transition")
+        print("tc name: %s" % attr.name)
+        # print("attrs: %s" % attr)
 
-    extra_execution_platforms = settings["//command_line_option:extra_execution_platforms"]
-    # print("  extra_execution_platforms: %s" % extra_execution_platforms)
+    ## we use the CLI string flags in //config/...
+    ## to set string settings in //toolchain/...
+    target_executor = settings["//toolchain/target/executor"]
+    target_emitter  = settings["//toolchain/target/emitter"]
+    config_executor = settings["//config/target/executor"]
+    config_emitter  = settings["//config/target/emitter"]
+    # target_runtime  = settings["//toolchain:runtime"]
 
-    target_host = settings["//command_line_option:platforms"]
-    # print(" platforms: %s" % target_host)
+    compiler = settings["//toolchain:compiler"]
+    lexer = settings["//toolchain:lexer"]
 
-    # NB: default for //config/stage is -1. this transition decrements
-    # it until it hits 0. This means that the builds go from 0 up, and
-    # the stage for final round will be -1.
+    # build_host  = settings["//command_line_option:host_platform"]
+    # extra_execution_platforms = settings["//command_line_option:extra_execution_platforms"]
 
-    # NB: for targets vm->vm, vm->sys we only need 2 stages
-    # for targets sys->sys, sys->vm we need three
+    # target_host = settings["//command_line_option:platforms"]
 
-    stage = int(settings["//config/stage"])
+    # stage = int(settings["//config/stage"])
 
-    if stage == 0:
-        # no change
-        return {}
+    if debug:
+        # print("//config/stage: %s" % stage)
+        print("//toolchain/target/executor: %s" % settings[
+            "//toolchain/target/executor"])
+        print("//toolchain/target/emitter:  %s" % settings[
+            "//toolchain/target/emitter"])
+        print("//config/target/executor: %s" % settings[
+            "//config/target/executor"])
+        print("//config/target/emitter:  %s" % settings[
+            "//config/target/emitter"])
 
-    stage = stage - 1
+        print("//toolchain:compiler:  %s" % settings["//toolchain:compiler"])
+        print("//toolchain:lexer:  %s" % settings["//toolchain:lexer"])
 
-    ## if target executor = vm:
-    if ((stage < 0) and (attr.name in ["vv_vv", "vv_vs", "sv_vv", "sv_vs"])):
-        stage = 1
-        compiler = "//bin:ocamlcc"
-        lexer    = "//lex:ocamllex"
-        # compiler = "//boot/baseline/compiler:compiler"
-        # lexer = "//boot/baseline/lexer"
-    ## if target executor = sys:
-    elif ((stage < 0) and (attr.name in ["ss_ss", "ss_sv", "vs_ss", "vs_sv"])):
-        stage = 2
-        compiler = "//bin:ocamlcc"
-        lexer    = "//lex:ocamllex"
-    elif stage == 0:
+        # print("//toolhchain:runtime:     %s" % target_runtime)
+        # print("attr.target_executor: %s" % attr.target_executor)
+        # print("//command_line_option:host_platform: %s" % build_host)
+        # print("//command_line_option:extra_execution_platforms: %s" % extra_execution_platforms)
+        # print("//command_line_option:platforms: %s" % target_host)
+
+
+    ## avoid rebuilding _boot/ocamlc.byte: ??
+
+    host_compilation_mode = "opt"
+    compilation_mode = "opt"
+    # runtime  = "//runtime:ocamlrun"
+
+    ## initial config: config settings passed on cli, toolchain
+    ## configs default to unspecified
+
+    # if target_executor == "unspecified":
+    #     print("INITIAL TRANSITION")
+    #     target_executor = config_executor
+    #     target_emitter = config_emitter
+
+    if (config_executor == "boot"): #and config_emitter == "boot"):
+        print("BOOT TRANSITION")
+        compilation_mode = "opt"
+        config_executor = "baseline"
+        config_emitter  = "baseline"
+
+        if (compiler == "//boot:ocamlc.boot" and
+            lexer    == "//boot:ocamllex.boot"):
+            compiler = "//boot:ocamlc.boot"
+            lexer    = "//boot:ocamllex.boot"
+            # return{}
+        else:
+            compiler = "//boot:ocamlc.boot"
+            lexer    = "//boot:ocamllex.boot"
+
+    elif (config_executor == "baseline"):
         compiler = "//boot:ocamlc.boot"
         lexer    = "//boot:ocamllex.boot"
-        # workdir  = "_boot"
-    elif stage == 1:
+    #     fail("bad config_emitter: %s" % config_emitter)
+
+    elif (config_executor == "vm" and config_emitter == "vm"):
+        print("VM-VM TRANSITION")
+        config_executor = "baseline"
+        config_emitter  = "baseline"
+        ## these just prevent circular dep?
+        ## need to set before recurring, otherwise we get a dep cycle
         compiler = "//bin:ocamlcc"
         lexer    = "//lex:ocamllex"
-    elif stage == 2:
+        # compiler = "//boot:ocamlc.boot"
+        # lexer    = "//boot:ocamllex.boot"
+
+    elif (config_executor == "vm" and config_emitter == "sys"):
+        print("VM-SYS transition")
+        config_executor = "vm"
+        config_emitter = "vm"
+        # target_executor = "boot"
+        # target_emitter = "boot"
+        # target_executor = "vm"
+        # target_emitter = "vm"
         compiler = "//bin:ocamlcc"
         lexer    = "//lex:ocamllex"
+
+    elif (config_executor == "sys" and config_emitter == "sys"):
+        print("SYS-SYS transition")
+        config_executor = "vm"
+        config_emitter  = "sys"
+        compiler = "//bin:ocamlcc"
+        lexer    = "//lex:ocamllex"
+
+    elif (config_executor == "sys" and config_emitter == "vm"):
+        print("SYS-VM transition")
+        config_executor = "sys"
+        config_emitter  = "sys"
+        compiler = "//bin:ocamlcc"
+        lexer    = "//lex:ocamllex"
+
     else:
-        print("stage t: %s" % type(stage))
-        fail("UNHANDLED COMPILER STAGE: %s" % stage)
+        fail("xxxxxxxxxxxxxxxx %s" % config_executor)
+
+    if debug:
+        # print("setting //toolchain/target/executor: %s" % target_executor)
+        # print("setting //toolchain/target/emitter: %s" % target_emitter)
+        print("setting //config/target/executor: %s" % config_executor)
+        print("setting //config/target/emitter: %s" % config_emitter)
+        print("setting //toolchain:compiler %s" % compiler)
+        print("setting //toolchain:lexer %s" % lexer)
 
     return {
-        # "//command_line_option:host_platform" : host_platform,
-        # "//command_line_option:extra_execution_platforms" : extra_execution_platforms,
-        # "//command_line_option:platforms"     : target_host,
-        "//config/stage"           : stage,
+        "//command_line_option:host_compilation_mode": "opt",
+        "//command_line_option:compilation_mode": "opt",
+
+        # "//toolchain/target/executor": target_executor,
+        # "//toolchain/target/emitter" : target_emitter,
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+
         "//toolchain:compiler": compiler,
-        "//toolchain:lexer"   : lexer
+        "//toolchain:lexer"   : lexer,
     }
 
 #######################
 tc_compiler_out_transition = transition(
     implementation = _tc_compiler_out_transition_impl,
     inputs = [
-        "//command_line_option:host_platform",
-        "//command_line_option:extra_execution_platforms",
-        "//command_line_option:platforms",
+        # "//command_line_option:host_platform",
+        # "//command_line_option:extra_execution_platforms",
+        # "//command_line_option:platforms",
         # "//config/target/runtime",
+
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+
         "//config/target/executor",
         "//config/target/emitter",
-        "//config/stage",
-        "//toolchain:compiler",
-        "//toolchain:lexer"
+        "//toolchain/target/executor",
+        "//toolchain/target/emitter",
+
+        # "//config/stage",
+        # "//toolchain:compiler",
+        # "//toolchain:lexer"
+        # "//toolchain:runtime"
     ],
     outputs = [
         # "//command_line_option:host_platform",
         # "//command_line_option:extra_execution_platforms",
         # "//command_line_option:platforms",
-        "//config/stage",
+        # "//config/stage",
+
+        "//command_line_option:host_compilation_mode",
+        "//command_line_option:compilation_mode",
+
+        # "//toolchain/target/executor",
+        # "//toolchain/target/emitter",
+
+        "//config/target/executor",
+        "//config/target/emitter",
+
         "//toolchain:compiler",
-        "//toolchain:lexer"
+        "//toolchain:lexer",
     ]
 )
 

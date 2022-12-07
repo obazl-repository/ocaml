@@ -1,6 +1,6 @@
 load("//bzl:rules.bzl",
      "boot_archive",
-     "boot_executable",
+     # "boot_executable",
      "boot_library",
      "compiler_module",
      # "bootstrap_ns",
@@ -85,6 +85,7 @@ compiler_module(
     ## Dynlink_compilerlibs.
     deps   = [
         "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Printexc",
@@ -92,7 +93,9 @@ compiler_module(
         ":Dynlink_common",
         ":Dynlink_types",
     ] + select({
-        "//platform/constraints/ocaml/emitter:vm_emitter?": [
+        # "//platform/constraints/ocaml/emitter:vm_emitter?": [
+        # "//config/target/executor:vm_executor?": [
+        "//toolchain/target/executor:vm_executor?": [
             "//bytecomp:Dll",
             "//bytecomp:Meta",
             "//bytecomp:Opcodes",
@@ -105,8 +108,10 @@ compiler_module(
             "Dynlink_compilerlibs.Misc",
             ## (LongString)
         ],
-        "//platform/constraints/ocaml/emitter:sys_emitter?": [
-            "//file_formats:Cmxs_format",
+        # "//platform/constraints/ocaml/emitter:sys_emitter?": [
+        # "//config/target/executor:sys_executor?": [
+        "//toolchain/target/executor:sys_executor?": [
+            # "//file_formats:Cmxs_format_cmi",
             "//stdlib:Stdlib.Filename",
         ]
     }) + select({
@@ -121,7 +126,26 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//stdlib:Stdlib.Obj",
-    ]
+    ] + select({
+        # "//platform/constraints/ocaml/emitter:vm_emitter?": [
+        # "//config/target/executor:vm_executor?": [
+        "//toolchain/target/executor:vm_executor?": [
+            "//file_formats:Cmo_format_cmi",
+            "//stdlib:Stdlib.Digest_cmi",
+            "//stdlib:Stdlib.Filename_cmi",
+            "//stdlib:Stdlib.List_cmi",
+            "//stdlib:Stdlib.Obj_cmi",
+            "//stdlib:Stdlib.Printexc_cmi",
+            ":Dynlink_compilerlibs.Config_cmi",
+            ":Dynlink_common_cmi",
+            ":Dynlink_types_cmi",
+        ],
+        # "//platform/constraints/ocaml/executor:sys_executor?": [
+        # "//config/target/executor:sys_executor?": [
+        "//toolchain/target/executor:sys_executor?": [
+            "//file_formats:Cmxs_format_cmi",
+        ]
+    })
 )
 
 #################
@@ -197,12 +221,17 @@ compiler_signature(
 # 	$(OCAMLC) -o $@ $^
 ## NB: dynlink.cma already contains byte/dynlink_compilerlibs.cmo??
 
-boot_executable(
-    name = "extract_crc",
-    main = ":Extract_crc",
-    opts = ["-nostdlib"],
-    prologue = [":dynlink"]
-)
+## https://github.com/ocaml/ocaml/pull/11766:
+# This tool is no longer installed and we don't use it in the build
+# system or testsuite either, so if there is no real need to keep it I'd
+# suggest to get rid of it.
+
+# boot_executable(
+#     name = "extract_crc",
+#     main = ":Extract_crc",
+#     opts = ["-nostdlib"],
+#     prologue = [":dynlink"]
+# )
 
 compiler_module(
     name   = "Extract_crc",
@@ -672,11 +701,11 @@ dynlink_signature(
 dynlink_module(
     name   = "Dynlink_compilerlibs.Config",
     ns     = ":Dynlink_compilerlibs",
-    struct = "//utils:config.ml",
+    struct = "//config:config_ml",
     sig    = ":Dynlink_compilerlibs.Config_cmi",
     opts = MODULE_OPTS,
     deps   = [ # [
-        "//config:Config_cc",
+        # "//config:Config_cc",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Printf",
@@ -688,7 +717,7 @@ dynlink_module(
 dynlink_signature(
     name = "Dynlink_compilerlibs.Config_cmi",
     ns     = ":Dynlink_compilerlibs",
-    src  = "//utils:config.mli",
+    src  = "//config:config.mli",
     opts = SIG_OPTS,
     deps   = [
         "//stdlib:Stdlib.List",

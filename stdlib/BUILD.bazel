@@ -1,14 +1,19 @@
 load("//bzl:rules.bzl",
      "boot_archive",
-     "boot_camlheaders",
+     # "boot_camlheaders",
      "boot_library",
-     "boot_module",
      "boot_signature",
-     "mustache")
+     )
+
+load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 load(":BUILD_RULES.bzl",
-     "stdlib_boot_module", "stdlib_module",
-     "stdlib_boot_signature", "stdlib_signature")
+     "kernel_module",
+     "kernel_signature",
+     "stdlib_internal_signature",
+     "stdlib_internal_module",
+     "stdlib_module",
+     "stdlib_signature")
 
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
@@ -48,7 +53,7 @@ boot_archive(
 
 ## We use several different rules:
 
-# stdlib_boot_[module|signature] - for Stdlib, Std_exit and
+# stdlib_kernel_[module|signature] - for Stdlib, Std_exit and
 # CamlinternalFormatBasics only. These are not in the ns but the
 # submodules of the ns depend on them; they "bootstrap" the ns.
 
@@ -56,10 +61,10 @@ boot_archive(
 
 # stdlib_[module|signature] for the submodules of the Stdlib namespace.
 
-# That leaves five modules essential that are not in the Stdlib
+# That leaves four modules that are not in the Stdlib
 # namespace, but that depend on submodules, and are depended on by
 # submodules. These are the Camlinternal* modules. The use the
-# stdlib_boot_* rules but pass '-open Stdlib' explicitly.
+# stdlib_internal_* rules but pass '-open Stdlib' explicitly.
 
 ##################################################################
 ##############  Main Resolver Module: Stdlib  ####################
@@ -67,9 +72,9 @@ boot_archive(
 # depend on itself! So it can build independently of stdlib.cma.
 
 #stdlib_resolver(
-stdlib_boot_module(
+kernel_module(
     name   = "Stdlib",
-    struct = "stdlib.ml",
+    struct = "stdlib_ml",
     sig    = "Stdlib_cmi", # doesn't work with stdlib.mli
     # use_prims = True,
     opts = [
@@ -92,6 +97,19 @@ mustache(
     template = "stdlib.ml.mustache"
 )
 
+kernel_signature(
+    name = "Stdlib_cmi",
+    src  = "stdlib_mli",
+    opts = SIG_OPTS + [
+        "-nopervasives",
+        "-no-alias-deps",
+    ],
+    warnings = [NO_CMI_FILE],
+    deps   = [
+        ":CamlinternalFormatBasics_cmi",
+    ],
+)
+
 mustache(
     name = "stdlib_mli",
     out  = "stdlib.mli",
@@ -109,19 +127,6 @@ mustache(
 #         "> $@"
 #     ]),
 # )
-
-stdlib_boot_signature(
-    name = "Stdlib_cmi",
-    src  = "stdlib.mli",
-    opts = SIG_OPTS + [
-        "-nopervasives",
-        "-no-alias-deps",
-    ],
-    warnings = [NO_CMI_FILE],
-    deps   = [
-        ":CamlinternalFormatBasics_cmi",
-    ],
-)
 
 # bootstrap_preprocess(
 #     name = "stdlib_ml_awk",
@@ -155,7 +160,7 @@ stdlib_boot_signature(
 # They depend on other subcomponents, but since they are not renamed
 # such deps must not be listed; instead just list :Stdlib.
 
-stdlib_boot_module(
+kernel_module(
     name   = "CamlinternalFormatBasics",
     struct = "camlinternalFormatBasics.ml",
     sig    = "CamlinternalFormatBasics_cmi",
@@ -166,14 +171,14 @@ stdlib_boot_module(
     # }),
 )
 
-stdlib_boot_signature(
+kernel_signature(
     name = "CamlinternalFormatBasics_cmi",
     src  = "camlinternalFormatBasics.mli",
     opts   = ["-nopervasives"]
  )
 
 
-stdlib_boot_module(
+stdlib_internal_module(
     name   = "CamlinternalFormat",
     struct = "camlinternalFormat.ml",
     sig    = "CamlinternalFormat_cmi",
@@ -194,7 +199,7 @@ stdlib_boot_module(
     ],
 )
 
-stdlib_boot_signature(
+stdlib_internal_signature(
     name = "CamlinternalFormat_cmi",
     src  = "camlinternalFormat.mli",
     opts = ["-open", "Stdlib"],
@@ -230,7 +235,7 @@ stdlib_boot_signature(
     ],
 )
 
-stdlib_boot_module(
+stdlib_internal_module(
     name   = "CamlinternalLazy",
     struct = "camlinternalLazy.ml",
     sig    = select({
@@ -247,13 +252,13 @@ stdlib_boot_module(
     ],
 )
 
-stdlib_boot_signature(
+stdlib_internal_signature(
     name = "CamlinternalLazy_cmi",
     src  = "camlinternalLazy.mli",
     deps = [":Stdlib_cmi"]
 )
 
-stdlib_boot_module(
+stdlib_internal_module(
     name   = "CamlinternalMod",
     struct = "camlinternalMod.ml",
     sig    = "CamlinternalMod_cmi",
@@ -267,16 +272,17 @@ stdlib_boot_module(
     ],
 )
 
-stdlib_boot_signature(
+stdlib_internal_signature(
     name = "CamlinternalMod_cmi",
     src  = "camlinternalMod.mli",
-    opts = ["-open", "Stdlib"],
+    # opts = ["-nopervasives", "-open", "Stdlib"],
     deps   = [
-        ":Stdlib.Obj",
+        ":Stdlib",
+        ":Stdlib.Obj_cmi",
     ],
 )
 
-stdlib_boot_module(
+stdlib_internal_module(
     name   = "CamlinternalOO",
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
@@ -300,11 +306,10 @@ stdlib_boot_module(
     ],
 )
 
-stdlib_boot_signature(
+stdlib_internal_signature(
     name = "CamlinternalOO_cmi",
     src  = "camlinternalOO.mli",
-    opts = ["-open", "Stdlib"],
-    deps   = [":Stdlib.Obj"]
+    deps   = [":Stdlib", ":Stdlib.Obj_cmi"]
 )
 
 #########################################################
@@ -331,13 +336,13 @@ stdlib_signature(
     src  = "arg.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Sys",
-        ":Stdlib.String",
-        ":Stdlib.Printf",
-        ":Stdlib.List",
-        ":Stdlib.Int",
-        ":Stdlib.Buffer",
-        ":Stdlib.Array",
+        ":Stdlib.Sys_cmi",
+        ":Stdlib.String_cmi",
+        ":Stdlib.Printf_cmi",
+        ":Stdlib.List_cmi",
+        ":Stdlib.Int_cmi",
+        ":Stdlib.Buffer_cmi",
+        ":Stdlib.Array_cmi",
     ],
 )
 
@@ -356,7 +361,7 @@ stdlib_signature(
     src  = "array.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Seq",
+        ":Stdlib.Seq_cmi",
     ],
 )
 
@@ -375,7 +380,7 @@ stdlib_signature(
     src  = "arrayLabels.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Seq",
+        ":Stdlib.Seq_cmi",
     ],
 )
 
@@ -402,9 +407,6 @@ stdlib_signature(
     name = "Stdlib.Atomic_cmi",
     src  = "atomic.mli",
     opts = SIG_OPTS,
-    deps   = [
-        # ":Stdlib_cmi"
-    ],
 )
 
 stdlib_module(
@@ -428,14 +430,7 @@ stdlib_signature(
     name = "Stdlib.Bigarray_cmi",
     src  = "bigarray.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Complex", ## (Stdlib Complex)
-        ## (Genarray)
-        ## (Array3)
-        ## (Array2)
-        ## (Array1)
-        ## (Array0)
-    ],
+    deps   = [":Stdlib.Complex_cmi"],
 )
 
 stdlib_module(
@@ -476,8 +471,8 @@ stdlib_signature(
     src  = "buffer.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Uchar",
-        ":Stdlib.Seq",
+        ":Stdlib.Uchar_cmi",
+        ":Stdlib.Seq_cmi",
     ],
 )
 
@@ -540,9 +535,7 @@ stdlib_signature(
     name = "Stdlib.Callback_cmi",
     src  = "callback.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.In_channel"
-    ],
+    deps   = [":Stdlib.In_channel_cmi"]
 )
 
 stdlib_module(
@@ -572,7 +565,6 @@ stdlib_signature(
     name = "Stdlib.Complex_cmi",
     src  = "complex.mli",
     opts = SIG_OPTS,
-    deps   = [ ],
 )
 
 stdlib_module(
@@ -606,10 +598,7 @@ stdlib_signature(
     name = "Stdlib.Digest_cmi",
     src  = "digest.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.In_channel_cmi"
-        # ":Stdlib"
-    ],
+    deps   = [":Stdlib.In_channel_cmi"]
 )
 
 stdlib_module(
@@ -633,7 +622,6 @@ stdlib_signature(
     name = "Stdlib.Domain_cmi",
     src  = "domain.mli",
     opts = SIG_OPTS,
-    deps   = [ ],
 )
 
 stdlib_module(
@@ -690,9 +678,7 @@ stdlib_signature(
     name = "Stdlib.Ephemeron_cmi",
     src  = "ephemeron.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Hashtbl_cmi",
-    ],
+    deps   = [":Stdlib.Hashtbl_cmi"]
 )
 
 stdlib_module(
@@ -716,7 +702,7 @@ stdlib_signature(
     name = "Stdlib.Filename_cmi",
     src  = "filename.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib"],
+    deps   = [":Stdlib_cmi"],
 )
 
 stdlib_module(
@@ -736,8 +722,8 @@ stdlib_signature(
     src  = "float.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Seq",
-        ":Stdlib"
+        ":Stdlib.Seq_cmi",
+        ":Stdlib_cmi"
     ],
 )
 
@@ -793,8 +779,6 @@ stdlib_signature(
     name = "Stdlib.Fun_cmi",
     src  = "fun.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ],
 )
 
 stdlib_module(
@@ -814,9 +798,7 @@ stdlib_signature(
     name = "Stdlib.Gc_cmi",
     src  = "gc.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Printexc",
-    ],
+    deps   = [":Stdlib.Printexc_cmi"]
 )
 
 stdlib_module(
@@ -838,10 +820,7 @@ stdlib_signature(
     name = "Stdlib.Genlex_cmi",
     src  = "genlex.mli",
     opts = SIG_OPTS,
-    deps   = [
-        # ":Stdlib",
-        ":Stdlib.Stream"
-    ],
+    deps   = [":Stdlib.Stream_cmi"]
 )
 
 stdlib_module(
@@ -858,9 +837,6 @@ stdlib_module(
         ":Stdlib.Seq",
         ":Stdlib.String",
         ":Stdlib.Sys",
-        # ":CamlinternalLazy",
-        ## (MakeSeeded)
-        ## (H)
     ],
 )
 
@@ -868,10 +844,7 @@ stdlib_signature(
     name = "Stdlib.Hashtbl_cmi",
     src  = "hashtbl.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Seq",
-        ## (H)
-    ],
+    deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -888,9 +861,7 @@ stdlib_signature(
     name = "Stdlib.In_channel_cmi",
     src  = "in_channel.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib"
-    ],
+    deps   = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -907,9 +878,6 @@ stdlib_signature(
     name = "Stdlib.Int_cmi",
     src  = "int.mli",
     opts = SIG_OPTS,
-    deps   = [
-        # ":Stdlib"
-    ],
 )
 
 stdlib_module(
@@ -927,10 +895,7 @@ stdlib_signature(
     name = "Stdlib.Int32_cmi",
     src  = "int32.mli",
     opts = SIG_OPTS + ["-no-alias-deps"],
-    deps   = [
-        # ":Stdlib_cmi",
-        ":Stdlib.Sys",
-    ],
+    deps   = [":Stdlib.Sys_cmi"]
 )
 
 stdlib_module(
@@ -947,9 +912,6 @@ stdlib_signature(
     name = "Stdlib.Int64_cmi",
     src  = "int64.mli",
     opts = SIG_OPTS,
-    deps   = [
-        # ":Stdlib"
-    ],
 )
 
 stdlib_module(
@@ -970,9 +932,7 @@ stdlib_signature(
     name = "Stdlib.Lazy_cmi",
     src  = "lazy.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":CamlinternalLazy",
-    ],
+    deps   = [":CamlinternalLazy_cmi"]
 )
 
 stdlib_module(
@@ -994,9 +954,6 @@ stdlib_signature(
     name = "Stdlib.Lexing_cmi",
     src  = "lexing.mli",
     opts = SIG_OPTS,
-    deps   = [
-        # ":Stdlib_cmi"
-    ],
 )
 
 stdlib_module(
@@ -1016,8 +973,8 @@ stdlib_signature(
     src  = "list.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Seq",
-        ":Stdlib.Either",
+        ":Stdlib.Seq_cmi",
+        ":Stdlib.Either_cmi",
     ],
 )
 
@@ -1036,8 +993,8 @@ stdlib_signature(
     src  = "listLabels.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Seq",
-        ":Stdlib.Either",
+        ":Stdlib.Seq_cmi",
+        ":Stdlib.Either_cmi",
     ],
 )
 
@@ -1056,9 +1013,7 @@ stdlib_signature(
     name = "Stdlib.Map_cmi",
     src  = "map.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Seq",
-    ],
+    deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1075,9 +1030,7 @@ stdlib_signature(
     name = "Stdlib.Marshal_cmi",
     src  = "marshal.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib"
-    ],
+    deps   = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -1097,12 +1050,10 @@ stdlib_signature(
     src  = "moreLabels.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Set",
-        ":Stdlib.Seq",
-        # ":Stdlib.Ord",
-        ":Stdlib.Map",
-        ":Stdlib.Hashtbl"
-        # H
+        ":Stdlib.Set_cmi",
+        ":Stdlib.Seq_cmi",
+        ":Stdlib.Map_cmi",
+        ":Stdlib.Hashtbl_cmi"
     ],
 )
 
@@ -1122,14 +1073,6 @@ stdlib_signature(
     name = "Stdlib.Mutex_cmi",
     src  = "mutex.mli",
     opts = SIG_OPTS,
-    deps   = [
-        # ":Stdlib.Set",
-        # ":Stdlib.Seq",
-        # # ":Stdlib.Ord",
-        # ":Stdlib.Map",
-        # ":Stdlib.Hashtbl"
-        # # H
-    ],
 )
 
 stdlib_module(
@@ -1147,10 +1090,7 @@ stdlib_signature(
     name = "Stdlib.Nativeint_cmi",
     src  = "nativeint.mli",
     opts = SIG_OPTS,
-    deps   = [
-        # ":Stdlib_cmi",
-        ":Stdlib.Sys",
-    ],
+    deps   = [":Stdlib.Sys_cmi"]
 )
 
 stdlib_module(
@@ -1169,10 +1109,7 @@ stdlib_signature(
     name = "Stdlib.Obj_cmi",
     src  = "obj.mli",
     opts = SIG_OPTS,
-    deps   = [
-        # ":Stdlib_cmi",
-        ":Stdlib.Int32",
-    ],
+    deps   = [":Stdlib.Int32_cmi"]
 )
 
 stdlib_module(
@@ -1191,9 +1128,7 @@ stdlib_signature(
     opts = SIG_OPTS + [
         "-no-principal" ## Only place this flag is used
     ],
-    deps   = [
-        ":CamlinternalOO",
-    ],
+    deps   = [":CamlinternalOO_cmi"]
 )
 
 stdlib_module(
@@ -1210,9 +1145,7 @@ stdlib_signature(
     name = "Stdlib.Option_cmi",
     src  = "option.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Seq",
-    ],
+    deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1227,7 +1160,7 @@ stdlib_signature(
     name = "Stdlib.Out_channel_cmi",
     src  = "out_channel.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib"],
+    deps   = [":Stdlib_cmi"],
 )
 
 stdlib_module(
@@ -1250,7 +1183,6 @@ stdlib_signature(
     deps   = [
         ":Stdlib.Obj_cmi",
         ":Stdlib.Lexing_cmi",
-        # ":Stdlib_cmi"
     ],
 )
 
@@ -1288,9 +1220,7 @@ stdlib_signature(
     name = "Stdlib.Printexc_cmi",
     src  = "printexc.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Obj_cmi"
-    ],
+    deps   = [":Stdlib.Obj_cmi"]
 )
 
 stdlib_module(
@@ -1311,9 +1241,7 @@ stdlib_signature(
     src  = "printf.mli",
     opts = SIG_OPTS,
     warnings = ["fragile-match"],
-    deps   = [
-        ":Stdlib.Buffer",
-    ],
+    deps   = [":Stdlib.Buffer_cmi"]
 )
 
 stdlib_module(
@@ -1331,10 +1259,7 @@ stdlib_signature(
     name = "Stdlib.Queue_cmi",
     src  = "queue.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Seq",
-        # ":Stdlib",
-    ],
+    deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1363,9 +1288,9 @@ stdlib_signature(
     src  = "random.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.Nativeint",
-        ":Stdlib.Int64",
-        ":Stdlib.Int32",
+        ":Stdlib.Nativeint_cmi",
+        ":Stdlib.Int64_cmi",
+        ":Stdlib.Int32_cmi",
     ],
 )
 
@@ -1384,10 +1309,7 @@ stdlib_signature(
     name = "Stdlib.Result_cmi",
     src  = "result.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib",
-        ":Stdlib.Seq"
-    ],
+    deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1416,10 +1338,6 @@ stdlib_signature(
     src   = "scanf.mli",
     opts  = SIG_OPTS,
     warnings = ["fragile-match"],
-    deps  = [
-        ":Stdlib_cmi",
-        # ":CamlinternalFormatBasics_cmi",
-    ],
 )
 
 stdlib_module(
@@ -1440,8 +1358,6 @@ stdlib_signature(
     name  = "Stdlib.Semaphore_cmi",
     src   = "semaphore.mli",
     opts  = SIG_OPTS,
-    deps  = [
-    ],
 )
 
 stdlib_module(
@@ -1478,9 +1394,7 @@ stdlib_signature(
     name = "Stdlib.Set_cmi",
     src  = "set.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Seq",
-    ],
+    deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1498,9 +1412,7 @@ stdlib_signature(
     name = "Stdlib.Stack_cmi",
     src  = "stack.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Seq",
-    ],
+    deps   = [":Stdlib.Seq_cmi"],
 )
 
 stdlib_module(
@@ -1521,10 +1433,10 @@ stdlib_signature(
     src  = "stdLabels.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Stdlib.StringLabels",
-        ":Stdlib.ListLabels",
-        ":Stdlib.BytesLabels",
-        ":Stdlib.ArrayLabels",
+        ":Stdlib.StringLabels_cmi",
+        ":Stdlib.ListLabels_cmi",
+        ":Stdlib.BytesLabels_cmi",
+        ":Stdlib.ArrayLabels_cmi",
     ],
 )
 
@@ -1546,8 +1458,6 @@ stdlib_signature(
     name = "Stdlib.Stream_cmi",
     src  = "stream.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ],
 )
 
 stdlib_module(
@@ -1610,7 +1520,6 @@ stdlib_signature(
     name = "Stdlib.Sys_cmi",
     src  = "sys.mli",
     opts = SIG_OPTS,
-    deps = [":Stdlib"],
 )
 
 stdlib_module(
@@ -1627,9 +1536,7 @@ stdlib_signature(
     name = "Stdlib.Uchar_cmi",
     src  = "uchar.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Char",
-    ],
+    deps   = [":Stdlib.Char_cmi"]
 )
 
 stdlib_module(
@@ -1653,8 +1560,6 @@ stdlib_signature(
     name = "Stdlib.Unit_cmi",
     src  = "unit.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ],
 )
 
 stdlib_module(
@@ -1680,128 +1585,8 @@ stdlib_signature(
     name = "Stdlib.Weak_cmi",
     src  = "weak.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib.Hashtbl",
-    ],
+    deps   = [":Stdlib.Hashtbl_cmi"],
 )
-
-################################################################
-# HEADERPROGRAM = header
-# HEADER_PATH = $(BINDIR)/
-# HEADER_TARGET_PATH = $(TARGET_BINDIR)/
-# TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
-
-## on systems that support hashbang scripts, emits a hashbang header,
-## e.g. '#!/usr/local/bin/ocamlrun', or does something I don't
-## understand involving ocamlrun.
-
-## on systems that do not support hashbang shell scripts, Makefile
-## compiles header.c to tmpheader.exe, etc...
-
-## so for PoC purposes we just emit a hard-coded shebang
-
-## camlheader is required for compiling a bytecode executable. to get
-## it into the deps list we add it to deps_runtime of stdlib.ml, until we
-## figure out how best to do this.
-
-## use --stamp and --workspace_status_command
-## see .bazelrc, bzl/camlheader.sh
-
-## FIXME: default uses sys install locn, e.g. /usr/local/bin/ocamlrun
-## for dev, use path to internal dev ocamlrun instead
-
-# stdlib/Makefile:
-# $(HEADERPROGRAM)%$(O): \
-#   OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
-
-# SYSPATHS_CMD = " ".join([
-#     "cat bazel-out/stable-status.txt | ",
-#     "grep \"STABLE_CAMLHEADER \" | ",
-#     "cut -d ' ' -f 2 - ",
-#     "> $(location camlheader);",
-
-#         "cat bazel-out/stable-status.txt | ",
-#     "grep \"STABLE_TARGET_CAMLHEADER \" | ",
-#     "cut -d ' ' -f 2 - ",
-#     "> $(location target_camlheader);",
-
-#         "cat bazel-out/stable-status.txt | ",
-#     "grep \"STABLE_CAMLHEADERD \" | ",
-#     "cut -d ' ' -f 2 - ",
-#     "> $(location camlheaderd);",
-
-#         "cat bazel-out/stable-status.txt | ",
-#     "grep STABLE_TARGET_CAMLHEADERD | ",
-#     "cut -d ' ' -f 2 - ",
-#     "> $(location target_camlheaderd);",
-
-#         "cat bazel-out/stable-status.txt | ",
-#     "grep \"STABLE_CAMLHEADERI \" | ",
-#     "cut -d ' ' -f 2 - ",
-#     "> $(location camlheaderi);",
-
-#         "cat bazel-out/stable-status.txt | ",
-#     "grep \"STABLE_TARGET_CAMLHEADERI \" | ",
-#     "cut -d ' ' -f 2 - ",
-#     "> $(location target_camlheaderi);",
-# ])
-
-## IMPORTANT! For this to work, the following cli args must be passed:
-# --stamp
-# --workspace_status_command=$PWD/bzl/camlheader.sh
-
-## FIXME: select camlheader content: for running under Bazel, null, otherwise installation path,
-## not $(execpath //boot/baseline:ocamlrun)?
-# DEVPATHS_CMD = "\n".join([
-#     "cat bazel-out/stable-status.txt | ",
-#     "while read KEY VAL; do",
-#     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
-#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun) > $(location _build/camlheader);\n",
-#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)d > $(location _build/camlheaderd);\n",
-#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)i > $(location _build/camlheaderi);\n",
-#     # "touch $(location camlheader);\n",
-#     # "touch $(location camlheaderd);\n",
-#     # "touch $(location camlheaderi);\n",
-#     "fi",
-#     "done",
-
-#     "echo '#!$(execpath //boot/baseline:ocamlrun)' > $(location _build/target_camlheader);",
-#     "echo '#!$(execpath //boot/baseline:ocamlrun)d' > $(location _build/target_camlheaderd);",
-#     "echo '#!$(execpath //boot/baseline:ocamlrun)i' > $(location _build/target_camlheaderi);",
-# ])
-
-boot_camlheaders(
-    name     = "camlheaders",
-    template = "camlheader.template",
-    # runtime  = "//runtime:ocamlrun",
-    # target_compatible_with = [
-    #     "//platform/constraints/ocaml/executor:vm_executor"
-    # ]
-)
-
-# genrule(
-#     name = "Xcamlheaders",
-#     outs = [
-#         "_build/camlheader",
-#         "_build/camlheaderd",
-#         "_build/camlheaderi",
-#         # "camlheader_ur",
-#         "_build/target_camlheader",
-#         "_build/target_camlheaderd",
-#         "_build/target_camlheaderi"
-#     ],
-#     # srcs = [
-#     #     "//boot/baseline:ocamlrun",
-#     #     "//bzl/toolchain:ocamlrun"
-#     # ],
-#     srcs = [
-#         "//boot/baseline:ocamlrun",
-#         "//bzl/toolchain:ocamlrun"
-#     ],
-#     cmd = DEVPATHS_CMD,
-#     stamp = True,
-#     visibility = ["//visibility:public"]
-# )
 
 ################################################################
 ## cmigroup used by `//promote` targets
@@ -1898,20 +1683,15 @@ boot_camlheaders(
 ## the compilers are hard-coded to look for 'std_exit'. So this rule
 ## special cases this.
 
-stdlib_boot_signature(
+kernel_signature(
     name = "Std_exit_cmi",
     src  = "std_exit.mli",
-    deps = [":Stdlib"]
+    opts = ["-nopervasives"]
 )
 
-stdlib_boot_module(
+kernel_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
     sig    = ":Std_exit_cmi",
-    # sig    = select({
-    #     "//config:sig_src?": "std_exit.mli",
-    #     "//conditions:default": "Std_exit_cmi"
-    # }),
-    opts = ["-open", "Stdlib"],
     deps = [":Stdlib"]
 )

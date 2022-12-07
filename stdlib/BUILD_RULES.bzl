@@ -16,22 +16,8 @@ load("//bzl/actions:signature_impl.bzl", "signature_impl")
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
 
-#### macro ####
-# def stdlib(stage = None,
-#            build_host_constraints = None,
-#            target_host_constraints = None,
-#            visibility = ["//visibility:public"]
-#            ):
-
-#     boot_stdlib(
-#         name       = "stdlib",
-#         stage      = stage,
-#         manifest   = STDLIB_MANIFEST,
-#         visibility = visibility
-#     )
-
 ################################################################
-def _stdlib_signature(ctx):
+def _stdlib_signature_impl(ctx):
 
     (this, extension) = paths.split_extension(ctx.file.src.basename)
     name = this[:1].capitalize() + this[1:]
@@ -41,32 +27,17 @@ def _stdlib_signature(ctx):
 
 ########################
 stdlib_signature = rule(
-    implementation = _stdlib_signature,
+    implementation = _stdlib_signature_impl,
     doc = "Sig rule for bootstrapping ocaml compilers",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
     attrs = dict(
         signature_attrs(),
-
         _opts = attr.string_list(
             # default = ["-nostdlib"]  # in tc.copts
         ),
-
         _resolver = attr.label(
             doc = "The commpiler always opens Stdlib, so everything depends on it.",
             default = "//stdlib:Stdlib"
         ),
-
         _rule = attr.string( default = "stdlib_signature" ),
     ),
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
@@ -77,50 +48,7 @@ stdlib_signature = rule(
 )
 
 ################################################################
-def _stdlib_boot_signature(ctx):
-
-    if ctx.label.name == "Std_exit_cmi":
-        module_name = "std_exit"
-    else:
-        (this, extension) = paths.split_extension(ctx.file.src.basename)
-        module_name = this[:1].capitalize() + this[1:]
-
-    return signature_impl(ctx, module_name)
-
-########################
-stdlib_boot_signature = rule(
-    implementation = _stdlib_boot_signature,
-    doc = "Sig rule for bootstrapping stdlib",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
-    attrs = dict(
-        signature_attrs(),
-        _opts = attr.string_list(
-            # default = ["-nostdlib", "-nopervasives"]
-        ),
-        # no _stdlib_resolver
-        _rule = attr.string( default = "stdlib_boot_signature" ),
-    ),
-    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    executable = False,
-    toolchains = ["//toolchain/type:boot",
-                  ## //toolchain/type:profile,",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
-)
-
-################################################################
-################################################################
-def _stdlib_module(ctx):
+def _stdlib_module_impl(ctx):
 
     (this, extension) = paths.split_extension(ctx.file.struct.basename)
     name = this[:1].capitalize() + this[1:]
@@ -130,35 +58,16 @@ def _stdlib_module(ctx):
 
 #######################
 stdlib_module = rule(
-    implementation = _stdlib_module,
+    implementation = _stdlib_module_impl,
     doc = "Compiles a module with the bootstrap compiler.",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         # exec_compatible_with = [
-    #         #     "//platform/constraints/ocaml/build/executor:vm_executor",
-    #         #     "//platform/constraints/ocaml/build/emitter:vm_emitter"
-    #         # ],
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
     attrs = dict(
         module_attrs(),
-
         _opts = attr.string_list(
             # default = ["-nopervasives"]
             # default = ["-nostdlib"], # in tc.copts
         ),
-
         _resolver = attr.label(
             doc = "The commpiler always opens Stdlib, so everything depends on it.",
-
             default = "//stdlib:Stdlib"
         ),
         _rule = attr.string( default = "stdlib_module" ),
@@ -175,12 +84,102 @@ stdlib_module = rule(
 )
 
 ################################################################
-## non-namespace rules: no _stdlib_resolver
-######################
-def _stdlib_boot_module(ctx):
+################################################################
+def _stdlib_internal_signature_impl(ctx):
 
-    if ctx.file.struct == "std_exit.ml":
-    # if ctx.label.name == "Std_exit":
+    (this, extension) = paths.split_extension(ctx.file.src.basename)
+    module_name = this[:1].capitalize() + this[1:]
+
+    return signature_impl(ctx, module_name)
+
+#################################
+stdlib_internal_signature = rule(
+    implementation = _stdlib_internal_signature_impl,
+    doc = "Sig rule for bootstrapping stdlib",
+    attrs = dict(
+        signature_attrs(),
+        _opts = attr.string_list(
+            # default = ["-nostdlib", "-nopervasives"]
+        ),
+        # no _stdlib_resolver
+        _rule = attr.string( default = "stdlib_internal_signature" ),
+    ),
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    executable = False,
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+######################################
+def _stdlib_internal_module_impl(ctx):
+
+    (this, extension) = paths.split_extension(ctx.file.struct.basename)
+    module_name = this[:1].capitalize() + this[1:]
+
+    return module_impl(ctx, module_name)
+
+##############################
+stdlib_internal_module = rule(
+    implementation = _stdlib_internal_module_impl,
+    doc = "Compiles a non-namespace module in stdlib pkg.",
+    attrs = dict(
+        module_attrs(),
+        _opts = attr.string_list(
+            # default = ["-nostdlib"] # in toolchain copts
+            ## CamlinternalFormatBasics.ml[i] add "-nopervasives"
+        ),
+        # no _stdlib_resolver
+        _rule = attr.string( default = "stdlib_internal_module" ),
+    ),
+    # cfg = compile_mode_in_transition,
+    provides = [BootInfo,ModuleInfo],
+    executable = False,
+    # fragments = ["platform", "cpp"],
+    # host_fragments = ["platform",  "cpp"],
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+################################################################
+################################################################
+## kernel rules: no deps
+################################
+def _kernel_signature_impl(ctx):
+
+    if ctx.file.src.basename == "std_exit.mli":
+        module_name = "std_exit" ## lowercase
+    else:
+        (this, extension) = paths.split_extension(ctx.file.src.basename)
+        module_name = this[:1].capitalize() + this[1:]
+
+    return signature_impl(ctx, module_name)
+
+########################
+kernel_signature = rule(
+    implementation = _kernel_signature_impl,
+    doc = "Sig rule for bootstrapping stdlib",
+    attrs = dict(
+        signature_attrs(),
+        _opts = attr.string_list(
+            # default = ["-nostdlib", "-nopervasives"]
+        ),
+        # no _stdlib_resolver
+        _rule = attr.string( default = "kernel_signature" ),
+    ),
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    executable = False,
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+########################
+def _kernel_module_impl(ctx):
+
+    if ctx.file.struct.basename == "std_exit.ml":
         module_name = "std_exit"
     else:
         (this, extension) = paths.split_extension(ctx.file.struct.basename)
@@ -189,8 +188,8 @@ def _stdlib_boot_module(ctx):
     return module_impl(ctx, module_name)
 
 ####################
-stdlib_boot_module = rule(
-    implementation = _stdlib_boot_module,
+kernel_module = rule(
+    implementation = _kernel_module_impl,
     doc = "Compiles a non-namespace module in stdlib pkg.",
     # exec_groups = {
     #     "boot": exec_group(
@@ -215,7 +214,7 @@ stdlib_boot_module = rule(
             ## CamlinternalFormatBasics.ml[i] add "-nopervasives"
         ),
         # no _stdlib_resolver
-        _rule = attr.string( default = "stdlib_boot_module" ),
+        _rule = attr.string( default = "kernel_module" ),
     ),
     # cfg = compile_mode_in_transition,
     provides = [BootInfo,ModuleInfo],
@@ -227,46 +226,3 @@ stdlib_boot_module = rule(
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
-
-#####################
-# boot_stdlib = rule(  # not used
-#     implementation = archive_impl,
-#     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
-#     exec_groups = {
-#         "boot": exec_group(
-#             # exec_compatible_with = [
-#             #     "//platform/constraints/ocaml/executor:vm_executor?",
-#             #     "//platform/constraints/ocaml/emitter:vm_emitter"
-#             # ],
-#             toolchains = ["//toolchain/type:boot"],
-#         ),
-#         # "baseline": exec_group(
-#         #     exec_compatible_with = [
-#         #         "//platform/constraints/ocaml/executor:vm_executor?",
-#         #         "//platform/constraints/ocaml/emitter:vm_emitter"
-#         #     ],
-#         #     toolchains = ["//toolchain/type:baseline"],
-#         # ),
-#     },
-
-#     attrs = dict(
-#         archive_attrs(),
-
-#         # only boot_stdlib and boot_compiler have a public 'stage' attr
-#         # stage = attr.label( default = "//config/stage" ),
-
-#         _rule = attr.string( default = "boot_stdlib" ),
-
-#         _allowlist_function_transition = attr.label(
-#             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-#         ),
-#     ),
-#     provides = [OcamlArchiveProvider, BootInfo],
-#     cfg = stdlib_in_transition,
-#     executable = False,
-#     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-#     # toolchains = ["//toolchain/type:boot",
-#     #               # ## //toolchain/type:profile,",
-#     #               "@bazel_tools//tools/cpp:toolchain_type"]
-# )
-

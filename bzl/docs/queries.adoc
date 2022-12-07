@@ -1,0 +1,70 @@
+= queries
+
+
+* list all instances of a particular rule:
++
+    bazel query 'kind("<regex> rule", //...)'
++
+For example, all uses of rule "mustache":
++
+    bazel query 'kind("mustache rule", //...)'
+
+* list all generated files (outputs of genrule, mustache rule):
+
+  ** in a package:
+
+    bazel query 'kind("generated file", //runtime:*)' --noimplicit_deps
+    bazel query 'kind("generated file", //runtime/caml:*)' --noimplicit_deps
+
+  ** in deps of a target:
+
+    bazel query 'kind("generated file", deps(//typing:ocamlcommon))' --noimplicit_deps
+    bazel query 'kind("generated file", deps(//typing:Envaux))' --noimplicit_deps
+
+== reverse deps
+
+* show everything that depends (directly or indirectly) on `//runtime/caml:domain_state.h`:
+
+    bazel query "rdeps(//..., //runtime/caml:domain_state.h)"
+
+* to limit the depth add an int argument. E.g. to show only direct rdeps:
+
+    bazel query "rdeps(//..., //runtime/caml:domain_state.h, 1)"
+
+== dep paths
+
+* show graph of all deps between `//lex:ocamllex` and `//runtime/caml:domain_state.h`:
+
+    bazel cquery "allpaths(//lex:ocamllex, //runtime/caml:domain_state.h)" --output=graph --config=boot
+
+You can add something like ` | dot -Tsvg > /tmp/deps.svg` to view the graph.
+
+* show only "some" (arbitrary) path:
+
+    bazel cquery "somepath(//lex:ocamllex, //runtime/caml:domain_state.h)" --output=graph --config=boot
+
+
+== examples
+
+`ocamlrun` may be used by the build process to run VM executables.  Show what depends on it:
+
+     bazel query "rdeps(//..., //runtime:ocamlrun)"
+    //boot:coldstart
+    //boot:ocamlc.boot
+    //boot:ocamlc.sh
+    //boot:ocamllex.boot
+    //boot:ocamllex.sh
+    //runtime:ocamlrun
+    //stdlib:camlheaders
+
+And what depends on `//stdlib:camlheaders`?
+
+    bazel query "rdeps(//..., //stdlib:camlheaders)"
+    //boot:coldstart
+    //boot:ocamlc.sh
+    //stdlib:camlheaders
+
+Nothing, apparently, since we're not using pkg `//boot`. But this does
+not show that e.g. executable rules have a hidden dependency on it,
+since the bytecode compiler inserts a camlheader into vm executables.
+See link:../bytecomp/bytelink.ml[bytecomp/bytelink.ml]

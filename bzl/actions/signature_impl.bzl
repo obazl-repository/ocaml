@@ -35,8 +35,26 @@ def signature_impl(ctx, module_name):
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
     tc = ctx.toolchains["//toolchain/type:boot"]
 
-    (stage, executor, emitter, workdir) = get_workdir(tc)
-    if executor == "vm":
+    (target_executor, target_emitter,
+     config_executor, config_emitter,
+     workdir) = get_workdir(ctx, tc)
+
+    ## target_* == unspecified means we're in the last stage
+    ## and config_* is what we're building now
+    ## otherwise target_* is what we're building now
+    ## executor = effective executor
+
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
+
+    executor = config_executor
+    emitter  = config_emitter
+
+    if executor in ["baseline", "vm"]:
         ext = ".cmo"
     else:
         ext = ".cmx"
@@ -58,7 +76,7 @@ def signature_impl(ctx, module_name):
     ns = None
     # (from_name, ns, module_name) = get_module_name(ctx, sig_src)
     if debug:
-        print("From {src} To: {dst}".format(
+        print("Module name: {src} To: {dst}".format(
             src = from_name, dst = module_name))
 
     # if False: ## ctx.attr.ppx:
@@ -184,16 +202,65 @@ def signature_impl(ctx, module_name):
     args = ctx.actions.args()
 
     executable = None
-    if executor == "vm":
-        ## ocamlrun
-        for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-            if f.basename == "ocamlrun":
-                # print("LEX RF: %s" % f.path)
-                executable = f
-            # the bytecode executable
-        args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+
+    ## IMPORTANT!!! The tc compiler runfiles contains the entire stack
+    ## of of bootstrapped compilers. E.g. if target is ocamlc.opt, then:
+    # <generated file runtime/ocamlrun>
+    # <generated file boot/ocamlc.boot>
+    # <generated file bin/_boot/ocamlc.byte>
+    # <generated file bin/_ocamlc.byte/ocamlc.byte>
+    # <generated file bin/_ocamlopt.byte/ocamlopt.byte>
+    # <generated file bin/_ocamlopt.opt/ocamlopt.opt>
+
+    # runfiles = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()
+    # print("RUNFILES: %s" % runfiles)
+
+    if tc.dev:
+        ocamlrun = None
+        effective_compiler = tc.compiler
     else:
-        executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
+        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    if tc.dev:
+        build_executor = "opt"
+    elif (target_executor == "unspecified"):
+        if (config_executor == "sys"):
+            if config_emitter == "sys":
+                # ss built from ocamlopt.byte
+                build_executor = "vm"
+            else:
+                # sv built from ocamlopt.opt
+                build_executor = "sys"
+        else:
+            build_executor = "vm"
+    elif target_executor in ["baseline", "vm"]:
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "sys"):
+        ## ss always built by vs (ocamlopt.byte)
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "vm"):
+        ## sv built by ss
+        build_executor = "sys"
+
+    if build_executor == "vm":
+        executable = ocamlrun
+        args.add(effective_compiler.path)
+    else:
+        executable = effective_compiler
+
+    if debug:
+        print("tgt: %s" % ctx.label)
+        print("target_executor: %s" % target_executor)
+        print("target_emitter: %s" % target_emitter)
+        print("config_executor: %s" % config_executor)
+        print("config_emitter: %s" % config_emitter)
+        print("ocamlrun: %s" % ocamlrun)
+        print("effective_compiler: %s" % effective_compiler)
+        print("executable: %s" % executable)
+        print("tc.dev: %s" % tc.dev)
+        # if ctx.label.name == "CamlinternalFormatBasics_cmi":
+        #     fail()
 
     resolver = []
     if hasattr(ctx.attr, "_resolver"):
@@ -285,6 +352,7 @@ def signature_impl(ctx, module_name):
         + direct_inputs # + ctx.files._ns_resolver,
         # + [tc.compiler[DefaultInfo].files_to_run.executable],
         # + ctx.files.data if ctx.files.data else [],
+        + [effective_compiler]
         + resolver
         ,
         transitive = []## indirect_inputs_depsets
@@ -306,11 +374,11 @@ def signature_impl(ctx, module_name):
         inputs = inputs_depset,
         outputs = [out_cmi],
         tools = [
-            tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            tc_compiler(tc)[DefaultInfo].files_to_run
+            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
+            # tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = "CompileOcamlSignature",
-        progress_message = progress_msg(stage, workdir, ctx)
+        progress_message = progress_msg(workdir, ctx)
     )
 
     #############################################

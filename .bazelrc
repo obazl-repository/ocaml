@@ -1,6 +1,8 @@
 # query --notool_deps
 # query --noimplicit_deps
 
+common:dev --//config:dev
+
 ## always use these settings:
 ## put it in ~/.bazelrc to enable for all bazel projects
 
@@ -10,17 +12,25 @@ common:show --subcommands=pretty_print
 common:show --verbose_failures
 
 ## suppress INFO msgs etc. emitted by 'bazel run'
-run:q --ui_event_filters=-info
-run:q --ui_event_filters=-stdout
-run:q --ui_event_filters=-stderr
-run:q --noshow_progress
+# common:q --nobuild
+common:q --noshow_progress
+common:q --ui_event_filters=-info
+# common:q --ui_event_filters=-stdout
+# common:q --ui_event_filters=-stderr
 
 ## now the default: build --incompatible_override_toolchain_transition
 build --incompatible_enable_cc_toolchain_resolution
 #build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
-#build --toolchain_resolution_debug=//toolchain/type:.*
-#build --toolchain_resolution_debug=//boot/toolchain/type:.*
+build --toolchain_resolution_debug=//toolchain/type:.*
+
+# --[no]enable_platform_specific_config default: "false"
+# If true, Bazel picks up host-OS-specific config lines from bazelrc
+# files. For example, if the host OS is Linux and you run bazel build,
+# Bazel picks up lines starting with build:linux. Supported OS
+# identifiers are linux, macos, windows, freebsd, and openbsd.
+# Enabling this flag is equivalent to using --config=linux on Linux,
+# --config=windows on Windows, etc.
 
 ### testing:
 # --extra_execution_platforms: The platforms that are available as
@@ -98,34 +108,43 @@ build --workspace_status_command=$PWD/bzl/camlheader.sh
 
 # build --config=ocamlc.byte
 
+# build the baseline _boot/ocamlc.byte using boot/ocamlc:
+build:boot --//config/target/executor=boot
+build:boot --//config/target/emitter=boot
+
 ## vv_vv
-build:ocamlc.byte --host_platform=//platform/ocaml/local:sys_vm
-build:ocamlc.byte --platforms=//platform/ocaml/local:sys_vm
+# build:ocamlc.byte --host_platform=//platform/ocaml/local:sys_vm
+# build:ocamlc.byte --platforms=//platform/ocaml/local:sys_vm
+build:ocamlc.byte --//config/target/executor=vm
 build:ocamlc.byte --//config/target/emitter=vm
 
 ## vv_vs
-build:ocamlopt.byte --host_platform=//platform/ocaml/local:sys_vm
-build:ocamlopt.byte --platforms=//platform/ocaml/local:sys_vm
+# build:ocamlopt.byte --host_platform=//platform/ocaml/local:sys_vm
+# build:ocamlopt.byte --platforms=//platform/ocaml/local:sys_vm
+build:ocamlopt.byte --//config/target/executor=vm
 build:ocamlopt.byte --//config/target/emitter=sys
 
-build:vs_ss --host_platform=//platform/ocaml/local:sys_vm
-build:vs_ss --platforms=//platform/ocaml/local:sys_sys
-build:vs_ss --//config/target/emitter=sys
-
-build:vs_sv --host_platform=//platform/ocaml/local:sys_vm
-build:vs_sv --platforms=//platform/ocaml/local:sys_sys
-build:vs_sv --//config/target/emitter=vm
-
 ## ss_ss
-build:ocamlopt.opt --host_platform=//platform/ocaml/local:sys_sys
-build:ocamlopt.opt --extra_execution_platforms=//platform/ocaml/local:sys_sys
-build:ocamlopt.opt --platforms=//platform/ocaml/local:sys_sys
+# build:ocamlopt.opt --host_platform=//platform/ocaml/local:sys_sys
+# build:ocamlopt.opt --extra_execution_platforms=//platform/ocaml/local:sys_sys
+# build:ocamlopt.opt --platforms=//platform/ocaml/local:sys_sys
+build:ocamlopt.opt --//config/target/executor=sys
 build:ocamlopt.opt --//config/target/emitter=sys
 
 ## ss_sv
-build:ocamlc.opt --host_platform=//platform/ocaml/local:sys_sys
-build:ocamlc.opt --platforms=//platform/ocaml/local:sys_sys
+# build:ocamlc.opt --host_platform=//platform/ocaml/local:sys_sys
+# build:ocamlc.opt --platforms=//platform/ocaml/local:sys_sys
+build:ocamlc.opt --//config/target/executor=sys
 build:ocamlc.opt --//config/target/emitter=vm
+
+# build:vs_ss --host_platform=//platform/ocaml/local:sys_vm
+# build:vs_ss --platforms=//platform/ocaml/local:sys_sys
+# build:vs_ss --//config/target/emitter=sys
+
+# build:vs_sv --host_platform=//platform/ocaml/local:sys_vm
+# build:vs_sv --platforms=//platform/ocaml/local:sys_sys
+# build:vs_sv --//config/target/emitter=vm
+
 
 try-import .config/dev.bazelrc
 try-import .config/user.bazelrc

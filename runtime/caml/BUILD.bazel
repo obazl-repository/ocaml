@@ -1,6 +1,4 @@
-load("//bzl:rules.bzl",
-     "mustache"
-)
+load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 exports_files(glob(["**"]))
 
@@ -29,9 +27,16 @@ mustache(
     out  = "domain_state.h",
     json = "domain_state.json",
     template = "domain_state.h.mustache",
-    visibility = [
-        "//runtime:__subpackages__"
-    ]
+    visibility = ["//runtime:__subpackages__", "//yacc:__pkg__"]
+)
+
+cc_library(
+    name = "dsh",
+    # srcs = [":domain_state.h"],
+    hdrs = [":domain_state_h"],
+    # include_prefix = "caml",
+    # strip_include_prefix = "caml",
+    visibility = ["//visibility:public"]
 )
 
 mustache(
@@ -50,7 +55,10 @@ mustache(
     out  = "fail.h",
     json = "//runtime:primitives.json",
     template = "fail.h.mustache",
-    visibility = ["//lambda:__pkg__"]
+    visibility = [
+        "//lambda:__pkg__",
+        "//runtime:__subpackages__"
+    ]
 )
 
 mustache(
@@ -58,9 +66,6 @@ mustache(
     out  = "jumptbl.h",
     json = "//bytecomp:opcodes.json",
     template = "jumptbl.h.mustache",
-    visibility = [
-        # "//runtime:__subpackages__"
-    ]
 )
 
 mustache(
@@ -68,13 +73,10 @@ mustache(
     out  = "opnames.h",
     json = "//bytecomp:opcodes.json",
     template = "opnames.h.mustache",
-    visibility = [
-        # "//runtime:__subpackages__"
-    ]
 )
 
 genrule(
-    name = "platform_s.h",
+    name = "s_h",
     outs = ["s.h"],
     srcs = select({
         # FIXME: if targethost = buildhost, use s.local.h
@@ -91,15 +93,20 @@ genrule(
 
 cc_library(
     name = "hdrs",
+    # srcs = [":domain_state_h"],
     hdrs = glob(
         ["*.h"]
     ) + [
-        ":domain_state.h",
-        ":fail.h",
-        ":jumptbl.h",
-        ":opnames.h",
-        ":s.h"
+        ":domain_state_h",
+        ":fail_h",
+        ":jumptbl_h",
+        ":opnames_h",
+        ":s_h"
     ],
+    # ] + select({
+    #     "//platform/os:linux?": ["//runtime/caml/linux:s.h"],
+    #     "//platform/os:macos?": ["//runtime/caml/macos:s.h"]
+    # }),
     include_prefix = "caml",
     visibility = ["//visibility:public"]
 )

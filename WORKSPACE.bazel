@@ -9,9 +9,10 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("//:WORKSPACE.bzl", "obazl_deps")
 obazl_deps()
 
+## coldstart snapshot for development:
 local_repository(
-    name = "boot",
-    path = ".bootstrap"
+    name = "baseline",
+    path = ".baseline"
 )
 
 # load("//bzl:rules.bzl",
@@ -48,23 +49,33 @@ register_execution_platforms(
 
 register_toolchains(
 
-    ## cross-platform toolchains
-    "//toolchain/selector/local/vm/target/amd64/linux:vv_vv",
-    "//toolchain/selector/local/vm/target/amd64/linux:vv_vs",
-    "//toolchain/selector/local/vm/target/amd64/linux:vs_ss",
-    "//toolchain/selector/local/vm/target/amd64/linux:vs_sv",
+    "//toolchain/selector/local:dev",
 
-    "//toolchain/selector/local/vm/target/amd64/linux:ss_ss",
-    "//toolchain/selector/local/vm/target/amd64/linux:ss_sv",
-    "//toolchain/selector/local/vm/target/amd64/linux:sv_vv",
-    "//toolchain/selector/local/vm/target/amd64/linux:sv_vs",
+    "//toolchain/selector/local:boot",
+    # "//toolchain/selector/local:baseline",
+    "//toolchain/selector/local:ocamlc.byte",
+    # "//toolchain/selector/local:boot.ocamlopt.byte",
+    "//toolchain/selector/local:ocamlopt.byte",
+    "//toolchain/selector/local:ocamlc.opt",
+    "//toolchain/selector/local:ocamlopt.opt",
+
+    ## cross-platform toolchains
+    # "//toolchain/selector/local/vm/target/amd64/linux:vv_vv",
+    # "//toolchain/selector/local/vm/target/amd64/linux:vv_vs",
+    # "//toolchain/selector/local/vm/target/amd64/linux:vs_ss",
+    # "//toolchain/selector/local/vm/target/amd64/linux:vs_sv",
+
+    # "//toolchain/selector/local/vm/target/amd64/linux:ss_ss",
+    # "//toolchain/selector/local/vm/target/amd64/linux:ss_sv",
+    # "//toolchain/selector/local/vm/target/amd64/linux:sv_vv",
+    # "//toolchain/selector/local/vm/target/amd64/linux:sv_vs",
 
     ## endo-toolchains
-    "//toolchain/selector/local/vm/target/local:vv_vv",
-    "//toolchain/selector/local/vm/target/local:vv_vs",
+    # "//toolchain/selector/local/vm/target/local:vv_vv",
+    # "//toolchain/selector/local/vm/target/local:vv_vs",
 
-    "//toolchain/selector/local/vm/target/local:ss_ss",
-    "//toolchain/selector/local/vm/target/local:ss_sv",
+    # "//toolchain/selector/local/vm/target/local:ss_ss",
+    # "//toolchain/selector/local/vm/target/local:ss_sv",
 
     # "//toolchain/selector/local:vs_ss",
     # "//toolchain/selector/local:vs_sv",

@@ -9,8 +9,10 @@ load("//bzl/rules:config_sys.bzl", "config_sys")
 load("//bzl:rules.bzl",
      "compiler_module",
      "compiler_signature",
-     "mustache"
 )
+
+load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
+
 load(":BUILD_RULES.bzl",
      "config_mkexe", "OCamlCcToolchainInfo", "config_cc_toolchain")
 
@@ -19,7 +21,7 @@ package(default_visibility = ["//visibility:public"])
 compiler_signature(
     name = "Config_cmi",
     src  = "config.mli",
-    deps   = ["//stdlib:Stdlib"],
+    deps   = ["//stdlib:Stdlib_cmi"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//utils:__pkg__",
@@ -71,7 +73,7 @@ compiler_module(
 ## to generate config.ml. Or for the first step we could use
 ## ctx.actions.expand_template.
 mustache(
-    name = "__config_ml__",
+    name = "config_ml",
     out      = "config.ml",
     template = "config.ml.mustache",
     json     = "config.ml.json",
@@ -159,11 +161,18 @@ string_flag(name = "target_host",
 
 string_list_flag(name = "manifest", build_setting_default = [])
 
+bool_flag( name = "dev", build_setting_default = False)
+config_setting(name = "dev?", flag_values = {":dev": "True"})
+
 bool_flag( name = "debug", build_setting_default = False)
 config_setting(name = "debug?", flag_values = {":debug": "True"})
 
 bool_flag( name = "instrumented", build_setting_default = False)
 config_setting(name = "instrumented?", flag_values = {":instrumented": "True"})
+
+## ocaml compile options
+bool_flag( name = "absname", build_setting_default = True)
+config_setting(name = "absname?", flag_values = {":absname": "True"})
 
 bool_flag( name = "bin-annot", build_setting_default = True)
 config_setting(name = "bin-annot?", flag_values = {":bin-annot": "True"})
@@ -171,17 +180,18 @@ config_setting(name = "bin-annot?", flag_values = {":bin-annot": "True"})
 bool_flag( name = "principal", build_setting_default = True)
 config_setting(name = "principal?", flag_values = {":principal": "True"})
 
+bool_flag( name = "xmo", build_setting_default = False)
+config_setting(name = "xmo?", flag_values = {":xmo": "True"})
+
+####
 bool_flag( name = "sig_src", build_setting_default = False)
 config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
-
-bool_flag( name = "absname", build_setting_default = True)
-config_setting(name = "absname?", flag_values = {":absname": "True"})
 
 bool_flag( name = "flat_float_array", build_setting_default = True)
 config_setting(name = "flat_float_array?",
                flag_values = {":flat_float_array": "True"})
 
-label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
+# label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
 
 label_flag( name = "primitives",
             build_setting_default = "//runtime:primitives")

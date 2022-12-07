@@ -29,7 +29,7 @@ def module_attrs():
         ),
         _primitives = attr.label( ## file
             allow_single_file = True,
-            default = "//runtime:primitives.dat"
+            default = "//runtime:primitives_dat"
         ),
 
         ns = attr.label(
@@ -96,7 +96,7 @@ def module_attrs():
             # cfg = ocaml_module_cc_deps_out_transition
         ),
 
-        _verbose = attr.label(default = "//config/ocaml:verbose"),
+        _verbose = attr.label(default = "//config/ocaml/compile:verbose"),
 
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath") # ppx also uses this

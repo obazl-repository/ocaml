@@ -12,3 +12,36 @@ So targets (including stdlib submodules) may depend on:
   ** the stdlib resolver but not submodules
   ** both
 
+
+Camlinternal* modules may depend on submodules in Stdlib. Since they
+are not themselves in the namespace (although they are included in the
+stdlib archive), we must explicitly pass `["-open", "Stdlib"].
+
+=== -nopervasives
+
+This really has two meanings:
+
+* disable the default "-open Stdlib"
+* this module does not depend on any primitives
+
+In other words, the Stdlib resolver serves a dual purpose. It acts as
+the resolver for the `Stdlib` namespace, but it also exports some
+primitives.
+
+Some modules do not depend on any "pervasives"; for example
+`stdlib/std_exit.mli`. But `stdlib/std_exit.ml` does depend on a
+primitive - `do_at_exit` - so we must list `//stdlib:Stdlib` as its
+dependency.
+
+Some modules may depend on a submodule in Stdlib, but not on any
+"pervasives". Listing `//stdlib:Stdlib` as a dependency would suffice
+to make the compile work, but fails to indicate lack of a `pervasives`
+dependency. To make that more explicit case we can pass
+`-nopervasives` to indicate the latter, but to satisfy the former we
+need to also depend on `//stdlib:Stdlib` and pass `-open Stdlib`.
+
+Examples are `//utils:Arg_helper_cmi` and `//utils:Binutils_cmi`.
+
+[Well, actually if we have something that depends on a Stdlib
+submodule and also needs `//stdlib:Stdlib` we can't tell whether it
+needs pervasives or not without inspecting it...]

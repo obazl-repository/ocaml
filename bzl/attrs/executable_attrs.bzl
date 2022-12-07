@@ -4,7 +4,7 @@ load("//bzl:providers.bzl",
      "OcamlLibraryMarker",
 )
 
-load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
+# load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
 
 #######################
 def executable_attrs():
@@ -39,7 +39,7 @@ def executable_attrs():
             doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
-        _verbose = attr.label(default = "//config/ocaml:verbose"),
+        _verbose = attr.label(default = "//config/ocaml/link:verbose"),
 
         use_prims = attr.bool( # overrides global _use_prims
             doc = "Undocumented flag, heavily used in bootstrapping",
@@ -51,17 +51,11 @@ def executable_attrs():
         ),
         _primitives = attr.label( ## file
             allow_single_file = True,
-            default = "//runtime:primitives.dat"
+            default = "//runtime:primitives_dat"
         ),
 
-        ## FIXME: runtime depends on target_executor
-        _runtime = attr.label(
-            # allow_single_file = True,
-            default = "//runtime:asmrun",
-            executable = False,
-            cfg = reset_config_transition
-            # default = "//config/runtime" # label flag set by transition
-        ),
+        ## _runtime attr goes in each rule - boot_compiler etc. need
+        ## it, but build_tool does not.
 
         ## The compiler always expects to find stdlib.cm{x}a (hardocded)
         ## UNLESS -nopervasives?
@@ -79,10 +73,10 @@ def executable_attrs():
             # cfg = exe_deps_out_transition,
         ),
 
-        _camlheaders = attr.label_list(
-            allow_files = True,
-            default = ["//config:camlheaders"]
-        ),
+        # _camlheaders = attr.label_list(
+        #     allow_files = True,
+        #     default = ["//config:camlheaders"]
+        # ),
 
         exe  = attr.string(
             doc = "By default, executable name is derived from 'name' attribute; use this to override."
@@ -97,7 +91,8 @@ def executable_attrs():
             default = False
         ),
         ## FIXME: add cc_linkopts?
-        cc_deps = attr.label_keyed_string_dict(
+        cc_deps = attr.label_list(
+        # cc_deps = attr.label_keyed_string_dict(
             doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
             """,
             ## FIXME: cc libs could come from LSPs that do not support CcInfo, e.g. rules_rust
@@ -114,12 +109,16 @@ def executable_attrs():
 
         ),
 
-        # _debug           = attr.label(default = "@ocaml//debug"),
+        _compilation_mode = attr.label(
+            default = "//config/compilation_mode"
+        ),
 
         _rule = attr.string( default  = "ocaml_executable" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
+
+        ## for runtime reset transition:
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
 
         _cc_toolchain = attr.label(
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")

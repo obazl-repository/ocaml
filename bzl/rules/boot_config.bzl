@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//config:CONFIG.bzl", "OCAML_BINDIR")
-load("//bzl:functions.bzl", "tc_compiler")
+load("//bzl:functions.bzl", "tc_compiler", "get_workdir")
 
 ########################
 def _boot_config(ctx):
@@ -11,27 +11,34 @@ def _boot_config(ctx):
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
     tc = ctx.toolchains["//toolchain/type:boot"]
 
+    (executor, emitter, workdir) = get_workdir(ctx, tc)
+
     # build_emitter = tc.build_emitter[BuildSettingInfo].value
     # print("BEMITTER: %s" % build_emitter)
 
-    target_executor = tc.target_executor[BuildSettingInfo].value
-    target_emitter  = tc.target_emitter[BuildSettingInfo].value
+    # target_executor = tc.target_executor[BuildSettingInfo].value
+    # target_emitter  = tc.target_emitter[BuildSettingInfo].value
 
-    stage = int(tc._stage[BuildSettingInfo].value)
-    workdir = "_{b}{t}{s}/".format(
-        b = target_executor, t = target_emitter, s = (stage))
+    # stage = int(tc._stage[BuildSettingInfo].value)
+    # workdir = "_{b}{t}{s}/".format(
+    #     b = target_executor, t = target_emitter, s = (stage))
 
-    print("module _stage: %s" % stage)
+    # print("module _stage: %s" % stage)
 
-    if stage == 2:
-        ext = ".cmx"
+    if executor in ["boot", "vm"]:
+        ext = ".cmo"
     else:
-        if target_executor == "vm":
-            ext = ".cmo"
-        elif target_executor == "sys":
-            ext = ".cmx"
-        else:
-            fail("Bad target_executor: %s" % target_executor)
+        ext = ".cmx"
+
+    # if stage == 2:
+    #     ext = ".cmx"
+    # else:
+    #     if target_executor == "vm":
+    #         ext = ".cmo"
+    #     elif target_executor == "sys":
+    #         ext = ".cmx"
+    #     else:
+    #         fail("Bad target_executor: %s" % target_executor)
 
     # tc = None
     # if ctx.attr._stage == "boot":
@@ -109,9 +116,9 @@ boot_config = rule(
         footer = attr.label(
             allow_single_file = True
         ),
-        _stage = attr.label(
-            default = "//config/stage"
-        ),
+        # _stage = attr.label(
+        #     default = "//config/stage"
+        # ),
         ocaml_bindir = attr.label(
             # allow_single_file = True,
             # default = "//boot/baseline"

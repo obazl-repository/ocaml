@@ -1,11 +1,11 @@
 load("//bzl:rules.bzl",
      "boot_archive",
-     "boot_executable",
+     # "boot_executable",
      "boot_library",
      "compiler_module",
      "bootstrap_repl",
      "compiler_signature",
-     "baseline_test",
+     # "baseline_test",
 )
 
 # load("//config:CONFIG.bzl",
@@ -55,23 +55,23 @@ SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
 #         ":ocamltoplevel",
 #     ]
 # )
-bootstrap_repl(
-    name = "ocaml",
-    main = ":Topstart",
-    opts = ["-linkall"],
-    ## args to be passed if the exe is run using `bazel run`:
-    args = ["-nostdlib",
-            "-I",
-            ## (I find no better way to put stdlib in srch path):
-            "../../../stdlib/__boot",
-            "-noinit"],
-    deps = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
-        ":ocamltoplevel",
-    ],
-    expunge = STDLIB_MODULE_NAMES + ["outcometree", "topdirs", "toploop"]
-)
+# bootstrap_repl(
+#     name = "ocaml",
+#     main = ":Topstart",
+#     opts = ["-linkall"],
+#     ## args to be passed if the exe is run using `bazel run`:
+#     args = ["-nostdlib",
+#             "-I",
+#             ## (I find no better way to put stdlib in srch path):
+#             "../../../stdlib/__boot",
+#             "-noinit"],
+#     deps = [
+#         "//compilerlibs:ocamlcommon",
+#         "//bytecomp:ocamlbytecomp",
+#         ":ocamltoplevel",
+#     ],
+#     expunge = STDLIB_MODULE_NAMES + ["outcometree", "topdirs", "toploop"]
+# )
 
 # genrule(
 #     name = "gen_ocaml",

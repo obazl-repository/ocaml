@@ -5,15 +5,34 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
 
-########################
-# def _build_tool(ctx):
+load("//bzl:functions.bzl", "get_workdir")
 
-#     tc = ctx.toolchains["//toolchain/type:boot"]
-#     return impl_executable(ctx, tc)
+##############################
+def _build_tool_impl(ctx):
+
+    tc = ctx.toolchains["//toolchain/type:boot"]
+    (target_executor, target_emitter,
+     config_executor, config_emitter,
+     workdir) = get_workdir(ctx, tc)
+    if target_executor == "unspecified":
+        executor = config_executor
+        emitter  = config_emitter
+    else:
+        executor = target_executor
+        emitter  = target_emitter
+
+    if executor in ["boot", "vm"]:
+        ext = ".byte"
+    else:
+        ext = ".opt"
+
+    exe_name = ctx.label.name + ext
+
+    return executable_impl(ctx, exe_name)
 
 #######################
 build_tool = rule(
-    implementation = executable_impl,
+    implementation = _build_tool_impl,
     doc = "Links OCaml executable binary using the bootstrap toolchain",
 
     # exec_groups = {
@@ -46,6 +65,7 @@ build_tool = rule(
         ),
     ),
     cfg = reset_config_transition,
+    # cfg = "exec",
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:boot",

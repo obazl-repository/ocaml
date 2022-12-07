@@ -4,7 +4,9 @@ load("@bazel_skylib//rules:common_settings.bzl",
 
 ## NB: config flags a settings, e.g. --//runtime:dbg, at bottom of file
 
-load("//bzl:rules.bzl", "boot_executable", "cc_assemble", "mustache")
+load("//bzl:rules.bzl", "cc_assemble")
+
+load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 load("//config:CONFIG.bzl", "ARCH")
 
@@ -43,8 +45,10 @@ cc_library(
         # "//runtime:build_config.h",
         "//runtime:common_c_sources",
         "//runtime:bytecode_only_c_sources",
-        "//runtime/caml:instruct.h",
-        ":primitives.h"
+        "//runtime/caml:domain_state.h",
+        "//runtime/caml:fail_h",
+        "//runtime/caml:instruct_h",
+        ":primitives_h"
     ] + select({
     # "//platform/target:vm?": ["//runtime:bytecode_only_c_sources"],
     # "//conditions:default": ["//runtime:native_only_c_sources"],
@@ -52,9 +56,19 @@ cc_library(
     }),
     copts = [
         "-x", "c",
+        "-I.",
+        "-Iruntime",
         "-Iruntime/caml",
-        "-I$(GENDIR)/runtime", # caml/instruct.h
+        "-Icaml",
+        "-Ihdrs/caml",
+        "-I$(GENDIR)",
+        "-I$(GENDIR)/caml",
+        "-I$(GENDIR)/runtime",
         "-I$(GENDIR)/runtime/caml",
+        # "-Iruntime/caml",
+        # "-I$(GENDIR)/runtime",
+        # "-I$(GENDIR)/runtime/hdrs",
+        # "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
@@ -103,21 +117,32 @@ cc_library(
         "//runtime:common_c_sources",
         "//runtime:native_only_c_sources",
         ":asm",
-        # "//runtime/caml:instruct.h",
-        "//runtime/caml:s.h",
-        ":primitives.h"
+        "//runtime/caml:domain_state.h",
+        "//runtime/caml:fail_h",
+        "//runtime/caml:s_h",
+        ":primitives_h"
     ],
+    hdrs = ["//runtime/caml:dsh"],
     # features = [
     #     "-supports_pic",    # disable pic
     #     "fully_static_link" # TODO: explore
     # ],
     copts = [
         "-x", "c",
+        "-I.",
+        "-Iruntime",
         "-Iruntime/caml",
-        "-I$(GENDIR)/runtime", # build_config.h
-        "-I$(GENDIR)/runtime/caml", # instruct.h
+        "-Icaml",
+        "-Ihdrs/caml",
+        "-I$(GENDIR)",
+        "-I$(GENDIR)/caml",
+        "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
+        # mac (clang) verbose:
+        # "-v",
+        # "-Xlinker" , "-t"
     ] + select({
         "//platform/os:macos?": [], #"-std=c11"],
         "//platform/os:linux?": [],
@@ -133,7 +158,23 @@ cc_library(
         "//conditions:default":  []
     }) + OPTIMIZATION_FLAGS
     ,
-    linkopts = ["$(OC_LDFLAGS)", "-ffunction-sections"],
+    linkopts = [
+        "FOOBAR",
+        "$(OC_LDFLAGS)",
+        "-ffunction-sections",
+        ## macos std linker (ld) debugging:
+        "-Wl,-v", # prints config, search paths
+        "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
+        "-Xlinker", "-t", # -Wl-v plus logs each file the linker loads.
+        "-why_load" # Log why each object file in a static library
+        #             # is loaded. That is, what symbol was needed.
+
+        ## zig (on mac) linker opts
+        # "-v",
+
+        ## linux
+        # "-Wl,--verbose"
+    ],
     defines = RUNTIME_DEFINES + [ # OC_NATIVE_DEFINES + [
     ] + select({
         # to unify camlrun and asmrun targets, need to select these:
@@ -144,7 +185,11 @@ cc_library(
             "SYS_$(SYSTEM)"
         ] #testing
     }),
-    deps = ["//runtime/caml:hdrs", ":asm"],
+    deps = [
+        "//runtime/caml:hdrs", ":asm",
+        "//runtime/caml:dsh"
+        # "//runtime/caml:domainstate_hdr"
+    ],
     toolchains = ["//profile/system/local"],
     visibility = [
         "//visibility:public"
@@ -160,7 +205,7 @@ cc_assemble(
     src = select({
         "//platform:windows_x86_32?": ARCH + "nt.asm",
         "//platform:windows_x86_64?": ARCH + "nt.asm",
-        "//conditions:default"      : ARCH + ".S"
+        "//conditions:default"      : ":__asm" # ARCH + ".S"
     }),
     copts = [
         "-Iruntime", # caml/m.h
@@ -191,7 +236,7 @@ cc_assemble(
 ################################################################
 # ARCH = "arm64"
 mustache(
-    name = "__asm__",
+    name = "__asm",
     out  = ARCH + ".S",
     json = "//runtime/caml:domain_state.json",
     template = select({
@@ -219,7 +264,6 @@ filegroup(
             "frame_descriptors.c",
             "instrtrace.c",
             "interp.c",
-            # "main.c",
             "prims.c", ## in case a make build writes it to srcs
             "sak.c",
             "signals_nat.c",
@@ -528,11 +572,13 @@ cc_binary(
     name = "ocamlrun",
     linkstatic = True,
     srcs = [
-        ":prims.c",
+        ":prims_c",
         "//runtime:common_c_sources",
         "//runtime:bytecode_only_c_sources",
-        "//runtime/caml:instruct.h",
-        ":primitives.h"
+        "//runtime/caml:domain_state.h",
+        "//runtime/caml:fail_h",
+        "//runtime/caml:instruct_h",
+        ":primitives_h"
     ] + select({
         # ":trace?": ["//runtime:instrtrace"],
         # FIXME: in INSTR_TRACE and DEBUG, throw an exception
@@ -546,9 +592,19 @@ cc_binary(
         "-x", "c",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
+        "-I.",
+        "-Iruntime",
         "-Iruntime/caml",
-        "-I$(GENDIR)/runtime", # caml/instruct.h
+        "-Icaml",
+        "-Ihdrs/caml",
+        "-I$(GENDIR)",
+        "-I$(GENDIR)/caml",
+        "-I$(GENDIR)/runtime",
         "-I$(GENDIR)/runtime/caml",
+        # "-Iruntime/caml",
+        # "-I$(GENDIR)/runtime", # caml/instruct_h
+        # "-I$(GENDIR)/runtime/hdrs",
+        # "-I$(GENDIR)/runtime/caml",
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
@@ -587,15 +643,15 @@ cc_binary(
 #     name = "instrtrace",
 #     srcs = [
 #         "instrtrace.c",
-#         "//runtime/caml:instruct.h",
-#         ":prims.c",
+#         "//runtime/caml:instruct_h",
+#         ":prims_c",
 #         ":primitives.h"
 #     ],
 #     copts = [
 #         "$(OC_CFLAGS)",
 #         "$(OC_CPPFLAGS)",
 #         "-Iruntime/caml",
-#         "-I$(GENDIR)/runtime", # caml/instruct.h
+#         "-I$(GENDIR)/runtime", # caml/instruct_h
 #         "-I$(GENDIR)/runtime/caml",
 #     ],
 #     local_defines = ["DEBUG"],
@@ -677,7 +733,7 @@ cc_binary(
 ################ debug
 # cc_binary(
 #     name = "ocamlrund",
-#     srcs = ["prims.c"],
+#     srcs = ["prims_c"],
 #     copts = OC_CFLAGS + CFLAGS + ["-g"],
 #     linkopts = OC_LDFLAGS + LDFLAGS + BYTECCLIBS + MKEXE_FLAGS,
 #     deps= [":camlrund"],
@@ -727,46 +783,45 @@ cc_binary(
 ##  experiments: partition the code
 ##      libprimitives, libmem, libinterp, etc.
 
-cc_library(
-    name = "mem",
-    alwayslink = True, linkstatic = True,
-    srcs = [
-        "gc_ctrl.c",
-        "gc_stats.c",
-        "memory.c",
-        "memprof.c",
-        "shared_heap.c",
-    ],
-    copts = [
-        "-x", "c",
-        "-I$(GENDIR)/runtime", # build_config.h
-        ## for platform-dependend s.h:
-        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
-        "$(OC_CFLAGS)",
-        "$(OC_CPPFLAGS)",
-    ] + select({
-        "//platform/os:macos?": [], #"-std=c11"],
-        "//platform/os:linux?": [],
-        "//conditions:default":  [] #"-std=c11"]
-    }) + select({
-        "//config/mode:pedantic?": ["-pedantic"],
-        "//conditions:default":  []
-    }) + OPTIMIZATION_FLAGS,
-    linkopts = ["$(OC_LDFLAGS)"],
-    defines = RUNTIME_DEFINES + [
-        "NATIVE_CODE",
-        "TARGET_$(ARCH)",
-        "MODEL_$(MODEL)",
-        "SYS_$(SYSTEM)"
-    ],
-    deps = ["//runtime/caml:hdrs"],
-    toolchains = ["//profile/system/local"],
-    visibility = [
-        "//boot/lib:__pkg__",
-        "//dev/lib:__pkg__",
-        "//lib:__pkg__"
-    ],
-)
+# cc_library( # experimental
+#     name = "mem",
+#     alwayslink = True, linkstatic = True,
+#     srcs = [
+#         "gc_ctrl.c",
+#         "gc_stats.c",
+#         "memory.c",
+#         "memprof.c",
+#         "shared_heap.c",
+#     ],
+#     copts = [
+#         "-x", "c",
+#         "-I$(GENDIR)/runtime", # build_config.h
+#         ## for platform-dependend s.h:
+#         "$(OC_CFLAGS)",
+#         "$(OC_CPPFLAGS)",
+#     ] + select({
+#         "//platform/os:macos?": [], #"-std=c11"],
+#         "//platform/os:linux?": [],
+#         "//conditions:default":  [] #"-std=c11"]
+#     }) + select({
+#         "//config/mode:pedantic?": ["-pedantic"],
+#         "//conditions:default":  []
+#     }) + OPTIMIZATION_FLAGS,
+#     linkopts = ["$(OC_LDFLAGS)"],
+#     defines = RUNTIME_DEFINES + [
+#         "NATIVE_CODE",
+#         "TARGET_$(ARCH)",
+#         "MODEL_$(MODEL)",
+#         "SYS_$(SYSTEM)"
+#     ],
+#     deps = ["//runtime/caml:hdrs"],
+#     toolchains = ["//profile/system/local"],
+#     visibility = [
+#         "//boot/lib:__pkg__",
+#         "//dev/lib:__pkg__",
+#         "//lib:__pkg__"
+#     ],
+# )
 
 
 ################################################################
@@ -910,18 +965,18 @@ string_list_flag(name = "args", build_setting_default = [],
             ])
 
 ################################################################
-genrule(
-    name = "ds_awk",
-    outs = ["domain_state64.inc"],
-    srcs = [
-        "gen_domain_state64_inc.awk",
-        "//runtime/caml:domain_state.tbl"
-    ],
-    cmd_bash  = " ".join([
-        "awk -f",
-        "$(location gen_domain_state64_inc.awk)",
-        "$(location //runtime/caml:domain_state.tbl)",
-        "> $@"
-    ]),
-)
+# genrule(
+#     name = "ds_awk",
+#     outs = ["domain_state64.inc"],
+#     srcs = [
+#         "gen_domain_state64_inc.awk",
+#         "//runtime/caml:domain_state.tbl"
+#     ],
+#     cmd_bash  = " ".join([
+#         "awk -f",
+#         "$(location gen_domain_state64_inc.awk)",
+#         "$(location //runtime/caml:domain_state.tbl)",
+#         "> $@"
+#     ]),
+# )
 

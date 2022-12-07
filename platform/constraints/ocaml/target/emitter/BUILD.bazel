@@ -4,14 +4,14 @@ constraint_setting(name = "emitter",
                    default_constraint_value = ":vm")
 
 constraint_value(name = "vm" , constraint_setting = ":emitter")
-config_setting  (name = "vm?", constraint_values=[":vm"])
+config_setting  (name = "vm_emitter?", constraint_values=[":vm"])
 
 constraint_value(name = "sys" , constraint_setting = ":emitter")
-config_setting  (name = "sys?", constraint_values=[":sys"])
+config_setting  (name = "sys_emitter?", constraint_values=[":sys"])
 
 constraint_value(name = "amd64" , constraint_setting = ":emitter")
-config_setting  (name = "amd64?", constraint_values=[":amd64"])
+config_setting  (name = "amd64_emitter?", constraint_values=[":amd64"])
 
 constraint_value(name = "arm64", constraint_setting = ":emitter")
-config_setting  (name = "arm64?", constraint_values=[":arm64"])
+config_setting  (name = "arm64_emitter?", constraint_values=[":arm64"])
 

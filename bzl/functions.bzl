@@ -27,53 +27,57 @@ def tc_compiler(tc): return tc.compiler[0]
 def tc_lexer(tc): return tc.lexer[0]
 
 ######################
-def get_workdir(tc):
+def get_workdir(ctx, tc):
     # build_emitter = tc.build_emitter[BuildSettingInfo].value
     target_executor = tc.target_executor[BuildSettingInfo].value
     target_emitter  = tc.target_emitter[BuildSettingInfo].value
-    stage = int(tc._stage[BuildSettingInfo].value)
+    config_executor = tc.config_executor[BuildSettingInfo].value
+    config_emitter  = tc.config_emitter[BuildSettingInfo].value
+
+    debug = False
+
+    if debug:
+        print("get_workdir %s" % ctx.label)
+        print("target_executor: %s" % target_executor)
+        print("target_emitter: %s" % target_emitter)
+        print("config_executor: %s" % config_executor)
+        print("config_emitter: %s" % config_emitter)
 
     ## WARNING: final (3rd) stage is always -1 (default for //config/stage)
 
-    if stage in [0, 1]:
+    if tc.dev:
+        pfx = "_dev"
+    else:
+        pfx = ""
+
+    if (config_executor == "boot"):
         workdir = "_boot/"
-    elif stage < 0:
-        if target_executor == "sys":
-            if target_emitter == "sys":
-                workdir = "_ocamlopt.opt/"
-            else:
-                workdir = "_ocamlc.opt/"
-        else:
-            if target_emitter == "sys":
-                workdir = "_ocamlopt.byte/"
-            else:
-                workdir = "_ocamlc.byte/"
-    else:
-        workdir = "_{b}{t}{s}/".format(
-            b = target_executor, t = target_emitter, s = (stage - 1))
+    elif (config_executor == "baseline"):
+        workdir = "_boot/"
+    elif (config_executor == "vm" and config_emitter == "vm"):
+        workdir = "_ocamlc.byte/"
+    elif (config_executor == "vm" and config_emitter == "sys"):
+        workdir = "_ocamlopt.byte/"
+    elif (config_executor == "sys" and config_emitter == "sys"):
+        workdir = "_ocamlopt.opt/"
+    elif (config_executor == "sys" and config_emitter == "vm"):
+        workdir = "_ocamlc.opt/"
+    elif config_executor == "unspecified":
+        # last stage
+        if (config_executor == "boot"):
+            workdir = "_boot/"
+        if (config_executor == "vm" and config_emitter == "vm"):
+            workdir = "_ocamlc.byte/"
+        elif (config_executor == "vm" and config_emitter == "sys"):
+            workdir = "_ocamlopt.byte/"
+        elif (config_executor == "sys" and config_emitter == "sys"):
+            workdir = "_ocamlopt.opt/"
+        elif (config_executor == "sys" and config_emitter == "vm"):
+            workdir = "_ocamlc.opt/"
 
-    # first stage always has vm executor
-    if stage in [0, 1]:
-        executor = "vm"
-    elif stage == 2:
-        executor = "vm"
-    elif target_executor == "vm":
-        # ext = ".cmo"
-        executor = "vm"
-    elif target_executor == "sys":
-        # ext = ".cmx"
-        executor = "sys"
-    else:
-        fail("Bad target_executor: %s" % target_executor)
-
-    # if target_executor == "vm":
-    #     ext = ".cmo"
-    # elif target_executor == "sys":
-    #     ext = ".cmx"
-    # else:
-    #     fail("Bad target_executor: %s" % target_executor)
-
-    return stage, executor, target_emitter, workdir
+    return (target_executor, target_emitter,
+            config_executor, config_emitter,
+            pfx + workdir)
 
 ###################################
 def submodule_from_label_string(s):

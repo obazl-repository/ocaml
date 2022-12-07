@@ -17,6 +17,7 @@ cc_binary(
         "main.c", "mkpar.c", "output.c", "reader.c",
         "skeleton.c", "symtab.c", "verbose.c", "warshall.c",
         "version.h", "defs.h",
+        "//runtime/caml:domain_state.h",
     ],
     features = ["no_legacy_features"],
     copts = [
@@ -26,9 +27,10 @@ cc_binary(
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
         "-I", "$(GENDIR)/yacc",
-        "-Iruntime",  # expose caml/*.h
+        "-Iruntime",
+        "-Iruntime/caml",
         "-I$(GENDIR)/runtime", # build_config.h
-        "-I$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
+        "-I$(GENDIR)/runtime/caml",
     ] + select({
         # if -c opt, the clang toolchain inserts -DNDEBUG
         # which causes a macro-redefined error
@@ -42,7 +44,7 @@ cc_binary(
         "//:__pkg__",  # :toolchain target
         "//boot:__subpackages__",
         "//lex:__pkg__",
-        "//toolchain/adapters:__subpackages__"
+        "//toolchain/adapter:__pkg__"
     ]
 )
 

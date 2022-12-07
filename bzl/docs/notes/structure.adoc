@@ -1,0 +1,46 @@
+= compiler structure
+
+== stdlib
+
+
+=== stdlib kernel modules
+
+These modules are not themselves members of the `stdlib` namespace.
+The submodules in `stdlib` depend on them; they "bootstrap" the namespace.
+
+* `//stdlib:Stdlib`
+* `//stdlib:CamlinternalFormatBasics`
+* `//stdlib:Std_exit`
+
+==== //stdlib:CamlinternalFormatBasics
+
+This is the foundation module - it depends on nothing, and just about
+everything depends on it.
+
+==== //stdlib:Stdlib
+
+This is the resolver module for the standard library; it contains the
+  module aliasing equations OCaml needs to resolve references like
+  `Stdlib.Array`. It does not depend on anything else in the standard
+  library; but it does depend on `CamlinternalFormatBasics`.
+
+==== //stdlib:Std_exit
+
+This module is included in every executable.
+
+
+
+=== stdlib "internal" modules
+
+Four modules in `//stdlib` are not in the `Stdlib` namespace, but
+depend on `Stdlib` submodules, and are depended on by submodules.
+These are the Camlinternal* modules.
+
+The use the stdlib_boot_* rules. Since they depend on `Stdlib` but are
+not in it, they must be compiled with '-open Stdlib'.
+
+
+* `//stdlib:CamlinternalFormat`
+* `//stdlib:CamlinternalLazy`
+* `//stdlib:CamlinternalMod`
+* `//stdlib:CamlinternalOO`

@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//bzl:rules.bzl", "boot_coldstart", "boot_import_vm_executable")
+load("//bzl/rules:boot_import_vm_executable.bzl", "boot_import_vm_executable")
+load(":BUILD_RULES.bzl", "boot_coldstart")
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
@@ -9,20 +10,24 @@ load("//bzl:rules.bzl", "boot_coldstart", "boot_import_vm_executable")
 ## Package //boot contains pre-compiled OCaml executables (ocamlc,
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
 
+alias(name = "coldstart", actual = ":bootstrap")
+
 boot_coldstart(
-    name = "coldstart",
+    name = "bootstrap",
     runner = "coldstart_runner.sh",
+    # args   = ["$(TARGET_EXECUTOR)"],
     data = [
-        "//runtime:ocamlrun",
-        ":ocamlc",
-        ":ocamllex",
+        # "//runtime:ocamlrun",
+        "//bin:ocamlcc",
+        "//lex:ocamllex",
         "//yacc:ocamlyacc",
         "@bazel_tools//tools/bash/runfiles",
-        "//stdlib:stdlib",
-        "//stdlib:Std_exit",
-        "//stdlib:Std_exit_cmi",
-        "//stdlib:Stdlib_cmi",
-        "//stdlib:camlheaders",
+        # "//stdlib:stdlib",
+        # "//stdlib:Std_exit",
+        # "//stdlib:Std_exit_cmi",
+        # "//stdlib:Stdlib_cmi",
+        ##FIXME: deal with camlheaders
+        # "//config/camlheaders",
     ],
     # deps = [
     # ],
@@ -46,7 +51,7 @@ sh_binary(
     data = [
         ":ocamlc",
         "//runtime:ocamlrun",
-        "//stdlib:camlheaders",
+        "//config/camlheaders",
 
         # We cannot depend on Std_exit on pain of circularity.
         # It depends on Stdlib, which is compiled by this tool.

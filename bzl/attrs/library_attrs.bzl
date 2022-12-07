@@ -40,10 +40,10 @@ def library_attrs():
         #     default = "//bzl/toolchain:tc"
         # ),
 
-        _stage = attr.label(
-            doc = "bootstrap stage",
-            default = "//config/stage"
-        ),
+        # _stage = attr.label(
+        #     doc = "bootstrap stage",
+        #     default = "//config/stage"
+        # ),
 
         #FIXME: underscore
         # ocamlc = attr.label(

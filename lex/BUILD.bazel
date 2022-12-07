@@ -1,11 +1,13 @@
 load("//bzl:rules.bzl",
-     "boot_compiler",
-     "boot_executable",
+     # "boot_compiler",
+     # "boot_executable",
      "compiler_module",
      "compiler_signature",
      "boot_library",
+     "ocaml_tool"
 )
 load(":BUILD_RULES.bzl", "lex")
+load("//yacc:BUILD_RULES.bzl", "yacc")
 
 load("//config:CONFIG.bzl",
      # "OC_COMMON_CFLAGS",
@@ -87,7 +89,8 @@ SIG_OPTS    =  ["-strict-formats"]
 
 BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
 
-boot_compiler(
+# boot_compiler( ## FIXME: ocamllex is not a compiler, use ocaml_tool?
+ocaml_tool(
     name       = "ocamllex",
     # stage      = stage,
     prologue   = [":lex"],
@@ -98,8 +101,8 @@ boot_compiler(
     #     "//conditions:default"   : BOOT_OPTS
     # }),
     use_prims = select({
-        "//platform/target:vm?" : True,
-        "//platform/target:sys?": False,
+        # "//platform/target:vm?" : True,
+        # "//platform/target:sys?": False,
         "//conditions:default"   : True
     }),
     visibility = ["//visibility:public"]
@@ -374,16 +377,26 @@ compiler_signature(
     ]
 )
 
+# yacc(
+#     name = "parser_ml",
+#     src  = "parser.mly",
+#     outs = ["parser.ml", "parser.mli"],
+#     opts = ["--strict", "-q"]
+# )
+
 genrule(
     name = "parser_ml",
     outs = ["parser.ml", "parser.mli"],
-    srcs = ["parser.mly"],
-    # assumption: ocamlyacc won't change, this is ok for bootstrapping?
-    tools = ["//yacc:ocamlyacc"],
+    srcs = ["parser.mly",
+            "//yacc:ocamlyacc"
+            ],
+    # tools = ["//yacc:ocamlyacc"],
     cmd   = " ".join([
+        # "echo PWD: $$PWD;",
         "$(execpath //yacc:ocamlyacc)",
         "--strict", "-v",
         "$(location parser.mly);",
+        # "echo `ls -la lex`;",
         "cp lex/parser.ml $(RULEDIR)/;",
         "cp lex/parser.mli $(RULEDIR)/;"
     ])

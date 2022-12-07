@@ -5,6 +5,8 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
+load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
+
 package(default_visibility = ["//visibility:public"])
 
 exports_files([
@@ -264,7 +266,7 @@ compiler_signature(
 
 compiler_module(
     name   = "Runtimedef",
-    struct = "runtimedef.ml",
+    struct = "runtimedef_ml",
     sig    = "Runtimedef_cmi",
     opts = MODULE_OPTS,
     deps   = [
@@ -278,22 +280,29 @@ compiler_module(
     ]
 )
 
-genrule(
+mustache(
     name = "runtimedef_ml",
-    outs = ["runtimedef.ml"],
-    srcs = [
-        "generate_runtimedef.sh",
-        "//runtime/caml:fail.h",
-        "//runtime:primitives_dat"
-    ],
-    cmd = " ".join([
-        "$(location :generate_runtimedef.sh)",
-        "$(location //runtime/caml:fail.h)",
-        "$(location //runtime:primitives_dat)",
-        " > $@"
-    ]),
-    visibility = ["//visibility:public"]
+    out  = "runtimedef.ml",
+    json = "//runtime:primitives.json",
+    template = "runtimedef.ml.mustache",
 )
+
+# genrule(
+#     name = "runtimedef_ml",
+#     outs = ["runtimedef.ml"],
+#     srcs = [
+#         "generate_runtimedef.sh",
+#         "//runtime/caml:fail.h",
+#         "//runtime:primitives_dat"
+#     ],
+#     cmd = " ".join([
+#         "$(location :generate_runtimedef.sh)",
+#         "$(location //runtime/caml:fail.h)",
+#         "$(location //runtime:primitives_dat)",
+#         " > $@"
+#     ]),
+#     visibility = ["//visibility:public"]
+# )
 
 compiler_signature(
     name = "Runtimedef_cmi",

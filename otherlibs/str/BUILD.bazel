@@ -75,5 +75,5 @@ cc_library(
         "//runtime/caml:signals.h",
     ],
     copts = ["-I", "runtime", "-I", "runtime/caml"],
-    hdrs = ["//runtime/caml:domain_state.tbl"]
+    hdrs = ["//runtime/caml:domain_state.h"]
 )

@@ -19,7 +19,8 @@ def signature_attrs():
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
 
-        _verbose = attr.label(default = "//config/ocaml:verbose"),
+        # no point in -verbose for sigs, they never invoke external cmds
+        # _verbose = attr.label(default = "//config/ocaml/compile:verbose"),
 
         # primitives never needed for sigs?
 
@@ -43,7 +44,8 @@ def signature_attrs():
 
         src = attr.label(
             doc = "A single .mli source file label",
-            allow_single_file = [".mli", ".ml"] #, ".cmi"]
+            allow_single_file = [".mli", ".ml"], #, ".cmi"]
+            # cfg = "host"
         ),
 
         ns = attr.label(

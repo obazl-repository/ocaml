@@ -16,7 +16,7 @@ toolchain_selector(  ## ocamlopt.byte, rom ocamlc.byte
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:vm_executor",
     ],
-    target_host_configuration = ["//config/target/emitter:vm?"]
+    target_host_configuration = ["//config/target/emitter:vm_emitter?"]
 )
 
 toolchain_selector(
@@ -29,7 +29,7 @@ toolchain_selector(
         # build emitter: matches target executor
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:vm_executor"],
-    target_host_configuration = ["//config/target/emitter:sys?"]
+    target_host_configuration = ["//config/target/emitter:sys_emitter?"]
 )
 
 toolchain_selector(
@@ -42,7 +42,7 @@ toolchain_selector(
     ],
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:sys_executor"],
-    target_host_configuration = ["//config/target/emitter:sys?"]
+    target_host_configuration = ["//config/target/emitter:sys_emitter?"]
 )
 
 toolchain_selector(
@@ -54,7 +54,7 @@ toolchain_selector(
         # buildhost emitter == targethost executor == sys
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:sys_executor"],
-    target_host_configuration = ["//config/target/emitter:vm?"]
+    target_host_configuration = ["//config/target/emitter:vm_emitter?"]
 )
 
 ################################################################
@@ -68,7 +68,7 @@ toolchain_selector(
     ],
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:sys_executor"],
-    target_host_configuration = ["//config/target/emitter:sys?"]
+    target_host_configuration = ["//config/target/emitter:sys_emitter?"]
 )
 
 toolchain_selector(
@@ -81,7 +81,7 @@ toolchain_selector(
     ],
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:sys_executor"],
-    target_host_configuration = ["//config/target/emitter:vm?"]
+    target_host_configuration = ["//config/target/emitter:vm_emitter?"]
 )
 ################################################################
 toolchain_selector(
@@ -94,7 +94,7 @@ toolchain_selector(
     ],
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:vm_executor"],
-    target_host_configuration = ["//config/target/emitter:vm?"]
+    target_host_configuration = ["//config/target/emitter:vm_emitter?"]
 )
 
 toolchain_selector(
@@ -107,5 +107,5 @@ toolchain_selector(
     ],
     target_host_constraints = [
         "//platform/constraints/ocaml/executor:vm_executor"],
-    target_host_configuration = ["//config/target/emitter:sys?"]
+    target_host_configuration = ["//config/target/emitter:sys_emitter?"]
 )

@@ -23,13 +23,22 @@ load("//bzl/rules/common:DEPS.bzl",
 
 ###############################
 def archive_impl(ctx):
-    debug = False # True
+    debug = False
 
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
     tc = ctx.toolchains["//toolchain/type:boot"]
-    (stage, executor, emitter, workdir) = get_workdir(tc)
 
-    if executor == "vm":
+    (target_executor, target_emitter,
+     config_executor, config_emitter,
+     workdir) = get_workdir(ctx, tc)
+    if target_executor == "unspecified":
+        executor = config_executor
+        emitter  = config_emitter
+    else:
+        executor = target_executor
+        emitter  = target_emitter
+
+    if executor in ["boot", "baseline", "vm"]:
         ext = ".cma"
     else:
         ext = ".cmxa"
@@ -110,37 +119,105 @@ def archive_impl(ctx):
         transitive = [merge_depsets(depsets, "paths")]
     )
 
-    if tc.target_host:
-        ext = ".cma"
-        # if shared:
-        #     ext = ".cmxs"
-        # else:
-    else:
-        ext = ".cmxa"
-
     #########################
     args = ctx.actions.args()
 
     executable = None
-    if executor == "vm":
-        ## ocamlrun
-        for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-            if f.basename == "ocamlrun":
-                # print("LEX RF: %s" % f.path)
-                executable = f
-            # the bytecode executable
-        args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
-    else:
-        executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
-    if hasattr(ctx.attr, "use_prims"):
-        if ctx.attr.use_prims:
-            args.add_all(["-use-prims", ctx.attr._primitives])
+    if tc.dev:
+        ocamlrun = None
+        effective_compiler = tc.compiler
     else:
-        if ctx.attr.use_prims[BuildSettingInfo].value:
-            args.add_all(["-use-prims", ctx.attr._primitives])
+        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+
+        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    if tc.dev:
+        build_executor = "opt"
+    elif (target_executor == "unspecified"):
+        if (config_executor == "sys"):
+            if config_emitter == "sys":
+                # ss built from ocamlopt.byte
+                build_executor = "vm"
+            else:
+                # sv built from ocamlopt.opt
+                build_executor = "sys"
         else:
-            args.add("-nopervasives")
+            build_executor = "vm"
+    elif target_executor in ["boot", "vm"]:
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "sys"):
+        ## ss always built by vs (ocamlopt.byte)
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "vm"):
+        ## sv built by ss
+        build_executor = "sys"
+
+    if build_executor == "vm":
+        executable = ocamlrun
+        args.add(effective_compiler.path)
+    else:
+        executable = effective_compiler
+
+    # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    # if (target_executor == "unspecified"):
+    #     if (config_executor == "sys"):
+    #         if config_emitter == "sys":
+    #             # ss built from ocamlopt.byte
+    #             executable = ocamlrun
+    #             args.add(effective_compiler.path)
+    #         else:
+    #             # sv built from ocamlopt.opt
+    #             executable = effective_compiler
+    #     else:
+    #         executable = ocamlrun
+    #         args.add(effective_compiler.path)
+
+    # elif target_executor in ["boot", "vm"]:
+    #         executable = ocamlrun
+    #         args.add(effective_compiler.path)
+
+    # elif (target_executor == "sys" and target_emitter == "sys"):
+    #     ## ss always built by vs (ocamlopt.byte)
+    #     executable = ocamlrun
+    #     args.add(effective_compiler.path)
+
+    # elif (target_executor == "sys" and target_emitter == "vm"):
+    #     ## sv built by ss
+    #     executable = effective_compiler
+
+    if ctx.label.name == "CamlinternalFormatBasics_cmi":
+        print("ocamlrun: %s" % ocamlrun)
+        print("effective_compiler: %s" % effective_compiler)
+        print("executable: %s" % executable)
+
+    # if executor in ["boot", "vm", "sys"]:
+    #     ## ocamlrun
+    #     for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    #         if f.basename == "ocamlrun":
+    #             # print("LEX RF: %s" % f.path)
+    #             executable = f
+    #         # the bytecode executable
+    #     args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    # else:
+    #     executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
+
+    ## -use-prims never needed for archive
+    # if hasattr(ctx.attr, "use_prims"):
+    #     if ctx.attr.use_prims:
+    #         args.add_all(["-use-prims", ctx.attr._primitives])
+    # else:
+    #     if ctx.attr.use_prims[BuildSettingInfo].value:
+    #         args.add_all(["-use-prims", ctx.attr._primitives])
+    #     else:
+    #         args.add("-nopervasives")
+
+
+    ## show calls to ar:
+    # args.add("-verbose")
+    # args.add("-ccopt", "-v")
 
     args.add("-o", out_archive)
 
@@ -401,16 +478,17 @@ def archive_impl(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = executable,
+        executable = executable.path,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
         tools = [
-            tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            tc_compiler(tc)[DefaultInfo].files_to_run
+            executable
+            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
+            # tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = mnemonic,
-        progress_message = progress_msg(stage, workdir, ctx)
+        progress_message = progress_msg(workdir, ctx)
     )
 
     ###################

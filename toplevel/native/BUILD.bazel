@@ -1,22 +1,20 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
+     "boot_library",
+     "boot_module",
 )
 
 MODULE_OPTS = ["-nostdlib"]
 
-ocaml_library(
+boot_library(
     name = "toplevel_native_lib",
-    modules  = [
+    manifest = [
         ":Topeval",
         ":Topmain",
         ":Trace",
     ],
 )
 
-ocaml_module(
+boot_module(
     name   = "Topeval",
     struct = "topeval.ml",
     opts = MODULE_OPTS,
@@ -68,7 +66,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+boot_module(
     name   = "Topmain",
     struct = "topmain.ml",
     opts = MODULE_OPTS,
@@ -94,7 +92,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+boot_module(
     name   = "Trace",
     struct = "trace.ml",
     opts = MODULE_OPTS,

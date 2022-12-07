@@ -37,10 +37,11 @@ boot_import_vm_executable = rule(
             allow_single_file = True,
             default = "//runtime:ocamlrun",
             executable = True,
-            cfg = reset_config_transition
+            cfg = "exec"
+            # cfg = reset_config_transition
         ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     ),
     # executable = True,
     # cfg = exec

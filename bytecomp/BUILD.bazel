@@ -3,8 +3,8 @@ load("//bzl:rules.bzl",
      "boot_library",
      "compiler_module",
      "compiler_signature",
-     "mustache"
 )
+load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -315,6 +315,7 @@ compiler_module(
         "//config:Config"
     ],
     visibility = [
+        "//asmcomp:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
@@ -485,7 +486,8 @@ compiler_signature(
 # -bin-annot -strict-formats
 compiler_module(
     name   = "Opcodes",
-    struct = "opcodes.ml",
+    struct = "opcodes_ml",
+    # makefiles generate opcodes.mli from opcodes.ml - why bother?
     # sig    = ":Opcodes_cmi",
     opts = MODULE_OPTS + ["-open", "Stdlib"],
     warnings = [w.MISSING_MLI],
@@ -518,15 +520,15 @@ compiler_module(
 # ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I bytecomp -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -c bytecomp/opcodes.ml
 
 mustache(
-    out  = "opcodes.ml",
     name = "opcodes_ml",
+    out  = "opcodes.ml",
     json = "opcodes.json",
     template = "opcodes.ml.mustache",
 )
 
 mustache(
-    out  = "opnames.ml",
     name = "opnames_ml",
+    out  = "opnames.ml",
     json = "opcodes.json",
     template = "opnames.ml.mustache",
     visibility = ["//tools:__pkg__"]

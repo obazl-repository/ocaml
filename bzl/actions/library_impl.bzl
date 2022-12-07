@@ -25,7 +25,15 @@ def library_impl(ctx):
 
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
     tc = ctx.toolchains["//toolchain/type:boot"]
-    (stage, executor, emitter, workdir) = get_workdir(tc)
+    (target_executor, target_emitter,
+     config_executor, config_emitter,
+     workdir) = get_workdir(ctx, tc)
+    if target_executor == "unspecified":
+        executor = config_executor
+        emitter  = config_emitter
+    else:
+        executor = target_executor
+        emitter  = target_emitter
 
     if executor == "vm":
         ext = ".cmo"

@@ -3,15 +3,27 @@ load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag", "string_setting")
 
 string_flag( name = "emitter",
-             values = ["vm", "sys", "unspecified"],
-             build_setting_default = "unspecified",
+             values = ["boot", "baseline", "vm", "sys", "unspecified"],
+             build_setting_default = "boot",
              visibility = [
-                 "//toolchain/adapter:__subpackages__"
+                 "//boot:__pkg__",
+                 "//bytecomp:__pkg__",
+                 "//config:__pkg__",
+                 "//lambda:__pkg__",
+                 "//runtime:__subpackages__",
+                 "//stdlib:__pkg__",
+                 "//toolchain/adapter:__subpackages__",
+                 "//utils:__pkg__",
+                 "//vendor/mustach:__pkg__"
              ])
 
-config_setting(name = "vm?", flag_values = {":emitter": "vm"})
-config_setting(name = "sys?", flag_values = {":emitter": "sys"})
-config_setting(name = "unspecified?", flag_values = {":emitter": "unspecified"})
+config_setting(name = "boot_emitter?", flag_values = {":emitter": "boot"})
+config_setting(name = "baseline_emitter?",
+               flag_values = {":emitter": "baseline"})
+config_setting(name = "vm_emitter?", flag_values = {":emitter": "vm"})
+config_setting(name = "sys_emitter?", flag_values = {":emitter": "sys"})
+
+config_setting(name = "unspecified_emitter?", flag_values = {":emitter": "unspecified"})
 
 # target_emitter_constraint(
 #     name = "xemitter",

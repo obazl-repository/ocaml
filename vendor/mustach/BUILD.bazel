@@ -28,6 +28,7 @@ cc_binary(
     visibility = [
         "//bytecomp:__pkg__",
         "//config:__pkg__",
+        "//lambda:__pkg__",
         "//runtime:__subpackages__",
         "//stdlib:__pkg__",
         "//utils:__pkg__"

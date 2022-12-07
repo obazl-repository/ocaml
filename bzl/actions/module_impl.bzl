@@ -34,75 +34,21 @@ def module_impl(ctx, module_name):
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
 
     tc = ctx.toolchains["//toolchain/type:boot"]
-    # print("tc target_host: %s" % tc.target_host)
 
-    (stage, executor, emitter, workdir) = get_workdir(tc)
+    (target_executor, target_emitter,
+     config_executor, config_emitter,
+     workdir) = get_workdir(ctx, tc)
+    if target_executor == "unspecified":
+        executor = config_executor
+        emitter  = config_emitter
+    else:
+        executor = target_executor
+        emitter  = target_emitter
 
-    if executor == "vm":
+    if executor in ["boot", "baseline", "vm"]:
         ext = ".cmo"
     else:
         ext = ".cmx"
-
-    # target_runtime = tc.target_runtime[BuildSettingInfo].value
-    # target_executor = tc.target_executor[BuildSettingInfo].value
-    # target_emitter  = tc.target_emitter[BuildSettingInfo].value
-    # stage = int(tc._stage[BuildSettingInfo].value)
-
-    if debug_bootstrap:
-        print("module _stage: %s" % stage)
-    # workdir = "_{b}{t}{stage}/".format(
-    #     b = target_executor, t = target_emitter, stage = (stage -  1))
-
-    # if stage == 2:
-    #     ext = ".cmx"
-    # elset:
-
-    ## set ext based on compiler capabilities
-    ## how do we discover those?
-    ## if the compiler emitter is vm, then vm, else sys
-    ## this should match buildhost emitter?
-    ## problem is mismatch between e.g. ss_ss toolchain and the
-    ## compiler it contains.
-
-
-    # if target_executor != target_emitter:
-    #     fail("mismatch")
-
-    # if stage < 2:
-    #     ext = ".cmo"
-    # elif target_executor == "vm":
-    #     ext = ".cmo"
-    #     # if target_emitter == "vm":
-    #     #     ext = ".cmo"
-    #     # else:
-    #     #     ext = ".cmo"
-    # elif target_executor == "sys":
-    #     ext = ".cmx"
-    #     # if target_emitter == "sys":
-    #     #     ext = ".cmx"
-    #     # else:
-    #     #     ext = ".cmx"
-    # else:
-    #     fail("Bad target_executor: %s" % target_executor)
-
-    # workdir = "_{}/".format(stage)
-
-    # tc = None
-    # if stage == "boot":
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//toolchain/type:boot"]
-    # elif stage == "baseline":
-    #     tc = ctx.exec_groups["baseline"].toolchains[
-    #         "//toolchain/type:baseline"]
-    # elif stage == "dev":
-    #     tc = ctx.exec_groups["dev"].toolchains[
-    #         "//toolchain/type:baseline"]
-    # else:
-    #     print("UNHANDLED STAGE: %s" % stage)
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//toolchain/type:boot"]
-
-    # if //platform/constraints/ocaml/emitter:vm_emitter?
 
     ################################################################
     ################  OUTPUTS  ################
@@ -181,7 +127,9 @@ def module_impl(ctx, module_name):
             action_outputs.append(action_output_cmi)
             provider_output_cmi = action_output_cmi
             mli_dir = None
-    else: ## no sig, compiler will generate .cmi
+    else: ## no sig
+        # compiler will generate .cmi
+        # put src in workdir as well
         action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
         action_outputs.append(action_output_cmi)
         provider_output_cmi = action_output_cmi
@@ -211,8 +159,11 @@ def module_impl(ctx, module_name):
                     # generated sigfile
                     in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-            else: # no sig
-                in_structfile = ctx.file.struct
+            else: # no sig - cmi will be generated, put both in workdir
+                # in_structfile = ctx.file.struct
+                in_structfile = ctx.actions.declare_file(workdir + ctx.file.struct.basename)
+                ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+
         else: # structfile is generated, e.g. by ocamllex or a genrule.
             # make sure it's in same dir as mli/cmi IF we have ctx.file.sig
             if ctx.file.sig:
@@ -242,8 +193,9 @@ def module_impl(ctx, module_name):
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                     # print("lbl: %s" % ctx.label)
                     # print("IN STRUCTFILE: %s" % in_structfile)
-            else:  ## no sig file
-                in_structfile = ctx.file.struct
+            else:  ## no sig file, will emit cmi, put both in workdir
+                in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
     else:  ## namespaced
         in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
         ctx.actions.symlink(
@@ -384,31 +336,90 @@ def module_impl(ctx, module_name):
     args = ctx.actions.args()
 
     executable = None
-    if executor == "vm":
-        ## ocamlrun
-        for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-            if f.basename == "ocamlrun":
-                # print("LEX RF: %s" % f.path)
-                executable = f
-            # the bytecode executable
-        args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+
+    if tc.dev:
+        ocamlrun = None
+        effective_compiler = tc.compiler
     else:
-        executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
+        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    if tc.dev:
+        build_executor = "opt"
+    elif (target_executor == "unspecified"):
+        if (config_executor == "sys"):
+            if config_emitter == "sys":
+                # ss built from ocamlopt.byte
+                build_executor = "vm"
+            else:
+                # sv built from ocamlopt.opt
+                build_executor = "sys"
+        else:
+            build_executor = "vm"
+    elif target_executor in ["boot", "vm"]:
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "sys"):
+        ## ss always built by vs (ocamlopt.byte)
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "vm"):
+        ## sv built by ss
+        build_executor = "sys"
+
+    if build_executor == "vm":
+        executable = ocamlrun
+        args.add(effective_compiler.path)
+    else:
+        executable = effective_compiler
+
+    # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    # if (target_executor == "unspecified"):
+    #     if (config_executor == "sys"):
+    #         if config_emitter == "sys":
+    #             # ss built from ocamlopt.byte
+    #             executable = ocamlrun
+    #             args.add(effective_compiler.path)
+    #         else:
+    #             # sv built from ocamlopt.opt
+    #             executable = effective_compiler
+    #     else:
+    #         executable = ocamlrun
+    #         args.add(effective_compiler.path)
+
+    # elif target_executor in ["boot", "vm"]:
+    #         executable = ocamlrun
+    #         args.add(effective_compiler.path)
+
+    # elif (target_executor == "sys" and target_emitter == "sys"):
+    #     ## ss always built by vs (ocamlopt.byte)
+    #     executable = ocamlrun
+    #     args.add(effective_compiler.path)
+
+    # elif (target_executor == "sys" and target_emitter == "vm"):
+    #     ## sv built by ss
+    #     executable = effective_compiler
+
+    if ctx.label.name == "CamlinternalFormatBasics":
+        print("lbl: %s" % ctx.label)
+        print("ocamlrun: %s" % ocamlrun)
+        print("effective_compiler: %s" % effective_compiler.path)
+        print("executable: %s" % executable.path)
 
     ## FIXME: -use-prims not needed for compilation?
-    if ext == ".cmo":
-        if ctx.attr.use_prims == True:
-            args.add_all(["-use-prims", ctx.file._primitives.path])
-        else:
-            if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
-                args.add_all(["-use-prims", ctx.file._primitives.path])
-            else:
-                if ctx.attr._use_prims[BuildSettingInfo].value:
-                    if not "-no-use-prims" in ctx.attr.opts:
-                        args.add_all(["-use-prims", ctx.file._primitives.path])
-                else:
-                    if  "-use-prims" in ctx.attr.opts:
-                        args.add_all(["-use-prims", ctx.file._primitives.path])
+    # if ext == ".cmo":
+    #     if ctx.attr.use_prims == True:
+    #         args.add_all(["-use-prims", ctx.file._primitives.path])
+    #     else:
+    #         if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
+    #             args.add_all(["-use-prims", ctx.file._primitives.path])
+    #         else:
+    #             if ctx.attr._use_prims[BuildSettingInfo].value:
+    #                 if not "-no-use-prims" in ctx.attr.opts:
+    #                     args.add_all(["-use-prims", ctx.file._primitives.path])
+    #             else:
+    #                 if  "-use-prims" in ctx.attr.opts:
+    #                     args.add_all(["-use-prims", ctx.file._primitives.path])
 
     resolver = None
     resolver_deps = []
@@ -435,6 +446,9 @@ def module_impl(ctx, module_name):
     _options = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
 
+    if ctx.attr._verbose[BuildSettingInfo].value:
+        args.add("-verbose")
+
     merged_input_depsets = [merge_depsets(depsets, "sigs")]
     if ext == ".cmx":
         merged_input_depsets.append(merge_depsets(depsets, "cli_link_deps"))
@@ -455,6 +469,7 @@ def module_impl(ctx, module_name):
         + [in_structfile]
         + depsets.deps.mli
         + resolver_deps
+        + [effective_compiler]
         ,
         transitive = []
         + merged_input_depsets
@@ -485,17 +500,18 @@ def module_impl(ctx, module_name):
     ################
     ctx.actions.run(
         # env = env,
-        executable = executable,
+        executable = executable.path,
         # executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs    = inputs_depset,
         outputs   = action_outputs,
         tools = [
-            tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            tc_compiler(tc)[DefaultInfo].files_to_run
+            executable,
+            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
+            # tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = "CompileBootstrapModule",
-        progress_message = progress_msg(stage, workdir, ctx)
+        progress_message = progress_msg(workdir, ctx)
     )
 
     #############################################

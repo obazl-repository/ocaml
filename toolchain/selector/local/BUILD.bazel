@@ -1,0 +1,102 @@
+load("//toolchain/selector:BUILD.bzl", "toolchain_selector")
+
+package(default_visibility=["//visibility:public"])
+
+exports_files(glob(["*.bazel"]))
+
+# the tc adapters are identical, but we use different names to ease
+# debugging
+
+################################################################
+toolchain_selector(
+    name           = "dev",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:dev",
+    target_host_configuration = [
+        # "//config/target/executor:sys_executor?",
+        # "//config/target/emitter:vm_emitter?",
+        "//config:dev?"
+    ]
+)
+
+################################################################
+toolchain_selector(
+    name           = "boot",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:boot",
+    target_host_configuration = [
+        "//config/target/executor:boot_executor?",
+        "//config/target/emitter:boot_emitter?"
+    ]
+)
+
+toolchain_selector(
+    name           = "baseline",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:boot",
+    target_host_configuration = [
+        "//config/target/executor:baseline_executor?",
+        "//config/target/emitter:baseline_emitter?"
+    ]
+)
+
+# toolchain_selector(
+#     name           = "bootvm",
+#     type           = "//toolchain/type:boot",
+#     adapter        = "//toolchain/adapter:boot",
+#     target_host_configuration = [
+#         "//config/target/executor:boot_executor?",
+#         "//config/target/emitter:vm_emitter?"
+#     ]
+# )
+
+toolchain_selector(
+    name           = "ocamlc.byte",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:ocamlc.byte",
+    target_host_configuration = [
+        "//config/target/executor:vm_executor?",
+        "//config/target/emitter:vm_emitter?"
+    ]
+)
+
+toolchain_selector(
+    name           = "boot.ocamlopt.byte",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:boot.ocamlopt.byte",
+    target_host_configuration = [
+        "//config/target/executor:vm_executor?",
+        "//config/target/emitter:sys_emitter?"
+    ]
+)
+toolchain_selector(
+    name           = "ocamlopt.byte",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:ocamlopt.byte",
+    target_host_configuration = [
+        "//config/target/executor:vm_executor?",
+        "//config/target/emitter:sys_emitter?",
+        # "//toolchain/target/executor:vm_executor?",
+        # "//toolchain/target/emitter:sys_emitter?"
+    ]
+)
+
+toolchain_selector(
+    name           = "ocamlopt.opt",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:ocamlopt.opt",
+    target_host_configuration = [
+        "//config/target/executor:sys_executor?",
+        "//config/target/emitter:sys_emitter?"
+    ]
+)
+
+toolchain_selector(
+    name           = "ocamlc.opt",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:ocamlc.opt",
+    target_host_configuration = [
+        "//config/target/executor:sys_executor?",
+        "//config/target/emitter:vm_emitter?"
+    ]
+)

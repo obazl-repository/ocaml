@@ -10,8 +10,8 @@ selects.config_setting_group(
         ## constraint config settings match targets:
         # "//platform/constraints/ocaml/executor:sys_executor?",
         # "//config/target/executor:sys?",
-        "//config/target/emitter:sys?",
-        "//config/stage:-1?"
+        "//config/target/emitter:sys_emitter?",
+        # "//config/stage:-1?"
     ]
 )
 
@@ -20,8 +20,8 @@ selects.config_setting_group(
     match_all = [
         ## constraint config settings match targets:
         "//platform/constraints/ocaml/executor:vm_executor?",
-        # "//config/target/emitter:vm?",
-        "//config/stage:2?"
+        # "//config/target/emitter:vm_emitter?",
+        # "//config/stage:2?"
     ]
 )
 
@@ -30,8 +30,8 @@ selects.config_setting_group(
     match_all = [
         ## constraint config settings match targets:
         "//platform/constraints/ocaml/executor:sys_executor?",
-        # "//config/target/emitter:sys?",
-        "//config/stage:2?"
+        # "//config/target/emitter:sys_emitter?",
+        # "//config/stage:2?"
     ]
 )
 
@@ -40,6 +40,6 @@ selects.config_setting_group(
     match_all = [
         "//platform/constraints/ocaml/executor:vm_executor?",
         # "//config/target/executor:vm?",
-        "//config/stage:-1?"
+        # "//config/stage:-1?"
     ]
 )

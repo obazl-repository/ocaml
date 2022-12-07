@@ -33,8 +33,8 @@ config_setting(name = "sys?", flag_values = {":xtarget": "sys"})
 alias(name = "boot", actual = "//platform:boot")
 alias(name = "boot?", actual = "//platform:boot?")
 
-alias(name = "dev", actual = "//platform:dev")
-alias(name = "dev?", actual = "//platform:dev?")
+# alias(name = "dev", actual = "//platform:dev")
+# alias(name = "dev?", actual = "//platform:dev?")
 
 # alias(name = "vm", actual = "//platform:vm")
 # alias(name = "vm?", actual = "//platform:vm?")

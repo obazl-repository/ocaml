@@ -1,21 +1,20 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-# load("//config:BUILD.bzl", "TargetInfo")
+
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
-load("//bzl/rules/common:transitions.bzl",
-     # "emitter_out_transition",
-     # "toolchain_in_transition",
-     "tc_compiler_out_transition")
+load("//bzl/rules/common:dev_transitions.bzl",
+     "dev_tc_compiler_out_transition")
 
 ##########################################
-def _toolchain_adapter_impl(ctx):
+def _dev_toolchain_adapter_impl(ctx):
 
+    ## avoid transition?
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
-        dev                    = False,
+        dev                    = True,
         # _stage                 = ctx.attr._stage,
-        build_host             = ctx.attr.build_host,
-        target_host            = ctx.attr.target_host,
+        # build_host             = ctx.attr.build_host,
+        # target_host            = ctx.attr.target_host,
         # _build_executor        = ctx.attr._build_executor,
         # build_emitter          = ctx.attr.build_emitter,
         # target_runtime         = ctx.attr.target_runtime,
@@ -26,6 +25,7 @@ def _toolchain_adapter_impl(ctx):
         target_executor        = ctx.attr.target_executor, # [TargetInfo],
         target_emitter         = ctx.attr.target_emitter,
         ## vm
+        runtime                = ctx.file.runtime,
         vmargs                 = ctx.attr.vmargs,
         repl                   = ctx.file.repl,
         vmlibs                 = ctx.files.vmlibs,
@@ -39,7 +39,7 @@ def _toolchain_adapter_impl(ctx):
         camlheaders            = ctx.files.camlheaders,
 
         ## core tools
-        compiler               = ctx.attr.compiler,
+        compiler               = ctx.file.compiler,
         copts                  = ctx.attr.copts,
         linkopts               = ctx.attr.linkopts,
         warnings               = ctx.attr.warnings,
@@ -49,46 +49,23 @@ def _toolchain_adapter_impl(ctx):
 
 ###################################
 ## the rule interface
-toolchain_adapter = rule(
-    _toolchain_adapter_impl,
+dev_toolchain_adapter = rule(
+    _dev_toolchain_adapter_impl,
     attrs = {
-        # "_stage" : attr.label( # int_flag
-        #     default = "//config/stage"
-        # ),
-
-        "build_host": attr.string(
-            doc     = "OCaml host platform: vm (bytecode) or an arch.",
-            default = "vm"
-        ),
-        "target_host": attr.label( # string
-            doc     = "OCaml target platform: vm (bytecode) or an arch.",
-            default = "//config:target_host"
-        ),
-        # "_build_executor" : attr.label(
-        #     default = "//config/build/executor",
-        # ),
-
-        # "build_emitter" : attr.label(
-        #     default = "//config/build/emitter",
-        #     # cfg = emitter_out_transition,
-        # ),
-
-        ## putting runtime in tc w/transitions caused spurious rebuilds on transition
-        # "target_runtime" : attr.label(default = "//toolchain:runtime"),
-
         "config_executor": attr.label(default = "//config/target/executor"),
         "config_emitter" : attr.label(default = "//config/target/emitter"),
         "target_executor": attr.label(default = "//toolchain/target/executor"),
         "target_emitter" : attr.label(default = "//toolchain/target/emitter"),
 
         ## Virtual Machine
-        # "runtime": attr.label(
-        #     doc = "Batch interpreter. ocamlrun, usually",
-        #     allow_single_file = True,
-        #     executable = True,
-        #     cfg = "exec"
-        #     # cfg = reset_config_transition
-        # ),
+        "runtime": attr.label(
+            doc = "Batch interpreter. ocamlrun, usually",
+            allow_single_file = True,
+            default = "@baseline//bin:ocamlrun",
+            executable = True,
+            cfg = "exec"
+            # cfg = reset_config_transition
+        ),
 
         "vmargs": attr.label( ## string list
             doc = "Args to pass to all invocations of ocamlrun",
@@ -101,30 +78,18 @@ toolchain_adapter = rule(
             executable = True,
             cfg = "exec",
         ),
+
         "vmlibs": attr.label_list(
             doc = "Dynamically-loadable libs needed by the ocamlrun vm. Standard location: lib/stublibs. The libs are usually named 'dll<name>_stubs.so', e.g. 'dllcore_unix_stubs.so'.",
             allow_files = True,
         ),
+
         "linkmode": attr.string(
             doc = "Default link mode: 'static' or 'dynamic'"
             # default = "static"
         ),
 
         #### runtime stuff ####
-        # "stdlib": attr.label(
-        #     default   = "//toolchain:stdlib",
-        #     executable = False,
-        #     # allow_single_file = True,
-        #     # cfg = "exec",
-        # ),
-
-        # "std_exit": attr.label(
-        #     # default = Label("//stdlib:Std_exit"),
-        #     executable = False,
-        #     allow_single_file = True,
-        #     # cfg = "exec",
-        # ),
-
         ##FIXME: only for VM executor
         "camlheaders": attr.label_list(
             allow_files = True,
@@ -133,19 +98,34 @@ toolchain_adapter = rule(
 
         ################################
         ## Core Tools
+        "_ocamlc_opt": attr.label(
+            default = "@baseline//bin:ocamlc.opt",
+            allow_single_file = True,
+            # allow_files = True,
+            executable = True,
+            cfg = "exec"),
+        "_ocamlopt_opt": attr.label(
+            default = "@baseline//bin:ocamlopt.opt",
+            allow_single_file = True,
+            # allow_files = True,
+            executable = True,
+            cfg = "exec"),
+
         "compiler": attr.label(
-            default = "//toolchain:compiler",
-            allow_files = True,
+            default = "//toolchain/dev:compiler",
+            allow_single_file = True,
+            # allow_files = True,
             executable = True,
             # cfg = "exec"
-            cfg = tc_compiler_out_transition
+            cfg = dev_tc_compiler_out_transition
         ),
 
         "lexer": attr.label(
-            default = "//toolchain:lexer",
+            default = "//toolchain/dev:lexer",
+            allow_single_file = True,
             executable = True,
             # cfg = "exec",
-            cfg = tc_compiler_out_transition
+            cfg = dev_tc_compiler_out_transition
         ),
 
         "yaccer": attr.label(
@@ -153,7 +133,7 @@ toolchain_adapter = rule(
             allow_single_file = True,
             executable = True,
             # cfg = "exec",
-            cfg = tc_compiler_out_transition
+            cfg = dev_tc_compiler_out_transition
         ),
 
         "copts" : attr.string_list(

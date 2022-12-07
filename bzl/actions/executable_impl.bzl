@@ -20,7 +20,7 @@ load("//bzl/rules/common:DEPS.bzl",
      "merge_depsets")
 
 #########################
-def executable_impl(ctx):  ## , tc):
+def executable_impl(ctx, exe_name):  ## , tc):
 
     debug = False
     # if ctx.label.name == "test":
@@ -41,7 +41,16 @@ def executable_impl(ctx):  ## , tc):
 
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
     tc = ctx.toolchains["//toolchain/type:boot"]
-    (stage, executor, emitter, workdir) = get_workdir(tc)
+    (target_executor, target_emitter,
+     config_executor, config_emitter,
+     workdir) = get_workdir(ctx, tc)
+
+    if target_executor == "unspecified":
+        executor = config_executor
+        emitter  = config_emitter
+    else:
+        executor = target_executor
+        emitter  = target_emitter
 
     ################################################################
     ################  DEPS  ################
@@ -97,14 +106,8 @@ def executable_impl(ctx):  ## , tc):
     # indirect_cc_deps  = {}
 
     ################
-    # includes  = []
+    includes  = []
     # cmxa_args  = []
-
-    out_exe = ctx.actions.declare_file(workdir + ctx.label.name)
-
-    runtime = []
-    for f in ctx.files._runtime:
-        runtime.append(f)
 
     ####  flags and options for bootstrapping executables
 
@@ -117,36 +120,130 @@ def executable_impl(ctx):  ## , tc):
     ## ocamlopt.opt: -nostdlib, -g
     ## ocamllex.opt: -nostdlib
 
+    # out_exe = ctx.actions.declare_file(workdir + ctx.label.name)
+    out_exe = ctx.actions.declare_file(workdir + exe_name)
+
     #########################
     args = ctx.actions.args()
 
     executable = None
-    if executor == "vm":
-        ## ocamlrun
-        for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-            if f.basename == "ocamlrun":
-                # print("LEX RF: %s" % f.path)
-                executable = f
-            # the bytecode executable
-        args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+
+    if tc.dev:
+        ocamlrun = None
+        effective_compiler = tc.compiler
     else:
-        executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
+        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+
+        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    if tc.dev:
+        build_executor = "opt"
+    elif (target_executor == "unspecified"):
+        if (config_executor == "sys"):
+            if config_emitter == "sys":
+                # ss built from ocamlopt.byte
+                build_executor = "vm"
+            else:
+                # sv built from ocamlopt.opt
+                build_executor = "sys"
+        else:
+            build_executor = "vm"
+    elif target_executor in ["boot", "baseline", "vm"]:
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "sys"):
+        ## ss always built by vs (ocamlopt.byte)
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "vm"):
+        ## sv built by ss
+        build_executor = "sys"
+
+    if build_executor == "vm":
+        executable = ocamlrun
+        args.add(effective_compiler.path)
+    else:
+        executable = effective_compiler
+
+    # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    # if (target_executor == "unspecified"):
+    #     if (config_executor == "sys"):
+    #         if config_emitter == "sys":
+    #             # ss built from ocamlopt.byte
+    #             executable = ocamlrun
+    #             args.add(effective_compiler.path)
+    #         else:
+    #             # sv built from ocamlopt.opt
+    #             executable = effective_compiler
+    #     else:
+    #         executable = ocamlrun
+    #         args.add(effective_compiler.path)
+
+    # elif target_executor in ["boot", "vm"]:
+    #         executable = ocamlrun
+    #         args.add(effective_compiler.path)
+
+    # elif (target_executor == "sys" and target_emitter == "sys"):
+    #     ## ss always built by vs (ocamlopt.byte)
+    #     executable = ocamlrun
+    #     args.add(effective_compiler.path)
+
+    # elif (target_executor == "sys" and target_emitter == "vm"):
+    #     ## sv built by ss
+    #     executable = effective_compiler
+
+    # if (executor in ["boot", "vm", "sys"] or ctx.attr._rule == "build_tool"):
+    #     ## ocamlrun
+    #     for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    #         if f.basename == "ocamlrun":
+    #             # print("LEX RF: %s" % f.path)
+    #             executable = f
+    #         # the bytecode executable
+    #     args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    # else:
+    #     executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
     args.add("-o", out_exe)
 
-    use_prims = False
-    if hasattr(ctx.attr, "use_prims"):
-        if ctx.attr.use_prims:
-            use_prims = True
-    else:
-        if ctx.attr._use_prims[BuildSettingInfo].value:
-            use_prims = True
+    # use_prims = False
+    # if hasattr(ctx.attr, "use_prims"):
+    #     if ctx.attr.use_prims:
+    #         use_prims = True
+    # else:
+    #     if ctx.attr._use_prims[BuildSettingInfo].value:
+    #         use_prims = True
 
-    if use_prims:
-        args.add_all(["-use-prims", ctx.file._primitives.path])
-        primitives_depset = [depset([ctx.file._primitives])]
-    else:
-        primitives_depset = []
+    primitives_depset = []
+    # if use_prims:
+    #     args.add_all(["-use-prims", ctx.file._primitives.path])
+    #     primitives_depset = [depset([ctx.file._primitives])]
+    # else:
+    #     primitives_depset = []
+
+    ## runtime_files are link-time deps, not to be confused with
+    ## runfiles, which are runtime deps.
+    runtime_files = []
+    if executor == "sys":
+        # only the native compilers need libasmrun
+        # WARNING: if we do not add libasmrun.a as a dep here,
+        # OCaml will try to link /usr/local/lib/ocaml/libasmrun.a
+        # to see, pass -verbose to the ocaml_compiler.opts or use
+        # --//config/ocaml/link:verbose
+        print("lbl: %s" % ctx.label)
+        print("exe runtime ccinfo: %s" % ctx.attr._runtime[CcInfo])
+        print("exe runtime files: %s" % ctx.attr._runtime.files)
+        # for f in ctx.files._runtime:
+        #     runtime_files.append(f)
+        #     includes.append(f.dirname)
+            ## do not add to CLI - asmcomp/asmlink adds it to the
+            ## OCaml cc link subcmd
+            # args.add(f.path)
+        print("runtime files: %s" % runtime_files)
+
+    if ctx.attr.cc_deps:
+        for f in ctx.files.cc_deps:
+            runtime_files.append(f)
+            includes.append(f.dirname)
 
     # args.add_all(tc.linkopts)
 
@@ -176,13 +273,12 @@ def executable_impl(ctx):  ## , tc):
     data_inputs = []
     # if ctx.attr.data:
     #     data_inputs = [depset(direct = ctx.files.data)]
-    if ctx.files._camlheaders:
-        data_inputs = [depset(direct = ctx.files._camlheaders)]
+    # if ctx.files._camlheaders:
+    #     data_inputs = [depset(direct = ctx.files._camlheaders)]
 
-    includes = []
     # print("CAMLHEADERS: %s" % ctx.files._camlheaders)
-    for hdr in ctx.files._camlheaders:
-        includes.append(hdr.dirname)
+    # for hdr in ctx.files._camlheaders:
+    #     includes.append(hdr.dirname)
 
     for path in paths_depset.to_list():
         includes.append(path)
@@ -194,10 +290,13 @@ def executable_impl(ctx):  ## , tc):
 
     # includes.append(ctx.file._std_exit.dirname)
 
-    ##FIXME: if we're building a sys compiler we need to add
-    ## libasmrun.a to runfiles, and if we're using a sys compiler we
-    ## need to add libasmrun.a to in puts and add its dir to search
+    ##FIXME: if we're *building* a sys compiler we need to add
+    ## libasmrun.a to runfiles, and if we're *using* a sys compiler we
+    ## need to add libasmrun.a to inputs and add its dir to search
     ## path (-I).
+
+    ## If we're building a vm executor tool, we need to add the
+    ## ocamlrun runtime to runfiles.
 
     # compiler_runfiles = []
     # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
@@ -230,9 +329,14 @@ def executable_impl(ctx):  ## , tc):
         transitive = [cli_link_deps_depset]
     )
 
-    for f in ctx.files._runtime:
-        # args.add(ctx.file._runtime.path)
-        includes.append(f.dirname)
+    if (executor in ["boot", "baseline", "vm"] or ctx.attr._rule == "build_tool"):
+        camlheaders = tc.camlheaders
+        print("CAMLHEADERS: {lbl} {h}".format(
+            lbl=ctx.label, h = camlheaders))
+        includes.append(camlheaders[0].dirname)
+    else:
+        print("NO CAMLHEADERS for %s" % ctx.label)
+        camlheaders = []
 
     args.add_all(includes, before_each="-I", uniquify=True)
 
@@ -251,8 +355,10 @@ def executable_impl(ctx):  ## , tc):
         args.add(ctx.file.main)
 
     runfiles = []
-    runfiles.append(ctx.file._primitives)
-    if tc_compiler(tc)[DefaultInfo].default_runfiles:
+    # if ...:
+    #     runfiles.append(ctx.file._primitives)
+    # if tc_compiler(tc)[DefaultInfo].default_runfiles:
+    if ocamlrun:
         runfiles.append(tc_compiler(tc)[DefaultInfo].default_runfiles)
     # else:
     #     runfiles = []
@@ -261,6 +367,8 @@ def executable_impl(ctx):  ## , tc):
     ##  a. the target attributes
     ##  b. the compiler
     ##  c. the toolchain?
+
+    # if target is sys, add asmrun?
 
     inputs_depset = depset(
         direct = []
@@ -275,9 +383,12 @@ def executable_impl(ctx):  ## , tc):
         ,
         transitive = []
         + [depset(
-            ctx.files._camlheaders + ctx.files._runtime
+            runtime_files
             + [ctx.file._stdlib]
+            # ctx.files._camlheaders
+            # + ctx.files._runtime
             # + ctx.files._stdlib
+            + camlheaders
         )]
         #FIXME: primitives should be provided by target, not tc?
         # + [depset([tc.primitives])] # if tc.primitives else []
@@ -306,19 +417,19 @@ def executable_impl(ctx):  ## , tc):
     #     print("XDEP: %s" % dep)
 
     if ctx.attr._rule == "boot_executable":
-        mnemonic = "CompileBootstrapExecutable"
+        mnemonic = "LinkBootstrapExecutable"
     elif ctx.attr._rule == "bootstrap_repl":
-        mnemonic = "CompileToplevel"
+        mnemonic = "LinkToplevel"
     elif ctx.attr._rule == "baseline_test":
-        mnemonic = "CompileBootstrapTest"
-    elif ctx.attr._rule == "boot_compiler":
-        mnemonic = "CompileOcamlcBoot"
+        mnemonic = "LinkBootstrapTest"
+    elif ctx.attr._rule == "ocaml_compiler":
+        mnemonic = "LinkOcamlCompiler"
     elif ctx.attr._rule == "build_tool":
-        mnemonic = "CompileBuildTool"
+        mnemonic = "LinkBuildTool"
     elif ctx.attr._rule == "baseline_compiler":
-        mnemonic = "CompileOcamlcKick"
+        mnemonic = "LinkOcamlcKick"
     elif ctx.attr._rule == "ocaml_tool":
-        mnemonic = "CompileOCamlTool"
+        mnemonic = "LinkOCamlTool"
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
 
@@ -335,27 +446,38 @@ def executable_impl(ctx):  ## , tc):
         inputs = inputs_depset,
         outputs = [out_exe],
         tools = [
-            tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            tc_compiler(tc)[DefaultInfo].files_to_run
+            executable,
+            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
+            # tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = mnemonic,
-        progress_message = progress_msg(stage, workdir, ctx)
+        progress_message = progress_msg(workdir, ctx)
     )
     ################
 
     #### RUNFILE DEPS ####
+    ## compilers: store the tool(s) used to build in runfiles
+    ## e.g. if we're linking ocamlopt.byte, we store the ocamlc.byte used to compile/link
+    ## if we're linking ocamlc.opt, we store the camlopt.byte used
+    ## that way each (vm) executable carries its "history",
+    ## and the coldstart can use that history to install all the compilers
 
-    compiler_runfiles = []
-    for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-        if rf.short_path.startswith("stdlib"):
-            # print("STDLIB: %s" % rf)
-            compiler_runfiles.append(rf)
-        if rf.path.endswith("ocamlrun"):
-            # print("OCAMLRUN: %s" % rf)
-            compiler_runfiles.append(rf)
+    # compiler_runfiles = []
+    # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    #     if rf.short_path.startswith("stdlib"):
+    #         # print("STDLIB: %s" % rf)
+    #         compiler_runfiles.append(rf)
+    #     if rf.path.endswith("ocamlrun"):
+    #         # print("OCAMLRUN: %s" % rf)
+    #         compiler_runfiles.append(rf)
     ##FIXME: add tc.stdlib, tc.std_exit
-    for f in ctx.files._camlheaders:
-        compiler_runfiles.append(f)
+    # for f in ctx.files._camlheaders:
+    #     compiler_runfiles.append(f)
+
+    if ocamlrun:
+        runfiles = [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
+    else:
+        runfiles = []
 
     if ctx.attr.strip_data_prefixes:
       myrunfiles = ctx.runfiles(
@@ -366,10 +488,11 @@ def executable_impl(ctx):  ## , tc):
         myrunfiles = ctx.runfiles(
             files = ctx.files.data,
             transitive_files =  depset(
-                direct=compiler_runfiles,
-                transitive = [depset(
-                    # [ctx.file._std_exit, ctx.file._stdlib]
-                )]
+                transitive = runfiles
+                # direct=compiler_runfiles,
+                # transitive = [depset(
+                #     # [ctx.file._std_exit, ctx.file._stdlib]
+                # )]
             )
         )
 
@@ -381,7 +504,7 @@ def executable_impl(ctx):  ## , tc):
     )
 
     exe_provider = None
-    if ctx.attr._rule in ["boot_compiler"]:
+    if ctx.attr._rule in ["ocaml_compiler"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
         exe_provider = OcamlExecutableMarker()

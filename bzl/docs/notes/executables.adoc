@@ -1,0 +1,52 @@
+= executables
+
+Three kinds:
+
+* "gentools" - compiler, assembler, archiver, linker, etc. - pgms that emit runnable code. compilers emit runtime
+* build tools - used only to build the compiler, e.g. `//tools:cvt_emit.byte`.
+* applications
+
+
+== ocamlrun
+
+* used to run boot (precompiled) tools `boot/ocamlc`, `boot:ocamllex`
+* used to run some build tools (`//tools:cvt_emit.byte`,
+* its path is used in camlheaders
+
+Used to run `ocamlc.byte`, `ocamlopt.byte`, and other VM tools after
+they have been built.
+
+== camlheaders
+
+Inserted as first line of VM executables. Each camlheader file
+(camlheader, camlheaderd, camlheaderi) contains one line, a shell
+script line pointing to `ocamlrun`:
+
+    #!/usr/local/bin/ocamlrun
+
+or
+
+    #!/...(home dir).../.opam/4.14.0/bin/ocamlrun
+
+With Bazel we can point it to the development version:
+
+    #!bazel-out/darwin-fastbuild-ST-33295065ab80/bin/runtime/ocamlrun
+
+
+The VM compiler inserts this line at the top of the VM executables it
+emits. See `//bytecomp/bytelink.ml`. The `link_bytecode` function
+constructs a filename (e.g. "camlheader", "camlheaderd", etc.) and
+then calls `utils/Load_path.find` to obtain the file and writes it as
+the first line of the bytecode executable.
+
+NOTE: This makes the camlheader files runtime deps, not compile- or link-time
+deps. Which means our build rules need not depend on them.
+
+`//bytecomp:Bytelink.link_bytecode` is called by `Bytelink.link`, which is commented
+"[m]ain entry point" . The `Bytelink.link` routine is called by
+`driver/Maindriver.main`, which is called by `driver/Main`:
+
+    let () =
+      exit (Maindriver.main Sys.argv Format.err_formatter)
+
+

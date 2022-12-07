@@ -29,6 +29,7 @@
 
 int main_os(int argc, char_os **argv)
 {
+    printf("hello\n");
 #ifdef _WIN32
   /* Expand wildcards and diversions in command line */
   caml_expand_command_line(&argc, &argv);

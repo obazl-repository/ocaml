@@ -1,4 +1,16 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "int_flag", "int_setting",
+     "string_flag", "string_setting"
+)
+
 package(default_visibility = ["//visibility:public"])
+
+string_setting(
+    name = "compilation_mode",
+    build_setting_default = "fastbuild",
+    values = ["dbg", "fastbuild", "opt"],
+    visibility = ["//visibility:public"]
+)
 
 ## Convenience rules, to save the user the trouble of defining similar
 ## config_settings.  Selects can use e.g.

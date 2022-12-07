@@ -104,7 +104,7 @@ Actual flags:
 
 * `-nostdlib` which means "no stdilb path", i.e. do not add the default stdlib path to search paths
 
-* `-nopervasies` undocumented and obsolete; originally Pervasives was
+* `-nopervasives` undocumented and obsolete; originally Pervasives was
   a module with basic ops for built-in types. Make log shows only used
   to compile camlinternalFormatBasics.ml[i] and stdlib.ml[i]
 

@@ -1,11 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl",
-     "boot_executable",
+     # "boot_executable",
      "boot_library",
      # "boot_lexer",
      "build_module",
-     "build_tool",
+     # "build_tool",
      "compiler_module",
      "compiler_signature",
      "ocaml_tool"
@@ -170,47 +170,7 @@ ocaml_tool(
     ]
 )
 
-################################################################
-# The preprocessor for asm generators
-# cvt_emit := cvt_emit$(EXE)
-# $(eval $(call PROGRAM_SYNONYM,cvt_emit))
-# $(cvt_emit): cvt_emit.cmo
-# 	$(CAMLC) $(LINKFLAGS) -o $@ $^
-
-##FIXME: this should only be built as a vm executable and run once
-# ocaml_tool(
-build_tool(
-    name = "cvt_emit.byte",
-    main = ":Cvt_emit",
-    opts = [
-        "-nostdlib",
-        "-verbose"
-    ],
-    exec_compatible_with   = [
-        "//platform/constraints/ocaml/build/executor:vm_executor",
-    ],
-    visibility = ["//asmcomp:__subpackages__"]
-)
-
-build_module(
-    name   = "Cvt_emit",
-    struct = "cvt_emit_ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Sys",
-        "//bytecomp:Bytesections",
-        "//stdlib:Stdlib.Array",
-    ],
-)
-
-lex(
-    name = "cvt_emit_ml",
-    src  = "cvt_emit.mll",
-    out  = "cvt_emit.ml"
-)
+## cvt_emit build targets moved to //asmcomp
 
 ################################################################
 # Reading cmt files
@@ -298,13 +258,13 @@ ocaml_tool(
 # 	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
 compiler_module(
     name = "Opnames",
-    struct = "//bytecomp:opnames.ml",
+    struct = "//bytecomp:opnames_ml",
     opts = MODULE_OPTS,
     warnings = [w.MISSING_MLI],
     deps = ["//stdlib:Stdlib"]
 )
 
-## moved to bytecode:opnames.ml
+## moved to bytecode:opnames_ml
 # genrule(
 #     name = "gen_opnames",
 #     outs = ["opnames.ml"],

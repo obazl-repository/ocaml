@@ -40,8 +40,6 @@ string_list_flag(name = "warnings",
                      # "-w", "+a-4-9-41-42-44-45-48",
                      "-warn-error", "+A"])
 
-bool_flag( name = "verbose", build_setting_default = False)
-
 ################################################################
 ##FIXME: what is the optimal way to select for flambda?
 bool_flag(
