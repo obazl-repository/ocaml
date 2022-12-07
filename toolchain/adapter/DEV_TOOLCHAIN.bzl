@@ -41,6 +41,8 @@ def _dev_toolchain_adapter_impl(ctx):
         ## core tools
         compiler               = ctx.file.compiler,
         copts                  = ctx.attr.copts,
+        sigopts                = ctx.attr.sigopts,
+        structopts             = ctx.attr.structopts,
         linkopts               = ctx.attr.linkopts,
         warnings               = ctx.attr.warnings,
         lexer                  = ctx.attr.lexer,
@@ -138,10 +140,16 @@ dev_toolchain_adapter = rule(
 
         "copts" : attr.string_list(
         ),
-        "warnings" : attr.label( ## string list
-            default = "//config:warnings",
+        "sigopts" : attr.string_list(
+            doc = "Compile options .mli files"
+        ),
+        "structopts" : attr.string_list(
+            doc = "Compile options .ml files"
         ),
         "linkopts" : attr.string_list(
+        ),
+        "warnings" : attr.label( ## string list
+            default = "//config:warnings",
         ),
 
         #### other tools - just those needed for builds ####

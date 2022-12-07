@@ -6,28 +6,63 @@ load("//toolchain/adapter:DEV_TOOLCHAIN.bzl", "dev_toolchain_adapter")
 ## NB: these are all the same, but for debugging they need different
 ## names. Use aliases?
 
-##################
+## compile options (.ml/mli) passed in most cases:
+# -absname
+# -bin-annot
+# -g
+# -nostdlib - everywhere, always?
+# -principal  (.ml only, stage 2, not bootstrap?)
+# -strict-sequence
+# -strict-formats (ocamlopt.opt, stdlib.ml[i]
+# -w +a-4-9-41-42-44-45-48
+# -warn-error +A
+# -use-prims (bootstrap stage only?)
+# -nopervasives: added for stdlib/camlinternalFormatBasics.ml[i], stdlib/stdlib.ml[i]
+
+## archive options
+# -nostdlib (all except stdlib.cma, cmxa)
+# -use-prims (stdlib.cma, ocamlcommon.cma, ocamlbytecomp.cma, ocamlmiddleend.cma, ocamltoplevel.cma, ocamloptcomp.cma)
+# -linkall (ocamlcommon.cma, cmxa only)
+
+# dynlink.cma, cmxa: -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +A -bin-annot -strict-formats
+
+## link options
+# -nostdlib
+# -g
+# -compat-32 (ocamlc.byte only)
+# -use-prims (ocamlc.byte, ocamlopt.byte only)
+# -cclib "-lm  -lpthread" (ocamlc.opt only)
+
+######################
 dev_toolchain_adapter(
     name        = "dev",
-    copts       = [
+    copts       = [ ## common opts: structs and sigs
         "-nostdlib",  ## inserted by rule
         "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
+        "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
+        "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
         ## FIXME: only for native (sys) targets
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [],
+    linkopts    = [
+        "-nostdlib",
+        # "-strict-sequence",
+        # "-absname",
+        # "-warn-error", "+A"
+    ],
+    sigopts     = [],
+    structopts  = select({
+        ## FIXME: -principal should not be used for boot stage
+        "//config/ocaml/compile:principal?" : ["-principal"],
+        "//conditions:default": []
+    }),
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )

@@ -4,7 +4,10 @@ load("//bzl:rules.bzl", "ocaml_compiler")
 
 ocaml_compiler(
     name = "ocamlcc",
-    opts = [
+    opts = [ ] + select({
+        # ocamlc.byte: ["-compat-32"]
+        "//conditions:default": []
+    }) + [
         # "-verbose",
         ## for testing (linux):
         # "-cc", "gcc",  ## cancels mkexe

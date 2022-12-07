@@ -435,6 +435,8 @@ def module_impl(ctx, module_name):
     if not ctx.attr.nocopts:
         args.add_all(tc.copts)
 
+    args.add_all(tc.structopts)
+
     args.add_all(tc.warnings[BuildSettingInfo].value)
 
     for w in ctx.attr.warnings:
