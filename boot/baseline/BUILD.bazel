@@ -1,5 +1,0 @@
-# alias( # implemented in C, so no byte/opt versions.
-#     name   = "ocamlrun",
-#     actual = "//runtime:ocamlrun",
-#     visibility = ["//visibility:public"]
-# )

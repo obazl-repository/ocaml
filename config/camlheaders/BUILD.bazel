@@ -1,0 +1,11 @@
+load(":BUILD_RULES.bzl", "camlheaders")
+
+#FIXME: only for vm executor
+camlheaders(
+    name = "camlheaders",
+    visibility = [
+        "//bin:__pkg__",
+        "//boot:__pkg__",
+        "//toolchain/adapter:__pkg__"
+    ]
+)

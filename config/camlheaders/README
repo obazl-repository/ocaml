@@ -1,0 +1,132 @@
+UPDATE: camlheaders only needed at link-time for VM executables. They
+are runtime deps, not compile- or link-time deps. They are NOT part of
+stdlib.
+
+During development, we always build with explicit runtime on the
+command line, so the camlheader is not needed. However the compiler is
+hard-coded to look for the file at link-time, so we provide a dummy
+file.
+
+To build a distribution we will need to provide proper camlheaders,
+using the install dir set at config-time.
+
+
+################################################################
+# HEADERPROGRAM = header
+# HEADER_PATH = $(BINDIR)/
+# HEADER_TARGET_PATH = $(TARGET_BINDIR)/
+# TARGETHEADERPROGRAM = target_$(HEADERPROGRAM)
+
+## on systems that support hashbang scripts, emits a hashbang header,
+## e.g. '#!/usr/local/bin/ocamlrun', or does something I don't
+## understand involving ocamlrun.
+
+## on systems that do not support hashbang shell scripts, Makefile
+## compiles header.c to tmpheader.exe, etc...
+
+## so for PoC purposes we just emit a hard-coded shebang
+
+## camlheader is required for compiling a bytecode executable. to get
+## it into the deps list we add it to deps_runtime of stdlib.ml, until we
+## figure out how best to do this.
+
+## use --stamp and --workspace_status_command
+## see .bazelrc, bzl/camlheader.sh
+
+## FIXME: default uses sys install locn, e.g. /usr/local/bin/ocamlrun
+## for dev, use path to internal dev ocamlrun instead
+
+# stdlib/Makefile:
+# $(HEADERPROGRAM)%$(O): \
+#   OC_CPPFLAGS += -DRUNTIME_NAME='"$(HEADER_PATH)ocamlrun$(subst .,,$*)"'
+
+# SYSPATHS_CMD = " ".join([
+#     "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_CAMLHEADER \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location camlheader);",
+
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_TARGET_CAMLHEADER \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location target_camlheader);",
+
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_CAMLHEADERD \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location camlheaderd);",
+
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep STABLE_TARGET_CAMLHEADERD | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location target_camlheaderd);",
+
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_CAMLHEADERI \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location camlheaderi);",
+
+#         "cat bazel-out/stable-status.txt | ",
+#     "grep \"STABLE_TARGET_CAMLHEADERI \" | ",
+#     "cut -d ' ' -f 2 - ",
+#     "> $(location target_camlheaderi);",
+# ])
+
+## IMPORTANT! For this to work, the following cli args must be passed:
+# --stamp
+# --workspace_status_command=$PWD/bzl/camlheader.sh
+
+## FIXME: select camlheader content: for running under Bazel, null, otherwise installation path,
+## not $(execpath //boot/baseline:ocamlrun)?
+# DEVPATHS_CMD = "\n".join([
+#     "cat bazel-out/stable-status.txt | ",
+#     "while read KEY VAL; do",
+#     "if [ $$KEY = \"STABLE_WORKSPACE_ROOT\" ]; then\n",
+#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun) > $(location _build/camlheader);\n",
+#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)d > $(location _build/camlheaderd);\n",
+#     "echo '#!'$$VAL/$(execpath //boot/baseline:ocamlrun)i > $(location _build/camlheaderi);\n",
+#     # "touch $(location camlheader);\n",
+#     # "touch $(location camlheaderd);\n",
+#     # "touch $(location camlheaderi);\n",
+#     "fi",
+#     "done",
+
+#     "echo '#!$(execpath //boot/baseline:ocamlrun)' > $(location _build/target_camlheader);",
+#     "echo '#!$(execpath //boot/baseline:ocamlrun)d' > $(location _build/target_camlheaderd);",
+#     "echo '#!$(execpath //boot/baseline:ocamlrun)i' > $(location _build/target_camlheaderi);",
+# ])
+
+# boot_camlheaders(
+#     name     = "camlheaders",
+#     template = "camlheader.template",
+#     # runtime  = "//runtime:ocamlrun",
+#     # target_compatible_with = [
+#     #     "//platform/constraints/ocaml/executor:vm_executor"
+#     # ]
+# )
+
+
+# genrule(
+#     name = "Xcamlheaders",
+#     outs = [
+#         "_build/camlheader",
+#         "_build/camlheaderd",
+#         "_build/camlheaderi",
+#         # "camlheader_ur",
+#         "_build/target_camlheader",
+#         "_build/target_camlheaderd",
+#         "_build/target_camlheaderi"
+#     ],
+#     # srcs = [
+#     #     "//boot/baseline:ocamlrun",
+#     #     "//bzl/toolchain:ocamlrun"
+#     # ],
+#     srcs = [
+#         "//boot/baseline:ocamlrun",
+#         "//bzl/toolchain:ocamlrun"
+#     ],
+#     cmd = DEVPATHS_CMD,
+#     stamp = True,
+#     visibility = ["//visibility:public"]
+# )
+

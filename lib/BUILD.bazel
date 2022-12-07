@@ -1,5 +1,0 @@
-load("//bzl/rules/macros:compiler.bzl", "compiler")
-load("//bzl/rules/macros:lexer.bzl", "lexer")
-load("//bzl/rules/macros:stdlib.bzl", "stdlib")
-
-stdlib(stage  = "dev")
