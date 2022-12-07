@@ -1,3 +1,15 @@
+load("//bzl:rules.bzl",
+     "boot_archive",
+     "boot_library",
+     "build_module",
+     "build_tool",
+     "compiler_module",
+     "compiler_signature",
+)
+load("//lex:BUILD_RULES.bzl", "lex")
+
+load("//config:CONFIG.bzl", "w")
+
 ## make log: >vm uses -use-prims, >sys does not
 # ./boot/ocamlrun ./boot/ocamlc
 # -nostdlib -use-prims -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
@@ -6,20 +18,11 @@
 # -nostdlib -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
 
 
-load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
-     "compiler_module",
-     "compiler_signature",
-)
-
-load("//config:CONFIG.bzl", "w")
-
 ## warnings
 NAME_OUT_OF_SCOPE = "40"
 
 MODULE_OPTS = []
-SIG_OPTS    = []
+SIG_OPTS    = ["-strict-formats"]
 
 ## dev/test target, builds everything
 boot_archive(
@@ -230,8 +233,8 @@ compiler_signature(
     src  = "CSEgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach",
-        ":Cmm",
+        ":Mach_cmi",
+        ":Cmm_cmi",
         "//parsing:Asttypes_cmi",
     ],
 )
@@ -267,6 +270,7 @@ compiler_signature(
 
 compiler_module(
     name   = "Arch",
+    sig    = ":Arch_cmi",
     struct = select({
         "//config/arch:x86_64": "//asmcomp/amd64:arch.ml",
         "//config/arch:arm"   : "//asmcomp/arm:arch.ml",
@@ -280,6 +284,23 @@ compiler_module(
     warnings = [w.MISSING_MLI],
     deps   = [
         "//utils:Clflags"
+    ],
+)
+
+compiler_signature(
+    name   = "Arch_cmi",
+    src = select({
+        "//config/arch:x86_64": "//asmcomp/amd64:arch.mli",
+        "//config/arch:arm"   : "//asmcomp/arm:arch.mli",
+        "//config/arch:arm64"   : "//asmcomp/arm64:arch.mli",
+        "//config/arch:i386"   : "//asmcomp/i386:arch.mli",
+        "//config/arch:ppc"   : "//asmcomp/power:arch.mli",
+        "//config/arch:riscv64"   : "//asmcomp/riscv:arch.mli",
+        "//config/arch:s390x"   : "//asmcomp/s390x:arch.mli",
+    }, no_match_error = "unknown arch"),
+    deps   = [
+        "//stdlib:Stdlib.Arg_cmi",
+        "//stdlib:Stdlib.Format_cmi"
     ],
 )
 
@@ -757,6 +778,49 @@ compiler_signature(
     ],
 )
 
+################################################################
+# The preprocessor for asm generators
+# cvt_emit := cvt_emit$(EXE)
+# $(eval $(call PROGRAM_SYNONYM,cvt_emit))
+# $(cvt_emit): cvt_emit.cmo
+# 	$(CAMLC) $(LINKFLAGS) -o $@ $^
+
+##FIXME: this should only be built as a vm executable and run once
+# ocaml_tool(
+build_tool(
+    name = "cvt_emit",
+    main = ":Cvt_emit",
+    opts = [
+        "-nostdlib",
+        "-verbose"
+    ],
+    # exec_compatible_with   = [
+    #     # "//platform/constraints/ocaml/build/executor:vm_executor",
+    #     "//config/target/executor:vm_executor?"
+    # ],
+    visibility = ["//asmcomp:__subpackages__"]
+)
+
+build_module(
+    name   = "Cvt_emit",
+    struct = "cvt_emit_ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+        "//bytecomp:Bytesections",
+        "//stdlib:Stdlib.Array",
+    ],
+)
+
+lex(
+    name = "cvt_emit_ml",
+    src  = "cvt_emit.mll",
+    out  = "cvt_emit.ml"
+)
+
 compiler_module(
     name   = "Dataflow",
     struct = "dataflow.ml",
@@ -1091,6 +1155,7 @@ compiler_signature(
     src  = "mach.mli",
     opts = SIG_OPTS,
     deps   = [
+        ":Arch_cmi",
         ":Reg_cmi",
     ],
 )
@@ -1147,7 +1212,7 @@ compiler_signature(
     src  = "printcmm.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm",
+        ":Cmm_cmi",
         "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format_cmi",
         "//lambda:Debuginfo_cmi",
@@ -1280,7 +1345,7 @@ compiler_signature(
     src  = "reg.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm",
+        ":Cmm_cmi",
         "//stdlib:Stdlib.Set_cmi",
         "//stdlib:Stdlib.Map_cmi",
         "//middle_end:Backend_var_cmi",

@@ -1,7 +1,8 @@
 load("//asmcomp:BUILD_RULES.bzl", "cvt_emit")
 
 exports_files([
-    "arch.ml", "CSE.ml", "proc.ml",
+    "arch.mli", "arch.ml",
+    "CSE.ml", "proc.ml",
     "reload.ml", "scheduling.ml", "selection.ml"
 ])
 
