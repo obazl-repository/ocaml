@@ -395,7 +395,7 @@ genrule(
         # "echo PWD: $$PWD;",
         "$(execpath //yacc:ocamlyacc)",
         "--strict", "-v",
-        "$(location parser.mly);",
+        "$(location parser.mly) > /dev/null;",
         # "echo `ls -la lex`;",
         "cp lex/parser.ml $(RULEDIR)/;",
         "cp lex/parser.mli $(RULEDIR)/;"
