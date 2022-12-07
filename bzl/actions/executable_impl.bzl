@@ -230,20 +230,22 @@ def executable_impl(ctx, exe_name):  ## , tc):
         print("lbl: %s" % ctx.label)
         print("exe runtime ccinfo: %s" % ctx.attr._runtime[CcInfo])
         print("exe runtime files: %s" % ctx.attr._runtime.files)
-        # for f in ctx.files._runtime:
-        #     runtime_files.append(f)
-        #     includes.append(f.dirname)
+
+        for f in ctx.files._runtime:
+            runtime_files.append(f)
+            includes.append(f.dirname)
+
             ## do not add to CLI - asmcomp/asmlink adds it to the
             ## OCaml cc link subcmd
             # args.add(f.path)
         print("runtime files: %s" % runtime_files)
 
-    if ctx.attr.cc_deps:
-        for f in ctx.files.cc_deps:
-            runtime_files.append(f)
-            includes.append(f.dirname)
+    # if ctx.attr.cc_deps:
+    #     for f in ctx.files.cc_deps:
+    #         runtime_files.append(f)
+    #         includes.append(f.dirname)
 
-    # args.add_all(tc.linkopts)
+    args.add_all(tc.linkopts)
 
     # if ext == ".cmx":
     #     args.add("-dstartup")
