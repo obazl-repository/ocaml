@@ -49,11 +49,12 @@ BOOTDIR=$BUILD_WORKSPACE_DIRECTORY/.baseline
 rm -vrf $BOOTDIR
 
 mkdir -p $BOOTDIR/bin
-# mkdir -p $BOOTDIR/lib
+mkdir -p $BOOTDIR/lib
 
 echo "workspace(name = \"baseline\")" > $BOOTDIR/WORKSPACE.bazel
 echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/BUILD.bazel
 echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/bin/BUILD.bazel
+echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/lib/BUILD.bazel
 
 EXECUTOR=`cat $(rlocation ocaml_tools/boot/executor)`
 EMITTER=`cat $(rlocation ocaml_tools/boot/emitter)`
@@ -62,6 +63,8 @@ echo "Executor: ${EXECUTOR}"
 echo "Emitter: ${EMITTER}"
 
 cp -f $(rlocation ocaml_tools/runtime/ocamlrun) $BOOTDIR/bin
+cp -f $(rlocation ocaml_tools/runtime/libasmrun.a) $BOOTDIR/lib
+cp -f $(rlocation ocaml_tools/runtime/libcamlrun.a) $BOOTDIR/lib
 
 if [ ${EXECUTOR} == "vm" ]; then
 
@@ -119,8 +122,10 @@ fi
 
 cp -f $(rlocation ocaml_tools/yacc/ocamlyacc) $BOOTDIR/bin
 
+
 chmod -f ug=+rx-w,o=-rwx $BOOTDIR/bin/*
 chmod -f ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
+chmod -f ugo=+r-xw $BOOTDIR/lib/*.a
 
 # chmod -f ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
 # chmod ug=+r-wx,o=-rwx $BOOTDIR/lib/*

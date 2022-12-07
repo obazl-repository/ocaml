@@ -56,6 +56,8 @@ def _boot_coldstart_impl(ctx):
     rfs.append(depset(direct = [executor, emitter]))
 
     for d in ctx.attr.data:
+        # print("DATUM: %s" % d)
+        rfs.append(d.files)
         rfs.append(d[DefaultInfo].default_runfiles.files)
 
     runfiles = ctx.runfiles(
