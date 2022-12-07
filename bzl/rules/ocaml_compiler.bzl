@@ -17,13 +17,6 @@ def _ocaml_compiler_impl(ctx):
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
 
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
-
     executor = config_executor
     emitter  = config_emitter
 
@@ -72,16 +65,6 @@ ocaml_compiler = rule(
             # cfg = reset_cc_config_transition ## only build once
             # default = "//config/runtime" # label flag set by transition
         ),
-
-        # _target_emitter = attr.label(
-        #     default = "//config/target/emitter:xemitter"
-        # ),
-
-        # only boot_stdlib and boot_compiler have a public 'stage' attr
-        # stage = attr.string(
-        #     mandatory = True,
-        #     values = ["boot", "baseline", "dev", "prod"]
-        # ),
 
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"

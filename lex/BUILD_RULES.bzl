@@ -168,29 +168,7 @@ def _lex_impl(ctx):
 lex = rule(
     implementation = _lex_impl,
     doc = "Generates an OCaml source file from an ocamllex source file.",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         # exec_compatible_with = [
-    #         #     "//platform/constraints/ocaml/executor:vm_executor?",
-    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
-    #         # ],
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor?",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
-
     attrs = dict(
-        # _stage = attr.label(
-        #     doc = "bootstrap stage",
-        #     default = "//config/stage"
-        # ),
-
         src = attr.label(
             doc = "A single .mll source file label",
             allow_single_file = [".mll"]

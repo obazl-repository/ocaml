@@ -361,20 +361,6 @@ compiler_signature(
 # utils/config.ml: \
 #   utils/config_$(if $(filter true,$(IN_COREBOOT_CYCLE)),boot,main).ml
 # 	cp $< $@
-# boot_config(
-#     name   = "config_ml",
-#     out    = "config.ml",
-#     header = select({
-#         "//config/stage:0?" : ":config.fixed.ml",
-#         "//config/stage:1?"  : ":config.dev.ml",
-#         "//config/stage:2?" : ":config.dev.ml",
-#         "//conditions:default" : ":config.generated.ml"
-#     }),
-#     stdlib = "//stdlib",
-#     deps = ["//config:Config_cc"],
-#     footer = "config.common.ml",
-#     visibility = ["//otherlibs/dynlink:__pkg__"]
-# )
 
 # genrule(
 #     outs   = ["config.ml"],

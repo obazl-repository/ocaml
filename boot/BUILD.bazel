@@ -79,9 +79,3 @@ sh_binary(
     ],
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
-
-# stdlib(stage  = "boot")
-# alias(
-#     name   = "stdlib",
-#     actual = "//stdlib"
-# )

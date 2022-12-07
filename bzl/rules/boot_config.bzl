@@ -8,49 +8,14 @@ def _boot_config(ctx):
 
     o = ctx.outputs.out
 
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
     tc = ctx.toolchains["//toolchain/type:boot"]
 
     (executor, emitter, workdir) = get_workdir(ctx, tc)
-
-    # build_emitter = tc.build_emitter[BuildSettingInfo].value
-    # print("BEMITTER: %s" % build_emitter)
-
-    # target_executor = tc.target_executor[BuildSettingInfo].value
-    # target_emitter  = tc.target_emitter[BuildSettingInfo].value
-
-    # stage = int(tc._stage[BuildSettingInfo].value)
-    # workdir = "_{b}{t}{s}/".format(
-    #     b = target_executor, t = target_emitter, s = (stage))
-
-    # print("module _stage: %s" % stage)
 
     if executor in ["boot", "vm"]:
         ext = ".cmo"
     else:
         ext = ".cmx"
-
-    # if stage == 2:
-    #     ext = ".cmx"
-    # else:
-    #     if target_executor == "vm":
-    #         ext = ".cmo"
-    #     elif target_executor == "sys":
-    #         ext = ".cmx"
-    #     else:
-    #         fail("Bad target_executor: %s" % target_executor)
-
-    # tc = None
-    # if ctx.attr._stage == "boot":
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//toolchain/type:boot"]
-    # elif ctx.attr._stage == "boot":
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//toolchain/type:boot"]
-    # else:
-    #     # print("MISSING STAGE")
-    #     tc = ctx.exec_groups["boot"].toolchains[
-    #         "//toolchain/type:boot"]
 
     stdlib_dir = ""
     for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
@@ -87,19 +52,6 @@ boot_config = rule(
     implementation = _boot_config,
 
     doc = "Builds boot toolchain and installs in .bootstrap/",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor?",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
-
     attrs = dict(
         out = attr.output(
             mandatory = True,

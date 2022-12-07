@@ -15,18 +15,6 @@ def _boot_signature(ctx):
 boot_signature = rule(
     implementation = _boot_signature,
     doc = "Sig rule for bootstrapping ocaml compilers",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor?",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
     attrs = dict(
         signature_attrs(),
         _opts = attr.string_list( ),

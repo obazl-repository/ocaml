@@ -10,10 +10,9 @@ load("//bzl/rules/common:transitions.bzl",
 ##########################################
 def _toolchain_adapter_impl(ctx):
 
-    return [platform_common.ToolchainInfo(
+    return [platform_common.ToolchainInfo] (
         name                   = ctx.label.name,
         dev                    = False,
-        # _stage                 = ctx.attr._stage,
         build_host             = ctx.attr.build_host,
         target_host            = ctx.attr.target_host,
         # _build_executor        = ctx.attr._build_executor,
@@ -54,10 +53,6 @@ def _toolchain_adapter_impl(ctx):
 toolchain_adapter = rule(
     _toolchain_adapter_impl,
     attrs = {
-        # "_stage" : attr.label( # int_flag
-        #     default = "//config/stage"
-        # ),
-
         "build_host": attr.string(
             doc     = "OCaml host platform: vm (bytecode) or an arch.",
             default = "vm"

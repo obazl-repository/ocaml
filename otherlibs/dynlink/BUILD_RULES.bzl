@@ -16,20 +16,6 @@ load("//bzl/actions:signature_impl.bzl", "signature_impl")
 # load(":BUILD.bzl", "STDLIB_MANIFEST")
 
 
-#### macro ####
-# def stdlib(stage = None,
-#            build_host_constraints = None,
-#            target_host_constraints = None,
-#            visibility = ["//visibility:public"]
-#            ):
-
-#     boot_stdlib(
-#         name       = "stdlib",
-#         stage      = stage,
-#         manifest   = STDLIB_MANIFEST,
-#         visibility = visibility
-#     )
-
 ################################################################
 def _dynlink_signature(ctx):
 
@@ -43,18 +29,6 @@ def _dynlink_signature(ctx):
 dynlink_signature = rule(
     implementation = _dynlink_signature,
     doc = "Sig rule for bootstrapping ocaml compilers",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
     attrs = dict(
         signature_attrs(),
 
@@ -89,22 +63,6 @@ def _dynlink_module(ctx):
 dynlink_module = rule(
     implementation = _dynlink_module,
     doc = "Compiles a module with the bootstrap compiler.",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         # exec_compatible_with = [
-    #         #     "//platform/constraints/ocaml/build/executor:vm_executor",
-    #         #     "//platform/constraints/ocaml/build/emitter:vm_emitter"
-    #         # ],
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
     attrs = dict(
         module_attrs(),
 

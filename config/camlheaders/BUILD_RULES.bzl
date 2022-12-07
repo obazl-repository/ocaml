@@ -42,7 +42,6 @@ camlheaders = rule(
 #     # for f in ctx.attr.runtimes:
 #     #     print("RF: %s" % f[DefaultInfo].default_runfiles.symlinks.to_list())
 #     pfx = ""
-#     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
 #     tc = ctx.toolchains["//toolchain/type:boot"]
 
 #     (executor, emitter, workdir) = get_workdir(ctx, tc)
@@ -122,25 +121,7 @@ camlheaders = rule(
 # prod_camlheaders = rule(
 #     implementation = _prod_camlheaders_impl,
 #     doc = "Generates camlheader files",
-#     # exec_groups = {
-#     #     "boot": exec_group(
-#     #         # exec_compatible_with = [
-#     #         #     "//platform/constraints/ocaml/executor:vm_executor?",
-#     #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
-#     #         # ],
-#     #         toolchains = ["//toolchain/type:boot"],
-#     #     ),
-#         # "baseline": exec_group(
-#         #     exec_compatible_with = [
-#         #         "//platform/constraints/ocaml/executor:vm_executor?",
-#         #         "//platform/constraints/ocaml/emitter:vm_emitter"
-#         #     ],
-#         #     toolchains = ["//toolchain/type:baseline"],
-#         # ),
-#     # },
-
 #     attrs = {
-#         # "_stage"   : attr.label( default = "//config/stage" ),
 #         "template" : attr.label(mandatory = True,allow_single_file=True),
 #         "_runtime" : attr.label(
 #             allow_single_file=True,

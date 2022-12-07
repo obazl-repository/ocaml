@@ -34,26 +34,6 @@ def _test_executable_impl(ctx):
 test_executable = rule(
     implementation = _test_executable_impl,
     doc = "Links OCaml executable binary using the bootstrap toolchain",
-
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         # exec_compatible_with = [
-    #         #     "//platform/constraints/ocaml/executor:vm_executor?",
-    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
-    #         # ],
-    #         toolchains = [
-    #             "@bazel_tools//tools/cpp:toolchain_type",
-    #             "//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor?",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
-
     attrs = dict(
         executable_attrs(),
 

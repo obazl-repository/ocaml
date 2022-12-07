@@ -191,22 +191,6 @@ def _kernel_module_impl(ctx):
 kernel_module = rule(
     implementation = _kernel_module_impl,
     doc = "Compiles a non-namespace module in stdlib pkg.",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         # exec_compatible_with = [
-    #         #     "//platform/constraints/ocaml/executor:vm_executor",
-    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
-    #         # ],
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
     attrs = dict(
         module_attrs(),
         _opts = attr.string_list(

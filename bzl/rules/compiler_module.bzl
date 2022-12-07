@@ -16,22 +16,6 @@ def _compiler_module(ctx):
 compiler_module = rule(
     implementation = _compiler_module,
     doc = "Compiles a module with the bootstrap compiler.",
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         # exec_compatible_with = [
-    #         #     "//platform/constraints/ocaml/executor:vm_executor?",
-    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
-    #         # ],
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor?",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
     attrs = dict(
         module_attrs(),
         _stdlib_resolver = attr.label(

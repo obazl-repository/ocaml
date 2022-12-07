@@ -79,9 +79,6 @@ def _cvt_emit(ctx):
     else:
         executable = effective_compiler
 
-    # workdir = "_{b}{t}{stage}/".format(
-    #     b = target_executor, t = target_emitter, stage = stage)
-
     # outfile = ctx.actions.declare_file(workdir + "emit.ml")
 
     pfx = ctx.label.package

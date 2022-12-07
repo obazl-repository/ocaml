@@ -33,23 +33,6 @@ def _ocaml_tool_impl(ctx):
 ocaml_tool = rule(
     implementation = _ocaml_tool_impl,
 
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         # exec_compatible_with = [
-    #         #     "//platform/constraints/ocaml/executor:vm_executor?",
-    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
-    #         # ],
-    #         toolchains = ["//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor?",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-     # },
-
     attrs = dict(
         executable_attrs(),
 

@@ -34,31 +34,8 @@ def _build_tool_impl(ctx):
 build_tool = rule(
     implementation = _build_tool_impl,
     doc = "Links OCaml executable binary using the bootstrap toolchain",
-
-    # exec_groups = {
-    #     "boot": exec_group(
-    #         # exec_compatible_with = [
-    #         #     "//platform/constraints/ocaml/executor:vm_executor?",
-    #         #     "//platform/constraints/ocaml/emitter:vm_emitter"
-    #         # ],
-    #         toolchains = [
-    #             "@bazel_tools//tools/cpp:toolchain_type",
-    #             "//toolchain/type:boot"],
-    #     ),
-        # "baseline": exec_group(
-        #     exec_compatible_with = [
-        #         "//platform/constraints/ocaml/executor:vm_executor?",
-        #         "//platform/constraints/ocaml/emitter:vm_emitter"
-        #     ],
-        #     toolchains = ["//toolchain/type:baseline"],
-        # ),
-    # },
-
     attrs = dict(
         executable_attrs(),
-
-        # stage = attr.label(default = "//config/stage"),
-
         _rule = attr.string( default = "build_tool" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
