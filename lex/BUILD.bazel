@@ -92,7 +92,7 @@ BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
 # boot_compiler( ## FIXME: ocamllex is not a compiler, use ocaml_tool?
 ocaml_tool(
     name       = "ocamllex",
-    # stage      = stage,
+    opts = ["-nostdlib"],
     prologue   = [":lex"],
     main       = ":Main",
     # opts       = select({

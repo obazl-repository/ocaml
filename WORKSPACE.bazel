@@ -52,7 +52,7 @@ register_toolchains(
     "//toolchain/selector/local:dev",
 
     "//toolchain/selector/local:boot",
-    # "//toolchain/selector/local:baseline",
+    "//toolchain/selector/local:baseline",
     "//toolchain/selector/local:ocamlc.byte",
     # "//toolchain/selector/local:boot.ocamlopt.byte",
     "//toolchain/selector/local:ocamlopt.byte",

@@ -127,13 +127,11 @@ def executable_impl(ctx, exe_name):  ## , tc):
     args = ctx.actions.args()
 
     executable = None
-
     if tc.dev:
         ocamlrun = None
         effective_compiler = tc.compiler
     else:
         ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-
         effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
 
     if tc.dev:
@@ -370,6 +368,9 @@ def executable_impl(ctx, exe_name):  ## , tc):
 
     # if target is sys, add asmrun?
 
+    print("lbl: %s" % ctx.label)
+    print("exe effective_compiler: %s" % effective_compiler.path)
+
     inputs_depset = depset(
         direct = []
         + [ctx.file._std_exit]
@@ -384,6 +385,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
         transitive = []
         + [depset(
             runtime_files
+            + [effective_compiler]
             + [ctx.file._stdlib]
             # ctx.files._camlheaders
             # + ctx.files._runtime
@@ -441,7 +443,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
     ctx.actions.run(
         env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
                "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
-        executable = executable,
+        executable = executable.path,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_exe],

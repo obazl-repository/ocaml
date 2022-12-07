@@ -336,7 +336,6 @@ def module_impl(ctx, module_name):
     args = ctx.actions.args()
 
     executable = None
-
     if tc.dev:
         ocamlrun = None
         effective_compiler = tc.compiler

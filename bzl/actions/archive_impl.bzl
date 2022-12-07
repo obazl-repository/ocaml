@@ -456,7 +456,9 @@ def archive_impl(ctx):
     args.add_all(includes, before_each="-I", uniquify=True)
 
     inputs_depset = depset(
-        direct = ctx.files.data if ctx.files.data else [],
+        direct = ctx.files.data if ctx.files.data else []
+        + [effective_compiler]
+        ,
         transitive = []
         + [
             sigs_depset,
