@@ -310,7 +310,8 @@ compiler_module(
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
-        "//typing:__pkg__"
+        "//typing:__pkg__",
+        "//testsuite:__subpackages__"
     ]
 )
 
@@ -1044,6 +1045,7 @@ compiler_signature(
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
+        "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
 )

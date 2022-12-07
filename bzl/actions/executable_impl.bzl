@@ -420,6 +420,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
 
     if ctx.attr._rule == "boot_executable":
         mnemonic = "LinkBootstrapExecutable"
+    elif ctx.attr._rule == "test_executable":
+        mnemonic = "LinkTestExecutable"
     elif ctx.attr._rule == "bootstrap_repl":
         mnemonic = "LinkToplevel"
     elif ctx.attr._rule == "baseline_test":
@@ -513,6 +515,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
     elif ctx.attr._rule in ["build_tool", "ocaml_tool"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
+        exe_provider = OcamlExecutableMarker()
+    elif ctx.attr._rule in ["test_executable"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()

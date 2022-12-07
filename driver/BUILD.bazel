@@ -292,6 +292,7 @@ compiler_module(
         "//bytecomp:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
+        "//testsuite:__subpackages__"
     ]
 )
 

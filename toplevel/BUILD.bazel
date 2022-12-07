@@ -154,6 +154,9 @@ boot_archive(
     name = "ocamltoplevel", # //toplevel:archive instead of ocamltoplevel?
     manifest  = TOPLEVEL,
     # deps      = TOPLEVEL_CMI
+    visibility = [
+        "//testsuite:__subpackages__"
+    ]
 )
 
 ################################################################
@@ -274,21 +277,22 @@ compiler_signature(
     src  = "topcommon.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Genprintval",
-        "//utils:Warnings",
-        "//typing:Types",
-        "//typing:Path",
+        "//parsing:Location_cmi",
+        "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
+        "//stdlib:Stdlib.Buffer_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
+        "//typing:Env_cmi",
+        "//typing:Ident_cmi",
         "//typing:Outcometree_cmi",
-        "//stdlib:Stdlib.Obj",
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Lexing",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
-        "//stdlib:Stdlib.Buffer",
+        "//typing:Path_cmi",
+        "//typing:Typedtree_cmi",
+        "//typing:Types_cmi",
+        "//utils:Warnings_cmi",
+        ":Genprintval_cmi",
     ]
 )
 
@@ -300,6 +304,7 @@ compiler_module(
     deps   = [
         ":Toploop",
         ":Topeval",
+        ":Topprinters",
         "//utils:Warnings",
         "//typing:Types",
         "//stdlib:Stdlib.Sys",
@@ -443,7 +448,8 @@ compiler_module(
     ],
     visibility = [
         "//tools:__pkg__",
-        "//toplevel/byte:__pkg__"
+        "//toplevel/byte:__pkg__",
+        "//testsuite:__subpackages__"
     ]
 )
 
@@ -452,18 +458,18 @@ compiler_signature(
     src  = "toploop.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//utils:Warnings",
-        "//typing:Types",
-        "//typing:Path",
+        "//utils:Warnings_cmi",
+        "//typing:Types_cmi",
+        "//typing:Path_cmi",
         "//parsing:Parsetree_cmi",
         "//typing:Outcometree_cmi",
-        "//stdlib:Stdlib.Obj",
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
+        "//stdlib:Stdlib.Obj_cmi",
+        "//parsing:Longident_cmi",
+        "//parsing:Location_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//typing:Env_cmi",
     ]
 )
 
@@ -510,9 +516,28 @@ compiler_signature(
     name = "Topmain_cmi",
     src  = "topmain.mli",
     opts = SIG_OPTS, # + ["-nopervasives"],
+    deps   = ["//stdlib:Stdlib"],
+    # visibility = ["//toplevel:__subpackages__"]
+)
+
+compiler_module(
+    name   = "Topprinters",
+    struct = "topprinters.ml",
+    sig    = ":Topprinters_cmi",
+    opts = MODULE_OPTS,
+    deps   = ["//typing:Ctype"],
+    # visibility = ["//toplevel:__pkg__"]
+)
+
+compiler_signature(
+    name = "Topprinters_cmi",
+    src  = "topprinters.mli",
+    opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
+        "//typing:Types"
     ],
-    visibility = ["//toplevel:__subpackages__"]
+    # visibility = ["//toplevel:__subpackages__"]
 )
 
 compiler_module(

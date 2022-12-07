@@ -105,7 +105,8 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__subpackages__",
-        "//middle_end:__subpackages__"
+        "//middle_end:__subpackages__",
+        "//testsuite:__subpackages__"
     ]
 )
 
@@ -119,7 +120,10 @@ compiler_signature(
         "//stdlib:Stdlib.Format_cmi",
         "//lambda:Debuginfo_cmi"
     ],
-    visibility = ["//asmcomp:__pkg__"]
+    visibility = [
+        "//asmcomp:__pkg__",
+        "//testsuite:__subpackages__"
+    ]
 )
 
 compiler_module(
@@ -261,7 +265,8 @@ compiler_module(
     visibility = [
         "//asmcomp:__subpackages__",
         "//driver:__pkg__",
-        "//middle_end:__subpackages__"
+        "//middle_end:__subpackages__",
+        "//testsuite:__subpackages__"
     ]
 )
 

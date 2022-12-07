@@ -351,7 +351,10 @@ compiler_module(
         # arch-dependent targets
         ":CSE", ":Emit", ":Reload", ":Scheduling", ":Selection"
     ],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//testsuite:__subpackages__"
+    ]
 )
 
 compiler_signature(
@@ -558,7 +561,8 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__subpackages__",
-        "//file_formats:__pkg__"
+        "//file_formats:__pkg__",
+        "//testsuite:__subpackages__"
     ]
 )
 
@@ -902,6 +906,7 @@ compiler_module(
         "//middle_end:Compilenv",
         "//utils:Domainstate"
     ],
+    visibility = ["//testsuite:__subpackages__"]
 )
 
 compiler_signature(
@@ -912,7 +917,6 @@ compiler_signature(
         ":Linear_cmi",
         ":Cmm_cmi",
     ],
-    visibility = ["//asmcomp:__subpackages__"]
 )
 
 compiler_module(
@@ -939,7 +943,10 @@ compiler_module(
         ":Cmm",
         ## (Scoped_location)
     ],
-    visibility = ["//asmcomp:__subpackages__"]
+    visibility = [
+        "//asmcomp:__subpackages__",
+        "//testsuite:__subpackages__"
+    ]
 )
 
 compiler_signature(

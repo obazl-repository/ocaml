@@ -132,6 +132,8 @@ compiler_module(
         "//middle_end:__subpackages__",
         "//otherlibs/dynlink:__pkg__",
         "//typing:__pkg__",
+
+        "//testsuite:__subpackages__"
     ],
 )
 

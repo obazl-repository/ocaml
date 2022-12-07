@@ -1426,6 +1426,7 @@ stdlib_module(
         ":Stdlib.BytesLabels",
         ":Stdlib.ArrayLabels",
     ],
+    visibility = ["//testsuite:__subpackages__"]
 )
 
 stdlib_signature(

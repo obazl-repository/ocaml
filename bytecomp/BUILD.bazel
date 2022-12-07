@@ -86,7 +86,7 @@ boot_archive(
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",
-        "//testsuite:__pkg__",
+        "//testsuite:__subpackages__",
     ]
 )
 

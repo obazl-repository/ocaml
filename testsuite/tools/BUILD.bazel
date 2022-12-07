@@ -1,43 +1,125 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_archive",
+     "test_executable",
+     "test_library",
+     "test_module",
+     "test_signature",
 )
+
+load("//lex:BUILD_RULES.bzl", "lex")
 
 MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
-ocaml_library(
+test_library(
     name = "testsuite_tools_lib",
-    modules  = [
+    manifest  = [
         ":Codegen_main",
         ":Expect_test",
         ":Parsecmmaux",
     ],
-    signatures  = [
-        ":Lexcmm_cmi",
-    ],
+    # signatures  = [
+    #     ":Lexcmm_cmi",
+    # ],
 )
 
-ocaml_module(
+################################################################
+# expect_MAIN=expect_test
+# expect_PROG=$(expect_MAIN)$(EXE)
+# expect_DIRS = parsing utils driver typing toplevel
+# expect_OCAMLFLAGS = $(addprefix -I $(ROOTDIR)/,$(expect_DIRS))
+# expect_LIBS := $(addprefix $(COMPILERLIBSDIR)/,\
+#   ocamlcommon ocamlbytecomp ocamltoplevel)
+
+test_executable(
+    name = "expect",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+        "//toplevel:ocamltoplevel"
+        # "//toplevel:Toploop",
+    ],
+    main = ":Expect_test"
+)
+
+################
+# codegen_PROG = codegen$(EXE)
+# codegen_DIRS = parsing utils typing middle_end bytecomp lambda asmcomp
+# codegen_OCAMLFLAGS = $(addprefix -I $(ROOTDIR)/, $(codegen_DIRS)) -w +40 -g
+# codegen_LIBS = $(addprefix $(COMPILERLIBSDIR)/,\
+#   ocamlcommon ocamloptcomp)
+# codegen_OBJECTS = $(addsuffix .cmo,\
+#   parsecmmaux parsecmm lexcmm codegen_main)
+
+################
+test_executable(
+    name = "codegen",
+    opts = ["-w", "+40", "-g"],
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//asmcomp:ocamloptcomp",
+        ":Parsecmmaux",
+        ":Parsecmm",
+        ":Lexcmm",
+        ":Codegen_main"
+    ],
+    main = ":Expect_test"
+)
+
+
+################################################################
+test_module(
     name   = "Codegen_main",
     struct = "codegen_main.ml",
     opts = MODULE_OPTS,
     deps   = [
+        "//asmcomp:Asmgen",
+        "//asmcomp:Emit",
+        "//asmcomp:Emitaux",
+        "//middle_end:Compilenv",
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Parsing",
+        "//stdlib:Stdlib.Printf",
+        "//utils:Clflags",
+        ":Parsecmm"
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Expect_test",
     struct = "expect_test.ml",
     opts = MODULE_OPTS,
     deps   = [
+        "//toplevel:Toploop",
+        "//driver:Main_args",
+        "//parsing:Location",
+        "//parsing:Printast",
+        "//stdlib:Stdlib.StdLabels",
+
+        "//parsing:Parsetree_cmi",
     ]
 )
 
-ocaml_signature(
+test_module(
+    name   = "Lexcmm",
+    struct = "lexcmm.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        "//stdlib:Stdlib.Scanf",
+        ":Parsecmm"
+    ]
+)
+
+lex(
+    name = "lexcmm_ml",
+    src  = "lexcmm.mll",
+    out  = "lexcmm.ml",
+)
+
+test_signature(
     name = "Lexcmm_cmi",
     src  = "lexcmm.mli",
     opts = SIG_OPTS,
@@ -45,20 +127,56 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
+    name   = "Parsecmm",
+    struct = "parsecmm.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        "//asmcomp:Cmm",
+        "//lambda:Lambda",
+        "//parsing:Location",
+        ":Parsecmmaux"
+    ]
+)
+
+genrule(
+    name = "parsecmm_ml",
+    outs  = ["parsecmm.ml", "parsecmm.mli"],
+    srcs  = [
+        "parsecmm.mly",
+        "//yacc:ocamlyacc"
+    ],
+    cmd  = " ".join([
+        "$(execpath //yacc:ocamlyacc)",
+        "--strict", "-q",
+        "$(location parsecmm.mly) > /dev/null;",
+        # "echo `ls -la lex`;",
+        "cp testsuite/tools/parsecmm.ml $(RULEDIR)/;",
+        "cp testsuite/tools/parsecmm.mli $(RULEDIR)/;"
+    ])
+)
+
+test_module(
     name   = "Parsecmmaux",
     struct = "parsecmmaux.ml",
     sig    = "Parsecmmaux_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//lambda:Lambda",
+        "//middle_end:Backend_var",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.String"
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Parsecmmaux_cmi",
     src  = "parsecmmaux.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//middle_end:Backend_var_cmi",
+        "//parsing:Location_cmi",
     ]
 )
 

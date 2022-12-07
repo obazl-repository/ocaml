@@ -1,44 +1,43 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_archive",
+     "test_library",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
-ocaml_library(
-    name = "testsuite_lib_lib",
-    modules  = [
+test_archive(
+    name = "testlib",
+    manifest  = [
         ":Lib",
         ":Testing",
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Lib",
     struct = "lib.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps   = ["//stdlib:Stdlib"]
 )
 
-ocaml_module(
+test_module(
     name   = "Testing",
     struct = "testing.ml",
     sig    = "Testing_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Scanf",
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Testing_cmi",
     src  = "testing.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ]
+    deps   = ["//stdlib:Stdlib"]
 )
 

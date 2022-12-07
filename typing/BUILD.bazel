@@ -401,6 +401,7 @@ compiler_signature(
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -504,7 +505,8 @@ compiler_signature(
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//middle_end:__subpackages__",
-        "//lambda:__pkg__"
+        "//lambda:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -891,7 +893,8 @@ compiler_signature(
     ],
     visibility = [
         "//lambda:__pkg__",
-        "//middle_end:__pkg__"
+        "//middle_end:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -1871,7 +1874,8 @@ compiler_signature(
     visibility = [
         "//driver:__pkg__",
         "//file_formats:__pkg__",
-        "//lambda:__pkg__"
+        "//lambda:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -2047,7 +2051,8 @@ compiler_signature(
         "//bytecomp:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
-        "//middle_end:__pkg__"
+        "//middle_end:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 

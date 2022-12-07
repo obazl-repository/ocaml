@@ -485,7 +485,9 @@ compiler_module(
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
-        "//typing:__pkg__"
+        "//typing:__pkg__",
+
+        "//testsuite:__subpackages__"
     ],
 )
 
@@ -503,7 +505,10 @@ compiler_signature(
         "//bytecomp:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
-        "//typing:__pkg__"
+        "//toplevel:__subpackages__",
+        "//typing:__pkg__",
+
+        "//testsuite:__subpackages__"
     ]
 )
 
@@ -535,7 +540,10 @@ compiler_signature(
         "//stdlib:Stdlib_cmi",
        "//stdlib:Stdlib.Format_cmi"
     ],
-    visibility = ["//typing:__pkg__"]
+    visibility = [
+        "//toplevel:__subpackages__",
+        "//typing:__pkg__"
+    ]
 )
 
 compiler_module(
@@ -649,7 +657,8 @@ compiler_signature(
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
-        "//typing:__pkg__"
+        "//typing:__pkg__",
+        "//testsuite:__subpackages__"
     ]
 )
 
@@ -708,7 +717,8 @@ compiler_module(
     visibility = [
         "//driver:__pkg__",
         "//toplevel:__pkg__",
-        "//typing:__pkg__"
+        "//typing:__pkg__",
+        "//testsuite:__subpackages__"
     ]
 )
 
