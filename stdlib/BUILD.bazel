@@ -152,6 +152,19 @@ mustache(
 ################################################################
 ############  Non-namespaced Components of Stdlib ##############
 
+## these contain "primitives?"
+
+boot_library(
+    name = "primitives",
+    manifest = [
+        "CamlinternalFormat",
+        "CamlinternalFormatBasics",
+        "CamlinternalLazy",
+        "CamlinternalMod",
+        "CamlinternalOO",
+    ]
+)
+
 ## camlinternal* modules:
 # All are in the Stdlib archive but none are in the Stdlib ns.
 # Atomic and FormatBasic are deps of the nslib but do not depend on
