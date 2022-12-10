@@ -36,7 +36,7 @@ else
 fi
 #       # --- end runfiles.bash initialization ---
 
-# echo "camlheader: $(rlocation ocaml_tools/config/camlheaders/camlheader)"
+# echo "camlheader: $(rlocation ocamlcc/config/camlheaders/camlheader)"
 
 # set -x
 
@@ -48,38 +48,44 @@ BOOTDIR=$BUILD_WORKSPACE_DIRECTORY/.baseline
 
 rm -vrf $BOOTDIR
 
+echo "Making .baseline directories"
+
 mkdir -p $BOOTDIR/bin
 mkdir -p $BOOTDIR/lib
+
+echo "Installing WORKSPACE and BUILD files"
 
 echo "workspace(name = \"baseline\")" > $BOOTDIR/WORKSPACE.bazel
 echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/BUILD.bazel
 echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/bin/BUILD.bazel
 echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/lib/BUILD.bazel
 
-EXECUTOR=`cat $(rlocation ocaml_tools/boot/executor)`
-EMITTER=`cat $(rlocation ocaml_tools/boot/emitter)`
+echo "Getting executor and emitter"
+
+EXECUTOR=`cat $(rlocation ocamlcc/boot/executor)`
+EMITTER=`cat $(rlocation ocamlcc/boot/emitter)`
 
 echo "Executor: ${EXECUTOR}"
 echo "Emitter: ${EMITTER}"
 
-cp -f $(rlocation ocaml_tools/runtime/ocamlrun) $BOOTDIR/bin
-cp -f $(rlocation ocaml_tools/runtime/libasmrun.a) $BOOTDIR/lib
-cp -f $(rlocation ocaml_tools/runtime/libcamlrun.a) $BOOTDIR/lib
+echo "Installing programs"
+
+cp -vf $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
 
 if [ ${EXECUTOR} == "vm" ]; then
 
     if [ ${EMITTER} == "vm" ]; then
 
-        cp -f $(rlocation ocaml_tools/lex/_ocamlc.byte/ocamllex.byte) \
+        cp -vf $(rlocation ocamlcc/lex/_ocamlc.byte/ocamllex.byte) \
            $BOOTDIR/bin/
-        cp -f $(rlocation ocaml_tools/bin/_ocamlc.byte/ocamlc.byte) \
+        cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) \
            $BOOTDIR/bin/
 
     elif [ ${EMITTER} == "sys" ]; then
 
-        cp -f $(rlocation ocaml_tools/lex/_ocamlopt.byte/ocamllex.byte) \
+        cp -vf $(rlocation ocamlcc/lex/_ocamlopt.byte/ocamllex.byte) \
            $BOOTDIR/bin/
-        cp -f $(rlocation ocaml_tools/bin/_ocamlopt.byte/ocamlopt.byte) \
+        cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) \
            $BOOTDIR/bin/
 
     else
@@ -90,25 +96,25 @@ if [ ${EXECUTOR} == "vm" ]; then
 elif [ ${EXECUTOR} == "sys" ]; then
 
     ## include entire stack of compilers:
-    cp -f $(rlocation ocaml_tools/bin/_ocamlc.byte/ocamlc.byte) \
+    cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) \
        $BOOTDIR/bin/
-    cp -f $(rlocation ocaml_tools/bin/_ocamlopt.byte/ocamlopt.byte) \
-       $BOOTDIR/bin/
-
-    cp -f $(rlocation ocaml_tools/lex/_ocamlc.opt/ocamllex.opt) \
+    cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) \
        $BOOTDIR/bin/
 
-    cp -f $(rlocation ocaml_tools/bin/_ocamlopt.opt/ocamlopt.opt) \
+    cp -vf $(rlocation ocamlcc/lex/_ocamlc.opt/ocamllex.opt) \
+       $BOOTDIR/bin/
+
+    cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) \
        $BOOTDIR/bin/
 
     if [ ${EMITTER} == "vm" ]; then
 
-        cp -f $(rlocation ocaml_tools/bin/_ocamlc.opt/ocamlc.opt) \
+        cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) \
            $BOOTDIR/bin/
 
     elif [ ${EMITTER} == "sys" ]; then
         echo
-        # cp -f $(rlocation ocaml_tools/bin/_ocamlopt.opt/ocamlopt.opt) \
+        # cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) \
         #    $BOOTDIR/bin/
 
     else
@@ -120,12 +126,21 @@ else
     exit 1
 fi
 
-cp -f $(rlocation ocaml_tools/yacc/ocamlyacc) $BOOTDIR/bin
+cp -vf $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
 
+echo "Installing libs"
 
-chmod -f ug=+rx-w,o=-rwx $BOOTDIR/bin/*
-chmod -f ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
-chmod -f ugo=+r-xw $BOOTDIR/lib/*.a
+cp -vf $(rlocation ocamlcc/runtime/libasmrun.a) $BOOTDIR/lib
+cp -vf $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
+
+echo "Setting permissions"
+
+chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
+chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
+chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
+chmod -vf ugo=+r-xw $BOOTDIR/lib/*.a
+
+echo "Coldstart completed."
 
 # chmod -f ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
 # chmod ug=+r-wx,o=-rwx $BOOTDIR/lib/*
