@@ -44,6 +44,7 @@ cc_binary(
         "//:__pkg__",  # :toolchain target
         "//boot:__subpackages__",
         "//lex:__pkg__",
+        "//ocamltest:__pkg__",
         "//toolchain/adapter:__pkg__",
         "//testsuite:__subpackages__",
     ]

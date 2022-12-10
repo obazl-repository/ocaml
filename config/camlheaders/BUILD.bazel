@@ -4,8 +4,12 @@ load(":BUILD_RULES.bzl", "camlheaders")
 camlheaders(
     name = "camlheaders",
     visibility = [
+        "//asmcomp:__pkg__",
         "//bin:__pkg__",
         "//boot:__pkg__",
+        "//lex:__pkg__",
+        "//ocamltest:__pkg__",
+        "//testsuite:__subpackages__",
         "//toolchain/adapter:__pkg__"
     ]
 )

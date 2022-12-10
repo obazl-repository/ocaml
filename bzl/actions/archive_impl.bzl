@@ -19,7 +19,7 @@ load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
      "merge_depsets")
 
-# load("//bzl/rules/common:transitions.bzl", "manifest_out_transition")
+# load("//bzl/transitions:transitions.bzl", "manifest_out_transition")
 
 ###############################
 def archive_impl(ctx):

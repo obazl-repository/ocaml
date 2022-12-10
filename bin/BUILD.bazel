@@ -68,7 +68,7 @@ ocaml_compiler(
 
         "//conditions:default": "//driver:Main"
     }),
-    cc_deps = ["//runtime:asmrun"],
+    # cc_deps = ["//runtime:asmrun"],
     visibility             = ["//visibility:public"]
 )
 

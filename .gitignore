@@ -330,6 +330,7 @@ META
 /yacc/.gdb_history
 
 ## Bazel
+.baseline
 bazel-*
 config/CONFIG.bzl
 config/config.ml.json.tplt

@@ -8,7 +8,7 @@ load("//bzl:providers.bzl",
 def module_attrs():
 
     return dict(
-
+        # module = attr.string(doc = "Module name; overrides name attr"),
         opts = attr.string_list(
             doc = "List of OCaml options. Will override configurable default options."
         ),

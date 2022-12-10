@@ -3,7 +3,10 @@
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
+load("//bzl/transitions:transitions.bzl", "reset_config_transition")
+
+load("//bzl/transitions:dev_transitions.bzl",
+     "dev_tc_compiler_out_transition")
 
 load("//bzl:functions.bzl", "get_workdir")
 
@@ -14,14 +17,14 @@ def _test_executable_impl(ctx):
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
 
-    if executor in ["boot", "vm"]:
+    if config_executor in ["boot", "vm"]:
         ext = ".byte"
     else:
         ext = ".opt"
@@ -36,16 +39,21 @@ test_executable = rule(
     doc = "Links OCaml executable binary using the bootstrap toolchain",
     attrs = dict(
         executable_attrs(),
-
-        # stage = attr.label(default = "//config/stage"),
-
+        _runtime = attr.label(
+            allow_single_file = True,
+            default = "//toolchain/dev:runtime",
+            executable = False,
+            # cfg = reset_cc_config_transition ## only build once
+            # default = "//config/runtime" # label flag set by transition
+        ),
         _rule = attr.string( default = "test_executable" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
     ),
-    cfg = reset_config_transition,
+    # cfg = reset_config_transition,
     # cfg = "exec",
+    cfg = dev_tc_compiler_out_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:boot",

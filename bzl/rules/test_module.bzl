@@ -18,11 +18,17 @@ test_module = rule(
     doc = "Compiles a module.",
     attrs = dict(
         module_attrs(),
-        _resolver = attr.label(
-            doc = "The commpiler always opens Stdlib, so everything depends on it.",
-
+        dump = attr.string_list(),
+        stdlib_primitives = attr.bool(default = False),
+        _stdlib = attr.label(
+            ## only added to depgraph if stdlib_primitives == True
             default = "//stdlib:Stdlib"
         ),
+        # _resolver = attr.label(
+        #     doc = "The compiler always opens Stdlib, so everything depends on it.",
+        #     default = "//stdlib:Stdlib"
+        # ),
+
         _rule = attr.string( default = "test_module" ),
     ),
     # cfg = compile_mode_in_transition,

@@ -1,8 +1,0 @@
-bin/ocamlc.byte
-bin/ocamllex.byte
-bin/ocamlrun
-bin/ocamlyacc
-lib/*.cmi
-lib/*.cmo
-lib/camlhead*
-lib/target_camlhead*

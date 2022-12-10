@@ -4,8 +4,14 @@ stdlib.
 
 During development, we always build with explicit runtime on the
 command line, so the camlheader is not needed. However the compiler is
-hard-coded to look for the file at link-time, so we provide a dummy
-file.
+hard-coded to look for the file at link-time, so we must provide a
+camlheader file; we provide one with `#!/dev/null`.
+
+For testing: the ocaml_test rule compiles an executable and then runs
+it. If the executable is a (standard) VM executable, this will fail,
+since the camlheader does not point to ocamlrun. So to make testing
+work, we need to generate a correct camlheader. We can do this because
+the toolchain contains an "ocamlrun" field.
 
 To build a distribution we will need to provide proper camlheaders,
 using the install dir set at config-time.

@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl/rules/common:cc_transitions.bzl", "reset_cc_config_transition")
+load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 DISABLED_FEATURES = [
     "module_maps",

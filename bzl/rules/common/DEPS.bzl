@@ -38,13 +38,16 @@ def aggregate_deps(ctx,
             print("IN MANIFEST: %s" % ctx.label)
             # fail("X")
 
-    if BootInfo not in target:
-        fail("BootInfo not in target: %s" % target)
+    if BootInfo in target:
+        provider = target[BootInfo]
+    else:
+        provider = None
+        if CcInfo not in target:
+            fail("Target lacks providers BootInfo, CcInfo: %s" % target)
 
     if OcamlSignatureProvider in target:
         depsets.deps.mli.append(target[OcamlSignatureProvider].mli)
 
-    provider = target[BootInfo]
 
     # if target not in archive_manifest:
     #     if hasattr(provider, "cli_link_deps"):
@@ -54,9 +57,9 @@ def aggregate_deps(ctx,
 
     # print("provider: %s" % provider)
 
-    depsets.deps.sigs.append(provider.sigs)
-
-    depsets.deps.cli_link_deps.append(provider.cli_link_deps)
+    if provider:
+        depsets.deps.sigs.append(provider.sigs)
+        depsets.deps.cli_link_deps.append(provider.cli_link_deps)
 
     if ModuleInfo in target:
         # if target.label.name == "Common":
@@ -80,11 +83,12 @@ def aggregate_deps(ctx,
             depsets.deps.cli_link_deps.append(
                 depset([target[ModuleInfo].struct]))
 
-    depsets.deps.afiles.append(provider.afiles)
-    if provider.ofiles != []:
-        depsets.deps.ofiles.append(provider.ofiles)
-    depsets.deps.archived_cmx.append(provider.archived_cmx)
-    depsets.deps.paths.append(provider.paths)
+    if provider:
+        depsets.deps.afiles.append(provider.afiles)
+        if provider.ofiles != []:
+            depsets.deps.ofiles.append(provider.ofiles)
+        depsets.deps.archived_cmx.append(provider.archived_cmx)
+        depsets.deps.paths.append(provider.paths)
 
     if CcInfo in target:
         ## if target == vm, and vmruntime = dynamic, then cc_binary

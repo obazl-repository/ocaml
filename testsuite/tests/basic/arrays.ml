@@ -1,5 +1,7 @@
 (* TEST *)
 
+let failed = ref false
+
 let bigarray n = [|
 n+0; n+1; n+2; n+3; n+4; n+5; n+6; n+7; n+8; n+9; n+10; n+11; n+12;
 n+13; n+14; n+15; n+16; n+17; n+18; n+19; n+20; n+21; n+22; n+23;
@@ -108,10 +110,14 @@ let test7 () =
   Array.blit b 0 a 5 3;
   if a <> [|"a"; "a"; "a"; "a"; "a"; "b1"; "b2"; "b3"; "a"; "a"|]
   || b <> [|"b1"; "b2"; "b3"|]
-  then print_string "Test7: failed(1)\n";
+  then begin
+      failed := true; print_string "Test7: failed(1)\n";
+      end;
   Array.blit a 5 a 6 4;
   if a <> [|"a"; "a"; "a"; "a"; "a"; "b1"; "b1"; "b2"; "b3"; "a"|]
-  then print_string "Test7: failed(2)\n"
+  then begin
+      failed := true; print_string "Test7: failed(2)\n";
+    end;;
 
 let test8 () =
   (try
@@ -143,4 +149,6 @@ let _ =
   test7();
   test8();
   test9();
-  exit 0
+  if !failed
+  then exit 1
+  else exit 0;

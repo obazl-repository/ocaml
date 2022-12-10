@@ -4,7 +4,9 @@ load("//bzl:providers.bzl",
      "OcamlLibraryMarker",
 )
 
-# load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
+load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
+
+# load("//bzl/transitions:transitions.bzl", "reset_config_transition")
 
 #######################
 def executable_attrs():
@@ -73,10 +75,10 @@ def executable_attrs():
             # cfg = exe_deps_out_transition,
         ),
 
-        # _camlheaders = attr.label_list(
-        #     allow_files = True,
-        #     default = ["//config:camlheaders"]
-        # ),
+        _camlheaders = attr.label_list(
+            allow_files = True,
+            default = ["//config/camlheaders"]
+        ),
 
         exe  = attr.string(
             doc = "By default, executable name is derived from 'name' attribute; use this to override."
@@ -92,13 +94,15 @@ def executable_attrs():
         ),
         ## FIXME: add cc_linkopts?
         cc_deps = attr.label_list(
-        # cc_deps = attr.label_keyed_string_dict(
-            doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
-            """,
-            ## FIXME: cc libs could come from LSPs that do not support CcInfo, e.g. rules_rust
-            # providers = [[CcInfo]]
+            # reset to cc mode to opt, so these deps will be built in
+            # same mode as runtimes.
+            ## PROBLEM: what if we're developing the code and we want
+            ## dbg? transition fns need a controlling flag so they all
+            ## make the same compilation_mode transition
+            cfg = reset_cc_config_transition
         ),
-
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
         cc_linkall = attr.label_list(
             ## equivalent to cc_library's "alwayslink"
             doc     = "True: use `-whole-archive` (GCC toolchain) or `-force_load` (Clang toolchain). Deps in this attribute must also be listed in cc_deps.",

@@ -62,7 +62,12 @@ def _boot_coldstart_impl(ctx):
         rfs.append(d.files)
         rfs.append(d[DefaultInfo].default_runfiles.files)
 
+    # for f in ctx.files.runtimes:
+    #     # print("RUNTIME: %s" % d)
+    #     rfs.append(f)
+
     runfiles = ctx.runfiles(
+        files = ctx.files.runtimes,
         transitive_files = depset(transitive=rfs)
         # files = ctx.files.data + ctx.files.deps
     )
@@ -92,6 +97,11 @@ boot_coldstart = rule(
         ),
         deps = attr.label_list(
             allow_files = True
+        ),
+
+        runtimes = attr.label_list(
+            allow_files = True,
+            doc = "libcamlrun.a, libsmrun.a"
         ),
 
         _target_executor = attr.label(default = "//config/target/executor"),

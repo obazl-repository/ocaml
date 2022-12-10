@@ -45,6 +45,12 @@ def executable_impl(ctx, exe_name):  ## , tc):
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
 
+    if debug:
+        print("target_executor: %s" % target_executor)
+        print("target_emitter: %s" % target_emitter)
+        print("config_executor: %s" % config_executor)
+        print("config_emitter: %s" % config_emitter)
+
     if target_executor == "unspecified":
         executor = config_executor
         emitter  = config_emitter
@@ -221,29 +227,33 @@ def executable_impl(ctx, exe_name):  ## , tc):
     ## runtime_files are link-time deps, not to be confused with
     ## runfiles, which are runtime deps.
     runtime_files = []
+    cc_libdirs    = []
     if executor == "sys":
-        # only the native compilers need libasmrun
+        # native compilers need libasmrun
         # WARNING: if we do not add libasmrun.a as a dep here,
         # OCaml will try to link /usr/local/lib/ocaml/libasmrun.a
         # to see, pass -verbose to the ocaml_compiler.opts or use
         # --//config/ocaml/link:verbose
-        print("lbl: %s" % ctx.label)
-        print("exe runtime ccinfo: %s" % ctx.attr._runtime[CcInfo])
-        print("exe runtime files: %s" % ctx.attr._runtime.files)
+        # print("lbl: %s" % ctx.label)
+        # print("exe runtime: %s" % ctx.attr._runtime)
+        # print("exe runtime files: %s" % ctx.attr._runtime.files)
 
-        for f in ctx.files._runtime:
+        for f in ctx.files._runtime: ## libasmrun.a
             runtime_files.append(f)
+            ## NB: Asmlink looks for libasmrun.a in the std search
+            ## space (-I dirs), not the link srch space (-L dirs)
             includes.append(f.dirname)
+            # cc_libdirs.append(f.dirname)
 
             ## do not add to CLI - asmcomp/asmlink adds it to the
             ## OCaml cc link subcmd
-            # args.add(f.path)
-        print("runtime files: %s" % runtime_files)
 
-    # if ctx.attr.cc_deps:
-    #     for f in ctx.files.cc_deps:
-    #         runtime_files.append(f)
-    #         includes.append(f.dirname)
+        # print("runtime files: %s" % runtime_files)
+    elif "-custom" in ctx.attr.opts:
+        for f in ctx.files._runtime:  # libcamlrun.a
+            runtime_files.append(f)
+            # will add -L<f.dirname> below
+            cc_libdirs.append(f.dirname)
 
     args.add_all(tc.linkopts)
 
@@ -252,14 +262,6 @@ def executable_impl(ctx, exe_name):  ## , tc):
 
     _options = get_options(rule, ctx)
     args.add_all(_options)
-
-    if ctx.attr.cc_linkopts:
-        for lopt in ctx.attr.cc_linkopts:
-            if lopt == "verbose":
-                # if platform == mac:
-                args.add_all(["-ccopt", "-Wl,-v"])
-            else:
-                args.add_all(["-ccopt", lopt])
 
     for w in ctx.attr.warnings:
         args.add_all(["-w",
@@ -330,15 +332,35 @@ def executable_impl(ctx, exe_name):  ## , tc):
     )
 
     if (executor in ["boot", "baseline", "vm"] or ctx.attr._rule == "build_tool"):
-        camlheaders = tc.camlheaders
-        print("CAMLHEADERS: {lbl} {h}".format(
-            lbl=ctx.label, h = camlheaders))
+        # camlheaders = tc.camlheaders
+        camlheaders = ctx.files._camlheaders
+        # print("CAMLHEADERS: {lbl} {h}".format(
+        #     lbl=ctx.label, h = camlheaders))
         includes.append(camlheaders[0].dirname)
     else:
-        print("NO CAMLHEADERS for %s" % ctx.label)
+        # print("NO CAMLHEADERS for %s" % ctx.label)
         camlheaders = []
 
     args.add_all(includes, before_each="-I", uniquify=True)
+
+    if ctx.attr.cc_linkopts:
+        for lopt in ctx.attr.cc_linkopts:
+            if lopt == "verbose":
+                # if platform == mac:
+                args.add_all(["-ccopt", "-Wl,-v"])
+            else:
+                args.add_all(["-ccopt", lopt])
+
+    for d in cc_libdirs:
+        args.add_all(["-ccopt", "-L" + d])
+
+    if ctx.attr.cc_deps:
+        for f in ctx.files.cc_deps:
+            # args.add_all(["-ccopt", "-L" + f.path])
+            # args.add_all(["-ccopt", f.basename])
+            args.add(f.path)
+            runtime_files.append(f)
+            includes.append(f.dirname)
 
     for dep in filtering_depset.to_list():
         if dep in manifest:
@@ -370,8 +392,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
 
     # if target is sys, add asmrun?
 
-    print("lbl: %s" % ctx.label)
-    print("exe effective_compiler: %s" % effective_compiler.path)
+    # print("lbl: %s" % ctx.label)
+    # print("exe effective_compiler: %s" % effective_compiler.path)
 
     inputs_depset = depset(
         direct = []
@@ -436,6 +458,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
         mnemonic = "LinkOcamlcKick"
     elif ctx.attr._rule == "ocaml_tool":
         mnemonic = "LinkOCamlTool"
+    elif ctx.attr._rule == "ocaml_test":
+        mnemonic = "OcamlTest"
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
 
@@ -480,10 +504,17 @@ def executable_impl(ctx, exe_name):  ## , tc):
     # for f in ctx.files._camlheaders:
     #     compiler_runfiles.append(f)
 
-    if ocamlrun:
-        runfiles = [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
-    else:
-        runfiles = []
+    runfiles = []
+    # if ocamlrun:
+    #     runfiles = [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
+    # print("runfiles tc.compiler: %s" % tc.compiler)
+    # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
+    if tc.dev:
+        runfiles.append(tc.ocamlrun)
+    elif ocamlrun:
+        runfiles.extend(tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list())
+
+    # print("EXE runfiles: %s" % runfiles)
 
     if ctx.attr.strip_data_prefixes:
       myrunfiles = ctx.runfiles(
@@ -492,9 +523,9 @@ def executable_impl(ctx, exe_name):  ## , tc):
       )
     else:
         myrunfiles = ctx.runfiles(
-            files = ctx.files.data,
+            files = ctx.files.data, # + runfiles,
             transitive_files =  depset(
-                transitive = runfiles
+                transitive = [depset(direct=runfiles)]
                 # direct=compiler_runfiles,
                 # transitive = [depset(
                 #     # [ctx.file._std_exit, ctx.file._stdlib]
@@ -523,6 +554,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_test":
+        exe_provider = OcamlTestMarker()
+    elif ctx.attr._rule == "ocaml_test":
         exe_provider = OcamlTestMarker()
     else:
         fail("Wrong rule called impl_executable: %s" % ctx.attr._rule)

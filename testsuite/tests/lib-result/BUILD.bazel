@@ -1,24 +1,22 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
+     "test_module",
+     "ocaml_test",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_lib-result_lib",
-    modules  = [
-        ":Test",
-    ],
+ocaml_test(
+    name = "lib-result",
+    main = ":Test",
+    timeout = "short"
 )
 
-ocaml_module(
+test_module(
     name   = "Test",
     struct = "test.ml",
-    opts = MODULE_OPTS,
+    # opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Result"
     ]
 )
 

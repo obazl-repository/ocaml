@@ -3,7 +3,7 @@
 # executable - in this case, adding the runtime to boot/ocamlc and
 # boot/ocamllex.
 
-load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
+load("//bzl/transitions:transitions.bzl", "reset_config_transition")
 
 ########################
 def _boot_import_vm_executable(ctx):

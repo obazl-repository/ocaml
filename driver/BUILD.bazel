@@ -193,21 +193,24 @@ compiler_module(
     sig    = "Compmisc_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Compenv", ## (Driver Compenv)
-        "//utils:Warnings",
-        "//typing:Types",
-        "//typing:Typemod",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Option",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
         "//config:Config",
+        "//parsing:Location",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Sys",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Typemod",
+        "//typing:Types",
         "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Compenv",
+
+        "//stdlib:Stdlib.Printf", # obazl
+
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -270,23 +273,20 @@ compiler_module(
     sig    = "Main_args_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Compenv", ## (Driver Compenv)
-        "//utils:Warnings",
-        "//stdlib:Stdlib.Sys",
-        "//utils:Profile",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Option",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        ## (Int_arg_helper)
-        "//stdlib:Stdlib.Format",
-        ## (Float_arg_helper)
-        "//stdlib:Stdlib.Filename",
         "//config:Config",
-        ## (Compiler_pass)
-        "//utils:Clflags",
+        "//parsing:Location",
         "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+        "//utils:Clflags",
+        "//utils:Misc",
+        "//utils:Profile",
+        "//utils:Warnings",
+        ":Compenv",
     ],
     visibility = [
         "//bytecomp:__pkg__",

@@ -19,14 +19,27 @@
 
 ################################################################
 ## For version 6:
-def _ModuleInfo_init(*, sig = None, struct = None, ofile = None):
-    return { "sig" : sig, "struct": struct, "ofile": ofile }
+def _ModuleInfo_init(*,
+                     sig = None,
+                     sig_src = None,
+                     struct = None,
+                     struct_src = None,
+                     ofile = None):
+    return {
+        "sig" : sig,
+        "sig_src": sig_src,
+        "struct": struct,
+        "struct_src": struct_src,
+        "ofile": ofile
+    }
 
 ModuleInfo, _new_moduleinfo = provider(
     doc = "foo",
     fields = {
         "sig"   : "One .cmi file",
+        "sig_src"   : "One .mli file",
         "struct": "One .cmo or .cmx file",
+        "struct_src": "One .ml file",
         "ofile" : "One .o file if struct is .cmx"
     },
     init = _ModuleInfo_init

@@ -307,6 +307,7 @@ compiler_module(
         "//lambda:__pkg__",
         "//parsing:__pkg__",
         "//middle_end:__subpackages__",
+        "//ocamltest:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
@@ -794,6 +795,7 @@ compiler_module(
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",
+        "//ocamltest:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
@@ -821,6 +823,7 @@ compiler_signature(
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//file_formats:__pkg__",
+        "//ocamltest:__pkg__",
         "//parsing:__pkg__",
         "//typing:__pkg__"
     ]

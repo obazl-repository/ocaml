@@ -41,6 +41,7 @@ boot_archive(
         "//boot:__subpackages__",
         "//dev:__subpackages__",
         "//fixpoint:__pkg__",
+        "//ocamltest:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",

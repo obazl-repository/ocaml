@@ -92,7 +92,22 @@ BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
 # boot_compiler( ## FIXME: ocamllex is not a compiler, use ocaml_tool?
 ocaml_tool(
     name       = "ocamllex",
-    opts = ["-nostdlib"],
+    opts = ["-verbose"],
+    cc_linkopts = select({
+        "@platforms//os:macos": [ ## FIXME: default tc, not zig
+            # "-Wl,-v", # prints config, search paths
+            # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
+            # "-t", # -Wl-v plus logs each file the linker loads.
+            # "-why_load" # Log why each object file in a static library
+            #             # is loaded. That is, what symbol was needed.
+            ## zig linker opts
+            # "-v",
+            ],
+        "@platforms//os:linux": [
+            # "-Wl,--verbose"
+            ##FIXME: depends on linker used (bfd, gold, etc.)
+        ]
+    }),
     prologue   = [":lex"],
     main       = ":Main",
     # opts       = select({

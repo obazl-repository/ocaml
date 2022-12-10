@@ -2,7 +2,9 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 # load("//config:BUILD.bzl", "TargetInfo")
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
-load("//bzl/rules/common:transitions.bzl",
+load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
+
+load("//bzl/transitions:transitions.bzl",
      # "emitter_out_transition",
      # "toolchain_in_transition",
      "tc_compiler_out_transition")
@@ -10,7 +12,7 @@ load("//bzl/rules/common:transitions.bzl",
 ##########################################
 def _toolchain_adapter_impl(ctx):
 
-    return [platform_common.ToolchainInfo] (
+    return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
         dev                    = False,
         build_host             = ctx.attr.build_host,
@@ -25,6 +27,7 @@ def _toolchain_adapter_impl(ctx):
         target_executor        = ctx.attr.target_executor, # [TargetInfo],
         target_emitter         = ctx.attr.target_emitter,
         ## vm
+        ocamlrun               = ctx.file.ocamlrun,
         vmargs                 = ctx.attr.vmargs,
         repl                   = ctx.file.repl,
         vmlibs                 = ctx.files.vmlibs,
@@ -35,7 +38,7 @@ def _toolchain_adapter_impl(ctx):
 
         ##FIXME: camlheaders only for vm executor
         ## should we have separate tcs for vm and sys executors?
-        camlheaders            = ctx.files.camlheaders,
+        # camlheaders            = ctx.files.camlheaders,
 
         ## core tools
         compiler               = ctx.attr.compiler,
@@ -46,7 +49,7 @@ def _toolchain_adapter_impl(ctx):
         warnings               = ctx.attr.warnings,
         lexer                  = ctx.attr.lexer,
         yaccer                 = ctx.file.yaccer,
-    )
+    )]
 
 ###################################
 ## the rule interface
@@ -77,6 +80,15 @@ toolchain_adapter = rule(
         "config_emitter" : attr.label(default = "//config/target/emitter"),
         "target_executor": attr.label(default = "//toolchain/target/executor"),
         "target_emitter" : attr.label(default = "//toolchain/target/emitter"),
+
+        "ocamlrun": attr.label(
+            doc = "ocaml",
+            allow_single_file = True,
+            default = "//toolchain:ocamlrun",
+            executable = True,
+            # cfg = "exec"
+            cfg = reset_cc_config_transition
+        ),
 
         ## Virtual Machine
         # "runtime": attr.label(
@@ -123,10 +135,10 @@ toolchain_adapter = rule(
         # ),
 
         ##FIXME: only for VM executor
-        "camlheaders": attr.label_list(
-            allow_files = True,
-            default = ["//config/camlheaders"]
-        ),
+        # "camlheaders": attr.label_list(
+        #     allow_files = True,
+        #     default = ["//config/camlheaders"]
+        # ),
 
         ################################
         ## Core Tools

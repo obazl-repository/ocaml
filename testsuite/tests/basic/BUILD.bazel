@@ -1,15 +1,17 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
+     "test_archive",
+     "test_executable",
+     "test_library",
+     "test_module",
+     "test_signature",
+     "ocaml_test",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_library(
     name = "testsuite_tests_basic_lib",
-    modules  = [
+    manifest = [
         ":Arrays",
         ":Bigints",
         ":Boxedints",
@@ -50,15 +52,23 @@ ocaml_library(
     ],
 )
 
-ocaml_module(
+ocaml_test(
+    name = "arrays_test",
+    main = ":Arrays",
+    timeout = "short"
+)
+
+test_module(
     name   = "Arrays",
     struct = "arrays.ml",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
+        "//stdlib:Stdlib.Gc"
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Bigints",
     struct = "bigints.ml",
     opts = MODULE_OPTS,
@@ -66,7 +76,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Boxedints",
     struct = "boxedints.ml",
     opts = MODULE_OPTS,
@@ -74,7 +84,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "CamlCase",
     struct = "camlCase.ml",
     opts = MODULE_OPTS,
@@ -82,7 +92,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Divint",
     struct = "divint.ml",
     opts = MODULE_OPTS,
@@ -90,7 +100,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Equality",
     struct = "equality.ml",
     opts = MODULE_OPTS,
@@ -98,7 +108,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Eval_order_1",
     struct = "eval_order_1.ml",
     opts = MODULE_OPTS,
@@ -106,7 +116,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Eval_order_2",
     struct = "eval_order_2.ml",
     opts = MODULE_OPTS,
@@ -114,7 +124,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Eval_order_3",
     struct = "eval_order_3.ml",
     opts = MODULE_OPTS,
@@ -122,7 +132,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Eval_order_4",
     struct = "eval_order_4.ml",
     opts = MODULE_OPTS,
@@ -130,7 +140,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Eval_order_6",
     struct = "eval_order_6.ml",
     opts = MODULE_OPTS,
@@ -138,7 +148,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Eval_order_7",
     struct = "eval_order_7.ml",
     opts = MODULE_OPTS,
@@ -146,7 +156,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Eval_order_pr10283",
     struct = "eval_order_pr10283.ml",
     opts = MODULE_OPTS,
@@ -154,7 +164,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Float",
     struct = "float.ml",
     opts = MODULE_OPTS,
@@ -162,7 +172,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Float_physical_equality",
     struct = "float_physical_equality.ml",
     opts = MODULE_OPTS,
@@ -170,7 +180,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Includestruct",
     struct = "includestruct.ml",
     opts = MODULE_OPTS,
@@ -178,7 +188,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Localexn",
     struct = "localexn.ml",
     opts = MODULE_OPTS,
@@ -186,7 +196,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Localfunction",
     struct = "localfunction.ml",
     opts = MODULE_OPTS,
@@ -194,7 +204,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Maps",
     struct = "maps.ml",
     opts = MODULE_OPTS,
@@ -202,7 +212,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Min_int",
     struct = "min_int.ml",
     opts = MODULE_OPTS,
@@ -210,7 +220,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Opt_variants",
     struct = "opt_variants.ml",
     opts = MODULE_OPTS,
@@ -218,7 +228,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Patmatch",
     struct = "patmatch.ml",
     opts = MODULE_OPTS,
@@ -226,7 +236,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Patmatch_for_multiple",
     struct = "patmatch_for_multiple.ml",
     opts = MODULE_OPTS,
@@ -234,7 +244,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Patmatch_incoherence",
     struct = "patmatch_incoherence.ml",
     opts = MODULE_OPTS,
@@ -242,7 +252,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Patmatch_split_no_or",
     struct = "patmatch_split_no_or.ml",
     opts = MODULE_OPTS,
@@ -250,7 +260,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7253",
     struct = "pr7253.ml",
     opts = MODULE_OPTS,
@@ -258,7 +268,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7533",
     struct = "pr7533.ml",
     opts = MODULE_OPTS,
@@ -266,7 +276,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7657",
     struct = "pr7657.ml",
     opts = MODULE_OPTS,
@@ -274,7 +284,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Recvalues",
     struct = "recvalues.ml",
     opts = MODULE_OPTS,
@@ -282,7 +292,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Sets",
     struct = "sets.ml",
     opts = MODULE_OPTS,
@@ -290,7 +300,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Stringmatch",
     struct = "stringmatch.ml",
     opts = MODULE_OPTS,
@@ -298,7 +308,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Switch_opts",
     struct = "switch_opts.ml",
     opts = MODULE_OPTS,
@@ -306,7 +316,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tailcalls",
     struct = "tailcalls.ml",
     opts = MODULE_OPTS,
@@ -314,7 +324,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Trigraph",
     struct = "trigraph.ml",
     opts = MODULE_OPTS,
@@ -322,7 +332,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tuple_match",
     struct = "tuple_match.ml",
     opts = MODULE_OPTS,
@@ -330,7 +340,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unit_naming",
     struct = "unit_naming.ml",
     opts = MODULE_OPTS,
@@ -338,7 +348,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Zero_divided_by_n",
     struct = "zero_divided_by_n.ml",
     opts = MODULE_OPTS,

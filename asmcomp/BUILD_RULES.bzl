@@ -2,7 +2,9 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
 
-load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
+load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
+
+load("//bzl/transitions:transitions.bzl", "reset_config_transition")
 
 # rule: cvt_emit runs //tools:cvt_emit.byte
 
@@ -20,64 +22,23 @@ def _cvt_emit(ctx):
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
 
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
-
-    # executable = None
-    # if executor in ["boot", "vm", "sys"]:
-    #     ## ocamlrun
-    #     for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-    #         if f.basename == "ocamlrun":
-    #             # print("LEX RF: %s" % f.path)
-    #             executable = f
-    #         # the bytecode executable
-    #     # args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
-    # else:
-    #     fail("exe:%s" % executor)
-    #     executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
-
-    # target_emitter  = tc.target_emitter[BuildSettingInfo].value
-
     executable = None
-
     if tc.dev:
-        ocamlrun = tc.runtime
+        ocamlrun = tc.ocamlrun
         effective_compiler = tc.compiler
     else:
         ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+
         effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
 
-    # if tc.dev:
-    #     build_executor = "vm"
+    build_executor = get_build_executor(tc)
 
-    if (target_executor == "unspecified"):
-        if (config_executor == "sys"):
-            if config_emitter == "sys":
-                # ss built from ocamlopt.byte
-                build_executor = "vm"
-            else:
-                # sv built from ocamlopt.opt
-                build_executor = "sys"
-        else:
-            build_executor = "vm"
-    elif target_executor in ["boot", "vm"]:
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "sys"):
-        ## ss always built by vs (ocamlopt.byte)
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "vm"):
-        ## sv built by ss
-        build_executor = "sys"
+    # if build_executor == "vm":
+    #     executable = ocamlrun
+    # else:
+    #     executable = effective_compiler
 
-    if build_executor == "vm":
-        executable = ocamlrun
-        # args.add(effective_compiler.path)
-    else:
-        executable = effective_compiler
+    executable = ocamlrun
 
     # outfile = ctx.actions.declare_file(workdir + "emit.ml")
 

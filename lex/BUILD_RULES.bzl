@@ -5,7 +5,7 @@ load("//bzl/actions:BUILD.bzl", "progress_msg")
 
 load("//bzl:functions.bzl", "get_workdir", "tc_lexer", "tc_compiler")
 
-load("//bzl/rules/common:transitions.bzl", "reset_config_transition")
+load("//bzl/transitions:transitions.bzl", "reset_config_transition")
 
 # rule: boot_compiler(name=ocamllex): builds the lexer
 # rule: lex runs the lexer, obtained from toolchain

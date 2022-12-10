@@ -5,24 +5,26 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/transitions:transitions.bzl", "reset_config_transition")
 
+load("//bzl/transitions:dev_transitions.bzl",
+     "dev_tc_compiler_out_transition")
+
 load("//bzl:functions.bzl", "get_workdir")
 
 ##############################
-def _build_tool_impl(ctx):
+def _ocaml_test_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:boot"]
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
-
-    # if config_executor == "unspecified":
+    # if target_executor == "unspecified":
     #     executor = config_executor
     #     emitter  = config_emitter
     # else:
     #     executor = target_executor
     #     emitter  = target_emitter
 
-    if config_emitter in ["boot", "vm"]:
+    if config_executor in ["boot", "baseline", "vm"]:
         ext = ".byte"
     else:
         ext = ".opt"
@@ -32,19 +34,27 @@ def _build_tool_impl(ctx):
     return executable_impl(ctx, exe_name)
 
 #######################
-build_tool = rule(
-    implementation = _build_tool_impl,
-    doc = "Links OCaml executable binary using the bootstrap toolchain",
+ocaml_test = rule(
+    implementation = _ocaml_test_impl,
+    doc = "Compile and test an OCaml program.",
     attrs = dict(
         executable_attrs(),
-        _rule = attr.string( default = "build_tool" ),
+        _runtime = attr.label(
+            allow_single_file = True,
+            default = "//toolchain/dev:runtime",
+            executable = False,
+            # cfg = reset_cc_config_transition ## only build once
+            # default = "//config/runtime" # label flag set by transition
+        ),
+        _rule = attr.string( default = "ocaml_test" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
     ),
-    cfg = reset_config_transition,
+    # cfg = reset_config_transition,
     # cfg = "exec",
-    executable = True,
+    cfg = dev_tc_compiler_out_transition,
+    test = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:boot",
                   ## //toolchain/type:profile,",

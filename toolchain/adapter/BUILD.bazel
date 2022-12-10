@@ -51,12 +51,7 @@ dev_toolchain_adapter(
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [
-        "-nostdlib",
-        # "-strict-sequence",
-        # "-absname",
-        # "-warn-error", "+A"
-    ],
+    linkopts    = ["-nostdlib"],
     sigopts     = [],
     structopts  = select({
         ## FIXME: -principal should not be used for boot stage
@@ -75,19 +70,21 @@ toolchain_adapter(
         "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
+        "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
+        "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [],
+    structopts  = select({
+        ## FIXME: -principal should not be used for boot stage
+        "//config/ocaml/compile:principal?" : ["-principal"],
+        "//conditions:default": []
+    }),
+    linkopts    = ["-nostdlib"],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -99,19 +96,21 @@ toolchain_adapter(
         "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
+        "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
+        "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [],
+    structopts  = select({
+        ## FIXME: -principal should not be used for boot stage
+        "//config/ocaml/compile:principal?" : ["-principal"],
+        "//conditions:default": []
+    }),
+    linkopts    = ["-nostdlib"],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -123,19 +122,21 @@ toolchain_adapter(
         "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
+        "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
+        "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [],
+    structopts  = select({
+        ## FIXME: -principal should not be used for boot stage
+        "//config/ocaml/compile:principal?" : ["-principal"],
+        "//conditions:default": []
+    }),
+    linkopts    = ["-nostdlib"],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -148,19 +149,21 @@ toolchain_adapter(
         "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
+        "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
+        "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [],
+    structopts  = select({
+        ## FIXME: -principal should not be used for boot stage
+        "//config/ocaml/compile:principal?" : ["-principal"],
+        "//conditions:default": []
+    }),
+    linkopts    = ["-nostdlib"],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -172,19 +175,21 @@ toolchain_adapter(
         "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
+        "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
+        "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [],
+    structopts  = select({
+        ## FIXME: -principal should not be used for boot stage
+        "//config/ocaml/compile:principal?" : ["-principal"],
+        "//conditions:default": []
+    }),
+    linkopts    = ["-nostdlib"],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -196,19 +201,21 @@ toolchain_adapter(
         "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
+        "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
+        "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [],
+    structopts  = select({
+        ## FIXME: -principal should not be used for boot stage
+        "//config/ocaml/compile:principal?" : ["-principal"],
+        "//conditions:default": []
+    }),
+    linkopts    = ["-nostdlib"],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -220,19 +227,21 @@ toolchain_adapter(
         "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
-        "//config:bin-annot?" : ["-bin-annot"],
+        "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
-        "//config:principal?" : ["-principal"],
-        "//conditions:default": []
-    }) + select({
-        "//config:absname?" : ["-absname"],
+        "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
         "//config:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = [],
+    structopts  = select({
+        ## FIXME: -principal should not be used for boot stage
+        "//config/ocaml/compile:principal?" : ["-principal"],
+        "//conditions:default": []
+    }),
+    linkopts    = ["-nostdlib"],
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -245,13 +254,13 @@ toolchain_adapter(
 #         "-strict-sequence",
 #         # "-warn-error", "+A",
 #     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
 #         "//conditions:default": []
 #     }) + select({
 #         "//config:principal?" : ["-principal"],
 #         "//conditions:default": []
 #     }) + select({
-#         "//config:absname?" : ["-absname"],
+#         "//config/ocaml/compile:absname?" : ["-absname"],
 #         "//conditions:default": []
 #     }),
 #     linkopts    = [],
@@ -266,13 +275,13 @@ toolchain_adapter(
 #         "-strict-sequence",
 #         # "-warn-error", "+A",
 #     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
 #         "//conditions:default": []
 #     }) + select({
 #         "//config:principal?" : ["-principal"],
 #         "//conditions:default": []
 #     }) + select({
-#         "//config:absname?" : ["-absname"],
+#         "//config/ocaml/compile:absname?" : ["-absname"],
 #         "//conditions:default": []
 #     }),
 #     linkopts    = [],
@@ -287,13 +296,13 @@ toolchain_adapter(
 #         "-strict-sequence",
 #         # "-warn-error", "+A",
 #     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
 #         "//conditions:default": []
 #     }) + select({
 #         "//config:principal?" : ["-principal"],
 #         "//conditions:default": []
 #     }) + select({
-#         "//config:absname?" : ["-absname"],
+#         "//config/ocaml/compile:absname?" : ["-absname"],
 #         "//conditions:default": []
 #     }),
 #     linkopts    = [],
@@ -308,13 +317,13 @@ toolchain_adapter(
 #         "-strict-sequence",
 #         # "-warn-error", "+A",
 #     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
 #         "//conditions:default": []
 #     }) + select({
 #         "//config:principal?" : ["-principal"],
 #         "//conditions:default": []
 #     }) + select({
-#         "//config:absname?" : ["-absname"],
+#         "//config/ocaml/compile:absname?" : ["-absname"],
 #         "//conditions:default": []
 #     }),
 #     linkopts    = [],
@@ -329,13 +338,13 @@ toolchain_adapter(
 #         "-strict-sequence",
 #         # "-warn-error", "+A",
 #     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
 #         "//conditions:default": []
 #     }) + select({
 #         "//config:principal?" : ["-principal"],
 #         "//conditions:default": []
 #     }) + select({
-#         "//config:absname?" : ["-absname"],
+#         "//config/ocaml/compile:absname?" : ["-absname"],
 #         "//conditions:default": []
 #     }),
 #     linkopts    = [],
@@ -350,13 +359,13 @@ toolchain_adapter(
 #         "-strict-sequence",
 #         # "-warn-error", "+A",
 #     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
 #         "//conditions:default": []
 #     }) + select({
 #         "//config:principal?" : ["-principal"],
 #         "//conditions:default": []
 #     }) + select({
-#         "//config:absname?" : ["-absname"],
+#         "//config/ocaml/compile:absname?" : ["-absname"],
 #         "//conditions:default": []
 #     }),
 #     linkopts    = [],
@@ -371,13 +380,13 @@ toolchain_adapter(
 #         "-strict-sequence",
 #         # "-warn-error", "+A",
 #     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
 #         "//conditions:default": []
 #     }) + select({
 #         "//config:principal?" : ["-principal"],
 #         "//conditions:default": []
 #     }) + select({
-#         "//config:absname?" : ["-absname"],
+#         "//config/ocaml/compile:absname?" : ["-absname"],
 #         "//conditions:default": []
 #     }),
 #     linkopts    = [],
@@ -392,13 +401,13 @@ toolchain_adapter(
 #         "-strict-sequence",
 #         # "-warn-error", "+A",
 #     ] + select({
-#         "//config:bin-annot?" : ["-bin-annot"],
+#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
 #         "//conditions:default": []
 #     }) + select({
 #         "//config:principal?" : ["-principal"],
 #         "//conditions:default": []
 #     }) + select({
-#         "//config:absname?" : ["-absname"],
+#         "//config/ocaml/compile:absname?" : ["-absname"],
 #         "//conditions:default": []
 #     }),
 #     linkopts    = [],

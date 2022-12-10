@@ -83,6 +83,7 @@ boot_archive(
         "//dev:__subpackages__",
         "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
+        "//ocamltest:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",

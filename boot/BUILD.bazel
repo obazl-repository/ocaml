@@ -16,9 +16,11 @@ boot_coldstart(
     name = "bootstrap",
     runner = "coldstart_runner.sh",
     # args   = ["$(TARGET_EXECUTOR)"],
-    data = [
+    runtimes = [
         "//runtime:asmrun",
         "//runtime:camlrun",
+    ],
+    data = [
         "//bin:ocamlcc",
         "//lex:ocamllex",
         "//yacc:ocamlyacc",

@@ -1,8 +1,8 @@
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
-# load("//bzl/rules/common:transitions.bzl", "executable_in_transition")
+# load("//bzl/transitions:transitions.bzl", "executable_in_transition")
 
-load("//bzl/rules/common:cc_transitions.bzl", "reset_cc_config_transition")
+load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 load("//bzl:functions.bzl", "get_workdir")
 

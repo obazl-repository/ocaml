@@ -1,8 +1,9 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//toolchain:transitions.bzl", "tool_out_transition")
+load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
-load("//bzl/rules/common:dev_transitions.bzl",
+load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
 
 ##########################################
@@ -24,8 +25,9 @@ def _dev_toolchain_adapter_impl(ctx):
 
         target_executor        = ctx.attr.target_executor, # [TargetInfo],
         target_emitter         = ctx.attr.target_emitter,
+        runtime                = ctx.file.runtime, # camlrun, asmrun
         ## vm
-        runtime                = ctx.file.runtime,
+        ocamlrun               = ctx.file.ocamlrun,
         vmargs                 = ctx.attr.vmargs,
         repl                   = ctx.file.repl,
         vmlibs                 = ctx.files.vmlibs,
@@ -36,7 +38,7 @@ def _dev_toolchain_adapter_impl(ctx):
 
         ##FIXME: camlheaders only for vm executor
         ## should we have separate tcs for vm and sys executors?
-        camlheaders            = ctx.files.camlheaders,
+        # camlheaders            = ctx.files.camlheaders,
 
         ## core tools
         compiler               = ctx.file.compiler,
@@ -59,14 +61,22 @@ dev_toolchain_adapter = rule(
         "target_executor": attr.label(default = "//toolchain/target/executor"),
         "target_emitter" : attr.label(default = "//toolchain/target/emitter"),
 
-        ## Virtual Machine
-        "runtime": attr.label(
-            doc = "Batch interpreter. ocamlrun, usually",
+        "ocamlrun": attr.label(
+            doc = "ocaml",
             allow_single_file = True,
-            default = "@baseline//bin:ocamlrun",
+            default = "//toolchain/dev:ocamlrun",
             executable = True,
-            cfg = "exec"
-            # cfg = reset_config_transition
+            # cfg = "exec"
+            cfg = reset_cc_config_transition
+        ),
+
+        "runtime": attr.label(
+            doc = "runtime lib, either libcamlrun.a or libasmrun.a",
+            allow_single_file = True,
+            default = "//toolchain/dev:runtime",
+            executable = False,
+            # cfg = "exec"
+            cfg = reset_cc_config_transition
         ),
 
         "vmargs": attr.label( ## string list
@@ -93,25 +103,26 @@ dev_toolchain_adapter = rule(
 
         #### runtime stuff ####
         ##FIXME: only for VM executor
-        "camlheaders": attr.label_list(
-            allow_files = True,
-            default = ["//config/camlheaders"]
-        ),
+        # "camlheaders": attr.label(
+        #     allow_single_file = True,
+        #     default = "//toolchain/dev:camlheaders",
+        #     cfg = dev_tc_compiler_out_transition
+        # ),
 
         ################################
         ## Core Tools
-        "_ocamlc_opt": attr.label(
-            default = "@baseline//bin:ocamlc.opt",
-            allow_single_file = True,
-            # allow_files = True,
-            executable = True,
-            cfg = "exec"),
-        "_ocamlopt_opt": attr.label(
-            default = "@baseline//bin:ocamlopt.opt",
-            allow_single_file = True,
-            # allow_files = True,
-            executable = True,
-            cfg = "exec"),
+        # "_ocamlc_opt": attr.label(
+        #     default = "@baseline//bin:ocamlc.opt",
+        #     allow_single_file = True,
+        #     # allow_files = True,
+        #     executable = True,
+        #     cfg = "exec"),
+        # "_ocamlopt_opt": attr.label(
+        #     default = "@baseline//bin:ocamlopt.opt",
+        #     allow_single_file = True,
+        #     # allow_files = True,
+        #     executable = True,
+        #     cfg = "exec"),
 
         "compiler": attr.label(
             default = "//toolchain/dev:compiler",

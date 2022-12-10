@@ -5,8 +5,8 @@ load("//bzl:rules.bzl",
      "test_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
+SIG_OPTS    = []
 
 test_archive(
     name = "testlib",

@@ -1,7 +1,6 @@
 debugger
 manual
 ocamldoc
-ocamltest
 stdlib/templates
 tools/unlabel-patches
 

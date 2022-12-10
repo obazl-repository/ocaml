@@ -2,6 +2,7 @@
 # query --noimplicit_deps
 
 common:dev --//config:dev
+# test --test_output=errors
 
 ## always use these settings:
 ## put it in ~/.bazelrc to enable for all bazel projects
@@ -22,7 +23,7 @@ common:q --ui_event_filters=-info
 build --incompatible_enable_cc_toolchain_resolution
 #build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type
-build --toolchain_resolution_debug=//toolchain/type:.*
+#build --toolchain_resolution_debug=//toolchain/type:.*
 
 # --[no]enable_platform_specific_config default: "false"
 # If true, Bazel picks up host-OS-specific config lines from bazelrc
@@ -109,8 +110,8 @@ build --workspace_status_command=$PWD/bzl/camlheader.sh
 # build --config=ocamlc.byte
 
 # build the baseline _boot/ocamlc.byte using boot/ocamlc:
-build:boot --//config/target/executor=boot
-build:boot --//config/target/emitter=boot
+# build:boot --//config/target/executor=boot
+# build:boot --//config/target/emitter=boot
 
 ## vv_vv
 # build:ocamlc.byte --host_platform=//platform/ocaml/local:sys_vm

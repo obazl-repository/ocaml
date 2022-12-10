@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load(":BUILD.bzl", "progress_msg")
+load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo",
@@ -38,26 +38,6 @@ def signature_impl(ctx, module_name):
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
-
-    ## target_* == unspecified means we're in the last stage
-    ## and config_* is what we're building now
-    ## otherwise target_* is what we're building now
-    ## executor = effective executor
-
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
-
-    executor = config_executor
-    emitter  = config_emitter
-
-    if executor in ["baseline", "vm"]:
-        ext = ".cmo"
-    else:
-        ext = ".cmx"
 
     ################
     includes   = []
@@ -126,6 +106,8 @@ def signature_impl(ctx, module_name):
                             target_file = sig_src)
         if debug:
             print("mlifile %s" % mlifile)
+
+    direct_inputs = [mlifile]
 
     # if sig_src.extension == "ml":  ## wtf?
     #     ofile = workdir + sig_src.basename + "i"
@@ -201,8 +183,6 @@ def signature_impl(ctx, module_name):
     #########################
     args = ctx.actions.args()
 
-    executable = None
-
     ## IMPORTANT!!! The tc compiler runfiles contains the entire stack
     ## of of bootstrapped compilers. E.g. if target is ocamlc.opt, then:
     # <generated file runtime/ocamlrun>
@@ -215,6 +195,7 @@ def signature_impl(ctx, module_name):
     # runfiles = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()
     # print("RUNFILES: %s" % runfiles)
 
+    executable = None
     if tc.dev:
         ocamlrun = None
         effective_compiler = tc.compiler
@@ -222,26 +203,7 @@ def signature_impl(ctx, module_name):
         ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
         effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
 
-    if tc.dev:
-        build_executor = "opt"
-    elif (target_executor == "unspecified"):
-        if (config_executor == "sys"):
-            if config_emitter == "sys":
-                # ss built from ocamlopt.byte
-                build_executor = "vm"
-            else:
-                # sv built from ocamlopt.opt
-                build_executor = "sys"
-        else:
-            build_executor = "vm"
-    elif target_executor in ["baseline", "vm"]:
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "sys"):
-        ## ss always built by vs (ocamlopt.byte)
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "vm"):
-        ## sv built by ss
-        build_executor = "sys"
+    build_executor = get_build_executor(tc)
 
     if build_executor == "vm":
         executable = ocamlrun
@@ -283,10 +245,21 @@ def signature_impl(ctx, module_name):
                       else "-" + w])
 
     _options = get_options(ctx.attr._rule, ctx)
+    for dep in ctx.attr.deps:
+        if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+            if dep.label.package == "stdlib":
+                if "-nopervasives" in _options:
+                    _options.remove("-nopervasives")
     args.add_all(_options)
 
     if hasattr(ctx.attr, "_resolver"):
         includes.append(ctx.attr._resolver[ModuleInfo].sig.dirname)
+
+    if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+        if ctx.attr.stdlib_primitives:
+            includes.append(ctx.attr._stdlib[ModuleInfo].sig.dirname)
+            direct_inputs.append(ctx.attr._stdlib[ModuleInfo].sig)
+            direct_inputs.append(ctx.attr._stdlib[ModuleInfo].struct)
 
     ccInfo_list = []
 
@@ -342,7 +315,6 @@ def signature_impl(ctx, module_name):
 
     args.add("-intf", mlifile)
 
-    direct_inputs = [mlifile]
     if ctx.files.data:
         direct_inputs.extend(ctx.files.data)
 

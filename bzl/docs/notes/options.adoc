@@ -1,0 +1,38 @@
+= options
+
+
+== dump options
+
+attr:  dump = ["cmm", "clambda", "lambda", ...],
+
+`utils/clflags.ml`:
+
+# let dump_source = ref false             (* -dsource *)
+# let dump_parsetree = ref false          (* -dparsetree *)
+# and dump_typedtree = ref false          (* -dtypedtree *)
+# and dump_shape = ref false              (* -dshape *)
+# and dump_rawlambda = ref false          (* -drawlambda *)
+# and dump_lambda = ref false             (* -dlambda *)
+# and dump_rawclambda = ref false         (* -drawclambda *)
+# and dump_clambda = ref false            (* -dclambda *)
+# and dump_rawflambda = ref false            (* -drawflambda *)
+# and dump_flambda = ref false            (* -dflambda *)
+# and dump_flambda_let = ref (None : int option) (* -dflambda-let=... *)
+# and dump_flambda_verbose = ref false    (* -dflambda-verbose *)
+# and dump_instr = ref false              (* -dinstr *)
+
+
+
+* `-dlambda` - dump lambda
+
+
+* `-dump-into-file`  dump output like -dlambda into <target>.dump
+
+* `-dump-dir <dir>` dump output like -dlambda into <dir>/<target>.dump
+
+* `-no-unique-ids` - "It's to make tests more reproducible. Without
+this option, outputs like dlambda or so take special measures to make
+identifiers unique, but that then makes their outputs more difficult
+to verify. This opiton turns off this behaviour of making identifier
+names unique." (src @Seb on slack)
+

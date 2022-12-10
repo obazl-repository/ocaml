@@ -1,3 +1,9 @@
+load("//bzl/rules:ocaml_test.bzl", _ocaml_test = "ocaml_test")
+load("//bzl/rules:ocaml_inline_expect_test.bzl",
+     _ocaml_inline_expect_test = "ocaml_inline_expect_test")
+load("//bzl/rules:lambda_expect_test.bzl",
+     _lambda_expect_test = "lambda_expect_test")
+
 load("//bzl/rules:test_archive.bzl", _test_archive = "test_archive")
 load("//bzl/rules:test_executable.bzl",
      _test_executable = "test_executable")
@@ -75,6 +81,9 @@ ocaml_tool      = _ocaml_tool
 # ocamlc_runtime    = _ocamlc_runtime
 # ocamlc_fixpoint    = _ocamlc_fixpoint
 
+ocaml_test = _ocaml_test
+ocaml_inline_expect_test = _ocaml_inline_expect_test
+lambda_expect_test = _lambda_expect_test
 test_archive = _test_archive
 test_executable = _test_executable
 test_library = _test_library

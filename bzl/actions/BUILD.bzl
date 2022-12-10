@@ -1,3 +1,37 @@
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+
+############################################################
+def get_build_executor(tc):
+
+    target_executor = tc.target_executor[BuildSettingInfo].value
+    target_emitter  = tc.target_emitter[BuildSettingInfo].value
+    config_executor = tc.config_executor[BuildSettingInfo].value
+    config_emitter  = tc.config_emitter[BuildSettingInfo].value
+
+    if tc.dev:
+        build_executor = "opt"
+    elif (target_executor == "unspecified"):
+        if (config_executor == "sys"):
+            if config_emitter == "sys":
+                # ss built from ocamlopt.byte
+                build_executor = "vm"
+            else:
+                # sv built from ocamlopt.opt
+                build_executor = "sys"
+        else:
+            build_executor = "vm"
+    elif target_executor in ["boot", "vm"]:
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "sys"):
+        ## ss always built by vs (ocamlopt.byte)
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "vm"):
+        ## sv built by ss
+        build_executor = "sys"
+
+    return build_executor
+
+###############################
 def progress_msg(workdir, ctx):
     rule = ctx.attr._rule
     if rule in ["ocaml_compiler", "build_tool", "ocaml_lex", "ocaml_tool", "test_executable"]:
@@ -8,6 +42,8 @@ def progress_msg(workdir, ctx):
         action = "Compiling"
     elif rule in ["boot_archive", "test_archive"]:
         action = "Archiving"
+    elif rule in ["ocaml_test", "lambda_expect_test"]:
+        action = "Testing"
     else:
         fail(rule)
 

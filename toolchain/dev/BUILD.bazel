@@ -7,8 +7,17 @@ label_setting(name="lexer",
               visibility = ["//visibility:public"])
 
 label_setting(name="runtime",
+              build_setting_default = "@baseline//lib:libcamlrun.a",
+              visibility = ["//visibility:public"])
+
+label_setting(name="ocamlrun",
               build_setting_default = "@baseline//bin:ocamlrun",
               visibility = ["//visibility:public"])
+
+label_setting(name="camlheaders",
+              build_setting_default = "@baseline//lib:camlheaders",
+              visibility = ["//visibility:public"])
+
 
 # label_setting(name="stdlib",
 #               build_setting_default = "//stdlib",

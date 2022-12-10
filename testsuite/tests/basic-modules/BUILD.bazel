@@ -1,17 +1,17 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_archive",
+     "test_executable",
+     "test_library",
+     "test_module",
+     "test_signature",
+     "ocaml_test",
+     "ocaml_inline_expect_test",
+     "lambda_expect_test"
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
-
-ocaml_library(
+test_library(
     name = "testsuite_tests_basic-modules_lib",
-    modules  = [
+    manifest = [
         ":Anonymous",
         ":Main",
         ":Offset",
@@ -23,76 +23,114 @@ ocaml_library(
     ],
 )
 
-ocaml_module(
-    name   = "Anonymous",
-    struct = "anonymous.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+ocaml_test(
+    name = "anonymous_test",
+    main = ":Anonymous",
+    prologue = [
+    ],
+    timeout = "short"
 )
 
-ocaml_module(
+#test_module(
+lambda_expect_test(
+    name   = "Anonymous",
+    struct   = "anonymous.ml",
+    expected = "anonymous.ocamlc.reference",
+    dump = [
+        "lambda",
+        # "rawlambda",
+        # "clambda",
+        # "cmm",
+        # "parsetree",
+        # "instr"
+        # "instruction-selection"
+    ],
+    opts   = [
+        "-dno-locations",
+        "-nostdlib",
+        "-nopervasives",
+        "-dno-unique-ids"
+    ],
+    deps = ["//stdlib"]
+)
+
+ocaml_test(
+    name = "main_test",
+    main = ":Main",
+    prologue = [
+        ":Offset",
+        ":Pr4008",
+        ":Pr7427",
+        ":Pr6726"
+    ],
+    timeout = "short"
+)
+
+test_module(
     name   = "Main",
     struct = "main.ml",
     sig    = "Main_cmi",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
+        ":Offset",
+        ":Pr4008",
+        ":Pr7427",
+        ":Pr6726"
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Main_cmi",
     src  = "main.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
 )
 
-ocaml_module(
+test_module(
     name   = "Offset",
     struct = "offset.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.String",
+        ":Pr6726"
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr4008",
     struct = "pr4008.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:primitives",
+        # "//stdlib:CamlinternalMod",
+        "//stdlib:Stdlib.List",
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6726",
     struct = "pr6726.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7427",
     struct = "pr7427.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-ocaml_module(
-    name   = "Recursive_module_evaluation_errors",
-    struct = "recursive_module_evaluation_errors.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+ocaml_inline_expect_test(
+    name = "Recursive_module_evaluation_errors",
+    src  = "recursive_module_evaluation_errors.ml",
 )
 
-ocaml_module(
+test_module(
     name   = "Recursive_module_init",
     struct = "recursive_module_init.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    deps = [
+        # "//stdlib"
+
+        "//stdlib:primitives",
+        # "//stdlib:CamlinternalOO",
+        # "//stdlib:CamlinternalMod",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
     ]
 )
 

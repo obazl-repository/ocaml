@@ -8,11 +8,14 @@ MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
 boot_library(
-    name = "libUnix",
+    name = "unix_lib",
     manifest  = [
         ":Unix",
         ":UnixLabels",
     ],
+    visibility = [
+        "//ocamltest:__pkg__"
+    ]
 )
 
 compiler_module(
@@ -35,7 +38,11 @@ compiler_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-    ]
+
+       ":unix", ## cc_library
+    ],
+    # cc_deps = [
+    # ]
 )
 
 compiler_signature(
@@ -144,4 +151,5 @@ cc_library(
     linkopts = ["-lm"],
     deps = ["//runtime/caml:hdrs"],
     toolchains = ["//profile/system/local"],
+    visibility = ["//ocamltest:__pkg__"]
 )

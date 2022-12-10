@@ -6,6 +6,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 def _reset_config_transition_impl(settings, attr):
     print("reset_config_transition: %s" % attr.name)
+
     return {
         # "//toolchain/target/executor": "boot",
         # "//toolchain/target/emitter" : "boot",
@@ -20,7 +21,7 @@ def _reset_config_transition_impl(settings, attr):
 #######################
 reset_config_transition = transition(
     implementation = _reset_config_transition_impl,
-    inputs = [],
+    inputs = ["//config:dev"],
     outputs = [
         # "//toolchain/target/executor",
         # "//toolchain/target/emitter",
@@ -77,6 +78,7 @@ def _tc_compiler_out_transition_impl(settings, attr):
 
         print("//toolchain:compiler:  %s" % settings["//toolchain:compiler"])
         print("//toolchain:lexer:  %s" % settings["//toolchain:lexer"])
+        print("//toolchain:runtime:  %s" % settings["//toolchain:runtime"])
 
         # print("//toolhchain:runtime:     %s" % target_runtime)
         # print("attr.target_executor: %s" % attr.target_executor)
@@ -109,14 +111,17 @@ def _tc_compiler_out_transition_impl(settings, attr):
             lexer    == "//boot:ocamllex.boot"):
             compiler = "//boot:ocamlc.boot"
             lexer    = "//boot:ocamllex.boot"
+            runtime  = "//runtime:camlrun"
             # return{}
         else:
             compiler = "//boot:ocamlc.boot"
             lexer    = "//boot:ocamllex.boot"
+            runtime  = "//runtime:camlrun"
 
     elif (config_executor == "baseline"):
         compiler = "//boot:ocamlc.boot"
         lexer    = "//boot:ocamllex.boot"
+        runtime  = "//runtime:camlrun"
     #     fail("bad config_emitter: %s" % config_emitter)
 
     elif (config_executor == "vm" and config_emitter == "vm"):
@@ -127,6 +132,8 @@ def _tc_compiler_out_transition_impl(settings, attr):
         ## need to set before recurring, otherwise we get a dep cycle
         compiler = "//bin:ocamlcc"
         lexer    = "//lex:ocamllex"
+        runtime  = "//runtime:asmrun"
+        # runtime  = "//runtime:camlrun"
         # compiler = "//boot:ocamlc.boot"
         # lexer    = "//boot:ocamllex.boot"
 
@@ -140,6 +147,7 @@ def _tc_compiler_out_transition_impl(settings, attr):
         # target_emitter = "vm"
         compiler = "//bin:ocamlcc"
         lexer    = "//lex:ocamllex"
+        runtime  = "//runtime:asmrun"
 
     elif (config_executor == "sys" and config_emitter == "sys"):
         print("SYS-SYS transition")
@@ -147,6 +155,7 @@ def _tc_compiler_out_transition_impl(settings, attr):
         config_emitter  = "sys"
         compiler = "//bin:ocamlcc"
         lexer    = "//lex:ocamllex"
+        runtime  = "//runtime:asmrun"
 
     elif (config_executor == "sys" and config_emitter == "vm"):
         print("SYS-VM transition")
@@ -154,6 +163,8 @@ def _tc_compiler_out_transition_impl(settings, attr):
         config_emitter  = "sys"
         compiler = "//bin:ocamlcc"
         lexer    = "//lex:ocamllex"
+        runtime  = "//runtime:asmrun"
+
 
     else:
         fail("xxxxxxxxxxxxxxxx %s" % config_executor)
@@ -177,6 +188,7 @@ def _tc_compiler_out_transition_impl(settings, attr):
 
         "//toolchain:compiler": compiler,
         "//toolchain:lexer"   : lexer,
+        "//toolchain:runtime" : runtime,
     }
 
 #######################
@@ -190,6 +202,7 @@ tc_compiler_out_transition = transition(
 
         "//toolchain:compiler",
         "//toolchain:lexer",
+        "//toolchain:runtime",
 
         "//config/target/executor",
         "//config/target/emitter",
@@ -218,6 +231,7 @@ tc_compiler_out_transition = transition(
 
         "//toolchain:compiler",
         "//toolchain:lexer",
+        "//toolchain:runtime",
     ]
 )
 
