@@ -5,6 +5,7 @@ load("//bzl:rules.bzl",
      "test_module",
      "test_signature",
      "ocaml_test",
+     # "ocaml_compile_test",
      "ocaml_inline_expect_test",
      "lambda_expect_test"
 )
@@ -33,23 +34,46 @@ ocaml_test(
 
 #test_module(
 lambda_expect_test(
-    name   = "Anonymous",
+    name   = "Anonymous_test",
     struct   = "anonymous.ml",
     expected = "anonymous.ocamlc.reference",
+    # dump = [
+    #     "lambda",
+    #     # "rawlambda",
+    #     # "clambda",
+    #     # "cmm",
+    #     # "parsetree",
+    #     # "instr"
+    #     # "instruction-selection"
+    # ],
+    # opts   = [
+    #     "-dno-locations",
+    #     "-nostdlib",
+    #     "-nopervasives",
+    #     "-dno-unique-ids"
+    # ],
+    deps = ["//stdlib"]
+)
+
+# ocaml_compile_test(
+test_module(
+    name   = "Anonymous",
+    struct   = "anonymous.ml",
     dump = [
         "lambda",
         # "rawlambda",
         # "clambda",
+        # "rawclambda",
         # "cmm",
         # "parsetree",
         # "instr"
         # "instruction-selection"
     ],
     opts   = [
-        "-dno-locations",
         "-nostdlib",
         "-nopervasives",
-        "-dno-unique-ids"
+        # "-dno-locations",
+        # "-dno-unique-ids"
     ],
     deps = ["//stdlib"]
 )

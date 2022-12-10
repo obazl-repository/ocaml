@@ -4,7 +4,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
-     "BootInfo", "ModuleInfo", "NsResolverInfo",
+     "BootInfo", "DumpInfo", "ModuleInfo", "NsResolverInfo",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
 load("//bzl:functions.bzl",
@@ -224,7 +224,9 @@ def module_impl(ctx, module_name):
         # print("OUT_O: %s" % out_o)
         # direct_linkargs.append(out_o)
 
-    if hasattr(ctx.attr, "dump"): # test rules
+    if (hasattr(ctx.attr, "dump") # test rules w/explicit dump
+        or hasattr(ctx.attr, "_lambda_expect_test")):
+
         out_dump = ctx.actions.declare_file(
             out_cm_.basename + ".dump",
             sibling = out_cm_,
@@ -449,9 +451,13 @@ def module_impl(ctx, module_name):
                     _options.remove("-nopervasives")
     args.add_all(_options)
 
-    if hasattr(ctx.attr, "dump"): # test rules
-        args.add("-dump-into-file")
-        args.add
+    if hasattr(ctx.attr, "_lambda_expect_test"):
+        for arg in ctx.attr._lambda_expect_test:
+            args.add(arg)
+
+    elif hasattr(ctx.attr, "dump"): # test rules w/explicit dump attr
+        if len(ctx.attr.dump) > 0:
+            args.add("-dump-into-file")
         for d in ctx.attr.dump:
             if d == "source":
                 args.add("-dsource")
@@ -466,7 +472,7 @@ def module_impl(ctx, module_name):
             if d == "lambda":
                 args.add("-dlambda")
             if d == "rawclambda":
-                args.add("drawclambda")
+                args.add("-drawclambda")
             if d == "rawflambda":
                 args.add("-drawflambda")
             if d == "flambda":
@@ -616,21 +622,16 @@ def module_impl(ctx, module_name):
     )
     providers.append(bootProvider)
 
-    if hasattr(ctx.attr, "dump"): # test rules
-        if len(ctx.attr.dump) > 0:
-            DumpInfo = provider()
-            d = DumpInfo(dlambda = out_dump)
-            providers.append(d)
-            outputGroupInfo = OutputGroupInfo(
-                cmi        = depset(direct=[provider_output_cmi]),
-                module     = moduleInfo_depset,
-                log = depset([out_dump])
-            )
-        else:
-            outputGroupInfo = OutputGroupInfo(
-                cmi        = depset(direct=[provider_output_cmi]),
-                module     = moduleInfo_depset,
-            )
+    if (hasattr(ctx.attr, "dump") # test rules
+        or hasattr(ctx.attr, "_lambda_expect_test")):
+        # if len(ctx.attr.dump) > 0:
+        d = DumpInfo(dump = out_dump)
+        providers.append(d)
+        outputGroupInfo = OutputGroupInfo(
+            cmi        = depset(direct=[provider_output_cmi]),
+            module     = moduleInfo_depset,
+            log = depset([out_dump])
+        )
     else:
         outputGroupInfo = OutputGroupInfo(
             cmi        = depset(direct=[provider_output_cmi]),

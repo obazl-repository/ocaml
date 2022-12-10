@@ -20,15 +20,16 @@ def _lambda_expect_test_impl(ctx):
     module_name = this[:1].capitalize() + this[1:]
 
     m = module_impl(ctx, module_name)
+
     for p in m:
         print("RESULT: %s" % p)
         if hasattr(p, "struct"):
             print("STRUCT: %s" % p)
             struct = p.struct
             struct_src = p.struct_src
-        if hasattr(p, "dlambda"):
+        if hasattr(p, "dump"):
             print("LAMBDA: %s" % p)
-            dlambda = p.dlambda
+            dlambda = p.dump
             break
 
     runner = ctx.actions.declare_file("lambda_expect_test_runner.sh")
@@ -124,7 +125,16 @@ lambda_expect_test = rule(
             #              [CcInfo]],
             # cfg = exe_deps_out_transition,
         ),
-        dump = attr.string_list(),
+        _lambda_expect_test = attr.string_list(
+            default = [
+                "-nostdlib",
+                "-nopervasives",
+                "-dno-unique-ids",
+                "-dno-locations",
+                "-dump-into-file",
+                "-dlambda"
+            ]
+        ),
         expected = attr.label(
             allow_single_file = True,
         ),
