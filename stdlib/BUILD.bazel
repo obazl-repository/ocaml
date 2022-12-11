@@ -34,15 +34,12 @@ LABEL_OPTS = ["-nolabels"]
 ## NB: we do not need to define an ocaml_ns_resolver (or rather
 ## bootstrap_ns_resolver), since Stdlib serves as our ns_resolver
 ## module. Each submodule includes itself by attribution ns=":Stdlib".
-## This library target just aggregates the resolver and submodules.
+## This target just aggregates the resolver and submodules.
 ## They can be listed in any order.
-
-# NB: boot_library will not work. The compilers expect to find
-# stdlib.cm[x]a - this is hardcoded.
 
 # stdlib_archive(
 # boot_library won't work because the compiler is hard-coded to expect stdlib.cma
-## boot_library(
+
 boot_archive(
     name       = "stdlib",
     # opts = ["-linkall"],

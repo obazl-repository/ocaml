@@ -64,7 +64,6 @@ STDLIB_MANIFEST = [
     "//stdlib:Stdlib.Uchar",
     "//stdlib:Stdlib.Unit",
     "//stdlib:Stdlib.Weak",
-    #"//stdlib:Stdlib.Weak",
 ]
 
 ## used by expunge in //toplevel:ocaml

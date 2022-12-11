@@ -1,4 +1,14 @@
 {
+    "kernel": [
+        "CamlinternalAtomic",
+        "CamlinternalFormat",
+        "CamlinternalFormatBasics",
+        "CamlinternalLazy",
+        "CamlinternalMod",
+        "CamlinternalOO",
+        "Stdlib"
+    ],
+
     "submodules": [
         { "module": "Arg" },
         { "module": "Array" },
