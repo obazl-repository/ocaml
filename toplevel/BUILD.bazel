@@ -102,6 +102,7 @@ boot_library(
         ":Expunge",
         ":Genprintval",
         ":Topcommon",
+        ":Topprinters",
         ":Topdirs",
         ":Toploop",
         ":Topstart",
@@ -137,6 +138,7 @@ TOPLEVEL = [
     ":Trace",
     ":Genprintval",
     ":Topcommon",
+    ":Topprinters",
     ":Topdirs",
     ":Toploop",
 ]
