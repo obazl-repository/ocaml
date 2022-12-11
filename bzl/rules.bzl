@@ -9,6 +9,7 @@ load("//bzl/rules:test_archive.bzl", _test_archive = "test_archive")
 load("//bzl/rules:test_executable.bzl",
      _test_executable = "test_executable")
 load("//bzl/rules:test_library.bzl", _test_library = "test_library")
+
 load("//bzl/rules:test_module.bzl",  _test_module  = "test_module")
 load("//bzl/rules:test_signature.bzl", _test_signature = "test_signature")
 
@@ -55,6 +56,8 @@ load("//bzl/rules:bootstrap_repl.bzl", _bootstrap_repl = "bootstrap_repl")
 # mustache    = _mustache
 cc_assemble = _cc_assemble
 build_module      = _build_module
+ocaml_module      = _build_module ### TEMPORARY until //testsuite cleanup
+
 build_tool      = _build_tool
 boot_import_vm_executable      = _boot_import_vm_executable
 
@@ -63,6 +66,7 @@ boot_archive      = _boot_archive
 
 # boot_executable      = _boot_executable
 # baseline_executable      = _baseline_executable
+ocaml_library  = _boot_library
 boot_library  = _boot_library
 boot_module      = _boot_module
 compiler_module      = _compiler_module

@@ -78,8 +78,8 @@ test_executable(
         ":ocamltest_manifest"
     ],
     main = ":Main",
+    data = ["//testsuite/tools:inline_expect"]
 )
-
 
 test_library(
     name = "ocamltest_manifest",

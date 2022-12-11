@@ -312,25 +312,24 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Makedepend", ## (Driver Makedepend)
-        ":Main_args", ## (Driver Main_args)
-        ":Compmisc", ## (Driver Compmisc)
-        ":Compile", ## (Driver Compile)
-        ":Compenv", ## (Driver Compenv)
-        "//utils:Warnings",
-        "//stdlib:Stdlib.String",
-        "//utils:Profile",
-        "//stdlib:Stdlib.Printf",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//config:Config",
-        "//utils:Clflags",
-        "//bytecomp:Bytepackager",
-        ## (Bytelink)
         "//bytecomp:Bytelibrarian",
+        "//bytecomp:Bytepackager",
+        "//config:Config",
+        "//parsing:Location",
         "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//utils:Clflags",
+        "//utils:Profile",
+        "//utils:Warnings",
+        ":Compenv",
+        ":Compile",
+        ":Compmisc",
+        ":Main_args",
+        ":Makedepend",
     ],
     visibility = [
         "//bytecomp:__pkg__"

@@ -35,12 +35,24 @@ test_library(
 ocaml_tool(
     name = "inline_expect",
     prologue = [
+        # "//stdlib",
+        # "//stdlib:CamlinternalMod", #FIXME: should not be necessary?
+        ## NB: makefiles don't need to list CamlinternalMod as a dep,
+        ## since they can get away with providing directories
+        ## containing deps. But with Bazel we have to list everything
+        ## explicitly. But still, why do we need to link it? Why can't
+        ## the compiler find it in the provided stdlib dir? The std
+        ## builds do; why not this one?
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         "//toplevel:ocamltoplevel"
     ],
     main = ":Expect_test",
-    visibility = ["//testsuite:__subpackages__"]
+    opts = ["-linkall"],
+    visibility = [
+        "//ocamltest:__pkg__",
+        "//testsuite:__subpackages__"
+    ]
 )
 
 ################
@@ -94,6 +106,7 @@ test_module(
     struct = "expect_test.ml",
     opts = MODULE_OPTS,
     deps   = [
+        # "//stdlib",
         "//toplevel:Toploop",
         "//driver:Main_args",
         "//parsing:Location",

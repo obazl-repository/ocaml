@@ -1,42 +1,63 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
+     "test_archive",
+     "test_executable",
+     "test_library",
+     "test_module",
+     "test_signature",
+     "ocaml_test",
+     "expect_test",
+     "inline_expect_test",
+     "lambda_expect_test"
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
-    name = "testsuite_tests_lib-arg_lib",
-    modules  = [
+test_suite(
+    name = "tests",
+    tests  = [
         ":Test_rest_all",
-        ":Testarg",
-        ":Testerror",
+        ":testarg_expect_test",
+        ":testerror_expect_test",
     ],
 )
 
-ocaml_module(
+inline_expect_test(
     name   = "Test_rest_all",
-    struct = "test_rest_all.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    src = "test_rest_all.ml",
 )
 
-ocaml_module(
+expect_test(
+    name     = "testarg_expect_test",
+    stdout   = "testarg.stdout",
+    expected = "testarg.reference",
+    main     = ":Testarg",
+    timeout  = "short"
+)
+
+test_module(
     name   = "Testarg",
     struct = "testarg.ml",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Printf"
     ]
 )
 
-ocaml_module(
+expect_test(
+    name     = "testerror_expect_test",
+    stdout   = "testerror.stdout",
+    expected = "testerror.reference",
+    main     = ":Testerror",
+    timeout  = "short"
+)
+
+test_module(
     name   = "Testerror",
     struct = "testerror.ml",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib"
     ]
 )
 

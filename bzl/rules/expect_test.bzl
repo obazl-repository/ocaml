@@ -41,7 +41,7 @@ def _expect_test_impl(ctx):
 
     pgm = exe[0].files.to_list()[0]
 
-    runner = ctx.actions.declare_file("expect_test_runner.sh")
+    runner = ctx.actions.declare_file(ctx.attr.name + ".sh")
     # stdout = ctx.actions.declare_file(ctx.attr.stdout)
     print("ROOT: %s" % pgm.short_path)
     # stdout = runner.dirname + "/" + ctx.attr.stdout
@@ -59,6 +59,13 @@ def _expect_test_impl(ctx):
             src = ctx.file.expected.path,
             dst = stdout
         ),
+        "if [ $? -eq 0 ]",
+        "then",
+        "    echo PASS",
+        "else",
+        "    echo FAIL",
+        "fi",
+
         # "cp -v ${{TEST_TMPDIR}}/{stdout} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(stdout=stdout),
         # "echo SH: %s" % runner.path,
         # "echo STDOUT: %s" % stdout,

@@ -37,6 +37,14 @@ inline_expect_test = rule(
     doc = "Compile and test an OCaml program.",
     attrs = dict(
         # executable_attrs(),
+        _tool    = attr.label(
+            allow_single_file = True,
+            default = "//testsuite/tools:inline_expect",
+            executable = True,
+            cfg = "exec"
+            # cfg = reset_cc_config_transition ## only build once
+        ),
+
         src = attr.label(
             mandatory = True,
             allow_single_file = True,
@@ -58,13 +66,6 @@ inline_expect_test = rule(
             doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
-        _tool    = attr.label(
-            allow_single_file = True,
-            default = "//testsuite/tools:inline_expect",
-            executable = True,
-            cfg = "exec"
-            # cfg = reset_cc_config_transition ## only build once
-        ),
         _runtime = attr.label(
             allow_single_file = True,
             default = "//toolchain/dev:runtime",

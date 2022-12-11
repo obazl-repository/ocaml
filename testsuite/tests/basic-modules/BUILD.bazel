@@ -75,7 +75,7 @@ ocaml_test(
 )
 
 expect_test(
-    name     = "Main_test",
+    name     = "Main_expect_test",
     stdout   = "Main.stdout",
     expected = "main.reference",
     prologue = [
@@ -151,12 +151,19 @@ inline_expect_test(
     src  = "recursive_module_evaluation_errors.ml",
 )
 
+expect_test(
+    name     = "Recursive_module_init_expect_test",
+    stdout   = "Recursive_module_init.stdout",
+    expected = "recursive_module_init.reference",
+    main     = ":Recursive_module_init",
+    timeout = "short"
+)
+
 test_module(
     name   = "Recursive_module_init",
     struct = "recursive_module_init.ml",
+    # dump = ["lambda"],
     deps = [
-        # "//stdlib"
-
         "//stdlib:primitives",
         # "//stdlib:CamlinternalOO",
         # "//stdlib:CamlinternalMod",
