@@ -17,6 +17,15 @@ def executable_attrs():
         #     default = "//config/stage"
         # ),
 
+        prologue = attr.label_list(
+            doc = "List of OCaml dependencies.",
+            providers = [[OcamlArchiveProvider],
+                         [OcamlLibraryMarker],
+                         [ModuleInfo],
+                         [CcInfo]],
+            # cfg = exe_deps_out_transition,
+        ),
+
         main = attr.label(
             doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
             mandatory = True,
@@ -26,7 +35,7 @@ def executable_attrs():
             # cfg = exe_deps_out_transition,
         ),
 
-        prologue = attr.label_list(
+        epilogue = attr.label_list(
             doc = "List of OCaml dependencies.",
             providers = [[OcamlArchiveProvider],
                          [OcamlLibraryMarker],

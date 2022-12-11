@@ -224,7 +224,7 @@ def module_impl(ctx, module_name):
         # print("OUT_O: %s" % out_o)
         # direct_linkargs.append(out_o)
 
-    if (hasattr(ctx.attr, "dump") # test rules w/explicit dump
+    if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):
 
         out_dump = ctx.actions.declare_file(
@@ -451,6 +451,7 @@ def module_impl(ctx, module_name):
                     _options.remove("-nopervasives")
     args.add_all(_options)
 
+    #FIXME: make a function for the dump stuff
     if hasattr(ctx.attr, "_lambda_expect_test"):
         for arg in ctx.attr._lambda_expect_test:
             args.add(arg)
@@ -622,7 +623,7 @@ def module_impl(ctx, module_name):
     )
     providers.append(bootProvider)
 
-    if (hasattr(ctx.attr, "dump") # test rules
+    if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):
         # if len(ctx.attr.dump) > 0:
         d = DumpInfo(dump = out_dump)

@@ -1,5 +1,3 @@
-## WARNING: this rule only used once, for //tools:cvt_emit.byte
-
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 

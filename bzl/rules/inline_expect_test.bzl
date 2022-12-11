@@ -9,7 +9,7 @@ load("//bzl/transitions:dev_transitions.bzl",
 load("//bzl:functions.bzl", "get_workdir")
 
 ##############################
-def _ocaml_inline_expect_test_impl(ctx):
+def _inline_expect_test_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:boot"]
     (target_executor, target_emitter,
@@ -32,8 +32,8 @@ def _ocaml_inline_expect_test_impl(ctx):
     return inline_expect_impl(ctx, exe_name)
 
 #######################
-ocaml_inline_expect_test = rule(
-    implementation = _ocaml_inline_expect_test_impl,
+inline_expect_test = rule(
+    implementation = _inline_expect_test_impl,
     doc = "Compile and test an OCaml program.",
     attrs = dict(
         # executable_attrs(),
@@ -80,7 +80,7 @@ ocaml_inline_expect_test = rule(
             # cfg = exe_deps_out_transition,
         ),
 
-        _rule = attr.string( default = "ocaml_inline_expect_test" ),
+        _rule = attr.string( default = "inline_expect_test" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),

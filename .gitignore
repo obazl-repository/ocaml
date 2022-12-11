@@ -339,3 +339,7 @@ runtime/caml/s.local.h
 profile/system/local/BUILD.bazel
 toolchain/profile/cc/local/BUILD.bazel
 *.log
+*tmp.*
+*generated*
+*mustached*
+*X

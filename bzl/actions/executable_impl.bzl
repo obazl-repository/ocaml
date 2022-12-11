@@ -458,7 +458,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
         mnemonic = "LinkOcamlcKick"
     elif ctx.attr._rule == "ocaml_tool":
         mnemonic = "LinkOCamlTool"
-    elif ctx.attr._rule == "ocaml_test":
+    elif ctx.attr._rule in ["ocaml_test", "expect_test"]:
         mnemonic = "OcamlTest"
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
@@ -555,7 +555,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_test":
         exe_provider = OcamlTestMarker()
-    elif ctx.attr._rule == "ocaml_test":
+    elif ctx.attr._rule in ["ocaml_test", "expect_test"]:
         exe_provider = OcamlTestMarker()
     else:
         fail("Wrong rule called impl_executable: %s" % ctx.attr._rule)

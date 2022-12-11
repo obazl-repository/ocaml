@@ -5,8 +5,8 @@ load("//bzl:rules.bzl",
      "test_module",
      "test_signature",
      "ocaml_test",
-     # "ocaml_compile_test",
-     "ocaml_inline_expect_test",
+     "expect_test",
+     "inline_expect_test",
      "lambda_expect_test"
 )
 
@@ -24,6 +24,7 @@ test_library(
     ],
 )
 
+# ocaml_test just compiles and runs executable
 ocaml_test(
     name = "anonymous_test",
     main = ":Anonymous",
@@ -32,30 +33,13 @@ ocaml_test(
     timeout = "short"
 )
 
-#test_module(
 lambda_expect_test(
     name   = "Anonymous_test",
     struct   = "anonymous.ml",
     expected = "anonymous.ocamlc.reference",
-    # dump = [
-    #     "lambda",
-    #     # "rawlambda",
-    #     # "clambda",
-    #     # "cmm",
-    #     # "parsetree",
-    #     # "instr"
-    #     # "instruction-selection"
-    # ],
-    # opts   = [
-    #     "-dno-locations",
-    #     "-nostdlib",
-    #     "-nopervasives",
-    #     "-dno-unique-ids"
-    # ],
-    deps = ["//stdlib"]
+    deps = ["//stdlib"]         # FIXME: make this implicit?
 )
 
-# ocaml_compile_test(
 test_module(
     name   = "Anonymous",
     struct   = "anonymous.ml",
@@ -90,11 +74,31 @@ ocaml_test(
     timeout = "short"
 )
 
+expect_test(
+    name     = "Main_test",
+    stdout   = "Main.stdout",
+    expected = "main.reference",
+    prologue = [
+        # "//stdlib",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
+        ":Offset",
+        ":Pr4008",
+        ":Pr7427",
+        ":Pr6726"
+    ],
+    main     = ":Main",
+    epilogue = [],
+    timeout = "short"
+)
+
 test_module(
     name   = "Main",
     struct = "main.ml",
     sig    = "Main_cmi",
     deps   = [
+        # "//stdlib",
+        # "//stdlib:Stdlib",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Set",
         ":Offset",
@@ -107,6 +111,7 @@ test_module(
 test_signature(
     name = "Main_cmi",
     src  = "main.mli",
+    deps = ["//stdlib:Stdlib"]
 )
 
 test_module(
@@ -132,14 +137,16 @@ test_module(
 test_module(
     name   = "Pr6726",
     struct = "pr6726.ml",
+    deps = ["//stdlib:Stdlib"]
 )
 
 test_module(
     name   = "Pr7427",
     struct = "pr7427.ml",
+    deps = ["//stdlib:Stdlib"]
 )
 
-ocaml_inline_expect_test(
+inline_expect_test(
     name = "Recursive_module_evaluation_errors",
     src  = "recursive_module_evaluation_errors.ml",
 )

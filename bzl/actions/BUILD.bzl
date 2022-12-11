@@ -42,7 +42,7 @@ def progress_msg(workdir, ctx):
         action = "Compiling"
     elif rule in ["boot_archive", "test_archive"]:
         action = "Archiving"
-    elif rule in ["ocaml_test", "lambda_expect_test"]:
+    elif rule in ["ocaml_test", "expect_test", "lambda_expect_test"]:
         action = "Testing"
     else:
         fail(rule)
