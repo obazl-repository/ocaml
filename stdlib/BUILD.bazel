@@ -45,7 +45,7 @@ LABEL_OPTS = ["-nolabels"]
 ## boot_library(
 boot_archive(
     name       = "stdlib",
-    opts = ["-linkall"],
+    # opts = ["-linkall"],
     ## makefiles pass -use-prims. does that make sense, for an archive?
     manifest   = STDLIB_MANIFEST,
     # data = ["//runtime:asmrun"],
