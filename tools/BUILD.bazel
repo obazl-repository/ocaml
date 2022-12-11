@@ -251,6 +251,7 @@ ocaml_tool(
 )
 
 ################
+## FIXME: move to //bytecomp
 # make_opcodes, opnames.ml
 # OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 # NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)

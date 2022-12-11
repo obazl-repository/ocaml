@@ -159,7 +159,7 @@ def inline_expect_impl(ctx, exe_name):  ## , tc):
 
     primitives_depset = []
 
-    includes.append(ctx.file._stdlib.dirname)
+    # includes.append(ctx.file._stdlib.dirname)
 
     ## runtime_files are link-time deps, not to be confused with
     ## runfiles, which are runtime deps.
@@ -295,7 +295,7 @@ def inline_expect_impl(ctx, exe_name):  ## , tc):
     #     progress_message = progress_msg(workdir, ctx)
     # )
     ################
-    args.append(ctx.file._stdlib.short_path)
+    # args.append(ctx.file._stdlib.short_path)
 
     args.append("-I")
     args.append("stdlib/_dev_boot")
