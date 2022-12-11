@@ -2,10 +2,11 @@ load("//bzl:rules.bzl",
      "boot_archive",
      # "boot_executable",
      "boot_library",
-     "compiler_module",
      "bootstrap_repl",
+     "build_tool",
+     "compiler_module",
      "compiler_signature",
-     # "baseline_test",
+     "ocaml_tool"
 )
 
 # load("//config:CONFIG.bzl",
@@ -42,19 +43,28 @@ SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
 # 	$(MAKE) ocaml
 # 	@$(EXTRAPATH) $(RLWRAP) $(OCAMLRUN) ./ocaml$(EXE) $(OC_TOPFLAGS)
 
-# boot_executable(
-#     name = "ocaml.tmp",
-#     main = ":Topstart",
-#     opts = ["-linkall"],
-#     args = ["-nostdlib",
-#             "-I", "/Users/gar/ocaml/ocaml/bazel-bin/stdlib/__boot",
-#             "-noinit"],
-#     prologue = [
-#         "//compilerlibs:ocamlcommon",
-#         "//bytecomp:ocamlbytecomp",
-#         ":ocamltoplevel",
-#     ]
-# )
+# ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -I toplevel/byte -linkall -o ocaml.tmp compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma compilerlibs/ocamltoplevel.cma toplevel/topstart.cmo
+
+ocaml_tool(
+    name = "ocaml.tmp",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+        ":ocamltoplevel",
+    ],
+    main = ":Topstart",
+    opts = ["-linkall"],
+    args = [
+        "-nostdlib",
+        "-I", "/Users/gar/obazl-repository/ocamlcc/bazel-bin/stdlib/_dev_ocamlc.byte",
+        "-noinit"
+    ],
+    visibility = ["//:__pkg__"]
+)
+
+# ./boot/ocamlrun expunge ocaml.tmp ocaml  camlinternalFormatBasics stdlib stdlib__Either stdlib__Sys stdlib__Obj stdlib__Atomic camlinternalLazy stdlib__Lazy stdlib__Seq stdlib__Option stdlib__Result stdlib__Bool stdlib__Char stdlib__Uchar stdlib__List stdlib__Int stdlib__Bytes stdlib__String stdlib__Unit stdlib__Marshal stdlib__Array stdlib__Float stdlib__Int32 stdlib__Int64 stdlib__Nativeint stdlib__Lexing stdlib__Parsing stdlib__Set stdlib__Map stdlib__Stack stdlib__Queue stdlib__Buffer stdlib__Mutex stdlib__Condition stdlib__Semaphore stdlib__Domain camlinternalFormat stdlib__Printf stdlib__Arg stdlib__Printexc stdlib__Fun stdlib__Gc stdlib__Digest stdlib__Bigarray stdlib__Random stdlib__Hashtbl stdlib__Weak stdlib__Format stdlib__Scanf stdlib__Callback camlinternalOO stdlib__Oo camlinternalMod stdlib__Ephemeron stdlib__Filename stdlib__Complex stdlib__ArrayLabels stdlib__ListLabels stdlib__BytesLabels stdlib__StringLabels stdlib__MoreLabels stdlib__StdLabels stdlib__In_channel stdlib__Out_channel stdlib__Effect outcometree topdirs toploop
+
+
 # bootstrap_repl(
 #     name = "ocaml",
 #     main = ":Topstart",
@@ -70,23 +80,24 @@ SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
 #         "//bytecomp:ocamlbytecomp",
 #         ":ocamltoplevel",
 #     ],
-#     expunge = STDLIB_MODULE_NAMES + ["outcometree", "topdirs", "toploop"]
+#     expunge = STDLIB_MODULE_NAMES + ["outcometree", "topprinters" "topdirs", "toploop"]
 # )
 
-# genrule(
-#     name = "gen_ocaml",
-#     outs = ["ocaml"],
-#     executable = True,
-#     srcs = [":ocaml.tmp", "//utils:expunge"],
-#     tools = ["//boot/baseline:ocamlrun"],
-#     cmd  = " ".join([
-#         "$(execpath //boot/baseline:ocamlrun)",
-#         "$(location //utils:expunge)",
-#         "$(location :ocaml.tmp)",
-#         "$(location ocaml)",
-#     ] + STDLIB_MODULE_NAMES + ["outcometree", "topdirs", "toploop"]
-#     )
-# )
+genrule(
+    name = "gen_ocaml",
+    outs = ["ocaml"],
+    executable = True,
+    srcs = [":ocaml.tmp", ":expunge"],
+    tools = ["@baseline//bin:ocamlrun"],
+    cmd  = " ".join([
+        "$(execpath @baseline//bin:ocamlrun)",
+        "$(location :expunge)",
+        "$(location :ocaml.tmp)",
+        "$(location ocaml)",
+    ] + STDLIB_MODULE_NAMES + ["outcometree", "topprinters", "topdirs", "toploop"]
+    ),
+    visibility = ["//:__pkg__"]
+)
 
 # baseline_test(
 #     name = "ocaml.test",
@@ -99,7 +110,7 @@ SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
 boot_library(
     name = "toplevel",
     manifest  = [
-        ":Expunge",
+        # ":Expunge",
         ":Genprintval",
         ":Topcommon",
         ":Topprinters",
@@ -162,6 +173,20 @@ boot_archive(
 )
 
 ################################################################
+build_tool(
+    name     = "expunge",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+    ],
+    main     = ":Expunge",
+    opts = [
+        "-nostdlib",
+        # "-verbose"
+    ],
+    visibility = ["//asmcomp:__subpackages__"]
+)
+
 compiler_module(
     name   = "Expunge",
     struct = "expunge.ml",

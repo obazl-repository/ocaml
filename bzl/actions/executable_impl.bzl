@@ -518,7 +518,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
 
     # print("EXE runfiles: %s" % runfiles)
 
-    print("DATA: %s" % ctx.files.data)
+    # print("DATA: %s" % ctx.files.data)
     if ctx.attr.strip_data_prefixes:
       myrunfiles = ctx.runfiles(
         # files = ctx.files.data + compiler_runfiles + [ctx.file._std_exit],

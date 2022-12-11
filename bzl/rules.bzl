@@ -1,4 +1,5 @@
 load("//bzl/rules:run_tool.bzl", _run_tool = "run_tool")
+load("//bzl/rules:run_repl.bzl", _run_repl = "run_repl")
 
 load("//bzl/rules:ocaml_test.bzl", _ocaml_test = "ocaml_test")
 load("//bzl/rules:expect_test.bzl", _expect_test = "expect_test")
@@ -88,6 +89,7 @@ ocaml_tool      = _ocaml_tool
 # ocamlc_runtime    = _ocamlc_runtime
 # ocamlc_fixpoint    = _ocamlc_fixpoint
 
+run_repl = _run_repl
 run_tool = _run_tool
 ocaml_test = _ocaml_test
 expect_test = _expect_test
