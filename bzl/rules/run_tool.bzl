@@ -1,5 +1,5 @@
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
@@ -33,6 +33,10 @@ def _run_tool_impl(ctx):
     tgt = ctx.file.arg
     print("TGT %s" % tgt)
 
+    if tgt.basename == "BUILD.bazel":
+        # no --//:arg passed
+        arg = ""
+
     if ctx.label.name == "ocamlcmt":
         if ModuleInfo in ctx.attr.arg:
             arg = ctx.attr.arg[ModuleInfo].cmt.short_path
@@ -47,8 +51,15 @@ def _run_tool_impl(ctx):
     if SigInfo in ctx.attr.arg:
         cmt_files.append(ctx.attr.arg[SigInfo].cmti)
 
+    if ctx.attr._verbose[BuildSettingInfo].value:
+        verbose = "set -x"
+    else:
+        verbose = ""
+
     cmd = "\n".join([
-        "{pgm} {arg};\n".format(
+        # "echo ARGS: $@;",
+        verbose,
+        "{pgm} $@ {arg};\n".format(
             pgm = ctx.file.tool.short_path,
             arg = arg)
     ])
@@ -92,6 +103,9 @@ run_tool = rule(
         arg = attr.label(
             allow_single_file = True,
             default = "//:arg"
+        ),
+        _verbose = attr.label(
+            default = "//:verbose"
         ),
 
         _rule = attr.string( default = "run_tool" ),

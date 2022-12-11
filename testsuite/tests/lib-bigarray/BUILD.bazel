@@ -1,60 +1,109 @@
-## GENERATED FILE ##
-
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
+     "test_archive",
+     "test_executable",
+     "test_library",
+     "test_module",
+     "test_signature",
+     "ocaml_test",
+     "expect_test",
+     "inline_expect_test",
+     "lambda_expect_test"
 )
 
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_lib-bigarray_lib",
-    modules  = [
-        ":Bigarrays",
-        ":Change_layout",
-        ":Fftba",
-        ":Pr5115",
-        ":Weak_bigarray",
+test_suite(
+    name = "tests",
+    tests  = [
+        ":Bigarrays_test",
+        ":Change_layout_test",
+        ":Fftba_test",
+        ":Pr5115_test",
+        ":Weak_bigarray_test",
     ],
 )
 
-ocaml_module(
+expect_test(
+    name     = "Bigarrays_test",
+    stdout   = "Bigarrays.stdout",
+    expected = "bigarrays.reference",
+    main     = ":Bigarrays",
+    timeout  = "short"
+)
+
+test_module(
     name   = "Bigarrays",
     struct = "bigarrays.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Bigarray",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Printf"
     ]
 )
 
-ocaml_module(
+expect_test(
+    name     = "Change_layout_test",
+    stdout   = "change_layout.stdout",
+    expected = "change_layout.reference",
+    main     = ":Change_layout",
+    timeout  = "short"
+)
+
+test_module(
     name   = "Change_layout",
     struct = "change_layout.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Bigarray",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
-ocaml_module(
+expect_test(
+    name     = "Fftba_test",
+    stdout   = "fftba.stdout",
+    expected = "fftba.reference",
+    main     = ":Fftba",
+    timeout  = "short"
+)
+
+test_module(
     name   = "Fftba",
     struct = "fftba.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps   = ["//stdlib:Stdlib.Bigarray"]
 )
 
-ocaml_module(
+expect_test(
+    name     = "Pr5115_test",
+    stdout   = "pr5115.stdout",
+    expected = "pr5115.reference",
+    main     = ":Pr5115",
+    timeout  = "short"
+)
+
+test_module(
     name   = "Pr5115",
     struct = "pr5115.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Bigarray",
+        "//stdlib:Stdlib.Printf"
     ]
 )
 
-ocaml_module(
+expect_test(
+    name     = "Weak_bigarray_test",
+    stdout   = "weak_bigarray.stdout",
+    expected = "weak_bigarray.reference",
+    main     = ":Weak_bigarray",
+    timeout  = "short"
+)
+
+test_module(
     name   = "Weak_bigarray",
     struct = "weak_bigarray.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Bigarray",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Weak"
     ]
 )
 

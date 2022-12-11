@@ -1,24 +1,7 @@
-## GENERATED FILE ##
+load("//bzl:rules.bzl", "inline_expect_test")
 
-load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-)
-
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_lib-array_lib",
-    modules  = [
-        ":Test_array",
-    ],
-)
-
-ocaml_module(
-    name   = "Test_array",
-    struct = "test_array.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+inline_expect_test(
+    name = "Test_array_test",
+    src  = "test_array.ml",
 )
 

@@ -1,0 +1,125 @@
+= tools
+:toc: auto
+:toclevels: 3
+
+== build targets
+
+NB: the leading `//` may be omitted in build commands, e.g. `$ bazel
+build tools:ocamldep` is equivalent to [.nowrap]`$ bazel build //tools:ocamldep`.
+
+* `//tools:ocamldep` - compute dependencies
+
+* `//tools:cmpbyt` - compare two bytecode executables
+
+Logging:
+
+* `//tools:ocamlcmt` - dump `.cmt`, `.cmti` files
+* `//tools:ocamldumpobj` - dissasembler for executable and .cmo object files
+* `//tools:ocamlobjinfo` - dump `.cmo`, `.cmx`, `.cma`, `.cmxa` files
+* `//tools:primreq` - determine the set of C primitives used by `.cmo`, `.cma` files
+
+Build tools:
+
+* `//tools:stripdebug` - copy bytecode executable, removing debug info and #! header
+
+These two  are not needed with Bazel:
+
+* `//tools:ocamlmklib` - facilitates the construction of libraries containing both OCaml code and C code (link:https://v2.ocaml.org/manual/intfc.html#s%3Aocamlmklib[Building  mixed C/OCaml libraries: ocamlmklib]
+* `//tools:ocamlmktop` -  builds OCaml toplevels that contain user code preloaded at start-up.  link:https://v2.ocaml.org/manual/toplevel.html#s%3Acustom-toplevel[Building custom toplevel systems: ocamlmktop
+]
+
+The OCaml profiling compilers:
+
+* `//tools:ocamlcp`
+* `//tools:ocamloptp`
+
+link:https://v2.ocaml.org/manual/profil.html[Profiling]:
+
+* `//tools:ocamlprof` -  prints execution counts gathered during the execution of a OCaml program instrumented with ocamlcp
+
+
+== running tools under bazel
+
+To run a tool directly on the command line, you must first build it
+and then construct a command line. This requires that you figure out
+where Bazel has saved things. For example:
+
+    .baseline/bin/ocamlrun ./bazel-bin/tools/_dev_boot/ocamlcmt.byte bazel-bin/stdlib/_dev_boot/Stdlib__Weak.cmt
+
+This is too cumbersome to be useful, but fortunately you can use Bazel
+to run the executables it builds. Executable targets can always be run
+under bazel, e.g. `$ bazel run path/to:target`. However this still
+requires that you provide the appropriate arguments as in the above
+example, so it only partially solves the problem. For example, to run
+`ocamlobjinfo` on Stdlib.Buffer the command would look like this:
+
+    $ bazel run tools:ocamlobjinfo -- $PWD/bazel-bin/stdlib/_dev_boot/Stdlib__Buffer.cmo
+
+This is still cumbersome, and requires that you first build the target
+in order to discover the correct path.
+
+As a convenience, the following targets are designed to automatically
+configure the command line needed. They write the constructed command
+line to a shell script that Bazel then executes. You pass them the
+Bazel label of the intended file, and they convert it to the
+appropriate filesystem path. They will also rebuild either the tool or
+the argument if the sources for either have changed:
+
+* `//:dumpobj`
+* `//:ocamlcmt`
+* `//:ocamlobjinfo`
+* `//:primreq`
+
+The leading `//` may be omitted. These targets take label arguments of the following form:
+
+    `--//:arg=<path to target`>
+
+Here `<path to target>` is a Bazel label, which the rules will convert
+to the correct filesystem path.
+
+For example, to inspect `Stdlib__Buffer.cmo` using `ocamlobjinfo`:
+
+    $ bazel run :ocamlobjinfo --//:arg=//stdlib:Stdlib.Buffer
+
+Show the primitives used by `Stdlib.Bool`:
+
+[source%nowrap,shell]
+----
+$ bazel run :primreq --//:arg=//stdlib:Stdlib.Bool -- -used
+INFO: Analyzed target //:primreq (0 packages loaded, 2062 targets configured).
+INFO: Found 1 target...
+Target //:primreq up-to-date:
+  bazel-bin/primreq.sh
+INFO: Elapsed time: 0.422s, Critical Path: 0.14s
+INFO: 2 processes: 2 internal.
+INFO: Build completed successfully, 2 total actions
+INFO: Running command line: bazel-bin/primreq.sh -used
+caml_hash
+caml_int_compare
+----
+
+[NOTE]
+====
+You can cut down the amount of output by passing
+`--ui_event_filters=-info` and `--noshow_progress`:
+[source%nowrap,shell]
+----
+$ bazel run :primreq --noshow_progress --ui_event_filters=-info --//:arg=//stdlib:Stdlib.Bool -- -used
+Target //:primreq up-to-date:
+  bazel-bin/primreq.sh
+caml_hash
+caml_int_compare
+----
+====
+
+Most of the tools take various additional arguments (such as `-I path`). Pass such arguments after a double-hypen `--`; e.g.
+
+    $ bazel run :ocamlobjinfo -- -help
+    $ bazel run :ocamlobjinfo --//:arg=//stdlib:Stdlib.Buffer -- -null-crc
+    $ bazel run :primreq --//:arg=//stdlib:Stdlib.Bool -- -used
+
+CAUTION: the `--//:arg` argument must come before the `--`.
+
+To see the generated command pass `--//config/tools:verbose` (before `--`):
+
+    $ bazel run :ocamlobjinfo --//:arg=//stdlib:Stdlib.Buffer --//config/tools:verbose -- -null-crc

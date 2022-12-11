@@ -16,6 +16,9 @@ load("//bzl/rules:test_library.bzl", _test_library = "test_library")
 load("//bzl/rules:test_module.bzl",  _test_module  = "test_module")
 load("//bzl/rules:test_signature.bzl", _test_signature = "test_signature")
 
+load("//bzl/rules:tool_module.bzl",  _tool_module  = "tool_module")
+load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
+
 load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
 load("//bzl/rules:build_tool.bzl", _build_tool = "build_tool")
@@ -100,3 +103,6 @@ test_executable = _test_executable
 test_library = _test_library
 test_module  = _test_module
 test_signature = _test_signature
+
+tool_module  = _tool_module
+tool_signature = _tool_signature

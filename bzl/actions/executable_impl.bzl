@@ -4,6 +4,7 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load(":BUILD.bzl", "progress_msg")
 
 load("//bzl:providers.bzl",
+     "BootInfo",
      "new_deps_aggregator",
      "OcamlExecutableMarker",
      "OcamlTestMarker"

@@ -64,6 +64,7 @@ def _expect_test_impl(ctx):
         "    echo PASS",
         "else",
         "    echo FAIL",
+        "    exit 1",
         "fi",
 
         # "cp -v ${{TEST_TMPDIR}}/{stdout} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(stdout=stdout),

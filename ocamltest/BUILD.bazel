@@ -2,8 +2,8 @@ load("//bzl:rules.bzl",
      "test_archive",
      "test_executable",
      "test_library",
-     "test_module",
-     "test_signature",
+     "tool_module",
+     "tool_signature",
 )
 
 load("//lex:BUILD_RULES.bzl", "lex")
@@ -127,7 +127,7 @@ test_library(
     # ],
 )
 
-test_module(
+tool_module(
     name   = "Actions",
     struct = "actions.ml",
     sig    = "Actions_cmi",
@@ -140,7 +140,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Actions_cmi",
     src  = "actions.mli",
     opts = SIG_OPTS,
@@ -152,7 +152,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Actions_helpers",
     struct = "actions_helpers.ml",
     sig    = "Actions_helpers_cmi",
@@ -174,7 +174,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Actions_helpers_cmi",
     src  = "actions_helpers.mli",
     opts = SIG_OPTS,
@@ -187,7 +187,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Builtin_actions",
     struct = "builtin_actions.ml",
     sig    = "Builtin_actions_cmi",
@@ -204,7 +204,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Builtin_actions_cmi",
     src  = "builtin_actions.mli",
     opts = SIG_OPTS,
@@ -215,7 +215,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Builtin_variables",
     struct = "builtin_variables.ml",
     sig    = "Builtin_variables_cmi",
@@ -226,7 +226,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Builtin_variables_cmi",
     src  = "builtin_variables.mli",
     opts = SIG_OPTS,
@@ -235,7 +235,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Environments",
     struct = "environments.ml",
     sig    = "Environments_cmi",
@@ -252,7 +252,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Environments_cmi",
     src  = "environments.mli",
     opts = SIG_OPTS,
@@ -260,7 +260,7 @@ test_signature(
     deps   = [":Variables"]
 )
 
-test_module(
+tool_module(
     name   = "Filecompare",
     struct = "filecompare.ml",
     sig    = "Filecompare_cmi",
@@ -273,7 +273,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Filecompare_cmi",
     src  = "filecompare.mli",
     opts = SIG_OPTS,
@@ -281,7 +281,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Main",
     struct = "main.ml",
     sig    = "Main_cmi",
@@ -305,7 +305,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Main_cmi",
     src  = "main.mli",
     opts = SIG_OPTS,
@@ -313,7 +313,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Modifier_parser",
     struct = "modifier_parser.ml",
     sig    = "Modifier_parser_cmi",
@@ -327,7 +327,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Modifier_parser_cmi",
     src  = "modifier_parser.mli",
     opts = SIG_OPTS,
@@ -336,7 +336,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_actions",
     struct = "ocaml_actions.ml",
     sig    = "Ocaml_actions_cmi",
@@ -370,7 +370,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_actions_cmi",
     src  = "ocaml_actions.mli",
     opts = SIG_OPTS,
@@ -381,7 +381,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_backends",
     struct = "ocaml_backends.ml",
     sig    = "Ocaml_backends_cmi",
@@ -389,13 +389,13 @@ test_module(
     stdlib_primitives = True,
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_backends_cmi",
     src  = "ocaml_backends.mli",
     opts = SIG_OPTS,
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_commands",
     struct = "ocaml_commands.ml",
     sig    = "Ocaml_commands_cmi",
@@ -404,13 +404,13 @@ test_module(
     deps   = [":Ocaml_files"]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_commands_cmi",
     src  = "ocaml_commands.mli",
     opts = SIG_OPTS,
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_compilers",
     struct = "ocaml_compilers.ml",
     sig    = "Ocaml_compilers_cmi",
@@ -428,7 +428,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_compilers_cmi",
     src  = "ocaml_compilers.mli",
     opts = SIG_OPTS,
@@ -439,7 +439,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_directories",
     struct = "ocaml_directories.ml",
     sig    = "Ocaml_directories_cmi",
@@ -450,7 +450,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_directories_cmi",
     src  = "ocaml_directories.mli",
     opts = SIG_OPTS,
@@ -458,7 +458,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_files",
     struct = "ocaml_files.ml",
     sig    = "Ocaml_files_cmi",
@@ -471,7 +471,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_files_cmi",
     src  = "ocaml_files.mli",
     opts = SIG_OPTS,
@@ -479,7 +479,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_filetypes",
     struct = "ocaml_filetypes.ml",
     sig    = "Ocaml_filetypes_cmi",
@@ -494,7 +494,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_filetypes_cmi",
     src  = "ocaml_filetypes.mli",
     opts = SIG_OPTS,
@@ -503,7 +503,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_flags",
     struct = "ocaml_flags.ml",
     sig    = "Ocaml_flags_cmi",
@@ -518,7 +518,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_flags_cmi",
     src  = "ocaml_flags.mli",
     opts = SIG_OPTS,
@@ -528,7 +528,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_modifiers",
     struct = "ocaml_modifiers.ml",
     sig    = "Ocaml_modifiers_cmi",
@@ -542,7 +542,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_modifiers_cmi",
     src  = "ocaml_modifiers.mli",
     opts = SIG_OPTS,
@@ -551,7 +551,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_tests",
     struct = "ocaml_tests.ml",
     sig    = "Ocaml_tests_cmi",
@@ -566,7 +566,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_tests_cmi",
     src  = "ocaml_tests.mli",
     opts = SIG_OPTS,
@@ -575,7 +575,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_tools",
     struct = "ocaml_tools.ml",
     sig    = "Ocaml_tools_cmi",
@@ -594,7 +594,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_tools_cmi",
     src  = "ocaml_tools.mli",
     opts = SIG_OPTS,
@@ -604,7 +604,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_toplevels",
     struct = "ocaml_toplevels.ml",
     sig    = "Ocaml_toplevels_cmi",
@@ -622,7 +622,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_toplevels_cmi",
     src  = "ocaml_toplevels.mli",
     opts = SIG_OPTS,
@@ -634,7 +634,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocaml_variables",
     struct = "ocaml_variables.ml",
     sig    = "Ocaml_variables_cmi",
@@ -646,7 +646,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocaml_variables_cmi",
     src  = "ocaml_variables.mli",
     opts = SIG_OPTS,
@@ -655,7 +655,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocamltest_config",
     struct = "ocamltest_config.ml",
     sig    = "Ocamltest_config_cmi",
@@ -667,7 +667,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocamltest_config_cmi",
     src  = "ocamltest_config.mli",
     opts = SIG_OPTS,
@@ -675,7 +675,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Ocamltest_stdlib",
     struct = "ocamltest_stdlib.ml",
     sig    = "Ocamltest_stdlib_cmi",
@@ -699,7 +699,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocamltest_stdlib_cmi",
     src  = "ocamltest_stdlib.mli",
     opts = SIG_OPTS,
@@ -732,7 +732,7 @@ test_signature(
 # 	echo '# 1 "$<"' > $@
 # 	cat $< >> $@
 
-test_module(
+tool_module(
     name   = "Ocamltest_unix",
     # module = "Ocamltest_unix",
     sig = "Ocamltest_unix_cmi",
@@ -747,7 +747,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Ocamltest_unix_cmi",
     src  = "ocamltest_unix.mli",
     opts = SIG_OPTS,
@@ -755,7 +755,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Options",
     struct = "options.ml",
     sig    = "Options_cmi",
@@ -774,7 +774,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Options_cmi",
     src  = "options.mli",
     opts = SIG_OPTS,
@@ -782,7 +782,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Result",
     struct = "result.ml",
     sig    = "Result_cmi",
@@ -793,13 +793,13 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Result_cmi",
     src  = "result.mli",
     opts = SIG_OPTS
 )
 
-test_module(
+tool_module(
     name   = "Run_command",
     struct = "run_command.ml",
     sig    = "Run_command_cmi",
@@ -811,7 +811,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Run_command_cmi",
     src  = "run_command.mli",
     opts = SIG_OPTS,
@@ -819,7 +819,7 @@ test_signature(
     # deps   = ["//stdlib:Stdlib"]
 )
 
-test_module(
+tool_module(
     name   = "Strace",
     struct = "strace.ml",
     sig    = "Strace_cmi",
@@ -831,7 +831,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Strace_cmi",
     src  = "strace.mli",
     opts = SIG_OPTS,
@@ -840,7 +840,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Tests",
     struct = "tests.ml",
     sig    = "Tests_cmi",
@@ -857,7 +857,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Tests_cmi",
     src  = "tests.mli",
     opts = SIG_OPTS,
@@ -869,7 +869,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Tsl_ast",
     struct = "tsl_ast.ml",
     sig    = "Tsl_ast_cmi",
@@ -879,7 +879,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Tsl_ast_cmi",
     src  = "tsl_ast.mli",
     opts = SIG_OPTS,
@@ -888,7 +888,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Tsl_lexer",
     struct = "tsl_lexer.ml",
     sig    = "Tsl_lexer_cmi",
@@ -907,7 +907,7 @@ lex(
     out  = "tsl_lexer.ml",
 )
 
-test_signature(
+tool_signature(
     name = "Tsl_lexer_cmi",
     src  = "tsl_lexer.mli",
     opts = SIG_OPTS,
@@ -917,7 +917,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Tsl_parser",
     struct = "tsl_parser.ml",
     sig    = "Tsl_parser_cmi",
@@ -928,7 +928,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Tsl_parser_cmi",
     src  = "tsl_parser.mli",
     opts = SIG_OPTS,
@@ -955,7 +955,7 @@ genrule(
     ])
 )
 
-test_module(
+tool_module(
     name   = "Tsl_semantics",
     struct = "tsl_semantics.ml",
     sig    = "Tsl_semantics_cmi",
@@ -975,7 +975,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Tsl_semantics_cmi",
     src  = "tsl_semantics.mli",
     opts = SIG_OPTS,
@@ -988,7 +988,7 @@ test_signature(
     ]
 )
 
-test_module(
+tool_module(
     name   = "Variables",
     struct = "variables.ml",
     sig    = "Variables_cmi",
@@ -1002,7 +1002,7 @@ test_module(
     ]
 )
 
-test_signature(
+tool_signature(
     name = "Variables_cmi",
     src  = "variables.mli",
     opts = SIG_OPTS,

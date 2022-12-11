@@ -1,3 +1,15 @@
+load("//bzl:rules.bzl",
+     "test_archive",
+     "test_executable",
+     "test_library",
+     "test_module",
+     "test_signature",
+     "ocaml_test",
+     "expect_test",
+     "inline_expect_test",
+     "lambda_expect_test"
+)
+
 ## GENERATED FILE ##
 
 load("//bzl:rules.bzl",
@@ -5,20 +17,28 @@ load("//bzl:rules.bzl",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+# MODULE_OPTS = ["-nostdlib"]
 
-ocaml_library(
-    name = "testsuite_tests_lib-atomic_lib",
-    modules  = [
-        ":Test_atomic",
-    ],
+# ocaml_library(
+#     name = "testsuite_tests_lib-atomic_lib",
+#     modules  = [
+#         ":Test_atomic",
+#     ],
+# )
+
+ocaml_test(
+    name = "atomic_test",
+    main = ":Test_atomic",
+    timeout = "short"
 )
 
-ocaml_module(
+test_module(
     name   = "Test_atomic",
     struct = "test_atomic.ml",
-    opts = MODULE_OPTS,
+    opts   = ["-nopervasives"],
     deps   = [
+        "//stdlib:Stdlib",
+        "//stdlib:Stdlib.Atomic"
     ]
 )
 
