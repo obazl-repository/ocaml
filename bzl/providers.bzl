@@ -21,14 +21,18 @@
 def _ModuleInfo_init(*,
                      sig = None,
                      sig_src = None,
+                     cmti = None,
                      struct = None,
                      struct_src = None,
+                     cmt = None,
                      ofile = None):
     return {
         "sig" : sig,
         "sig_src": sig_src,
+        "cmti": cmti,
         "struct": struct,
         "struct_src": struct_src,
+        "cmt": cmt,
         "ofile": ofile
     }
 
@@ -37,8 +41,10 @@ ModuleInfo, _new_moduleinfo = provider(
     fields = {
         "sig"   : "One .cmi file",
         "sig_src"   : "One .mli file",
+        "cmti"  : "One .cmti file",
         "struct": "One .cmo or .cmx file",
         "struct_src": "One .ml file",
+        "cmt"  : "One .cmt file",
         "ofile" : "One .o file if struct is .cmx"
     },
     init = _ModuleInfo_init

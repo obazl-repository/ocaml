@@ -213,6 +213,15 @@ def module_impl(ctx, module_name):
     # direct_linkargs.append(out_cm_)
     default_outputs.append(out_cm_)
 
+    _options = get_options(ctx.attr._rule, ctx)
+    if ( ("-bin-annot" in _options)
+         or ("-bin-annot" in tc.copts) ):
+        out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
+        action_outputs.append(out_cmt)
+        default_outputs.append(out_cmt)
+    else:
+        out_cmt = None
+
     moduleInfo_ofile = None
     if ext == ".cmx":
         # if not ctx.attr._rule.startswith("bootstrap"):
@@ -443,7 +452,6 @@ def module_impl(ctx, module_name):
                       w if w.startswith("-")
                       else "-" + w])
 
-    _options = get_options(ctx.attr._rule, ctx)
     for dep in ctx.attr.deps:
         if hasattr(ctx.attr, "stdlib_primitives"): # test rules
             if dep.label.package == "stdlib":
@@ -587,13 +595,15 @@ def module_impl(ctx, module_name):
 
     moduleInfo_depset = depset(
         ## FIXME: add ofile?
-        direct= [provider_output_cmi, out_cm_],
+        direct= [provider_output_cmi, out_cm_]
+        + [out_cmt] if out_cmt else [],
     )
     moduleInfo = ModuleInfo(
         sig    = provider_output_cmi,
         # sig_src = in_structfile,
         struct = out_cm_,
         struct_src = in_structfile,
+        cmt = out_cmt,
         ofile  = moduleInfo_ofile
     )
 

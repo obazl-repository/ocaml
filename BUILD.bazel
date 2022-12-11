@@ -1,7 +1,38 @@
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+load("//bzl:rules.bzl", "run_tool")
 
 exports_files(["Makefile.config", "VERSION", "BUILD.bazel"])
 
+label_flag(name = "arg", build_setting_default = "Label()")
+
+run_tool(
+    name = "dumpobj",
+    tool = "//tools:dumpobj",
+    arg  = ":arg",
+)
+
+run_tool(
+    name = "ocamlcmt",
+    tool = "//tools:ocamlcmt",
+    arg  = ":arg",
+)
+
+run_tool(
+    name = "ocamlobjinfo",
+    tool = "//tools:ocamlobjinfo",
+    arg  = ":arg",
+)
+
+run_tool(
+    name = "primreq",
+    tool = "//tools:primreq",
+    arg  = ":arg",
+)
+
+
+################################################################
 build_test(
     name = "toolchain",
     targets = [

@@ -1,3 +1,5 @@
+load("//bzl/rules:run_tool.bzl", _run_tool = "run_tool")
+
 load("//bzl/rules:ocaml_test.bzl", _ocaml_test = "ocaml_test")
 load("//bzl/rules:expect_test.bzl", _expect_test = "expect_test")
 load("//bzl/rules:inline_expect_test.bzl",
@@ -86,6 +88,7 @@ ocaml_tool      = _ocaml_tool
 # ocamlc_runtime    = _ocamlc_runtime
 # ocamlc_fixpoint    = _ocamlc_fixpoint
 
+run_tool = _run_tool
 ocaml_test = _ocaml_test
 expect_test = _expect_test
 inline_expect_test = _inline_expect_test
