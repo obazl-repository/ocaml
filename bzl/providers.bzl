@@ -51,6 +51,27 @@ ModuleInfo, _new_moduleinfo = provider(
 )
 
 ################################################################
+def _SigInfo_init(*,
+                  cmi  = None,
+                  cmti = None,
+                  mli  = None):
+    return {
+        "cmi"  : cmi,
+        "cmti" : cmti,
+        "mli"  : mli,
+    }
+
+SigInfo, _new_siginfo = provider(
+    doc = "OCaml signature provider",
+    fields = {
+        "cmi"   : "One .cmi file",
+        "cmti"  : "One .cmti file",
+        "mli"  : "One .mli file",
+    },
+    init = _SigInfo_init
+)
+
+################################################################
 def _DumpInfo_init(*, dump = None):
     return { "dump": dump }
 
@@ -176,26 +197,11 @@ OcamlNsResolverProvider = provider(
 OcamlSignatureProvider = provider(
     doc = "OCaml interface provider.",
     fields = {
-        # "deps": "sig deps",
-
         "mli": ".mli input file",
         "cmi": ".cmi output file",
-        # "module_links":    "Depset of module files to be linked by executable or archive rules.",
-        # "archive_links":    "Depset of archive files to be linked by executable or archive rules.",
-        # "paths":    "Depset of paths for -I params",
-        # "depgraph": "Depset containing transitive closure of deps",
-        # "archived_modules": "Depset containing archive contents"
-    }
-    # fields = module_fields
-    # {
-    #     # "ns_module": "Name of ns module (string)",
-    #     "paths"    : "Depset of search path strings",
-    #     "resolvers": "Depset of resolver module names",
-    #     "deps_opam" : "Depset of OPAM package names"
+        "cmti": ".cmti output file",
 
-    #     # "payload": "An [OcamlInterfacePayload](#ocamlinterfacepayload) structure.",
-    #     # "deps"   : "An [OcamlDepsetProvider](#ocamldepsetprovider)."
-    # }
+    }
 )
 
 # OcamlArchiveMarker    = provider(doc = "OCaml Archive Marker provider.")

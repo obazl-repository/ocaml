@@ -5,6 +5,7 @@ load(":BUILD.bzl", "progress_msg", "get_build_executor")
 load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
+     "SigInfo",
      "new_deps_aggregator",
      "OcamlSignatureProvider")
 
@@ -117,7 +118,18 @@ def signature_impl(ctx, module_name):
     # if ctx.label.name == "CamlinternalFormatBasics_cmi":
     #     print("OCMI: %s" % ocmi)
 
+    action_outputs = []
     out_cmi = ctx.actions.declare_file(ocmi)
+    action_outputs.append(out_cmi)
+
+    _options = get_options(ctx.attr._rule, ctx)
+    if ( ("-bin-annot" in _options)
+         or ("-bin-annot" in tc.copts) ):
+        out_cmti = ctx.actions.declare_file(workdir + module_name + ".cmti")
+        action_outputs.append(out_cmti)
+        # default_outputs.append(out_cmt)
+    else:
+        out_cmt = None
 
     if debug:
         print("out_cmi %s" % out_cmi)
@@ -244,7 +256,6 @@ def signature_impl(ctx, module_name):
                       w if w.startswith("-")
                       else "-" + w])
 
-    _options = get_options(ctx.attr._rule, ctx)
     for dep in ctx.attr.deps:
         if hasattr(ctx.attr, "stdlib_primitives"): # test rules
             if dep.label.package == "stdlib":
@@ -299,10 +310,10 @@ def signature_impl(ctx, module_name):
 
     if sig_src.extension == "ml":
         args.add("-i")
-        args.add("-o", out_cmi)
     else:
         args.add("-c")
-        args.add("-o", out_cmi)
+
+    args.add("-o", out_cmi)
 
     pack_ns = False
     if hasattr(ctx.attr, "_pack_ns"):
@@ -344,7 +355,7 @@ def signature_impl(ctx, module_name):
         executable = executable,
         arguments = [args],
         inputs = inputs_depset,
-        outputs = [out_cmi],
+        outputs = action_outputs,
         tools = [
             # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
             # tc_compiler(tc)[DefaultInfo].files_to_run
@@ -364,9 +375,17 @@ def signature_impl(ctx, module_name):
         files = default_depset
     )
 
+    ## FIXME: switch to SigInfo provider
     sigProvider = OcamlSignatureProvider(
-        mli = mlifile,
-        cmi = out_cmi
+        mli  = mlifile,
+        cmi  = out_cmi,
+        cmti = out_cmti
+    )
+
+    sigInfo = SigInfo(
+        mli  = mlifile,
+        cmi  = out_cmi,
+        cmti = out_cmti
     )
 
     bootInfo = BootInfo(
@@ -386,6 +405,7 @@ def signature_impl(ctx, module_name):
         defaultInfo,
         bootInfo,
         sigProvider,
+        sigInfo
     ]
 
     if ccInfo_list:
