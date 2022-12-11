@@ -207,8 +207,6 @@ def executable_impl(ctx, exe_name):  ## , tc):
     # else:
     #     executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
 
-    args.add("-o", out_exe)
-
     # use_prims = False
     # if hasattr(ctx.attr, "use_prims"):
     #     if ctx.attr.use_prims:
@@ -324,6 +322,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
     ## all deps. Then we use the manifest to filter.
 
     manifest = ctx.files.prologue
+    if ctx.label.name == "ocamlobjinfo":
+        print("PROLOGUE: %s" % manifest)
 
     filtering_depset = depset(
         order = dsorder,
@@ -375,6 +375,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
     # ## 'main' dep must come last on cmd line
     if ctx.file.main:
         args.add(ctx.file.main)
+
+    args.add("-o", out_exe)
 
     runfiles = []
     # if ...:
