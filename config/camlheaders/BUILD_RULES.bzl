@@ -14,18 +14,22 @@ load("//bzl/transitions:dev_transitions.bzl",
 ###########################
 def _camlheaders_impl(ctx):
 
-    f = ctx.actions.declare_file("camlheader")
-
     tc = ctx.toolchains["//toolchain/type:boot"]
     # print("CAMLHEADERS tc.ocamlrun: %s" % tc.ocamlrun.path)
 
+    f = ctx.actions.declare_file("camlheader")
     ctx.actions.write(
         output = f,
         content = "#!{f}\n".format(
             f = tc.ocamlrun.path
         )
     )
-    return [DefaultInfo(files=depset([f]))]
+    fur = ctx.actions.declare_file("camlheader_ur")
+    ctx.actions.write(
+        output = fur,
+        content = "#!\n"
+    )
+    return [DefaultInfo(files=depset([f, fur]))]
 
 ###################
 camlheaders = rule(
