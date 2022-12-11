@@ -219,10 +219,6 @@ def archive_impl(ctx):
     # args.add("-verbose")
     # args.add("-ccopt", "-v")
 
-    args.add("-o", out_archive)
-
-    args.add("-a")
-
     ## examples from mac make log:
     ## ocamlbytecomp.cma, ocamloptcomp.cma:  -nostdlib, -use-prims
 
@@ -447,13 +443,16 @@ def archive_impl(ctx):
         transitive = [cli_link_deps_depset]
     )
 
+    args.add_all(includes, before_each="-I", uniquify=True)
+
     for dep in filtering_depset.to_list():
         if dep in manifest:
             # if ctx.label == Label("@//compilerlibs:ocamlcommon"):
             #     print("DEP: %s" % dep)
             args.add(dep)
 
-    args.add_all(includes, before_each="-I", uniquify=True)
+    args.add("-a")
+    args.add("-o", out_archive)
 
     inputs_depset = depset(
         direct = ctx.files.data if ctx.files.data else []
