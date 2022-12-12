@@ -3,7 +3,6 @@ load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag",
      "string_list_flag")
 
-load("//bzl/rules:config_cc_toolchain.bzl", "config_cc_toolchain")
 load("//bzl/rules:config_sys.bzl", "config_sys")
 
 package(default_visibility = ["//visibility:public"])
@@ -14,8 +13,18 @@ package(default_visibility = ["//visibility:public"])
 # bool_flag( name = "instrumented", build_setting_default = False)
 # config_setting(name = "instrumented?", flag_values = {":instrumented": "True"})
 
+bool_flag( name = "absname", build_setting_default = True)
+config_setting(name = "absname?", flag_values = {":absname": "True"})
+
 bool_flag( name = "bin-annot", build_setting_default = True)
 config_setting(name = "bin-annot?", flag_values = {":bin-annot": "True"})
+
+bool_flag( name = "flambda", build_setting_default = False)
+config_setting(name = "flambda?", flag_values = {":flambda": "True"})
+
+bool_flag( name = "flat_float_array", build_setting_default = True)
+config_setting(name = "flat_float_array?",
+               flag_values = {":flat_float_array": "True"})
 
 bool_flag( name = "principal", build_setting_default = True)
 config_setting(name = "principal?", flag_values = {":principal": "True"})
@@ -23,12 +32,17 @@ config_setting(name = "principal?", flag_values = {":principal": "True"})
 bool_flag( name = "sig_src", build_setting_default = False)
 config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
 
-bool_flag( name = "absname", build_setting_default = True)
-config_setting(name = "absname?", flag_values = {":absname": "True"})
+bool_flag( name = "with_cmm_invariants", build_setting_default = False)
+config_setting(name = "with_cmm_invariants?",
+               flag_values = {":with_cmm_invariants": "True"})
 
-bool_flag( name = "flat_float_array", build_setting_default = True)
-config_setting(name = "flat_float_array?",
-               flag_values = {":flat_float_array": "True"})
+bool_flag( name = "with_flambda_invariants", build_setting_default = False)
+config_setting(name = "with_flambda_invariants?",
+               flag_values = {":with_flambda_invariants": "True"})
+
+bool_flag( name = "xmo", build_setting_default = False)
+config_setting(name = "xmo?", flag_values = {":xmo": "True"})
+
 
 label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
 
@@ -39,18 +53,6 @@ string_list_flag(name = "warnings",
                  build_setting_default = [
                      # "-w", "+a-4-9-41-42-44-45-48",
                      "-warn-error", "+A"])
-
-################################################################
-##FIXME: what is the optimal way to select for flambda?
-bool_flag(
-    name = "flambda",
-    build_setting_default = False,
-    visibility = ["//visibility:public"]
-)
-config_setting(
-    name = "flambda?",
-    flag_values = {":flambda": "True"},
-)
 
 ################################################################
 config_setting(
