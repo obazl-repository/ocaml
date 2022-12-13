@@ -1,181 +1,271 @@
-load("//bzl:rules.bzl",
+load("//bzl/rules/test:rules.bzl",
      "test_archive",
      "test_executable",
      "test_library",
      "test_module",
      "test_signature",
+
+     "compile_fail_test",
+     "expect_test",
      "ocaml_test",
 )
 
-MODULE_OPTS = []
-
-test_library(
-    name = "testsuite_tests_basic_lib",
-    manifest = [
-        ":Arrays",
-        ":Bigints",
-        ":Boxedints",
-        ":CamlCase",
-        ":Divint",
-        ":Equality",
-        ":Eval_order_1",
-        ":Eval_order_2",
-        ":Eval_order_3",
-        ":Eval_order_4",
-        ":Eval_order_6",
-        ":Eval_order_7",
-        ":Eval_order_pr10283",
-        ":Float",
-        ":Float_physical_equality",
-        ":Includestruct",
-        ":Localexn",
-        ":Localfunction",
-        ":Maps",
-        ":Min_int",
-        ":Opt_variants",
-        ":Patmatch",
-        ":Patmatch_for_multiple",
-        ":Patmatch_incoherence",
-        ":Patmatch_split_no_or",
-        ":Pr7253",
-        ":Pr7533",
-        ":Pr7657",
-        ":Recvalues",
-        ":Sets",
-        ":Stringmatch",
-        ":Switch_opts",
-        ":Tailcalls",
-        ":Trigraph",
-        ":Tuple_match",
+test_suite(
+    name = "tests",
+    tests = [
+        ":arrays_test",
+        ":bigints_test",
+        ":boxedints_test",
+        ":camlCase_test",
+        # ":Divint",
+        # ":Equality",
+        # ":Eval_order_1",
+        # ":Eval_order_2",
+        # ":Eval_order_3",
+        # ":Eval_order_4",
+        # ":Eval_order_6",
+        # ":Eval_order_7",
+        # ":Eval_order_pr10283",
+        # ":Float",
+        # ":Float_physical_equality",
+        # ":Includestruct",
+        # ":Localexn",
+        # ":Localfunction",
+        # ":Maps",
+        # ":Min_int",
+        # ":Opt_variants",
+        # ":Patmatch",
+        # ":Patmatch_for_multiple",
+        # ":Patmatch_incoherence",
+        # ":Patmatch_split_no_or",
+        # ":Pr7253",
+        # ":Pr7533",
+        # ":Pr7657",
+        # ":Recvalues",
+        # ":Sets",
+        # ":Stringmatch",
+        # ":Switch_opts",
+        # ":Tailcalls",
+        # ":Trigraph",
+        # ":Tuple_match",
         ":Unit_naming",
-        ":Zero_divided_by_n",
+        # ":Zero_divided_by_n",
     ],
 )
 
-ocaml_test(
-    name = "arrays_test",
-    main = ":Arrays",
-    timeout = "short"
+expect_test(
+    name    = "arrays_test",
+    stdout  = "arrays.stdout",
+    expect  = "arrays.reference",
+    main    = ":Arrays",
+    timeout = "short",
 )
 
 test_module(
     name   = "Arrays",
     struct = "arrays.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        "//stdlib:Stdlib",
-        "//stdlib:Stdlib.Gc"
-    ]
+    deps   = ["//stdlib:Stdlib.Gc"]
+)
+
+expect_test(
+    name    = "bigints_test",
+    stdout  = "bigints.stdout",
+    expect  = "bigints.reference",
+    main    = ":Bigints",
 )
 
 test_module(
     name   = "Bigints",
     struct = "bigints.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps   = ["//stdlib:Stdlib.Sys"]
+)
+
+############
+expect_test(
+    name    = "boxedints_test",
+    stdout  = "boxedints.stdout",
+    expect  = "boxedints.reference",
+    main    = ":Boxedints",
 )
 
 test_module(
     name   = "Boxedints",
     struct = "boxedints.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf"
     ]
+
 )
 
-test_module(
+################################################################
+test_module( # not a test, used by unit_naming_test
     name   = "CamlCase",
     struct = "camlCase.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+)
+################################################################
+
+############
+expect_test(
+    name     = "divint_test",
+    stdout   = "divint.stdout",
+    expect   = "divint.reference",
+    main     = ":Divint",
 )
 
 test_module(
     name   = "Divint",
     struct = "divint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    deps = [
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf"
     ]
+)
+
+############
+expect_test(
+    name    = "equality_test",
+    stdout  = "equality.stdout",
+    expect  = "equality.reference",
+    main    = ":Equality",
 )
 
 test_module(
     name   = "Equality",
     struct = "equality.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Fun"
     ]
+)
+
+############
+expect_test(
+    name    = "eval_order_1_test",
+    stdout  = "eval_order_1.stdout",
+    expect  = "eval_order_1.reference",
+    main    = ":Eval_order_1",
 )
 
 test_module(
     name   = "Eval_order_1",
     struct = "eval_order_1.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Printf",
     ]
+)
+
+############
+expect_test(
+    name    = "eval_order_2_test",
+    stdout  = "eval_order_2.stdout",
+    expect  = "eval_order_2.reference",
+    main    = ":Eval_order_2",
 )
 
 test_module(
     name   = "Eval_order_2",
     struct = "eval_order_2.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
+)
+
+############
+expect_test(
+    name    = "eval_order_3_test",
+    stdout  = "eval_order_3.stdout",
+    expect  = "eval_order_3.reference",
+    main    = ":Eval_order_3",
 )
 
 test_module(
     name   = "Eval_order_3",
     struct = "eval_order_3.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Printf",
     ]
+)
+
+############
+expect_test(
+    name    = "eval_order_4_test",
+    stdout  = "eval_order_4.stdout",
+    expect  = "eval_order_4.reference",
+    main    = ":Eval_order_4",
 )
 
 test_module(
     name   = "Eval_order_4",
     struct = "eval_order_4.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
+)
+
+############
+expect_test(
+    name    = "eval_order_6_test",
+    stdout  = "eval_order_6.stdout",
+    expect  = "eval_order_6.reference",
+    main    = ":Eval_order_6",
 )
 
 test_module(
     name   = "Eval_order_6",
     struct = "eval_order_6.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Int",
     ]
+)
+
+############
+expect_test(
+    name    = "eval_order_7_test",
+    stdout  = "eval_order_7.stdout",
+    expect  = "eval_order_7.reference",
+    main    = ":Eval_order_7",
 )
 
 test_module(
     name   = "Eval_order_7",
     struct = "eval_order_7.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
 
+############
+expect_test(
+    name    = "eval_order_pr10283_test",
+    stdout  = "eval_order_pr10283.stdout",
+    expect  = "eval_order_pr10283.reference",
+    main    = ":Eval_order_pr10283",
+)
 test_module(
     name   = "Eval_order_pr10283",
     struct = "eval_order_pr10283.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Printf",
     ]
+)
+
+############
+expect_test(
+    name    = "float_test",
+    stdout  = "float.stdout",
+    expect  = "float.reference",
+    main    = ":Float",
 )
 
 test_module(
     name   = "Float",
     struct = "float.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Printf",
     ]
 )
 
 test_module(
     name   = "Float_physical_equality",
     struct = "float_physical_equality.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -183,7 +273,6 @@ test_module(
 test_module(
     name   = "Includestruct",
     struct = "includestruct.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -191,7 +280,6 @@ test_module(
 test_module(
     name   = "Localexn",
     struct = "localexn.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -199,7 +287,6 @@ test_module(
 test_module(
     name   = "Localfunction",
     struct = "localfunction.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -207,7 +294,6 @@ test_module(
 test_module(
     name   = "Maps",
     struct = "maps.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -215,7 +301,6 @@ test_module(
 test_module(
     name   = "Min_int",
     struct = "min_int.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -223,7 +308,6 @@ test_module(
 test_module(
     name   = "Opt_variants",
     struct = "opt_variants.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -231,7 +315,6 @@ test_module(
 test_module(
     name   = "Patmatch",
     struct = "patmatch.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -239,7 +322,6 @@ test_module(
 test_module(
     name   = "Patmatch_for_multiple",
     struct = "patmatch_for_multiple.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -247,7 +329,6 @@ test_module(
 test_module(
     name   = "Patmatch_incoherence",
     struct = "patmatch_incoherence.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -255,7 +336,6 @@ test_module(
 test_module(
     name   = "Patmatch_split_no_or",
     struct = "patmatch_split_no_or.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -263,7 +343,6 @@ test_module(
 test_module(
     name   = "Pr7253",
     struct = "pr7253.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -271,7 +350,6 @@ test_module(
 test_module(
     name   = "Pr7533",
     struct = "pr7533.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -279,7 +357,6 @@ test_module(
 test_module(
     name   = "Pr7657",
     struct = "pr7657.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -287,7 +364,6 @@ test_module(
 test_module(
     name   = "Recvalues",
     struct = "recvalues.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -295,7 +371,6 @@ test_module(
 test_module(
     name   = "Sets",
     struct = "sets.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -303,7 +378,6 @@ test_module(
 test_module(
     name   = "Stringmatch",
     struct = "stringmatch.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -311,7 +385,6 @@ test_module(
 test_module(
     name   = "Switch_opts",
     struct = "switch_opts.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -319,7 +392,6 @@ test_module(
 test_module(
     name   = "Tailcalls",
     struct = "tailcalls.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -327,7 +399,6 @@ test_module(
 test_module(
     name   = "Trigraph",
     struct = "trigraph.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
@@ -335,23 +406,23 @@ test_module(
 test_module(
     name   = "Tuple_match",
     struct = "tuple_match.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
 
-test_module(
-    name   = "Unit_naming",
+compile_fail_test(
+# test_module(
+    name   = "unit_naming_test",
     struct = "unit_naming.ml",
-    opts = MODULE_OPTS,
+    expect = "unit_naming.compilers.reference",
     deps   = [
-    ]
+        ":CamlCase"
+    ],
 )
 
 test_module(
     name   = "Zero_divided_by_n",
     struct = "zero_divided_by_n.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )
