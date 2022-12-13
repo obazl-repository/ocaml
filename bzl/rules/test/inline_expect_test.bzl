@@ -1,4 +1,4 @@
-load("//bzl/actions:inline_expect_impl.bzl", "inline_expect_impl")
+load(":inline_expect_impl.bzl", "inline_expect_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/transitions:transitions.bzl", "reset_config_transition")

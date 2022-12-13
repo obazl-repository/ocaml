@@ -54,14 +54,29 @@ def get_workdir(ctx, tc):
         workdir = "_boot/"
     elif (config_executor == "baseline"):
         workdir = "_boot/"
+    elif (config_executor == "vm" and config_emitter == "boot"):
+        if tc.dev:
+            # dev mode, passing only --//config/target/executor=vm
+            workdir = "_ocamlc.opt/"
+        else:
+            workdir = "_ocamlc.byte/"
     elif (config_executor == "vm" and config_emitter == "vm"):
         workdir = "_ocamlc.byte/"
     elif (config_executor == "vm" and config_emitter == "sys"):
-        workdir = "_ocamlopt.byte/"
-    elif (config_executor == "sys" and config_emitter == "sys"):
-        workdir = "_ocamlopt.opt/"
+        if tc.dev:
+            workdir = "_ocamlopt.byte/"
+        else:
+            workdir = "_ocamlopt.byte/"
+    elif (config_executor == "sys" and config_emitter == "boot"):
+        if tc.dev:
+            # dev mode, passing only --//config/target/executor=sys
+            workdir = "_ocamlopt.opt/"
+        else:
+            workdir = "_ocamlc.opt/"
     elif (config_executor == "sys" and config_emitter == "vm"):
         workdir = "_ocamlc.opt/"
+    elif (config_executor == "sys" and config_emitter == "sys"):
+        workdir = "_ocamlopt.opt/"
     elif config_executor == "unspecified":
         # last stage
         if (config_executor == "boot"):
@@ -74,6 +89,9 @@ def get_workdir(ctx, tc):
             workdir = "_ocamlopt.opt/"
         elif (config_executor == "sys" and config_emitter == "vm"):
             workdir = "_ocamlc.opt/"
+
+    if debug:
+        print("inferred workdir: %s" % pfx + workdir)
 
     return (target_executor, target_emitter,
             config_executor, config_emitter,

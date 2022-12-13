@@ -1,5 +1,10 @@
-# query --notool_deps
-# query --noimplicit_deps
+## in dev mode, just pass //config/target/executor=<> to set output
+build --flag_alias=tgt=//config/target/executor
+build --flag_alias=stdlib=//testsuite/tests:with-stdlib
+
+
+query --notool_deps
+query --noimplicit_deps
 
 common:dev --//config:dev
 # test --test_output=errors

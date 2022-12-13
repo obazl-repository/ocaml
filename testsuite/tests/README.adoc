@@ -1,0 +1,105 @@
+= Bazel tests
+
+
+== overview
+
+Bazel rules:
+
+* `ocaml_test` - for tests that run tests internally and report pass/fail and may write diagnostic messages to stdout/stderr
+
+* `expect_test` - for tests that compile and run code that writes
+  something to stdout, which is then compared to a "reference" file.
+
+* `lambda_expect_test` - for test that compile code with `-dlambda` and compare the output to a reference file
+
+* `inline_expect_test` - for tests that run
+  `testsuite/tools/expect_test` (Bazel build target:
+  `//testsuite/tools:inline_expect`)
+
+=== meta-testing
+
+With Bazel a build target can directly depend on submodules in a
+namespace ("wrapped" lib). For example,
+`testsuite/tests/basic/float.ml` depends only on `Stdlib.Printf`; with
+Bazel this can be expressed explicitly:
+
+   deps = ["//stdlib:Stdlib.Printf"]
+
+Depending on the `stdlib` archive file will also work but is not necessary:
+
+   deps = ["//stdlib"]
+
+Each target depending on the archive file will be rebuilt whenever any
+submodule changes, whether or not the target actually depends on it,
+since the archive will be rebuilt. Depending directly on submodules
+avoids this.
+
+This requires a form of meta-testing, to make sure that Bazel is
+handling both dependency strategies correctly. We list both the
+archive dependency and the direct submodule dependencies on each
+target and use `select` to choose between them.
+
+Flag:
+
+* `--//testsuite/tests:with-stdlib` - controls deps of `test_module` targets.
+
+  ** False (default): depend on stdlib submodules but not stdlib.cma/cmxa
+  ** True: depend on stdlib.cma/cmxa
+
+This flag controls the `select` function used for `test_module`
+targets. For example, here is the code to build `testsuite/tests/basic/equality.ml`:
+
+----
+test_module(
+    name   = "Equality",
+    struct = "equality.ml",
+    deps   = select({
+        "//testsuite/tests:with-stdlib?":["//stdlib"],
+        "//conditions:default": ["//stdlib:Stdlib.Fun"]
+    })
+)
+----
+
+By default, this target will depend only on `Stdlib__Fun.cm[o|x]`.
+
+== conversion
+
+=== rule: expect_test
+
+For tests whose controlling stanza is `(* TEST *)` and have a `.reference` file for expect diffing.
+
+See `testsuite/test/basic/BUILD.bazel` for examples.
+
+Build the `.ml` file using rule `test_module` and add an `expect_test`
+target depending on it.
+
+Convention: the name of `test_module` targets should be the normalized
+module name, e.g. `Min_int` for `min_int.ml`.
+
+
+[CAUTION]
+====
+Be careful about case. In particular when the file name is
+segmented like `min_int.ml`, make sure not to inadvertently capitalize
+all the segments. If your test_module is `Opt_variants` but you list
+`Opt_Variants` as the `main` attribute of `expect_test`, you'll get an
+error like:
+
+   Error in fail: Target lacks providers BootInfo, CcInfo: <input file target //testsuite/tests/basic:Opt_Variants>
+
+(At least this happens on a mac; on Linux you'll probably get some variant of "file not found"
+====
+
+Convention: use suffix `.stdout` for the stdout attribute.
+
+Dependencies for the test_module should look like this:
+
+----
+    deps   = select({
+        "//testsuite/tests:with-stdlib?":["//stdlib"],
+        "//conditions:default": [
+            ## list of deps, using specific stdlib submodules, not //stdlib; e.g.
+            "//stdlib:Stdlib.Int"  ## dep on Stdlib__Int.cm[o|x]
+         ]
+    })
+----

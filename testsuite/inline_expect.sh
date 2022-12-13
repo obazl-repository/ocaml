@@ -3,14 +3,18 @@
 # bazel run testsuite/tools:inline_expect --config=ocamlc.byte -- \
 # bazel-bin/testsuite/tools/_dev_ocamlc.opt/inline_expect.opt \
 
+WORKDIR="_dev_boot"
+
 .baseline/bin/ocamlrun \
-    bazel-bin/testsuite/tools/_dev_ocamlopt.byte/inline_expect.byte \
+    bazel-bin/testsuite/tools/${WORKDIR}/inline_expect.byte \
+    -drawlambda \
+    -dlambda \
     -strict-sequence \
     -strict-formats \
     -absname \
     -nocwd \
     -nostdlib \
-    -I $PWD/bazel-bin/stdlib/_dev_ocamlopt.byte \
+    -I $PWD/bazel-bin/stdlib/${WORKDIR} \
     $PWD/$1
 
 # set -x
@@ -22,7 +26,8 @@ diff -w \
 if [ $? -eq 0 ]
 then
     echo PASS
-    rm "$1.corrected"
+    # unless -k
+    # rm "$1.corrected"
 else
     echo FAIL
 fi

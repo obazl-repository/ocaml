@@ -36,6 +36,8 @@ ocaml_tool = rule(
     attrs = dict(
         executable_attrs(),
 
+        vm_only = attr.bool(default = False),
+
         ## _runtime: for sys executor only
         _runtime = attr.label(
             # allow_single_file = True,

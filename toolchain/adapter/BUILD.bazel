@@ -38,7 +38,7 @@ dev_toolchain_adapter(
     name        = "dev",
     copts       = [ ## common opts: structs and sigs
         "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
+        # "-strict-sequence",
         # "-warn-error", "+A",
     ] + select({
         "//config/ocaml/compile:absname?" : ["-absname"],

@@ -1,5 +1,5 @@
-load("//bzl:rules.bzl",
-     "ocaml_tool",
+load("//bzl:rules.bzl", "ocaml_tool")
+load("//bzl/rules/test:rules.bzl",
      "test_archive",
      "test_executable",
      "test_library",
@@ -32,8 +32,22 @@ test_library(
 # expect_LIBS := $(addprefix $(COMPILERLIBSDIR)/,\
 #   ocamlcommon ocamlbytecomp ocamltoplevel)
 
+environment(name = "vm") ## secret bazel thing, undocumented
+environment_group(
+    name = "vm_env",
+    defaults = [
+        ":vm",
+    ],
+    environments = [
+        ":vm",
+    ],
+)
+
+
+## FIXME: only build VM version. build should fail for ocamlopt.[byte|opt]
 ocaml_tool(
     name = "inline_expect",
+    vm_only = True,
     prologue = [
         # "//stdlib",
         # "//stdlib:CamlinternalMod", #FIXME: should not be necessary?
@@ -48,7 +62,22 @@ ocaml_tool(
         "//toplevel:ocamltoplevel"
     ],
     main = ":Expect_test",
-    opts = ["-linkall"],
+    opts = ["-linkall", "-verbose"],
+    cc_linkopts = select({
+        "@platforms//os:macos": [ ## FIXME: default tc, not zig
+            # "-Wl,-v", # prints config, search paths
+            # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
+            # "-t", # -Wl-v plus logs each file the linker loads.
+            # "-why_load" # Log why each object file in a static library
+            #             # is loaded. That is, what symbol was needed.
+            ## zig linker opts
+            # "-v",
+            ],
+        "@platforms//os:linux": [
+            # "-Wl,--verbose"
+            ##FIXME: depends on linker used (bfd, gold, etc.)
+        ]
+    }),
     visibility = [
         "//ocamltest:__pkg__",
         "//testsuite:__subpackages__"

@@ -1,4 +1,4 @@
-load("//bzl:rules.bzl",
+load("//bzl/rules/test:rules.bzl",
      "test_archive",
      "test_executable",
      "test_library",
@@ -7,7 +7,6 @@ load("//bzl:rules.bzl",
      "ocaml_test",
      "expect_test",
      "inline_expect_test",
-     "lambda_expect_test"
 )
 
 MODULE_OPTS = []

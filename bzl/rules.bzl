@@ -1,21 +1,6 @@
 load("//bzl/rules:run_tool.bzl", _run_tool = "run_tool")
 load("//bzl/rules:run_repl.bzl", _run_repl = "run_repl")
 
-load("//bzl/rules:ocaml_test.bzl", _ocaml_test = "ocaml_test")
-load("//bzl/rules:expect_test.bzl", _expect_test = "expect_test")
-load("//bzl/rules:inline_expect_test.bzl",
-     _inline_expect_test = "inline_expect_test")
-load("//bzl/rules:lambda_expect_test.bzl",
-     _lambda_expect_test = "lambda_expect_test")
-
-load("//bzl/rules:test_archive.bzl", _test_archive = "test_archive")
-load("//bzl/rules:test_executable.bzl",
-     _test_executable = "test_executable")
-load("//bzl/rules:test_library.bzl", _test_library = "test_library")
-
-load("//bzl/rules:test_module.bzl",  _test_module  = "test_module")
-load("//bzl/rules:test_signature.bzl", _test_signature = "test_signature")
-
 load("//bzl/rules:tool_module.bzl",  _tool_module  = "tool_module")
 load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
 
@@ -50,9 +35,6 @@ load("//bzl/rules:compiler_signature.bzl", _compiler_signature = "compiler_signa
 load("//bzl/rules:bootstrap_repl.bzl", _bootstrap_repl = "bootstrap_repl")
 
 
-# load("//bzl/rules:baseline_test.bzl",
-#      _baseline_test = "baseline_test")
-
 # load("//bzl/rules:baseline_compiler.bzl", _baseline_compiler = "baseline_compiler")
 
 
@@ -83,7 +65,6 @@ compiler_module      = _compiler_module
 bootstrap_repl   = _bootstrap_repl
 boot_signature   = _boot_signature
 compiler_signature   = _compiler_signature
-# baseline_test   = _baseline_test
 
 # boot_compiler    = _boot_compiler
 ocaml_compiler    = _ocaml_compiler
@@ -94,15 +75,5 @@ ocaml_tool      = _ocaml_tool
 
 run_repl = _run_repl
 run_tool = _run_tool
-ocaml_test = _ocaml_test
-expect_test = _expect_test
-inline_expect_test = _inline_expect_test
-lambda_expect_test = _lambda_expect_test
-test_archive = _test_archive
-test_executable = _test_executable
-test_library = _test_library
-test_module  = _test_module
-test_signature = _test_signature
-
 tool_module  = _tool_module
 tool_signature = _tool_signature

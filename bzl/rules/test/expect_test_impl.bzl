@@ -13,50 +13,71 @@ load("//bzl/transitions:dev_transitions.bzl",
 
 load("//bzl:functions.bzl", "get_workdir")
 
+## expect_test
+
+## builds an executable and runs it
+## executable is expected to write to stdout
+## expect_test redirects output to file,
+## then diffs it against expected output.
+
 ##############################
-def _expect_test_impl(ctx):
+def expect_test_impl(ctx):
+
+    debug = True
 
     tc = ctx.toolchains["//toolchain/type:boot"]
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
+
+    if debug == True:
+        print("EXPECT_TEST: %s" % ctx.label)
+        print("config_executor: %s" % config_executor)
+        print("config_emitter: %s" % config_emitter)
 
     if config_executor in ["boot", "vm"]:
-        ext = ".byte"
+        ext      = ".byte"
     else:
-        ext = ".opt"
+        ext      = ".opt"
 
     exe_name = ctx.label.name + ext
 
     exe = executable_impl(ctx, exe_name)
 
-    for p in exe:
-        print("RESULT: %s" % p.files.to_list()[0].path)
+    if debug:
+        print("exe: %s" % exe)
+        for f in exe[0].default_runfiles.files.to_list():
+            print("RF: %s" % f)
 
     pgm = exe[0].files.to_list()[0]
 
+    if config_executor in ["boot", "vm"]:
+        ocamlrun = exe[0].default_runfiles.files.to_list()[0]
+        pgm_cmd = ocamlrun.short_path + " " + pgm.short_path
+    else:
+        ocamlrun = None
+        pgm_cmd = pgm.short_path
+
     runner = ctx.actions.declare_file(ctx.attr.name + ".sh")
     # stdout = ctx.actions.declare_file(ctx.attr.stdout)
-    print("ROOT: %s" % pgm.short_path)
+    # print("ROOT: %s" % pgm.short_path)
     # stdout = runner.dirname + "/" + ctx.attr.stdout
     # stdout = ctx.attr.stdout
     stdout = ctx.attr.stdout
-    print("STDOUT: %s" % stdout)
+
+    if debug:
+        print("ocamlrun: %s" % ocamlrun)
+        print("pgm: %s" % pgm)
+        print("STDOUT: %s" % stdout)
 
     cmd = "\n".join([
         # "{pgm} > ${{TEST_TMPDIR}}/{stdout};".format(
         "{pgm} > ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(
-            pgm=pgm.short_path,
+            pgm=pgm_cmd,
             stdout = stdout
         ),
         "diff -w {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
-            src = ctx.file.expected.path,
+            src = ctx.file.expect.path,
             dst = stdout
         ),
         "if [ $? -eq 0 ]",
@@ -88,13 +109,10 @@ def _expect_test_impl(ctx):
     )
 
     myrunfiles = ctx.runfiles(
-        files = [runner, pgm, ctx.file.expected]
-        # transitive_files =  depset(
-        #     transitive = [
-        #         depset(direct=runfiles),
-        #         sigs_depset
-        #     ]
-        # )
+        files = [runner] + [ocamlrun] if ocamlrun else [],
+        transitive_files =  depset([
+            pgm, ctx.file.expect
+        ])
     )
 
     defaultInfo = DefaultInfo(
@@ -107,37 +125,37 @@ def _expect_test_impl(ctx):
 
     # return expect_impl(ctx, exe_name)
 
-#######################
-expect_test = rule(
-    implementation = _expect_test_impl,
-    doc = "Compile and test an OCaml program.",
-    attrs = dict(
-        executable_attrs(),
+# #######################
+# expect_test = rule(
+#     implementation = _expect_test_impl,
+#     doc = "Compile and test an OCaml program.",
+#     attrs = dict(
+#         executable_attrs(),
 
-        stdout = attr.string( ),
-        expected = attr.label(
-            allow_single_file = True,
-        ),
+#         stdout = attr.string( ),
+#         expect = attr.label(
+#             allow_single_file = True,
+#         ),
 
-        _runtime = attr.label(
-            allow_single_file = True,
-            default = "//toolchain/dev:runtime",
-            executable = False,
-            # cfg = reset_cc_config_transition ## only build once
-            # default = "//config/runtime" # label flag set by transition
-        ),
+#         _runtime = attr.label(
+#             allow_single_file = True,
+#             default = "//toolchain/dev:runtime",
+#             executable = False,
+#             # cfg = reset_cc_config_transition ## only build once
+#             # default = "//config/runtime" # label flag set by transition
+#         ),
 
-        _rule = attr.string( default = "expect_test" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
-    ),
-    # cfg = reset_config_transition,
-    # cfg = "exec",
-    cfg = dev_tc_compiler_out_transition,
-    test = True,
-    fragments = ["cpp"],
-    toolchains = ["//toolchain/type:boot",
-                  ## //toolchain/type:profile,",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
-)
+#         _rule = attr.string( default = "expect_test" ),
+#         _allowlist_function_transition = attr.label(
+#             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+#         ),
+#     ),
+#     # cfg = reset_config_transition,
+#     # cfg = "exec",
+#     cfg = dev_tc_compiler_out_transition,
+#     test = True,
+#     fragments = ["cpp"],
+#     toolchains = ["//toolchain/type:boot",
+#                   ## //toolchain/type:profile,",
+#                   "@bazel_tools//tools/cpp:toolchain_type"]
+# )

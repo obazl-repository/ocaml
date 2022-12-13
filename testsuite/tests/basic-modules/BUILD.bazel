@@ -1,4 +1,4 @@
-load("//bzl:rules.bzl",
+load("//bzl/rules/test:rules.bzl",
      "test_archive",
      "test_executable",
      "test_library",
@@ -24,7 +24,7 @@ test_library(
     ],
 )
 
-# ocaml_test just compiles and runs executable
+# ocaml_test just compiles and runs executable, w/o diffing
 ocaml_test(
     name = "anonymous_test",
     main = ":Anonymous",
@@ -36,29 +36,29 @@ ocaml_test(
 lambda_expect_test(
     name   = "Anonymous_test",
     struct   = "anonymous.ml",
-    expected = "anonymous.ocamlc.reference",
+    expect   = "anonymous.ocamlc.reference",
     deps = ["//stdlib"]         # FIXME: make this implicit?
 )
 
 test_module(
     name   = "Anonymous",
     struct   = "anonymous.ml",
-    dump = [
-        "lambda",
-        # "rawlambda",
-        # "clambda",
-        # "rawclambda",
-        # "cmm",
-        # "parsetree",
-        # "instr"
-        # "instruction-selection"
-    ],
-    opts   = [
-        "-nostdlib",
-        "-nopervasives",
-        # "-dno-locations",
-        # "-dno-unique-ids"
-    ],
+    # dump = [
+    #     "lambda",
+    #     # "rawlambda",
+    #     # "clambda",
+    #     # "rawclambda",
+    #     # "cmm",
+    #     # "parsetree",
+    #     # "instr"
+    #     # "instruction-selection"
+    # ],
+    # opts   = [
+    #     "-nostdlib",
+    #     "-nopervasives",
+    #     # "-dno-locations",
+    #     # "-dno-unique-ids"
+    # ],
     deps = ["//stdlib"]
 )
 
@@ -77,7 +77,7 @@ ocaml_test(
 expect_test(
     name     = "Main_expect_test",
     stdout   = "Main.stdout",
-    expected = "main.reference",
+    expect   = "main.reference",
     prologue = [
         # "//stdlib",
         "//stdlib:Stdlib.Printf",
@@ -154,7 +154,7 @@ inline_expect_test(
 expect_test(
     name     = "Recursive_module_init_expect_test",
     stdout   = "Recursive_module_init.stdout",
-    expected = "recursive_module_init.reference",
+    expect   = "recursive_module_init.reference",
     main     = ":Recursive_module_init",
     timeout = "short"
 )

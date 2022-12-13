@@ -43,6 +43,9 @@ You can add something like ` | dot -Tsvg > /tmp/deps.svg` to view the graph.
 
     bazel cquery "somepath(//lex:ocamllex, //runtime/caml:domain_state.h)" --output=graph --config=boot
 
+== providers
+
+    bazel cquery //testsuite/tests/lib-bigarray:Change_layout --output=starlark --starlark:expr="providers(target)"
 
 == examples
 

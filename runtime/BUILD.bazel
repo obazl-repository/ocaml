@@ -327,7 +327,21 @@ filegroup(
 #     "md5.c",
 #     "memory.c",
 #     "memprof.c",
+
+## NB: everything in meta.c is guarded by #ifndef NATIVE_CODE and at
+## top of file: "/* Primitives for the toplevel */" makefiles always
+## compile it. for libcamlrun w/o -DNATIVE_CODE but with it for libasmrun.
+
+## libcamlrun:
+# gcc -c ... -o runtime/meta.b.o runtime/meta.c
+# ditto for -o: meta.bd.o, meta.bi.o, meta.bpic.o
+
+## libasmrun:
+# gcc -c ... -DNATIVE_CODE ... -o runtime/meta.n.o runtime/meta.c
+# ditto for -o: meta.nd.o, meta.ni.o, meta.npic.o
+
 #     "meta.c",
+
 #     "minor_gc.c",
 #     "misc.c",
 #     "obj.c",

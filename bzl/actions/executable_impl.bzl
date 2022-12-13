@@ -23,20 +23,13 @@ load("//bzl/rules/common:DEPS.bzl",
 #########################
 def executable_impl(ctx, exe_name):  ## , tc):
 
-    debug = False
-    # if ctx.label.name == "test":
-        # debug = True
-
-    # print("++ EXECUTABLE {}".format(ctx.label))
+    debug = True
 
     if debug:
         print("EXECUTABLE TARGET: {kind}: {tgt}".format(
             kind = ctx.attr._rule,
             tgt  = ctx.label.name
         ))
-
-    # tc = ctx.toolchains["//toolchain/type:boot"]
-    # print("boot tc: %s" % tc)
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
@@ -47,17 +40,30 @@ def executable_impl(ctx, exe_name):  ## , tc):
      workdir) = get_workdir(ctx, tc)
 
     if debug:
+        print("tc.name: %s" % tc.name)
         print("target_executor: %s" % target_executor)
         print("target_emitter: %s" % target_emitter)
         print("config_executor: %s" % config_executor)
         print("config_emitter: %s" % config_emitter)
+        print("tc.compiler: %s" % tc.compiler)
+        # for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+        #     print("tc rf: %s" % f)
+        # x = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+        # print("tc executable: %s" % x)
 
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    if hasattr(ctx.attr, "vm_only"):
+        if ctx.attr.vm_only:
+            if config_executor == "sys":
+                fail("This target can only be built for vm executor. Try passing --//config/target/executor=vm")
+
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
+    executor = config_executor
+    emitter  = config_emitter
 
     ################################################################
     ################  DEPS  ################
@@ -238,6 +244,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
         # print("exe runtime files: %s" % ctx.attr._runtime.files)
 
         for f in ctx.files._runtime: ## libasmrun.a
+            print("XXXXXXXXXXXXXXXX: %s" % f)
             runtime_files.append(f)
             ## NB: Asmlink looks for libasmrun.a in the std search
             ## space (-I dirs), not the link srch space (-L dirs)

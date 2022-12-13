@@ -45,8 +45,8 @@ def _lambda_expect_test_impl(ctx):
         "echo DUMP path: {};".format(dlambda.path),
         "echo LAMBDA path: {};".format(lambdafile),
         # "echo LAMBDA short path: %s\n" % dlambda.short_path)
-        # "echo EXPECT path: %s\n" % ctx.file.expected.path)
-        # "echo EXPECT short path: %s\n" % ctx.file.expected.short_path)
+        # "echo EXPECT path: %s\n" % ctx.file.expect.path)
+        # "echo EXPECT short path: %s\n" % ctx.file.expect.short_path)
         "echo ROOT:   {}".format(dlambda.root.path),
         # "set -x;",
 
@@ -70,7 +70,7 @@ def _lambda_expect_test_impl(ctx):
         "diff -w -B {a} {b};".format(
         # a = dlambda.short_path,
         b = lambdafile,
-        a = ctx.file.expected.path)
+        a = ctx.file.expect.path)
     ])
 
     ctx.actions.write(
@@ -80,7 +80,7 @@ def _lambda_expect_test_impl(ctx):
     )
 
     myrunfiles = ctx.runfiles(
-        files = [dlambda, ctx.file.expected]
+        files = [dlambda, ctx.file.expect]
         # transitive_files =  depset(
         #     transitive = [
         #         depset(direct=runfiles),
@@ -135,7 +135,7 @@ lambda_expect_test = rule(
                 "-dlambda"
             ]
         ),
-        expected = attr.label(
+        expect = attr.label(
             allow_single_file = True,
         ),
         opts             = attr.string_list( ),

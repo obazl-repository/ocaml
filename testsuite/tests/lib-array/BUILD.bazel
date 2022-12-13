@@ -1,7 +1,8 @@
-load("//bzl:rules.bzl", "inline_expect_test")
+load("//bzl/rules/test:rules.bzl", "inline_expect_test")
 
 inline_expect_test(
     name = "Test_array_test",
     src  = "test_array.ml",
+    timeout = "short"
 )
 

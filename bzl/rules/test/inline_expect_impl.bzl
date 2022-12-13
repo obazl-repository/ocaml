@@ -1,7 +1,9 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("@bazel_skylib//lib:collections.bzl", "collections")
+
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-load(":BUILD.bzl", "progress_msg")
+load("//bzl/actions:BUILD.bzl", "progress_msg")
 
 load("//bzl:providers.bzl",
      "new_deps_aggregator",
@@ -151,7 +153,6 @@ def inline_expect_impl(ctx, exe_name):  ## , tc):
     #     # ctx.file._stdlib.dirname + "/../.."
     # )
     args.append("-nostdlib")
-    args.append("-nopervasives")
     # args.append("-verbose")
 
     # args.append("-I")
@@ -204,8 +205,8 @@ def inline_expect_impl(ctx, exe_name):  ## , tc):
 
     # args.add_all(tc.linkopts)
 
-    # _options = get_options(rule, ctx)
-    # args.add_all(_options)
+    _options = get_options(rule, ctx)
+    args.extend(_options)
 
     # if ctx.attr.cc_linkopts:
     #     for lopt in ctx.attr.cc_linkopts:
@@ -298,15 +299,29 @@ def inline_expect_impl(ctx, exe_name):  ## , tc):
     # args.append(ctx.file._stdlib.short_path)
 
     args.append("-I")
-    args.append("stdlib/_dev_boot")
+    args.append("stdlib/{}".format(workdir))
     # last arg:
-    args.append(ctx.file.src.path)
+    args.append(ctx.file.src.path + ";")
 
-    runner = ctx.actions.declare_file(workdir + "inline_expect_test_runner.sh")
+    runner = ctx.actions.declare_file(workdir + ctx.file.src.basename + ".test_runner.sh")
+
+    # args.append("echo PWD: $PWD;")
+    # args.append("echo 'listing: {}';".format(ctx.file.src.dirname))
+    # args.append("ls -la {};".format(ctx.file.src.dirname))
+    # args.append("cat {};".format(ctx.file.src.path + ".corrected"))
+
+    args.extend(["diff", "-w",
+                ctx.file.src.path,
+                ctx.file.src.path + ".corrected;"])
+
+
+    cmd = args[0]
+    for arg in args[1:]:
+        cmd = cmd + " \\\n" + arg
 
     ctx.actions.write(
         output  = runner,
-        content = " ".join(args),
+        content = cmd,
         is_executable = True
     )
 

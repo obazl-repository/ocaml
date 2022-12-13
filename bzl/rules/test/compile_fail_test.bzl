@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//lib:collections.bzl", "collections")
 
-load(":BUILD.bzl", "progress_msg", "get_build_executor")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
      "BootInfo", "DumpInfo", "ModuleInfo", "NsResolverInfo",
@@ -9,25 +9,21 @@ load("//bzl:providers.bzl",
 
 load("//bzl:functions.bzl",
      "get_module_name", "get_workdir", "tc_compiler")
+
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:options.bzl", "get_options")
 
-##############################################
-def gen_compile_script(ctx, executable, args):
+load("//bzl/attrs:module_attrs.bzl", "module_attrs")
+load("//bzl/actions:module_impl.bzl", "module_impl")
 
-    script = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
+load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
-    ctx.actions.write(
-        output = script,
-        content = args,
-        is_executable = True
-    )
+######################
+def _compile_fail_test(ctx):
 
-    return script
-
-#####################
-def module_impl(ctx, module_name):
+    (this, extension) = paths.split_extension(ctx.file.struct.basename)
+    module_name = this[:1].capitalize() + this[1:]
 
     basename = ctx.label.name
     from_name = basename[:1].capitalize() + basename[1:]
@@ -111,7 +107,8 @@ def module_impl(ctx, module_name):
             ctx.actions.symlink(output = sig_src,
                                 target_file = ctx.file.sig)
 
-            action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+            # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+            action_output_cmi = workdir + module_name + ".cmi"
             action_outputs.append(action_output_cmi)
             provider_output_cmi = action_output_cmi
             mli_dir = None
@@ -130,21 +127,22 @@ def module_impl(ctx, module_name):
         else:
             # generated sigfile, e.g. by cp, rename, link
             # need to symlink .mli, to match symlink of .ml
-            sig_src = ctx.actions.declare_file(
-                workdir + module_name + ".mli"
-            )
+            # sig_src = ctx.actions.declare_file(
+            sig_src = workdir + module_name + ".mli"
             sig_inputs.append(sig_src)
             ctx.actions.symlink(output = sig_src,
                                 target_file = ctx.file.sig)
 
-            action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+            # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+            action_output_cmi = workdir + module_name + ".cmi"
             action_outputs.append(action_output_cmi)
             provider_output_cmi = action_output_cmi
             mli_dir = None
     else: ## no sig
         # compiler will generate .cmi
         # put src in workdir as well
-        action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+        # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+        action_output_cmi = workdir + module_name + ".cmi"
         action_outputs.append(action_output_cmi)
         provider_output_cmi = action_output_cmi
         mli_dir = None
@@ -218,7 +216,8 @@ def module_impl(ctx, module_name):
 
     direct_inputs = [in_structfile]
 
-    out_cm_ = ctx.actions.declare_file(workdir + module_name + ext)
+    # out_cm_ = ctx.actions.declare_file(workdir + module_name + ext)
+    out_cm_ = workdir + module_name + ext
     # sibling = new_cmi) # fname)
     if debug:
         print("OUT_CM_: %s" % out_cm_.path)
@@ -227,18 +226,22 @@ def module_impl(ctx, module_name):
     default_outputs.append(out_cm_)
 
     _options = get_options(ctx.attr._rule, ctx)
-    if ( ("-bin-annot" in _options)
-         or ("-bin-annot" in tc.copts) ):
-        out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
-        action_outputs.append(out_cmt)
-        default_outputs.append(out_cmt)
+    if ("-bin-annot" in _options):
+        _options.remove("-bin-annot")
+         # or ("-bin-annot" in tc.copts) ):
+
+        # out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
+        # out_cmt = workdir + module_name + ".cmt"
+        # action_outputs.append(out_cmt)
+        # default_outputs.append(out_cmt)
     else:
         out_cmt = None
 
     moduleInfo_ofile = None
     if ext == ".cmx":
         # if not ctx.attr._rule.startswith("bootstrap"):
-        out_o = ctx.actions.declare_file(workdir + module_name + ".o")
+        # out_o = ctx.actions.declare_file(workdir + module_name + ".o")
+        out_o = workdir + module_name + ".o"
                                          # sibling = out_cm_)
         action_outputs.append(out_o)
         default_outputs.append(out_o)
@@ -323,12 +326,12 @@ def module_impl(ctx, module_name):
     ## build depsets here, use for OcamlProvider and OutputGroupInfo
     sigs_depset = depset(
         order=dsorder,
-        direct = [provider_output_cmi],
+        # direct = [provider_output_cmi],
         transitive = [merge_depsets(depsets, "sigs")])
 
     cli_link_deps_depset = depset(
         order = dsorder,
-        direct = [out_cm_],
+        # direct = [out_cm_],
         transitive = [merge_depsets(depsets, "cli_link_deps")]
     )
 
@@ -340,7 +343,7 @@ def module_impl(ctx, module_name):
     if ext == ".cmx":
         ofiles_depset  = depset(
             order=dsorder,
-            direct = [out_o],
+            # direct = [out_o],
             transitive = [merge_depsets(depsets, "ofiles")]
         )
     else:
@@ -356,7 +359,7 @@ def module_impl(ctx, module_name):
 
     paths_depset  = depset(
         order = dsorder,
-        direct = [out_cm_.dirname],
+        # direct = [out_cm_.dirname],
         transitive = [merge_depsets(depsets, "paths")]
     )
 
@@ -367,7 +370,9 @@ def module_impl(ctx, module_name):
     indirect_cc_deps  = {}
 
     #########################
-    args = ctx.actions.args()
+    args = [] ## ctx.actions.args()
+
+    # args.append("echo PWD: $PWD;")
 
     executable = None
     if tc.dev:
@@ -379,11 +384,17 @@ def module_impl(ctx, module_name):
 
     build_executor = get_build_executor(tc)
 
+    runfiles = []
+
     if build_executor == "vm":
         executable = ocamlrun
-        args.add(effective_compiler.path)
+        args.append(executable)
+        args.append(effective_compiler.short_path)
+        runfiles.extend([executable, effective_compiler])
     else:
         executable = effective_compiler
+        args.append(executable.short_path)
+        runfiles.extend([executable])
 
     # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
     # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
@@ -393,22 +404,22 @@ def module_impl(ctx, module_name):
     #         if config_emitter == "sys":
     #             # ss built from ocamlopt.byte
     #             executable = ocamlrun
-    #             args.add(effective_compiler.path)
+    #             args.append(effective_compiler.path)
     #         else:
     #             # sv built from ocamlopt.opt
     #             executable = effective_compiler
     #     else:
     #         executable = ocamlrun
-    #         args.add(effective_compiler.path)
+    #         args.append(effective_compiler.path)
 
     # elif target_executor in ["boot", "vm"]:
     #         executable = ocamlrun
-    #         args.add(effective_compiler.path)
+    #         args.append(effective_compiler.path)
 
     # elif (target_executor == "sys" and target_emitter == "sys"):
     #     ## ss always built by vs (ocamlopt.byte)
     #     executable = ocamlrun
-    #     args.add(effective_compiler.path)
+    #     args.append(effective_compiler.path)
 
     # elif (target_executor == "sys" and target_emitter == "vm"):
     #     ## sv built by ss
@@ -423,17 +434,17 @@ def module_impl(ctx, module_name):
     ## FIXME: -use-prims not needed for compilation?
     # if ext == ".cmo":
     #     if ctx.attr.use_prims == True:
-    #         args.add_all(["-use-prims", ctx.file._primitives.path])
+    #         args.append_all(["-use-prims", ctx.file._primitives.path])
     #     else:
     #         if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
-    #             args.add_all(["-use-prims", ctx.file._primitives.path])
+    #             args.append_all(["-use-prims", ctx.file._primitives.path])
     #         else:
     #             if ctx.attr._use_prims[BuildSettingInfo].value:
     #                 if not "-no-use-prims" in ctx.attr.opts:
-    #                     args.add_all(["-use-prims", ctx.file._primitives.path])
+    #                     args.append_all(["-use-prims", ctx.file._primitives.path])
     #             else:
     #                 if  "-use-prims" in ctx.attr.opts:
-    #                     args.add_all(["-use-prims", ctx.file._primitives.path])
+    #                     args.append_all(["-use-prims", ctx.file._primitives.path])
 
     resolver = None
     resolver_deps = []
@@ -442,30 +453,27 @@ def module_impl(ctx, module_name):
         resolver_deps.append(resolver.sig)
         resolver_deps.append(resolver.struct)
         nsname = resolver.struct.basename[:-4]
-        args.add_all(["-open", nsname])
+        args.extend(["-open", nsname])
 
     if hasattr(ctx.attr, "stdlib_primitives"): # test rules
         if ctx.attr.stdlib_primitives:
-            includes.append(ctx.attr._stdlib[ModuleInfo].sig.dirname)
-            direct_inputs.append(ctx.attr._stdlib[ModuleInfo].sig)
-            direct_inputs.append(ctx.attr._stdlib[ModuleInfo].struct)
+            includes.append("stdlib/_dev_boot")
+            includes.append(ctx.attr._stdlib[BootInfo].sigs.to_list()[0].dirname)
+            # direct_inputs.append(ctx.attr._stdlib[ModuleInfo].sig)
+            # direct_inputs.append(ctx.attr._stdlib[ModuleInfo].struct)
 
     if hasattr(ctx.attr, "_opts"):
-        args.add_all(ctx.attr._opts)
+        args.extend(ctx.attr._opts)
 
-    if not ctx.attr.nocopts:
-        # for opt in tc.copts:
-        #     if opt not in NEGATION_OPTS:
-        #         args.add(opt)
-        #     else:
-        args.add_all(tc.copts)
+    # if not ctx.attr.nocopts:
+    #     args.extend(tc.copts)
 
-    args.add_all(tc.structopts)
+    args.extend(tc.structopts)
 
-    args.add_all(tc.warnings[BuildSettingInfo].value)
+    args.extend(tc.warnings[BuildSettingInfo].value)
 
     for w in ctx.attr.warnings:
-        args.add_all(["-w",
+        args.extend(["-w",
                       w if w.startswith("-")
                       else "-" + w])
 
@@ -474,52 +482,52 @@ def module_impl(ctx, module_name):
             if dep.label.package == "stdlib":
                 if "-nopervasives" in _options:
                     _options.remove("-nopervasives")
-    args.add_all(_options)
+    args.extend(_options)
 
     #FIXME: make a function for the dump stuff
     if hasattr(ctx.attr, "_lambda_expect_test"):
         for arg in ctx.attr._lambda_expect_test:
-            args.add(arg)
+            args.append(arg)
 
     elif hasattr(ctx.attr, "dump"): # test rules w/explicit dump attr
         if len(ctx.attr.dump) > 0:
-            args.add("-dump-into-file")
+            args.append("-dump-into-file")
         for d in ctx.attr.dump:
             if d == "source":
-                args.add("-dsource")
+                args.append("-dsource")
             if d == "parsetree":
-                args.add("-dparsetree")
+                args.append("-dparsetree")
             if d == "typedtree":
-                args.add("-dtypedtree")
+                args.append("-dtypedtree")
             if d == "shape":
-                args.add("-dshape")
+                args.append("-dshape")
             if d == "rawlambda":
-                args.add("-drawlambda")
+                args.append("-drawlambda")
             if d == "lambda":
-                args.add("-dlambda")
+                args.append("-dlambda")
             if d == "rawclambda":
-                args.add("-drawclambda")
+                args.append("-drawclambda")
             if d == "rawflambda":
-                args.add("-drawflambda")
+                args.append("-drawflambda")
             if d == "flambda":
-                args.add("-dflambda")
+                args.append("-dflambda")
             if d == "flambda-let":
-                args.add("-dflambda-let")
+                args.append("-dflambda-let")
             if d == "flambda-verbose":
-                args.add("-dflambda-verbose")
+                args.append("-dflambda-verbose")
 
             if d == "instruction-selection":
-                args.add("-dsel")
+                args.append("-dsel")
 
             if ext == ".cmo":
                 if d == "instr":
-                    args.add("-dinstr")
+                    args.append("-dinstr")
 
             if ext == ".cmx":
                 if d == "clambda":
-                    args.add("-dclambda")
+                    args.append("-dclambda")
                 if d == "cmm":
-                    args.add("-dcmm")
+                    args.append("-dcmm")
 
     merged_input_depsets = [merge_depsets(depsets, "sigs")]
     if ext == ".cmx":
@@ -555,120 +563,100 @@ def module_impl(ctx, module_name):
     #     print("inputs_depset: %s" % inputs_depset)
 
     if pack_ns:
-        args.add("-for-pack", pack_ns)
+        args.append("-for-pack", pack_ns)
 
     if sig_src:
         includes.append(sig_src.dirname)
 
-    args.add_all(includes, before_each="-I", uniquify = True)
+    for inc in collections.uniq(includes):
+        args.extend(["-I", inc])
 
-    args.add("-c")
+    args.append("-c")
 
     if sig_src:
-        args.add(sig_src)
-        args.add(in_structfile) # structfile)
+        args.append(sig_src)
+        args.append(in_structfile.path) # structfile)
     else:
-        args.add("-impl", in_structfile) # structfile)
-        args.add("-o", out_cm_)
+        args.extend(["-impl", ctx.file.struct.short_path])
+                     ## in_structfile.short_path]) # structfile)
+        args.extend(["-o", out_cm_])
 
-    # print("ACTION_OUTPUTS: %s" % action_outputs)
+    dump = ctx.file.struct.basename + ".dump"
 
-    # if ctx.attr.dlambda:
-    #     lambdalog = ctx.actions.declare_file(out_cm_.path + ".dump")
-    #     action_outputs.append(lambdalog)
+    args.extend([">", dump + ";"])
 
-    # if ctx.attr._rule == "compile_fail_test":
-    #     script = gen_compile_script(ctx, executable, args)
+    ## now diff the output:
+    args.extend(["diff", "-w", dump, ctx.file.expect.path])
 
-    ################
-    ctx.actions.run(
-        # env = env,
-        executable = executable.path,
-        # executable = tc.compiler[DefaultInfo].files_to_run,
-        arguments = [args],
-        inputs    = inputs_depset,
-        outputs   = action_outputs,
-        tools = [
-            executable,
-            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            # tc_compiler(tc)[DefaultInfo].files_to_run
-        ],
-        mnemonic = "CompileBootstrapModule",
-        progress_message = progress_msg(workdir, ctx)
+    script = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
+    ctx.actions.write(
+        output = script,
+        content = " ".join(args),
+        is_executable = True
     )
 
-    #############################################
-    ################  PROVIDERS  ################
+    ################################################################
+    # runfiles = []
+    # if ocamlrun:
+    #     runfiles = [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
+    # print("runfiles tc.compiler: %s" % tc.compiler)
+    # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
+    # if tc.dev:
+    #     runfiles.append(tc.ocamlrun)
+    # elif ocamlrun:
+    #     runfiles.extend(tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list())
 
-    default_depset = depset(
-        order = dsorder,
-        # only output one file; for cmx, get .o from ModuleInfo
-        direct = [out_cm_], # default_outputs,
-        # transitive = [depset(direct=default_outputs)]
-        # transitive = bottomup_ns_files + [depset(direct=default_outputs)]
+    print("EXE runfiles: %s" % runfiles)
+
+    print("SIGS: %s" % ctx.attr._stdlib[BootInfo].sigs)
+
+    # print("DATA: %s" % ctx.files.data)
+    myrunfiles = ctx.runfiles(
+        files = [ctx.file.struct, ctx.file.expect],
+        transitive_files =  depset(
+            transitive = [
+                depset(direct=runfiles),
+                depset(direct=ctx.files.data),
+                ctx.attr._stdlib[BootInfo].sigs,
+                ctx.attr._stdlib[BootInfo].cli_link_deps,
+            ]
+            # direct=compiler_runfiles,
+            # transitive = [depset(
+            #     # [ctx.file._std_exit, ctx.file._stdlib]
+            # )]
+        )
     )
 
+    ################################################################
     defaultInfo = DefaultInfo(
-        files = default_depset
+        executable = script,
+        runfiles   = myrunfiles
     )
     providers = [defaultInfo]
 
-    moduleInfo_depset = depset(
-        ## FIXME: add ofile?
-        direct= [provider_output_cmi, out_cm_]
-        + [out_cmt] if out_cmt else [],
-    )
-    moduleInfo = ModuleInfo(
-        sig    = provider_output_cmi,
-        # sig_src = in_structfile,
-        struct = out_cm_,
-        struct_src = in_structfile,
-        cmt = out_cmt,
-        ofile  = moduleInfo_ofile
-    )
-
-    providers.append(moduleInfo)
-
-    if hasattr(ctx.attr, "_resolver"):
-        resolver = ctx.attr._resolver[ModuleInfo]
-        nsResolverInfo = NsResolverInfo(
-            sigs   = depset(
-                direct = [resolver.sig],
-                # transitive = ... depsets.deps.resolvers
-            ),
-            structs = depset(
-                direct = [resolver.struct],
-                # transitive = ... depsets.deps.resolvers
-            )
-        )
-        providers.append(nsResolverInfo)
-
-    bootProvider = BootInfo(
-        sigs     = sigs_depset,
-        cli_link_deps = cli_link_deps_depset,
-        afiles   = afiles_depset,
-        ofiles   = ofiles_depset,
-        archived_cmx  = archived_cmx_depset,
-        paths    = paths_depset,
-    )
-    providers.append(bootProvider)
-
-    if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
-        or hasattr(ctx.attr, "_lambda_expect_test")):
-        # if len(ctx.attr.dump) > 0:
-        d = DumpInfo(dump = out_dump)
-        providers.append(d)
-        outputGroupInfo = OutputGroupInfo(
-            cmi        = depset(direct=[provider_output_cmi]),
-            module     = moduleInfo_depset,
-            log = depset([out_dump])
-        )
-    else:
-        outputGroupInfo = OutputGroupInfo(
-            cmi        = depset(direct=[provider_output_cmi]),
-            module     = moduleInfo_depset
-        )
-
-    providers.append(outputGroupInfo)
-
     return providers
+
+####################
+compile_fail_test = rule(
+    implementation = _compile_fail_test,
+    doc = "Compiles a module with the bootstrap compiler.",
+    attrs = dict(
+        module_attrs(),
+        expect = attr.label(
+            mandatory = True,
+            allow_single_file = True
+        ),
+        stdlib_primitives = attr.bool(default = True),
+        _stdlib = attr.label(
+            doc = "The commpiler always opens Stdlib, so everything depends on it.",
+
+            default = "//stdlib"
+        ),
+        _rule = attr.string( default = "compile_fail_test" ),
+    ),
+    # cfg = compile_mode_in_transition,
+    test = True,
+    toolchains = ["//toolchain/type:boot",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
