@@ -59,7 +59,10 @@ ocaml_tool(
         "-I", "/Users/gar/obazl-repository/ocamlcc/bazel-bin/stdlib/_dev_ocamlc.byte",
         "-noinit"
     ],
-    visibility = ["//:__pkg__"]
+    visibility = [
+        "//:__pkg__",
+        "//testsuite/tests:__subpackages__"
+    ]
 )
 
 # ./boot/ocamlrun expunge ocaml.tmp ocaml  camlinternalFormatBasics stdlib stdlib__Either stdlib__Sys stdlib__Obj stdlib__Atomic camlinternalLazy stdlib__Lazy stdlib__Seq stdlib__Option stdlib__Result stdlib__Bool stdlib__Char stdlib__Uchar stdlib__List stdlib__Int stdlib__Bytes stdlib__String stdlib__Unit stdlib__Marshal stdlib__Array stdlib__Float stdlib__Int32 stdlib__Int64 stdlib__Nativeint stdlib__Lexing stdlib__Parsing stdlib__Set stdlib__Map stdlib__Stack stdlib__Queue stdlib__Buffer stdlib__Mutex stdlib__Condition stdlib__Semaphore stdlib__Domain camlinternalFormat stdlib__Printf stdlib__Arg stdlib__Printexc stdlib__Fun stdlib__Gc stdlib__Digest stdlib__Bigarray stdlib__Random stdlib__Hashtbl stdlib__Weak stdlib__Format stdlib__Scanf stdlib__Callback camlinternalOO stdlib__Oo camlinternalMod stdlib__Ephemeron stdlib__Filename stdlib__Complex stdlib__ArrayLabels stdlib__ListLabels stdlib__BytesLabels stdlib__StringLabels stdlib__MoreLabels stdlib__StdLabels stdlib__In_channel stdlib__Out_channel stdlib__Effect outcometree topdirs toploop

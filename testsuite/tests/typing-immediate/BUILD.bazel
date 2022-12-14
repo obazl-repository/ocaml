@@ -1,24 +1,15 @@
-## GENERATED FILE ##
+load("//bzl/rules/test:rules.bzl", "inline_expect_test")
 
-load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-)
-
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_typing-immediate_lib",
-    modules  = [
-        ":Immediate",
-    ],
-)
-
-ocaml_module(
-    name   = "Immediate",
-    struct = "immediate.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+test_suite(
+    name  = "tests",
+    tests = [
+        "immediate_test",
     ]
 )
 
+inline_expect_test(
+    name    = "immediate_test",
+    src     = "immediate.ml",
+    timeout = "short",
+    tags    = ["inline_expect"]
+)

@@ -189,6 +189,7 @@ O  tool-dumpobj
 O  tool-expect-test
 O  tool-lexyacc
 O  tool-ocaml
+  X all but directive_failure.ml and t060-raise.ml
 O  tool-ocaml-annot
 O  tool-ocamlc-compat32
 O  tool-ocamlc-error-cleanup
@@ -212,7 +213,7 @@ O  typing-extensions
 O  typing-external
 O  typing-fstclassmod
 O  typing-gadts
-O  typing-immediate
+X  typing-immediate
 O  typing-implicit_unpack
 O  typing-kind
 O  typing-labels

@@ -1,44 +1,49 @@
-## GENERATED FILE ##
+load("//bzl/rules/test:rules.bzl",
+     "test_archive",
+     "test_executable",
+     "test_library",
+     "test_module",
+     "test_signature",
 
-load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-     "ocaml_signature",
+     "compile_fail_test",
+     "expect_test",
+     "inline_expect_test",
+     "ocaml_test",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
+SIG_OPTS    = []
 
-ocaml_library(
-    name = "testsuite_tests_typing-recmod_lib",
-    modules  = [
-        ":Gpr1626",
-        ":Pr9494",
-        ":T01bad",
-        ":T02bad",
-        ":T03ok",
-        ":T04bad",
-        ":T05bad",
-        ":T06ok",
-        ":T07bad",
-        ":T08bad",
-        ":T09bad",
-        ":T10ok",
-        ":T11bad",
-        ":T12bad",
-        ":T13ok",
-        ":T14bad",
-        ":T15bad",
-        ":T16ok",
-        ":T17ok",
-        ":T18ok",
-        ":T20ok",
-        ":T21ok",
-        ":T22ok",
-    ],
-)
+# test_library(
+#     name = "testsuite_tests_typing-recmod_lib",
+#     modules  = [
+#         ":Gpr1626",
+#         ":Pr9494",
+#         ":T01bad",
+#         ":T02bad",
+#         ":T03ok",
+#         ":T04bad",
+#         ":T05bad",
+#         ":T06ok",
+#         ":T07bad",
+#         ":T08bad",
+#         ":T09bad",
+#         ":T10ok",
+#         ":T11bad",
+#         ":T12bad",
+#         ":T13ok",
+#         ":T14bad",
+#         ":T15bad",
+#         ":T16ok",
+#         ":T17ok",
+#         ":T18ok",
+#         ":T20ok",
+#         ":T21ok",
+#         ":T22ok",
+#     ],
+# )
 
-ocaml_module(
+test_module(
     name   = "Gpr1626",
     struct = "gpr1626.ml",
     opts = MODULE_OPTS,
@@ -46,7 +51,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr9494",
     struct = "pr9494.ml",
     opts = MODULE_OPTS,
@@ -54,15 +59,24 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
-    name   = "T01bad",
+compile_fail_test(
+    name   = "t01bad_test",
     struct = "t01bad.ml",
-    opts = MODULE_OPTS,
+    expect = "t01bad.compilers.reference",
     deps   = [
-    ]
+
+    ],
 )
 
-ocaml_module(
+# test_module(
+#     name   = "T01bad",
+#     struct = "t01bad.ml",
+#     opts = MODULE_OPTS,
+#     deps   = [
+#     ]
+# )
+
+test_module(
     name   = "T02bad",
     struct = "t02bad.ml",
     opts = MODULE_OPTS,
@@ -70,7 +84,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T03ok",
     struct = "t03ok.ml",
     opts = MODULE_OPTS,
@@ -78,7 +92,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T04bad",
     struct = "t04bad.ml",
     opts = MODULE_OPTS,
@@ -86,7 +100,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T05bad",
     struct = "t05bad.ml",
     opts = MODULE_OPTS,
@@ -94,7 +108,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T06ok",
     struct = "t06ok.ml",
     opts = MODULE_OPTS,
@@ -102,7 +116,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T07bad",
     struct = "t07bad.ml",
     opts = MODULE_OPTS,
@@ -110,7 +124,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T08bad",
     struct = "t08bad.ml",
     opts = MODULE_OPTS,
@@ -118,7 +132,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T09bad",
     struct = "t09bad.ml",
     opts = MODULE_OPTS,
@@ -126,7 +140,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T10ok",
     struct = "t10ok.ml",
     opts = MODULE_OPTS,
@@ -134,7 +148,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T11bad",
     struct = "t11bad.ml",
     opts = MODULE_OPTS,
@@ -142,7 +156,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T12bad",
     struct = "t12bad.ml",
     opts = MODULE_OPTS,
@@ -150,7 +164,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T13ok",
     struct = "t13ok.ml",
     opts = MODULE_OPTS,
@@ -158,7 +172,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T14bad",
     struct = "t14bad.ml",
     opts = MODULE_OPTS,
@@ -166,7 +180,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T15bad",
     struct = "t15bad.ml",
     opts = MODULE_OPTS,
@@ -174,7 +188,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T16ok",
     struct = "t16ok.ml",
     opts = MODULE_OPTS,
@@ -182,7 +196,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T17ok",
     struct = "t17ok.ml",
     opts = MODULE_OPTS,
@@ -190,7 +204,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T18ok",
     struct = "t18ok.ml",
     opts = MODULE_OPTS,
@@ -198,7 +212,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T20ok",
     struct = "t20ok.ml",
     opts = MODULE_OPTS,
@@ -206,7 +220,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T21ok",
     struct = "t21ok.ml",
     opts = MODULE_OPTS,
@@ -214,7 +228,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "T22ok",
     struct = "t22ok.ml",
     sig    = "T22ok_cmi",
@@ -223,7 +237,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "T22ok_cmi",
     src  = "t22ok.mli",
     opts = SIG_OPTS,

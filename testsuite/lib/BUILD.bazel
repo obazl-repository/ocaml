@@ -1,4 +1,4 @@
-load("//bzl:rules.bzl",
+load("//bzl/rules/test:rules.bzl",
      "test_archive",
      "test_library",
      "test_module",
@@ -20,7 +20,8 @@ test_module(
     name   = "Lib",
     struct = "lib.ml",
     opts = MODULE_OPTS,
-    deps   = ["//stdlib:Stdlib"]
+    deps   = ["//stdlib:Stdlib"],
+    visibility = ["//testsuite/tests:__subpackages__"]
 )
 
 test_module(

@@ -1,1437 +1,1272 @@
-## GENERATED FILE ##
-
-load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_module",
-)
-
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_tool-ocaml_lib",
-    modules  = [
-        ":Directive_failure",
-        ":T000",
-        ":T010-const0",
-        ":T010-const1",
-        ":T010-const2",
-        ":T010-const3",
-        ":T011-constint",
-        ":T020",
-        ":T021-pushconst1",
-        ":T021-pushconst2",
-        ":T021-pushconst3",
-        ":T022-pushconstint",
-        ":T040-makeblock1",
-        ":T040-makeblock2",
-        ":T040-makeblock3",
-        ":T041-makeblock",
-        ":T050-getglobal",
-        ":T050-pushgetglobal",
-        ":T051-getglobalfield",
-        ":T051-pushgetglobalfield",
-        ":T060-raise",
-        ":T070-branch",
-        ":T070-branchif",
-        ":T070-branchifnot",
-        ":T071-boolnot",
-        ":T080-eq",
-        ":T080-geint",
-        ":T080-gtint",
-        ":T080-leint",
-        ":T080-ltint",
-        ":T080-neq",
-        ":T090-acc0",
-        ":T090-acc1",
-        ":T090-acc2",
-        ":T090-acc3",
-        ":T090-acc4",
-        ":T090-acc5",
-        ":T090-acc6",
-        ":T090-acc7",
-        ":T091-acc",
-        ":T092-pushacc",
-        ":T092-pushacc0",
-        ":T092-pushacc1",
-        ":T092-pushacc2",
-        ":T092-pushacc3",
-        ":T092-pushacc4",
-        ":T092-pushacc5",
-        ":T092-pushacc6",
-        ":T092-pushacc7",
-        ":T093-pushacc",
-        ":T100-pushtrap",
-        ":T101-poptrap",
-        ":T110-addint",
-        ":T110-andint",
-        ":T110-asrint-1",
-        ":T110-asrint-2",
-        ":T110-divint-1",
-        ":T110-divint-2",
-        ":T110-divint-3",
-        ":T110-lslint",
-        ":T110-lsrint",
-        ":T110-modint-1",
-        ":T110-modint-2",
-        ":T110-mulint",
-        ":T110-negint",
-        ":T110-offsetint",
-        ":T110-orint",
-        ":T110-subint",
-        ":T110-xorint",
-        ":T120-getstringchar",
-        ":T121-setstringchar",
-        ":T130-getvectitem",
-        ":T130-vectlength",
-        ":T131-setvectitem",
-        ":T140-switch-1",
-        ":T140-switch-2",
-        ":T140-switch-3",
-        ":T140-switch-4",
-        ":T141-switch-5",
-        ":T141-switch-6",
-        ":T141-switch-7",
-        ":T142-switch-8",
-        ":T142-switch-9",
-        ":T142-switch-A",
-        ":T150-push-1",
-        ":T150-push-2",
-        ":T160-closure",
-        ":T161-apply1",
-        ":T162-return",
-        ":T163",
-        ":T164-apply2",
-        ":T164-apply3",
-        ":T165-apply",
-        ":T170-envacc2",
-        ":T170-envacc3",
-        ":T170-envacc4",
-        ":T171-envacc",
-        ":T172-pushenvacc1",
-        ":T172-pushenvacc2",
-        ":T172-pushenvacc3",
-        ":T172-pushenvacc4",
-        ":T173-pushenvacc",
-        ":T180-appterm1",
-        ":T180-appterm2",
-        ":T180-appterm3",
-        ":T181-appterm",
-        ":T190-makefloatblock-1",
-        ":T190-makefloatblock-2",
-        ":T190-makefloatblock-3",
-        ":T191-vectlength",
-        ":T192-getfloatfield-1",
-        ":T192-getfloatfield-2",
-        ":T193-setfloatfield-1",
-        ":T193-setfloatfield-2",
-        ":T200-getfield0",
-        ":T200-getfield1",
-        ":T200-getfield2",
-        ":T200-getfield3",
-        ":T201-getfield",
-        ":T210-setfield0",
-        ":T210-setfield1",
-        ":T210-setfield2",
-        ":T210-setfield3",
-        ":T211-setfield",
-        ":T220-assign",
-        ":T230-check_signals",
-        ":T240-c_call1",
-        ":T240-c_call2",
-        ":T240-c_call3",
-        ":T240-c_call4",
-        ":T240-c_call5",
-        ":T250-closurerec-1",
-        ":T250-closurerec-2",
-        ":T251-pushoffsetclosure0",
-        ":T251-pushoffsetclosure2",
-        ":T251-pushoffsetclosurem2",
-        ":T252-pushoffsetclosure",
-        ":T253-offsetclosure0",
-        ":T253-offsetclosure2",
-        ":T253-offsetclosurem2",
-        ":T254-offsetclosure",
-        ":T260-offsetref",
-        ":T270-push_retaddr",
-        ":T300-getmethod",
-        ":T301-object",
-        ":T310-alloc-1",
-        ":T310-alloc-2",
-        ":T320-gc-1",
-        ":T320-gc-2",
-        ":T320-gc-3",
-        ":T330-compact-1",
-        ":T330-compact-2",
-        ":T330-compact-3",
-        ":T330-compact-4",
-        ":T340-weak",
-        ":T350-heapcheck",
-        ":T360-stacks-1",
-        ":T360-stacks-2",
-    ],
-)
-
-ocaml_module(
-    name   = "Directive_failure",
-    struct = "directive_failure.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T000",
-    struct = "t000.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T010-const0",
-    struct = "t010-const0.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T010-const1",
-    struct = "t010-const1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T010-const2",
-    struct = "t010-const2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T010-const3",
-    struct = "t010-const3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T011-constint",
-    struct = "t011-constint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T020",
-    struct = "t020.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T021-pushconst1",
-    struct = "t021-pushconst1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T021-pushconst2",
-    struct = "t021-pushconst2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T021-pushconst3",
-    struct = "t021-pushconst3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T022-pushconstint",
-    struct = "t022-pushconstint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T040-makeblock1",
-    struct = "t040-makeblock1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T040-makeblock2",
-    struct = "t040-makeblock2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T040-makeblock3",
-    struct = "t040-makeblock3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T041-makeblock",
-    struct = "t041-makeblock.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T050-getglobal",
-    struct = "t050-getglobal.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T050-pushgetglobal",
-    struct = "t050-pushgetglobal.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T051-getglobalfield",
-    struct = "t051-getglobalfield.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T051-pushgetglobalfield",
-    struct = "t051-pushgetglobalfield.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T060-raise",
-    struct = "t060-raise.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T070-branch",
-    struct = "t070-branch.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T070-branchif",
-    struct = "t070-branchif.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T070-branchifnot",
-    struct = "t070-branchifnot.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T071-boolnot",
-    struct = "t071-boolnot.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T080-eq",
-    struct = "t080-eq.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T080-geint",
-    struct = "t080-geint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T080-gtint",
-    struct = "t080-gtint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T080-leint",
-    struct = "t080-leint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T080-ltint",
-    struct = "t080-ltint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T080-neq",
-    struct = "t080-neq.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T090-acc0",
-    struct = "t090-acc0.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T090-acc1",
-    struct = "t090-acc1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T090-acc2",
-    struct = "t090-acc2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T090-acc3",
-    struct = "t090-acc3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T090-acc4",
-    struct = "t090-acc4.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T090-acc5",
-    struct = "t090-acc5.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T090-acc6",
-    struct = "t090-acc6.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T090-acc7",
-    struct = "t090-acc7.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+load("//bzl/rules/test:rules.bzl", "repl_test")
+
+test_suite(
+    name  = "tests",
+    tests = [
+        # "directive_failure_test", ## needs repl_fail_test
+        "t000_test",
+        "t010-const0_test",
+        "t010-const1_test",
+        "t010-const2_test",
+        "t010-const3_test",
+        "t011-constint_test",
+        "t020_test",
+        "t021-pushconst1_test",
+        "t021-pushconst2_test",
+        "t021-pushconst3_test",
+        "t022-pushconstint_test",
+        "t040-makeblock1_test",
+        "t040-makeblock2_test",
+        "t040-makeblock3_test",
+        "t041-makeblock_test",
+        "t050-getglobal_test",
+        "t050-pushgetglobal_test",
+        "t051-getglobalfield_test",
+        "t051-pushgetglobalfield_test",
+        # "t060-raise_test",  ## needs repl_fail_test
+        "t070-branch_test",
+        "t070-branchif_test",
+        "t070-branchifnot_test",
+        "t071-boolnot_test",
+        "t080-eq_test",
+        "t080-geint_test",
+        "t080-gtint_test",
+        "t080-leint_test",
+        "t080-ltint_test",
+        "t080-neq_test",
+        "t090-acc0_test",
+        "t090-acc1_test",
+        "t090-acc2_test",
+        "t090-acc3_test",
+        "t090-acc4_test",
+        "t090-acc5_test",
+        "t090-acc6_test",
+        "t090-acc7_test",
+        "t091-acc_test",
+        "t092-pushacc_test",
+        "t092-pushacc0_test",
+        "t092-pushacc1_test",
+        "t092-pushacc2_test",
+        "t092-pushacc3_test",
+        "t092-pushacc4_test",
+        "t092-pushacc5_test",
+        "t092-pushacc6_test",
+        "t092-pushacc7_test",
+        "t093-pushacc_test",
+        "t100-pushtrap_test",
+        "t101-poptrap_test",
+        "t110-addint_test",
+        "t110-andint_test",
+        "t110-asrint-1_test",
+        "t110-asrint-2_test",
+        "t110-divint-1_test",
+        "t110-divint-2_test",
+        "t110-divint-3_test",
+        "t110-lslint_test",
+        "t110-lsrint_test",
+        "t110-modint-1_test",
+        "t110-modint-2_test",
+        "t110-mulint_test",
+        "t110-negint_test",
+        "t110-offsetint_test",
+        "t110-orint_test",
+        "t110-subint_test",
+        "t110-xorint_test",
+        "t120-getstringchar_test",
+        "t121-setstringchar_test",
+        "t130-getvectitem_test",
+        "t130-vectlength_test",
+        "t131-setvectitem_test",
+        "t140-switch-1_test",
+        "t140-switch-2_test",
+        "t140-switch-3_test",
+        "t140-switch-4_test",
+        "t141-switch-5_test",
+        "t141-switch-6_test",
+        "t141-switch-7_test",
+        "t142-switch-8_test",
+        "t142-switch-9_test",
+        "t142-switch-A_test",
+        "t150-push-1_test",
+        "t150-push-2_test",
+        "t160-closure_test",
+        "t161-apply1_test",
+        "t162-return_test",
+        "t163_test",
+        "t164-apply2_test",
+        "t164-apply3_test",
+        "t165-apply_test",
+        "t170-envacc2_test",
+        "t170-envacc3_test",
+        "t170-envacc4_test",
+        "t171-envacc_test",
+        "t172-pushenvacc1_test",
+        "t172-pushenvacc2_test",
+        "t172-pushenvacc3_test",
+        "t172-pushenvacc4_test",
+        "t173-pushenvacc_test",
+        "t180-appterm1_test",
+        "t180-appterm2_test",
+        "t180-appterm3_test",
+        "t181-appterm_test",
+        "t190-makefloatblock-1_test",
+        "t190-makefloatblock-2_test",
+        "t190-makefloatblock-3_test",
+        "t191-vectlength_test",
+        "t192-getfloatfield-1_test",
+        "t192-getfloatfield-2_test",
+        "t193-setfloatfield-1_test",
+        "t193-setfloatfield-2_test",
+        "t200-getfield0_test",
+        "t200-getfield1_test",
+        "t200-getfield2_test",
+        "t200-getfield3_test",
+        "t201-getfield_test",
+        "t210-setfield0_test",
+        "t210-setfield1_test",
+        "t210-setfield2_test",
+        "t210-setfield3_test",
+        "t211-setfield_test",
+        "t220-assign_test",
+        "t230-check_signals_test",
+        "t240-c_call1_test",
+        "t240-c_call2_test",
+        "t240-c_call3_test",
+        "t240-c_call4_test",
+        "t240-c_call5_test",
+        "t250-closurerec-1_test",
+        "t250-closurerec-2_test",
+        "t251-pushoffsetclosure0_test",
+        "t251-pushoffsetclosure2_test",
+        "t251-pushoffsetclosurem2_test",
+        "t252-pushoffsetclosure_test",
+        "t253-offsetclosure0_test",
+        "t253-offsetclosure2_test",
+        "t253-offsetclosurem2_test",
+        "t254-offsetclosure_test",
+        "t260-offsetref_test",
+        "t270-push_retaddr_test",
+        "t300-getmethod_test",
+        "t301-object_test",
+        "t310-alloc-1_test",
+        "t310-alloc-2_test",
+        "t320-gc-1_test",
+        "t320-gc-2_test",
+        "t320-gc-3_test",
+        "t330-compact-1_test",
+        "t330-compact-2_test",
+        "t330-compact-3_test",
+        "t330-compact-4_test",
+        "t340-weak_test",
+        "t350-heapcheck_test",
+        "t360-stacks-1_test",
+        "t360-stacks-2_test",
+    ]
+)
+
+repl_test(
+    name    = "directive_failure_test",
+    script  = "directive_failure.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t000_test",
+    script  = "t000.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t010-const0_test",
+    script  = "t010-const0.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t010-const1_test",
+    script  = "t010-const1.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t010-const2_test",
+    script  = "t010-const2.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t010-const3_test",
+    script  = "t010-const3.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t011-constint_test",
+    script  = "t011-constint.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t020_test",
+    script  = "t020.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t021-pushconst1_test",
+    script  = "t021-pushconst1.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t021-pushconst2_test",
+    script  = "t021-pushconst2.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t021-pushconst3_test",
+    script  = "t021-pushconst3.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t022-pushconstint_test",
+    script  = "t022-pushconstint.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t040-makeblock1_test",
+    script  = "t040-makeblock1.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t040-makeblock2_test",
+    script  = "t040-makeblock2.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t040-makeblock3_test",
+    script  = "t040-makeblock3.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t041-makeblock_test",
+    script  = "t041-makeblock.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t050-getglobal_test",
+    script  = "t050-getglobal.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t050-pushgetglobal_test",
+    script  = "t050-pushgetglobal.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t051-getglobalfield_test",
+    script  = "t051-getglobalfield.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t051-pushgetglobalfield_test",
+    script  = "t051-pushgetglobalfield.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t060-raise_test",
+    script  = "t060-raise.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t070-branch_test",
+    script  = "t070-branch.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t070-branchif_test",
+    script  = "t070-branchif.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t070-branchifnot_test",
+    script  = "t070-branchifnot.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t071-boolnot_test",
+    script  = "t071-boolnot.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t080-eq_test",
+    script  = "t080-eq.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t080-geint_test",
+    script  = "t080-geint.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t080-gtint_test",
+    script  = "t080-gtint.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t080-leint_test",
+    script  = "t080-leint.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t080-ltint_test",
+    script  = "t080-ltint.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t080-neq_test",
+    script  = "t080-neq.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t090-acc0_test",
+    script  = "t090-acc0.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t090-acc1_test",
+    script  = "t090-acc1.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t090-acc2_test",
+    script  = "t090-acc2.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t090-acc3_test",
+    script  = "t090-acc3.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t090-acc4_test",
+    script  = "t090-acc4.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t090-acc5_test",
+    script  = "t090-acc5.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t090-acc6_test",
+    script  = "t090-acc6.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t090-acc7_test",
+    script  = "t090-acc7.ml",
+    timeout = "short",
+    tags    = ["repl"]
+)
+
+repl_test(
+    name    = "t091-acc_test",
+    script  = "t091-acc.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
-
-ocaml_module(
-    name   = "T091-acc",
-    struct = "t091-acc.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-ocaml_module(
-    name   = "T092-pushacc",
-    struct = "t092-pushacc.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+
+repl_test(
+    name    = "t092-pushacc_test",
+    script  = "t092-pushacc.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T092-pushacc0",
-    struct = "t092-pushacc0.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t092-pushacc0_test",
+    script  = "t092-pushacc0.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T092-pushacc1",
-    struct = "t092-pushacc1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t092-pushacc1_test",
+    script  = "t092-pushacc1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T092-pushacc2",
-    struct = "t092-pushacc2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t092-pushacc2_test",
+    script  = "t092-pushacc2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T092-pushacc3",
-    struct = "t092-pushacc3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t092-pushacc3_test",
+    script  = "t092-pushacc3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T092-pushacc4",
-    struct = "t092-pushacc4.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t092-pushacc4_test",
+    script  = "t092-pushacc4.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T092-pushacc5",
-    struct = "t092-pushacc5.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t092-pushacc5_test",
+    script  = "t092-pushacc5.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T092-pushacc6",
-    struct = "t092-pushacc6.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t092-pushacc6_test",
+    script  = "t092-pushacc6.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T092-pushacc7",
-    struct = "t092-pushacc7.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t092-pushacc7_test",
+    script  = "t092-pushacc7.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T093-pushacc",
-    struct = "t093-pushacc.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t093-pushacc_test",
+    script  = "t093-pushacc.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T100-pushtrap",
-    struct = "t100-pushtrap.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t100-pushtrap_test",
+    script  = "t100-pushtrap.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T101-poptrap",
-    struct = "t101-poptrap.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t101-poptrap_test",
+    script  = "t101-poptrap.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-addint",
-    struct = "t110-addint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-addint_test",
+    script  = "t110-addint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-andint",
-    struct = "t110-andint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-andint_test",
+    script  = "t110-andint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-asrint-1",
-    struct = "t110-asrint-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-asrint-1_test",
+    script  = "t110-asrint-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-asrint-2",
-    struct = "t110-asrint-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-asrint-2_test",
+    script  = "t110-asrint-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-divint-1",
-    struct = "t110-divint-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-divint-1_test",
+    script  = "t110-divint-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-divint-2",
-    struct = "t110-divint-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-divint-2_test",
+    script  = "t110-divint-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-divint-3",
-    struct = "t110-divint-3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-divint-3_test",
+    script  = "t110-divint-3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-lslint",
-    struct = "t110-lslint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-lslint_test",
+    script  = "t110-lslint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-lsrint",
-    struct = "t110-lsrint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-lsrint_test",
+    script  = "t110-lsrint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-modint-1",
-    struct = "t110-modint-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-modint-1_test",
+    script  = "t110-modint-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-modint-2",
-    struct = "t110-modint-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-modint-2_test",
+    script  = "t110-modint-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-mulint",
-    struct = "t110-mulint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-mulint_test",
+    script  = "t110-mulint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-negint",
-    struct = "t110-negint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-negint_test",
+    script  = "t110-negint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-offsetint",
-    struct = "t110-offsetint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-offsetint_test",
+    script  = "t110-offsetint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-orint",
-    struct = "t110-orint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-orint_test",
+    script  = "t110-orint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-subint",
-    struct = "t110-subint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-subint_test",
+    script  = "t110-subint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T110-xorint",
-    struct = "t110-xorint.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t110-xorint_test",
+    script  = "t110-xorint.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T120-getstringchar",
-    struct = "t120-getstringchar.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t120-getstringchar_test",
+    script  = "t120-getstringchar.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T121-setstringchar",
-    struct = "t121-setstringchar.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t121-setstringchar_test",
+    script  = "t121-setstringchar.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T130-getvectitem",
-    struct = "t130-getvectitem.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t130-getvectitem_test",
+    script  = "t130-getvectitem.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T130-vectlength",
-    struct = "t130-vectlength.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t130-vectlength_test",
+    script  = "t130-vectlength.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T131-setvectitem",
-    struct = "t131-setvectitem.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t131-setvectitem_test",
+    script  = "t131-setvectitem.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T140-switch-1",
-    struct = "t140-switch-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t140-switch-1_test",
+    script  = "t140-switch-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T140-switch-2",
-    struct = "t140-switch-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t140-switch-2_test",
+    script  = "t140-switch-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T140-switch-3",
-    struct = "t140-switch-3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t140-switch-3_test",
+    script  = "t140-switch-3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T140-switch-4",
-    struct = "t140-switch-4.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t140-switch-4_test",
+    script  = "t140-switch-4.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T141-switch-5",
-    struct = "t141-switch-5.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t141-switch-5_test",
+    script  = "t141-switch-5.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T141-switch-6",
-    struct = "t141-switch-6.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t141-switch-6_test",
+    script  = "t141-switch-6.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T141-switch-7",
-    struct = "t141-switch-7.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t141-switch-7_test",
+    script  = "t141-switch-7.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T142-switch-8",
-    struct = "t142-switch-8.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t142-switch-8_test",
+    script  = "t142-switch-8.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T142-switch-9",
-    struct = "t142-switch-9.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t142-switch-9_test",
+    script  = "t142-switch-9.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T142-switch-A",
-    struct = "t142-switch-A.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t142-switch-A_test",
+    script  = "t142-switch-A.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T150-push-1",
-    struct = "t150-push-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t150-push-1_test",
+    script  = "t150-push-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T150-push-2",
-    struct = "t150-push-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t150-push-2_test",
+    script  = "t150-push-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T160-closure",
-    struct = "t160-closure.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t160-closure_test",
+    script  = "t160-closure.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T161-apply1",
-    struct = "t161-apply1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t161-apply1_test",
+    script  = "t161-apply1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T162-return",
-    struct = "t162-return.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t162-return_test",
+    script  = "t162-return.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T163",
-    struct = "t163.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t163_test",
+    script  = "t163.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T164-apply2",
-    struct = "t164-apply2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t164-apply2_test",
+    script  = "t164-apply2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T164-apply3",
-    struct = "t164-apply3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t164-apply3_test",
+    script  = "t164-apply3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T165-apply",
-    struct = "t165-apply.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t165-apply_test",
+    script  = "t165-apply.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T170-envacc2",
-    struct = "t170-envacc2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t170-envacc2_test",
+    script  = "t170-envacc2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T170-envacc3",
-    struct = "t170-envacc3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t170-envacc3_test",
+    script  = "t170-envacc3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T170-envacc4",
-    struct = "t170-envacc4.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t170-envacc4_test",
+    script  = "t170-envacc4.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T171-envacc",
-    struct = "t171-envacc.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t171-envacc_test",
+    script  = "t171-envacc.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T172-pushenvacc1",
-    struct = "t172-pushenvacc1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t172-pushenvacc1_test",
+    script  = "t172-pushenvacc1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T172-pushenvacc2",
-    struct = "t172-pushenvacc2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t172-pushenvacc2_test",
+    script  = "t172-pushenvacc2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T172-pushenvacc3",
-    struct = "t172-pushenvacc3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t172-pushenvacc3_test",
+    script  = "t172-pushenvacc3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T172-pushenvacc4",
-    struct = "t172-pushenvacc4.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t172-pushenvacc4_test",
+    script  = "t172-pushenvacc4.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T173-pushenvacc",
-    struct = "t173-pushenvacc.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t173-pushenvacc_test",
+    script  = "t173-pushenvacc.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T180-appterm1",
-    struct = "t180-appterm1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t180-appterm1_test",
+    script  = "t180-appterm1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T180-appterm2",
-    struct = "t180-appterm2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t180-appterm2_test",
+    script  = "t180-appterm2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T180-appterm3",
-    struct = "t180-appterm3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t180-appterm3_test",
+    script  = "t180-appterm3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T181-appterm",
-    struct = "t181-appterm.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t181-appterm_test",
+    script  = "t181-appterm.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T190-makefloatblock-1",
-    struct = "t190-makefloatblock-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t190-makefloatblock-1_test",
+    script  = "t190-makefloatblock-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T190-makefloatblock-2",
-    struct = "t190-makefloatblock-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t190-makefloatblock-2_test",
+    script  = "t190-makefloatblock-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T190-makefloatblock-3",
-    struct = "t190-makefloatblock-3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t190-makefloatblock-3_test",
+    script  = "t190-makefloatblock-3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T191-vectlength",
-    struct = "t191-vectlength.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t191-vectlength_test",
+    script  = "t191-vectlength.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T192-getfloatfield-1",
-    struct = "t192-getfloatfield-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t192-getfloatfield-1_test",
+    script  = "t192-getfloatfield-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T192-getfloatfield-2",
-    struct = "t192-getfloatfield-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t192-getfloatfield-2_test",
+    script  = "t192-getfloatfield-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T193-setfloatfield-1",
-    struct = "t193-setfloatfield-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t193-setfloatfield-1_test",
+    script  = "t193-setfloatfield-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T193-setfloatfield-2",
-    struct = "t193-setfloatfield-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t193-setfloatfield-2_test",
+    script  = "t193-setfloatfield-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T200-getfield0",
-    struct = "t200-getfield0.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t200-getfield0_test",
+    script  = "t200-getfield0.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T200-getfield1",
-    struct = "t200-getfield1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t200-getfield1_test",
+    script  = "t200-getfield1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T200-getfield2",
-    struct = "t200-getfield2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t200-getfield2_test",
+    script  = "t200-getfield2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T200-getfield3",
-    struct = "t200-getfield3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t200-getfield3_test",
+    script  = "t200-getfield3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T201-getfield",
-    struct = "t201-getfield.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t201-getfield_test",
+    script  = "t201-getfield.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T210-setfield0",
-    struct = "t210-setfield0.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t210-setfield0_test",
+    script  = "t210-setfield0.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T210-setfield1",
-    struct = "t210-setfield1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t210-setfield1_test",
+    script  = "t210-setfield1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T210-setfield2",
-    struct = "t210-setfield2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t210-setfield2_test",
+    script  = "t210-setfield2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T210-setfield3",
-    struct = "t210-setfield3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t210-setfield3_test",
+    script  = "t210-setfield3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T211-setfield",
-    struct = "t211-setfield.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t211-setfield_test",
+    script  = "t211-setfield.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T220-assign",
-    struct = "t220-assign.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t220-assign_test",
+    script  = "t220-assign.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T230-check_signals",
-    struct = "t230-check_signals.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t230-check_signals_test",
+    script  = "t230-check_signals.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T240-c_call1",
-    struct = "t240-c_call1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t240-c_call1_test",
+    script  = "t240-c_call1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T240-c_call2",
-    struct = "t240-c_call2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t240-c_call2_test",
+    script  = "t240-c_call2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T240-c_call3",
-    struct = "t240-c_call3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t240-c_call3_test",
+    script  = "t240-c_call3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T240-c_call4",
-    struct = "t240-c_call4.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t240-c_call4_test",
+    script  = "t240-c_call4.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T240-c_call5",
-    struct = "t240-c_call5.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t240-c_call5_test",
+    script  = "t240-c_call5.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T250-closurerec-1",
-    struct = "t250-closurerec-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t250-closurerec-1_test",
+    script  = "t250-closurerec-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T250-closurerec-2",
-    struct = "t250-closurerec-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t250-closurerec-2_test",
+    script  = "t250-closurerec-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T251-pushoffsetclosure0",
-    struct = "t251-pushoffsetclosure0.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t251-pushoffsetclosure0_test",
+    script  = "t251-pushoffsetclosure0.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T251-pushoffsetclosure2",
-    struct = "t251-pushoffsetclosure2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t251-pushoffsetclosure2_test",
+    script  = "t251-pushoffsetclosure2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T251-pushoffsetclosurem2",
-    struct = "t251-pushoffsetclosurem2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t251-pushoffsetclosurem2_test",
+    script  = "t251-pushoffsetclosurem2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T252-pushoffsetclosure",
-    struct = "t252-pushoffsetclosure.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t252-pushoffsetclosure_test",
+    script  = "t252-pushoffsetclosure.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T253-offsetclosure0",
-    struct = "t253-offsetclosure0.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t253-offsetclosure0_test",
+    script  = "t253-offsetclosure0.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T253-offsetclosure2",
-    struct = "t253-offsetclosure2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t253-offsetclosure2_test",
+    script  = "t253-offsetclosure2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T253-offsetclosurem2",
-    struct = "t253-offsetclosurem2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t253-offsetclosurem2_test",
+    script  = "t253-offsetclosurem2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T254-offsetclosure",
-    struct = "t254-offsetclosure.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t254-offsetclosure_test",
+    script  = "t254-offsetclosure.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T260-offsetref",
-    struct = "t260-offsetref.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t260-offsetref_test",
+    script  = "t260-offsetref.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T270-push_retaddr",
-    struct = "t270-push_retaddr.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t270-push_retaddr_test",
+    script  = "t270-push_retaddr.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T300-getmethod",
-    struct = "t300-getmethod.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t300-getmethod_test",
+    script  = "t300-getmethod.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T301-object",
-    struct = "t301-object.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t301-object_test",
+    script  = "t301-object.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T310-alloc-1",
-    struct = "t310-alloc-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t310-alloc-1_test",
+    script  = "t310-alloc-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T310-alloc-2",
-    struct = "t310-alloc-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t310-alloc-2_test",
+    script  = "t310-alloc-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T320-gc-1",
-    struct = "t320-gc-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t320-gc-1_test",
+    script  = "t320-gc-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T320-gc-2",
-    struct = "t320-gc-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t320-gc-2_test",
+    script  = "t320-gc-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T320-gc-3",
-    struct = "t320-gc-3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t320-gc-3_test",
+    script  = "t320-gc-3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T330-compact-1",
-    struct = "t330-compact-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t330-compact-1_test",
+    script  = "t330-compact-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T330-compact-2",
-    struct = "t330-compact-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t330-compact-2_test",
+    script  = "t330-compact-2.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T330-compact-3",
-    struct = "t330-compact-3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t330-compact-3_test",
+    script  = "t330-compact-3.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T330-compact-4",
-    struct = "t330-compact-4.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t330-compact-4_test",
+    script  = "t330-compact-4.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T340-weak",
-    struct = "t340-weak.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t340-weak_test",
+    script  = "t340-weak.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T350-heapcheck",
-    struct = "t350-heapcheck.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t350-heapcheck_test",
+    script  = "t350-heapcheck.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T360-stacks-1",
-    struct = "t360-stacks-1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t360-stacks-1_test",
+    script  = "t360-stacks-1.ml",
+    timeout = "short",
+    tags    = ["repl"]
 )
 
-ocaml_module(
-    name   = "T360-stacks-2",
-    struct = "t360-stacks-2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+repl_test(
+    name    = "t360-stacks-2_test",
+    script  = "t360-stacks-2.ml",
+    runparams = {"l": "1000000"},
+    timeout = "short",
+    tags    = ["repl"]
 )
-

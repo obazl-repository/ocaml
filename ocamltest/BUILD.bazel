@@ -1,10 +1,11 @@
 load("//bzl:rules.bzl",
+     "tool_module",
+     "tool_signature")
+
+load("//bzl/rules/test:rules.bzl",
      "test_archive",
      "test_executable",
-     "test_library",
-     "tool_module",
-     "tool_signature",
-)
+     "test_library")
 
 load("//lex:BUILD_RULES.bzl", "lex")
 
@@ -78,6 +79,8 @@ test_executable(
         ":ocamltest_manifest"
     ],
     main = ":Main",
+    # ocamltest may want to run expect_test, so we need to depend on
+    # it:
     data = ["//testsuite/tools:inline_expect"]
 )
 

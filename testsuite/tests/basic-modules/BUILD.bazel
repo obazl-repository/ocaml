@@ -149,6 +149,8 @@ test_module(
 inline_expect_test(
     name = "Recursive_module_evaluation_errors",
     src  = "recursive_module_evaluation_errors.ml",
+    timeout = "short",
+    tags = ["inline_expect"]
 )
 
 expect_test(
