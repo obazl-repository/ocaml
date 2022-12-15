@@ -31,6 +31,16 @@ toolchain_selector(
 )
 
 toolchain_selector(
+    name           = "cc",
+    type           = "//toolchain/type:cc",
+    adapter        = "//toolchain/adapter:cc",
+    # target_host_configuration = [
+    #     "//config/target/executor:unspecified_executor?",
+    #     # "//config/target/emitter:boot_emitter?"
+    # ]
+)
+
+toolchain_selector(
     name           = "baseline",
     type           = "//toolchain/type:boot",
     adapter        = "//toolchain/adapter:boot",
@@ -39,16 +49,6 @@ toolchain_selector(
         "//config/target/emitter:baseline_emitter?"
     ]
 )
-
-# toolchain_selector(
-#     name           = "bootvm",
-#     type           = "//toolchain/type:boot",
-#     adapter        = "//toolchain/adapter:boot",
-#     target_host_configuration = [
-#         "//config/target/executor:boot_executor?",
-#         "//config/target/emitter:vm_emitter?"
-#     ]
-# )
 
 toolchain_selector(
     name           = "ocamlc.byte",

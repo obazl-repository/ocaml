@@ -27,7 +27,11 @@ mustache(
     out  = "domain_state.h",
     json = "domain_state.json",
     template = "domain_state.h.mustache",
-    visibility = ["//runtime:__subpackages__", "//yacc:__pkg__"]
+    visibility = [
+        "//boot:__pkg__",
+        "//runtime:__subpackages__",
+        "//yacc:__pkg__"
+    ]
 )
 
 cc_library(
@@ -45,6 +49,7 @@ mustache(
     json = "//bytecomp:opcodes.json",
     template = "instruct.h.mustache",
     visibility = [
+        "//boot:__pkg__",
         "//runtime:__subpackages__",
         "//tools:__pkg__"
     ]
@@ -56,6 +61,7 @@ mustache(
     json = "//runtime:primitives.json",
     template = "fail.h.mustache",
     visibility = [
+        "//boot:__pkg__",
         "//lambda:__pkg__",
         "//runtime:__subpackages__"
     ]
@@ -66,6 +72,10 @@ mustache(
     out  = "jumptbl.h",
     json = "//bytecomp:opcodes.json",
     template = "jumptbl.h.mustache",
+    visibility = [
+        "//boot:__pkg__",
+        "//runtime:__pkg__",
+    ]
 )
 
 mustache(
@@ -73,6 +83,10 @@ mustache(
     out  = "opnames.h",
     json = "//bytecomp:opcodes.json",
     template = "opnames.h.mustache",
+    visibility = [
+        "//boot:__pkg__",
+        "//runtime:__pkg__",
+    ]
 )
 
 genrule(
@@ -86,6 +100,7 @@ genrule(
     }),
     cmd  = "cp $(SRCS) $@", #FIXME: symlink?
     visibility = [
+        "//boot:__pkg__",
         "//runtime:__pkg__",
         "//utils:__pkg__"
     ]
@@ -97,16 +112,18 @@ cc_library(
     hdrs = glob(
         ["*.h"]
     ) + [
-        ":domain_state_h",
-        ":fail_h",
-        ":jumptbl_h",
-        ":opnames_h",
-        ":s_h"
+        ":domain_state.h",
+        ":fail.h",
+        ":instruct.h",
+        ":jumptbl.h",
+        ":opnames.h",
+        ":s.h"
     ],
     # ] + select({
     #     "//platform/os:linux?": ["//runtime/caml/linux:s.h"],
     #     "//platform/os:macos?": ["//runtime/caml/macos:s.h"]
     # }),
+    # strip_include_prefix = "",
     include_prefix = "caml",
     visibility = ["//visibility:public"]
 )

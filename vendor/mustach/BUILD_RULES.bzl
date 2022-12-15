@@ -9,29 +9,7 @@ DISABLED_FEATURES = [
 ########################
 def _mustache_impl(ctx):
 
-    # target_executor = ctx.attr._target_executor[BuildSettingInfo].value
-    # target_emitter = ctx.attr._target_emitter[BuildSettingInfo].value
-
-    ##FIXME: do not prepend workdir for C outputs
-
-    # if ctx.attr.out.endswith(".h"):
-    #     workdir = ""
-    # elif ctx.attr.out.endswith(".c"):
-    #     workdir = ""
-    # elif (target_executor == "boot"):
-    #     workdir = "_boot/"
-    # elif (target_executor == "vm" and target_emitter == "vm"):
-    #     workdir = "_ocamlc.byte/"
-    # elif (target_executor == "vm" and target_emitter == "sys"):
-    #     workdir = "_ocamlopt.byte/"
-    # elif (target_executor == "sys" and target_emitter == "sys"):
-    #     workdir = "_ocamlopt.opt/"
-    # elif (target_executor == "sys" and target_emitter == "vm"):
-    #     workdir = "_ocamlc.opt/"
-
-    # workdir = "" # _tools/"
-
-    # outfile = ctx.actions.declare_file(workdir + ctx.attr.out)
+    tc = ctx.toolchains["//toolchain/type:cc"]
 
     args = ctx.actions.args()
     args.add_all(["-j", ctx.file.json.path])
@@ -39,14 +17,16 @@ def _mustache_impl(ctx):
     # args.add_all(["-o", outfile.path])
     args.add_all(["-o", ctx.outputs.out.path])
 
+    for var in ctx.var:
+        print("VAR: {k}: {v}".format(k=var, v=ctx.var[var]))
+
     ctx.actions.run(
         mnemonic = "Mustache",
-        executable = ctx.file._tool,
+        executable = tc.mustache, ## ctx.file._tool,
         arguments = [args],
         inputs = depset(
             [ctx.file.template, ctx.file.json],
         ),
-        # outputs = [outfile]
         outputs = [ctx.outputs.out],
     )
 
@@ -65,20 +45,20 @@ mustache = rule(
         "json": attr.label(
             mandatory = True,
             allow_single_file = True,
-            cfg = "exec",
+            # cfg = "exec",
         ),
         "template": attr.label(
             mandatory = True,
             allow_single_file = True,
             cfg = "exec",
         ),
-        "_tool": attr.label(
-            allow_single_file = True,
-            executable = True,
-            cfg = "exec",
-            # cfg = reset_cc_config_transition,
-            default = "//toolchain/dev:mustach"
-        ),
+        # "_tool": attr.label(
+        #     allow_single_file = True,
+        #     executable = True,
+        #     cfg = "exec",
+        #     # cfg = reset_cc_config_transition,
+        #     default = "//toolchain/dev:mustach"
+        # ),
 
         # "_target_executor": attr.label(default = "//config/target/executor"),
         # "_target_emitter" : attr.label(default = "//config/target/emitter"),
@@ -86,13 +66,13 @@ mustache = rule(
         # "_cc_toolchain": attr.label(
         #     default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
         # ),
-        # "_allowlist_function_transition": attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
     },
-    # cfg = reset_cc_config_transition,
-    # toolchains = [
-    #     # "//toolchain/type:boot",
-    #     "@bazel_tools//tools/cpp:toolchain_type"
-    # ]
+    cfg = reset_cc_config_transition,
+    toolchains = [
+        "//toolchain/type:cc",
+        "@bazel_tools//tools/cpp:toolchain_type"
+    ]
 )

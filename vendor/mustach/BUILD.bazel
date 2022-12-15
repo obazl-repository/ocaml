@@ -33,6 +33,7 @@ cc_binary(
         "//lambda:__pkg__",
         "//runtime:__subpackages__",
         "//stdlib:__pkg__",
+        "//toolchain:__subpackages__",
         "//utils:__pkg__"
     ],
 )

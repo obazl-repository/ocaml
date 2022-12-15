@@ -18,6 +18,10 @@ label_setting(name="camlheaders",
               build_setting_default = "@baseline//lib:camlheaders",
               visibility = ["//visibility:public"])
 
+label_setting(name="mustach",
+              build_setting_default = "@baseline//bin:mustach",
+              visibility = ["//visibility:public"])
+
 
 # label_setting(name="stdlib",
 #               build_setting_default = "//stdlib",

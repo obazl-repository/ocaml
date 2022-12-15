@@ -42,29 +42,38 @@ cc_library(
     # alwayslink = True,
     linkstatic = True,
     srcs = [
-        # "//runtime:build_config.h",
         "//runtime:common_c_sources",
         "//runtime:bytecode_only_c_sources",
         "//runtime/caml:domain_state.h",
         "//runtime/caml:fail_h",
         "//runtime/caml:instruct_h",
-        ":primitives_h"
+        # ":primitives.h"
     ] + select({
     # "//platform/target:vm?": ["//runtime:bytecode_only_c_sources"],
     # "//conditions:default": ["//runtime:native_only_c_sources"],
     "//conditions:default": []
     }),
+    deps = [
+        ":hdrs",
+        "//runtime/caml:hdrs",
+    ],
     copts = [
         "-x", "c",
-        "-I.",
-        "-Iruntime",
-        "-Iruntime/caml",
-        "-Icaml",
-        "-Ihdrs/caml",
-        "-I$(GENDIR)",
-        "-I$(GENDIR)/caml",
-        "-I$(GENDIR)/runtime",
-        "-I$(GENDIR)/runtime/caml",
+
+        ## ridiculous. needed because the mustache rule that produces
+        ## these hdrs is involved in a transition.
+        "-I$(GENDIR)/runtime/_virtual_includes/hdrs/caml",
+        "-I$(GENDIR)/runtime/caml/_virtual_includes/hdrs/caml",
+
+        # "-I.",
+        # "-Iruntime",
+        # "-Iruntime/caml",
+        # "-Icaml",
+        # "-Ihdrs/caml",
+        # "-I$(GENDIR)",
+        # "-I$(GENDIR)/caml",
+        # "-I$(GENDIR)/runtime",
+        # "-I$(GENDIR)/runtime/caml",
         # "-Iruntime/caml",
         # "-I$(GENDIR)/runtime",
         # "-I$(GENDIR)/runtime/hdrs",
@@ -96,7 +105,6 @@ cc_library(
     })
     ,
     defines = RUNTIME_DEFINES,
-    deps = ["//runtime/caml:hdrs"],
     toolchains = ["//profile/system/local"],
     visibility = [
         "//:__pkg__",
@@ -118,26 +126,38 @@ cc_library(
         "//runtime:native_only_c_sources",
         ":asm",
         "//runtime/caml:domain_state.h",
-        "//runtime/caml:fail_h",
-        "//runtime/caml:s_h",
+        "//runtime/caml:fail.h",
+        "//runtime/caml:jumptbl.h",
+        "//runtime/caml:opnames.h",
+        "//runtime/caml:s.h",
+        # "//runtime/caml:misc.h",
         ":primitives_h"
     ],
-    hdrs = ["//runtime/caml:dsh"],
+    # hdrs = ["//runtime/caml:domain_state.h"],
     # features = [
     #     "-supports_pic",    # disable pic
     #     "fully_static_link" # TODO: explore
     # ],
+    deps = [
+        # ":asm",
+        "//runtime/caml:hdrs",
+        ":hdrs",
+    ],
     copts = [
         "-x", "c",
-        "-I.",
-        "-Iruntime",
-        "-Iruntime/caml",
-        "-Icaml",
-        "-Ihdrs/caml",
-        "-I$(GENDIR)",
-        "-I$(GENDIR)/caml",
-        "-I$(GENDIR)/runtime",
-        "-I$(GENDIR)/runtime/caml",
+
+        "-I$(GENDIR)/runtime/_virtual_includes/hdrs/caml",
+        "-I$(GENDIR)/runtime/caml/_virtual_includes/hdrs/caml",
+
+        # "-I.",
+        # "-Iruntime/caml/_virtual_includes/hdrs/runtime",
+        # "-Icaml",
+        # "-Iruntime",
+        # "-Iruntime/caml",  ## static hdrs, e.g. misc.h
+        # "-I$(GENDIR)",
+        # "-I$(GENDIR)/caml",
+        # "-I$(GENDIR)/runtime", # caml/domain_state.h, caml/fail.h, primitives.h, etc.
+        # "-I$(GENDIR)/runtime/caml",  ## s.h
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
         # mac (clang) verbose:
@@ -185,11 +205,6 @@ cc_library(
             "SYS_$(SYSTEM)"
         ] #testing
     }),
-    deps = [
-        "//runtime/caml:hdrs", ":asm",
-        "//runtime/caml:dsh"
-        # "//runtime/caml:domainstate_hdr"
-    ],
     toolchains = ["//profile/system/local"],
     visibility = [
         "//visibility:public"
@@ -207,6 +222,9 @@ cc_assemble(
         "//platform:windows_x86_64?": ARCH + "nt.asm",
         "//conditions:default"      : ":__asm" # ARCH + ".S"
     }),
+    deps = [
+        "//runtime/caml:hdrs"
+    ],
     copts = [
         "-Iruntime", # caml/m.h
         "-I$(GENDIR)/runtime/caml",
@@ -226,9 +244,6 @@ cc_assemble(
         "TARGET_$(ARCH)",
         "MODEL_$(MODEL)",
         "SYS_$(SYSTEM)"
-    ],
-    deps = [
-        "//runtime/caml:hdrs"
     ],
     toolchains = ["//profile/system/local"],
 )
@@ -475,6 +490,7 @@ mustache(
     out  = "ints.c",
     template = "ints.c.mustache",
     json     = "primitives.json",
+    visibility = ["//boot:__pkg__"]
 )
 
 mustache(
@@ -495,11 +511,22 @@ mustache(
     # ],
 )
 
+cc_library(
+    name = "hdrs",
+    hdrs = [
+        ":primitives.h",
+    ],
+    # strip_include_prefix = "",
+    include_prefix = "caml",
+    visibility = ["//visibility:public"]
+)
+
 mustache(
     name = "primitives_h",
     out  = "primitives.h",
     template = "primitives.h.mustache",
     json     = "primitives.json",
+    visibility = ["//boot:__pkg__"]
 )
 
 mustache(
@@ -507,6 +534,7 @@ mustache(
     out  = "prims.c",
     template = "prims.c.mustache",
     json     = "primitives.json",
+    visibility = ["//boot:__pkg__"]
 )
 
 # prims.c : primitives
@@ -602,19 +630,27 @@ cc_binary(
         ],
         "//conditions:default": []
     }),
+    deps= [
+        "//runtime/caml:hdrs",
+        ":hdrs"
+    ],
     copts = [
         "-x", "c",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
-        "-I.",
-        "-Iruntime",
-        "-Iruntime/caml",
-        "-Icaml",
-        "-Ihdrs/caml",
-        "-I$(GENDIR)",
-        "-I$(GENDIR)/caml",
-        "-I$(GENDIR)/runtime",
-        "-I$(GENDIR)/runtime/caml",
+
+        "-I$(GENDIR)/runtime/_virtual_includes/hdrs/caml",
+        "-I$(GENDIR)/runtime/caml/_virtual_includes/hdrs/caml",
+
+        # "-I.",
+        # "-Iruntime",
+        # "-Iruntime/caml",
+        # "-Icaml",
+        # "-Ihdrs/caml",
+        # "-I$(GENDIR)",
+        # "-I$(GENDIR)/caml",
+        # "-I$(GENDIR)/runtime",
+        # "-I$(GENDIR)/runtime/caml",
         # "-Iruntime/caml",
         # "-I$(GENDIR)/runtime", # caml/instruct_h
         # "-I$(GENDIR)/runtime/hdrs",
@@ -644,10 +680,6 @@ cc_binary(
     #     "//platform/target:vm?" : ["$(VM_LINKLIBS)"],
     #     "//conditions:default"   : ["$(VM_LINKLIBS)"],
     # }),
-    deps= [
-        # ":camlrun",
-        "//runtime/caml:hdrs"
-    ],
     toolchains = ["//profile/system/local"],
     visibility = ["//visibility:public"],
 )

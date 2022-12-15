@@ -96,12 +96,11 @@ def _tc_compiler_out_transition_impl(settings, attr):
     ## initial config: config settings passed on cli, toolchain
     ## configs default to unspecified
 
-    # if target_executor == "unspecified":
-    #     print("INITIAL TRANSITION")
-    #     target_executor = config_executor
-    #     target_emitter = config_emitter
+    if target_executor == "unspecified":
+        print("CC TRANSITION")
+        return {}
 
-    if (config_executor == "boot"): #and config_emitter == "boot"):
+    elif (config_executor == "boot"): #and config_emitter == "boot"):
         print("BOOT TRANSITION")
         compilation_mode = "opt"
         config_executor = "baseline"

@@ -48,7 +48,7 @@ def _toolchain_adapter_impl(ctx):
         linkopts               = ctx.attr.linkopts,
         warnings               = ctx.attr.warnings,
         lexer                  = ctx.attr.lexer,
-        yaccer                 = ctx.file.yaccer,
+        # yaccer                 = ctx.file.yaccer,
     )]
 
 ###################################
@@ -157,13 +157,13 @@ toolchain_adapter = rule(
             cfg = tc_compiler_out_transition
         ),
 
-        "yaccer": attr.label(
-            default = "//yacc:ocamlyacc",
-            allow_single_file = True,
-            executable = True,
-            # cfg = "exec",
-            cfg = tc_compiler_out_transition
-        ),
+        # "yaccer": attr.label(
+        #     default = "//yacc:ocamlyacc",
+        #     allow_single_file = True,
+        #     executable = True,
+        #     # cfg = "exec",
+        #     cfg = tc_compiler_out_transition
+        # ),
 
         "copts" : attr.string_list(
             doc = "Common compile options, for both .ml and .mli"
