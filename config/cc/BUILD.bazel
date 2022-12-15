@@ -7,3 +7,6 @@ bool_flag(
     visibility = ["//visibility:public"]
 )
 
+bool_flag(name = "verbose", build_setting_default = False,
+          visibility = ["//visibility:public"])
+config_setting(name = "verbose?", flag_values = {":verbose": "True"})

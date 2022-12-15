@@ -45,6 +45,8 @@ def progress_msg(workdir, ctx):
     elif rule in ["ocaml_test", "expect_test", "lambda_expect_test",
                   "compile_fail_test"]:
         action = "Testing"
+    elif rule in ["lex"]:
+        action = "Lexing"
     else:
         fail(rule)
 

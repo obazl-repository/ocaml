@@ -421,7 +421,7 @@ genrule(
 
 compiler_module(
     name   = "Lexer",
-    struct = "lexer_ml",
+    struct = "lexer.ml",
     sig    = "Lexer_cmi",
     opts = MODULE_OPTS,
     deps   = [

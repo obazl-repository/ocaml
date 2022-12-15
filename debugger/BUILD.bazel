@@ -25,7 +25,7 @@ ocaml_tool(
         "//toplevel:Topprinters",
         ":debugger_lib",
     ],
-    cc_deps = ["//otherlibs/unix"],
+    # cc_deps = ["//otherlibs/unix"],
     main = ":Ocamldebug.Ocamldebug_entry",
     opts = select({
         "//config/target/executor:boot_executor?": ["-custom"],

@@ -195,7 +195,7 @@ lex = rule(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),
 
-        _rule = attr.string( default = "ocaml_lex" )
+        _rule = attr.string( default = "lex" )
     ),
     executable = False,
     # cfg = reset_config_transition,

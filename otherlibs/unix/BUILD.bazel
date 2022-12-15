@@ -150,13 +150,20 @@ cc_library(
         "unix_sources"
     ],
     hdrs = ["unixsupport.h", "socketaddr.h"],
+    deps = [
+        "//runtime/caml:hdrs",
+        "//runtime/caml:domain_state_h",
+        "//runtime/caml:fail_h",
+    ],
     copts= [
-        "-I", "$(GENDIR)/runtime/caml/cross-compile",
+        "-Iruntime",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
         # "$(FILE_OFFSET_BITS)"
     ],
     defines = ["CAML_BUILDING_UNIX"],
     linkopts = ["-lm"],
-    deps = ["//runtime/caml:hdrs"],
     toolchains = ["//profile/system/local"],
     visibility = [
         "//debugger:__pkg__",

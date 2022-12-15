@@ -11,6 +11,7 @@ cc_mustache(
     visibility = [
         "//boot:__pkg__",
         "//runtime:__subpackages__",
+        "//otherlibs/unix:__pkg__",
         "//yacc:__pkg__"
     ]
 )
@@ -35,6 +36,7 @@ cc_mustache(
     visibility = [
         "//boot:__pkg__",
         "//lambda:__pkg__",
+        "//otherlibs/unix:__pkg__",
         "//runtime:__subpackages__"
     ]
 )
