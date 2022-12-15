@@ -17,8 +17,8 @@ def _mustache_impl(ctx):
     # args.add_all(["-o", outfile.path])
     args.add_all(["-o", ctx.outputs.out.path])
 
-    for var in ctx.var:
-        print("VAR: {k}: {v}".format(k=var, v=ctx.var[var]))
+    # for var in ctx.var:
+    #     print("VAR: {k}: {v}".format(k=var, v=ctx.var[var]))
 
     ctx.actions.run(
         mnemonic = "Mustache",

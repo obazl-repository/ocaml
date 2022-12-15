@@ -7,6 +7,7 @@ load("@bazel_skylib//rules:common_settings.bzl",
 load("//bzl:rules.bzl", "cc_assemble")
 
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
+load("//vendor/mustach:cc_mustache.bzl", "cc_mustache")
 
 load("//config:CONFIG.bzl", "ARCH")
 
@@ -44,9 +45,9 @@ cc_library(
     srcs = [
         "//runtime:common_c_sources",
         "//runtime:bytecode_only_c_sources",
-        "//runtime/caml:domain_state.h",
-        "//runtime/caml:fail_h",
-        "//runtime/caml:instruct_h",
+        # "//runtime/caml:domain_state.h",
+        # "//runtime/caml:fail_h",
+        # "//runtime/caml:instruct_h",
         # ":primitives.h"
     ] + select({
     # "//platform/target:vm?": ["//runtime:bytecode_only_c_sources"],
@@ -56,28 +57,15 @@ cc_library(
     deps = [
         ":hdrs",
         "//runtime/caml:hdrs",
+        "//runtime/caml:domain_state_h",
+        "//runtime/caml:fail_h",
+        "//runtime/caml:instruct_h",
+        "//runtime/caml:jumptbl_h",
     ],
     copts = [
         "-x", "c",
-
-        ## ridiculous. needed because the mustache rule that produces
-        ## these hdrs is involved in a transition.
-        "-I$(GENDIR)/runtime/_virtual_includes/hdrs/caml",
-        "-I$(GENDIR)/runtime/caml/_virtual_includes/hdrs/caml",
-
-        # "-I.",
-        # "-Iruntime",
-        # "-Iruntime/caml",
-        # "-Icaml",
-        # "-Ihdrs/caml",
-        # "-I$(GENDIR)",
-        # "-I$(GENDIR)/caml",
-        # "-I$(GENDIR)/runtime",
-        # "-I$(GENDIR)/runtime/caml",
-        # "-Iruntime/caml",
-        # "-I$(GENDIR)/runtime",
-        # "-I$(GENDIR)/runtime/hdrs",
-        # "-I$(GENDIR)/runtime/caml",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
@@ -121,54 +109,39 @@ cc_library(
     linkstatic = True,
     # linkshared = True,
     srcs = [
-        # "//runtime:build_config.h",
         "//runtime:common_c_sources",
         "//runtime:native_only_c_sources",
         ":asm",
-        "//runtime/caml:domain_state.h",
-        "//runtime/caml:fail.h",
-        "//runtime/caml:jumptbl.h",
-        "//runtime/caml:opnames.h",
-        "//runtime/caml:s.h",
-        # "//runtime/caml:misc.h",
         ":primitives_h"
     ],
-    # hdrs = ["//runtime/caml:domain_state.h"],
     # features = [
     #     "-supports_pic",    # disable pic
     #     "fully_static_link" # TODO: explore
     # ],
     deps = [
-        # ":asm",
         "//runtime/caml:hdrs",
+        "//runtime/caml:domain_state_h",
+        "//runtime/caml:fail_h",
         ":hdrs",
     ],
     copts = [
         "-x", "c",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime",
 
-        "-I$(GENDIR)/runtime/_virtual_includes/hdrs/caml",
-        "-I$(GENDIR)/runtime/caml/_virtual_includes/hdrs/caml",
-
-        # "-I.",
-        # "-Iruntime/caml/_virtual_includes/hdrs/runtime",
-        # "-Icaml",
-        # "-Iruntime",
-        # "-Iruntime/caml",  ## static hdrs, e.g. misc.h
-        # "-I$(GENDIR)",
-        # "-I$(GENDIR)/caml",
-        # "-I$(GENDIR)/runtime", # caml/domain_state.h, caml/fail.h, primitives.h, etc.
-        # "-I$(GENDIR)/runtime/caml",  ## s.h
+        # "-I$(GENDIR)/runtime/_virtual_includes/hdrs/caml",
+        # "-I$(GENDIR)/runtime/caml/_virtual_includes/hdrs/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
-        # mac (clang) verbose:
-        # "-v",
-        # "-Xlinker" , "-t"
     ] + select({
         "//platform/os:macos?": [], #"-std=c11"],
         "//platform/os:linux?": [],
         "//conditions:default":  [] #"-std=c11"]
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
+        "//conditions:default":  []
+    }) + select({
+        "//config/cc:verbose?": ["-v"], # mac only?
         "//conditions:default":  []
     }) + select({
         ":fastbuild?": [
@@ -178,6 +151,17 @@ cc_library(
         "//conditions:default":  []
     }) + OPTIMIZATION_FLAGS
     ,
+    defines = RUNTIME_DEFINES + [ # OC_NATIVE_DEFINES + [
+    ] + select({
+        # to unify camlrun and asmrun targets, need to select these:
+        "//conditions:default"   : [
+            "NATIVE_CODE",
+            "TARGET_$(ARCH)",
+            "MODEL_$(MODEL)",
+            "SYS_$(SYSTEM)"
+        ] #testing
+    }),
+    ## NB: static cc_library does not link, so these have no effect:
     linkopts = [
         "FOOBAR",
         "$(OC_LDFLAGS)",
@@ -195,16 +179,7 @@ cc_library(
         ## linux
         # "-Wl,--verbose"
     ],
-    defines = RUNTIME_DEFINES + [ # OC_NATIVE_DEFINES + [
-    ] + select({
-        # to unify camlrun and asmrun targets, need to select these:
-        "//conditions:default"   : [
-            "NATIVE_CODE",
-            "TARGET_$(ARCH)",
-            "MODEL_$(MODEL)",
-            "SYS_$(SYSTEM)"
-        ] #testing
-    }),
+    ## This tc provides custom MAKE vars used above:
     toolchains = ["//profile/system/local"],
     visibility = [
         "//visibility:public"
@@ -521,7 +496,7 @@ cc_library(
     visibility = ["//visibility:public"]
 )
 
-mustache(
+cc_mustache(
     name = "primitives_h",
     out  = "primitives.h",
     template = "primitives.h.mustache",
@@ -617,10 +592,6 @@ cc_binary(
         ":prims_c",
         "//runtime:common_c_sources",
         "//runtime:bytecode_only_c_sources",
-        "//runtime/caml:domain_state.h",
-        "//runtime/caml:fail_h",
-        "//runtime/caml:instruct_h",
-        ":primitives_h"
     ] + select({
         # ":trace?": ["//runtime:instrtrace"],
         # FIXME: in INSTR_TRACE and DEBUG, throw an exception
@@ -632,29 +603,18 @@ cc_binary(
     }),
     deps= [
         "//runtime/caml:hdrs",
-        ":hdrs"
+        "//runtime/caml:domain_state_h",
+        "//runtime/caml:fail_h",
+        "//runtime/caml:instruct_h",
+        "//runtime/caml:jumptbl_h",
+        ":primitives_h"
     ],
     copts = [
         "-x", "c",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
-
-        "-I$(GENDIR)/runtime/_virtual_includes/hdrs/caml",
-        "-I$(GENDIR)/runtime/caml/_virtual_includes/hdrs/caml",
-
-        # "-I.",
-        # "-Iruntime",
-        # "-Iruntime/caml",
-        # "-Icaml",
-        # "-Ihdrs/caml",
-        # "-I$(GENDIR)",
-        # "-I$(GENDIR)/caml",
-        # "-I$(GENDIR)/runtime",
-        # "-I$(GENDIR)/runtime/caml",
-        # "-Iruntime/caml",
-        # "-I$(GENDIR)/runtime", # caml/instruct_h
-        # "-I$(GENDIR)/runtime/hdrs",
-        # "-I$(GENDIR)/runtime/caml",
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
