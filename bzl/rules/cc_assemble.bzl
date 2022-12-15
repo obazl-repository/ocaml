@@ -138,9 +138,7 @@ cc_assemble = rule(
         "src": attr.label(mandatory = True, allow_single_file = True),
         "copts": attr.string_list(),
         "defines": attr.string_list(),
-        "deps": attr.label_list(
-            allow_files = True,
-        ),
+        "deps": attr.label_list(),
 
         "_cc_toolchain": attr.label(
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
