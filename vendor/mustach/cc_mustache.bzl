@@ -1,3 +1,5 @@
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
 # from https://github.com/bazelbuild/rules_cc/blob/main/examples/my_c_compile/my_c_compile.bzl
 
 # also https://github.com/bazelbuild/rules_cc/blob/main/examples/my_c_archive/my_c_archive.bzl
@@ -61,7 +63,13 @@ def _cc_mustache_impl(ctx):
         direct_public_headers = [ctx.outputs.out],
         headers = depset([ctx.outputs.out]),
         ## includes: set of search paths
-        includes = depset([ctx.outputs.out.dirname]),
+        includes = depset([
+            #bazel will add these as e.g. -Ibazel-out/darwin-fastbuild/bin
+            # srcs in runtime/caml may directly #include "foo.h"
+            ctx.outputs.out.dirname,
+            # srcs in runtime may #include "caml/foo.h"
+            paths.dirname(ctx.outputs.out.dirname)
+        ]),
         quote_includes = depset([ctx.outputs.out.dirname]),
         # system_includes=unbound,
         # framework_includes=unbound,
@@ -88,23 +96,21 @@ cc_mustache = rule(
         "json": attr.label(
             mandatory = True,
             allow_single_file = True,
-            # cfg = "exec",
         ),
         "template": attr.label(
             mandatory = True,
             allow_single_file = True,
-            # cfg = "exec",
         ),
         "_cc_toolchain": attr.label(
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
         ),
 
-        # "_allowlist_function_transition": attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
 
-        # ),
+        ),
     },
-    # cfg = reset_cc_config_transition,
+    cfg = reset_cc_config_transition,
     fragments = ["cpp"],
     toolchains = use_cpp_toolchain() + [
         "//toolchain/type:cc",

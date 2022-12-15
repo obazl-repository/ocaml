@@ -66,6 +66,7 @@ cc_library(
         "-x", "c",
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
@@ -112,7 +113,9 @@ cc_library(
         "//runtime:common_c_sources",
         "//runtime:native_only_c_sources",
         ":asm",
-        ":primitives_h"
+        "//runtime/caml:fail.h",
+        "//runtime/caml:s.h",
+        # ":primitives_h"
     ],
     # features = [
     #     "-supports_pic",    # disable pic
@@ -128,9 +131,8 @@ cc_library(
         "-x", "c",
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
 
-        # "-I$(GENDIR)/runtime/_virtual_includes/hdrs/caml",
-        # "-I$(GENDIR)/runtime/caml/_virtual_includes/hdrs/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
@@ -613,6 +615,7 @@ cc_binary(
         "-x", "c",
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
