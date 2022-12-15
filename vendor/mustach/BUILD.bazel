@@ -26,6 +26,7 @@ cc_binary(
         "//conditions:default":  []
     }),
     visibility = [
+        "//boot:__pkg__",
         "//bytecomp:__pkg__",
         "//config:__pkg__",
         "//debugger:__pkg__",

@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//bzl/rules:boot_import_vm_executable.bzl", "boot_import_vm_executable")
-load(":BUILD_RULES.bzl", "boot_coldstart")
+load(":BUILD_RULES.bzl", "boot_coldstart", "boot_setup")
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
@@ -11,6 +11,29 @@ load(":BUILD_RULES.bzl", "boot_coldstart")
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
 
 alias(name = "coldstart", actual = ":bootstrap")
+
+boot_setup(
+    name = "setup",
+    runner = "setup_runner.sh",
+    data = [
+        "@bazel_tools//tools/bash/runfiles",
+        "//vendor/mustach",
+        "//runtime:ints.c",
+        "//runtime:primitives.dat",
+        "//runtime:primitives.h",
+        "//runtime:prims.c",
+        "//runtime/caml:domain_state.h",
+        "//runtime/caml:instruct.h",
+        "//runtime/caml:fail.h",
+        "//runtime/caml:jumptbl.h",
+        "//runtime/caml:opnames.h",
+        "//runtime/caml:s.h",
+        "//stdlib:stdlib.mli",
+        "//stdlib:stdlib.ml",
+    ],
+    # deps = [
+    # ],
+)
 
 boot_coldstart(
     name = "bootstrap",

@@ -4,37 +4,17 @@
 
 # echo "args: $@"
 
-# --- begin runfiles.bash initialization ---
-# Copy-pasted from Bazel's Bash runfiles library (tools/bash/runfiles/runfiles.bash).
-# set -euo pipefail
-if [[ ! -d "${RUNFILES_DIR:-/dev/null}" && ! -f "${RUNFILES_MANIFEST_FILE:-/dev/null}" ]]; then
-    if [[ -f "$0.runfiles_manifest" ]]; then
-        export RUNFILES_MANIFEST_FILE="$0.runfiles_manifest"
-    elif [[ -f "$0.runfiles/MANIFEST" ]]; then
-        export RUNFILES_MANIFEST_FILE="$0.runfiles/MANIFEST"
-    elif [[ -f "$0.runfiles/bazel_tools/tools/bash/runfiles/runfiles.bash" ]]; then
-        export RUNFILES_DIR="$0.runfiles"
-    fi
-fi
-
-echo "RUNFILES_DIR: ${RUNFILES_DIR}"
-echo "RUNFILES_MANIFEST_FILE: ${RUNFILES_MANIFEST_FILE}"
-echo
-for x in `cat ${RUNFILES_MANIFEST_FILE}`; do
-    echo $x
-done
-# echo `cat  ${RUNFILES_MANIFEST_FILE}`
-echo
-
-if [[ -f "${RUNFILES_DIR:-/dev/null}/bazel_tools/tools/bash/runfiles/runfiles.bash" ]]; then
-    source "${RUNFILES_DIR}/bazel_tools/tools/bash/runfiles/runfiles.bash"
-elif [[ -f "${RUNFILES_MANIFEST_FILE:-/dev/null}" ]]; then
-    source "$(grep -m1 "^bazel_tools/tools/bash/runfiles/runfiles.bash" "$RUNFILES_MANIFEST_FILE" | cut -d ' ' -f 2-)"
-else
-    echo >&2 "ERROR: cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash"
-    exit 1
-fi
-#       # --- end runfiles.bash initialization ---
+# --- begin runfiles.bash initialization v2 ---
+# Copy-pasted from the Bazel Bash runfiles library v2.
+# https://github.com/bazelbuild/bazel/blob/master/tools/bash/runfiles/runfiles.bash
+set -uo pipefail; set +e; f=bazel_tools/tools/bash/runfiles/runfiles.bash
+source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
+    source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
+    source "$0.runfiles/$f" 2>/dev/null || \
+    source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+    source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+    { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
+# --- end runfiles.bash initialization v2 ---
 
 # echo "camlheader: $(rlocation ocamlcc/config/camlheaders/camlheader)"
 
@@ -46,7 +26,7 @@ echo "BUILD_WORKING_DIRECTORY: $BUILD_WORKING_DIRECTORY"
 
 BOOTDIR=$BUILD_WORKSPACE_DIRECTORY/.baseline
 
-rm -vrf $BOOTDIR
+# rm -vrf $BOOTDIR
 
 echo "Making .baseline directories"
 

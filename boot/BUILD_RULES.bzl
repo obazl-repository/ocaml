@@ -123,3 +123,54 @@ boot_coldstart = rule(
 #   if "args" not in kwargs:
 #       kwargs["args"] = ["a", "b", "c"]
 #   _boot_coldstart(**kwargs)
+
+################################################################
+
+def _boot_setup_impl(ctx):
+
+    runner = ctx.actions.declare_file("setup.sh")
+    ctx.actions.symlink(output = runner,
+                        target_file = ctx.file.runner)
+
+    rfs = []
+
+    for d in ctx.attr.data:
+        # print("DATUM: %s" % d)
+        rfs.append(d.files)
+        rfs.append(d[DefaultInfo].default_runfiles.files)
+
+    # for f in ctx.files.runtimes:
+    #     # print("RUNTIME: %s" % d)
+    #     rfs.append(f)
+
+    runfiles = ctx.runfiles(
+        # files = ctx.files.runtimes,
+        transitive_files = depset(transitive=rfs)
+    )
+
+    defaultInfo = DefaultInfo(
+        executable = runner,
+        runfiles   = runfiles
+    )
+
+    return defaultInfo
+
+#####################
+boot_setup = rule(
+    implementation = _boot_setup_impl,
+
+    doc = "Prebuilds CC tools",
+
+    attrs = dict(
+        runner = attr.label(
+            allow_single_file = True,
+            executable = True,
+            cfg = "exec",
+            default = "//boot:coldstart.sh",
+        ),
+        data = attr.label_list(
+            allow_files = True
+        ),
+    ),
+    executable = True,
+)
