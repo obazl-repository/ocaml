@@ -237,11 +237,12 @@ def signature_impl(ctx, module_name):
         #     fail()
 
     resolver = []
-    if hasattr(ctx.attr, "_resolver"):
-        resolver.append(ctx.attr._resolver[ModuleInfo].sig)
-        resolver.append(ctx.attr._resolver[ModuleInfo].struct)
-        ns = ctx.attr._resolver[ModuleInfo].struct.basename[:-4]
-        args.add_all(["-open", ns])
+    if hasattr(ctx.attr, "ns"):
+        if ctx.attr.ns:
+            resolver.append(ctx.attr.ns[ModuleInfo].sig)
+            resolver.append(ctx.attr.ns[ModuleInfo].struct)
+            ns = ctx.attr.ns[ModuleInfo].struct.basename[:-4]
+            args.add_all(["-open", ns])
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -263,8 +264,13 @@ def signature_impl(ctx, module_name):
                     _options.remove("-nopervasives")
     args.add_all(_options)
 
-    if hasattr(ctx.attr, "_resolver"):
-        includes.append(ctx.attr._resolver[ModuleInfo].sig.dirname)
+    if hasattr(ctx.attr, "ns"):
+        if ctx.attr.ns:
+            # includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
+            includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
+            direct_inputs.append(ctx.attr.ns[ModuleInfo].sig)
+            direct_inputs.append(ctx.attr.ns[ModuleInfo].struct)
+
 
     if hasattr(ctx.attr, "stdlib_primitives"): # test rules
         if ctx.attr.stdlib_primitives:
@@ -274,14 +280,14 @@ def signature_impl(ctx, module_name):
 
     ccInfo_list = []
 
-    # ns_resolver_depset = []
+    # nsns_depset = []
     # if hasattr(ctx.attr, "ns"):
     #     # print("HAS ctx.attr.ns")
     #     ## Only -open Stdlib if we have a dep on Stdlib.
     #     if ctx.files.deps :
     #         if ctx.attr.ns:
     #             # if BootInfo in ctx.attr.ns:
-    #                 # ns_resolver_depset = [ctx.attr.ns[BootInfo].inputs]
+    #                 # nsns_depset = [ctx.attr.ns[BootInfo].inputs]
 
     #             # for f in ctx.attr.ns[DefaultInfo].files.to_list():
     #             #     # args.add("-I", f.dirname)

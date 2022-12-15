@@ -437,18 +437,19 @@ def module_impl(ctx, module_name):
 
     resolver = None
     resolver_deps = []
-    if hasattr(ctx.attr, "_resolver"):
-        resolver = ctx.attr._resolver[ModuleInfo]
-        resolver_deps.append(resolver.sig)
-        resolver_deps.append(resolver.struct)
-        nsname = resolver.struct.basename[:-4]
-        args.add_all(["-open", nsname])
+    if hasattr(ctx.attr, "ns"):
+        if ctx.attr.ns:
+            resolver = ctx.attr.ns[ModuleInfo]
+            resolver_deps.append(resolver.sig)
+            resolver_deps.append(resolver.struct)
+            nsname = resolver.struct.basename[:-4]
+            args.add_all(["-open", nsname])
 
-    if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-        if ctx.attr.stdlib_primitives:
-            includes.append(ctx.attr._stdlib[ModuleInfo].sig.dirname)
-            direct_inputs.append(ctx.attr._stdlib[ModuleInfo].sig)
-            direct_inputs.append(ctx.attr._stdlib[ModuleInfo].struct)
+    # if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+    #     if ctx.attr.stdlib_primitives:
+            includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
+            direct_inputs.append(ctx.attr.ns[ModuleInfo].sig)
+            direct_inputs.append(ctx.attr.ns[ModuleInfo].struct)
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -526,9 +527,11 @@ def module_impl(ctx, module_name):
         merged_input_depsets.append(merge_depsets(depsets, "cli_link_deps"))
         merged_input_depsets.append(archived_cmx_depset)
 
-    # OCaml srcs use two namespaces, Stdlib and Dynlink_compilerlibs
-    if hasattr(ctx.attr, "_resolver"):
-        includes.append(ctx.attr._resolver[ModuleInfo].sig.dirname)
+    # OCaml srcs use three namespaces:
+    #     Stdlib, Dynlink_compilerlibs, Ocamldebug
+    if hasattr(ctx.attr, "ns"):
+        if ctx.attr.ns:
+            includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
 
     ################ Direct Deps ################
 
@@ -629,19 +632,20 @@ def module_impl(ctx, module_name):
 
     providers.append(moduleInfo)
 
-    if hasattr(ctx.attr, "_resolver"):
-        resolver = ctx.attr._resolver[ModuleInfo]
-        nsResolverInfo = NsResolverInfo(
-            sigs   = depset(
-                direct = [resolver.sig],
-                # transitive = ... depsets.deps.resolvers
-            ),
-            structs = depset(
-                direct = [resolver.struct],
-                # transitive = ... depsets.deps.resolvers
+    if hasattr(ctx.attr, "ns"):
+        if ctx.attr.ns:
+            resolver = ctx.attr.ns[ModuleInfo]
+            nsResolverInfo = NsResolverInfo(
+                sigs   = depset(
+                    direct = [resolver.sig],
+                    # transitive = ... depsets.deps.resolvers
+                ),
+                structs = depset(
+                    direct = [resolver.struct],
+                    # transitive = ... depsets.deps.resolvers
+                )
             )
-        )
-        providers.append(nsResolverInfo)
+            providers.append(nsResolverInfo)
 
     bootProvider = BootInfo(
         sigs     = sigs_depset,

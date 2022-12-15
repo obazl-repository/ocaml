@@ -21,7 +21,7 @@ exports_files([
     "datarepr.mli", "datarepr.ml",
     "env.mli", "env.ml",
     "ident.mli", "ident.ml",
-    "outcometree.mli", "outcometree.ml",
+    "outcometree.mli", # "outcometree.ml",
     "path.ml", "path.mli",
     "persistent_env.mli", "persistent_env.ml",
     "predef.mli", "predef.ml",
@@ -183,6 +183,7 @@ compiler_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//lambda:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//toplevel:__pkg__"
@@ -256,20 +257,9 @@ compiler_module(
         ":Subst",
         ":Type_immediacy",
         ":Types",
-
-        #### (Meths)
-        #### (For_copy)
-        #### (Vars)
-        #### (Variance)
-        #### (Uid)
-        #### (TypeSet)
-        #### (TypePairs)
-        #### (TypeMap)
-        #### (TypeHash)
-        #### (Transient_expr)
-        #### (Subtype)
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//lambda:__pkg__",
         "//toplevel:__subpackages__"
     ]
@@ -365,6 +355,7 @@ compiler_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
@@ -398,6 +389,7 @@ compiler_signature(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
@@ -423,7 +415,10 @@ compiler_module(
         ":Subst",
         ":Types",
     ],
-    visibility = ["//tools:__pkg__"]
+    visibility = [
+        "//debugger:__pkg__",
+        "//tools:__pkg__"
+    ]
 )
 
 compiler_signature(
@@ -482,6 +477,7 @@ compiler_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
@@ -502,6 +498,7 @@ compiler_signature(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//middle_end:__subpackages__",
@@ -762,6 +759,7 @@ compiler_module(
         "//stdlib:Stdlib.Sys",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//toplevel:__pkg__",
     ]
 )
@@ -789,6 +787,7 @@ compiler_signature(
         ":Type_immediacy_cmi",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//toplevel:__subpackages__"
     ]
@@ -872,6 +871,7 @@ compiler_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__pkg__",
         "//middle_end/closure:__pkg__",
@@ -892,6 +892,7 @@ compiler_signature(
         ":Ident_cmi",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__pkg__",
         "//toplevel:__subpackages__",
@@ -954,6 +955,7 @@ compiler_module(
         "//utils:Warnings",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//toplevel:__pkg__"
     ]
@@ -993,6 +995,7 @@ compiler_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//lambda:__pkg__",
         "//middle_end/flambda:__pkg__",
         "//otherlibs/dynlink:__pkg__",
@@ -1125,6 +1128,7 @@ compiler_module(
         #### (Vars)
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//lambda:__pkg__",
         "//tools:__pkg__",
@@ -1872,6 +1876,7 @@ compiler_signature(
         "//parsing:Asttypes_cmi",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
@@ -2025,6 +2030,7 @@ compiler_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
@@ -2049,6 +2055,7 @@ compiler_signature(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__pkg__",

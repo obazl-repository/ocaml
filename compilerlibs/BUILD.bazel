@@ -39,6 +39,7 @@ boot_archive(
     visibility = [
         "//bin:__pkg__",  # the new compiler
         "//boot:__subpackages__",
+        "//debugger:__pkg__",
         "//dev:__subpackages__",
         "//fixpoint:__pkg__",
         "//ocamltest:__pkg__",

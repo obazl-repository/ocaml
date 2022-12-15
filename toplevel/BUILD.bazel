@@ -239,7 +239,8 @@ compiler_module(
         "//typing:Ctype",
         "//stdlib:Stdlib.Bytes",
         "//typing:Btype",
-    ]
+    ],
+    visibility = ["//debugger:__pkg__"]
 )
 
 compiler_signature(
@@ -556,7 +557,7 @@ compiler_module(
     sig    = ":Topprinters_cmi",
     opts = MODULE_OPTS,
     deps   = ["//typing:Ctype"],
-    # visibility = ["//toplevel:__pkg__"]
+    visibility = ["//debugger:__pkg__"]
 )
 
 compiler_signature(

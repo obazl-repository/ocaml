@@ -17,17 +17,18 @@ load("//bzl/actions:signature_impl.bzl", "signature_impl")
 
 
 ################################################################
-def _dynlink_signature(ctx):
+def _ns_signature(ctx):
 
     (this, extension) = paths.split_extension(ctx.file.src.basename)
     name = this[:1].capitalize() + this[1:]
-    module_name = "Dynlink_compilerlibs__" + name
+    ns_pfx = ctx.file.ns.basename[:-4]
+    module_name = ns_pfx + "__" + name
 
     return signature_impl(ctx, module_name)
 
 ########################
-dynlink_signature = rule(
-    implementation = _dynlink_signature,
+ns_signature = rule(
+    implementation = _ns_signature,
     doc = "Sig rule for bootstrapping ocaml compilers",
     attrs = dict(
         signature_attrs(),
@@ -36,11 +37,12 @@ dynlink_signature = rule(
             # default = ["-nostdlib"]  # in tc.copts
         ),
 
-        _resolver = attr.label(
-            default = "//otherlibs/dynlink:Dynlink_compilerlibs"
+        stdlib_primitives = attr.bool(default = False),
+        _stdlib = attr.label(
+            default = "//stdlib:Stdlib"
         ),
 
-        _rule = attr.string( default = "dynlink_signature" ),
+        _rule = attr.string( default = "ns_signature" ),
     ),
     # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
@@ -51,30 +53,35 @@ dynlink_signature = rule(
 )
 
 ################################################################
-def _dynlink_module(ctx):
+def _ns_module(ctx):
 
     (this, extension) = paths.split_extension(ctx.file.struct.basename)
     name = this[:1].capitalize() + this[1:]
-    module_name = "Dynlink_compilerlibs__" + name
+    ns_pfx = ctx.file.ns.basename[:-4]
+    module_name = ns_pfx + "__" + name
 
     return module_impl(ctx, module_name)
 
 #######################
-dynlink_module = rule(
-    implementation = _dynlink_module,
+ns_module = rule(
+    implementation = _ns_module,
     doc = "Compiles a module with the bootstrap compiler.",
     attrs = dict(
         module_attrs(),
 
+        stdlib_primitives = attr.bool(default = False),
+        _stdlib = attr.label(
+            default = "//stdlib:Stdlib"
+        ),
         # _opts = attr.string_list(
         #     default = ["-open", "Dynlink_compilerlibs"],
         # ),
 
-        _resolver = attr.label(
-            default = "//otherlibs/dynlink:Dynlink_compilerlibs"
-        ),
+        # _resolver = attr.label(
+        #     default = "//otherlibs/dynlink:Dynlink_compilerlibs"
+        # ),
 
-        _rule = attr.string( default = "dynlink_module" ),
+        _rule = attr.string( default = "ns_module" ),
     ),
     # cfg = compile_mode_in_transition,
     provides = [BootInfo,ModuleInfo],

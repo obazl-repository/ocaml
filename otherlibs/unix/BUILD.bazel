@@ -14,6 +14,7 @@ boot_library(
         ":UnixLabels",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//ocamltest:__pkg__"
     ]
 )
@@ -43,13 +44,19 @@ compiler_module(
     ],
     # cc_deps = [
     # ]
+    visibility = [
+        "//debugger:__pkg__"
+    ]
 )
 
 compiler_signature(
     name = "Unix_cmi",
     src  = "unix.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib.Bigarray"]
+    deps   = ["//stdlib:Stdlib.Bigarray"],
+    visibility = [
+        "//debugger:__pkg__"
+    ]
 )
 
 compiler_module(
@@ -151,5 +158,8 @@ cc_library(
     linkopts = ["-lm"],
     deps = ["//runtime/caml:hdrs"],
     toolchains = ["//profile/system/local"],
-    visibility = ["//ocamltest:__pkg__"]
+    visibility = [
+        "//debugger:__pkg__",
+        "//ocamltest:__pkg__"
+    ]
 )

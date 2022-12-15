@@ -43,6 +43,7 @@ cc_binary(
     visibility = [
         "//:__pkg__",  # :toolchain target
         "//boot:__subpackages__",
+        "//debugger:__pkg__",
         "//lex:__pkg__",
         "//ocamltest:__pkg__",
         "//toolchain/adapter:__pkg__",

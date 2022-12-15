@@ -478,6 +478,7 @@ compiler_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
@@ -525,6 +526,7 @@ compiler_module(
         "//utils:Misc",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//lambda:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -543,6 +545,7 @@ compiler_signature(
        "//stdlib:Stdlib.Format_cmi"
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]

@@ -7,6 +7,7 @@ camlheaders(
         "//asmcomp:__pkg__",
         "//bin:__pkg__",
         "//boot:__pkg__",
+        "//debugger:__pkg__",
         "//lex:__pkg__",
         "//ocamltest:__pkg__",
         "//testsuite:__subpackages__",

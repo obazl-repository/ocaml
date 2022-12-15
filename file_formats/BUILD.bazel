@@ -66,6 +66,7 @@ compiler_module(
         "//config:Config",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//typing:__pkg__"

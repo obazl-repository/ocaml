@@ -302,6 +302,7 @@ compiler_module(
     visibility = [
         "//asmcomp:__subpackages__",
         "//bytecomp:__subpackages__",
+        "//debugger:__pkg__",
         "//driver:__subpackages__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
@@ -713,6 +714,7 @@ compiler_module(
     visibility = [
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//middle_end:__pkg__",
@@ -792,6 +794,7 @@ compiler_module(
         "//asmcomp:__subpackages__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
+        "//debugger:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
         "//middle_end:__subpackages__",

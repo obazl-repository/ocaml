@@ -34,8 +34,13 @@ stdlib_signature = rule(
         _opts = attr.string_list(
             # default = ["-nostdlib"]  # in tc.copts
         ),
-        _resolver = attr.label(
-            doc = "The commpiler always opens Stdlib, so everything depends on it.",
+        stdlib_primitives = attr.bool(default = False),
+        _stdlib = attr.label(
+            default = "//stdlib:Stdlib"
+        ),
+        # _resolver = attr.label(
+        ns = attr.label(
+            doc = "The compiler always opens Stdlib, so everything depends on it.",
             default = "//stdlib:Stdlib"
         ),
         _rule = attr.string( default = "stdlib_signature" ),
@@ -62,12 +67,17 @@ stdlib_module = rule(
     doc = "Compiles a module with the bootstrap compiler.",
     attrs = dict(
         module_attrs(),
+        stdlib_primitives = attr.bool(default = False),
+        _stdlib = attr.label(
+            default = "//stdlib:Stdlib"
+        ),
         _opts = attr.string_list(
             # default = ["-nopervasives"]
             # default = ["-nostdlib"], # in tc.copts
         ),
-        _resolver = attr.label(
-            doc = "The commpiler always opens Stdlib, so everything depends on it.",
+        # _resolver = attr.label(
+        ns = attr.label(
+            doc = "The compiler always opens Stdlib, so everything depends on it.",
             default = "//stdlib:Stdlib"
         ),
         _rule = attr.string( default = "stdlib_module" ),

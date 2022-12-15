@@ -317,6 +317,7 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//debugger:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
@@ -427,6 +428,7 @@ compiler_module(
         "//typing:Env",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__"
     ]
@@ -445,6 +447,7 @@ compiler_signature(
         "//typing:Env_cmi",
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//driver:__pkg__"
     ]
@@ -653,6 +656,7 @@ compiler_module(
         #### (LongString)
     ],
     visibility = [
+        "//debugger:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__"

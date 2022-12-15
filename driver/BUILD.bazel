@@ -214,6 +214,7 @@ compiler_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//debugger:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
     ]

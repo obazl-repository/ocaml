@@ -410,14 +410,14 @@ stdlib_module(
     struct = "atomic.ml",
     name   = "Stdlib.Atomic",
     sig    = "Stdlib.Atomic_cmi",
-    opts = MODULE_OPTS,
+    opts = ["-nopervasives"],
     deps   = [],
 )
 
 stdlib_signature(
     name = "Stdlib.Atomic_cmi",
     src  = "atomic.mli",
-    opts = SIG_OPTS,
+    opts = ["-nopervasives"],
 )
 
 stdlib_module(
@@ -665,6 +665,7 @@ stdlib_module(
 stdlib_signature(
     name = "Stdlib.Either_cmi",
     src  = "either.mli",
+    stdlib_primitives = True
 )
 
 stdlib_module(
@@ -888,7 +889,7 @@ stdlib_module(
 stdlib_signature(
     name = "Stdlib.Int_cmi",
     src  = "int.mli",
-    opts = SIG_OPTS,
+    opts = ["-nopervasives"],
 )
 
 stdlib_module(
@@ -1531,7 +1532,7 @@ stdlib_module(
 stdlib_signature(
     name = "Stdlib.Sys_cmi",
     src  = "sys.mli",
-    opts = SIG_OPTS,
+    opts = ["-nopervasives"],
 )
 
 stdlib_module(

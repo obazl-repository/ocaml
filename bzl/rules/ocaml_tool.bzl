@@ -4,6 +4,9 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
+load("//bzl/transitions:dev_transitions.bzl",
+     "dev_tc_compiler_out_transition")
+
 load("//bzl:functions.bzl", "get_workdir")
 
 ##############################
@@ -38,14 +41,22 @@ ocaml_tool = rule(
 
         vm_only = attr.bool(default = False),
 
-        ## _runtime: for sys executor only
         _runtime = attr.label(
-            # allow_single_file = True,
-            default = "//runtime:asmrun",
+            allow_single_file = True,
+            default = "//toolchain/dev:runtime",
             executable = False,
             # cfg = reset_cc_config_transition ## only build once
             # default = "//config/runtime" # label flag set by transition
         ),
+
+        # ## _runtime: for sys executor only
+        # _runtime = attr.label(
+        #     # allow_single_file = True,
+        #     default = "//runtime:asmrun",
+        #     executable = False,
+        #     # cfg = reset_cc_config_transition ## only build once
+        #     # default = "//config/runtime" # label flag set by transition
+        # ),
 
         _rule = attr.string( default = "ocaml_tool" ),
         # _allowlist_function_transition = attr.label(
@@ -53,6 +64,7 @@ ocaml_tool = rule(
         # ),
     ),
     # cfg = executable_in_transition,
+    cfg = dev_tc_compiler_out_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:boot",

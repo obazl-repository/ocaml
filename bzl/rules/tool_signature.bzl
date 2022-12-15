@@ -17,7 +17,11 @@ tool_signature = rule(
     doc = "Sig rule for bootstrapping ocaml compilers",
     attrs = dict(
         signature_attrs(),
-        stdlib_primitives = attr.bool(default = False),
+        stdlib_primitives = attr.bool(
+            # FIXME: does False mean -nopervasives?
+            doc = "Should be True only if -nopervasives does not work",
+            default = False
+        ),
         _stdlib = attr.label(
             ## only added to depgraph if stdlib_primitives == True
             allow_single_file = True,
