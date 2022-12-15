@@ -4,13 +4,6 @@ load("//bzl:functions.bzl", "get_workdir")
 
 load("//bzl/rules/common:impl_common.bzl", "tmpdir")
 
-load("//bzl/transitions:transitions.bzl", "reset_config_transition")
-load("//bzl/transitions:dev_transitions.bzl",
-     "dev_tc_compiler_out_transition")
-
-# incoming transition to ensure this is only built once.
-# use ctx.actions.expand_template, six times
-
 ###########################
 def _camlheaders_impl(ctx):
 
@@ -35,13 +28,6 @@ def _camlheaders_impl(ctx):
 camlheaders = rule(
     implementation = _camlheaders_impl,
     doc = "Generates dummy camlheader file",
-    attrs = {
-        # "template" : attr.label(mandatory = True,allow_single_file=True),
-        # "_allowlist_function_transition": attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
-    },
-    # cfg = dev_tc_compiler_out_transition,
     toolchains = ["//toolchain/type:boot"]
 )
 

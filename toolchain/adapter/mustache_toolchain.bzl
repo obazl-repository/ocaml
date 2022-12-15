@@ -3,11 +3,8 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//toolchain:transitions.bzl", "tool_out_transition")
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
-load("//bzl/transitions:dev_transitions.bzl",
-     "dev_tc_compiler_out_transition")
-
 ##########################################
-def _tools_toolchain_adapter_impl(ctx):
+def _mustache_toolchain_adapter_impl(ctx):
 
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
@@ -16,8 +13,8 @@ def _tools_toolchain_adapter_impl(ctx):
 
 ###################################
 ## the rule interface
-tools_toolchain_adapter = rule(
-    _tools_toolchain_adapter_impl,
+mustache_toolchain_adapter = rule(
+    _mustache_toolchain_adapter_impl,
     attrs = {
         "mustache": attr.label(
             default = "//vendor/mustach",

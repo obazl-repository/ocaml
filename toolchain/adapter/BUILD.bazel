@@ -2,7 +2,7 @@ exports_files(["BUILD.bazel"])
 
 load("//toolchain/adapter:BUILD.bzl", "toolchain_adapter")
 load("//toolchain/adapter:DEV_TOOLCHAIN.bzl", "dev_toolchain_adapter")
-load("//toolchain/adapter:tools_toolchain.bzl", "tools_toolchain_adapter")
+load("//toolchain/adapter:mustache_toolchain.bzl", "mustache_toolchain_adapter")
 
 ## NB: these are all the same, but for debugging they need different
 ## names. Use aliases?
@@ -116,9 +116,7 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-tools_toolchain_adapter(
-    name        = "cc",
-)
+mustache_toolchain_adapter(name = "mustache")
 
 toolchain_adapter(
     name        = "ocamlc.byte",

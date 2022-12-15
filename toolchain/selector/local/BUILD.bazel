@@ -31,13 +31,11 @@ toolchain_selector(
 )
 
 toolchain_selector(
-    name           = "cc",
-    type           = "//toolchain/type:cc",
-    adapter        = "//toolchain/adapter:cc",
-    # target_host_configuration = [
-    #     "//config/target/executor:unspecified_executor?",
-    #     # "//config/target/emitter:boot_emitter?"
-    # ]
+    name           = "mustache",
+    type           = "//toolchain/type:mustache",
+    adapter        = "//toolchain/adapter:mustache",
+    # we always transition to null ocaml tc, so we don't care about
+    # the ocaml config
 )
 
 toolchain_selector(

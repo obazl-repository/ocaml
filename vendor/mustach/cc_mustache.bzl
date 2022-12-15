@@ -18,7 +18,7 @@ DISABLED_FEATURES = [
 ###########################
 def _cc_mustache_impl(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:cc"]
+    tc = ctx.toolchains["//toolchain/type:mustache"]
 
     # hdr = ctx.actions.declare_file("foobar.h", sibling=ctx.file.json)
     # print("out: %s" % ctx.outputs.out.path)
@@ -113,7 +113,7 @@ cc_mustache = rule(
     cfg = reset_cc_config_transition,
     fragments = ["cpp"],
     toolchains = use_cpp_toolchain() + [
-        "//toolchain/type:cc",
+        "//toolchain/type:mustache",
     ]
 )
 

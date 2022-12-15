@@ -41,7 +41,7 @@ toolchain_type(name = "baseline", visibility = ["//visibility:public"])
 
 toolchain_type(name = "dev", visibility = ["//visibility:public"])
 
-toolchain_type(name = "cc", visibility = ["//visibility:public"])
+toolchain_type(name = "mustache", visibility = ["//visibility:public"])
 
 ####  TOOLCHAIN PROFILES  ################
 toolchain_type(name = "ocaml_tc_profile",

@@ -9,7 +9,7 @@ DISABLED_FEATURES = [
 ########################
 def _mustache_impl(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:cc"]
+    tc = ctx.toolchains["//toolchain/type:mustache"]
 
     args = ctx.actions.args()
     args.add_all(["-j", ctx.file.json.path])
@@ -72,7 +72,7 @@ mustache = rule(
     },
     cfg = reset_cc_config_transition,
     toolchains = [
-        "//toolchain/type:cc",
+        "//toolchain/type:mustache",
         "@bazel_tools//tools/cpp:toolchain_type"
     ]
 )
