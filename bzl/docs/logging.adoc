@@ -1,0 +1,55 @@
+= logging
+
+== verbosity
+
+Bazel:
+
+* `-s` or `--subcommands=True`
+* `--subcommands=pretty_print`
+* `--verbose_failures`
+* `--noshow_progress`
+* `--ui_event_filters=-info` - prevents INFO messages
+* `--ui_event_filters=-stdout` - prevents stdout msgs to screen
+* `--ui_event_filters=-stderr` - prevents stderr msgs to screen
+* `bazel test --test_output=<category>` - writes <category> msgs to screen; categories: error, all, etc. - see link:https://bazel.build/reference/command-line-reference[CLI docs] for more info.
+
+
+OCaml build targets:
+
+* `--//config/ocaml/linkcompile` - affects all ocaml compile actions
+* `--//config/ocaml/link:archive` - affects all ocaml archive (`-a`) actions
+* `--//config/ocaml/link:verbose` - affects all ocaml link actions
+
+OCaml cc actions - assemble/compile/link actions spawned by ocaml compilers:
+
+* use `cc_linkopts` attribute of executable rules (`ocaml_compiler`,
+  `ocaml_tool`, `build_tool`, ...) to enable vebosity for native builds
+
+CC build targets:
+
+* `--//config/cc:verbose` - affects all cc_binary, cc_library targets
+
+
+
+== intermediate data
+
+Compiler switches controlling emission of intermediate data:
+
+* `-dlambda`
+* `-drawlambda`
+* etc.
+
+
+
+`testsuite/test/basic/patmatch_for_multiple.ml`:
+
+   -drawlambda is the Lambda code generated directly by the
+     pattern-matching compiler; it contain "alias" bindings or static
+     exits that are unused, and will be removed by simplification, or
+     that are used only once, and will be inlined by simplification.
+   -dlambda is the Lambda code resulting from simplification.
+
+  The -drawlambda output more closely matches what the
+  pattern-compiler produces, and the -dlambda output more closely
+  matches the final generated code.
+

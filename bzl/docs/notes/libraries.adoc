@@ -1,0 +1,3 @@
+= libraries
+
+See https://github.com/ocaml/RFCs/blob/master/rfcs/ocamlib.md

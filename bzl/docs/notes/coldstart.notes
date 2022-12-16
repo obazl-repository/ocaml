@@ -1,0 +1,81 @@
+Config: 8c2bd0982c9abb6cfb8c87aeefebdcd75689daa5f3c809ea03b1fe0eb6385e7d:
+affected by starlark transition: [
+                                  //config/target/emitter:emitter,
+                                  //toolchain:compiler,
+                                  //toolchain:lexer,
+                                  //toolchain:runtime
+                                  ]
+ compilation_mode: opt
+ host_compilation_mode: opt
+    410 FragmentOptions user-defined {
+    411   //config/target/emitter:emitter: vm
+    412   //config/target/executor:executor: vm
+    413   //toolchain:compiler: //bin:ocamlcc
+    414   //toolchain:lexer: //lex:ocamllex
+    415   //toolchain:runtime: //runtime:asmrun
+    416 }
+
+//stdlib:stdlib_mli [action 'Mustache stdlib/stdlib.mli'
+//stdlib:stdlib_ml [action 'Mustache stdlib/stdlib.ml'
+//bytecomp:opcodes_ml [action 'Mustache bytecomp/opcodes.ml
+
+//parsing:parser_mli [action 'Executing genrule //parsing:parser_mli'
+
+################################################################
+Config: b392ef8e339b1fd3cabf62f2f93eb5cf5fff7485f0aa6a05b095d5b1e8d26bc9
+affected by starlark transition: []
+cmode: fastbuild
+hcmode: opt
+   410 FragmentOptions user-defined {
+    411   //config/target/emitter:emitter: sys
+    412   //config/target/executor:executor: vm
+    413 }
+
+//stdlib:stdlib_mli [action 'Mustache stdlib/stdlib.mli'
+//stdlib:stdlib_ml [action 'Mustache stdlib/stdlib.ml'
+//config:config_ml [action 'Mustache config/config.ml'
+//utils:domainstate_mli [action 'Mustache utils/domainstate.mli
+
+####
+//parsing:lexer_ml [action 'opt [_ocamlc.byte/]:
+8c2bd0982c9abb6cfb8c87aeefebdcd75689daa5f3c809ea03b1fe0eb6385e7d
+########
+
+//bytecomp:opcodes_ml [action 'Mustache bytecomp/opcodes.ml'
+b392ef8e339b1fd3cabf62f2f93eb5cf5fff7485f0aa6a05b095d5b1e8d26bc9
+
+//stdlib:Std_exit_cmi [action 'opt [_ocamlc.byte/]:
+8c2bd0982c9abb6cfb8c87aeefebdcd75689daa5f3c809ea03b1fe0eb6385e7d
+//stdlib:CamlinternalFormatBasics_cmi [action 'opt [_ocamlc.byte/]:
+8c2bd0982c9abb6cfb8c87aeefebdcd75689daa5f3c809ea03b1fe0eb6385e7d
+
+//utils:domainstate_ml [action 'Mustache utils/domainstate.ml
+b392ef8e339b1fd3cabf62f2f93eb5cf5fff7485f0aa6a05b095d5b1e8d26bc9
+
+################################################################
+Config: 457d8baf4b05c771dd872345d75698d582458765cb41cee823eeb94bb5fd3cc2
+affected by starlark transition: [//config/target/emitter:emitter, //config/target/executor:executor]
+cmode: fb
+hcmode: opt
+    410 FragmentOptions user-defined {
+    411 }
+
+//stdlib:stdlib_ml [action 'Mustache stdlib/stdlib.ml'
+
+
+//bytecomp:opcodes_ml [action 'Mustache bytecomp/opcodes.ml'
+
+//stdlib:CamlinternalFormatBasics_cmi [action 'opt [_ocamlc.byte/]:
+
+ //asmcomp:cvt_emit_ml [action 'fastbuild [_boot/]:
+ 457d8baf4b05c771dd872345d75698d582458765cb41cee823eeb94bb5fd3cc2
+
+
+
+//stdlib:CamlinternalFormatBasics_cmi [action 'fastbuild [_boot/]
+config: 457d8baf4b05c771dd872345d75698d582458765cb41cee823eeb94bb5fd3cc2
+affected by starlark transition: [//config/target/emitter:emitter, //config/target/executor:executor]
+compilation_mode: fastbuild
+host_compilation_mode: opt
+
+

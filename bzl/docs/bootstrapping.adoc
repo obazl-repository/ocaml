@@ -1,89 +1,106 @@
-= bootstrapping
+= bootstrapping the compilers
 
-== The Bootstrap Problem
+The OCaml compiler collection may be defined inductively in a form
+that is homomorphic (or at least analogous) to the inductive
+definition of the natural numers.
 
-=== The Problem
+== Minimal stack
 
-* the build recursion must terminate
-* Bazel forbids cycles in the dep graph, so the compiler target cannot indirectly depend on itself
+[cols="^1,^1,2,10"]
+|===
+| Nat | ^| OCamlCC | Remarks
 
-More practical problems:
+| Z | 0 | boot/ocamlc | `boot/ocamlc`, precompiled
 
-* the stdlib must be bootstrapped - -nostdlib, etc.
-* primitives - to change the primitives, the compiler must be told to use the new stuff rather than those that are baked-in
+| SZ | 1 | ocamlc.byte | built by `boot/ocamlc`
 
+| SSZ | 2 | ocamlopt.byte | built by `boot/ocamlc`
 
-=== The Solution
+| SSSZ | 3 | ocamlopt.opt | built by `ocamlopt.byte`
 
-== legacy
+| SSSSZ | 4 | ocamlc.opt | built by `ocamlopt.byte`
 
-=== primitives
+|===
 
-Primitives are the operations implemented in C. So the compiler
-already has them, in its runtime library. But to build a new version
-of the compiler, possibly including changes to the primitives, the
-compiler must use an externally-provided table of primitives rather
-than its internal table.
-
-That's what the `-use-prims` option is for. The `primitives` file is
-generated, by a simple shell script, from the C sources in `runtime/`
-and passed to the compiler as `-use-prims <primsfile>`. It just
-contains a list of the symbols exported by the C files as OCaml
-primitives. The primitives are marked by `CAMLprim value`; the shell
-script just strips this prefix. For example, `runtime/hash.c`
-contains:
-
-```
-CAMLprim value caml_hash(value count, value limit, value seed, value obj)
-```
-
-which turns into `caml_hash` in the `primitives` file.
+Remarks: the VM compilers (`ocamlc.byte`, `ocamlopt.byte`) built in
+the minimal stack are built from source by the precompiled boot
+compiler, so they are not fully "new". The native compilers
+(`ocamlopt.opt`, `oqcamlc.opt`) similarly are built from source by the
+`ocamlopt.byte` compiler built by the boot compiler.
 
 
+== Fixed-point stack
 
-The legacy build always uses this for bootstrapping, even for the
-coldstart. Recall that the coldstart effectively rebuilds the boot
-compiler, on the assumption that the source code in the distribution
-is in sync with the `boot/ocamlc` that ships with it. If that is the
-case, there is no reason to us `-use-prims` for the coldstart. It's
-only needed if the C sources change.
+[cols="^1,^1,2,10"]
+|===
+| Nat | ^| OCamlCC | Remarks
 
+| Z | 0 | `boot/ocamlc` | precompiled
 
+| SZ | 1 | `_baseline/ocamlc.byte` | built by `boot/ocamlc`
 
-== obazl
+| SSZ | 2 | `_fp/ocamlc.byte` | built by `_baseline/ocamlc.byte`
 
+| SSSZ | 3 | `_fp/ocamlopt.byte` | built by `_fp/ocamlc.byte`
 
+| SSSSZ | 4 | `_baseline/ocamlopt.opt` | built by `_fp/ocamlopt.byte`
 
-Bazel:
+| SSSSSZ | 5 | `_fp/ocamlopt.opt` | built by `_baseline/ocamlopt.opt`
 
-* Target `//boot:coldstart` builds the boot toolchain and installs it in hidden directory `.bootstrap`.  Everything in `.bootstrap` is read-only.
+| SSSSSSZ | 6 | `_fp/ocamlc.opt` | built by `_baseline/ocamlopt.opt`
 
-* The toolchain used for development depends on the tools in `.bootstrap`.
-
-Toolchains:
-
-* boot - contains only the precompiled tools and the c tools
-
-* boot  - contains boot plus stdlib compiled with boot
-
-* baseline - contains tools and stdlib compiled with boot toolchain
-
-* dev - tools and stdlib compiled with baseline
+|===
 
 
-== References
 
-link:https://github.com/ocaml/ocaml/pull/11290[Add more information to BOOTSTRAP.adoc #11290]
+== Implemention details
 
-link:https://github.com/ocaml/ocaml/pull/11149[Make the bootstrap process repeatable #11149] (OCaml)
+[cols="^1,^1,2,2,10"]
+|===
+| Nat | ^| Compiler ^| Lexer | Config
 
-bootstrap cycles in bazel: https://gist.github.com/rrbutani/f5d80af864e67d873ae4491111d9dcce
+| Z | 0 | ocamlc.boot | ocamllex.boot
+| `//toolchain/target/executor:boot` +
+`//toolchain/target/emitter:boot` +
+`//toolchain:compiler` = `//boot:ocamlc.boot` +
+`//toolchain:lexer`      = `//boot:ocamllex.boot` +
+`//toolchain:runtime` = `//runtime:camlrun`
 
-bootstrap example: https://gist.github.com/rrbutani/f427d642dd995c1181918570b0caa156
+| SZ | 1 | ocamlc.baseline | ocamllex.boot
+| `//toolchain/target/executor:baseline` +
+`//toolchain/target/emitter:baseline` +
+`//toolchain:compiler` = `//boot:ocamlc.boot` +
+`//toolchain:lexer`       = `//boot:ocamllex.boot` +
+`//toolchain:runtime` = `//runtime:camlrun`
 
-another, without transitions:  https://gist.github.com/rrbutani/4ef90cf0e87304c1d112b8168eb76a38
+| SSZ | 2 | ocamlc.byte | ocamllex.byte
+| `//toolchain/target/executor:vm` +
+`//toolchain/target/emitter:vm` +
+`//toolchain:compiler` = `//bin:ocamlcc` +
+`//toolchain:lexer` = `//bin:ocamllex` +
+`//toolchain:runtime` = `//runtime:camlrun`
 
+| SSSZ | 3 | ocamlopt.byte |
+| `//toolchain/target/executor:vm` +
+`//toolchain/target/emitter:sys` +
+`//toolchain:compiler` = `//bin:ocamlcc` +
+`//toolchain:lexer` = `//bin:ocamllex` +
+`//toolchain:runtime` = `//runtime:asmrun`
 
-https://github.com/bazelbuild/bazel/issues/11584
+| SSSSZ | 4 | ocamlopt.opt | ocamllex.opt
+| `//toolchain/target/executor:sys` +
+`//toolchain/target/emitter:sys` +
+`//toolchain:compiler` = `//bin:ocamlcc` +
+`//toolchain:lexer` = `//bin:ocamllex` +
+`//toolchain:runtime` = `//runtime:asmrun`
+
+| SSSSSZ | 5 | ocamlc.opt |
+| `//toolchain/target/executor:sys` +
+`//toolchain/target/emitter:vm` +
+`//toolchain:compiler` = `//bin:ocamlcc` +
+`//toolchain:lexer` = `//bin:ocamllex` +
+`//toolchain:runtime` = `//runtime:camlrun`
+
+|===
 
 
