@@ -8,7 +8,7 @@ def _boot_config(ctx):
 
     o = ctx.outputs.out
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     (executor, emitter, workdir) = get_workdir(ctx, tc)
 
@@ -80,7 +80,7 @@ boot_config = rule(
             default = "//stdlib:Std_exit"
         )
     ),
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

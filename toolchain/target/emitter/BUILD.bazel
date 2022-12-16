@@ -3,7 +3,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "string_setting")
 # only set by tc_compiler_out_transition
 string_setting( name = "emitter",
              values = ["boot", "baseline", "vm", "sys", "unspecified"],
-             build_setting_default = "unspecified",
+             build_setting_default = "boot",
              visibility = [
                  "//bytecomp:__pkg__",
                  "//config:__subpackages__",

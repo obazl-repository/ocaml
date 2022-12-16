@@ -19,18 +19,20 @@ cc_binary(
         "version.h", "defs.h",
         "//runtime/caml:domain_state.h",
     ],
-    features = ["no_legacy_features"],
+    # features = ["no_legacy_features"],
+    deps = [
+        "//runtime/caml:hdrs",
+        "//runtime/caml:domain_state_h",
+    ],
     copts = [
         "-x", "c",
-        # "-fno-strict-aliasing",
-        # "-fwrapv",
-        "$(OC_CFLAGS)",
-        "$(OC_CPPFLAGS)",
         "-I", "$(GENDIR)/yacc",
         "-Iruntime",
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime", # build_config.h
         "-I$(GENDIR)/runtime/caml",
+        "$(OC_CFLAGS)",
+        "$(OC_CPPFLAGS)",
     ] + select({
         # if -c opt, the clang toolchain inserts -DNDEBUG
         # which causes a macro-redefined error
@@ -38,7 +40,6 @@ cc_binary(
         "//conditions:default": []
     }),
     linkopts = ["$(OC_LDFLAGS)"],
-    deps = ["//runtime/caml:hdrs"],
     toolchains = ["//profile/system/local"],
     visibility = [
         "//:__pkg__",  # :toolchain target

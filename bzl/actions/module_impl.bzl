@@ -44,25 +44,48 @@ def module_impl(ctx, module_name):
     # tc = ctx.exec_groups[ctx.attr._stage].toolchains[
     #     "//toolchain/type:{}".format(ctx.attr._stage)
     # ]
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
 
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    #########################
+    args = ctx.actions.args()
 
-    if executor in ["boot", "baseline", "vm"]:
-        ext = ".cmo"
+    executable = None
+    if tc.dev:
+        ocamlrun = None
+        effective_compiler = tc.compiler
     else:
+        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    build_executor = get_build_executor(tc)
+    print("BX: %s" % build_executor)
+    print("TX: %s" % config_executor)
+    print("ef: %s" % effective_compiler)
+
+    if build_executor == "vm":
+        executable = ocamlrun
+        args.add(effective_compiler.path)
+        if config_executor in ["sys"]:
+            ext = ".cmx"
+        else:
+            ext = ".cmo"
+    else:
+        executable = effective_compiler
         ext = ".cmx"
+
+
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
 
     ################################################################
     ################  OUTPUTS  ################
@@ -366,24 +389,6 @@ def module_impl(ctx, module_name):
     # indirect_ppx_codep_path_depsets = []
     indirect_cc_deps  = {}
 
-    #########################
-    args = ctx.actions.args()
-
-    executable = None
-    if tc.dev:
-        ocamlrun = None
-        effective_compiler = tc.compiler
-    else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
-
-    build_executor = get_build_executor(tc)
-
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.add(effective_compiler.path)
-    else:
-        executable = effective_compiler
 
     # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
     # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable

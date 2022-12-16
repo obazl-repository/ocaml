@@ -5,7 +5,7 @@ load("//bzl/actions:BUILD.bzl", "progress_msg")
 
 load("//bzl:functions.bzl", "get_workdir", "tc_lexer", "tc_compiler")
 
-load("//bzl/transitions:transitions.bzl", "reset_config_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 # rule: boot_compiler(name=ocamllex): builds the lexer
 # rule: lex runs the lexer, obtained from toolchain
@@ -30,7 +30,7 @@ def _lex_impl(ctx):
 
     # mode = ctx.attr.mode
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
@@ -200,7 +200,7 @@ lex = rule(
     executable = False,
     # cfg = reset_config_transition,
     # fragments = ["cpp"],
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

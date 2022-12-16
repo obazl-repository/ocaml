@@ -27,18 +27,47 @@ def signature_impl(ctx, module_name):
     # if ctx.label.name in ["Pervasives"]
     #     debug = True
 
-    # if "//toolchain/type:boot" in ctx.toolchains:
+    # if "//toolchain/type:ocaml" in ctx.toolchains:
     #     fail("BOOT")
 
     basename = ctx.label.name
     from_name = basename[:1].capitalize() + basename[1:]
 
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
+
+    #########################
+    args = ctx.actions.args()
+
+    executable = None
+    if tc.dev:
+        ocamlrun = None
+        effective_compiler = tc.compiler
+    else:
+        ## tc.compiler runfiles: bottom element is always ocamlrun
+        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+        ## most recently built compiler:
+        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    build_executor = get_build_executor(tc)
+    print("xBX: %s" % build_executor)
+    print("xTX: %s" % config_executor)
+    print("xef: %s" % effective_compiler)
+
+    if build_executor == "vm":
+        executable = ocamlrun
+        args.add(effective_compiler.path)
+        if config_executor in ["sys"]:
+            ext = ".cmx"
+        else:
+            ext = ".cmo"
+    else:
+        executable = effective_compiler
+        ext = ".cmx"
 
     ################
     includes   = []
@@ -191,37 +220,6 @@ def signature_impl(ctx, module_name):
     # if ctx.label.name == "CamlinternalFormatBasics_cmi":
     #     print("depsets: %s" % depsets)
     #     fail("x")
-
-    #########################
-    args = ctx.actions.args()
-
-    ## IMPORTANT!!! The tc compiler runfiles contains the entire stack
-    ## of of bootstrapped compilers. E.g. if target is ocamlc.opt, then:
-    # <generated file runtime/ocamlrun>
-    # <generated file boot/ocamlc.boot>
-    # <generated file bin/_boot/ocamlc.byte>
-    # <generated file bin/_ocamlc.byte/ocamlc.byte>
-    # <generated file bin/_ocamlopt.byte/ocamlopt.byte>
-    # <generated file bin/_ocamlopt.opt/ocamlopt.opt>
-
-    # runfiles = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()
-    # print("RUNFILES: %s" % runfiles)
-
-    executable = None
-    if tc.dev:
-        ocamlrun = None
-        effective_compiler = tc.compiler
-    else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
-
-    build_executor = get_build_executor(tc)
-
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.add(effective_compiler.path)
-    else:
-        executable = effective_compiler
 
     if debug:
         print("tgt: %s" % ctx.label)

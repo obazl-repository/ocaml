@@ -22,7 +22,7 @@ def _bootstrap_repl_impl(ctx):
     # # "$(location :ocaml.tmp)",
     # # "$(location ocaml)",
 
-    # tc = ctx.toolchains["//toolchain/type:bootstrap"]
+    # tc = ctx.toolchains["//toolchain/type:ocamlstrap"]
 
     # args = ctx.actions.args()
     # args.add(ctx.file._expunger)
@@ -93,5 +93,5 @@ bootstrap_repl = rule(
     ),
     # cfg = executable_in_transition,
     executable = True,
-    toolchains = ["//toolchain/type:bootstrap"],
+    toolchains = ["//toolchain/type:ocamlstrap"],
 )

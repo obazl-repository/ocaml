@@ -40,9 +40,9 @@ def _compile_fail_test(ctx):
     # tc = ctx.exec_groups[ctx.attr._stage].toolchains[
     #     "//toolchain/type:{}".format(ctx.attr._stage)
     # ]
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     (target_executor, target_emitter,
      config_executor, config_emitter,
@@ -656,7 +656,7 @@ compile_fail_test = rule(
     ),
     # cfg = compile_mode_in_transition,
     test = True,
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

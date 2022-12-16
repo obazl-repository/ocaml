@@ -21,20 +21,20 @@
 # stdlib_mli
 
 def _reset_cc_config_transition_impl(settings, attr):
-    print("reset_cc_config_transition: %s" % attr.name)
+    # print("reset_cc_config_transition: %s" % attr.name)
 
     return {
         "//command_line_option:host_compilation_mode": "opt",
         "//command_line_option:compilation_mode": "opt",
 
-        "//toolchain/target/executor": "unspecified",
-        "//toolchain/target/emitter" : "unspecified",
+        "//toolchain/target/executor": "boot",
+        "//toolchain/target/emitter" : "boot",
 
-        "//config/target/executor": "unspecified",
-        "//config/target/emitter" : "unspecified",
+        "//config/target/executor": "boot",
+        "//config/target/emitter" : "boot",
 
-        "//toolchain:compiler" : "//boot:ocamlc.boot",
-        "//toolchain:lexer"    : "//boot:ocamllex.boot",
+        # "//toolchain:compiler" : "//boot:ocamlc.boot",
+        # "//toolchain:lexer"    : "//boot:ocamllex.boot",
     }
 
 #######################
@@ -48,8 +48,7 @@ reset_cc_config_transition = transition(
         "//toolchain/target/emitter",
         "//config/target/executor",
         "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-
+        # "//toolchain:compiler",
+        # "//toolchain:lexer",
     ]
 )

@@ -6,7 +6,7 @@ load("//bzl:providers.bzl",
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
-# load("//bzl/transitions:transitions.bzl", "reset_config_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 #######################
 def executable_attrs():

@@ -3,7 +3,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-# load("//bzl/transitions:transitions.bzl", "compiler_in_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "compiler_in_transition")
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
@@ -12,7 +12,7 @@ load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
 ##############################
 def _ocaml_compiler_impl(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
@@ -75,7 +75,7 @@ ocaml_compiler = rule(
     # cfg = compiler_in_transition,
     executable = True,
     fragments = ["cpp"],
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

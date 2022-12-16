@@ -16,7 +16,7 @@ def _yacc_impl(ctx):
     if debug:
         print("OCAMLYACC: %s" % ctx.label.name)
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
     # (executor, emitter, workdir) = get_workdir(ctx, tc)
 
     # lexout_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
@@ -90,7 +90,7 @@ yacc = rule(
         ),
     ),
     executable = False,
-    toolchains = ["//toolchain/type:boot"]
+    toolchains = ["//toolchain/type:ocaml"]
                   # ## //toolchain/type:profile,",
                   # "@bazel_tools//tools/cpp:toolchain_type"]
 )

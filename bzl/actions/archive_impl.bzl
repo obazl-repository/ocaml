@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load(":BUILD.bzl", "progress_msg")
+load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo",
@@ -19,29 +19,81 @@ load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
      "merge_depsets")
 
-# load("//bzl/transitions:transitions.bzl", "manifest_out_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "manifest_out_transition")
 
 ###############################
 def archive_impl(ctx):
     debug = False
 
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
 
-    if executor in ["boot", "baseline", "vm"]:
-        ext = ".cma"
+    # if executor in ["boot", "baseline", "vm"]:
+    #     ext = ".cma"
+    # else:
+    #     ext = ".cmxa"
+
+    args = ctx.actions.args()
+
+    executable = None
+
+    if tc.dev:
+        ocamlrun = None
+        effective_compiler = tc.compiler
     else:
+        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+
+        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    if tc.dev:
+        build_executor = "opt"
+    elif (target_executor == "unspecified"):
+        if (config_executor == "sys"):
+            if config_emitter == "sys":
+                # ss built from ocamlopt.byte
+                build_executor = "vm"
+            else:
+                # sv built from ocamlopt.opt
+                build_executor = "sys"
+        else:
+            build_executor = "vm"
+    elif target_executor in ["boot", "vm"]:
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "sys"):
+        ## ss always built by vs (ocamlopt.byte)
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "vm"):
+        ## sv built by ss
+        build_executor = "sys"
+
+    build_executor = get_build_executor(tc)
+    if build_executor == "vm":
+        executable = ocamlrun
+        args.add(effective_compiler.path)
+        if config_executor in ["sys"]:
+            ext = ".cmxa"
+        else:
+            ext = ".cma"
+    else:
+        executable = effective_compiler
         ext = ".cmxa"
+
+    # if build_executor == "vm":
+    #     executable = ocamlrun
+    #     args.add(effective_compiler.path)
+    # else:
+    #     executable = effective_compiler
+
 
     ################################################################
     ################  OUTPUTS: out_archive  ################
@@ -120,45 +172,6 @@ def archive_impl(ctx):
     )
 
     #########################
-    args = ctx.actions.args()
-
-    executable = None
-
-    if tc.dev:
-        ocamlrun = None
-        effective_compiler = tc.compiler
-    else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
-
-    if tc.dev:
-        build_executor = "opt"
-    elif (target_executor == "unspecified"):
-        if (config_executor == "sys"):
-            if config_emitter == "sys":
-                # ss built from ocamlopt.byte
-                build_executor = "vm"
-            else:
-                # sv built from ocamlopt.opt
-                build_executor = "sys"
-        else:
-            build_executor = "vm"
-    elif target_executor in ["boot", "vm"]:
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "sys"):
-        ## ss always built by vs (ocamlopt.byte)
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "vm"):
-        ## sv built by ss
-        build_executor = "sys"
-
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.add(effective_compiler.path)
-    else:
-        executable = effective_compiler
-
     # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
     # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
 

@@ -7,7 +7,7 @@ load("//bzl/rules/common:impl_common.bzl", "tmpdir")
 ###########################
 def _camlheaders_impl(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
     # print("CAMLHEADERS tc.ocamlrun: %s" % tc.ocamlrun.path)
 
     f = ctx.actions.declare_file("camlheader")
@@ -28,7 +28,7 @@ def _camlheaders_impl(ctx):
 camlheaders = rule(
     implementation = _camlheaders_impl,
     doc = "Generates dummy camlheader file",
-    toolchains = ["//toolchain/type:boot"]
+    toolchains = ["//toolchain/type:ocaml"]
 )
 
 ########################
@@ -44,7 +44,7 @@ camlheaders = rule(
 #     # for f in ctx.attr.runtimes:
 #     #     print("RF: %s" % f[DefaultInfo].default_runfiles.symlinks.to_list())
 #     pfx = ""
-#     tc = ctx.toolchains["//toolchain/type:boot"]
+#     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
 #     (executor, emitter, workdir) = get_workdir(ctx, tc)
 
@@ -141,7 +141,7 @@ camlheaders = rule(
 #             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 #     },
 #     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-#     toolchains = ["//toolchain/type:boot",
+#     toolchains = ["//toolchain/type:ocaml",
 #                   # ## //toolchain/type:profile,",
 #                   "@bazel_tools//tools/cpp:toolchain_type"]
 # )

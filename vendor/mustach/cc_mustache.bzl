@@ -31,8 +31,8 @@ def _cc_mustache_impl(ctx):
     # args.add_all(["-o", outfile.path])
     args.add_all(["-o", ctx.outputs.out.path])
 
-    for var in ctx.var:
-        print("VAR: {k}: {v}".format(k=var, v=ctx.var[var]))
+    # for var in ctx.var:
+    #     print("VAR: {k}: {v}".format(k=var, v=ctx.var[var]))
 
     ctx.actions.run(
         mnemonic = "CCMustache",
@@ -81,7 +81,7 @@ def _cc_mustache_impl(ctx):
         compilation_context = compilation_ctx,
         # linking_context = cc_common.create_linking_context()
     )
-    print("ccinfo: %s" % ccinfo)
+    # print("ccinfo: %s" % ccinfo)
 
     return [
         # DefaultInfo(),

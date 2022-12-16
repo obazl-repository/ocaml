@@ -23,7 +23,7 @@ dependencies under a single label, packaged in a
     ),
     # provides = [OcamlLibraryMarker],
     executable = False,
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

@@ -23,8 +23,8 @@ def library_impl(ctx):
     debug = False
     # print("**** NS_LIB {} ****************".format(ctx.label))
 
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)

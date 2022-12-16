@@ -10,7 +10,7 @@ exports_files(glob(["*.bazel"]))
 ################################################################
 toolchain_selector(
     name           = "dev",
-    type           = "//toolchain/type:boot",
+    type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:dev",
     target_host_configuration = [
         # "//config/target/executor:sys_executor?",
@@ -22,7 +22,7 @@ toolchain_selector(
 ################################################################
 toolchain_selector(
     name           = "boot",
-    type           = "//toolchain/type:boot",
+    type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:boot",
     target_host_configuration = [
         "//config/target/executor:boot_executor?",
@@ -40,7 +40,7 @@ toolchain_selector(
 
 toolchain_selector(
     name           = "baseline",
-    type           = "//toolchain/type:boot",
+    type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:boot",
     target_host_configuration = [
         "//config/target/executor:baseline_executor?",
@@ -50,7 +50,7 @@ toolchain_selector(
 
 toolchain_selector(
     name           = "ocamlc.byte",
-    type           = "//toolchain/type:boot",
+    type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:ocamlc.byte",
     target_host_configuration = [
         "//config/target/executor:vm_executor?",
@@ -60,7 +60,7 @@ toolchain_selector(
 
 toolchain_selector(
     name           = "boot.ocamlopt.byte",
-    type           = "//toolchain/type:boot",
+    type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:boot.ocamlopt.byte",
     target_host_configuration = [
         "//config/target/executor:vm_executor?",
@@ -69,7 +69,7 @@ toolchain_selector(
 )
 toolchain_selector(
     name           = "ocamlopt.byte",
-    type           = "//toolchain/type:boot",
+    type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:ocamlopt.byte",
     target_host_configuration = [
         "//config/target/executor:vm_executor?",
@@ -81,7 +81,7 @@ toolchain_selector(
 
 toolchain_selector(
     name           = "ocamlopt.opt",
-    type           = "//toolchain/type:boot",
+    type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:ocamlopt.opt",
     target_host_configuration = [
         "//config/target/executor:sys_executor?",
@@ -91,7 +91,7 @@ toolchain_selector(
 
 toolchain_selector(
     name           = "ocamlc.opt",
-    type           = "//toolchain/type:boot",
+    type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:ocamlc.opt",
     target_host_configuration = [
         "//config/target/executor:sys_executor?",

@@ -27,7 +27,7 @@ boot_module = rule(
     fragments = ["platform", "cpp"],
     host_fragments = ["platform",  "cpp"],
     # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

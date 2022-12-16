@@ -5,7 +5,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 def _cc_build_profile_impl(ctx):
 
-    # tc = ctx.toolchains["//toolchain/type:boot"]
+    # tc = ctx.toolchains["//toolchain/type:ocaml"]
     tcp = ctx.toolchains["//toolchain/type:cc_tc_profile"]
 
     cctc = ctx.toolchains["@bazel_tools//tools/cpp:toolchain_type"]
@@ -62,6 +62,6 @@ cc_build_profile = rule(
     toolchains = [
         "@bazel_tools//tools/cpp:toolchain_type",
         "//toolchain/type:cc_tc_profile",
-        # "//toolchain/type:boot",
+        # "//toolchain/type:ocaml",
     ]
 )

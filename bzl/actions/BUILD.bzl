@@ -3,10 +3,20 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 ############################################################
 def get_build_executor(tc):
 
+    debug = True
+    if debug:
+        print("get_build_executor")
+
     target_executor = tc.target_executor[BuildSettingInfo].value
     target_emitter  = tc.target_emitter[BuildSettingInfo].value
     config_executor = tc.config_executor[BuildSettingInfo].value
     config_emitter  = tc.config_emitter[BuildSettingInfo].value
+
+    if debug:
+        print("target_executor %s" % target_executor)
+        print("target_emitter  %s" % target_emitter)
+        print("config_executor %s" % config_executor)
+        print("config_emitter  %s" % config_emitter)
 
     if tc.dev:
         build_executor = "opt"
@@ -20,12 +30,18 @@ def get_build_executor(tc):
                 build_executor = "sys"
         else:
             build_executor = "vm"
-    elif target_executor in ["boot", "vm"]:
+    elif (config_executor == "boot" and config_emitter == "boot"):
         build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "sys"):
+    elif (config_executor == "baseline" and config_emitter == "baseline"):
+        build_executor = "vm"
+    elif (config_executor == "vm" and config_emitter == "vm"):
+        build_executor = "vm"
+    elif (config_executor == "vm" and config_emitter == "sys"):
+        build_executor = "vm"
+    elif (config_executor == "sys" and config_emitter == "sys"):
         ## ss always built by vs (ocamlopt.byte)
         build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "vm"):
+    elif (config_executor == "sys" and config_emitter == "vm"):
         ## sv built by ss
         build_executor = "sys"
 

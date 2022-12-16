@@ -1,7 +1,7 @@
 load(":inline_expect_impl.bzl", "inline_expect_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//bzl/transitions:transitions.bzl", "reset_config_transition")
+load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
@@ -11,7 +11,7 @@ load("//bzl:functions.bzl", "get_workdir")
 ##############################
 def _inline_expect_test_impl(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
@@ -91,7 +91,7 @@ inline_expect_test = rule(
     cfg = dev_tc_compiler_out_transition,
     test = True,
     fragments = ["cpp"],
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

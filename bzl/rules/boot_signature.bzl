@@ -23,7 +23,7 @@ boot_signature = rule(
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
     fragments = ["cpp"],
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

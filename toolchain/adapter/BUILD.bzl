@@ -1,13 +1,13 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-# load("//config:BUILD.bzl", "TargetInfo")
+
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
-load("//bzl/transitions:transitions.bzl",
-     # "emitter_out_transition",
-     # "toolchain_in_transition",
-     "tc_compiler_out_transition")
+load("//bzl/transitions:tc_transitions.bzl",
+     "tc_compiler_out_transition",
+     "tc_lexer_out_transition",
+     "tc_runtime_out_transition")
 
 ##########################################
 def _toolchain_adapter_impl(ctx):
@@ -17,10 +17,6 @@ def _toolchain_adapter_impl(ctx):
         dev                    = False,
         build_host             = ctx.attr.build_host,
         target_host            = ctx.attr.target_host,
-        # _build_executor        = ctx.attr._build_executor,
-        # build_emitter          = ctx.attr.build_emitter,
-        # target_runtime         = ctx.attr.target_runtime,
-
         config_executor        = ctx.attr.config_executor,
         config_emitter         = ctx.attr.config_emitter,
 
@@ -42,6 +38,7 @@ def _toolchain_adapter_impl(ctx):
 
         ## core tools
         compiler               = ctx.attr.compiler,
+        runtime                = ctx.file.runtime,
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
         structopts             = ctx.attr.structopts,
@@ -73,9 +70,6 @@ toolchain_adapter = rule(
         #     # cfg = emitter_out_transition,
         # ),
 
-        ## putting runtime in tc w/transitions caused spurious rebuilds on transition
-        # "target_runtime" : attr.label(default = "//toolchain:runtime"),
-
         "config_executor": attr.label(default = "//config/target/executor"),
         "config_emitter" : attr.label(default = "//config/target/emitter"),
         "target_executor": attr.label(default = "//toolchain/target/executor"),
@@ -91,13 +85,16 @@ toolchain_adapter = rule(
         ),
 
         ## Virtual Machine
-        # "runtime": attr.label(
-        #     doc = "Batch interpreter. ocamlrun, usually",
-        #     allow_single_file = True,
-        #     executable = True,
-        #     cfg = "exec"
-        #     # cfg = reset_config_transition
-        # ),
+        ## putting runtime in tc w/transitions caused spurious rebuilds on transition (????)
+        # "target_runtime" : attr.label(default = "//toolchain:runtime"),
+        "runtime": attr.label( # the lib, not ocamlrun
+            doc = "Batch interpreter. ocamlrun, usually",
+            default = "//toolchain:runtime",
+            allow_single_file = True,
+            executable = False,
+            # cfg = "exec"
+            cfg = tc_runtime_out_transition
+        ),
 
         "vmargs": attr.label( ## string list
             doc = "Args to pass to all invocations of ocamlrun",
@@ -154,7 +151,7 @@ toolchain_adapter = rule(
             default = "//toolchain:lexer",
             executable = True,
             # cfg = "exec",
-            cfg = tc_compiler_out_transition
+            cfg = tc_lexer_out_transition
         ),
 
         # "yaccer": attr.label(

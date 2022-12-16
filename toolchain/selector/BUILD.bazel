@@ -13,7 +13,7 @@ exports_files(glob(["*.bazel"]))
 ###################
 # toolchain_selector(
 #     name           = "bootstrap",
-#     type           = "//toolchain/type:boot",
+#     type           = "//toolchain/type:ocaml",
 #     adapter        = "//toolchain/adapters/boot",
 #     # target_host_configuration   = [
 #     #     "//platform/build:boot?",
@@ -25,7 +25,7 @@ exports_files(glob(["*.bazel"]))
 
 # toolchain_selector(
 #     name           = "boot-vmsys",
-#     type           = "//toolchain/type:boot",
+#     type           = "//toolchain/type:ocaml",
 #     adapter        = "//toolchain/adapters/boot:vmsys",
 #     build_host_constraints  = ["//platform/build:boot?"],
 #     target_host_constraints  = ["//platform/target:sys?"],

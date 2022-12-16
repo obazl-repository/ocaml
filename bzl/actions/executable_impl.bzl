@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-load(":BUILD.bzl", "progress_msg")
+load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo",
@@ -23,7 +23,7 @@ load("//bzl/rules/common:DEPS.bzl",
 #########################
 def executable_impl(ctx, exe_name):  ## , tc):
 
-    debug = True
+    debug = False
 
     if debug:
         print("EXECUTABLE TARGET: {kind}: {tgt}".format(
@@ -33,8 +33,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:boot"]
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
@@ -50,6 +50,60 @@ def executable_impl(ctx, exe_name):  ## , tc):
         #     print("tc rf: %s" % f)
         # x = tc_compiler(tc)[DefaultInfo].files_to_run.executable
         # print("tc executable: %s" % x)
+
+    #########################
+    args = ctx.actions.args()
+
+    executable = None
+    if tc.dev:
+        ocamlrun = None
+        effective_compiler = tc.compiler
+    else:
+        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+
+    if tc.dev:
+        build_executor = "opt"
+    elif (target_executor == "unspecified"):
+        if (config_executor == "sys"):
+            if config_emitter == "sys":
+                # ss built from ocamlopt.byte
+                build_executor = "vm"
+            else:
+                # sv built from ocamlopt.opt
+                build_executor = "sys"
+        else:
+            build_executor = "vm"
+    elif target_executor in ["boot", "baseline", "vm"]:
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "sys"):
+        ## ss always built by vs (ocamlopt.byte)
+        build_executor = "vm"
+    elif (target_executor == "sys" and target_emitter == "vm"):
+        ## sv built by ss
+        build_executor = "sys"
+
+    build_executor = get_build_executor(tc)
+    print("xBX: %s" % build_executor)
+    print("xTX: %s" % config_executor)
+    print("xef: %s" % effective_compiler)
+
+    if build_executor == "vm":
+        executable = ocamlrun
+        args.add(effective_compiler.path)
+        # if config_executor in ["sys"]:
+        #     ext = ".cmx"
+        # else:
+        #     ext = ".cmo"
+    else:
+        executable = effective_compiler
+        # ext = ".cmx"
+
+    # if build_executor == "vm":
+    #     executable = ocamlrun
+    #     args.add(effective_compiler.path)
+    # else:
+    #     executable = effective_compiler
 
     if hasattr(ctx.attr, "vm_only"):
         if ctx.attr.vm_only:
@@ -136,44 +190,6 @@ def executable_impl(ctx, exe_name):  ## , tc):
     # out_exe = ctx.actions.declare_file(workdir + ctx.label.name)
     out_exe = ctx.actions.declare_file(workdir + exe_name)
 
-    #########################
-    args = ctx.actions.args()
-
-    executable = None
-    if tc.dev:
-        ocamlrun = None
-        effective_compiler = tc.compiler
-    else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
-
-    if tc.dev:
-        build_executor = "opt"
-    elif (target_executor == "unspecified"):
-        if (config_executor == "sys"):
-            if config_emitter == "sys":
-                # ss built from ocamlopt.byte
-                build_executor = "vm"
-            else:
-                # sv built from ocamlopt.opt
-                build_executor = "sys"
-        else:
-            build_executor = "vm"
-    elif target_executor in ["boot", "baseline", "vm"]:
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "sys"):
-        ## ss always built by vs (ocamlopt.byte)
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "vm"):
-        ## sv built by ss
-        build_executor = "sys"
-
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.add(effective_compiler.path)
-    else:
-        executable = effective_compiler
-
     # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
     # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
 
@@ -243,23 +259,30 @@ def executable_impl(ctx, exe_name):  ## , tc):
         # print("exe runtime: %s" % ctx.attr._runtime)
         # print("exe runtime files: %s" % ctx.attr._runtime.files)
 
-        for f in ctx.files._runtime: ## libasmrun.a
-            print("XXXXXXXXXXXXXXXX: %s" % f)
-            runtime_files.append(f)
-            ## NB: Asmlink looks for libasmrun.a in the std search
-            ## space (-I dirs), not the link srch space (-L dirs)
-            includes.append(f.dirname)
-            # cc_libdirs.append(f.dirname)
+        # for f in ctx.files._runtime: ## libasmrun.a
+        # for f in tc.runtime: ## libasmrun.a
+        print("tc.RUNTIME: %s" % tc.runtime)
+        runtime_files.append(tc.runtime)
+        ## NB: Asmlink looks for libasmrun.a in the std search
+        ## space (-I dirs), not the link srch space (-L dirs)
+        includes.append(tc.runtime.dirname)
+        # cc_libdirs.append(f.dirname)
 
-            ## do not add to CLI - asmcomp/asmlink adds it to the
-            ## OCaml cc link subcmd
+        ## do not add to CLI - asmcomp/asmlink adds it to the
+        ## OCaml cc link subcmd
 
         # print("runtime files: %s" % runtime_files)
     elif "-custom" in ctx.attr.opts:
-        for f in ctx.files._runtime:  # libcamlrun.a
-            runtime_files.append(f)
-            # will add -L<f.dirname> below
-            cc_libdirs.append(f.dirname)
+        # for f in ctx.files._runtime:  # libcamlrun.a
+        # for f in tc.runtime:  # libcamlrun.a
+            # print("tc.RUNTIME: %s" % f)
+            # runtime_files.append(f)
+            # # will add -L<f.dirname> below
+            # cc_libdirs.append(f.dirname)
+        print("tc.RUNTIME: %s" % tc.runtime)
+        runtime_files.append(tc.runtime)
+        # will add -L<f.dirname> below
+        cc_libdirs.append(tc.runtime.dirname)
 
     args.add_all(tc.linkopts)
 

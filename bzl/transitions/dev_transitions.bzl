@@ -6,7 +6,7 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
     ## called for tc.compiler and tc.lexer
     ## so we should see this twice per config
 
-    debug = False
+    debug = True
 
     if debug:
         print("ENTRY: dev_tc_compiler_out_transition")

@@ -115,7 +115,7 @@ boot_coldstart = rule(
     ),
     cfg = _coldstart_transition,
     executable = True,
-    # toolchains = ["//toolchain/type:boot"],
+    # toolchains = ["//toolchain/type:ocaml"],
 )
 
 ###############################

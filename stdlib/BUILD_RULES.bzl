@@ -11,7 +11,7 @@ load("//bzl/actions:module_impl.bzl", "module_impl")
 load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
 load("//bzl/actions:signature_impl.bzl", "signature_impl")
 
-# load("//bzl/transitions:transitions.bzl", "stdlib_in_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "stdlib_in_transition")
 
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
@@ -47,7 +47,7 @@ stdlib_signature = rule(
     ),
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
@@ -88,7 +88,7 @@ stdlib_module = rule(
     # fragments = ["platform", "cpp"],
     # host_fragments = ["platform",  "cpp"],
     # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
@@ -116,7 +116,7 @@ stdlib_internal_signature = rule(
     ),
     # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
@@ -148,7 +148,7 @@ stdlib_internal_module = rule(
     # fragments = ["platform", "cpp"],
     # host_fragments = ["platform",  "cpp"],
     # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
@@ -181,7 +181,7 @@ kernel_signature = rule(
     ),
     # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
@@ -216,7 +216,7 @@ kernel_module = rule(
     # fragments = ["platform", "cpp"],
     # host_fragments = ["platform",  "cpp"],
     # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

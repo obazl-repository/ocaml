@@ -176,7 +176,7 @@ boot_archive(
 )
 
 ################################################################
-build_tool(
+build_tool(  ## moved to //utils:expunge
     name     = "expunge",
     prologue = [
         "//compilerlibs:ocamlcommon",

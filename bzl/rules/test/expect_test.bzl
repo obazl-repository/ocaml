@@ -6,7 +6,7 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 # load("//bzl/actions:module_impl.bzl", "module_impl")
 # load("//bzl/actions:expect_impl.bzl", "expect_impl")
 
-load("//bzl/transitions:transitions.bzl", "reset_config_transition")
+load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
@@ -83,7 +83,7 @@ expect_x_test = rule(
     cfg = dev_tc_compiler_out_transition,
     test = True,
     fragments = ["cpp"],
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

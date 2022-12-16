@@ -13,7 +13,7 @@ test_library = rule(
     ),
     # provides = [OcamlLibraryMarker],
     executable = False,
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

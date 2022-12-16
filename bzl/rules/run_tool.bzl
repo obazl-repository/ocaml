@@ -7,7 +7,7 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 # load("//bzl/actions:module_impl.bzl", "module_impl")
 # load("//bzl/actions:expect_impl.bzl", "expect_impl")
 
-load("//bzl/transitions:transitions.bzl", "reset_config_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
@@ -19,7 +19,7 @@ load("//bzl:functions.bzl", "get_workdir")
 ##############################
 def _run_tool_impl(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
     (target_executor, target_emitter,
      config_executor, config_emitter,
      workdir) = get_workdir(ctx, tc)
@@ -117,7 +117,7 @@ run_tool = rule(
     # cfg = "exec",
     # cfg = dev_tc_compiler_out_transition,
     executable = True,
-    toolchains = ["//toolchain/type:boot",
+    toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

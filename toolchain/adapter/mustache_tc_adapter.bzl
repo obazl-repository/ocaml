@@ -1,7 +1,10 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//toolchain:transitions.bzl", "tool_out_transition")
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
+
+# load("//toolchain:tc_transitions.bzl", "tool_out_transition")
+
+load("//bzl/transitions:tc_transitions.bzl", "tc_mustache_out_transition")
 
 ##########################################
 def _mustache_toolchain_adapter_impl(ctx):
@@ -21,13 +24,14 @@ mustache_toolchain_adapter = rule(
             allow_single_file = True,
             executable = True,
             cfg = "exec",
-            # cfg = tc_compiler_out_transition
+            # cfg = tc_mustache_out_transition
         ),
 
-        # "_allowlist_function_transition": attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
+    cfg = reset_cc_config_transition,
     # cfg = tc_compiler_out_transition, # toolchain_in_transition,
     doc = "Defines a toolchain for build tools (mustache)",
     provides = [platform_common.ToolchainInfo],
