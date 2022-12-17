@@ -794,13 +794,8 @@ compiler_signature(
 build_tool(
     name = "cvt_emit",
     main = ":Cvt_emit",
-    opts = [
-        "-nostdlib",
-        "-verbose"
-    ],
-    # exec_compatible_with   = [
-    #     # "//platform/constraints/ocaml/build/executor:vm_executor",
-    #     "//config/target/executor:vm_executor?"
+    # opts = [
+    #     "-verbose"
     # ],
     visibility = ["//asmcomp:__subpackages__"]
 )

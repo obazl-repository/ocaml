@@ -1,7 +1,12 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//config:CONFIG.bzl", "OCAML_BINDIR")
-load("//bzl:functions.bzl", "tc_compiler", "get_workdir")
+load("//bzl:functions.bzl", "tc_compiler") #, "get_workdir")
+
+load("//toolchain/adapter:BUILD.bzl",
+     # "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
 
 ########################
 def _boot_config(ctx):
@@ -10,9 +15,12 @@ def _boot_config(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    (executor, emitter, workdir) = get_workdir(ctx, tc)
+    workdir = tc_workdir(tc)
 
-    if executor in ["boot", "vm"]:
+    # (executor, emitter, workdir) = get_workdir(ctx, tc)
+
+    # if executor in ["boot", "vm"]:
+    if tc_build_executor == "vm":
         ext = ".cmo"
     else:
         ext = ".cmx"

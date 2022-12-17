@@ -33,8 +33,9 @@ def _reset_cc_config_transition_impl(settings, attr):
         "//config/target/executor": "boot",
         "//config/target/emitter" : "boot",
 
-        # "//toolchain:compiler" : "//boot:ocamlc.boot",
-        # "//toolchain:lexer"    : "//boot:ocamllex.boot",
+        "//toolchain:compiler" : "//boot:ocamlc.boot",
+        "//toolchain:lexer"    : "//boot:ocamllex.boot",
+        "//toolchain:runtime"    : "//runtime:ocamlrun",
     }
 
 #######################
@@ -48,7 +49,8 @@ reset_cc_config_transition = transition(
         "//toolchain/target/emitter",
         "//config/target/executor",
         "//config/target/emitter",
-        # "//toolchain:compiler",
-        # "//toolchain:lexer",
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
     ]
 )

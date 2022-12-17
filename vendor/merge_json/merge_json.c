@@ -29,14 +29,18 @@ static cJSON item[1];
 
 cJSON *read_json(char *json_file) {
     errno = 0;
-    printf("cwd: %s\n", getcwd(NULL, 0));
+#ifdef DEBUG
+        printf("cwd: %s\n", getcwd(NULL, 0));
+#endif
     FILE *stream = fopen(json_file, "r");
     if (stream == NULL) {
         printf(RED "ERROR: " CRESET "fopen %s: %s\n",
                json_file, strerror(errno));
         return NULL;
+#ifdef DEBUG
     } else {
         if (debug) printf("fopened %s\n", json_file);
+#endif
     }
     fseek (stream, 0, SEEK_END);
     uint64_t filea_sz = ftell (stream);
@@ -49,7 +53,9 @@ cJSON *read_json(char *json_file) {
         fclose(stream);
         return NULL;
     }
+#ifdef DEBUG
     printf("readed: %d\n", filea_sz);
+#endif
 
     cJSON *json = cJSON_Parse((char*)buffer);
     /* cJSON *jsona = cJSON_ParseWithLength(buffer, filea_sz); */
@@ -97,11 +103,17 @@ cJSON *merge_json(char *filea, char *fileb, char *output)
     char *item_str;
     cJSON_ArrayForEach(item, jsonb) {
         item_str = cJSON_PrintUnformatted(item);
+#ifdef DEBUG
         printf("jsonb item: %s : %s\n", item->string, item_str);
+#endif
         cJSON_bool ok = cJSON_HasObjectItem(jsona, item->string);
+#ifdef DEBUG
         printf("in jsona? %d\n", ok);
+#endif
         if (cJSON_HasObjectItem(jsona, item->string)) {
+#ifdef DEBUG
             printf("replacing %s\n", item->string);
+#endif
             cJSON *obj = cJSON_GetObjectItem(jsona, item->string);
             if (cJSON_IsBool(item))
                 cJSON_SetBoolValue(obj, item);
@@ -147,8 +159,9 @@ cJSON *merge_json(char *filea, char *fileb, char *output)
 void save_json(char *output, cJSON *map)
 {
     char * json_string = cJSON_Print(map);
+#ifdef DEBUG
     printf(json_string);
-
+#endif
     errno = 0;
     FILE *ostream;
     ostream = fopen(output, "w");
@@ -227,11 +240,14 @@ int main(int argc, char **argv)
     cJSON *merged = merge_json(json_a, json_b, output);
     save_json(output, merged);
 
+    /* printf("merge_json: freeing stuff\n"); */
+
     cJSON_Delete(merged);
 
     free(json_a);               /* string */
     free(json_b);               /* string */
     /* free(output); */
+    /* printf("returning\n"); */
     return 0;
 }
 

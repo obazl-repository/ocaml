@@ -243,6 +243,25 @@ def tc_mustache_transition_impl(settings, attr, debug):
         # "//toolchain:runtime"  : "//runtime:camlrun",
     }
 
+##############################################
+def tc_boot_in_transition_impl(settings, attr, debug):
+    print("tc_boot_in_transition_impl")
+
+    return {
+        "//command_line_option:host_compilation_mode": "opt",
+        "//command_line_option:compilation_mode": "opt",
+
+        "//toolchain/target/executor": "boot",
+        "//toolchain/target/emitter" : "boot",
+
+        "//config/target/executor": "boot",
+        "//config/target/emitter" : "boot",
+
+        "//toolchain:compiler" : "//boot:ocamlc.boot",
+        "//toolchain:lexer"    : "//boot:ocamllex.boot",
+        "//toolchain:runtime"  : "//runtime:camlrun",
+    }
+
 #####################################################
 ## reset_config_transition
 # reset stage to 0 (_boot) so runtime is only built once

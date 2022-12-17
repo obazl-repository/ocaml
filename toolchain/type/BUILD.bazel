@@ -37,7 +37,7 @@
 
 toolchain_type(name = "ocaml", visibility = ["//visibility:public"])
 
-# toolchain_type(name = "boot", visibility = ["//visibility:public"])
+toolchain_type(name = "boot", visibility = ["//visibility:public"])
 
 toolchain_type(name = "baseline", visibility = ["//visibility:public"])
 

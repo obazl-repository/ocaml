@@ -4,26 +4,26 @@ The OCaml compiler collection may be defined inductively in a form
 that is homomorphic (or at least analogous) to the inductive
 definition of the natural numers.
 
-== Minimal stack
+== Boot stack
 
 [cols="^1,^1,2,10"]
 |===
 | Nat | ^| OCamlCC | Remarks
 
-| Z | 0 | boot/ocamlc | `boot/ocamlc`, precompiled
+| Z | 0 | `boot/ocamlc` | precompiled
 
-| SZ | 1 | ocamlc.byte | built by `boot/ocamlc`
+| SZ | 1 | `_boot/ocamlc.byte` | built by `boot/ocamlc`
 
-| SSZ | 2 | ocamlopt.byte | built by `boot/ocamlc`
+| SSZ | 2 | `_boot/ocamlopt.byte` | built by `boot/ocamlc`
 
-| SSSZ | 3 | ocamlopt.opt | built by `ocamlopt.byte`
+| SSSZ | 3 | `_boot/ocamlopt.opt` | built by `ocamlopt.byte`
 
-| SSSSZ | 4 | ocamlc.opt | built by `ocamlopt.byte`
+| SSSSZ | 4 | `_boot/ocamlc.opt` | built by `ocamlopt.byte`
 
 |===
 
 Remarks: the VM compilers (`ocamlc.byte`, `ocamlopt.byte`) built in
-the minimal stack are built from source by the precompiled boot
+the boot stack are built from source by the precompiled boot
 compiler, so they are not fully "new". The native compilers
 (`ocamlopt.opt`, `oqcamlc.opt`) similarly are built from source by the
 `ocamlopt.byte` compiler built by the boot compiler.
@@ -104,3 +104,12 @@ compiler, so they are not fully "new". The native compilers
 |===
 
 
+
+Without transitions, circularity. Note the same config id on all targets:
+
+----
+.-> //bin:ocamlcc (3b3d2b2d012caaeea2d4fcbb07cc99215977da019d5bb230ada48e31aecfc892)
+|   //toolchain/adapter:boot (3b3d2b2d012caaeea2d4fcbb07cc99215977da019d5bb230ada48e31aecfc892)
+|   //toolchain:compiler (3b3d2b2d012caaeea2d4fcbb07cc99215977da019d5bb230ada48e31aecfc892)
+`-- //bin:ocamlcc (3b3d2b2d012caaeea2d4fcbb07cc99215977da019d5bb230ada48e31aecfc892)
+----

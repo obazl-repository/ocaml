@@ -1,6 +1,11 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
+
 load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
@@ -11,7 +16,7 @@ load("//bzl:providers.bzl",
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
-load("//bzl:functions.bzl", "tc_compiler", "get_workdir")
+# load("//bzl:functions.bzl", "get_workdir")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -28,64 +33,76 @@ def archive_impl(ctx):
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
+    workdir = tc_workdir(tc)
 
-    # if executor in ["boot", "baseline", "vm"]:
-    #     ext = ".cma"
-    # else:
-    #     ext = ".cmxa"
+    # (target_executor, # x
+    #  target_emitter,  # x
+    #  config_executor, # x
+    #  config_emitter,  # x
+    #  workdir) = get_workdir(ctx, tc)
 
+    # (ocamlrun, # x
+    #  executable, # in actions.run
+    #  build_executor, # x
+    #  target_executor # x
+    #  ) = configure_action(ctx, tc)
+
+    #########################
     args = ctx.actions.args()
 
-    executable = None
-
-    if tc.dev:
-        ocamlrun = None
-        effective_compiler = tc.compiler
+    toolarg = tc_tool_arg(tc)
+    if toolarg:
+        args.add(toolarg.path)
+        toolarg_input = [toolarg]
     else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+        toolarg_input = []
 
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    # executable = None
+    # if tc.dev:
+    #     ocamlrun = None
+    #     effective_compiler = tc.compiler
+    # else:
+    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
 
-    if tc.dev:
-        build_executor = "opt"
-    elif (target_executor == "unspecified"):
-        if (config_executor == "sys"):
-            if config_emitter == "sys":
-                # ss built from ocamlopt.byte
-                build_executor = "vm"
-            else:
-                # sv built from ocamlopt.opt
-                build_executor = "sys"
-        else:
-            build_executor = "vm"
-    elif target_executor in ["boot", "vm"]:
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "sys"):
-        ## ss always built by vs (ocamlopt.byte)
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "vm"):
-        ## sv built by ss
-        build_executor = "sys"
+    #     effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
 
-    build_executor = get_build_executor(tc)
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.add(effective_compiler.path)
-        if config_executor in ["sys"]:
-            ext = ".cmxa"
-        else:
-            ext = ".cma"
+    # if tc.dev:
+    #     build_executor = "opt"
+    # elif (target_executor == "unspecified"):
+    #     if (config_executor == "sys"):
+    #         if config_emitter == "sys":
+    #             # ss built from ocamlopt.byte
+    #             build_executor = "vm"
+    #         else:
+    #             # sv built from ocamlopt.opt
+    #             build_executor = "sys"
+    #     else:
+    #         build_executor = "vm"
+    # elif target_executor in ["boot", "vm"]:
+    #     build_executor = "vm"
+    # elif (target_executor == "sys" and target_emitter == "sys"):
+    #     ## ss always built by vs (ocamlopt.byte)
+    #     build_executor = "vm"
+    # elif (target_executor == "sys" and target_emitter == "vm"):
+    #     ## sv built by ss
+    #     build_executor = "sys"
+
+    # build_executor = get_build_executor(tc)
+    # if build_executor == "vm":
+    #     executable = ocamlrun
+    #     args.add(effective_compiler.path)
+    #     if config_executor in ["sys"]:
+    #         ext = ".cmxa"
+    #     else:
+    #         ext = ".cma"
+    # else:
+    #     executable = effective_compiler
+    #     ext = ".cmxa"
+
+    # if tc_build_executor(tc) == "vm":
+    if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
+        ext = ".cma"
     else:
-        executable = effective_compiler
         ext = ".cmxa"
 
     # if build_executor == "vm":
@@ -201,10 +218,10 @@ def archive_impl(ctx):
     #     ## sv built by ss
     #     executable = effective_compiler
 
-    if ctx.label.name == "CamlinternalFormatBasics_cmi":
-        print("ocamlrun: %s" % ocamlrun)
-        print("effective_compiler: %s" % effective_compiler)
-        print("executable: %s" % executable)
+    # if ctx.label.name == "CamlinternalFormatBasics_cmi":
+    #     print("ocamlrun: %s" % ocamlrun)
+    #     print("effective_compiler: %s" % effective_compiler)
+    #     print("executable: %s" % executable)
 
     # if executor in ["boot", "vm", "sys"]:
     #     ## ocamlrun
@@ -469,7 +486,8 @@ def archive_impl(ctx):
 
     inputs_depset = depset(
         direct = ctx.files.data if ctx.files.data else []
-        + [effective_compiler]
+        + [tc_executable(tc)]
+        + toolarg_input
         ,
         transitive = []
         + [
@@ -492,12 +510,12 @@ def archive_impl(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = executable.path,
+        executable = tc_executable(tc).path,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
         tools = [
-            executable
+            # executable
             # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
             # tc_compiler(tc)[DefaultInfo].files_to_run
         ],

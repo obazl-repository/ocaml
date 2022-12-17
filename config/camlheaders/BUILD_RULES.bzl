@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl:functions.bzl", "get_workdir")
+# load("//bzl:functions.bzl", "get_workdir")
 
 load("//bzl/rules/common:impl_common.bzl", "tmpdir")
 
@@ -8,12 +8,14 @@ load("//bzl/rules/common:impl_common.bzl", "tmpdir")
 def _camlheaders_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
+
     # print("CAMLHEADERS tc.ocamlrun: %s" % tc.ocamlrun.path)
 
     f = ctx.actions.declare_file("camlheader")
     ctx.actions.write(
         output = f,
         content = "#!{f}\n".format(
+            ## FIXME: should we get ocamlrun from tc.compiler runfiles?
             f = tc.ocamlrun.path
         )
     )

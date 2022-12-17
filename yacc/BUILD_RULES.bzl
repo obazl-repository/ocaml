@@ -1,7 +1,10 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:functions.bzl", "get_workdir", "tc_lexer")
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
 
 # rule: cc_binary builds ocamlyacc
 # rule: yacc runs it, obtained from tc
@@ -17,6 +20,9 @@ def _yacc_impl(ctx):
         print("OCAMLYACC: %s" % ctx.label.name)
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
+
+    workdir = tc_workdir(tc)
+
     # (executor, emitter, workdir) = get_workdir(ctx, tc)
 
     # lexout_fname = paths.replace_extension(ctx.file.src.basename, ".ml")

@@ -81,7 +81,7 @@ mustache(
     name = "config_ml",
     out      = "config.ml",
     template = "config.ml.mustache",
-    json     = "config.ml.json",
+    json     = "config.json", # "config.ml.json",
     # stdlib = "//stdlib"
 )
 

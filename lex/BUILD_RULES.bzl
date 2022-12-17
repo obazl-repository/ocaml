@@ -1,9 +1,17 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl/actions:BUILD.bzl", "progress_msg")
+load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
-load("//bzl:functions.bzl", "get_workdir", "tc_lexer", "tc_compiler")
+# load("//bzl:functions.bzl", "tc_lexer")
+
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler",
+     "tc_executable",
+     "tc_lexer",
+     "tc_tool_arg", "tc_lexer_arg",
+     "tc_build_executor",
+     "tc_workdir")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
@@ -30,24 +38,27 @@ def _lex_impl(ctx):
 
     # mode = ctx.attr.mode
 
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
+    tc = ctx.toolchains["//toolchain/type:boot"]
 
-    if debug:
-        print("target_emitter: %s" % target_emitter)
-        print("target_executor: %s" % target_executor)
-        print("config_emitter: %s" % config_emitter)
-        print("config_executor: %s" % config_executor)
-        print("tc.dev: %s" % tc.dev)
+    workdir = tc_workdir(tc)
 
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
+
+    # if debug:
+    #     print("target_emitter: %s" % target_emitter)
+    #     print("target_executor: %s" % target_executor)
+    #     print("config_emitter: %s" % config_emitter)
+    #     print("config_executor: %s" % config_executor)
+    #     print("tc.dev: %s" % tc.dev)
+
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
 
     lexout_fname = paths.replace_extension(ctx.file.src.basename, ".ml")
 
@@ -62,6 +73,13 @@ def _lex_impl(ctx):
     #########################
     args = ctx.actions.args()
 
+    toolarg = tc_lexer_arg(tc)
+    if toolarg:
+        args.add(toolarg.path)
+        toolarg_input = [toolarg]
+    else:
+        toolarg_input = []
+
     # tool = None
     # for f in tc_lexer(tc)[DefaultInfo].default_runfiles.files.to_list():
     #     if f.basename == "ocamlrun":
@@ -70,66 +88,63 @@ def _lex_impl(ctx):
 
     # args.add(tc_lexer(tc)[DefaultInfo].files_to_run.executable.path)
 
-    executable = None
-
-    ## IMPORTANT!!! The tc compiler runfiles contains the entire stack
-    ## of of bootstrapped compilers. E.g. if target is ocamlc.opt, then:
-    # <generated file runtime/ocamlrun>
-    # <generated file boot/ocamlc.boot>
-    # <generated file bin/_boot/ocamlc.byte>
-    # <generated file bin/_ocamlc.byte/ocamlc.byte>
-    # <generated file bin/_ocamlopt.byte/ocamlopt.byte>
-    # <generated file bin/_ocamlopt.opt/ocamlopt.opt>
-
-    if debug:
-        print("target_emitter: %s" % target_emitter)
-        print("target_executor: %s" % target_executor)
-        print("config_emitter: %s" % config_emitter)
-        print("config_executor: %s" % config_executor)
-        print("tc.dev: %s" % tc.dev)
+    # if debug:
+    #     print("target_emitter: %s" % target_emitter)
+    #     print("target_executor: %s" % target_executor)
+    #     print("config_emitter: %s" % config_emitter)
+    #     print("config_executor: %s" % config_executor)
+    #     print("tc.dev: %s" % tc.dev)
 
     # runfiles = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()
     # print("RUNFILES: %s" % runfiles)
 
-    if tc.dev:
-        ocamlrun = None
-    else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    # executable = None
+    # if tc.dev:
+    #     ocamlrun = None
+    #     effective_compiler = tc.compiler
+    # else:
+    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
 
-    effective_compiler = tc_lexer(tc)[DefaultInfo].files_to_run.executable
+    #     effective_compiler = tc_lexer(tc)[DefaultInfo].files_to_run.executable
 
-    if tc.dev:
-        build_executor = "opt"
-    elif (target_executor == "unspecified"):
-        if (config_executor == "sys"):
-            if config_emitter == "sys":
-                # ss built from ocamlopt.byte
-                build_executor = "vm"
-            else:
-                # sv built from ocamlopt.opt
-                build_executor = "sys"
-        else:
-            build_executor = "vm"
-    elif target_executor in ["boot", "vm"]:
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "sys"):
-        ## ss always built by vs (ocamlopt.byte)
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "vm"):
-        ## sv built by ss
-        build_executor = "sys"
+    # build_executor = get_build_executor(tc)
 
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.add(effective_compiler.path)
-    else:
-        executable = effective_compiler
+    # if tc.dev:
+    #     build_executor = "opt"
+    # elif (target_executor == "unspecified"):
+    #     if (config_executor == "sys"):
+    #         if config_emitter == "sys":
+    #             # ss built from ocamlopt.byte
+    #             build_executor = "vm"
+    #         else:
+    #             # sv built from ocamlopt.opt
+    #             build_executor = "sys"
+    #     else:
+    #         build_executor = "vm"
+    # elif target_executor in ["boot", "vm"]:
+    #     build_executor = "vm"
+    # elif (target_executor == "sys" and target_emitter == "sys"):
+    #     ## ss always built by vs (ocamlopt.byte)
+    #     build_executor = "vm"
+    # elif (target_executor == "sys" and target_emitter == "vm"):
+    #     ## sv built by ss
+    #     build_executor = "sys"
 
+    # if build_executor == "vm":
+    #     executable = ocamlrun
+    #     args.add(effective_compiler.path)
+    # else:
+    #     executable = effective_compiler
+
+    print("TCLEX: %s" % tc_lexer(tc))
     inputs_depset = depset(
         direct = [
             ctx.file.src,
-        ],
-        transitive = [tc_lexer(tc)[DefaultInfo].default_runfiles.files]
+        ] + toolarg_input
+        ,
+        transitive = [
+            tc.lexer[DefaultInfo].default_runfiles.files
+        ]
     )
 
     # args.add_all(tc.copts)
@@ -147,11 +162,12 @@ def _lex_impl(ctx):
 
     ctx.actions.run(
         # env = env,
-        executable = executable,
+        executable = tc_lexer(tc),
         arguments = [args],
         inputs = inputs_depset,
         outputs = [ctx.outputs.out],
-        tools = tc_lexer(tc)[DefaultInfo].default_runfiles.files,
+        tools = [tc_lexer(tc)],
+        ## tc_lexer(tc)[DefaultInfo].default_runfiles.files,
         mnemonic = "OcamlLex",
         progress_message = progress_msg(workdir, ctx)
         # progress_message = "{mode} ocaml_lex: //{pkg}:{tgt}".format(
@@ -198,9 +214,16 @@ lex = rule(
         _rule = attr.string( default = "lex" )
     ),
     executable = False,
+
+    # fixme: reset transition - we only ever need one version of
+    # ocamllex when compiling compilers. We can build both versions
+    # (ocamllex.byte, ocamllex.opt) but we only need to *use* one.
+    # Which can be boot/ocamllex?
+
+
     # cfg = reset_config_transition,
     # fragments = ["cpp"],
-    toolchains = ["//toolchain/type:ocaml",
+    toolchains = ["//toolchain/type:boot",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )

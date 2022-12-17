@@ -1,6 +1,9 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
 
 load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
@@ -18,60 +21,65 @@ def _cvt_emit(ctx):
     debug = True
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
 
-    executable = None
-    if tc.dev:
-        ocamlrun = None
-        effective_compiler = tc.compiler
-    else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    workdir = tc_workdir(tc)
 
-    if tc.dev:
-        build_executor = "opt"
-    elif (target_executor == "unspecified"):
-        if (config_executor == "sys"):
-            if config_emitter == "sys":
-                # ss built from ocamlopt.byte
-                build_executor = "vm"
-            else:
-                # sv built from ocamlopt.opt
-                build_executor = "sys"
-        else:
-            build_executor = "vm"
-    elif target_executor in ["boot", "baseline", "vm"]:
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "sys"):
-        ## ss always built by vs (ocamlopt.byte)
-        build_executor = "vm"
-    elif (target_executor == "sys" and target_emitter == "vm"):
-        ## sv built by ss
-        build_executor = "sys"
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
 
-    build_executor = get_build_executor(tc)
-    print("cvt ocamlrun: %s" % ocamlrun)
-    print("cvtBX: %s" % build_executor)
-    print("cvtTX: %s" % config_executor)
-    print("cvt ef: %s" % effective_compiler)
+    # executable = None
+    # if tc.dev:
+    #     ocamlrun = None
+    #     effective_compiler = tc.compiler
+    # else:
+    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    #     effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
 
-    if config_emitter == "vm":
-        exec_tools = [ocamlrun,
-                      ##effective_compiler]
-                      ctx.file._tool]
-        executable_cmd = ocamlrun.path + " " + ctx.file._tool.path
+    # if tc.dev:
+    #     build_executor = "opt"
+    # elif (target_executor == "unspecified"):
+    #     if (config_executor == "sys"):
+    #         if config_emitter == "sys":
+    #             # ss built from ocamlopt.byte
+    #             build_executor = "vm"
+    #         else:
+    #             # sv built from ocamlopt.opt
+    #             build_executor = "sys"
+    #     else:
+    #         build_executor = "vm"
+    # elif target_executor in ["boot", "baseline", "vm"]:
+    #     build_executor = "vm"
+    # elif (target_executor == "sys" and target_emitter == "sys"):
+    #     ## ss always built by vs (ocamlopt.byte)
+    #     build_executor = "vm"
+    # elif (target_executor == "sys" and target_emitter == "vm"):
+    #     ## sv built by ss
+    #     build_executor = "sys"
+
+    # build_executor = get_build_executor(tc)
+    # print("cvt ocamlrun: %s" % ocamlrun.path)
+    # print("cvtBX: %s" % build_executor)
+    # print("cvtTX: %s" % config_executor)
+    # print("cvtTM: %s" % config_emitter)
+    # print("cvt ef: %s" % effective_compiler)
+
+    # if config_executor == "vm":
+    exec_tools = [
+        tc_executable(tc), ## ocamlrun,
+        ctx.file._tool
+    ]
+    executable_cmd = tc_executable(tc).path + " " + ctx.file._tool.path
         # if config_executor in ["sys"]:
         #     ext = ".cmx"
         # else:
         #     ext = ".cmo"
-    else:
-        # exec_tools = [effective_compiler]
-        # executable_cmd = effective_compiler.path
-        exec_tools = [ctx.file._tool]
-        executable_cmd = ctx.file._tool.path
-        # ext = ".cmx"
+    # else:
+    #     # exec_tools = [effective_compiler]
+    #     # executable_cmd = effective_compiler.path
+    #     exec_tools = [ctx.file._tool]
+    #     executable_cmd = ctx.file._tool.path
+    #     # ext = ".cmx"
 
     print("EXEC TOOLS: %s" % exec_tools)
     print("exe cmd: %s" % executable_cmd)
@@ -107,7 +115,7 @@ def _cvt_emit(ctx):
     ctx.actions.run_shell(
         mnemonic = "CvtEmit",
         outputs = [ctx.outputs.out],
-        inputs  = [ctx.file.src],
+        inputs  = [ctx.file.src, tc_executable(tc)],
         # tools attr forces build of these deps:
         tools   = exec_tools,
         command = " ".join([

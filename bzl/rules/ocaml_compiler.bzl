@@ -7,18 +7,25 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
-load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
+# load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
 
 ##############################
 def _ocaml_compiler_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
 
-    executor = config_executor
-    emitter  = config_emitter
+    workdir = tc_workdir(tc)
+
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
+
+    executor = tc.config_executor[BuildSettingInfo].value
+    emitter  = tc.config_emitter[BuildSettingInfo].value
 
     if executor == "boot":
         exe_name = "ocamlc.byte"
@@ -58,13 +65,13 @@ ocaml_compiler = rule(
         executable_attrs(),
 
         ## _runtime: for sys executor only
-        _runtime = attr.label(
-            # allow_single_file = True,
-            default = "//runtime:asmrun",
-            executable = False,
-            # cfg = reset_cc_config_transition ## only build once
-            # default = "//config/runtime" # label flag set by transition
-        ),
+        # _runtime = attr.label(
+        #     # allow_single_file = True,
+        #     default = "//runtime:asmrun",
+        #     executable = False,
+        #     # cfg = reset_cc_config_transition ## only build once
+        #     # default = "//config/runtime" # label flag set by transition
+        # ),
 
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"

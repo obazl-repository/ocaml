@@ -1,6 +1,12 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load(":BUILD.bzl", "progress_msg", "get_build_executor")
+load(":BUILD.bzl", "progress_msg")
+#, "get_build_executor", "configure_action")
+
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
 
 load("//bzl:providers.bzl",
      "BootInfo",
@@ -9,8 +15,7 @@ load("//bzl:providers.bzl",
      "new_deps_aggregator",
      "OcamlSignatureProvider")
 
-load("//bzl:functions.bzl",
-     "get_module_name", "get_workdir", "tc_compiler")
+load("//bzl:functions.bzl", "get_module_name")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -36,38 +41,31 @@ def signature_impl(ctx, module_name):
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
+    # (executable,  ## ocamlrun or compiler
+    #  tool_arg,    ## None or compiler to be added to args
+    #  build_executor,
+    #  target_executor,
+    #  workdir
+    #  ) = configure_action(ctx,tc)
+
+    # (target_executor, # x
+    #  target_emitter,  # x
+    #  config_executor, # x
+    #  config_emitter,  # x
+    #  workdir
+    #  ) = get_workdir(ctx, tc)
+
+    workdir = tc_workdir(tc)
 
     #########################
     args = ctx.actions.args()
 
-    executable = None
-    if tc.dev:
-        ocamlrun = None
-        effective_compiler = tc.compiler
+    toolarg = tc_tool_arg(tc)
+    if toolarg:
+        args.add(toolarg.path)
+        toolarg_input = [toolarg]
     else:
-        ## tc.compiler runfiles: bottom element is always ocamlrun
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-        ## most recently built compiler:
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
-
-    build_executor = get_build_executor(tc)
-    print("xBX: %s" % build_executor)
-    print("xTX: %s" % config_executor)
-    print("xef: %s" % effective_compiler)
-
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.add(effective_compiler.path)
-        if config_executor in ["sys"]:
-            ext = ".cmx"
-        else:
-            ext = ".cmo"
-    else:
-        executable = effective_compiler
-        ext = ".cmx"
+        toolarg_input = []
 
     ################
     includes   = []
@@ -223,13 +221,12 @@ def signature_impl(ctx, module_name):
 
     if debug:
         print("tgt: %s" % ctx.label)
-        print("target_executor: %s" % target_executor)
-        print("target_emitter: %s" % target_emitter)
-        print("config_executor: %s" % config_executor)
-        print("config_emitter: %s" % config_emitter)
-        print("ocamlrun: %s" % ocamlrun)
-        print("effective_compiler: %s" % effective_compiler)
-        print("executable: %s" % executable)
+        # print("target_emitter: %s" % target_emitter)
+        # print("config_executor: %s" % config_executor)
+        # print("config_emitter: %s" % config_emitter)
+        # print("ocamlrun: %s" % ocamlrun)
+        print("tc_executable: %s" % tc_executable(tc))
+        print("tc_tool_arg: %s" % tc_tool_arg(tc))
         print("tc.dev: %s" % tc.dev)
         # if ctx.label.name == "CamlinternalFormatBasics_cmi":
         #     fail()
@@ -339,7 +336,8 @@ def signature_impl(ctx, module_name):
         + direct_inputs # + ctx.files._ns_resolver,
         # + [tc.compiler[DefaultInfo].files_to_run.executable],
         # + ctx.files.data if ctx.files.data else [],
-        + [effective_compiler]
+        # + [effective_compiler]
+        + toolarg_input
         + resolver
         ,
         transitive = []## indirect_inputs_depsets
@@ -350,19 +348,19 @@ def signature_impl(ctx, module_name):
         # + depsets.deps.sigs
         # + depsets.deps.archives
         # + ns_resolver_depset
-        # + [tc.compiler[DefaultInfo].default_runfiles.files]
+        + [tc.compiler[0][DefaultInfo].default_runfiles.files]
     )
 
     ##########################################
+    sigexe = tc_executable(tc)
+    # print("SIGexe: %s" % sigexe)
     ################  ACTION  ################
     ctx.actions.run(
-        executable = executable,
+        executable = sigexe,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
         tools = [
-            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            # tc_compiler(tc)[DefaultInfo].files_to_run
         ],
         mnemonic = "CompileOcamlSignature",
         progress_message = progress_msg(workdir, ctx)

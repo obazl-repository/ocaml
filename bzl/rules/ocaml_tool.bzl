@@ -7,23 +7,36 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 load("//bzl/transitions:tc_transitions.bzl",
      "ocaml_tool_in_transition")
 
-load("//bzl:functions.bzl", "get_workdir")
+load("//toolchain/adapter:BUILD.bzl",
+     # "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
+
+# load("//bzl:functions.bzl", "get_workdir")
 
 ##############################
 def _ocaml_tool_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
 
-    if executor in ["boot", "vm"]:
+    workdir = tc_workdir(tc)
+
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
+
+    # if executor in ["boot", "vm"]:
+    #     ext = ".byte"
+    # else:
+    #     ext = ".opt"
+
+    if tc_build_executor == "vm":
         ext = ".byte"
     else:
         ext = ".opt"

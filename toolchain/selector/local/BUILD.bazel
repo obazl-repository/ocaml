@@ -21,6 +21,16 @@ toolchain_selector(
 
 ################################################################
 toolchain_selector(
+    name           = "preproc",
+    type           = "//toolchain/type:boot",
+    adapter        = "//toolchain/adapter:preproc",
+    target_host_configuration = [
+        # "//config/target/executor:boot_executor?",
+        # "//config/target/emitter:boot_emitter?"
+    ]
+)
+
+toolchain_selector(
     name           = "boot",
     type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:boot",

@@ -47,7 +47,9 @@ register_execution_platforms(
 register_toolchains(
 
     "//toolchain/selector/local:dev",
+
     "//toolchain/selector/local:mustache",
+    "//toolchain/selector/local:preproc",
 
     "//toolchain/selector/local:boot",
     "//toolchain/selector/local:baseline",

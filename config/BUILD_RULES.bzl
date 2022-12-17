@@ -117,6 +117,7 @@ def cc_tc_config_map(ctx):
         action_name = ACTION_NAMES.c_compile
     )
 
+    root = ctx.var["BINDIR"]
     config_map["c_compiler_path"] = c_compiler_path
 
     # source_file = ctx.file._src
@@ -378,6 +379,13 @@ config_mkexe = rule(
 )
 
 ################################################################
+## FIXME:
+# on macos, ar fails with:
+# sh: external/local_config_cc/libtool: No such file or directory
+# ditto for asm, which cannot find external/local_config_cc/wrapped_clang
+# but linking *does* find external/local_config_cc/wrapped_clang
+# so we know it should work for asm/ar
+
 def _ocaml_config_impl(ctx):
 
     cc_config_map = cc_tc_config_map(ctx)
@@ -388,18 +396,34 @@ def _ocaml_config_impl(ctx):
     json_map = {}
 
     json_map["c_compiler"] = cc_config_map["C_COMPILER"]
-    json_map["ocamlc_cflags"] = " ".join(cc_config_map["c_compile_cmd_line"])
+    json_map["ocamlc_cflags"] = " " + " ".join(cc_config_map["c_compile_cmd_line"])
 
-    json_map["ar"] = cc_config_map["AR"]
+    # on mac:
+    # sh: external/local_config_cc/libtool: No such file or directory
+    # json_map["ar"] = cc_config_map["AR"]
 
-    json_map["asm"] = cc_config_map["c_compiler_path"] + " ".join(
-        cc_config_map["assemble_cmd_line"])
+    root = ctx.file._clang.path
+
+    # json_map["asm"] = ctx.file._clang.path + " " + " ".join(
 
     linker  = cc_config_map["c_compiler_path"]
+    arglist = cc_config_map["assemble_cmd_line"]
+    # arglist = cc_config_map["preprocess_assemble_cmd_line"]
+    asmargs = " ".join(arglist)
+
+    json_map["asm"] = linker + " -c " + asmargs
+    # + " -I bazel-out/darwin-fastbuild-ST-b477eae0a590/bin/runtime -Wl,-Lbazel-out/darwin-fastbuild-ST-b477eae0a590/bin/runtime -Wl,-lasmrun"
+
+    # json_map["asm"] = "clang -c -Wno-trigraphs "
+
+    # json_map["asm"] = cc_config_map["c_compiler_path"] + " -c -Wno-trigraphs "
+    # + " ".join(
+    #     cc_config_map["assemble_cmd_line"])
+
     arglist = cc_config_map["cpp_link_exe_cmd_line"]
     linkargs = " ".join(arglist)
 
-    json_map["mkexe_cmd"] = linkargs
+    json_map["mkexe_cmd"] = linker + " " + linkargs
 
     if ctx.attr._flambda[BuildSettingInfo].value:
         json_map["flambda"] =  True
@@ -419,10 +443,12 @@ def _ocaml_config_impl(ctx):
     args.add_all(["-b", user_json.path])
     args.add_all(["-o", ctx.outputs.out])
 
+    clang_tc = ctx.attr._clang
+
     ctx.actions.run(
         executable = ctx.file._tool.path,
         arguments = [args],
-        inputs    = [ctx.file.json, user_json],
+        inputs    = [ctx.file.json, user_json] + clang_tc.files.to_list(),
         outputs   = [ctx.outputs.out],
         tools = [ctx.file._tool],
         mnemonic = "OCamlConfig",
@@ -454,7 +480,14 @@ ocaml_config = rule(
         ),
         "_with_cmm_invariants": attr.label(
             default = "//config/ocaml:with_cmm_invariants"
-        )
+        ),
+
+        "_clang": attr.label(
+            default = "@local_config_cc//:wrapped_clang",
+            allow_single_file = True,
+            executable = True,
+            cfg = "exec"
+        ),
     },
     toolchains = use_cpp_toolchain(),
     fragments = ["apple", "cpp", "platform"],

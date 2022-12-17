@@ -1,5 +1,8 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
+load("//bzl:providers.bzl",
+     "BootInfo")
+
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
@@ -8,6 +11,247 @@ load("//bzl/transitions:tc_transitions.bzl",
      "tc_compiler_out_transition",
      "tc_lexer_out_transition",
      "tc_runtime_out_transition")
+
+####################
+def tc_compiler(tc):
+
+    # print("tct: %s" % type(tc.compiler))
+    if type(tc.compiler) == "list":
+        # print("TCC: %s" % tc.compiler[0][DefaultInfo])
+        return tc.compiler[0]
+    else:
+        return tc.compiler
+
+###################
+## FIXME: merge tc_build_executor and tc_workdir
+def tc_workdir(tc):
+
+    config_executor = tc.config_executor[BuildSettingInfo].value
+    config_emitter  = tc.config_emitter[BuildSettingInfo].value
+
+    if (config_executor == "boot"):
+        workdir = "_boot/"
+
+    elif (config_executor == "baseline"):
+        workdir = "_baseline/"
+
+    # elif (config_executor == "vm" and config_emitter == "boot"):
+    #     if tc.dev:
+    #         # dev mode, passing only --//config/target/executor=vm
+    #         workdir = "_ocamlc.opt/"
+    #     else:
+    #         workdir = "_ocamlc.byte/"
+
+    elif (config_executor == "vm" and config_emitter == "vm"):
+        workdir = "_ocamlc.byte/"
+
+    elif (config_executor == "vm" and config_emitter == "sys"):
+        workdir = "_ocamlopt.byte/"
+
+    # elif (config_executor == "sys" and config_emitter == "boot"):
+    #     if tc.dev:
+    #         # dev mode, passing only --//config/target/executor=sys
+    #         workdir = "_ocamlopt.opt/"
+    #     else:
+    #         workdir = "_ocamlc.opt/"
+
+    elif (config_executor == "sys" and config_emitter == "vm"):
+        workdir = "_ocamlc.opt/"
+
+    elif (config_executor == "sys" and config_emitter == "sys"):
+        workdir = "_ocamlopt.opt/"
+
+    else:
+        print("config_executor: %s" % config_executor)
+        print("config_emitter: %s" % config_emitter)
+        fail("BAD CONFIG")
+
+    return workdir
+
+###################
+def tc_executable(tc):
+    debug = False
+    if debug:
+        print("tc_executable")
+        print("tc.name: %s" % tc.name)
+
+    if tc.dev:
+        # native only
+        return tc.compiler
+    else:
+        if debug:
+            print("tc_build_executor: %s" % tc_build_executor(tc))
+        ## tc.compiler runfiles: bottom element is always ocamlrun
+        if tc_build_executor(tc) == "vm":
+            if type(tc.compiler) == "list":
+                ## built compiler, transitioned
+
+                xocamlrun =  tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+                if debug:
+                    print("XOCAMLRUN: %s" % xocamlrun)
+                return xocamlrun
+
+            else:
+                ## boot compiler
+                if debug:
+                    print("TX: %s" % tc.compiler[DefaultInfo])
+                ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+                if debug:
+                    print("OCAMLRUN: %s" % ocamlrun)
+                return ocamlrun
+        else:
+            if debug:
+                print("returning tc ex: %s" % tc.compiler[0][DefaultInfo].files_to_run.executable)
+            return tc.compiler[0][DefaultInfo].files_to_run.executable
+
+#################
+def tc_tool_arg(tc):
+    debug = False
+
+    if debug:
+        print("TC_TOOL_ARG")
+        print("tc.config_executor: %s" % tc.config_executor[BuildSettingInfo].value)
+    if type(tc.compiler) == "list":
+        tcc = tc.compiler[0][DefaultInfo].files_to_run.executable
+    else:
+        tcc = tc.compiler[DefaultInfo].files_to_run.executable
+    if debug:
+        print("tc.compiler: %s" % tcc)
+
+    if tc.dev:
+        return None
+    else:
+        # if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
+        if tc_build_executor(tc) in ["boot", "baseline", "vm"]:
+            # most recently built compiler
+            return tcc
+        else:
+            # return tc_compiler(tc)[DefaultInfo].files_to_run.executable
+            return None
+
+###################
+def tc_lexer(tc):
+    debug = False
+    if debug:
+        print("tc_lexer")
+        print("tc.name: %s" % tc.name)
+
+    if tc.dev:
+        # native only
+        return tc.compiler
+    else:
+        if debug:
+            print("lx tc_build_executor: %s" % tc_build_executor(tc))
+        ## tc.compiler runfiles: bottom element is always ocamlrun
+        if tc_build_executor(tc) == "vm":
+            if type(tc.compiler) == "list":
+                ## built compiler, transitioned
+
+                xocamlrun =  tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+                if debug:
+                    print("lx XOCAMLRUN: %s" % xocamlrun)
+                return xocamlrun
+
+            else:
+                ## boot compiler
+                if debug:
+                    print("lx TX: %s" % tc.compiler[DefaultInfo])
+                ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+                if debug:
+                    print("lx OCAMLRUN: %s" % ocamlrun)
+                return ocamlrun
+        else:
+            if debug:
+                print("lx returning tc lex: %s" % tc.lexer[0][DefaultInfo].files_to_run.executable)
+            return tc.lexer[0][DefaultInfo].files_to_run.executable
+
+#################
+def tc_lexer_arg(tc):
+    print("TC_LEXER_ARG")
+    print("tc.config_executor: %s" % tc.config_executor[BuildSettingInfo].value)
+    if type(tc.lexer) == "list":
+        tcc = tc.lexer[0][DefaultInfo].files_to_run.executable
+    else:
+        tcc = tc.lexer[DefaultInfo].files_to_run.executable
+    print("tc.lexer: %s" % tcc)
+
+    if tc.dev:
+        return None
+    else:
+        if tc.config_executor[BuildSettingInfo].value in ["boot", "vm"]:
+            # most recently built compiler
+            return tcc
+        else:
+            # return tc.lexer[DefaultInfo].files_to_run.executable
+            return tcc
+
+#################
+## FIXME: merge tc_build_executor and tc_workdir
+def tc_build_executor(tc):
+    debug = False
+    if debug:
+        print("tc_build_executor")
+
+    if tc.dev:
+        build_executor = "opt"
+    else:
+        # we can always infer build_emitter from target_executor
+        # in general we cannot so infer build_executor.
+        # however in this controlled environment we always know
+        # how target executor/emitter combinations are built,
+        # so we can infer build executor from that pair.
+
+        # target_executor = tc.target_executor[BuildSettingInfo].value
+        # target_emitter  = tc.target_emitter[BuildSettingInfo].value
+
+        ## NB: "config" means target (//config/target/[executor|emitter])
+        t_executor = tc.config_executor[BuildSettingInfo].value
+        t_emitter  = tc.config_emitter[BuildSettingInfo].value
+
+        if debug:
+            print("t_executor: %s" % t_executor)
+            print("t_emitter: %s" % t_emitter)
+
+        stack = "boot"  ## FIXME: use //config/stack:fixed-point?
+        baseline = False
+
+        if (t_executor == "boot" and t_emitter == "boot"):
+            build_executor = "vm"
+        elif (t_executor == "baseline" and t_emitter == "baseline"):
+            build_executor = "vm"
+
+        elif (t_executor == "vm" and t_emitter == "vm"):
+            # target: ocamlc.byte
+            build_executor = "vm"
+
+        elif (t_executor == "vm" and t_emitter == "sys"):
+            # target: ocamlopt.byte
+            build_executor = "vm"
+
+        elif (t_executor == "sys" and t_emitter == "sys"):
+            # target: ocamlopt.opt
+            if stack == "fixed-point":
+                if baseline:
+                    # _baseline/ocamlopt.opt built by _fp/ocamlopt.byte
+                    build_executor = "vm"
+                else:
+                    # _fp/ocamlopt.opt built by _baseline/ocamlopt.opt
+                    build_executor = "sys"
+            else:
+                # built by ocamlopt.byte
+                build_executor = "vm"
+
+        elif (t_executor == "sys" and t_emitter == "vm"):
+            # target: ocamlc.opt
+            if stack == "fixed-point":
+                # _fp/ocamlc.opt built by _fp/ocamlopt.opt
+                build_executor = "sys"
+            else:
+                # ocamlc.opt built by ocamlopt.byte
+                # FIXME: implement boot, fixed-point protocols
+                build_executor = "sys"  # legacy, should be vm
+
+        return build_executor
 
 ##########################################
 def _toolchain_adapter_impl(ctx):
@@ -22,6 +266,7 @@ def _toolchain_adapter_impl(ctx):
 
         target_executor        = ctx.attr.target_executor, # [TargetInfo],
         target_emitter         = ctx.attr.target_emitter,
+
         ## vm
         ocamlrun               = ctx.file.ocamlrun,
         vmargs                 = ctx.attr.vmargs,
@@ -38,7 +283,7 @@ def _toolchain_adapter_impl(ctx):
 
         ## core tools
         compiler               = ctx.attr.compiler,
-        runtime                = ctx.file.runtime,
+        runtime                = ctx.attr.runtime,
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
         structopts             = ctx.attr.structopts,
@@ -52,6 +297,7 @@ def _toolchain_adapter_impl(ctx):
 ## the rule interface
 toolchain_adapter = rule(
     _toolchain_adapter_impl,
+    doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
     attrs = {
         "build_host": attr.string(
             doc     = "OCaml host platform: vm (bytecode) or an arch.",
@@ -200,7 +446,6 @@ toolchain_adapter = rule(
 
     },
     # cfg = tc_compiler_out_transition, # toolchain_in_transition,
-    doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
     provides = [platform_common.ToolchainInfo],
 
     ## NB: config frags evidently expose CLI opts like `--cxxopt`;

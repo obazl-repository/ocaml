@@ -12,7 +12,12 @@ load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
      "merge_depsets")
 
-load("//bzl:functions.bzl", "get_workdir")
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
+
+# load("//bzl:functions.bzl", "get_workdir")
 
 ## Library targets do not produce anything, they just merge their deps
 ## and pass them on.
@@ -25,20 +30,23 @@ def library_impl(ctx):
 
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
 
-    if executor == "vm":
-        ext = ".cmo"
-    else:
-        ext = ".cmx"
+    workdir = tc_workdir(tc)
+
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
+
+    # if executor == "vm":
+    #     ext = ".cmo"
+    # else:
+    #     ext = ".cmx"
 
     ################################################################
     ################  DEPS  ################

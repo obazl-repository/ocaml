@@ -1,5 +1,12 @@
+load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
+
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
 
 load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
@@ -7,8 +14,7 @@ load("//bzl:providers.bzl",
      "BootInfo", "DumpInfo", "ModuleInfo", "NsResolverInfo",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
-load("//bzl:functions.bzl",
-     "get_module_name", "get_workdir", "tc_compiler")
+load("//bzl:functions.bzl", "get_module_name") #, "get_workdir")
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:options.bzl", "get_options")
@@ -46,39 +52,63 @@ def module_impl(ctx, module_name):
     # ]
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
 
+    cc_toolchain = find_cpp_toolchain(ctx)
+
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
+    workdir = tc_workdir(tc)
+
+    # (target_executor, # x
+    #  target_emitter,  # x
+    #  config_executor, # o
+    #  config_emitter,  # x
+    #  workdir
+    #  ) = get_workdir(ctx, tc)
+
+    # (ocamlrun, # x
+    #  executable, # in actions.run
+    #  build_executor, # x for setting executable
+    #  target_executor # x
+    #  ) = configure_action(ctx, tc)
 
     #########################
     args = ctx.actions.args()
 
-    executable = None
-    if tc.dev:
-        ocamlrun = None
-        effective_compiler = tc.compiler
+    toolarg = tc_tool_arg(tc)
+    if toolarg:
+        args.add(toolarg.path)
+        toolarg_input = [toolarg]
     else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+        toolarg_input = []
 
-    build_executor = get_build_executor(tc)
-    print("BX: %s" % build_executor)
-    print("TX: %s" % config_executor)
-    print("ef: %s" % effective_compiler)
+    # executable = None
+    # if tc.dev:
+    #     ocamlrun = None
+    #     effective_compiler = tc.compiler
+    # else:
+    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    #     effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
 
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.add(effective_compiler.path)
-        if config_executor in ["sys"]:
-            ext = ".cmx"
-        else:
-            ext = ".cmo"
+    # build_executor = get_build_executor(tc)
+    # print("BX: %s" % build_executor)
+    # print("TX: %s" % config_executor)
+    # print("ef: %s" % effective_compiler)
+
+    # if build_executor == "vm":
+    #     executable = ocamlrun
+    #     args.add(effective_compiler.path)
+    #     if config_executor in ["sys"]:
+    #         ext = ".cmx"
+    #     else:
+    #         ext = ".cmo"
+    # else:
+    #     executable = effective_compiler
+    #     ext = ".cmx"
+
+    if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
+        ext = ".cmo"
     else:
-        executable = effective_compiler
         ext = ".cmx"
-
 
     # if target_executor == "unspecified":
     #     executor = config_executor
@@ -545,6 +575,12 @@ def module_impl(ctx, module_name):
     # on primitives that are exported by //stdlib:Stdlib
     includes.extend(paths_depset.to_list())
 
+    runtime_deps = []
+    print("module: %s" % ctx.label)
+    # for x in tc.runtime[0][CcInfo].linking_context.linker_inputs.to_list():
+    #     for lib in x.libraries:
+    #         runtime_deps.extend(lib.objects)
+
     inputs_depset = depset(
         order = dsorder,
         direct = []
@@ -552,12 +588,18 @@ def module_impl(ctx, module_name):
         + direct_inputs
         + depsets.deps.mli
         + resolver_deps
-        + [effective_compiler]
+        + [tc_executable(tc)]
+        + toolarg_input
+        + runtime_deps
         ,
         transitive = []
         + merged_input_depsets
+        + [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
         # + ns_deps
         # + bottomup_ns_inputs
+        ## depend on cc tc - makes bazel stuff accessible to ocaml's
+        ## cc driver
+        + [cc_toolchain.all_files]
     )
     # if ctx.label.name == "Misc":
     #     print("inputs_depset: %s" % inputs_depset)
@@ -567,6 +609,8 @@ def module_impl(ctx, module_name):
 
     if sig_src:
         includes.append(sig_src.dirname)
+
+    includes.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
 
     args.add_all(includes, before_each="-I", uniquify = True)
 
@@ -590,16 +634,15 @@ def module_impl(ctx, module_name):
 
     ################
     ctx.actions.run(
-        # env = env,
-        executable = executable.path,
+        env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+               "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+        executable = tc_executable(tc).path,
         # executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs    = inputs_depset,
         outputs   = action_outputs,
         tools = [
-            executable,
-            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            # tc_compiler(tc)[DefaultInfo].files_to_run
+            # executable,
         ],
         mnemonic = "CompileBootstrapModule",
         progress_message = progress_msg(workdir, ctx)

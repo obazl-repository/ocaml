@@ -1,11 +1,11 @@
 label_setting(name="compiler",
-              # build_setting_default = "//bin:ocamlcc",
-              build_setting_default = "//boot:ocamlc.boot",
+              build_setting_default = "//bin:ocamlcc",
+              # build_setting_default = "//boot:ocamlc.boot",
               visibility = ["//visibility:public"])
 
 label_setting(name="lexer",
-              # build_setting_default = "//bin:ocamllex",
-              build_setting_default = "//boot:ocamllex.boot",
+              build_setting_default = "//lex:ocamllex",
+              # build_setting_default = "//boot:ocamllex.boot",
               visibility = ["//visibility:public"])
 
 label_setting(name="ocamlrun",

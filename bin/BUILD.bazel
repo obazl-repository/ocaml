@@ -10,7 +10,9 @@ ocaml_compiler(
         # ocamlc.byte: ["-compat-32"]
         "//conditions:default": []
     }) + [
+        ## use --//config/ocaml/link:verbose instead
         # "-verbose",
+
         ## for testing (linux):
         # "-cc", "gcc",  ## cancels mkexe
         # "-ccopt", "-B/usr/bin",
