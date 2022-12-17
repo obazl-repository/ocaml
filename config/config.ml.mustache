@@ -22,12 +22,12 @@ let c_compiler = {|{{c_compiler}}|}
 let c_output_obj = {|{{c_output_obj}}|}
 let c_has_debug_prefix_map = {{c_has_debug_prefix_map}}
 let as_has_debug_prefix_map = {{as_has_debug_prefix_map}}
-let ocamlc_cflags = {|{{ocamlc_cflags}}|}
-let ocamlc_cppflags = {|{{ocamlc_cppflags}}|}
+let ocamlc_cflags = {|{{{ocamlc_cflags}}}|}
+let ocamlc_cppflags = {|{{{ocamlc_cppflags}}}|}
 (* #7678: ocamlopt uses these only to compile .c files, and the behaviour for
           the two drivers should be identical. *)
-let ocamlopt_cflags = {|{{ocamlopt_cflags}}|}
-let ocamlopt_cppflags = {|{{ocamlopt_cppflags}}|}
+let ocamlopt_cflags = {|{{{ocamlopt_cflags}}}|}
+let ocamlopt_cppflags = {|{{{ocamlopt_cppflags}}}|}
 let bytecomp_c_libraries = {|{{bytecomp_c_libs}}|}
 (* bytecomp_c_compiler and native_c_compiler have been supported for a
    long time and are retained for backwards compatibility.

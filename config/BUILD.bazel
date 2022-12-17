@@ -15,7 +15,7 @@ load("//bzl:rules.bzl",
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 load(":BUILD_RULES.bzl",
-     "ocaml_config",
+     "ocaml_cc_config",
      "config_mkexe", "OCamlCcToolchainInfo", "config_cc_toolchain")
 
 package(default_visibility = ["//visibility:public"])
@@ -85,10 +85,20 @@ mustache(
     # stdlib = "//stdlib"
 )
 
-ocaml_config(
+ocaml_cc_config(
     name = "config_json",
     json = "config.initial.json",
-    out  = "config.json"
+    out  = "config.json",
+    # asmopts = [
+    #     "-arch", "x86_64",
+    #     "-g", "-static",
+    #     "-flto",
+    #     "-ffunction-sections"
+    # ],
+    # linkopts = [
+    #     "-v"
+    # ],
+    copts    = []
 )
 
 # this is a singleton rule whose only job is to inject the link

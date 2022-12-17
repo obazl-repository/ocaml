@@ -1,0 +1,12 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_setting")
+
+## keep: -S, retain asm source code
+bool_flag(name = "keep", build_setting_default = False,
+          visibility = ["//visibility:public"])
+config_setting(name = "keep?", flag_values = {":keep": "True"})
+
+bool_flag(name = "verbose", build_setting_default = False,
+          visibility = ["//visibility:public"])
+config_setting(name = "verbose?", flag_values = {":verbose": "True"})
+

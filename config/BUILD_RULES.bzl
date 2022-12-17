@@ -379,17 +379,10 @@ config_mkexe = rule(
 )
 
 ################################################################
-## FIXME:
-# on macos, ar fails with:
-# sh: external/local_config_cc/libtool: No such file or directory
-# ditto for asm, which cannot find external/local_config_cc/wrapped_clang
-# but linking *does* find external/local_config_cc/wrapped_clang
-# so we know it should work for asm/ar
-
-def _ocaml_config_impl(ctx):
+def _ocaml_cc_config_impl(ctx):
 
     cc_config_map = cc_tc_config_map(ctx)
-    print("cc_config_map: %s" % cc_config_map)
+    # print("cc_config_map: %s" % cc_config_map)
 
     user_json = ctx.actions.declare_file("user_config.json")
 
@@ -398,30 +391,27 @@ def _ocaml_config_impl(ctx):
     json_map["c_compiler"] = cc_config_map["C_COMPILER"]
     json_map["ocamlc_cflags"] = " " + " ".join(cc_config_map["c_compile_cmd_line"])
 
-    # on mac:
-    # sh: external/local_config_cc/libtool: No such file or directory
     # json_map["ar"] = cc_config_map["AR"]
 
-    root = ctx.file._clang.path
-
-    # json_map["asm"] = ctx.file._clang.path + " " + " ".join(
-
-    linker  = cc_config_map["c_compiler_path"]
+    assembler  = cc_config_map["c_compiler_path"]
     arglist = cc_config_map["assemble_cmd_line"]
     # arglist = cc_config_map["preprocess_assemble_cmd_line"]
+    arglist.extend(ctx.attr.asmopts)
+    if ctx.attr._asm_verbose[BuildSettingInfo].value: ## //config/ocaml/cc/asm:verbose
+        arglist.append("-v")
     asmargs = " ".join(arglist)
 
-    json_map["asm"] = linker + " -c " + asmargs
-    # + " -I bazel-out/darwin-fastbuild-ST-b477eae0a590/bin/runtime -Wl,-Lbazel-out/darwin-fastbuild-ST-b477eae0a590/bin/runtime -Wl,-lasmrun"
+    json_map["asm"] = assembler + " -c " + asmargs
 
-    # json_map["asm"] = "clang -c -Wno-trigraphs "
-
-    # json_map["asm"] = cc_config_map["c_compiler_path"] + " -c -Wno-trigraphs "
-    # + " ".join(
-    #     cc_config_map["assemble_cmd_line"])
-
-    arglist = cc_config_map["cpp_link_exe_cmd_line"]
+    linker  = cc_config_map["c_compiler_path"]
+    arglist = []
+    arglist.extend(cc_config_map["cpp_link_exe_cmd_line"])
+    arglist.extend(ctx.attr.linkopts)
+    if ctx.attr._link_verbose[BuildSettingInfo].value: ## //config/ocaml/cc/link:verbose
+        arglist.append("-v")
     linkargs = " ".join(arglist)
+    # maczig:
+    # linkargs = " rc"
 
     json_map["mkexe_cmd"] = linker + " " + linkargs
 
@@ -460,13 +450,25 @@ def _ocaml_config_impl(ctx):
     ]
 
 ####################
-ocaml_config = rule(
-    implementation = _ocaml_config_impl,
+ocaml_cc_config = rule(
+    implementation = _ocaml_cc_config_impl,
     attrs = {
         "out": attr.output(mandatory = True),
         "json": attr.label(
             allow_single_file = True,
             mandatory  = True
+        ),
+        "asmopts"  : attr.string_list(),
+        "_asm_verbose": attr.label(
+            default = "//config/ocaml/cc/asm:verbose"
+        ),
+        "copts"    : attr.string_list(),
+        "_compile_verbose": attr.label(
+            default = "//config/ocaml/cc/compile:verbose"
+        ),
+        "linkopts" : attr.string_list(),
+        "_link_verbose": attr.label(
+            default = "//config/ocaml/cc/link:verbose"
         ),
         "_tool" : attr.label(
             allow_single_file = True,
