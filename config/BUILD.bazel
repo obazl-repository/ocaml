@@ -3,7 +3,8 @@ load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag",
      "string_list_flag")
 
-load("//bzl/rules:config_cc_toolchain.bzl", "config_cc_toolchain")
+# load(":config_cc_toolchain.bzl", "config_cc_toolchain")
+
 load("//bzl/rules:config_sys.bzl", "config_sys")
 
 load("//bzl:rules.bzl",
@@ -14,6 +15,7 @@ load("//bzl:rules.bzl",
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 load(":BUILD_RULES.bzl",
+     "ocaml_config",
      "config_mkexe", "OCamlCcToolchainInfo", "config_cc_toolchain")
 
 package(default_visibility = ["//visibility:public"])
@@ -81,6 +83,12 @@ mustache(
     template = "config.ml.mustache",
     json     = "config.ml.json",
     # stdlib = "//stdlib"
+)
+
+ocaml_config(
+    name = "config_json",
+    json = "config.initial.json",
+    out  = "config.json"
 )
 
 # this is a singleton rule whose only job is to inject the link
@@ -173,17 +181,9 @@ config_setting(name = "debug?", flag_values = {":debug": "True"})
 bool_flag( name = "instrumented", build_setting_default = False)
 config_setting(name = "instrumented?", flag_values = {":instrumented": "True"})
 
-## ocaml compile options
-bool_flag( name = "xmo", build_setting_default = False)
-config_setting(name = "xmo?", flag_values = {":xmo": "True"})
-
 ####
 bool_flag( name = "sig_src", build_setting_default = False)
 config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
-
-bool_flag( name = "flat_float_array", build_setting_default = True)
-config_setting(name = "flat_float_array?",
-               flag_values = {":flat_float_array": "True"})
 
 # label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
 
