@@ -6,7 +6,7 @@ load("//bzl:rules.bzl",
      "compiler_module",
      "compiler_signature",
 )
-load("//lex:BUILD_RULES.bzl", "lex")
+load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
 load("//config:CONFIG.bzl", "w")
 
@@ -814,7 +814,7 @@ build_module(
     ],
 )
 
-lex(
+run_ocamllex(
     name = "cvt_emit_ml",
     src  = "cvt_emit.mll",
     out  = "cvt_emit.ml"

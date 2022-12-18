@@ -10,7 +10,7 @@ load("//bzl:rules.bzl",
 # load("//bzl/rules:ocaml_tool.bzl",
 #      "ocaml_tool_vm", "ocaml_tool_sys")
 
-load(":BUILD_RULES.bzl", "lex")
+load(":BUILD_RULES.bzl", "run_ocamllex")
 load("//yacc:BUILD_RULES.bzl", "yacc")
 
 load("//config:CONFIG.bzl",
@@ -295,7 +295,7 @@ compiler_module(
     visibility = ["//file_formats:__pkg__"]
 )
 
-lex(
+run_ocamllex(
     name = "lexer_ml",
     src  = "lexer.mll",
     out  = "lexer.ml",

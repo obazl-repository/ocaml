@@ -1,24 +1,17 @@
 load(":inline_expect_impl.bzl", "inline_expect_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
-load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
-
-load("//bzl:functions.bzl", "get_workdir")
 
 ##############################
 def _inline_expect_test_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     # (target_executor, target_emitter,
     #  config_executor, config_emitter,
@@ -30,7 +23,7 @@ def _inline_expect_test_impl(ctx):
     #     executor = target_executor
     #     emitter  = target_emitter
 
-    if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
+    if tc.config_executor in ["boot", "baseline", "vm"]:
         ext = ".byte"
     else:
         ext = ".opt"

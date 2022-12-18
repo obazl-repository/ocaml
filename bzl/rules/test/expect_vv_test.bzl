@@ -4,8 +4,6 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/transitions:test_transitions.bzl", "vv_test_in_transition")
 
-load("//bzl:functions.bzl", "get_workdir")
-
 load(":expect_test_impl.bzl", "expect_test_impl")
 
 ## expect_vv_test

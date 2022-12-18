@@ -3,12 +3,10 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
-
-load("//bzl:functions.bzl", "get_workdir")
 
 ## expect_test
 
@@ -24,7 +22,7 @@ def expect_test_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     # (target_executor, target_emitter,
     #  config_executor, config_emitter,
@@ -35,7 +33,7 @@ def expect_test_impl(ctx):
     #     print("config_executor: %s" % config_executor)
     #     print("config_emitter: %s" % config_emitter)
 
-    if tc.config_executor[BuildSettingInfo].value in ["boot", "vm"]:
+    if tc.config_executor in ["boot", "vm"]:
         ext      = ".byte"
     else:
         ext      = ".opt"
@@ -51,7 +49,7 @@ def expect_test_impl(ctx):
 
     pgm = exe[0].files.to_list()[0]
 
-    if config_executor in ["boot", "vm"]:
+    if tc.config_executor in ["boot", "vm"]:
         ocamlrun = exe[0].default_runfiles.files.to_list()[0]
         pgm_cmd = ocamlrun.short_path + " " + pgm.short_path
     else:

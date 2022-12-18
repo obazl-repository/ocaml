@@ -16,7 +16,7 @@ def _ocaml_compile_test_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     # (target_executor, target_emitter,
     #  config_executor, config_emitter,

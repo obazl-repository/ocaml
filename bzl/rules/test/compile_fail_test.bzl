@@ -3,14 +3,11 @@ load("@bazel_skylib//lib:collections.bzl", "collections")
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//toolchain/adapter:BUILD.bzl", "tc_compiler", "tc_workdir")
-
 load("//bzl:providers.bzl",
      "BootInfo", "DumpInfo", "ModuleInfo", "NsResolverInfo",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
-load("//bzl:functions.bzl",
-     "get_module_name", "get_workdir", "tc_compiler")
+load("//bzl:functions.bzl", "get_module_name")
 
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
@@ -46,7 +43,7 @@ def _compile_fail_test(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    # workdir = tc.workdir
     # (target_executor, target_emitter,
     #  config_executor, config_emitter,
     #  workdir) = get_workdir(ctx, tc)
@@ -104,14 +101,14 @@ def _compile_fail_test(ctx):
         if ctx.file.sig.is_source:
             # need to symlink .mli, to match symlink of .ml
             sig_src = ctx.actions.declare_file(
-                workdir + module_name + ".mli"
+                tc.workdir + module_name + ".mli"
             )
             sig_inputs.append(sig_src)
             ctx.actions.symlink(output = sig_src,
                                 target_file = ctx.file.sig)
 
-            # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
-            action_output_cmi = workdir + module_name + ".cmi"
+            # action_output_cmi = ctx.actions.declare_file(tc.workdir + module_name + ".cmi")
+            action_output_cmi = tc.workdir + module_name + ".cmi"
             action_outputs.append(action_output_cmi)
             provider_output_cmi = action_output_cmi
             mli_dir = None
@@ -131,21 +128,21 @@ def _compile_fail_test(ctx):
             # generated sigfile, e.g. by cp, rename, link
             # need to symlink .mli, to match symlink of .ml
             # sig_src = ctx.actions.declare_file(
-            sig_src = workdir + module_name + ".mli"
+            sig_src = tc.workdir + module_name + ".mli"
             sig_inputs.append(sig_src)
             ctx.actions.symlink(output = sig_src,
                                 target_file = ctx.file.sig)
 
-            # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
-            action_output_cmi = workdir + module_name + ".cmi"
+            # action_output_cmi = ctx.actions.declare_file(tc.workdir + module_name + ".cmi")
+            action_output_cmi = tc.workdir + module_name + ".cmi"
             action_outputs.append(action_output_cmi)
             provider_output_cmi = action_output_cmi
             mli_dir = None
     else: ## no sig
         # compiler will generate .cmi
-        # put src in workdir as well
-        # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
-        action_output_cmi = workdir + module_name + ".cmi"
+        # put src in tc.workdir as well
+        # action_output_cmi = ctx.actions.declare_file(tc.workdir + module_name + ".cmi")
+        action_output_cmi = tc.workdir + module_name + ".cmi"
         action_outputs.append(action_output_cmi)
         provider_output_cmi = action_output_cmi
         mli_dir = None
@@ -159,35 +156,35 @@ def _compile_fail_test(ctx):
             # structfile in src dir, make sure in same dir as sig
             if ctx.file.sig:
                 if ctx.file.sig.is_source:
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    in_structfile = ctx.actions.declare_file(tc.workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                 elif OcamlSignatureProvider in ctx.attr.sig:
                     # sig file is compiled .cmo
                     # force name of module to match compiled sig
                     extlen = len(ctx.file.sig.extension)
                     module_name = ctx.file.sig.basename[:-(extlen + 1)]
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    in_structfile = ctx.actions.declare_file(tc.workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                     # print("lbl: %s" % ctx.label)
                     # print("IN STRUCTFILE: %s" % in_structfile)
                 else:
                     # generated sigfile
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    in_structfile = ctx.actions.declare_file(tc.workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-            else: # no sig - cmi will be generated, put both in workdir
+            else: # no sig - cmi will be generated, put both in tc.workdir
                 # in_structfile = ctx.file.struct
-                in_structfile = ctx.actions.declare_file(workdir + ctx.file.struct.basename)
+                in_structfile = ctx.actions.declare_file(tc.workdir + ctx.file.struct.basename)
                 ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
 
         else: # structfile is generated, e.g. by ocamllex or a genrule.
             # make sure it's in same dir as mli/cmi IF we have ctx.file.sig
             if ctx.file.sig:
                 if ctx.file.sig.is_source:
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    in_structfile = ctx.actions.declare_file(tc.workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                     if paths.dirname(ctx.file.struct.short_path) != mli_dir:
                         in_structfile = ctx.actions.declare_file(
-                            workdir + module_name + ".ml") # ctx.file.struct.basename)
+                            tc.workdir + module_name + ".ml") # ctx.file.struct.basename)
                         ctx.actions.symlink(
                             output = in_structfile,
                             target_file = ctx.file.struct)
@@ -204,23 +201,23 @@ def _compile_fail_test(ctx):
                     # force name of module to match compiled sig
                     extlen = len(ctx.file.sig.extension)
                     module_name = ctx.file.sig.basename[:-(extlen + 1)]
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    in_structfile = ctx.actions.declare_file(tc.workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                     # print("lbl: %s" % ctx.label)
                     # print("IN STRUCTFILE: %s" % in_structfile)
-            else:  ## no sig file, will emit cmi, put both in workdir
-                in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+            else:  ## no sig file, will emit cmi, put both in tc.workdir
+                in_structfile = ctx.actions.declare_file(tc.workdir + module_name + ".ml")
                 ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
     else:  ## namespaced
-        in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+        in_structfile = ctx.actions.declare_file(tc.workdir + module_name + ".ml")
         ctx.actions.symlink(
             output = in_structfile, target_file = ctx.file.struct
         )
 
     direct_inputs = [in_structfile]
 
-    # out_cm_ = ctx.actions.declare_file(workdir + module_name + ext)
-    out_cm_ = workdir + module_name + ext
+    # out_cm_ = ctx.actions.declare_file(tc.workdir + module_name + ext)
+    out_cm_ = tc.workdir + module_name + ext
     # sibling = new_cmi) # fname)
     if debug:
         print("OUT_CM_: %s" % out_cm_.path)
@@ -233,8 +230,8 @@ def _compile_fail_test(ctx):
         _options.remove("-bin-annot")
          # or ("-bin-annot" in tc.copts) ):
 
-        # out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
-        # out_cmt = workdir + module_name + ".cmt"
+        # out_cmt = ctx.actions.declare_file(tc.workdir + module_name + ".cmt")
+        # out_cmt = tc.workdir + module_name + ".cmt"
         # action_outputs.append(out_cmt)
         # default_outputs.append(out_cmt)
     else:
@@ -243,8 +240,8 @@ def _compile_fail_test(ctx):
     moduleInfo_ofile = None
     if ext == ".cmx":
         # if not ctx.attr._rule.startswith("bootstrap"):
-        # out_o = ctx.actions.declare_file(workdir + module_name + ".o")
-        out_o = workdir + module_name + ".o"
+        # out_o = ctx.actions.declare_file(tc.workdir + module_name + ".o")
+        out_o = tc.workdir + module_name + ".o"
                                          # sibling = out_cm_)
         action_outputs.append(out_o)
         default_outputs.append(out_o)
@@ -382,8 +379,8 @@ def _compile_fail_test(ctx):
         ocamlrun = None
         effective_compiler = tc.compiler
     else:
-        ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-        effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+        ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+        effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     build_executor = get_build_executor(tc)
 
@@ -399,8 +396,8 @@ def _compile_fail_test(ctx):
         args.append(executable.short_path)
         runfiles.extend([executable])
 
-    # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-    # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    # ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+    # effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     # if (target_executor == "unspecified"):
     #     if (config_executor == "sys"):
@@ -601,13 +598,13 @@ def _compile_fail_test(ctx):
     ################################################################
     # runfiles = []
     # if ocamlrun:
-    #     runfiles = [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
+    #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
     # print("runfiles tc.compiler: %s" % tc.compiler)
     # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
     # if tc.dev:
     #     runfiles.append(tc.ocamlrun)
     # elif ocamlrun:
-    #     runfiles.extend(tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list())
+    #     runfiles.extend(tc.compiler[DefaultInfo].default_runfiles.files.to_list())
 
     print("EXE runfiles: %s" % runfiles)
 

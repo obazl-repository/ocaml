@@ -3,11 +3,6 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(":BUILD.bzl", "progress_msg")
 #, "get_build_executor", "configure_action")
 
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
 load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
@@ -55,12 +50,12 @@ def signature_impl(ctx, module_name):
     #  workdir
     #  ) = get_workdir(ctx, tc)
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     #########################
     args = ctx.actions.args()
 
-    toolarg = tc_tool_arg(tc)
+    toolarg = tc.tool_arg
     if toolarg:
         args.add(toolarg.path)
         toolarg_input = [toolarg]
@@ -225,8 +220,8 @@ def signature_impl(ctx, module_name):
         # print("config_executor: %s" % config_executor)
         # print("config_emitter: %s" % config_emitter)
         # print("ocamlrun: %s" % ocamlrun)
-        print("tc_executable: %s" % tc_executable(tc))
-        print("tc_tool_arg: %s" % tc_tool_arg(tc))
+        print("tc.executable: %s" % tc.executable)
+        print("tc.tool_arg: %s" % tc.tool_arg)
         print("tc.dev: %s" % tc.dev)
         # if ctx.label.name == "CamlinternalFormatBasics_cmi":
         #     fail()
@@ -348,11 +343,11 @@ def signature_impl(ctx, module_name):
         # + depsets.deps.sigs
         # + depsets.deps.archives
         # + ns_resolver_depset
-        + [tc.compiler[0][DefaultInfo].default_runfiles.files]
+        + [tc.compiler[DefaultInfo].default_runfiles.files]
     )
 
     ##########################################
-    sigexe = tc_executable(tc)
+    sigexe = tc.executable
     # print("SIGexe: %s" % sigexe)
     ################  ACTION  ################
     ctx.actions.run(

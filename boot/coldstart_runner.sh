@@ -16,8 +16,8 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
     { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
 # --- end runfiles.bash initialization v2 ---
 
-# echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
-# echo "`cat ${RUNFILES_MANIFEST_FILE}`"
+echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
+echo "`cat ${RUNFILES_MANIFEST_FILE}`"
 
 # echo "camlheader: $(rlocation ocamlcc/config/camlheaders/camlheader)"
 
@@ -53,61 +53,67 @@ echo "Emitter: ${EMITTER}"
 
 echo "Installing programs"
 
-cp -vf $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
+# if [ ${EXECUTOR} == "vm" ]; then
 
-if [ ${EXECUTOR} == "vm" ]; then
+#     if [ ${EMITTER} == "vm" ]; then
 
-    if [ ${EMITTER} == "vm" ]; then
+#         cp -vf $(rlocation ocamlcc/lex/_ocamlc.byte/ocamllex.byte) \
+#            $BOOTDIR/bin/
+#         cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) \
+#            $BOOTDIR/bin/
 
-        cp -vf $(rlocation ocamlcc/lex/_ocamlc.byte/ocamllex.byte) \
-           $BOOTDIR/bin/
-        cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) \
-           $BOOTDIR/bin/
+#     elif [ ${EMITTER} == "sys" ]; then
 
-    elif [ ${EMITTER} == "sys" ]; then
+#         cp -vf $(rlocation ocamlcc/lex/_ocamlopt.byte/ocamllex.byte) \
+#            $BOOTDIR/bin/
+#         cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) \
+#            $BOOTDIR/bin/
 
-        cp -vf $(rlocation ocamlcc/lex/_ocamlopt.byte/ocamllex.byte) \
-           $BOOTDIR/bin/
-        cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) \
-           $BOOTDIR/bin/
+#     else
+#         echo >&2 "ERROR: unknown emitter: ${EMITTER}"
+#         exit 1
+#     fi
 
-    else
-        echo >&2 "ERROR: unknown emitter: ${EMITTER}"
-        exit 1
-    fi
+# elif [ ${EXECUTOR} == "sys" ]; then
 
-elif [ ${EXECUTOR} == "sys" ]; then
+#     ## include entire stack of compilers:
+#     cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) \
+#        $BOOTDIR/bin/
+#     cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) \
+#        $BOOTDIR/bin/
 
-    ## include entire stack of compilers:
-    cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) \
-       $BOOTDIR/bin/
-    cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) \
-       $BOOTDIR/bin/
+#     cp -vf $(rlocation ocamlcc/lex/_ocamlc.opt/ocamllex.opt) \
+#        $BOOTDIR/bin/
 
-    cp -vf $(rlocation ocamlcc/lex/_ocamlc.opt/ocamllex.opt) \
-       $BOOTDIR/bin/
+#     cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) \
+#        $BOOTDIR/bin/
 
-    cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) \
-       $BOOTDIR/bin/
+#     if [ ${EMITTER} == "vm" ]; then
 
-    if [ ${EMITTER} == "vm" ]; then
+#         cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) \
+#            $BOOTDIR/bin/
 
-        cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) \
-           $BOOTDIR/bin/
+#     elif [ ${EMITTER} == "sys" ]; then
+#         echo
+#         # cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) \
+#         #    $BOOTDIR/bin/
 
-    elif [ ${EMITTER} == "sys" ]; then
-        echo
-        # cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) \
-        #    $BOOTDIR/bin/
+#     else
+#         echo >&2 "ERROR: unknown emitter: ${EMITTER}"
+#         exit 1
+#     fi
+# else
+#     echo >&2 "ERROR: unknown executor: ${EXECUTOR}"
+#     exit 1
+# fi
 
-    else
-        echo >&2 "ERROR: unknown emitter: ${EMITTER}"
-        exit 1
-    fi
-else
-    echo >&2 "ERROR: unknown executor: ${EXECUTOR}"
-    exit 1
-fi
+cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
+cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) $BOOTDIR/bin/
+cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) $BOOTDIR/bin/
+cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) $BOOTDIR/bin/
+
+cp -vf $(rlocation ocamlcc/lex/_sys/ocamllex.opt) $BOOTDIR/bin/
+cp -vf $(rlocation ocamlcc/lex/_vm/ocamllex.byte) $BOOTDIR/bin/
 
 cp -vf $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
 
@@ -115,6 +121,7 @@ echo "Installing libs"
 
 cp -vf $(rlocation ocamlcc/runtime/libasmrun.a) $BOOTDIR/lib
 cp -vf $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
+cp -vf $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
 
 echo "Setting permissions"
 

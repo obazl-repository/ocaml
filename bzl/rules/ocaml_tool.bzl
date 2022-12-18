@@ -7,21 +7,16 @@ load("//bzl/transitions:tool_transitions.bzl",
      "ocaml_tool_vm_in_transition",
      "ocaml_tool_sys_in_transition")
 
-# load("//bzl/transitions:tc_transitions.bzl",
-#      "ocaml_tool_in_transition")
-
-load("//toolchain/adapter:BUILD.bzl", "tc_workdir")
-
 ##############################
 def _ocaml_tool_vm_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
-    print("OCAML TOOL.BYTE emitter: %s" % tc.config_emitter[BuildSettingInfo].value)
+    print("OCAML TOOL.BYTE emitter: %s" % tc.config_emitter)
 
-    if tc.config_emitter[BuildSettingInfo].value == "sys":
+    if tc.config_emitter == "sys":
         # ext = ".opt"
         workdir = "_sys/"
     else:
@@ -47,7 +42,7 @@ ocaml_tool_vm = rule(
             executable = False,
         ),
 
-        _rule = attr.string( default = "ocaml_tool" ),
+        _rule = attr.string( default = "ocaml_tool_vm" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -65,9 +60,9 @@ def _ocaml_tool_sys_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
-    if tc.config_emitter[BuildSettingInfo].value == "vm":
+    if tc.config_emitter == "vm":
         # ext = ".byte"
         workdir = "_vm/"
     else:

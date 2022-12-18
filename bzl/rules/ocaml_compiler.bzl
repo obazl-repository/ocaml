@@ -9,20 +9,15 @@ load("//bzl/transitions:tool_transitions.bzl",
      "ocamlopt_opt_in_transition",
      "ocamlc_opt_in_transition")
 
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
 ##############################
 def _ocaml_compiler_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
-    executor = tc.config_executor[BuildSettingInfo].value
-    emitter  = tc.config_emitter[BuildSettingInfo].value
+    executor = tc.config_executor
+    emitter  = tc.config_emitter
 
     if executor == "boot":
         exe_name = "ocamlc.byte"
@@ -77,10 +72,10 @@ def _ocamlc_byte_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
-    executor = tc.config_executor[BuildSettingInfo].value
-    emitter  = tc.config_emitter[BuildSettingInfo].value
+    executor = tc.config_executor
+    emitter  = tc.config_emitter
 
     if executor == "boot":
         exe_name = "ocamlc.byte"
@@ -132,10 +127,10 @@ def _ocamlopt_byte_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
-    executor = tc.config_executor[BuildSettingInfo].value
-    emitter  = tc.config_emitter[BuildSettingInfo].value
+    executor = tc.config_executor
+    emitter  = tc.config_emitter
 
     if executor == "boot":
         exe_name = "ocamlc.byte"
@@ -187,9 +182,9 @@ def _ocamlopt_opt_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
-    executor = tc.config_executor[BuildSettingInfo].value
+    executor = tc.config_executor
     emitter  = tc.config_emitter[BuildSettingInfo].value
 
     if executor == "boot":
@@ -242,10 +237,10 @@ def _ocamlc_opt_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
-    executor = tc.config_executor[BuildSettingInfo].value
-    emitter  = tc.config_emitter[BuildSettingInfo].value
+    executor = tc.config_executor
+    emitter  = tc.config_emitter
 
     if executor == "boot":
         exe_name = "ocamlc.byte"

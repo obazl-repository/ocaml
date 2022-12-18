@@ -9,8 +9,6 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker"
 )
 
-load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
-
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
 load("//bzl/rules/common:options.bzl", "get_options")
@@ -41,16 +39,15 @@ def lambda_expect_impl(ctx, exe_name):  ## , tc):
     # cc_toolchain = find_cpp_toolchain(ctx)
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
 
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    # if target_executor == "unspecified":
+    executor = tc.config_executor
+    # else:
+        # executor = target_executor
+        # emitter  = target_emitter
 
     ################
     includes  = []
@@ -168,7 +165,7 @@ def lambda_expect_impl(ctx, exe_name):  ## , tc):
 
     runfiles = []
     # if ocamlrun:
-    #     runfiles.append(tc_compiler(tc)[DefaultInfo].default_runfiles)
+    #     runfiles.append(tc.compiler[DefaultInfo].default_runfiles)
 
     inputs_depset = depset(
         direct = []
@@ -210,8 +207,8 @@ def lambda_expect_impl(ctx, exe_name):  ## , tc):
     #     outputs = [out_exe],
     #     tools = [
     #         executable,
-    #         # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-    #         # tc_compiler(tc)[DefaultInfo].files_to_run
+    #         # tc.compiler[DefaultInfo].default_runfiles.files,
+    #         # tc.compiler[DefaultInfo].files_to_run
     #     ],
     #     mnemonic = mnemonic,
     #     progress_message = progress_msg(workdir, ctx)
@@ -224,7 +221,7 @@ def lambda_expect_impl(ctx, exe_name):  ## , tc):
     # last arg:
     args.append(ctx.file.src.path)
 
-    runner = ctx.actions.declare_file(workdir + "lambda_expect_test_runner.sh")
+    runner = ctx.actions.declare_file(tc.workdir + "lambda_expect_test_runner.sh")
 
     ctx.actions.write(
         output  = runner,
@@ -240,7 +237,7 @@ def lambda_expect_impl(ctx, exe_name):  ## , tc):
     ## and the coldstart can use that history to install all the compilers
 
     # compiler_runfiles = []
-    # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    # for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
     #     if rf.short_path.startswith("stdlib"):
     #         # print("STDLIB: %s" % rf)
     #         compiler_runfiles.append(rf)
@@ -258,13 +255,13 @@ def lambda_expect_impl(ctx, exe_name):  ## , tc):
     for f in ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list():
         runfiles.append(f)
     # if ocamlrun:
-    #     runfiles = [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
+    #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
     # print("runfiles tc.compiler: %s" % tc.compiler)
     # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
     # if tc.dev:
     #     runfiles.append(tc.ocamlrun)
     # elif ocamlrun:
-    #     runfiles.append(tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list)
+    #     runfiles.append(tc.compiler[DefaultInfo].default_runfiles.files.to_list)
 
     # print("EXE runfiles: %s" % runfiles)
 

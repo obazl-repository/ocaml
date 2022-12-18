@@ -12,7 +12,7 @@ load("//bzl:rules.bzl",
      "compiler_module",
      "compiler_signature",
 )
-load("//lex:BUILD_RULES.bzl", "lex")
+load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
 MODULE_OPTS = []
 SIG_OPTS    = []
@@ -436,7 +436,7 @@ compiler_module(
     ]
 )
 
-lex(
+run_ocamllex(
     name = "lexer_ml",
     src  = "lexer.mll",
     out  = "lexer.ml",

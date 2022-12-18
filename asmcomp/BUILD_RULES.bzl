@@ -1,10 +1,5 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
 load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
@@ -22,7 +17,7 @@ def _cvt_emit(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     # (target_executor, target_emitter,
     #  config_executor, config_emitter,
@@ -33,8 +28,8 @@ def _cvt_emit(ctx):
     #     ocamlrun = None
     #     effective_compiler = tc.compiler
     # else:
-    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-    #     effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    #     ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+    #     effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     # if tc.dev:
     #     build_executor = "opt"
@@ -66,10 +61,10 @@ def _cvt_emit(ctx):
 
     # if config_executor == "vm":
     exec_tools = [
-        tc_executable(tc), ## ocamlrun,
+        tc.executable, ## ocamlrun,
         ctx.file._tool
     ]
-    executable_cmd = tc_executable(tc).path + " " + ctx.file._tool.path
+    executable_cmd = tc.executable.path + " " + ctx.file._tool.path
         # if config_executor in ["sys"]:
         #     ext = ".cmx"
         # else:
@@ -89,9 +84,9 @@ def _cvt_emit(ctx):
     #     ocamlrun = tc.ocamlrun
     #     effective_compiler = tc.compiler
     # else:
-    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    #     ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
 
-    #     effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    #     effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     # build_executor = get_build_executor(tc)
 
@@ -115,7 +110,7 @@ def _cvt_emit(ctx):
     ctx.actions.run_shell(
         mnemonic = "CvtEmit",
         outputs = [ctx.outputs.out],
-        inputs  = [ctx.file.src, tc_executable(tc)],
+        inputs  = [ctx.file.src, tc.executable],
         # tools attr forces build of these deps:
         tools   = exec_tools,
         command = " ".join([

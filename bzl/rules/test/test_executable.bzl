@@ -1,26 +1,19 @@
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
-load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
+# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
-
-# load("//bzl:functions.bzl", "get_workdir")
 
 ##############################
 def _test_executable_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
-    if tc.config_executor[BuildSettingInfo].value in ["boot", "vm"]:
+    if tc.config_executor in ["boot", "vm"]:
         ext = ".byte"
     else:
         ext = ".opt"

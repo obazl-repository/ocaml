@@ -12,6 +12,31 @@ load(":BUILD_RULES.bzl", "boot_coldstart", "boot_setup")
 
 alias(name = "coldstart", actual = ":bootstrap")
 
+boot_coldstart(
+    name = "bootstrap",
+    runner = "coldstart_runner.sh",
+    runtimes = [
+        "//runtime:asmrun",
+        "//runtime:camlrun",
+    ],
+    # lexer "//lex:ocamllex",
+    data = [
+        "//bin:ocamlc.opt",  ## runfiles contain all 4
+        "//lex:ocamllex.byte",
+        "//lex:ocamllex.opt",
+        "//yacc:ocamlyacc",
+        "@bazel_tools//tools/bash/runfiles",
+        # "//stdlib:stdlib",
+        # "//stdlib:Std_exit",
+        # "//stdlib:Std_exit_cmi",
+        # "//stdlib:Stdlib_cmi",
+        ##FIXME: deal with camlheaders
+        # "//config/camlheaders",
+    ],
+    # deps = [
+    # ],
+)
+
 boot_setup(
     name = "preproc",
     runner = "preproc_runner.sh",
@@ -34,29 +59,6 @@ boot_setup(
     ],
 )
 
-boot_coldstart(
-    name = "bootstrap",
-    runner = "coldstart_runner.sh",
-    # args   = ["$(TARGET_EXECUTOR)"],
-    runtimes = [
-        "//runtime:asmrun",
-        "//runtime:camlrun",
-    ],
-    # lexer "//lex:ocamllex",
-    data = [
-        "//bin:ocamlcc",  ## runfiles contain all 4
-        "//yacc:ocamlyacc",
-        "@bazel_tools//tools/bash/runfiles",
-        # "//stdlib:stdlib",
-        # "//stdlib:Std_exit",
-        # "//stdlib:Std_exit_cmi",
-        # "//stdlib:Stdlib_cmi",
-        ##FIXME: deal with camlheaders
-        # "//config/camlheaders",
-    ],
-    # deps = [
-    # ],
-)
 
 sh_binary(
     name = "clean",

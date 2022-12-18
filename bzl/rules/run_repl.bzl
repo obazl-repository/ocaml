@@ -6,17 +6,12 @@ load("//bzl/transitions:dev_transitions.bzl",
 
 load("//bzl:providers.bzl", "BootInfo", "ModuleInfo", "SigInfo")
 
-load("//toolchain/adapter:BUILD.bzl",
-     # "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
 ##############################
 def _run_repl_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     runner = ctx.actions.declare_file(ctx.attr.name + ".sh")
 

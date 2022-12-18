@@ -1,73 +1,5 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-def get_workdir(ctx, tc):
-    # build_emitter = tc.build_emitter[BuildSettingInfo].value
-    target_executor = tc.target_executor[BuildSettingInfo].value
-    target_emitter  = tc.target_emitter[BuildSettingInfo].value
-    config_executor = tc.config_executor[BuildSettingInfo].value
-    config_emitter  = tc.config_emitter[BuildSettingInfo].value
-
-    debug = False
-
-    if debug:
-        print("get_workdir %s" % ctx.label)
-        print("target_executor: %s" % target_executor)
-        print("target_emitter: %s" % target_emitter)
-        print("config_executor: %s" % config_executor)
-        print("config_emitter: %s" % config_emitter)
-
-    if tc.dev:
-        pfx = "_dev"
-    else:
-        pfx = ""
-
-    if (config_executor == "boot"):
-        workdir = "_boot/"
-    elif (config_executor == "baseline"):
-        workdir = "_boot/"
-    elif (config_executor == "vm" and config_emitter == "boot"):
-        if tc.dev:
-            # dev mode, passing only --//config/target/executor=vm
-            workdir = "_ocamlc.opt/"
-        else:
-            workdir = "_ocamlc.byte/"
-    elif (config_executor == "vm" and config_emitter == "vm"):
-        workdir = "_ocamlc.byte/"
-    elif (config_executor == "vm" and config_emitter == "sys"):
-        if tc.dev:
-            workdir = "_ocamlopt.byte/"
-        else:
-            workdir = "_ocamlopt.byte/"
-    elif (config_executor == "sys" and config_emitter == "boot"):
-        if tc.dev:
-            # dev mode, passing only --//config/target/executor=sys
-            workdir = "_ocamlopt.opt/"
-        else:
-            workdir = "_ocamlc.opt/"
-    elif (config_executor == "sys" and config_emitter == "vm"):
-        workdir = "_ocamlc.opt/"
-    elif (config_executor == "sys" and config_emitter == "sys"):
-        workdir = "_ocamlopt.opt/"
-    elif config_executor == "unspecified":
-        # last stage
-        if (config_executor == "boot"):
-            workdir = "_boot/"
-        if (config_executor == "vm" and config_emitter == "vm"):
-            workdir = "_ocamlc.byte/"
-        elif (config_executor == "vm" and config_emitter == "sys"):
-            workdir = "_ocamlopt.byte/"
-        elif (config_executor == "sys" and config_emitter == "sys"):
-            workdir = "_ocamlopt.opt/"
-        elif (config_executor == "sys" and config_emitter == "vm"):
-            workdir = "_ocamlc.opt/"
-
-    if debug:
-        print("inferred workdir: %s" % pfx + workdir)
-
-    return (target_executor, target_emitter,
-            config_executor, config_emitter,
-            pfx + workdir)
-
 ###########################
 def get_build_executor(tc):
 
@@ -133,9 +65,9 @@ def get_build_executor(tc):
 #         effective_compiler = tc.compiler
 #     else:
 #         ## tc.compiler runfiles: bottom element is always ocamlrun
-#         ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+#         ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
 #         ## most recently built compiler:
-#         effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+#         effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
 #     build_executor = get_build_executor(tc)
 #     # print("xBX: %s" % build_executor)
@@ -175,8 +107,8 @@ def progress_msg(workdir, ctx):
     elif rule in ["ocaml_test", "expect_test", "lambda_expect_test",
                   "compile_fail_test"]:
         action = "Testing"
-    elif rule in ["lex"]:
-        action = "Lexing"
+    elif rule in ["run_ocamllex"]:
+        action = "Running ocamllex"
     else:
         fail(rule)
 

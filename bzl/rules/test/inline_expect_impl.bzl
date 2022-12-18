@@ -11,8 +11,6 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker"
 )
 
-# load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
-
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
 load("//bzl/rules/common:options.bzl", "get_options")
@@ -40,7 +38,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
 
     # tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    # workdir = tc_workdir(tc)
+    # workdir = tc.workdir
     # (target_executor, target_emitter,
     #  config_executor, config_emitter,
     #  workdir) = get_workdir(ctx, tc)
@@ -113,8 +111,8 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     #     ocamlrun = None
     #     effective_compiler = tc.compiler
     # else:
-    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-    #     effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    #     ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+    #     effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     # if tc.dev:
     #     build_executor = "opt"
@@ -252,7 +250,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
 
     runfiles = []
     # if ocamlrun:
-    #     runfiles.append(tc_compiler(tc)[DefaultInfo].default_runfiles)
+    #     runfiles.append(tc.compiler[DefaultInfo].default_runfiles)
 
     inputs_depset = depset(
         direct = []
@@ -294,8 +292,8 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     #     outputs = [out_exe],
     #     tools = [
     #         executable,
-    #         # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-    #         # tc_compiler(tc)[DefaultInfo].files_to_run
+    #         # tc.compiler[DefaultInfo].default_runfiles.files,
+    #         # tc.compiler[DefaultInfo].files_to_run
     #     ],
     #     mnemonic = mnemonic,
     #     progress_message = progress_msg(workdir, ctx)
@@ -338,7 +336,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     ## and the coldstart can use that history to install all the compilers
 
     # compiler_runfiles = []
-    # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    # for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
     #     if rf.short_path.startswith("stdlib"):
     #         # print("STDLIB: %s" % rf)
     #         compiler_runfiles.append(rf)
@@ -356,13 +354,13 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     for f in ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list():
         runfiles.append(f)
     # if ocamlrun:
-    #     runfiles = [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
+    #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
     # print("runfiles tc.compiler: %s" % tc.compiler)
     # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
     # if tc.dev:
     #     runfiles.append(tc.ocamlrun)
     # elif ocamlrun:
-    #     runfiles.append(tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list)
+    #     runfiles.append(tc.compiler[DefaultInfo].default_runfiles.files.to_list)
 
     # print("EXE runfiles: %s" % runfiles)
 

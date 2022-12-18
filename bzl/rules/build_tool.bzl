@@ -7,19 +7,12 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/transitions:tc_transitions.bzl", "tc_boot_in_transition")
 
-# load("//bzl:functions.bzl", "get_workdir")
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
-
 ##############################
 def _build_tool_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:boot"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     ext = ".byte"
 

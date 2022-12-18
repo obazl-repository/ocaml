@@ -10,7 +10,7 @@ load("//bzl:rules.bzl",
      "compiler_signature",
      "ocaml_tool"
 )
-load("//lex:BUILD_RULES.bzl", "lex")
+# load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
 exports_files([
     "check-parser-uptodate-or-warn.sh",
@@ -759,7 +759,7 @@ ocaml_tool(
 #     warnings = [w.MISSING_MLI]
 # )
 
-# lex(
+# run_ocamllex(
 #     name = "make_opcodes_ml",
 #     src  = "make_opcodes.mll",
 #     out  = "make_opcodes.ml",

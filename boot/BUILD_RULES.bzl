@@ -60,7 +60,7 @@ def _boot_coldstart_impl(ctx):
         rfs.append(d.files)
         rfs.append(d[DefaultInfo].default_runfiles.files)
 
-    rfs.append(ctx.attr.lexer[DefaultInfo].files)
+    # rfs.append(ctx.attr.lexer[DefaultInfo].files)
     # rfs.append(ctx.attr.lexer[DefaultInfo].default_runfiles.files)
     # for f in ctx.files.runtimes:
     #     # print("RUNTIME: %s" % d)
@@ -95,10 +95,10 @@ boot_coldstart = rule(
         data = attr.label_list(
             allow_files = True
         ),
-        lexer = attr.label(
-            allow_single_file = True,
-            default = "//lex:ocamllex",
-        ),
+        # lexer = attr.label(
+        #     allow_single_file = True,
+        #     default = "//lex:ocamllex",
+        # ),
         deps = attr.label_list(
             allow_files = True
         ),

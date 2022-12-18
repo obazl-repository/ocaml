@@ -5,13 +5,9 @@ load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
 # load("//bzl:functions.bzl", "tc_lexer")
 
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler",
-     "tc_executable",
-     "tc_lexer",
-     "tc_tool_arg", "tc_lexer_arg",
-     "tc_build_executor",
-     "tc_workdir")
+# load("//toolchain/adapter:BUILD.bzl",
+#      "tc_lexer",
+#      "tc_lexer_arg")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
@@ -27,7 +23,7 @@ load("//toolchain/adapter:BUILD.bzl",
 
 ################################################################
 ## ocamllex runner: lex()
-def _lex_impl(ctx):
+def _run_ocamllex_impl(ctx):
 
     debug = False
     if (ctx.label.name == "_Impl"):
@@ -40,7 +36,7 @@ def _lex_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:boot"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     # (target_executor, target_emitter,
     #  config_executor, config_emitter,
@@ -73,7 +69,7 @@ def _lex_impl(ctx):
     #########################
     args = ctx.actions.args()
 
-    toolarg = tc_lexer_arg(tc)
+    toolarg = tc.lexer_arg
     if toolarg:
         args.add(toolarg.path)
         toolarg_input = [toolarg]
@@ -81,12 +77,12 @@ def _lex_impl(ctx):
         toolarg_input = []
 
     # tool = None
-    # for f in tc_lexer(tc)[DefaultInfo].default_runfiles.files.to_list():
+    # for f in tc.lexer[DefaultInfo].default_runfiles.files.to_list():
     #     if f.basename == "ocamlrun":
     #         # print("LEX RF: %s" % f.path)
     #         tool = f
 
-    # args.add(tc_lexer(tc)[DefaultInfo].files_to_run.executable.path)
+    # args.add(tc.lexer[DefaultInfo].files_to_run.executable.path)
 
     # if debug:
     #     print("target_emitter: %s" % target_emitter)
@@ -95,7 +91,7 @@ def _lex_impl(ctx):
     #     print("config_executor: %s" % config_executor)
     #     print("tc.dev: %s" % tc.dev)
 
-    # runfiles = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()
+    # runfiles = tc.compiler[DefaultInfo].default_runfiles.files.to_list()
     # print("RUNFILES: %s" % runfiles)
 
     # executable = None
@@ -103,9 +99,9 @@ def _lex_impl(ctx):
     #     ocamlrun = None
     #     effective_compiler = tc.compiler
     # else:
-    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    #     ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
 
-    #     effective_compiler = tc_lexer(tc)[DefaultInfo].files_to_run.executable
+    #     effective_compiler = tc.lexer[DefaultInfo].files_to_run.executable
 
     # build_executor = get_build_executor(tc)
 
@@ -136,7 +132,7 @@ def _lex_impl(ctx):
     # else:
     #     executable = effective_compiler
 
-    print("TCLEX: %s" % tc_lexer(tc))
+    print("TCLEX: %s" % tc.lexer)
     inputs_depset = depset(
         direct = [
             ctx.file.src,
@@ -162,12 +158,12 @@ def _lex_impl(ctx):
 
     ctx.actions.run(
         # env = env,
-        executable = tc_lexer(tc),
+        executable = tc.lexecutable,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [ctx.outputs.out],
-        tools = [tc_lexer(tc)],
-        ## tc_lexer(tc)[DefaultInfo].default_runfiles.files,
+        tools = [tc.lexecutable],
+        ## tc.lexer[DefaultInfo].default_runfiles.files,
         mnemonic = "OcamlLex",
         progress_message = progress_msg(workdir, ctx)
         # progress_message = "{mode} ocaml_lex: //{pkg}:{tgt}".format(
@@ -181,8 +177,8 @@ def _lex_impl(ctx):
     return [DefaultInfo(files = depset(direct = [ctx.outputs.out]))]
 
 #################
-lex = rule(
-    implementation = _lex_impl,
+run_ocamllex = rule(
+    implementation = _run_ocamllex_impl,
     doc = "Generates an OCaml source file from an ocamllex source file.",
     attrs = dict(
         src = attr.label(
@@ -211,7 +207,7 @@ lex = rule(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),
 
-        _rule = attr.string( default = "lex" )
+        _rule = attr.string( default = "run_ocamllex" )
     ),
     executable = False,
 

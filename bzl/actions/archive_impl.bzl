@@ -1,11 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
 load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
@@ -16,15 +11,11 @@ load("//bzl:providers.bzl",
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
-# load("//bzl:functions.bzl", "get_workdir")
-
 load("//bzl/rules/common:options.bzl", "get_options")
 
 load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
      "merge_depsets")
-
-# load("//bzl/transitions:tc_transitions.bzl", "manifest_out_transition")
 
 ###############################
 def archive_impl(ctx):
@@ -33,7 +24,7 @@ def archive_impl(ctx):
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     # (target_executor, # x
     #  target_emitter,  # x
@@ -50,7 +41,7 @@ def archive_impl(ctx):
     #########################
     args = ctx.actions.args()
 
-    toolarg = tc_tool_arg(tc)
+    toolarg = tc.tool_arg
     if toolarg:
         args.add(toolarg.path)
         toolarg_input = [toolarg]
@@ -62,9 +53,9 @@ def archive_impl(ctx):
     #     ocamlrun = None
     #     effective_compiler = tc.compiler
     # else:
-    #     ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
+    #     ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
 
-    #     effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    #     effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     # if tc.dev:
     #     build_executor = "opt"
@@ -99,8 +90,8 @@ def archive_impl(ctx):
     #     executable = effective_compiler
     #     ext = ".cmxa"
 
-    # if tc_build_executor(tc) == "vm":
-    if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
+    # if tc.build_executor == "vm":
+    if tc.config_executor in ["boot", "baseline", "vm"]:
         ext = ".cma"
     else:
         ext = ".cmxa"
@@ -189,8 +180,8 @@ def archive_impl(ctx):
     )
 
     #########################
-    # ocamlrun = tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list()[0]
-    # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    # ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+    # effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     # if (target_executor == "unspecified"):
     #     if (config_executor == "sys"):
@@ -225,14 +216,14 @@ def archive_impl(ctx):
 
     # if executor in ["boot", "vm", "sys"]:
     #     ## ocamlrun
-    #     for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    #     for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
     #         if f.basename == "ocamlrun":
     #             # print("LEX RF: %s" % f.path)
     #             executable = f
     #         # the bytecode executable
-    #     args.add(tc_compiler(tc)[DefaultInfo].files_to_run.executable.path)
+    #     args.add(tc.compiler[DefaultInfo].files_to_run.executable.path)
     # else:
-    #     executable = tc_compiler(tc)[DefaultInfo].files_to_run.executable.path
+    #     executable = tc.compiler[DefaultInfo].files_to_run.executable.path
 
     ## -use-prims never needed for archive
     # if hasattr(ctx.attr, "use_prims"):
@@ -486,7 +477,7 @@ def archive_impl(ctx):
 
     inputs_depset = depset(
         direct = ctx.files.data if ctx.files.data else []
-        + [tc_executable(tc)]
+        + [tc.executable]
         + toolarg_input
         ,
         transitive = []
@@ -510,14 +501,14 @@ def archive_impl(ctx):
     ################
     ctx.actions.run(
         # env = env,
-        executable = tc_executable(tc).path,
+        executable = tc.executable.path,
         arguments = [args],
         inputs = inputs_depset,
         outputs = action_outputs,
         tools = [
             # executable
-            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            # tc_compiler(tc)[DefaultInfo].files_to_run
+            # tc.compiler[DefaultInfo].default_runfiles.files,
+            # tc.compiler[DefaultInfo].files_to_run
         ],
         mnemonic = mnemonic,
         progress_message = progress_msg(workdir, ctx)

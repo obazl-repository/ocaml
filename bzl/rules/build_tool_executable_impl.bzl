@@ -10,12 +10,6 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker"
 )
 
-# load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
-load("//toolchain/adapter:BUILD.bzl",
-     "tc_compiler", "tc_executable", "tc_tool_arg",
-     "tc_build_executor",
-     "tc_workdir")
-
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
 load("//bzl/rules/common:options.bzl", "get_options")
@@ -39,7 +33,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     tc = ctx.toolchains["//toolchain/type:boot"]
 
-    workdir = tc_workdir(tc)
+    workdir = tc.workdir
 
     # (target_executor, target_emitter,
     #  config_executor, config_emitter,
@@ -56,21 +50,21 @@ def executable_impl(ctx, tc, exe_name, workdir):
         print("tc.compiler: %s" % tc.compiler)
         # for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
         #     print("tc rf: %s" % f)
-        # x = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+        # x = tc.compiler[DefaultInfo].files_to_run.executable
         # print("tc executable: %s" % x)
 
     #########################
     args = ctx.actions.args()
 
-    if tc_tool_arg(tc):
-        args.add(tc_tool_arg(tc))
+    if tc.compiler_arg:
+        args.add(tc.compiler_arg)
 
     # executable = None
     # if tc.dev:
     #     ocamlrun = None
     # else:
     #     ocamlrun = tc.ocamlrun
-    #     # effective_compiler = tc_compiler(tc)[DefaultInfo].files_to_run.executable
+    #     # effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
     # effective_compiler = tc.compiler
 
     # if tc.dev:
@@ -116,7 +110,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     # else:
     #     executable = effective_compiler
 
-    config_executor = tc.config_executor[BuildSettingInfo].value
+    config_executor = tc.config_executor
 
     if hasattr(ctx.attr, "vm_only"):
         if ctx.attr.vm_only:
@@ -288,7 +282,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     ## ocamlrun runtime to runfiles.
 
     # compiler_runfiles = []
-    # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    # for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
     #     if rf.short_path.startswith("stdlib"):
     #         # print("STDLIB: %s" % rf)
     #         # args.add("-DFOOBAR")
@@ -370,8 +364,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
     runfiles = []
     # if ...:
     #     runfiles.append(ctx.file._primitives)
-    # if tc_compiler(tc)[DefaultInfo].default_runfiles:
-    if tc_build_executor == "vm":  ## ocamlrun:
+    # if tc.compiler[DefaultInfo].default_runfiles:
+    if tc.build_executor == "vm":  ## ocamlrun:
         runfiles.append(tc.ocamlrun)
     # else:
     #     runfiles = []
@@ -394,14 +388,14 @@ def executable_impl(ctx, tc, exe_name, workdir):
         # + ctx.files._camlheaders
         # + camlheader_deps
         + tc
-        + tc_compiler(tc)[DefaultInfo].files_to_run
+        + tc.compiler[DefaultInfo].files_to_run
         + runfiles
-        + [tc_tool_arg(tc)]
+        + [tc.tool_arg]
         ,
         transitive = []
         + [depset(
             runtime_files
-            + [tc_executable(tc), tc_tool_arg(tc)]
+            + [tc.cexecutable, tc.compiler_arg]
             + [ctx.file._stdlib]
             # ctx.files._camlheaders
             # + ctx.files._runtime
@@ -455,7 +449,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     else:
         fail("Unknown rule for executable: %s" % ctx.attr._rule)
 
-    # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    # for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
     #     if rf.path.endswith("ocamlrun"):
     #         print("exec OCAMLRUN: %s" % rf)
 
@@ -463,14 +457,14 @@ def executable_impl(ctx, tc, exe_name, workdir):
     ctx.actions.run(
         env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
                "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
-        executable = tc_executable(tc).path,
+        executable = tc.cexecutable,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_exe],
         tools = [
             # executable,
-            # tc_compiler(tc)[DefaultInfo].default_runfiles.files,
-            # tc_compiler(tc)[DefaultInfo].files_to_run
+            # tc.compiler[DefaultInfo].default_runfiles.files,
+            # tc.compiler[DefaultInfo].files_to_run
         ],
         mnemonic = mnemonic,
         progress_message = progress_msg(workdir, ctx)
@@ -485,7 +479,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     ## and the coldstart can use that history to install all the compilers
 
     # compiler_runfiles = []
-    # for rf in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
+    # for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
     #     if rf.short_path.startswith("stdlib"):
     #         # print("STDLIB: %s" % rf)
     #         compiler_runfiles.append(rf)
@@ -498,7 +492,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     runfiles = []
     # if ocamlrun:
-    #     runfiles = [tc_compiler(tc)[DefaultInfo].default_runfiles.files]
+    #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
     # print("runfiles tc.compiler: %s" % tc.compiler)
     # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
     runfiles.append(tc.ocamlrun)
