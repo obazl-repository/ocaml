@@ -2,9 +2,21 @@
 build --flag_alias=tgt=//config/target/executor
 build --flag_alias=stdlib=//testsuite/tests:with-stdlib
 
+# build --experimental_output_directory_naming_scheme=diff_against_baseline
 
 query --notool_deps
 query --noimplicit_deps
+
+build:ccv --//config/ocaml/compile:verbose
+build:ccv --//config/ocaml/link:verbose
+build:ccv --//config/ocaml/archive:verbose
+
+build:ccvv --//config/ocaml/compile:verbose
+build:ccvv --//config/ocaml/link:verbose
+build:ccvv --//config/ocaml/archive:verbose
+build:ccvv --//config/ocaml/cc/asm:verbose
+build:ccvv --//config/ocaml/cc/compile:verbose
+build:ccvv --//config/ocaml/cc/link:verbose
 
 common:dev --//config:dev
 # test --test_output=errors
