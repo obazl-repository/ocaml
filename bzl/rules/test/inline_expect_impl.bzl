@@ -11,7 +11,7 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker"
 )
 
-load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
+# load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
@@ -22,7 +22,7 @@ load("//bzl/rules/common:DEPS.bzl",
      "merge_depsets")
 
 #########################
-def inline_expect_impl(ctx, exe_name):  ## , tc):
+def inline_expect_impl(ctx, tc, exe_name, workdir):
 
     debug = False
     # if ctx.label.name == "test":
@@ -38,17 +38,22 @@ def inline_expect_impl(ctx, exe_name):  ## , tc):
 
     # cc_toolchain = find_cpp_toolchain(ctx)
 
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
+    # tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    # workdir = tc_workdir(tc)
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
+
+    executor = tc.config_executor[BuildSettingInfo].value
+    emitter  = tc.config_emitter[BuildSettingInfo].value
+
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
 
     ################################################################
     ################  DEPS  ################

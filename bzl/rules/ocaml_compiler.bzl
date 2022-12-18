@@ -3,11 +3,8 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-# load("//bzl/transitions:tc_transitions.bzl", "compiler_in_transition")
-
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
-# load("//bzl:functions.bzl", "get_workdir", "tc_compiler")
 load("//toolchain/adapter:BUILD.bzl",
      "tc_compiler", "tc_executable", "tc_tool_arg",
      "tc_build_executor",
@@ -19,10 +16,6 @@ def _ocaml_compiler_impl(ctx):
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     workdir = tc_workdir(tc)
-
-    # (target_executor, target_emitter,
-    #  config_executor, config_emitter,
-    #  workdir) = get_workdir(ctx, tc)
 
     executor = tc.config_executor[BuildSettingInfo].value
     emitter  = tc.config_emitter[BuildSettingInfo].value
@@ -50,11 +43,7 @@ def _ocaml_compiler_impl(ctx):
     else:
         fail("unknown executor: %s" % executor)
 
-    # for f in tc_compiler(tc)[DefaultInfo].default_runfiles.files.to_list():
-    #     print("CRF {executor}:{emitter} rf: {rf}".format(
-    #         executor = executor, emitter = emitter, rf = f.path))
-
-    return executable_impl(ctx, exe_name)
+    return executable_impl(ctx, tc, exe_name, workdir)
 
 #####################
 ocaml_compiler = rule(

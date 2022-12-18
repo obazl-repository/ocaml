@@ -4,7 +4,7 @@ label_setting(name="compiler",
               visibility = ["//visibility:public"])
 
 label_setting(name="lexer",
-              build_setting_default = "//lex:ocamllex",
+              build_setting_default = "//lex:ocamllex.byte",
               # build_setting_default = "//boot:ocamllex.boot",
               visibility = ["//visibility:public"])
 

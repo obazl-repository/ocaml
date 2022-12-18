@@ -2,8 +2,6 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 def _coldstart_transition_impl(settings, attr):
 
-    # default: build and install ocamlc.opt, ocamlopt.opt
-
     if settings["//config/target/executor"] == "boot":
         executor = "sys"
         emitter  = "vm"
@@ -62,6 +60,8 @@ def _boot_coldstart_impl(ctx):
         rfs.append(d.files)
         rfs.append(d[DefaultInfo].default_runfiles.files)
 
+    rfs.append(ctx.attr.lexer[DefaultInfo].files)
+    # rfs.append(ctx.attr.lexer[DefaultInfo].default_runfiles.files)
     # for f in ctx.files.runtimes:
     #     # print("RUNTIME: %s" % d)
     #     rfs.append(f)
@@ -94,6 +94,10 @@ boot_coldstart = rule(
         ),
         data = attr.label_list(
             allow_files = True
+        ),
+        lexer = attr.label(
+            allow_single_file = True,
+            default = "//lex:ocamllex",
         ),
         deps = attr.label_list(
             allow_files = True

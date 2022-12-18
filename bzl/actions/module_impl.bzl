@@ -109,6 +109,7 @@ def module_impl(ctx, module_name):
         ext = ".cmo"
     else:
         ext = ".cmx"
+        args.add("-S") # testing - retain asm code
 
     # if target_executor == "unspecified":
     #     executor = config_executor
@@ -576,8 +577,8 @@ def module_impl(ctx, module_name):
     includes.extend(paths_depset.to_list())
 
     runtime_deps = []
-    print("module: %s" % ctx.label)
-    # for x in tc.runtime[0][CcInfo].linking_context.linker_inputs.to_list():
+    # print("module: %s" % ctx.label)
+    # for x in tc.runtime[CcInfo].linking_context.linker_inputs.to_list():
     #     for lib in x.libraries:
     #         runtime_deps.extend(lib.objects)
 

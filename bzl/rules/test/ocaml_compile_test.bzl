@@ -1,4 +1,4 @@
-load("//bzl/actions:compile_test_impl.bzl", "compile_test_impl")
+load(":compile_test_impl.bzl", "compile_test_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 load("//bzl/transitions:dev_transitions.bzl",
@@ -15,9 +15,12 @@ load("//bzl:functions.bzl", "get_workdir")
 def _ocaml_compile_test_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
+
+    workdir = tc_workdir(tc)
+
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
     # if target_executor == "unspecified":
     #     executor = config_executor
     #     emitter  = config_emitter
@@ -25,14 +28,14 @@ def _ocaml_compile_test_impl(ctx):
     #     executor = target_executor
     #     emitter  = target_emitter
 
-    if config_executor in ["boot", "baseline", "vm"]:
+    if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
         ext = ".byte"
     else:
         ext = ".opt"
 
     exe_name = ctx.label.name + ext
 
-    return compile_impl(ctx, exe_name)
+    return compile_impl(ctx, tc, exe_name, workdir)
 
 #######################
 ocaml_compile_test = rule(

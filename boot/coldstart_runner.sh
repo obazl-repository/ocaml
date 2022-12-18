@@ -16,6 +16,9 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
     { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
 # --- end runfiles.bash initialization v2 ---
 
+# echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
+# echo "`cat ${RUNFILES_MANIFEST_FILE}`"
+
 # echo "camlheader: $(rlocation ocamlcc/config/camlheaders/camlheader)"
 
 # set -x
@@ -35,10 +38,10 @@ mkdir -p $BOOTDIR/lib
 
 echo "Installing WORKSPACE and BUILD files"
 
-echo "workspace(name = \"baseline\")" > $BOOTDIR/WORKSPACE.bazel
-echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/BUILD.bazel
-echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/bin/BUILD.bazel
-echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/lib/BUILD.bazel
+# echo "workspace(name = \"baseline\")" > $BOOTDIR/WORKSPACE.bazel
+# echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/BUILD.bazel
+# echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/bin/BUILD.bazel
+# echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/lib/BUILD.bazel
 
 echo "Getting executor and emitter"
 
@@ -115,8 +118,9 @@ cp -vf $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
 
 echo "Setting permissions"
 
-chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
-chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
+# chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
+# chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
+chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*.opt
 chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
 chmod -vf ugo=+r-xw $BOOTDIR/lib/*.a
 

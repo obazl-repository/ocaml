@@ -13,3 +13,21 @@ zig bundles its own linker(s).  They're in the same dir as the compiler (c++), i
 * wasm-ld
 
 
+"The macOS linker /usr/bin/ld is not available on non-macOS systems,
+so relying on it would prevent cross-compiling for macOS. Also
+/usr/bin/ld is not always available on macOS systems, for example if
+xcode command line tools have not been installed. This is why Zig uses
+LLD as the linker, rather than depending on a system linker, and it
+means that zig cc is an alternative to installing the xcode command
+line tools. All of that relies on LLD working well on macOS however,
+which has not yet been the case. But finally, LLD's macos support is
+seeing some love, and I expect this situation to change during this
+release cycle of LLVM."  (src: link:https://github.com/ziglang/zig/issues/4841[4841], April 2020)
+
+"While not a permanent fix, it is now possible to fall back to the
+system linker on macOS by setting export ZIG_SYSTEM_LINKER_HACK=1 env
+var before linking." (same source)
+
+Unfortunately this does not seem to have any effect.  Removed: https://github.com/ziglang/zig/issues/8728
+
+link:https://github.com/llvm/llvm-project/blob/main/lld/MachO/Options.td[llvm lld-machO options]

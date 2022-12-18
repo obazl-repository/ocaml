@@ -1,6 +1,8 @@
-## WARNING: this rule only used once, for //tools:cvt_emit.byte
+## WARNING: this rule only used twice:
+## //tools:cvt_emit.byte
+## //utils:expunge (was: //toplevel:expunge)
 
-load("//bzl/actions:tool_executable_impl.bzl", "executable_impl")
+load(":build_tool_executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/transitions:tc_transitions.bzl", "tc_boot_in_transition")
@@ -19,20 +21,11 @@ def _build_tool_impl(ctx):
 
     workdir = tc_workdir(tc)
 
-    # (target_executor, target_emitter,
-    #  config_executor, config_emitter,
-    #  workdir) = get_workdir(ctx, tc)
-
-    # if config_emitter in ["boot", "vm"]:
-    #     ext = ".byte"
-    # else:
-    #     ext = ".opt"
-
     ext = ".byte"
 
     exe_name = ctx.label.name + ext
 
-    return executable_impl(ctx, exe_name)
+    return executable_impl(ctx, tc, exe_name, workdir)
 
 #######################
 build_tool = rule(

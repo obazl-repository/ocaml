@@ -15,8 +15,6 @@ load("//bzl:providers.bzl",
      "OcamlTestMarker"
 )
 
-# load("//bzl:functions.bzl", "get_workdir")
-
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
 load("//bzl/rules/common:options.bzl", "get_options")
@@ -26,7 +24,7 @@ load("//bzl/rules/common:DEPS.bzl",
      "merge_depsets")
 
 #########################
-def executable_impl(ctx, exe_name):  ## , tc):
+def executable_impl(ctx, tc, exe_name, workdir):
 
     debug = False
 
@@ -38,21 +36,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
-
-    workdir = tc_workdir(tc)
-
-    # (target_executor, # x
-    #  target_emitter,  # x
-    #  config_executor, # control runtime, check vm_only, select camlheaders
-    #  config_emitter,  # x
-    #  workdir) = get_workdir(ctx, tc)
-
-    # (ocamlrun, # used for runfiles
-    #  executable, # in actions.run
-    #  build_executor, # x
-    #  target_executor # x
-    #  ) = configure_action(ctx, tc)
+    # tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     config_executor = tc.config_executor[BuildSettingInfo].value
 
@@ -392,7 +376,8 @@ def executable_impl(ctx, exe_name):  ## , tc):
         transitive = [cli_link_deps_depset]
     )
 
-    if (config_executor in ["boot", "baseline", "vm"] or ctx.attr._rule == "build_tool"):
+    if config_executor in ["boot", "baseline", "vm"]:
+        ## or ctx.attr._rule == "build_tool"):
 
         ## if target_executor(tc) in [...]
 
@@ -526,7 +511,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
         mnemonic = "LinkBuildTool"
     elif ctx.attr._rule == "baseline_compiler":
         mnemonic = "LinkOcamlcKick"
-    elif ctx.attr._rule == "ocaml_tool":
+    elif ctx.attr._rule in ["ocaml_tool_vm", "ocaml_tool_sys"]:
         mnemonic = "LinkOCamlTool"
     elif ctx.attr._rule in ["ocaml_test", "expect_test"]:
         mnemonic = "OcamlTest"
@@ -622,7 +607,7 @@ def executable_impl(ctx, exe_name):  ## , tc):
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule in ["build_tool", "ocaml_tool"]:
+    elif ctx.attr._rule in ["build_tool", "ocaml_tool_vm", "ocaml_tool_sys"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
         exe_provider = OcamlExecutableMarker()

@@ -55,16 +55,20 @@ cc_library(
         "//runtime/caml:jumptbl_h",
     ],
     copts = [
-        "-x", "c",
+        # "-x", "c",  # makes zig barf on mac
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime",
         "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
+
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
         "//conditions:default":  [] #"-std=c11"]
+    }) + select({
+        # mac zig: ["-Wno-deprecated-non-prototype"]
+        "//conditions:default": []
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
@@ -103,12 +107,8 @@ cc_library(
     srcs = [
         "//runtime:common_c_sources",
         "//runtime:native_only_c_sources",
-        ":asm",
+        ":archasm",
     ],
-    # features = [
-    #     "-supports_pic",    # disable pic
-    #     "fully_static_link" # TODO: explore
-    # ],
     deps = [
         "//runtime/caml:hdrs",
         "//runtime/caml:domain_state_h",
@@ -116,12 +116,16 @@ cc_library(
         ":hdrs",
     ],
     copts = [
-        "-x", "c",
+        # "-x", "c",  # zig barfs
+        # "-fPIC",
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime",
         "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
+        # "-Wl,S",
+        # "-Wl,-static",
+        # "-Wl,--verbose"
     ] + select({
         "//platform/os:macos?": [], #"-std=c11"],
         "//platform/os:linux?": [],
@@ -150,19 +154,31 @@ cc_library(
             "SYS_$(SYSTEM)"
         ] #testing
     }),
-    ## NB: static cc_library does not link, so these have no effect:
+    #BUG: zig builds the archive with 'rcsD' which causes link error
+    #due to "absolute symbol". But linkopts is ignored. Dunno how to
+    #tell Zig tc how to archive. In fact I have not manage to pass
+    #anything to the 'ar' cmd it runs to produce libasmrun.a. features
+    # features = [
+    #     "supports_pic",
+    #     "user_link_flags",
+    #     "no_legacy_features",
+    #     # "fully_static_link" # TODO: explore
+    # ],
     linkopts = [
-        "$(OC_LDFLAGS)",
-        "-ffunction-sections",
+        # "-fPIC",
+        # "$(OC_LDFLAGS)",
+        ## NB: static cc_library does not link, so these have no effect:
+        # "-ffunction-sections",
         ## macos std linker (ld) debugging:
-        "-Wl,-v", # prints config, search paths
-        "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
-        "-Xlinker", "-t", # -Wl-v plus logs each file the linker loads.
-        "-why_load" # Log why each object file in a static library
+        # "-Wl,-v", # prints config, search paths
+        # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
+        # "-Xlinker", "-t", # -Wl-v plus logs each file the linker loads.
+        # "-why_load" # Log why each object file in a static library
         #             # is loaded. That is, what symbol was needed.
 
         ## zig (on mac) linker opts
         # "-v",
+        "[S]",
 
         ## linux
         # "-Wl,--verbose"
@@ -179,11 +195,11 @@ cc_library(
 )
 
 cc_assemble(
-    name = "asm",
+    name = "archasm",
     src = select({
         "//platform:windows_x86_32?": ARCH + "nt.asm",
         "//platform:windows_x86_64?": ARCH + "nt.asm",
-        "//conditions:default"      : ":__asm" # ARCH + ".S"
+        "//conditions:default"      : ":arch_s" # ARCH + ".S"
     }),
     deps = [
         "//runtime/caml:hdrs"
@@ -214,7 +230,7 @@ cc_assemble(
 ################################################################
 # ARCH = "arm64"
 mustache(
-    name = "__asm",
+    name = "arch_s",
     out  = ARCH + ".S",
     json = "//runtime/caml:domain_state.json",
     template = select({
@@ -222,6 +238,69 @@ mustache(
         # "//platform:windows_x86_64?": ARCH + "nt.asm.mustache",
         "//conditions:default"      : ARCH + ".S.mustache"
     }),
+)
+
+genrule(
+    outs = ["amd64.mustached.S"],
+    name = "amd64_mustache_test",
+    srcs = [
+        "arch_s",
+        # "//runtime:asmrun",
+        "//runtime/caml:config.h",
+        "//runtime/caml:domain_state.tbl",
+        "//runtime/caml:m.h",
+        "//runtime/caml:s_h"
+    ],
+    cmd  = " ".join([
+        "gcc -E",
+        "-Wno-trigraphs",
+        # "-I", "`dirname $(location //runtime:asmrun)`",
+        "-I", "runtime", # caml/m.h etc.
+        # "-I", "`dirname $(location //runtime/caml:config.h)`",
+        "-I", "`dirname $(location //runtime/caml:domain_state.tbl)`",
+        "-I", "`dirname $(location //runtime/caml:s_h)`",
+        # "-I", "`dirname $(location //runtime/caml:m.h)`",
+        "-DNATIVE_CODE",
+        "-DTARGET_amd64",
+        "-DMODEL_default",
+        "-DSYS_macosx",
+        "-o",
+        "$(location amd64.mustached.S)",
+        "$(location arch_s)"
+    ]),
+    # toolchains = ["//profile/system/local"],
+    # visibility = ["//boot:__pkg__"]
+)
+
+genrule(
+    outs = ["amd64.pp.S"],
+    name = "amd64_test",
+    srcs = [
+        "amd64.original.S",
+        # "//runtime:asmrun",
+        "//runtime/caml:config.h",
+        "//runtime/caml:domain_state.tbl",
+        "//runtime/caml:m.h",
+        "//runtime/caml:s_h"
+    ],
+    cmd  = " ".join([
+        "gcc -E",
+        "-Wno-trigraphs",
+        # "-I", "`dirname $(location //runtime:asmrun)`",
+        "-I", "`dirname $(location //runtime/caml:config.h)`",
+        "-I", "`dirname $(location //runtime/caml:domain_state.tbl)`",
+        "-I", "`dirname $(location //runtime/caml:s_h)`",
+        "-I", "`dirname $(location //runtime/caml:m.h)`",
+        "-DNATIVE_CODE",
+        "-DTARGET_amd64",
+        "-DMODEL_default",
+        "-DSYS_macosx",
+        "-o",
+        "$(location amd64.pp.S)",
+        "$(location amd64.original.S)"
+    ]),
+    # toolchains = ["//profile/system/local"],
+    # visibility = ["//boot:__pkg__"]
 )
 
 ################################################################
@@ -523,18 +602,23 @@ cc_binary(
         ":primitives_h"
     ],
     copts = [
-        "-x", "c",
+        # zig: warning: '-x c' after last input file has no effect [-Wunused-command-line-argument]
+        # "-x", "c",
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime",
         "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
+
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
         "//conditions:default":  ["-std=c11"]
     }) + select({
         ":fastbuild?": ["-UDEBUG"], # Bazel adds -DDEBUG on macos; why?
+        "//conditions:default":  []
+    }) + select({
+        # mac zig: ["-Wno-deprecated-non-prototype"],
         "//conditions:default":  []
     # }) + select({
     #     ":INSTR_TRACE?": ["-DINSTR_TRACE"],
@@ -592,60 +676,60 @@ cc_binary(
 ## builds. so instead of distinguishing between e.g. vm and native
 ## builds we select on features. after all the vm/runtime is c code
 ## compiled to the native sys target, just like the native runtime.
-cc_library(
-    name = "commonrun",
-    alwayslink = True,
-    linkstatic = True,
-    srcs = [## ":build_config.h",
-        ":common_c_sources",
-        # "//runtime/caml:domain_state.h",
-        # "//runtime/caml:fail_h",
-    ],
-    deps = [
-        "//runtime/caml:hdrs",
-        "//runtime/caml:domain_state_h",
-        "//runtime/caml:fail_h",
-        "//runtime/caml:instruct_h",
-        ":primitives_h"
-    ],
-    copts = [
-        "-x", "c",
-        "-Iruntime",
-        "-Iruntime/caml",
-        "-I$(GENDIR)/runtime",
-        "-I$(GENDIR)/runtime/caml",
-        "$(OC_CFLAGS)",
-        "$(OC_CPPFLAGS)",
-    ] + select({
-        "//platform/os:macos?": ["-std=c11"],
-        "//platform/os:linux?": [],
-        "//conditions:default":  [] #"-std=c11"]
-    }) + select({
-        "//config/mode:pedantic?": ["-pedantic"],
-        "//conditions:default":  []
-    }) + select({
-        ":fastbuild?": [
-            # Bazel adds -DDEBUG on macos; why?
-            "-UDEBUG"
-        ],
-        "//conditions:default":  []
-    }) + OPTIMIZATION_FLAGS
-    ,
-    linkopts = ["$(OC_LDFLAGS)"]
-    + select({
-        # "//runtime:msan?": ["-fsanitize=leak", "-fPIE", "-pie"],
-        "//conditions:default": []
-    }) + select({
-        # "//runtime:asan": ["-fsanitize=address"],
-        "//conditions:default": []
-    })
-    ,
-    defines = RUNTIME_DEFINES,
-    # defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
-    # defines = CC_DEFINES,
-    toolchains = ["//profile/system/local"],
-    visibility = ["//visibility:public"]
-)
+# cc_library(
+#     name = "commonrun",
+#     alwayslink = True,
+#     linkstatic = True,
+#     srcs = [## ":build_config.h",
+#         ":common_c_sources",
+#         # "//runtime/caml:domain_state.h",
+#         # "//runtime/caml:fail_h",
+#     ],
+#     deps = [
+#         "//runtime/caml:hdrs",
+#         "//runtime/caml:domain_state_h",
+#         "//runtime/caml:fail_h",
+#         "//runtime/caml:instruct_h",
+#         ":primitives_h"
+#     ],
+#     copts = [
+#         # "-x", "c",        # zig
+#         "-Iruntime",
+#         "-Iruntime/caml",
+#         "-I$(GENDIR)/runtime",
+#         "-I$(GENDIR)/runtime/caml",
+#         "$(OC_CFLAGS)",
+#         "$(OC_CPPFLAGS)",
+#     ] + select({
+#         "//platform/os:macos?": ["-std=c11"],
+#         "//platform/os:linux?": [],
+#         "//conditions:default":  [] #"-std=c11"]
+#     }) + select({
+#         "//config/mode:pedantic?": ["-pedantic"],
+#         "//conditions:default":  []
+#     }) + select({
+#         ":fastbuild?": [
+#             # Bazel adds -DDEBUG on macos; why?
+#             "-UDEBUG"
+#         ],
+#         "//conditions:default":  []
+#     }) + OPTIMIZATION_FLAGS
+#     ,
+#     linkopts = ["$(OC_LDFLAGS)"]
+#     + select({
+#         # "//runtime:msan?": ["-fsanitize=leak", "-fPIE", "-pie"],
+#         "//conditions:default": []
+#     }) + select({
+#         # "//runtime:asan": ["-fsanitize=address"],
+#         "//conditions:default": []
+#     })
+#     ,
+#     defines = RUNTIME_DEFINES,
+#     # defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
+#     # defines = CC_DEFINES,
+#     toolchains = ["//profile/system/local"],
+#     visibility = ["//visibility:public"]
+# )
 
 ################  PIC  ################
 ## if unix and SUPPORTS_SHARED_LIBRARIES (i.e. has dlopen)
@@ -947,7 +1031,7 @@ cc_library( ## TODO: make a macro
         ":primitives_h"
     ],
     copts = [
-        "-x", "c",
+        # "-x", "c",
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",

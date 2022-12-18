@@ -3,9 +3,6 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-# load("//bzl/actions:module_impl.bzl", "module_impl")
-# load("//bzl/actions:expect_impl.bzl", "expect_impl")
-
 load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
@@ -25,6 +22,8 @@ load(":expect_test_impl.bzl", "expect_test_impl")
 ## then diffs it against expected output.
 
 ###############################################################
+####  MACRO
+################################################################
 def expect_test(name, stdout, expect, main, timeout = "short",
                 **kwargs):
 

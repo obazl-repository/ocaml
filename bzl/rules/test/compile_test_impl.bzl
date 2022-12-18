@@ -20,7 +20,7 @@ load("//bzl/rules/common:DEPS.bzl",
      "merge_depsets")
 
 #########################
-def compile_test_impl(ctx, exe_name):  ## , tc):
+def compile_test_impl(ctx, tc, exe_name, workdir):
 
     debug = False
     # if ctx.label.name == "test":
@@ -36,17 +36,20 @@ def compile_test_impl(ctx, exe_name):  ## , tc):
 
     # cc_toolchain = find_cpp_toolchain(ctx)
 
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
+    # tc = ctx.toolchains["//toolchain/type:ocaml"]
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
 
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
+
+    executor = tc.config_executor[BuildSettingInfo].value
+    emitter  = tc.config_emitter[BuildSettingInfo].value
 
     ################################################################
     ################  DEPS  ################

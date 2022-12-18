@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-load(":BUILD.bzl", "progress_msg", "get_build_executor")
+load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo",
@@ -25,7 +25,7 @@ load("//bzl/rules/common:DEPS.bzl",
      "merge_depsets")
 
 #########################
-def executable_impl(ctx, exe_name):  ## , tc):
+def executable_impl(ctx, tc, exe_name, workdir):
 
     debug = False
 

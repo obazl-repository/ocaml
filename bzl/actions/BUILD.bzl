@@ -159,7 +159,9 @@ def get_build_executor(tc):
 ###############################
 def progress_msg(workdir, ctx):
     rule = ctx.attr._rule
-    if rule in ["ocaml_compiler", "build_tool", "ocaml_lex", "ocaml_tool", "test_executable"]:
+    if rule in ["ocaml_compiler", "build_tool", "ocaml_lex",
+                "ocaml_tool_vm", "ocaml_tool_sys",
+                "test_executable"]:
         action = "Linking"
     elif rule in ["compiler_module", "build_module", "stdlib_module", "stdlib_internal_module", "kernel_module", "test_module", "tool_module", "ns_module"]:
         action = "Compiling"

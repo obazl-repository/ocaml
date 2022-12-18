@@ -98,6 +98,11 @@ def module_attrs():
 
         _verbose = attr.label(default = "//config/ocaml/compile:verbose"),
 
+        _keep_asm = attr.label(
+            doc = "Pass -S to retain asm sources",
+            default = "//config/ocaml/cc/asm:keep"
+        ),
+
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath") # ppx also uses this
         # ),

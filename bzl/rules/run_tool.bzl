@@ -1,14 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl/actions:executable_impl.bzl", "executable_impl")
-load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
-
-# load("//bzl/actions:module_impl.bzl", "module_impl")
-# load("//bzl/actions:expect_impl.bzl", "expect_impl")
-
-# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
-
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
 

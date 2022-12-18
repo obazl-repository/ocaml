@@ -1,35 +1,33 @@
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
+load("//toolchain/adapter:BUILD.bzl",
+     "tc_compiler", "tc_executable", "tc_tool_arg",
+     "tc_build_executor",
+     "tc_workdir")
+
 load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
 
-load("//bzl:functions.bzl", "get_workdir")
+# load("//bzl:functions.bzl", "get_workdir")
 
 ##############################
 def _test_executable_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
 
-    if config_executor in ["boot", "vm"]:
+    workdir = tc_workdir(tc)
+
+    if tc.config_executor[BuildSettingInfo].value in ["boot", "vm"]:
         ext = ".byte"
     else:
         ext = ".opt"
 
     exe_name = ctx.label.name + ext
 
-    return executable_impl(ctx, exe_name)
+    return executable_impl(ctx, tc, exe_name, workdir)
 
 #######################
 test_executable = rule(

@@ -13,11 +13,11 @@ load(":BUILD_RULES.bzl", "boot_coldstart", "boot_setup")
 alias(name = "coldstart", actual = ":bootstrap")
 
 boot_setup(
-    name = "setup",
-    runner = "setup_runner.sh",
+    name = "preproc",
+    runner = "preproc_runner.sh",
     data = [
         "@bazel_tools//tools/bash/runfiles",
-        "//vendor/mustach",
+        # generated code - cache it so it only gets generated once
         "//runtime:ints.c",
         "//runtime:primitives.dat",
         "//runtime:primitives.h",
@@ -30,9 +30,8 @@ boot_setup(
         "//runtime/caml:s.h",
         "//stdlib:stdlib.mli",
         "//stdlib:stdlib.ml",
+        "//vendor/mustach",
     ],
-    # deps = [
-    # ],
 )
 
 boot_coldstart(
@@ -43,9 +42,9 @@ boot_coldstart(
         "//runtime:asmrun",
         "//runtime:camlrun",
     ],
+    # lexer "//lex:ocamllex",
     data = [
-        "//bin:ocamlcc",
-        "//lex:ocamllex",
+        "//bin:ocamlcc",  ## runfiles contain all 4
         "//yacc:ocamlyacc",
         "@bazel_tools//tools/bash/runfiles",
         # "//stdlib:stdlib",
@@ -100,7 +99,7 @@ sh_binary(
     name = "ocamllex.sh",
     srcs = ["ocamllex.byte.sh"],
     data = [
-        ":ocamllex",
+        ":ocamllex.byte",
         "//runtime:ocamlrun"
     ],
     deps = ["@bazel_tools//tools/bash/runfiles"]

@@ -153,6 +153,13 @@ def get_options(rule, ctx):
                 if not "-keep-locs" in ctx.attr.opts: # avoid dup, use the one in opts
                     options.append("-keep-locs")
 
+    # if hasattr(ctx.attr, "_keep_asm"):
+    #     ## only if target_executor == "sys"
+    #     if ctx.attr._keep_asm[BuildSettingInfo].value:
+    #         if not "-no-keep-asm" in ctx.attr.opts:
+    #             if not "-keep-asm" in ctx.attr.opts: # avoid dup, use the one in opts
+    #                 options.append("-S")
+
     if hasattr(ctx.attr, "_noassert"):
         if ctx.attr._noassert[BuildSettingInfo].value:
             if not "-no-noassert" in ctx.attr.opts:

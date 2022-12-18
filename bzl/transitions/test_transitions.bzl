@@ -3,6 +3,9 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 #####################################################
 def _vv_test_in_transition_impl(settings, attr):
     ## set //config/target/executor, emitter to vm
+
+    ## FIXME: can we use two tc adapters instead of transitioning?
+
     return {
         "//config/target/executor": "vm",
         "//config/target/emitter" : "vm",
@@ -12,10 +15,7 @@ def _vv_test_in_transition_impl(settings, attr):
 #######################
 vv_test_in_transition = transition(
     implementation = _vv_test_in_transition_impl,
-    inputs = [
-        # "//config/target/executor",
-        # "//config/target/emitter",
-    ],
+    inputs = [],
     outputs = [
         "//config/target/executor",
         "//config/target/emitter",

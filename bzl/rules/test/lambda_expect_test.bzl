@@ -2,8 +2,6 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl/actions:module_impl.bzl", "module_impl")
 
-# load("//bzl/actions:lambda_expect_impl.bzl", "lambda_expect_impl")
-
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")

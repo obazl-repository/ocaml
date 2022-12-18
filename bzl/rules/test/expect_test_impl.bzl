@@ -3,9 +3,6 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-# load("//bzl/actions:module_impl.bzl", "module_impl")
-# load("//bzl/actions:expect_impl.bzl", "expect_impl")
-
 load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
@@ -26,23 +23,26 @@ def expect_test_impl(ctx):
     debug = True
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
 
-    if debug == True:
-        print("EXPECT_TEST: %s" % ctx.label)
-        print("config_executor: %s" % config_executor)
-        print("config_emitter: %s" % config_emitter)
+    workdir = tc_workdir(tc)
 
-    if config_executor in ["boot", "vm"]:
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
+
+    # if debug == True:
+    #     print("EXPECT_TEST: %s" % ctx.label)
+    #     print("config_executor: %s" % config_executor)
+    #     print("config_emitter: %s" % config_emitter)
+
+    if tc.config_executor[BuildSettingInfo].value in ["boot", "vm"]:
         ext      = ".byte"
     else:
         ext      = ".opt"
 
     exe_name = ctx.label.name + ext
 
-    exe = executable_impl(ctx, exe_name)
+    exe = executable_impl(ctx, tc, exe_name, workdir)
 
     if debug:
         print("exe: %s" % exe)

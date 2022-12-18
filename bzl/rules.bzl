@@ -7,7 +7,11 @@ load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
 load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
 load("//bzl/rules:build_tool.bzl", _build_tool = "build_tool")
-load("//bzl/rules:ocaml_tool.bzl", _ocaml_tool = "ocaml_tool")
+load("//bzl/rules:ocaml_tool.bzl",
+     _ocaml_tool = "ocaml_tool",
+     _ocaml_tool_vm = "ocaml_tool_vm",
+     _ocaml_tool_sys = "ocaml_tool_sys",
+     )
 load("//bzl/rules:build_module.bzl", _build_module = "build_module")
 
 load("//bzl/rules:boot_import_vm_executable.bzl", _boot_import_vm_executable = "boot_import_vm_executable")
@@ -68,7 +72,9 @@ compiler_signature   = _compiler_signature
 
 # boot_compiler    = _boot_compiler
 ocaml_compiler    = _ocaml_compiler
-ocaml_tool      = _ocaml_tool
+ocaml_tool         = _ocaml_tool
+ocaml_tool_vm      = _ocaml_tool_vm
+ocaml_tool_sys     = _ocaml_tool_sys
 
 # ocamlc_runtime    = _ocamlc_runtime
 # ocamlc_fixpoint    = _ocamlc_fixpoint

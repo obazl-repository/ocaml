@@ -3,6 +3,8 @@ load("@bazel_skylib//lib:collections.bzl", "collections")
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+load("//toolchain/adapter:BUILD.bzl", "tc_compiler", "tc_workdir")
+
 load("//bzl:providers.bzl",
      "BootInfo", "DumpInfo", "ModuleInfo", "NsResolverInfo",
      "new_deps_aggregator", "OcamlSignatureProvider")
@@ -44,18 +46,19 @@ def _compile_fail_test(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    (target_executor, target_emitter,
-     config_executor, config_emitter,
-     workdir) = get_workdir(ctx, tc)
+    workdir = tc_workdir(tc)
+    # (target_executor, target_emitter,
+    #  config_executor, config_emitter,
+    #  workdir) = get_workdir(ctx, tc)
 
-    if target_executor == "unspecified":
-        executor = config_executor
-        emitter  = config_emitter
-    else:
-        executor = target_executor
-        emitter  = target_emitter
+    # if target_executor == "unspecified":
+    #     executor = config_executor
+    #     emitter  = config_emitter
+    # else:
+    #     executor = target_executor
+    #     emitter  = target_emitter
 
-    if executor in ["boot", "baseline", "vm"]:
+    if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
         ext = ".cmo"
     else:
         ext = ".cmx"

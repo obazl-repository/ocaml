@@ -1,7 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load(":transitions.bzl",
-     "ocaml_tool_in_transition_impl",
      "tc_boot_in_transition_impl",
      "tc_compiler_out_transition_impl",
      "tc_lexer_out_transition_impl",
@@ -63,8 +62,8 @@ tc_compiler_out_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        # "//toolchain:lexer",
-        # "//toolchain:runtime",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
     ]
 )
 
@@ -99,7 +98,9 @@ tc_lexer_out_transition = transition(
     outputs = [
         "//config/target/executor",
         "//config/target/emitter",
+        "//toolchain:compiler",
         "//toolchain:lexer",
+        "//toolchain:runtime",
     ]
 )
 #####################################################
@@ -118,16 +119,19 @@ def _tc_runtime_out_transition_impl(settings, attr):
 tc_runtime_out_transition = transition(
     implementation = _tc_runtime_out_transition_impl,
     inputs = [
-        "//toolchain:runtime",
-
         "//config/target/executor",
         "//config/target/emitter",
-        "//toolchain/target/executor",
-        "//toolchain/target/emitter",
+
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
     ],
     outputs = [
         "//config/target/executor",
         "//config/target/emitter",
+
+        "//toolchain:compiler",
+        "//toolchain:lexer",
         "//toolchain:runtime",
     ]
 )
@@ -157,38 +161,22 @@ tc_mustache_out_transition = transition(
         # "//command_line_option:platforms",
         # "//config/target/runtime",
 
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain/target/executor",
+        "//toolchain/target/emitter",
+
         "//toolchain:compiler",
         "//toolchain:lexer",
         "//toolchain:runtime",
-
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain/target/executor",
-        "//toolchain/target/emitter",
-
-        # "//config/stage",
-        # "//toolchain:compiler",
-        # "//toolchain:lexer"
-        # "//toolchain:runtime"
     ],
     outputs = [
-        # "//command_line_option:host_platform",
-        # "//command_line_option:extra_execution_platforms",
-        # "//command_line_option:platforms",
-        # "//config/stage",
-
-        "//command_line_option:host_compilation_mode",
-        "//command_line_option:compilation_mode",
-
-        "//toolchain/target/executor",
-        "//toolchain/target/emitter",
-
         "//config/target/executor",
         "//config/target/emitter",
 
-        # "//toolchain:compiler",
-        # "//toolchain:lexer",
-        # "//toolchain:runtime",
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
     ]
 )
 
@@ -237,51 +225,6 @@ tc_boot_in_transition = transition(
         # "//command_line_option:platforms",
         # "//config/stage",
 
-        "//command_line_option:host_compilation_mode",
-        "//command_line_option:compilation_mode",
-
-        "//toolchain/target/executor",
-        "//toolchain/target/emitter",
-
-        "//config/target/executor",
-        "//config/target/emitter",
-
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-    ]
-)
-
-#####################################################
-def _ocaml_tool_in_transition_impl(settings, attr):
-    print("ocaml_tool_in_transition")
-    debug = False
-    return ocaml_tool_in_transition_impl(settings, attr, debug)
-
-#######################
-ocaml_tool_in_transition = transition(
-    implementation = _ocaml_tool_in_transition_impl,
-    inputs = [
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain/target/executor",
-        "//toolchain/target/emitter",
-
-        # "//config/stage",
-        # "//toolchain:compiler",
-        # "//toolchain:lexer"
-        # "//toolchain:runtime"
-    ],
-    outputs = [
-        # "//command_line_option:host_platform",
-        # "//command_line_option:extra_execution_platforms",
-        # "//command_line_option:platforms",
-        # "//config/stage",
-
         # "//command_line_option:host_compilation_mode",
         # "//command_line_option:compilation_mode",
 
@@ -291,9 +234,9 @@ ocaml_tool_in_transition = transition(
         "//config/target/executor",
         "//config/target/emitter",
 
-        # "//toolchain:compiler",
-        # "//toolchain:lexer",
-        # "//toolchain:runtime",
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
     ]
 )
 

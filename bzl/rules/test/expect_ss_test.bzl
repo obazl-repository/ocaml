@@ -1,15 +1,6 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
-
-# load("//bzl/actions:module_impl.bzl", "module_impl")
-# load("//bzl/actions:expect_impl.bzl", "expect_impl")
-
-# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
-
-# load("//bzl/transitions:dev_transitions.bzl",
-#      "dev_tc_compiler_out_transition")
 
 load("//bzl/transitions:test_transitions.bzl", "ss_test_in_transition")
 
@@ -44,6 +35,7 @@ expect_ss_test = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
     ),
+    ## FIXME: use two toolchain adapters instead of transitioning?
     cfg = ss_test_in_transition,
     test = True,
     fragments = ["cpp"],
