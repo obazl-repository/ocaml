@@ -324,9 +324,6 @@ def ocaml_compilers(name,
             "-cclib", "-lpthread",
         ],
         "//conditions:default": []
-    }) + select({
-        "//config/target/executor:sys_executor?": ["-S"],
-        "//conditions:default": []
     }),
         cc_linkopts = select({
             "@platforms//os:macos": [ ## FIXME: default tc, not zig
@@ -350,8 +347,6 @@ def ocaml_compilers(name,
                         # "//config/target:ult_sys?": ["//asmcomp:ocamloptcomp"],
 
         "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-
-        # "//toolchain/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
         "//conditions:default": ["//bytecomp:ocamlbytecomp"]
                     }),
         main = select({
@@ -360,8 +355,6 @@ def ocaml_compilers(name,
             # "//config/target:ult_sys?": "//driver:Optmain",
 
         "//config/target/emitter:sys_emitter?": "//driver:Optmain",
-            # "//toolchain/target/emitter:sys_emitter?": "//driver:Optmain",
-
         "//conditions:default": "//driver:Main"
         }),
         # cc_deps = ["//runtime:asmrun"],
@@ -399,9 +392,6 @@ def ocaml_compilers(name,
             "-cclib", "-lpthread",
         ],
         "//conditions:default": []
-    }) + select({
-        "//config/target/executor:sys_executor?": ["-S"],
-        "//conditions:default": []
     }),
         cc_linkopts = select({
             "@platforms//os:macos": [ ## FIXME: default tc, not zig
@@ -418,25 +408,14 @@ def ocaml_compilers(name,
                 ##FIXME: depends on linker used (bfd, gold, etc.)
         ]
         }),
-        prologue = ["//compilerlibs:ocamlcommon",
-                    ] + select({
-                        # "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],
-                        # "//config/target:baseline_sys?": ["//asmcomp:ocamloptcomp"],
-                        # "//config/target:ult_sys?": ["//asmcomp:ocamloptcomp"],
-
-        "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-
-        # "//toolchain/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-        "//conditions:default": ["//bytecomp:ocamlbytecomp"]
-                    }),
+        prologue = [
+            "//compilerlibs:ocamlcommon",
+        ] + select({
+            "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
+            "//conditions:default": ["//bytecomp:ocamlbytecomp"]
+        }),
         main = select({
-            # "//config/target:baseline_vm?": "//driver:Main",
-            # "//config/target:baseline_sys?": "//driver:Optmain",
-            # "//config/target:ult_sys?": "//driver:Optmain",
-
         "//config/target/emitter:sys_emitter?": "//driver:Optmain",
-            # "//toolchain/target/emitter:sys_emitter?": "//driver:Optmain",
-
         "//conditions:default": "//driver:Main"
         }),
         # cc_deps = ["//runtime:asmrun"],
@@ -474,9 +453,6 @@ def ocaml_compilers(name,
             "-cclib", "-lpthread",
         ],
         "//conditions:default": []
-    }) + select({
-        "//config/target/executor:sys_executor?": ["-S"],
-        "//conditions:default": []
     }),
         cc_linkopts = select({
             "@platforms//os:macos": [ ## FIXME: default tc, not zig
@@ -493,26 +469,15 @@ def ocaml_compilers(name,
                 ##FIXME: depends on linker used (bfd, gold, etc.)
         ]
         }),
-        prologue = ["//compilerlibs:ocamlcommon",
-                    ] + select({
-                        # "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],
-                        # "//config/target:baseline_sys?": ["//asmcomp:ocamloptcomp"],
-                        # "//config/target:ult_sys?": ["//asmcomp:ocamloptcomp"],
-
-        "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-
-        # "//toolchain/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-        "//conditions:default": ["//bytecomp:ocamlbytecomp"]
-                    }),
+        prologue = [
+            "//compilerlibs:ocamlcommon",
+        ] + select({
+            "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
+            "//conditions:default": ["//bytecomp:ocamlbytecomp"]
+        }),
         main = select({
-            # "//config/target:baseline_vm?": "//driver:Main",
-            # "//config/target:baseline_sys?": "//driver:Optmain",
-            # "//config/target:ult_sys?": "//driver:Optmain",
-
-        "//config/target/emitter:sys_emitter?": "//driver:Optmain",
-            # "//toolchain/target/emitter:sys_emitter?": "//driver:Optmain",
-
-        "//conditions:default": "//driver:Main"
+            "//config/target/emitter:sys_emitter?": "//driver:Optmain",
+            "//conditions:default": "//driver:Main"
         }),
         # cc_deps = ["//runtime:asmrun"],
         visibility = visibility
@@ -549,9 +514,6 @@ def ocaml_compilers(name,
             "-cclib", "-lpthread",
         ],
         "//conditions:default": []
-    }) + select({
-        "//config/target/executor:sys_executor?": ["-S"],
-        "//conditions:default": []
     }),
         cc_linkopts = select({
             "@platforms//os:macos": [ ## FIXME: default tc, not zig
@@ -568,26 +530,15 @@ def ocaml_compilers(name,
                 ##FIXME: depends on linker used (bfd, gold, etc.)
         ]
         }),
-        prologue = ["//compilerlibs:ocamlcommon",
-                    ] + select({
-                        # "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],
-                        # "//config/target:baseline_sys?": ["//asmcomp:ocamloptcomp"],
-                        # "//config/target:ult_sys?": ["//asmcomp:ocamloptcomp"],
-
-        "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-
-        # "//toolchain/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-        "//conditions:default": ["//bytecomp:ocamlbytecomp"]
-                    }),
+        prologue = [
+            "//compilerlibs:ocamlcommon",
+        ] + select({
+            "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
+            "//conditions:default": ["//bytecomp:ocamlbytecomp"]
+        }),
         main = select({
-            # "//config/target:baseline_vm?": "//driver:Main",
-            # "//config/target:baseline_sys?": "//driver:Optmain",
-            # "//config/target:ult_sys?": "//driver:Optmain",
-
-        "//config/target/emitter:sys_emitter?": "//driver:Optmain",
-            # "//toolchain/target/emitter:sys_emitter?": "//driver:Optmain",
-
-        "//conditions:default": "//driver:Main"
+            "//config/target/emitter:sys_emitter?": "//driver:Optmain",
+            "//conditions:default": "//driver:Main"
         }),
         # cc_deps = ["//runtime:asmrun"],
         visibility = visibility

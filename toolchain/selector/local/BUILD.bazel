@@ -84,8 +84,6 @@ toolchain_selector(
     target_host_configuration = [
         "//config/target/executor:vm_executor?",
         "//config/target/emitter:sys_emitter?",
-        # "//toolchain/target/executor:vm_executor?",
-        # "//toolchain/target/emitter:sys_emitter?"
     ]
 )
 

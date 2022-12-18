@@ -66,13 +66,7 @@ test_executable(
     }),
     prologue = ["//compilerlibs:ocamlcommon",
                 ] + select({
-        # "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],
-        # "//config/target:baseline_sys?": ["//asmcomp:ocamloptcomp"],
-        # "//config/target:ult_sys?": ["//asmcomp:ocamloptcomp"],
-
         "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-
-        # "//toolchain/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
         "//conditions:default": ["//bytecomp:ocamlbytecomp"]
     }) + [
         "//otherlibs/unix:unix_lib",

@@ -14,8 +14,7 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
 
     ## we use the CLI string flags in //config/...
     ## to set string settings in //toolchain/...
-    target_executor = settings["//toolchain/target/executor"]
-    target_emitter  = settings["//toolchain/target/emitter"]
+
     config_executor = settings["//config/target/executor"]
     config_emitter  = settings["//config/target/emitter"]
     # target_runtime  = settings["//toolchain:runtime"]
@@ -38,10 +37,6 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
             "//config/target/executor"])
         print("//config/target/emitter:  %s" % settings[
             "//config/target/emitter"])
-        print("//toolchain/target/executor: %s" % settings[
-            "//toolchain/target/executor"])
-        print("//toolchain/target/emitter:  %s" % settings[
-            "//toolchain/target/emitter"])
 
         print("//toolchain/dev:compiler  %s" % compiler)
         print("//toolchain/dev:lexer  %s" % lexer)
@@ -75,64 +70,28 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
         print("setting camlheaders:   %s" % camlheaders)
 
     return {
-        # "//command_line_option:host_compilation_mode": "opt",
-        # "//command_line_option:compilation_mode": "opt",
-        # "//config/target/executor": config_executor,
-        # "//config/target/emitter" : config_emitter,
-        # "//toolchain/target/executor": target_executor,
-
         "//toolchain/dev:compiler": compiler,
         "//toolchain/dev:runtime"  : runtime,
         "//toolchain/dev:camlheaders"  : camlheaders,
 
-        "//toolchain/target/emitter" : config_emitter,
-
-        # "//toolchain/dev:lexer"   : lexer,
     }
 
 #######################
 dev_tc_compiler_out_transition = transition(
     implementation = _dev_tc_compiler_out_transition_impl,
     inputs = [
-        # "//command_line_option:host_platform",
-        # "//command_line_option:extra_execution_platforms",
-        # "//command_line_option:platforms",
-        # "//config/target/runtime",
+        "//config/target/executor",
+        "//config/target/emitter",
+        # "//toolchain/dev:camlheaders",
 
         "//toolchain/dev:compiler",
         "//toolchain/dev:lexer",
         "//toolchain/dev:runtime",
-
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain/target/executor",
-        "//toolchain/target/emitter",
-
-        "//toolchain/dev:camlheaders",
-
-        # "//config/stage",
-        # "//toolchain/dev:compiler",
-        # "//toolchain:lexer"
-        # "//toolchain:runtime"
     ],
     outputs = [
-        # "//command_line_option:host_platform",
-        # "//command_line_option:extra_execution_platforms",
-        # "//command_line_option:platforms",
-        # "//config/stage",
-
-        # "//command_line_option:host_compilation_mode",
-        # "//command_line_option:compilation_mode",
-        # "//config/target/executor",
-        # "//config/target/emitter",
-        # "//toolchain/target/executor",
-
-        "//toolchain/target/emitter",
         "//toolchain/dev:compiler",
         "//toolchain/dev:runtime",
 
         "//toolchain/dev:camlheaders",
-
-        # "//toolchain:lexer",
     ]
 )

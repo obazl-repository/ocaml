@@ -12,19 +12,15 @@ def _dev_toolchain_adapter_impl(ctx):
     ## avoid transition?
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
-        dev                    = True,
-        # _stage                 = ctx.attr._stage,
-        # build_host             = ctx.attr.build_host,
-        # target_host            = ctx.attr.target_host,
-        # _build_executor        = ctx.attr._build_executor,
-        # build_emitter          = ctx.attr.build_emitter,
-        # target_runtime         = ctx.attr.target_runtime,
+        dev                    = ctx.attr.dev,
 
-        config_executor        = ctx.attr.config_executor,
-        config_emitter         = ctx.attr.config_emitter,
+        build_executor         = tc_build_executor(ctx),
 
-        target_executor        = ctx.attr.target_executor, # [TargetInfo],
-        target_emitter         = ctx.attr.target_emitter,
+        config_executor        = _config_executor,
+        config_emitter         = _config_emitter,
+
+        workdir                = tc_workdir(ctx),
+
         runtime                = ctx.file.runtime, # camlrun, asmrun
         ## vm
         ocamlrun               = ctx.file.ocamlrun,
@@ -58,8 +54,6 @@ dev_toolchain_adapter = rule(
     attrs = {
         "config_executor": attr.label(default = "//config/target/executor"),
         "config_emitter" : attr.label(default = "//config/target/emitter"),
-        "target_executor": attr.label(default = "//toolchain/target/executor"),
-        "target_emitter" : attr.label(default = "//toolchain/target/emitter"),
 
         "ocamlrun": attr.label(
             doc = "ocaml",

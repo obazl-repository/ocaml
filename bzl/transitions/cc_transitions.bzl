@@ -45,8 +45,7 @@ reset_cc_config_transition = transition(
     outputs = [
         "//command_line_option:host_compilation_mode",
         "//command_line_option:compilation_mode",
-        "//toolchain/target/executor",
-        "//toolchain/target/emitter",
+k
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",

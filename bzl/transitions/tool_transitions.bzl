@@ -2,12 +2,10 @@
 def _ocaml_tool_in_transition_impl(settings, attr, debug):
 
     print("ocaml_tool_in_transition")
-    debug = False
+    debug = True
 
     ## we use the CLI string flags in //config/...
     ## to set string settings in //toolchain/...
-    target_executor = settings["//toolchain/target/executor"]
-    target_emitter  = settings["//toolchain/target/emitter"]
     config_executor = settings["//config/target/executor"]
     config_emitter  = settings["//config/target/emitter"]
     # target_runtime  = settings["//toolchain:runtime"]
@@ -24,10 +22,6 @@ def _ocaml_tool_in_transition_impl(settings, attr, debug):
 
     if debug:
         # print("//config/stage: %s" % stage)
-        print("//toolchain/target/executor: %s" % settings[
-            "//toolchain/target/executor"])
-        print("//toolchain/target/emitter:  %s" % settings[
-            "//toolchain/target/emitter"])
         print("//config/target/executor: %s" % settings[
             "//config/target/executor"])
         print("//config/target/emitter:  %s" % settings[
@@ -130,19 +124,12 @@ def _ocaml_tool_in_transition_impl(settings, attr, debug):
         fail("xxxxxxxxxxxxxxxx %s" % config_executor)
 
     if debug:
-        # print("setting //toolchain/target/executor: %s" % target_executor)
-        # print("setting //toolchain/target/emitter: %s" % target_emitter)
         print("setting //config/target/executor: %s" % config_executor)
         print("setting //config/target/emitter: %s" % config_emitter)
         print("setting //toolchain:compiler %s" % compiler)
         print("setting //toolchain:lexer %s" % lexer)
 
     return {
-        # "//command_line_option:host_compilation_mode": "opt",
-        # "//command_line_option:compilation_mode": "opt",
-
-        # "//toolchain/target/executor": target_executor,
-        # "//toolchain/target/emitter" : target_emitter,
         "//config/target/executor": config_executor,
         "//config/target/emitter" : config_emitter,
     }
@@ -151,19 +138,12 @@ def _ocaml_tool_in_transition_impl(settings, attr, debug):
 ocaml_tool_in_transition = transition(
     implementation = _ocaml_tool_in_transition_impl,
     inputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+
         "//toolchain:compiler",
         "//toolchain:lexer",
         "//toolchain:runtime",
-
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain/target/executor",
-        "//toolchain/target/emitter",
-
-        # "//config/stage",
-        # "//toolchain:compiler",
-        # "//toolchain:lexer"
-        # "//toolchain:runtime"
     ],
     outputs = [
         "//config/target/executor",
@@ -277,11 +257,17 @@ def _ocamlopt_byte_in_transition_impl(settings, attr):
     debug = True
     if debug: print("ocamlopt_byte_in_transition")
 
-    config_executor = "vm"
-    config_emitter  = "sys"
-    compiler = "//bin:ocamlc.byte"
-    lexer    = "//lex:ocamllex.sys"
-    runtime  = "//runtime:asmrun"
+    config_executor = "baseline"
+    config_emitter  = "baseline"
+
+    if settings["//config:dev"] == True:
+        compiler = "@baseline//bin:ocamlc.opt"
+        lexer    = "@baseline//bin:ocamllex.opt"
+        runtime  = "@baseline//bin:ocamlrun"
+    else:
+        compiler = "//bin:ocamlcc"
+        lexer    = "//lex:ocamllex"
+        runtime  = "//runtime:asmrun"
 
     return {
         "//config/target/executor": config_executor,
@@ -294,7 +280,7 @@ def _ocamlopt_byte_in_transition_impl(settings, attr):
 ################################################################
 ocamlopt_byte_in_transition = transition(
     implementation = _ocamlopt_byte_in_transition_impl,
-    inputs = [],
+    inputs = ["//config:dev"],
     outputs = [
         "//config/target/executor",
         "//config/target/emitter",

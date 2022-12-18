@@ -37,9 +37,6 @@ ocaml_compiler(
             "-cclib", "-lpthread",
         ],
         "//conditions:default": []
-    }) + select({
-        "//config/target/executor:sys_executor?": ["-S"],
-        "//conditions:default": []
     }),
     cc_linkopts = select({
         "@platforms//os:macos": [ ## FIXME: default tc, not zig
@@ -64,7 +61,6 @@ ocaml_compiler(
 
         "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
 
-        # "//toolchain/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
         "//conditions:default": ["//bytecomp:ocamlbytecomp"]
     }),
     main = select({
@@ -73,7 +69,6 @@ ocaml_compiler(
         # "//config/target:ult_sys?": "//driver:Optmain",
 
         "//config/target/emitter:sys_emitter?": "//driver:Optmain",
-        # "//toolchain/target/emitter:sys_emitter?": "//driver:Optmain",
 
         "//conditions:default": "//driver:Main"
     }),
@@ -113,9 +108,6 @@ ocaml_compilers(
             "-cclib", "-lpthread",
         ],
         "//conditions:default": []
-    }) + select({
-        "//config/target/executor:sys_executor?": ["-S"],
-        "//conditions:default": []
     }),
     cc_linkopts = select({
         "@platforms//os:macos": [ ## FIXME: default tc, not zig
@@ -140,7 +132,6 @@ ocaml_compilers(
 
         "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
 
-        # "//toolchain/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
         "//conditions:default": ["//bytecomp:ocamlbytecomp"]
     }),
     main = select({
@@ -149,7 +140,6 @@ ocaml_compilers(
         # "//config/target:ult_sys?": "//driver:Optmain",
 
         "//config/target/emitter:sys_emitter?": "//driver:Optmain",
-        # "//toolchain/target/emitter:sys_emitter?": "//driver:Optmain",
 
         "//conditions:default": "//driver:Main"
     }),

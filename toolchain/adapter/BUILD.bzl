@@ -27,9 +27,6 @@ def tc_build_executor(ctx):
         # how target executor/emitter combinations are built,
         # so we can infer build executor from that pair.
 
-        # target_executor = ctx.attr.target_executor[BuildSettingInfo].value
-        # target_emitter  = ctx.attr.target_emitter[BuildSettingInfo].value
-
         ## NB: "config" means target (//config/target/[executor|emitter])
         t_executor = ctx.attr.config_executor[BuildSettingInfo].value
         t_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
@@ -212,8 +209,8 @@ def _toolchain_adapter_impl(ctx):
         config_executor        = config_executor,
         config_emitter         = config_emitter,
 
-        target_executor        = ctx.attr.target_executor, # [TargetInfo],
-        target_emitter         = ctx.attr.target_emitter,
+        # target_executor        = ctx.attr.target_executor, # [TargetInfo],
+        # target_emitter         = ctx.attr.target_emitter,
 
         workdir                = tc_workdir(ctx),
 
@@ -272,8 +269,6 @@ toolchain_adapter = rule(
 
         "config_executor": attr.label(default = "//config/target/executor"),
         "config_emitter" : attr.label(default = "//config/target/emitter"),
-        "target_executor": attr.label(default = "//toolchain/target/executor"),
-        "target_emitter" : attr.label(default = "//toolchain/target/emitter"),
 
         "ocamlrun": attr.label(
             doc = "ocaml",

@@ -2,11 +2,12 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 ##############################################
 def _tc_target_transitions(settings, attr, debug):
+    debug = True
+    if debug: print("tc_target_transitions")
 
     ## we use the CLI string flags in //config/...
     ## to set string settings in //toolchain/...
-    # target_executor = settings["//toolchain/target/executor"]
-    # target_emitter  = settings["//toolchain/target/emitter"]
+
     config_executor = settings["//config/target/executor"]
     config_emitter  = settings["//config/target/emitter"]
     # target_runtime  = settings["//toolchain:runtime"]
@@ -23,10 +24,6 @@ def _tc_target_transitions(settings, attr, debug):
 
     if debug:
         # print("//config/stage: %s" % stage)
-        # print("//toolchain/target/executor: %s" % settings[
-        #     "//toolchain/target/executor"])
-        # print("//toolchain/target/emitter:  %s" % settings[
-        #     "//toolchain/target/emitter"])
         print("//config/target/executor: %s" % settings[
             "//config/target/executor"])
         print("//config/target/emitter:  %s" % settings[
@@ -65,6 +62,8 @@ def _tc_target_transitions(settings, attr, debug):
 ##############################################
 def tc_compiler_out_transition_impl(settings, attr, debug):
 
+    debug = True
+
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
     # compiler = settings["//toolchain:compiler"]
@@ -102,19 +101,12 @@ def tc_compiler_out_transition_impl(settings, attr, debug):
     #     fail("xxxxxxxxxxxxxxxx %s" % config_executor)
 
     if debug:
-        # print("setting //toolchain/target/executor: %s" % target_executor)
-        # print("setting //toolchain/target/emitter: %s" % target_emitter)
         print("setting //config/target/executor: %s" % config_executor)
         print("setting //config/target/emitter: %s" % config_emitter)
         print("setting //toolchain:compiler %s" % compiler)
         # print("setting //toolchain:lexer %s" % lexer)
 
     return {
-        # "//command_line_option:host_compilation_mode": "opt",
-        # "//command_line_option:compilation_mode": "opt",
-
-        # "//toolchain/target/executor": target_executor,
-        # "//toolchain/target/emitter" : target_emitter,
         "//config/target/executor": config_executor,
         "//config/target/emitter" : config_emitter,
 
@@ -125,6 +117,8 @@ def tc_compiler_out_transition_impl(settings, attr, debug):
 
 ##############################################
 def tc_lexer_out_transition_impl(settings, attr, debug):
+
+    debug = True
 
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
@@ -160,19 +154,12 @@ def tc_lexer_out_transition_impl(settings, attr, debug):
     #     fail("xxxxxxxxxxxxxxxx %s" % config_executor)
 
     if debug:
-        # print("setting //toolchain/target/executor: %s" % target_executor)
-        # print("setting //toolchain/target/emitter: %s" % target_emitter)
         print("setting //config/target/executor: %s" % config_executor)
         print("setting //config/target/emitter: %s" % config_emitter)
         # print("setting //toolchain:compiler %s" % compiler)
         print("setting //toolchain:lexer %s" % lexer)
 
     return {
-        # "//command_line_option:host_compilation_mode": "opt",
-        # "//command_line_option:compilation_mode": "opt",
-        # "//toolchain/target/executor": target_executor,
-        # "//toolchain/target/emitter" : target_emitter,
-
         "//config/target/executor": config_executor,
         "//config/target/emitter" : config_emitter,
 
@@ -183,6 +170,8 @@ def tc_lexer_out_transition_impl(settings, attr, debug):
 
 ##############################################
 def tc_runtime_out_transition_impl(settings, attr, debug):
+
+    debug = True
 
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
@@ -227,14 +216,13 @@ def tc_runtime_out_transition_impl(settings, attr, debug):
 
 ##############################################
 def tc_mustache_transition_impl(settings, attr, debug):
-    print("tc_mustache_transition_impl")
+    debug = True
+
+    if debug: print("tc_mustache_transition_impl")
 
     return {
         # "//command_line_option:host_compilation_mode": "opt",
         # "//command_line_option:compilation_mode": "opt",
-
-        # "//toolchain/target/executor": "boot",
-        # "//toolchain/target/emitter" : "boot",
 
         "//config/target/executor": "boot",
         "//config/target/emitter" : "boot",
@@ -246,15 +234,20 @@ def tc_mustache_transition_impl(settings, attr, debug):
 
 ##############################################
 def tc_boot_in_transition_impl(settings, attr, debug):
-    print("tc_boot_in_transition_impl")
+    debug = True
+
+    if debug: print("tc_boot_in_transition_impl")
+
+    if settings["//config:dev"] == True:
+        compiler = "@baseline//bin:ocamlc.opt"
+        lexer    = "@baseline//bin:ocamllex.opt"
+        runtime  = "@baseline//bin:ocamlrun"
+    else:
+        compiler = "//boot:ocamlc.boot"
+        lexer    = "//boot:ocamllex.boot"
+        runtime  = "//runtime:asmrun"
 
     return {
-        # "//command_line_option:host_compilation_mode": "opt",
-        # "//command_line_option:compilation_mode": "opt",
-
-        # "//toolchain/target/executor": "boot",
-        # "//toolchain/target/emitter" : "boot",
-
         "//config/target/executor": "boot",
         "//config/target/emitter" : "boot",
 
@@ -267,12 +260,11 @@ def tc_boot_in_transition_impl(settings, attr, debug):
 ## reset_config_transition
 # reset stage to 0 (_boot) so runtime is only built once
 def reset_config_transition_impl(settings, attr):
-    print("reset_config_transition: %s" % attr.name)
+    debug = True
+
+    if debug: print("reset_config_transition: %s" % attr.name)
 
     return {
-        # "//toolchain/target/executor": "boot",
-        # "//toolchain/target/emitter" : "boot",
-
         "//config/target/executor": "boot",
         "//config/target/emitter" : "boot",
 

@@ -60,43 +60,43 @@ compiler, so they are not fully "new". The native compilers
 | Nat | ^| Compiler ^| Lexer | Config
 
 | Z | 0 | ocamlc.boot | ocamllex.boot
-| `//toolchain/target/executor:boot` +
-`//toolchain/target/emitter:boot` +
+| `//'config/target/executor:boot` +
+`//'config/target/emitter:boot` +
 `//toolchain:compiler` = `//boot:ocamlc.boot` +
 `//toolchain:lexer`      = `//boot:ocamllex.boot` +
 `//toolchain:runtime` = `//runtime:camlrun`
 
 | SZ | 1 | ocamlc.baseline | ocamllex.boot
-| `//toolchain/target/executor:baseline` +
-`//toolchain/target/emitter:baseline` +
+| `//'config/target/executor:baseline` +
+`//'config/target/emitter:baseline` +
 `//toolchain:compiler` = `//boot:ocamlc.boot` +
 `//toolchain:lexer`       = `//boot:ocamllex.boot` +
 `//toolchain:runtime` = `//runtime:camlrun`
 
 | SSZ | 2 | ocamlc.byte | ocamllex.byte
-| `//toolchain/target/executor:vm` +
-`//toolchain/target/emitter:vm` +
+| `//'config/target/executor:vm` +
+`//'config/target/emitter:vm` +
 `//toolchain:compiler` = `//bin:ocamlcc` +
 `//toolchain:lexer` = `//bin:ocamllex` +
 `//toolchain:runtime` = `//runtime:camlrun`
 
 | SSSZ | 3 | ocamlopt.byte |
-| `//toolchain/target/executor:vm` +
-`//toolchain/target/emitter:sys` +
+| `//'config/target/executor:vm` +
+`//'config/target/emitter:sys` +
 `//toolchain:compiler` = `//bin:ocamlcc` +
 `//toolchain:lexer` = `//bin:ocamllex` +
 `//toolchain:runtime` = `//runtime:asmrun`
 
 | SSSSZ | 4 | ocamlopt.opt | ocamllex.opt
-| `//toolchain/target/executor:sys` +
-`//toolchain/target/emitter:sys` +
+| `//'config/target/executor:sys` +
+`//'config/target/emitter:sys` +
 `//toolchain:compiler` = `//bin:ocamlcc` +
 `//toolchain:lexer` = `//bin:ocamllex` +
 `//toolchain:runtime` = `//runtime:asmrun`
 
 | SSSSSZ | 5 | ocamlc.opt |
-| `//toolchain/target/executor:sys` +
-`//toolchain/target/emitter:vm` +
+| `//'config/target/executor:sys` +
+`//'config/target/emitter:vm` +
 `//toolchain:compiler` = `//bin:ocamlcc` +
 `//toolchain:lexer` = `//bin:ocamllex` +
 `//toolchain:runtime` = `//runtime:camlrun`
