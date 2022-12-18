@@ -159,7 +159,10 @@ def get_build_executor(tc):
 ###############################
 def progress_msg(workdir, ctx):
     rule = ctx.attr._rule
-    if rule in ["ocaml_compiler", "build_tool", "ocaml_lex",
+    if rule in ["ocaml_compiler",
+                "ocamlc_byte", "ocamlopt_byte",
+                "ocamlopt_opt", "ocamlc_opt",
+                "build_tool", "ocaml_lex",
                 "ocaml_tool_vm", "ocaml_tool_sys",
                 "test_executable"]:
         action = "Linking"

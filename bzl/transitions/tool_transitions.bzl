@@ -90,7 +90,7 @@ def _ocaml_tool_in_transition_impl(settings, attr, debug):
         config_emitter  = "baseline"
         ## these just prevent circular dep?
         ## need to set before recurring, otherwise we get a dep cycle
-        compiler = "//bin:ocamlcc"
+        compiler = "//bin:ocamlc.byte"
         lexer    = "//lex:ocamllex.byte"
         runtime  = "//runtime:asmrun"
         # runtime  = "//runtime:camlrun"
@@ -105,7 +105,7 @@ def _ocaml_tool_in_transition_impl(settings, attr, debug):
         # target_emitter = "boot"
         # target_executor = "vm"
         # target_emitter = "vm"
-        compiler = "//bin:ocamlcc"
+        compiler = "//bin:ocamlc.byte"
         lexer    = "//lex:ocamllex.byte"
         runtime  = "//runtime:asmrun"
 
@@ -113,7 +113,7 @@ def _ocaml_tool_in_transition_impl(settings, attr, debug):
         print("SYS-SYS transition")
         config_executor = "vm"
         config_emitter  = "sys"
-        compiler = "//bin:ocamlcc"
+        compiler = "//bin:ocamlc.byte"
         lexer    = "//lex:ocamllex.byte"
         runtime  = "//runtime:asmrun"
 
@@ -121,7 +121,7 @@ def _ocaml_tool_in_transition_impl(settings, attr, debug):
         print("SYS-VM transition")
         config_executor = "sys"
         config_emitter  = "sys"
-        compiler = "//bin:ocamlcc"
+        compiler = "//bin:ocamlc.byte"
         lexer    = "//lex:ocamllex.byte"
         runtime  = "//runtime:asmrun"
 
@@ -183,7 +183,7 @@ def _ocaml_tool_vm_in_transition_impl(settings, attr):
 
     config_executor = "vm"
     config_emitter  = "vm"
-    compiler = "//bin:ocamlcc"
+    compiler = "//bin:ocamlc.byte"
     lexer    = "//lex:ocamllex.byte"
     runtime  = "//runtime:asmrun"
 
@@ -215,7 +215,7 @@ def _ocaml_tool_sys_in_transition_impl(settings, attr):
 
     config_executor = "sys"
     config_emitter  = "sys"
-    compiler = "//bin:ocamlcc"
+    compiler = "//bin:ocamlc.byte"
     lexer    = "//lex:ocamllex.sys"
     runtime  = "//runtime:asmrun"
 
@@ -230,6 +230,134 @@ def _ocaml_tool_sys_in_transition_impl(settings, attr):
 ################################################################
 ocaml_tool_sys_in_transition = transition(
     implementation = _ocaml_tool_sys_in_transition_impl,
+    inputs = [],
+    outputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
+    ]
+)
+
+##########################################################
+def _ocamlc_byte_in_transition_impl(settings, attr):
+    debug = True
+    if debug: print("ocamlc_byte_in_transition")
+
+    config_executor = "vm"
+    config_emitter  = "vm"
+    compiler = "//bin:ocamlc.byte"
+    lexer    = "//lex:ocamllex.sys"
+    runtime  = "//runtime:asmrun"
+
+    return {
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"  : compiler,
+        "//toolchain:lexer"     : lexer,
+        "//toolchain:runtime"   : runtime
+    }
+
+################################################################
+ocamlc_byte_in_transition = transition(
+    implementation = _ocamlc_byte_in_transition_impl,
+    inputs = [],
+    outputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
+    ]
+)
+
+##########################################################
+def _ocamlopt_byte_in_transition_impl(settings, attr):
+    debug = True
+    if debug: print("ocamlopt_byte_in_transition")
+
+    config_executor = "vm"
+    config_emitter  = "sys"
+    compiler = "//bin:ocamlc.byte"
+    lexer    = "//lex:ocamllex.sys"
+    runtime  = "//runtime:asmrun"
+
+    return {
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"  : compiler,
+        "//toolchain:lexer"     : lexer,
+        "//toolchain:runtime"   : runtime
+    }
+
+################################################################
+ocamlopt_byte_in_transition = transition(
+    implementation = _ocamlopt_byte_in_transition_impl,
+    inputs = [],
+    outputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
+    ]
+)
+
+##########################################################
+def _ocamlopt_opt_in_transition_impl(settings, attr):
+    debug = True
+    if debug: print("ocamlopt_opt_in_transition")
+
+    config_executor = "sys"
+    config_emitter  = "sys"
+    compiler = "//bin:ocamlc.byte"
+    lexer    = "//lex:ocamllex.sys"
+    runtime  = "//runtime:asmrun"
+
+    return {
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"  : compiler,
+        "//toolchain:lexer"     : lexer,
+        "//toolchain:runtime"   : runtime
+    }
+
+################################################################
+ocamlopt_opt_in_transition = transition(
+    implementation = _ocamlopt_opt_in_transition_impl,
+    inputs = [],
+    outputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        "//toolchain:lexer",
+        "//toolchain:runtime",
+    ]
+)
+
+##########################################################
+def _ocamlc_opt_in_transition_impl(settings, attr):
+    debug = True
+    if debug: print("ocamlc_opt_in_transition")
+
+    config_executor = "sys"
+    config_emitter  = "vm"
+    compiler = "//bin:ocamlc.byte"
+    lexer    = "//lex:ocamllex.sys"
+    runtime  = "//runtime:asmrun"
+
+    return {
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"  : compiler,
+        "//toolchain:lexer"     : lexer,
+        "//toolchain:runtime"   : runtime
+    }
+
+################################################################
+ocamlc_opt_in_transition = transition(
+    implementation = _ocamlc_opt_in_transition_impl,
     inputs = [],
     outputs = [
         "//config/target/executor",

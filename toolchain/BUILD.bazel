@@ -1,5 +1,5 @@
 label_setting(name="compiler",
-              build_setting_default = "//bin:ocamlcc",
+              build_setting_default = "//bin:ocamlc.byte",
               # build_setting_default = "//boot:ocamlc.boot",
               visibility = ["//visibility:public"])
 

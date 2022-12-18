@@ -281,14 +281,14 @@ tc_boot_in_transition = transition(
 #     stage = stage
 
 #     if stage == 0:  # boot
-#         compiler = "//boot:ocamlc.byte"
+#         compiler = "//boot:ocamlcc"
 #         lexer = "//boot:ocamllex.boot"
 #         # lexer = "//boot:ocamllex.boot"
 #     elif stage == 1: # dev built by baseline tc
-#         compiler = "//boot/baseline:baseline" # ocamlc.byte"
+#         compiler = "//boot/baseline:baseline" # ocamlcc"
 #         lexer = "//boot/baseline:ocamllex.byte"
 #     elif stage == 2:
-#         compiler = "//dev/bin:ocamlc.byte"
+#         compiler = "//dev/bin:ocamlcc"
 #         lexer = "//dev/bin:ocamllex.byte"
 #     else:
 #         fail("UNHANDLED COMPILER STAGE: %s" % stage)
@@ -344,14 +344,14 @@ tc_boot_in_transition = transition(
 #     # stage = stage
 
 #     # if stage == 0:  # boot
-#     #     compiler = "//boot:ocamlc.byte"
+#     #     compiler = "//boot:ocamlcc"
 #     #     lexer = "//boot:ocamllex.boot"
 #     #     # lexer = "//boot:ocamllex.boot"
 #     # elif stage == 1: # dev built by baseline tc
-#     #     compiler = "//bin:ocamlcc" # ocamlc.byte"
+#     #     compiler = "//bin:ocamlcc" # ocamlcc"
 #     #     lexer = "//boot/baseline:lexer"
 #     # elif stage == 2:
-#     #     compiler = "//bin:ocamlcc" # ocamlc.byte"
+#     #     compiler = "//bin:ocamlcc" # ocamlcc"
 #     #     lexer = "//lex:ocamllex"
 #     #     # compiler = "//dev/bin:ocamlc.dev"
 #     #     # lexer = "//dev/bin:ocamllex.byte"
@@ -370,16 +370,16 @@ tc_boot_in_transition = transition(
 #     #     elif _stage == "baseline":
 #     #         stage    = 0  # baseline built by boot tc
 #     #         # stage = "boot"
-#     #         compiler = "//boot:ocamlc.byte"
+#     #         compiler = "//boot:ocamlcc"
 #     #         lexer = "//boot:ocamllex.byte"
 #     #         # lexer = "//boot:ocamllex.boot"
 #     #     elif _stage == "dev":
 #     #         stage = 1  # dev built by baseline tc
-#     #         compiler = "//boot/baseline:ocamlc.byte"
+#     #         compiler = "//boot/baseline:ocamlcc"
 #     #         lexer = "//boot/baseline:ocamllex.byte"
 #     #     elif _stage == "prod":
 #     #         stage = 2  # prod built by dev tc
-#     #         compiler = "//dev/bin:ocamlc.byte"
+#     #         compiler = "//dev/bin:ocamlcc"
 #     #         lexer = "//dev/bin:ocamllex.byte"
 #     #     else:
 #     #         fail("UNHANDLED COMPILER STAGE: %s" % stage)
@@ -430,7 +430,7 @@ tc_boot_in_transition = transition(
 #             stdlib = "//boot:stdlib"
 #         elif stage == "dev":
 #             stage    = 1
-#             compiler = "//boot/baseline:ocamlc.byte"
+#             compiler = "//boot/baseline:ocamlcc"
 #             lexer = "//boot/baseline:ocamllex.byte"
 #             stdlib = "//boot/baseline:stdlib"
 #         else:
