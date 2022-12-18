@@ -4,8 +4,12 @@ load("//bzl:rules.bzl",
      "compiler_module",
      "compiler_signature",
      "boot_library",
-     "ocaml_tool"
-)
+     "ocaml_tool_vm",
+     "ocaml_tool_sys")
+
+# load("//bzl/rules:ocaml_tool.bzl",
+#      "ocaml_tool_vm", "ocaml_tool_sys")
+
 load(":BUILD_RULES.bzl", "lex")
 load("//yacc:BUILD_RULES.bzl", "yacc")
 
@@ -89,9 +93,74 @@ SIG_OPTS    =  ["-strict-formats"]
 
 BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
 
-# boot_compiler( ## FIXME: ocamllex is not a compiler, use ocaml_tool?
-ocaml_tool(
-    name       = "ocamllex",
+# ocaml_tool(
+#     name       = "ocamllex",
+#     opts = ["-verbose"],
+#     cc_linkopts = select({
+#         "@platforms//os:macos": [ ## FIXME: default tc, not zig
+#             # "-Wl,-v", # prints config, search paths
+#             # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
+#             # "-t", # -Wl-v plus logs each file the linker loads.
+#             # "-why_load" # Log why each object file in a static library
+#             #             # is loaded. That is, what symbol was needed.
+#             ## zig linker opts
+#             # "-v",
+#             ],
+#         "@platforms//os:linux": [
+#             # "-Wl,--verbose"
+#             ##FIXME: depends on linker used (bfd, gold, etc.)
+#         ]
+#     }),
+#     prologue   = [":lex"],
+#     main       = ":Main",
+#     # opts       = select({
+#     #     "//platform/target:vm?" : BOOT_OPTS,
+#     #     "//platform/target:sys?": ["-nostdlib"],
+#     #     "//conditions:default"   : BOOT_OPTS
+#     # }),
+#     use_prims = select({
+#         # "//platform/target:vm?" : True,
+#         # "//platform/target:sys?": False,
+#         "//conditions:default"   : True
+#     }),
+#     visibility = ["//visibility:public"]
+# )
+
+ocaml_tool_vm(
+    name       = "ocamllex.byte",
+    opts = ["-verbose"],
+    cc_linkopts = select({
+        "@platforms//os:macos": [ ## FIXME: default tc, not zig
+            # "-Wl,-v", # prints config, search paths
+            # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
+            # "-t", # -Wl-v plus logs each file the linker loads.
+            # "-why_load" # Log why each object file in a static library
+            #             # is loaded. That is, what symbol was needed.
+            ## zig linker opts
+            # "-v",
+            ],
+        "@platforms//os:linux": [
+            # "-Wl,--verbose"
+            ##FIXME: depends on linker used (bfd, gold, etc.)
+        ]
+    }),
+    prologue   = [":lex"],
+    main       = ":Main",
+    # opts       = select({
+    #     "//platform/target:vm?" : BOOT_OPTS,
+    #     "//platform/target:sys?": ["-nostdlib"],
+    #     "//conditions:default"   : BOOT_OPTS
+    # }),
+    use_prims = select({
+        # "//platform/target:vm?" : True,
+        # "//platform/target:sys?": False,
+        "//conditions:default"   : True
+    }),
+    visibility = ["//visibility:public"]
+)
+
+ocaml_tool_sys(
+    name       = "ocamllex.opt",
     opts = ["-verbose"],
     cc_linkopts = select({
         "@platforms//os:macos": [ ## FIXME: default tc, not zig
