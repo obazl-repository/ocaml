@@ -124,7 +124,7 @@ cJSON *merge_json(char *filea, char *fileb, char *output)
         } else {
             /* adding item transfers ownership, which would crash delete */
             cJSON *new_item = cJSON_Duplicate(item, cJSON_False);
-            cJSON *obj = cJSON_AddItemToObject(jsona, item->string, new_item);
+            cJSON_bool ok = cJSON_AddItemToObject(jsona, item->string, new_item);
         }
         free(item_str);
     }
