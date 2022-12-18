@@ -27,9 +27,6 @@ def _reset_cc_config_transition_impl(settings, attr):
         "//command_line_option:host_compilation_mode": "opt",
         "//command_line_option:compilation_mode": "opt",
 
-        "//toolchain/target/executor": "boot",
-        "//toolchain/target/emitter" : "boot",
-
         "//config/target/executor": "boot",
         "//config/target/emitter" : "boot",
 
@@ -45,7 +42,7 @@ reset_cc_config_transition = transition(
     outputs = [
         "//command_line_option:host_compilation_mode",
         "//command_line_option:compilation_mode",
-k
+
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",

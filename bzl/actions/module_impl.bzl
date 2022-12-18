@@ -36,35 +36,11 @@ def module_impl(ctx, module_name):
     debug = False
     debug_bootstrap = False
 
-    # if ctx.label.name in ["Stdlib"]:
-    #     print("this: %s" % ctx.label) #.package + "/" + ctx.label.name)
-    #     print("manifest: %s" % ctx.attr._manifest[BuildSettingInfo].value)
-    #     debug = True
-        # fail("x")
-
-    # tc = ctx.exec_groups[ctx.attr._stage].toolchains[
-    #     "//toolchain/type:{}".format(ctx.attr._stage)
-    # ]
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
-
     cc_toolchain = find_cpp_toolchain(ctx)
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     workdir = tc.workdir
-
-    # (target_executor, # x
-    #  target_emitter,  # x
-    #  config_executor, # o
-    #  config_emitter,  # x
-    #  workdir
-    #  ) = get_workdir(ctx, tc)
-
-    # (ocamlrun, # x
-    #  executable, # in actions.run
-    #  build_executor, # x for setting executable
-    #  target_executor # x
-    #  ) = configure_action(ctx, tc)
 
     #########################
     args = ctx.actions.args()
@@ -76,42 +52,10 @@ def module_impl(ctx, module_name):
     else:
         toolarg_input = []
 
-    # executable = None
-    # if tc.dev:
-    #     ocamlrun = None
-    #     effective_compiler = tc.compiler
-    # else:
-    #     ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
-    #     effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
-
-    # build_executor = get_build_executor(tc)
-    # print("BX: %s" % build_executor)
-    # print("TX: %s" % config_executor)
-    # print("ef: %s" % effective_compiler)
-
-    # if build_executor == "vm":
-    #     executable = ocamlrun
-    #     args.add(effective_compiler.path)
-    #     if config_executor in ["sys"]:
-    #         ext = ".cmx"
-    #     else:
-    #         ext = ".cmo"
-    # else:
-    #     executable = effective_compiler
-    #     ext = ".cmx"
-
-    if tc.config_executor in ["boot", "baseline", "vm"]:
-        ext = ".cmo"
-    else:
+    if tc.config_executor == "sys":
         ext = ".cmx"
-        args.add("-S") # testing - retain asm code
-
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
+    else:
+        ext = ".cmo"
 
     ################################################################
     ################  OUTPUTS  ################
@@ -415,57 +359,6 @@ def module_impl(ctx, module_name):
     # indirect_ppx_codep_path_depsets = []
     indirect_cc_deps  = {}
 
-
-    # ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
-    # effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
-
-    # if (target_executor == "unspecified"):
-    #     if (config_executor == "sys"):
-    #         if config_emitter == "sys":
-    #             # ss built from ocamlopt.byte
-    #             executable = ocamlrun
-    #             args.add(effective_compiler.path)
-    #         else:
-    #             # sv built from ocamlopt.opt
-    #             executable = effective_compiler
-    #     else:
-    #         executable = ocamlrun
-    #         args.add(effective_compiler.path)
-
-    # elif target_executor in ["boot", "vm"]:
-    #         executable = ocamlrun
-    #         args.add(effective_compiler.path)
-
-    # elif (target_executor == "sys" and target_emitter == "sys"):
-    #     ## ss always built by vs (ocamlopt.byte)
-    #     executable = ocamlrun
-    #     args.add(effective_compiler.path)
-
-    # elif (target_executor == "sys" and target_emitter == "vm"):
-    #     ## sv built by ss
-    #     executable = effective_compiler
-
-    # if ctx.label.name == "CamlinternalFormatBasics":
-    #     print("lbl: %s" % ctx.label)
-    #     print("ocamlrun: %s" % ocamlrun)
-    #     print("effective_compiler: %s" % effective_compiler.path)
-    #     print("executable: %s" % executable.path)
-
-    ## FIXME: -use-prims not needed for compilation?
-    # if ext == ".cmo":
-    #     if ctx.attr.use_prims == True:
-    #         args.add_all(["-use-prims", ctx.file._primitives.path])
-    #     else:
-    #         if ctx.attr._rule in ["stdlib_module", "stdlib_signature"]:
-    #             args.add_all(["-use-prims", ctx.file._primitives.path])
-    #         else:
-    #             if ctx.attr._use_prims[BuildSettingInfo].value:
-    #                 if not "-no-use-prims" in ctx.attr.opts:
-    #                     args.add_all(["-use-prims", ctx.file._primitives.path])
-    #             else:
-    #                 if  "-use-prims" in ctx.attr.opts:
-    #                     args.add_all(["-use-prims", ctx.file._primitives.path])
-
     resolver = None
     resolver_deps = []
     if hasattr(ctx.attr, "ns"):
@@ -606,7 +499,8 @@ def module_impl(ctx, module_name):
     if sig_src:
         includes.append(sig_src.dirname)
 
-    includes.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
+    # includes.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
+    includes.append(tc.runtime.dirname)
 
     args.add_all(includes, before_each="-I", uniquify = True)
 

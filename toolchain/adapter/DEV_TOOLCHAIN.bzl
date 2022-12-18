@@ -177,7 +177,6 @@ dev_toolchain_adapter = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
-    # cfg = tc_compiler_out_transition, # toolchain_in_transition,
     doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
     provides = [platform_common.ToolchainInfo],
 

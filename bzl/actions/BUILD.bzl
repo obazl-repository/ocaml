@@ -7,29 +7,25 @@ def get_build_executor(tc):
     if debug:
         print("get_build_executor")
 
-    target_executor = tc.target_executor[BuildSettingInfo].value
-    target_emitter  = tc.target_emitter[BuildSettingInfo].value
     config_executor = tc.config_executor[BuildSettingInfo].value
     config_emitter  = tc.config_emitter[BuildSettingInfo].value
 
     if debug:
-        print("target_executor %s" % target_executor)
-        print("target_emitter  %s" % target_emitter)
         print("config_executor %s" % config_executor)
         print("config_emitter  %s" % config_emitter)
 
     if tc.dev:
         build_executor = "opt"
-    elif (target_executor == "unspecified"):
-        if (config_executor == "sys"):
-            if config_emitter == "sys":
-                # ss built from ocamlopt.byte
-                build_executor = "vm"
-            else:
-                # sv built from ocamlopt.opt
-                build_executor = "sys"
-        else:
-            build_executor = "vm"
+    # elif (target_executor == "unspecified"):
+    #     if (config_executor == "sys"):
+    #         if config_emitter == "sys":
+    #             # ss built from ocamlopt.byte
+    #             build_executor = "vm"
+    #         else:
+    #             # sv built from ocamlopt.opt
+    #             build_executor = "sys"
+    #     else:
+    #         build_executor = "vm"
     elif (config_executor == "boot" and config_emitter == "boot"):
         build_executor = "vm"
     elif (config_executor == "baseline" and config_emitter == "baseline"):

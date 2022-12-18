@@ -52,20 +52,6 @@ mustache = rule(
             allow_single_file = True,
             cfg = "exec",
         ),
-        # "_tool": attr.label(
-        #     allow_single_file = True,
-        #     executable = True,
-        #     cfg = "exec",
-        #     # cfg = reset_cc_config_transition,
-        #     default = "//toolchain/dev:mustach"
-        # ),
-
-        # "_target_executor": attr.label(default = "//config/target/executor"),
-        # "_target_emitter" : attr.label(default = "//config/target/emitter"),
-
-        # "_cc_toolchain": attr.label(
-        #     default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
-        # ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),

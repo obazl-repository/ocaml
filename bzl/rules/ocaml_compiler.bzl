@@ -185,7 +185,7 @@ def _ocamlopt_opt_impl(ctx):
     workdir = tc.workdir
 
     executor = tc.config_executor
-    emitter  = tc.config_emitter[BuildSettingInfo].value
+    emitter  = tc.config_emitter
 
     if executor == "boot":
         exe_name = "ocamlc.byte"

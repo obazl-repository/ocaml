@@ -26,21 +26,6 @@ def library_impl(ctx):
 
     workdir = tc.workdir
 
-    # (target_executor, target_emitter,
-    #  config_executor, config_emitter,
-    #  workdir) = get_workdir(ctx, tc)
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
-
-    # if executor == "vm":
-    #     ext = ".cmo"
-    # else:
-    #     ext = ".cmx"
-
     ################################################################
     ################  DEPS  ################
     depsets = new_deps_aggregator()
@@ -50,11 +35,7 @@ def library_impl(ctx):
         manifest.append(dep[DefaultInfo].files)
 
     for dep in ctx.attr.manifest:
-        # if ctx.label == Label("@//bytecomp:ocamlcommon"):
-        #     print("dep[ModuleInfo]: %s" % dep[ModuleInfo])
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
-    # if ctx.label == Label("@//bytecomp:ocamlcommon"):
-    #     fail()
 
     ################################
     ## merge BootInfo deps
@@ -91,21 +72,10 @@ def library_impl(ctx):
         transitive = [merge_depsets(depsets, "paths")]
     )
 
-    # if ctx.label == Label("@//typing:ocamlcommon"):
-    #     print("sigs: %s" % sigs_depset)
-    #     print("cli_link_deps: %s" % cli_link_deps_depset)
-    #     # fail()
-
     inputs_depset = depset(
         ctx.files.manifest,
         # transitive = [cli_link_deps_depset]
     )
-
-    # for f in ctx.files.manifest:
-    #     inputs_depset.append(f)
-
-    # print("inputs: %s" % inputs_depset)
-    # fail("x")
 
     ################################################################
     ##    ACTION
@@ -131,12 +101,6 @@ def library_impl(ctx):
     #### PROVIDERS ####
     default_depset = depset(
         order = dsorder,
-        # direct = normalized_ctx.files.manifest, # ns_resolver_module,
-        # transitive = [depset(direct = the_ns_resolvers)]
-
-        # direct = the_ns_resolvers + [ns_resolver_module] if ns_resolver_module else [],
-        # transitive = [depset(ctx.files.manifest)]
-        # transitive = [depset(normalized_ctx.files.manifest)]
         transitive = [inputs_depset]
     )
 

@@ -24,31 +24,10 @@ def signature_impl(ctx, module_name):
     debug = False
     debug_bootstrap = False
 
-    # if ctx.label.name in ["Pervasives"]
-    #     debug = True
-
-    # if "//toolchain/type:ocaml" in ctx.toolchains:
-    #     fail("BOOT")
-
     basename = ctx.label.name
     from_name = basename[:1].capitalize() + basename[1:]
 
-    # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-
-    # (executable,  ## ocamlrun or compiler
-    #  tool_arg,    ## None or compiler to be added to args
-    #  build_executor,
-    #  target_executor,
-    #  workdir
-    #  ) = configure_action(ctx,tc)
-
-    # (target_executor, # x
-    #  target_emitter,  # x
-    #  config_executor, # x
-    #  config_emitter,  # x
-    #  workdir
-    #  ) = get_workdir(ctx, tc)
 
     workdir = tc.workdir
 
@@ -69,30 +48,16 @@ def signature_impl(ctx, module_name):
     if debug:
         print("sig_src: %s" % sig_src)
 
-    # if sig_src.extension == "ml":
-    #     # extract mli file from ml file
-
     # add prefix if namespaced. from_name == normalized module name
     # derived from sig_src; module_name == prefixed if ns else same as
     # from_name.
 
     ns = None
-    # (from_name, ns, module_name) = get_module_name(ctx, sig_src)
     if debug:
         print("Module name: {src} To: {dst}".format(
             src = from_name, dst = module_name))
 
-    # if False: ## ctx.attr.ppx:
-    #     ## mlifile output is generated output of ppx processing
-    #     mlifile = impl_ppx_transform("ocaml_signature", ctx,
-    #                                  sig_src,
-    #                                  module_name + ".mli")
-    # else:
-
     if from_name == module_name:
-        # if ctx.label.name == "CamlinternalFormatBasics_cmi":
-        #     print("not namespaced")
-
         ## We need to ensure mli file and cmi file are in the same
         ## place. Since Bazel writes output files into its own dirs
         ## (won't write back into src dir), this means we need to
@@ -161,14 +126,7 @@ def signature_impl(ctx, module_name):
     ################  DEPS  ################
     depsets = new_deps_aggregator()
 
-    # if ctx.attr._manifest[BuildSettingInfo].value:
-    #     manifest = ctx.attr._manifest[BuildSettingInfo].value
-    # else:
     manifest = []
-
-    # if ctx.label.name == "Stdlib_cmi":
-    #     print("Stdlib manifest: %s" % manifest)
-        # fail("X")
 
     for dep in ctx.attr.deps:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
@@ -216,15 +174,9 @@ def signature_impl(ctx, module_name):
 
     if debug:
         print("tgt: %s" % ctx.label)
-        # print("target_emitter: %s" % target_emitter)
-        # print("config_executor: %s" % config_executor)
-        # print("config_emitter: %s" % config_emitter)
-        # print("ocamlrun: %s" % ocamlrun)
         print("tc.executable: %s" % tc.executable)
         print("tc.tool_arg: %s" % tc.tool_arg)
         print("tc.dev: %s" % tc.dev)
-        # if ctx.label.name == "CamlinternalFormatBasics_cmi":
-        #     fail()
 
     resolver = []
     if hasattr(ctx.attr, "ns"):
@@ -270,36 +222,6 @@ def signature_impl(ctx, module_name):
 
     ccInfo_list = []
 
-    # nsns_depset = []
-    # if hasattr(ctx.attr, "ns"):
-    #     # print("HAS ctx.attr.ns")
-    #     ## Only -open Stdlib if we have a dep on Stdlib.
-    #     if ctx.files.deps :
-    #         if ctx.attr.ns:
-    #             # if BootInfo in ctx.attr.ns:
-    #                 # nsns_depset = [ctx.attr.ns[BootInfo].inputs]
-
-    #             # for f in ctx.attr.ns[DefaultInfo].files.to_list():
-    #             #     # args.add("-I", f.dirname)
-    #             #     includes.append(f.dirname)
-    #                 # args.add(f)
-
-    #             args.add("-no-alias-deps")
-    #             args.add("-open", ns)
-        #     else:
-        #         args.add("-nopervasives")
-        # else:
-        #     args.add("-nopervasives")
-
-    # if ctx.label.name == "Stdlib_cmi":
-    #     print("sig depset : %s" % depsets)
-        # fail("x")
-
-    # arch_depset = merge_depsets(depsets, "archives")
-    # for arch in arch_depset.to_list():
-    #     includes.append(arch.dirname)
-
-    # args.add_all(paths_depset.to_list(), before_each="-I")
     includes.extend(paths_depset.to_list())
 
     args.add_all(includes, before_each="-I", uniquify = True)
@@ -348,7 +270,7 @@ def signature_impl(ctx, module_name):
 
     ##########################################
     sigexe = tc.executable
-    # print("SIGexe: %s" % sigexe)
+    print("SIGexe: %s" % sigexe)
     ################  ACTION  ################
     ctx.actions.run(
         executable = sigexe,
@@ -392,10 +314,6 @@ def signature_impl(ctx, module_name):
         ofiles   = ofiles_depset,
         archived_cmx  = archived_cmx_depset,
         paths    = paths_depset,
-
-        # ofiles   = ofiles_depset,
-        # archives = archives_depset,
-        # astructs = astructs_depset,
     )
 
     providers = [

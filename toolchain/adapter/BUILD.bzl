@@ -209,8 +209,6 @@ def _toolchain_adapter_impl(ctx):
         config_executor        = config_executor,
         config_emitter         = config_emitter,
 
-        # target_executor        = ctx.attr.target_executor, # [TargetInfo],
-        # target_emitter         = ctx.attr.target_emitter,
 
         workdir                = tc_workdir(ctx),
 

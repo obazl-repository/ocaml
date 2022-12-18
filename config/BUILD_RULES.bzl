@@ -24,9 +24,9 @@ def cc_tc_config_map(ctx):
     tc = find_cpp_toolchain(ctx)
     # tc is a CcToolchainInfo
 
-    print("VAR: %s" % ctx.var)
+    # print("VAR: %s" % ctx.var)
     for k,v in ctx.var.items():
-        print("VAR: {k} : {v}".format(k=k, v=v))
+        # print("VAR: {k} : {v}".format(k=k, v=v))
         config_map[k] = v
 
     # config_map["AR"] = ctx.var["AR"]
