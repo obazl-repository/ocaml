@@ -1,9 +1,9 @@
 exports_files(["BUILD.bazel"])
 
-load("//toolchain/adapter:ocaml_tc_adapter.bzl", "toolchain_adapter")
-load("//toolchain/adapter:DEV_TOOLCHAIN.bzl", "dev_toolchain_adapter")
-load("//toolchain/adapter:mustache_tc_adapter.bzl", "mustache_toolchain_adapter")
 load("//toolchain/adapter:boot_tc_adapter.bzl", "boot_toolchain_adapter")
+load("//toolchain/adapter:dev_tc_adapter.bzl", "dev_toolchain_adapter")
+load("//toolchain/adapter:ocaml_tc_adapter.bzl", "toolchain_adapter")
+load("//toolchain/adapter:mustache_tc_adapter.bzl", "mustache_toolchain_adapter")
 
 ## NB: these are all the same, but for debugging they need different
 ## names. Use aliases?

@@ -6,10 +6,12 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
 
-load("//toolchain/adapter:ocaml_tc_adapter.bzl",
-     "tc_executable", "tc_tool_arg",
+load(":tc_utils.bzl",
+     "tc_build_executor",
+     "tc_tool_arg",
+     "tc_executable",
      "tc_compiler",
-     "tc_workdir", "tc_build_executor")
+     "tc_workdir")
 
 ################
 def _executable(ctx):

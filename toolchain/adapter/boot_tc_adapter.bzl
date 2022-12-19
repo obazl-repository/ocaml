@@ -9,8 +9,12 @@ load("//bzl/transitions:tc_transitions.bzl",
      "tc_lexer_out_transition",
      "tc_runtime_out_transition")
 
-load("//toolchain/adapter:ocaml_tc_adapter.bzl",
-     "tc_workdir", "tc_build_executor")
+load(":tc_utils.bzl",
+     "tc_build_executor",
+     "tc_tool_arg",
+     "tc_executable",
+     "tc_compiler",
+     "tc_workdir")
 
 ###################
 # returns file, no runfiles
@@ -87,7 +91,7 @@ def _tool_arg(ctx, tool):
     debug = True
 
     if debug:
-        print("lx _TOOL_ARG for %s" % tool)
+        print("boot_tc _TOOL_ARG for %s" % tool)
         print("lx dev mode? %s" % ctx.attr.dev[BuildSettingInfo].value)
         print("lx build executor: %s" % tc_build_executor(ctx))
         print("lx config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
