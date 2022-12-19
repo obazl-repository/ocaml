@@ -87,10 +87,17 @@ def get_build_executor(tc):
 ###############################
 def progress_msg(workdir, ctx):
     rule = ctx.attr._rule
+
+    if "//toolchain/type:boot" in ctx.toolchains:
+        tc = ctx.toolchains["//toolchain/type:boot"]
+    else:
+        tc = ctx.toolchains["//toolchain/type:ocaml"]
+
     if rule in ["ocaml_compiler",
                 "ocamlc_byte", "ocamlopt_byte",
                 "ocamlopt_opt", "ocamlc_opt",
-                "build_tool", "ocaml_lex",
+                "build_tool_vm", "build_tool_sys",
+                "ocaml_lex",
                 "ocaml_tool_vm", "ocaml_tool_sys",
                 "test_executable"]:
         action = "Linking"
@@ -108,9 +115,15 @@ def progress_msg(workdir, ctx):
     else:
         fail(rule)
 
-    msg = "{m} [{wd}]: {ws}//{pkg}:{tgt} {action} {rule}".format(
-        m   = ctx.var["COMPILATION_MODE"],
-        wd  = workdir,
+    cmode = ctx.var["COMPILATION_MODE"]
+    if cmode == "fastbuild": cmode = "fb"
+
+    msg = "{m} [{c} > {x}/{em}]: {ws}//{pkg}:{tgt} {action} {rule}".format(
+        m   = cmode,
+        c   = tc.compiler[DefaultInfo].files_to_run.executable.basename,
+        x   = tc.config_executor,
+        em  = tc.config_emitter,
+        # wd  = workdir,
         # m  = ctx.attr._compilation_mode,
         rule= rule,
         ws  = ctx.label.workspace_name if ctx.label.workspace_name else "", ## ctx.workspace_name,

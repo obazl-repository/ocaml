@@ -35,6 +35,7 @@ def signature_impl(ctx, module_name):
     args = ctx.actions.args()
 
     toolarg = tc.tool_arg
+    print("SIG tool_arg: %s" % toolarg)
     if toolarg:
         args.add(toolarg.path)
         toolarg_input = [toolarg]

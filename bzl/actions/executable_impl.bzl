@@ -342,6 +342,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     elif ctx.attr._rule == "baseline_test":
         mnemonic = "LinkBootstrapTest"
     elif ctx.attr._rule in ["ocaml_compiler",
+                            "build_tool_vm", "build_tool_sys",
                             "ocamlc_byte", "ocamlopt_byte",
                             "ocamlopt_opt", "ocamlc_opt"]:
         mnemonic = "LinkOcamlCompiler"
@@ -432,6 +433,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     exe_provider = None
     if ctx.attr._rule in ["ocaml_compiler",
+                          "build_tool_vm", "build_tool_sys",
                           "ocamlc_byte", "ocamlopt_byte",
                           "ocamlopt_opt", "ocamlc_opt"]:
         exe_provider = OcamlExecutableMarker()

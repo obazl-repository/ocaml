@@ -10,32 +10,48 @@ load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 # use ctx.actions.expand_template, six times
 
 ########################
-def _cvt_emit(ctx):
+def _run_cvt_emit(ctx):
 
     debug_bootstrap = False
     debug = True
 
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
+    # tc = ctx.toolchains["//toolchain/type:boot"]
 
-    workdir = tc.workdir
+    # workdir = tc.workdir
 
-    exec_tools = [
-        tc.executable, ## ocamlrun,
-        ctx.file._tool
-    ]
-    executable_cmd = tc.executable.path + " " + ctx.file._tool.path
+    # exec_tools = [
+    #     tc.cexecutable, ## ocamlrun,
+    #     ctx.file._tool
+    # ]
 
-    print("EXEC TOOLS: %s" % exec_tools)
-    print("exe cmd: %s" % executable_cmd)
+    # if tc.build_executor == "sys":
+    #     executable_cmd = tc.cvt_emit
+    # else:
+    #     executable_cmd = tc.ocamlrun.path
+
+    # print("EXEC TOOLS: %s" % exec_tools)
+    # print("exe cmd: %s" % executable_cmd)
+
+    print("cvt_emit: %s" % ctx.file._tool)
+    print("cvt_emit rfs: %s" % ctx.attr._tool[DefaultInfo].default_runfiles.files)
+
+    print("cvt emit _tool: %s" % ctx.attr._tool)
+
+    ocamlrun =  ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list()[0]
+    executable_cmd = ocamlrun.path + " " + ctx.file._tool.path
 
     pfx = ctx.label.package
 
     ctx.actions.run_shell(
         mnemonic = "CvtEmit",
         outputs = [ctx.outputs.out],
-        inputs  = [ctx.file.src, tc.executable],
+        inputs  = [
+            ocamlrun,
+            ctx.file._tool,
+            ctx.file.src
+        ],
         # tools attr forces build of these deps:
-        tools   = exec_tools,
+        tools   = [ocamlrun, ctx.file._tool], # exec_tools,
         command = " ".join([
             "echo '# 1 \"{pfx}/emit.mlp\"' > {out};".format(
                 pfx=pfx, out = ctx.outputs.out.path),
@@ -54,8 +70,8 @@ def _cvt_emit(ctx):
     return defaultInfo
 
 #####################
-cvt_emit = rule(
-    implementation = _cvt_emit,
+run_cvt_emit = rule(
+    implementation = _run_cvt_emit,
     doc = "Preprocess .mlp files",
     attrs = {
         "src"   : attr.label(
@@ -67,13 +83,14 @@ cvt_emit = rule(
         ),
         "_tool" : attr.label(
             allow_single_file=True,
-            default = ":cvt_emit"
+            default = "//toolchain:cvt_emit"
+            # cfg = tool_reset_transition
         ),
         # "_allowlist_function_transition": attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
-    toolchains = ["//toolchain/type:ocaml",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
+    # toolchains = ["//toolchain/type:boot",
+    #               "@bazel_tools//tools/cpp:toolchain_type"]
 )

@@ -16,6 +16,13 @@ label_setting(name="runtime",
               build_setting_default = "//runtime:camlrun",
               visibility = ["//visibility:public"])
 
+label_setting(name="cvt_emit",
+              # build_setting_default = "//boot:ocamllex.boot", # fake
+              build_setting_default = "//asmcomp:cvt_emit.byte",
+              # build_setting_default = "@baseline//bin:cvt_emit.byte",
+              # dev mode: @baseline/bin:cvt_emit
+              visibility = ["//visibility:public"])
+
 label_setting(name="stdlib",
               build_setting_default = "//stdlib",
               visibility = ["//visibility:public"])

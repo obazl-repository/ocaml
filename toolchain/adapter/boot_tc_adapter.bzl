@@ -14,12 +14,12 @@ load(":BUILD.bzl", "tc_workdir", "tc_build_executor")
 ###################
 # returns file, no runfiles
 def _executable(ctx, tool):
-    debug = False
+    debug = True
     if debug:
         print("boot tc.executable")
         print("tc.name: %s" % ctx.attr.name)
 
-    if ctx.attr.dev:
+    if ctx.attr.dev[BuildSettingInfo].value:
         # native only
         if tool == "compiler":
             return ctx.file.compiler
@@ -29,7 +29,7 @@ def _executable(ctx, tool):
         if debug:
             print("lx tc.build_executor: %s" % tc_build_executor(ctx))
         ## tc.compiler runfiles: bottom element is always ocamlrun
-        if tc_build_executor(ctx) == "vm":
+        if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
             if type(ctx.attr.lexer) == "list":
                 ## built tool, transitioned
                 if tool == "compiler":
@@ -77,8 +77,12 @@ def _lexer(ctx):
 
 #################
 def _tool_arg(ctx, tool):
-    print("_TOOL_ARG")
-    print("tc.config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
+    debug = True
+
+    if debug:
+        print("boot tc: _TOOL_ARG")
+        print("tc.config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
+
     if type(ctx.attr.lexer) == "list":
         if tool == "lexer":
             tcc = ctx.attr.lexer[0][DefaultInfo].files_to_run.executable
@@ -91,7 +95,7 @@ def _tool_arg(ctx, tool):
             tcc = ctx.attr.compiler[DefaultInfo].files_to_run.executable
     print("tcc: %s" % tcc)
 
-    if ctx.attr.dev:
+    if ctx.attr.dev[BuildSettingInfo].value:
         return None
     else:
         if ctx.attr.config_executor[BuildSettingInfo].value in ["boot", "vm"]:
@@ -105,6 +109,7 @@ def _tool_arg(ctx, tool):
 def _boot_toolchain_adapter_impl(ctx):
 
     config_executor = ctx.attr.config_executor[BuildSettingInfo].value
+    config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
@@ -113,7 +118,7 @@ def _boot_toolchain_adapter_impl(ctx):
         build_executor         = tc_build_executor(ctx),
 
         config_executor        = config_executor,
-        config_emitter         = ctx.attr.config_emitter,
+        config_emitter         = config_emitter,
 
         workdir                = tc_workdir(ctx),
 
@@ -130,6 +135,8 @@ def _boot_toolchain_adapter_impl(ctx):
         lexecutable            = _executable(ctx, "lexer"),
         lexer_arg              = _tool_arg(ctx, "lexer"),
 
+        cvt_emit               = ctx.file.cvt_emit,
+
         runtime                = ctx.file.runtime,
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
@@ -145,7 +152,7 @@ boot_toolchain_adapter = rule(
     _boot_toolchain_adapter_impl,
     doc = "Toolchain for building build_tool preprocessors",
     attrs = {
-        "dev": attr.bool(default = False),
+        "dev": attr.label(default = "//config:dev"),
 
         "config_executor": attr.label(default = "//config/target/executor"),
         "config_emitter" : attr.label(default = "//config/target/emitter"),
@@ -189,6 +196,16 @@ boot_toolchain_adapter = rule(
 
         "lexer": attr.label(
             default = "//boot:ocamllex.boot",
+            allow_single_file = True,
+            executable = True,
+            cfg = "exec",
+            # cfg = tc_lexer_out_transition
+        ),
+
+        "cvt_emit": attr.label(
+            default = "//boot:ocamllex.boot", # fake, will be transitioned
+            # default = "//toolchain:cvt_emit",
+            allow_single_file = True,
             executable = True,
             cfg = "exec",
             # cfg = tc_lexer_out_transition

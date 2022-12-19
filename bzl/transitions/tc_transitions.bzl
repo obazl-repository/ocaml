@@ -33,7 +33,7 @@ tc_compiler_out_transition = transition(
         "//toolchain:compiler",
         "//toolchain:lexer",
         "//toolchain:runtime",
-
+        "//toolchain:cvt_emit",
     ],
     outputs = [
         "//config/target/executor",
@@ -42,6 +42,7 @@ tc_compiler_out_transition = transition(
         "//toolchain:compiler",
         "//toolchain:lexer",
         "//toolchain:runtime",
+        "//toolchain:cvt_emit",
     ]
 )
 
@@ -77,6 +78,7 @@ tc_lexer_out_transition = transition(
         "//toolchain:compiler",
         "//toolchain:lexer",
         "//toolchain:runtime",
+        "//toolchain:cvt_emit",
     ]
 )
 #####################################################
@@ -95,6 +97,8 @@ def _tc_runtime_out_transition_impl(settings, attr):
 tc_runtime_out_transition = transition(
     implementation = _tc_runtime_out_transition_impl,
     inputs = [
+        "//config:dev",
+
         "//config/target/executor",
         "//config/target/emitter",
 

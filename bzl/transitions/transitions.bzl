@@ -63,6 +63,7 @@ def _tc_target_transitions(settings, attr, debug):
 def tc_compiler_out_transition_impl(settings, attr, debug):
 
     debug = True
+    if debug: print("tc_compiler_out_transition")
 
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
@@ -112,13 +113,15 @@ def tc_compiler_out_transition_impl(settings, attr, debug):
 
         "//toolchain:compiler": compiler,
         "//toolchain:lexer"   : settings["//toolchain:lexer"],
-        "//toolchain:runtime" : settings["//toolchain:runtime"]
+        "//toolchain:runtime" : settings["//toolchain:runtime"],
+        "//toolchain:cvt_emit" : settings["//toolchain:cvt_emit"]
     }
 
 ##############################################
 def tc_lexer_out_transition_impl(settings, attr, debug):
 
     debug = True
+    if debug: print("tc_lexer_out_transition")
 
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
@@ -165,41 +168,50 @@ def tc_lexer_out_transition_impl(settings, attr, debug):
 
         "//toolchain:compiler": settings["//toolchain:compiler"],
         "//toolchain:lexer"   : lexer,
-        "//toolchain:runtime" : settings["//toolchain:runtime"]
+        "//toolchain:runtime" : settings["//toolchain:runtime"],
+        "//toolchain:cvt_emit" : settings["//toolchain:cvt_emit"]
     }
 
 ##############################################
 def tc_runtime_out_transition_impl(settings, attr, debug):
 
     debug = True
+    if debug: print("tc_runtime_out_transition")
 
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
     if debug:
         print("//toolchain:runtime: %s" % settings["//toolchain:runtime"])
 
+    if settings["//config:dev"]:
+        rt_pkg = "@baseline//bin"
+    else:
+        rt_pkg = "//runtime"
+
     if config_executor == "boot":
         print("rttxn CC TRANSITION")
         return {}
     elif (config_executor == "boot"): #and config_emitter == "boot"):
         print("rttxn BOOT TRANSITION")
-        runtime  = "//runtime:camlrun"
+        rt_target  = ":camlrun"
     elif (config_executor == "baseline"):
         print("rttxn BASELINE TRANSITION")
-        runtime  = "//runtime:camlrun"
+        rt_target  = ":camlrun"
     elif (config_executor == "vm" and config_emitter == "vm"):
         print("rttxn VM-VM TRANSITION")
-        runtime  = "//runtime:camlrun"
+        rt_target  = ":camlrun"
 
     elif (config_executor == "vm" and config_emitter == "sys"):
         print("rttxn VM-SYS TRANSITION")
-        runtime  = "//runtime:asmrun"
+        rt_target  = ":asmrun"
     elif (config_executor == "sys" and config_emitter == "sys"):
         print("rttxn SYS-SYS TRANSITION")
-        runtime  = "//runtime:asmrun"
+        rt_target  = ":asmrun"
     elif (config_executor == "sys" and config_emitter == "vm"):
         print("rttxn SYS-VM TRANSITION")
-        runtime  = "//runtime:camlrun"
+        rt_target  = ":camlrun"
+
+    runtime = rt_pkg + rt_target
 
     if debug:
         print("setting //config/target/executor: %s" % config_executor)
@@ -236,24 +248,49 @@ def tc_mustache_transition_impl(settings, attr, debug):
 def tc_boot_in_transition_impl(settings, attr, debug):
     debug = True
 
-    if debug: print("tc_boot_in_transition_impl")
+    executor = settings["//config/target/executor"]
+    emitter  = settings["//config/target/emitter"]
+    compiler = settings["//toolchain:compiler"]
+    lexer    = settings["//toolchain:lexer"]
+    runtime  = settings["//toolchain:runtime"]
+
+    if debug:
+        print("tc_boot_in_transition_impl")
+        print("tc.dev: %s" % settings["//config:dev"])
+        print("//config/target:executor: %s" % executor)
+        print("//config/target:emitter:  %s" % emitter)
+        print("//toolchain:compiler:     %s" % compiler)
+        print("//toolchain:lexer         %s" % lexer)
+        print("//toolchain:runtime       %s" % runtime)
 
     if settings["//config:dev"] == True:
         compiler = "@baseline//bin:ocamlc.opt"
         lexer    = "@baseline//bin:ocamllex.opt"
         runtime  = "@baseline//bin:ocamlrun"
+        executor = settings["//config/target/executor"]
+        emitter  = settings["//config/target/emitter"]
     else:
+    # if not settings["//config:dev"]:
         compiler = "//boot:ocamlc.boot"
         lexer    = "//boot:ocamllex.boot"
         runtime  = "//runtime:asmrun"
+        executor = "boot"
+        emitter  = "boot"
+
+    if debug:
+        print("setting //config/target/executor: %s" % executor)
+        print("setting //config/target/emitter:  %s" % emitter)
+        print("setting //toolchain:compiler:     %s" % compiler)
+        print("setting //toolchain:lexer:        %s" % lexer)
+        print("setting//toolchain:runtime:       %s" % runtime)
 
     return {
-        "//config/target/executor": "boot",
-        "//config/target/emitter" : "boot",
+        "//config/target/executor": executor,
+        "//config/target/emitter" : emitter,
 
-        "//toolchain:compiler" : "//boot:ocamlc.boot",
-        "//toolchain:lexer"    : "//boot:ocamllex.boot",
-        "//toolchain:runtime"  : "//runtime:camlrun",
+        "//toolchain:compiler" : compiler,
+        "//toolchain:lexer"    : lexer,
+        "//toolchain:runtime"  : runtime
     }
 
 #####################################################

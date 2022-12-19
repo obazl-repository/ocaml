@@ -18,18 +18,18 @@ def tc_build_executor(ctx):
     if debug:
         print("tc.build_executor")
 
-    if ctx.attr.dev:
-        build_executor = "opt"
+    ## NB: "config" means target (//config/target/[executor|emitter])
+    t_executor = ctx.attr.config_executor[BuildSettingInfo].value
+    t_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
+
+    if ctx.attr.dev[BuildSettingInfo].value:
+        build_executor = t_executor
     else:
         # we can always infer build_emitter from target_executor
         # in general we cannot so infer build_executor.
         # however in this controlled environment we always know
         # how target executor/emitter combinations are built,
         # so we can infer build executor from that pair.
-
-        ## NB: "config" means target (//config/target/[executor|emitter])
-        t_executor = ctx.attr.config_executor[BuildSettingInfo].value
-        t_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
         if debug:
             print("t_executor: %s" % t_executor)
@@ -77,16 +77,18 @@ def tc_build_executor(ctx):
         else:
             build_executor = "ERROR"
 
-    print("TC.BUILD_EXECUTOR: %s" % build_executor)
+    print("inferred build executor == %s" % build_executor)
     return build_executor
 
 #################
-def _tool_arg(ctx):
-    debug = False
+def tc_tool_arg(ctx):
+    debug = True
 
     if debug:
-        print("TC.TOOL_ARG")
+        print("TC.TOOL_ARG: %s" % ctx.label)
+        print("tc.build_executor: %s" % tc_build_executor(ctx))
         print("tc.config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
+
     if type(ctx.attr.compiler) == "list":
         tcc = ctx.attr.compiler[0][DefaultInfo].files_to_run.executable
     else:
@@ -94,30 +96,35 @@ def _tool_arg(ctx):
     if debug:
         print("tc.compiler: %s" % tcc)
 
-    if ctx.attr.dev:
+    if ctx.attr.dev[BuildSettingInfo].value:
+        print("returning DEV toolarg: none")
         return None
     else:
         # if ctx.attr.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
         if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
             # most recently built compiler
+            print("returning TARG vm: %s" % tcc)
             return tcc
         else:
             # return tc.compiler[DefaultInfo].files_to_run.executable
+            print("returning TARG sys: None")
             return None
 
 ###################
-def _executable(ctx):
-    debug = False
+## returns file object
+def tc_executable(ctx):
+    debug = True
     if debug:
         print("_executable")
         print("tc.name: %s" % ctx.attr.name)
 
-    if ctx.attr.dev:
+    if ctx.attr.dev[BuildSettingInfo].value:
         # native only
+        if debug: print("dev executable: %s" % ctx.attr.compiler)
         return ctx.attr.compiler # ctx.file.compiler?
     else:
         ## tc.compiler runfiles: bottom element is always ocamlrun
-        if tc_build_executor(ctx) == "vm":
+        if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
             if type(ctx.attr.compiler) == "list":
                 ## built compiler, transitioned
 
@@ -140,7 +147,7 @@ def _executable(ctx):
             return ctx.attr.compiler[0][DefaultInfo].files_to_run.executable
 
 ####################
-def _compiler(ctx):
+def tc_compiler(ctx):
 
     if type(ctx.attr.compiler) == "list":
         # because of transitions
@@ -157,6 +164,7 @@ def tc_workdir(ctx):
 
     if (config_executor == "boot"):
         workdir = "_boot/"
+        # fail("WHY BOOT?")
 
     elif (config_executor == "baseline"):
         workdir = "_baseline/"
@@ -197,8 +205,8 @@ def tc_workdir(ctx):
 ##########################################
 def _toolchain_adapter_impl(ctx):
 
-    config_executor = ctx.attr.config_executor[BuildSettingInfo].value
-    config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
+    _config_executor = ctx.attr.config_executor[BuildSettingInfo].value
+    _config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
@@ -206,9 +214,8 @@ def _toolchain_adapter_impl(ctx):
 
         build_executor         = tc_build_executor(ctx),
 
-        config_executor        = config_executor,
-        config_emitter         = config_emitter,
-
+        config_executor        = _config_executor,
+        config_emitter         = _config_emitter,
 
         workdir                = tc_workdir(ctx),
 
@@ -227,11 +234,11 @@ def _toolchain_adapter_impl(ctx):
         # camlheaders            = ctx.files.camlheaders,
 
         ## core tools
-        executable             = _executable(ctx),
-        tool_arg               = _tool_arg(ctx),
+        executable             = tc_executable(ctx),
+        tool_arg               = tc_tool_arg(ctx),
 
-        compiler               = _compiler(ctx),
-        runtime                = ctx.attr.runtime,
+        compiler               = tc_compiler(ctx),
+        runtime                = ctx.file.runtime,
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
         structopts             = ctx.attr.structopts,
@@ -247,7 +254,7 @@ toolchain_adapter = rule(
     _toolchain_adapter_impl,
     doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
     attrs = {
-        "dev": attr.bool(default = False),
+        "dev": attr.label(default = "//config:dev"),
         # "build_host": attr.string(
         #     doc     = "OCaml host platform: vm (bytecode) or an arch.",
         #     default = "vm"

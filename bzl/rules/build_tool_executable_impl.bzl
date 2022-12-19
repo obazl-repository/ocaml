@@ -31,7 +31,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
-    tc = ctx.toolchains["//toolchain/type:boot"]
+    # tc = ctx.toolchains["//toolchain/type:boot"]
 
     workdir = tc.workdir
 
@@ -39,7 +39,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     #  config_executor, config_emitter,
     #  workdir) = get_workdir(ctx, tc)
 
-    workdir = "_preproc/"
+    # workdir = "_preproc/"
 
     if debug:
         print("tc.name: %s" % tc.name)
@@ -438,7 +438,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
         mnemonic = "LinkBootstrapTest"
     elif ctx.attr._rule == "ocaml_compiler":
         mnemonic = "LinkOcamlCompiler"
-    elif ctx.attr._rule == "build_tool":
+    elif ctx.attr._rule in ["build_tool_vm", "build_tool_sys"]:
         mnemonic = "LinkBuildTool"
     elif ctx.attr._rule == "baseline_compiler":
         mnemonic = "LinkOcamlcKick"
@@ -533,7 +533,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule in ["build_tool", "ocaml_tool"]:
+    elif ctx.attr._rule in ["build_tool_vm", "build_tool_sys",
+                            "ocaml_tool"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
         exe_provider = OcamlExecutableMarker()

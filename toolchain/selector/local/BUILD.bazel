@@ -23,6 +23,7 @@ toolchain_selector(
 toolchain_selector(
     name           = "preproc",
     type           = "//toolchain/type:boot",
+    # adapter        = "//toolchain/adapter:boot",
     adapter        = "//toolchain/adapter:preproc",
     target_host_configuration = [
         # "//config/target/executor:boot_executor?",

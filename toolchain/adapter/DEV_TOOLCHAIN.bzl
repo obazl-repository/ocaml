@@ -6,10 +6,27 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
 
+load(":BUILD.bzl",
+     "tc_executable", "tc_tool_arg",
+     "tc_compiler",
+     "tc_workdir", "tc_build_executor")
+
+################
+def _executable(ctx):
+    x = tc_executable(ctx)
+    return x[DefaultInfo].files.to_list()[0]
+
 ##########################################
 def _dev_toolchain_adapter_impl(ctx):
 
-    ## avoid transition?
+    print("DEV TC")
+
+    _config_executor = ctx.attr.config_executor[BuildSettingInfo].value
+    _config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
+
+    print("DEV TC config_executor: %s" % _config_executor)
+    print("DEV TC config_emitter:  %s" % _config_emitter)
+
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
         dev                    = ctx.attr.dev,
@@ -37,7 +54,10 @@ def _dev_toolchain_adapter_impl(ctx):
         # camlheaders            = ctx.files.camlheaders,
 
         ## core tools
-        compiler               = ctx.file.compiler,
+        executable             = _executable(ctx),
+        tool_arg               = tc_tool_arg(ctx),
+
+        compiler               = tc_compiler(ctx),
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
         structopts             = ctx.attr.structopts,
@@ -52,6 +72,7 @@ def _dev_toolchain_adapter_impl(ctx):
 dev_toolchain_adapter = rule(
     _dev_toolchain_adapter_impl,
     attrs = {
+        "dev": attr.label(default = "//config:dev"),
         "config_executor": attr.label(default = "//config/target/executor"),
         "config_emitter" : attr.label(default = "//config/target/emitter"),
 
@@ -119,28 +140,28 @@ dev_toolchain_adapter = rule(
         #     cfg = "exec"),
 
         "compiler": attr.label(
-            default = "//toolchain/dev:compiler",
+            default = "//toolchain:compiler",
             allow_single_file = True,
             # allow_files = True,
             executable = True,
-            # cfg = "exec"
-            cfg = dev_tc_compiler_out_transition
+            cfg = "exec"
+            # cfg = dev_tc_compiler_out_transition
         ),
 
         "lexer": attr.label(
-            default = "//toolchain/dev:lexer",
+            default = "//toolchain:lexer",
             allow_single_file = True,
             executable = True,
-            # cfg = "exec",
-            cfg = dev_tc_compiler_out_transition
+            cfg = "exec",
+            # cfg = dev_tc_compiler_out_transition
         ),
 
         "yaccer": attr.label(
             default = "//yacc:ocamlyacc",
             allow_single_file = True,
             executable = True,
-            # cfg = "exec",
-            cfg = dev_tc_compiler_out_transition
+            cfg = "exec",
+            # cfg = dev_tc_compiler_out_transition
         ),
 
         "copts" : attr.string_list(
