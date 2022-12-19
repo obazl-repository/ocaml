@@ -6,7 +6,7 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
 
-load(":BUILD.bzl",
+load("//toolchain/adapter:ocaml_tc_adapter.bzl",
      "tc_executable", "tc_tool_arg",
      "tc_compiler",
      "tc_workdir", "tc_build_executor")

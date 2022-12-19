@@ -1,11 +1,9 @@
 label_setting(name="compiler",
               build_setting_default = "//bin:ocamlc.byte",
-              # build_setting_default = "//boot:ocamlc.boot",
               visibility = ["//visibility:public"])
 
 label_setting(name="lexer",
               build_setting_default = "//lex:ocamllex.byte",
-              # build_setting_default = "//boot:ocamllex.boot",
               visibility = ["//visibility:public"])
 
 label_setting(name="ocamlrun",
@@ -17,10 +15,7 @@ label_setting(name="runtime",
               visibility = ["//visibility:public"])
 
 label_setting(name="cvt_emit",
-              # build_setting_default = "//boot:ocamllex.boot", # fake
               build_setting_default = "//asmcomp:cvt_emit.byte",
-              # build_setting_default = "@baseline//bin:cvt_emit.byte",
-              # dev mode: @baseline/bin:cvt_emit
               visibility = ["//visibility:public"])
 
 label_setting(name="stdlib",

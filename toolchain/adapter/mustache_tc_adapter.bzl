@@ -2,8 +2,6 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
-# load("//toolchain:tc_transitions.bzl", "tool_out_transition")
-
 load("//bzl/transitions:tc_transitions.bzl", "tc_mustache_out_transition")
 
 ##########################################

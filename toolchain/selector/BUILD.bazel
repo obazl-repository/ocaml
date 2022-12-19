@@ -32,14 +32,14 @@ exports_files(glob(["*.bazel"]))
 # )
 
 ################################################################
-toolchain_selector(
-    name           = "vm",
-    type           = "//toolchain/type:baseline",
-    adapter        = "//toolchain/adapters/baseline",
-    build_host_constraints  = ["//platform/build:vm?"],
-    # target_host_constraints = ["//platform/target:vm?"],
-    # target_host_configuration   = ["//platform/xtarget:sys?"]
-)
+# toolchain_selector(
+#     name           = "vm",
+#     type           = "//toolchain/type:baseline",
+#     adapter        = "//toolchain/adapters/baseline",
+#     build_host_constraints  = ["//platform/build:vm?"],
+#     # target_host_constraints = ["//platform/target:vm?"],
+#     # target_host_configuration   = ["//platform/xtarget:sys?"]
+# )
 
 # ##########
 # toolchain_selector(

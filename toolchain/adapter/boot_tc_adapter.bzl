@@ -9,17 +9,18 @@ load("//bzl/transitions:tc_transitions.bzl",
      "tc_lexer_out_transition",
      "tc_runtime_out_transition")
 
-load(":BUILD.bzl", "tc_workdir", "tc_build_executor")
+load("//toolchain/adapter:ocaml_tc_adapter.bzl",
+     "tc_workdir", "tc_build_executor")
 
 ###################
 # returns file, no runfiles
 def _executable(ctx, tool):
     debug = True
     if debug:
-        print("boot tc.executable")
+        print("BOOT tc.executable entry")
         print("tc.name: %s" % ctx.attr.name)
 
-    if ctx.attr.dev[BuildSettingInfo].value:
+    if False: # ctx.attr.dev[BuildSettingInfo].value:
         # native only
         if tool == "compiler":
             return ctx.file.compiler
@@ -54,12 +55,18 @@ def _executable(ctx, tool):
                 return ocamlrun
         else:
             if debug:
-                print("lx returning tc lex: %s" % ctx.attr.lexer[0][DefaultInfo].files_to_run.executable)
+                print("lx executable: returning %s" % ctx.attr.lexer)
 
             if tool == "compiler":
-                return ctx.attr.compiler[DefaultInfo].files_to_run.executable
+                if ctx.attr.dev[BuildSettingInfo].value:
+                    return ctx.file.compiler
+                else:
+                    return ctx.attr.compiler[DefaultInfo].files_to_run.executable
             else:
-                return ctx.attr.lexer[DefaultInfo].files_to_run.executable
+                if ctx.attr.dev[BuildSettingInfo].value:
+                    return ctx.file.lexer
+                else:
+                    return ctx.attr.lexer[DefaultInfo].files_to_run.executable
 
 ###################
 # returns attr with runfiles
@@ -80,30 +87,39 @@ def _tool_arg(ctx, tool):
     debug = True
 
     if debug:
-        print("boot tc: _TOOL_ARG")
-        print("tc.config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
+        print("lx _TOOL_ARG for %s" % tool)
+        print("lx dev mode? %s" % ctx.attr.dev[BuildSettingInfo].value)
+        print("lx build executor: %s" % tc_build_executor(ctx))
+        print("lx config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
 
-    if type(ctx.attr.lexer) == "list":
-        if tool == "lexer":
+    # if ctx.attr.dev[BuildSettingInfo].value:
+    #     fail()
+
+    if tool == "lexer":
+        if type(ctx.attr.lexer) == "list":
             tcc = ctx.attr.lexer[0][DefaultInfo].files_to_run.executable
         else:
-            tcc = ctx.attr.compiler[0][DefaultInfo].files_to_run.executable
-    else:
-        if tool == "lexer":
             tcc = ctx.attr.lexer[DefaultInfo].files_to_run.executable
+    else: # tool == "compiler":
+        if type(ctx.attr.compiler) == "list":
+            tcc = ctx.attr.compiler[0][DefaultInfo].files_to_run.executable
         else:
             tcc = ctx.attr.compiler[DefaultInfo].files_to_run.executable
     print("tcc: %s" % tcc)
 
     if ctx.attr.dev[BuildSettingInfo].value:
-        return None
+        if tool == "compiler":
+            return ctx.file.compiler
+        else:
+            return ctx.file.lexer
     else:
-        if ctx.attr.config_executor[BuildSettingInfo].value in ["boot", "vm"]:
+        if ctx.attr.config_executor[BuildSettingInfo].value in [
+            "boot", "baseline", "vm"]:
             # most recently built compiler
             return tcc
         else:
             # return tc.lexer[DefaultInfo].files_to_run.executable
-            return tcc
+            return None
 
 ##########################################
 def _boot_toolchain_adapter_impl(ctx):
