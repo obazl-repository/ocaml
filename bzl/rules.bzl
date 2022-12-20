@@ -8,7 +8,8 @@ load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
 load("//bzl/rules:build_tool.bzl", _build_tool = "build_tool")
 load("//bzl/rules:ocaml_tool.bzl",
-     _ocaml_tool = "ocaml_tool",
+     _ocaml_tool_r = "ocaml_tool_r",
+     _ocaml_tools = "ocaml_tools",
      _ocaml_tool_vm = "ocaml_tool_vm",
      _ocaml_tool_sys = "ocaml_tool_sys",
      )
@@ -33,8 +34,7 @@ load("//bzl/rules:boot_signature.bzl", _boot_signature = "boot_signature")
 load("//bzl/rules:boot_library.bzl", _boot_library = "boot_library")
 
 load("//bzl/rules:ocaml_compiler.bzl",
-     _ocamlc_byte = "ocamlc_byte",
-     _ocaml_compiler = "ocaml_compiler",
+     _ocaml_compiler_r = "ocaml_compiler_r",
      _ocaml_compilers = "ocaml_compilers")
 
 load("//bzl/rules:compiler_module.bzl", _compiler_module = "compiler_module")
@@ -75,10 +75,10 @@ boot_signature   = _boot_signature
 compiler_signature   = _compiler_signature
 
 # boot_compiler    = _boot_compiler
-ocaml_compiler    = _ocaml_compiler
+ocaml_compiler_r   = _ocaml_compiler_r
 ocaml_compilers    = _ocaml_compilers
-ocamlc_byte       = _ocamlc_byte
-ocaml_tool         = _ocaml_tool
+ocaml_tool_r       = _ocaml_tool_r
+ocaml_tools        = _ocaml_tools
 ocaml_tool_vm      = _ocaml_tool_vm
 ocaml_tool_sys     = _ocaml_tool_sys
 

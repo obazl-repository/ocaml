@@ -46,7 +46,7 @@ reset_cc_config_transition = transition(
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
         "//toolchain:runtime",
     ]
 )

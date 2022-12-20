@@ -19,7 +19,6 @@ boot_coldstart(
         "//runtime:asmrun",
         "//runtime:camlrun",
     ],
-    # lexer "//lex:ocamllex",
     data = [
         "//bin:ocamlc.opt",  ## runfiles contain all 4
         "//lex:ocamllex.byte",

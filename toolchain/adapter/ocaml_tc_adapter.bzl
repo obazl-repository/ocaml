@@ -9,7 +9,7 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 load("//bzl/transitions:tc_transitions.bzl",
      "tc_compiler_out_transition",
-     "tc_lexer_out_transition",
+     # "tc_lexer_out_transition",
      "tc_runtime_out_transition")
 
 load(":tc_utils.bzl",
@@ -55,13 +55,16 @@ def _toolchain_adapter_impl(ctx):
         tool_arg               = tc_tool_arg(ctx),
 
         compiler               = tc_compiler(ctx),
+        # lexer                  = ctx.attr.lexer,
+        cvt_emit               = ctx.file.cvt_emit,
+
         runtime                = ctx.file.runtime,
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
         structopts             = ctx.attr.structopts,
         linkopts               = ctx.attr.linkopts,
         warnings               = ctx.attr.warnings,
-        # lexer                  = ctx.attr.lexer,
+
         # yaccer                 = ctx.file.yaccer,
     )]
 
@@ -163,9 +166,11 @@ toolchain_adapter = rule(
         ),
 
         # "lexer": attr.label(
+        #     # default = "//boot:ocamllex.boot",
         #     default = "//toolchain:lexer",
+        #     allow_single_file = True,
         #     executable = True,
-        #     # cfg = "exec",
+        #     # cfg = tc_compiler_out_transition
         #     cfg = tc_lexer_out_transition
         # ),
 

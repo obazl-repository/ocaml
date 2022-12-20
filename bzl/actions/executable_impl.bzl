@@ -352,7 +352,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
         mnemonic = "LinkBuildTool"
     # elif ctx.attr._rule == "baseline_compiler":
     #     mnemonic = "LinkBaseline"
-    elif ctx.attr._rule in ["ocaml_tool_vm", "ocaml_tool_sys"]:
+    elif ctx.attr._rule in ["ocaml_tool_r",
+                            "ocaml_tool_vm", "ocaml_tool_sys"]:
         mnemonic = "LinkOCamlTool"
     elif ctx.attr._rule in ["ocaml_test", "expect_test"]:
         mnemonic = "OcamlTest"
@@ -439,7 +440,9 @@ def executable_impl(ctx, tc, exe_name, workdir):
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule in ["build_tool", "ocaml_tool_vm", "ocaml_tool_sys"]:
+    elif ctx.attr._rule in ["build_tool",
+                            "ocaml_tool_r",
+                            "ocaml_tool_vm", "ocaml_tool_sys"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
         exe_provider = OcamlExecutableMarker()

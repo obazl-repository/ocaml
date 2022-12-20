@@ -9,20 +9,24 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 load("//bzl/transitions:tc_transitions.bzl",
      "tc_compiler_out_transition",
-     "tc_lexer_out_transition",
+     # "tc_lexer_out_transition",
      "tc_runtime_out_transition")
 
 #################
 def tc_build_executor(ctx):
     debug = True
     if debug:
-        print("tc.build_executor")
+        print("tc.build_executor: %s" % ctx.label)
 
     ## NB: "config" means target (//config/target/[executor|emitter])
     t_executor = ctx.attr.config_executor[BuildSettingInfo].value
     t_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
+    if debug:
+        print("config_executor: %s" % t_executor)
+        print("config_emitter: %s" % t_emitter)
+        print("tc.compiler: %s" % ctx.attr.compiler)
 
-    if ctx.attr.dev[BuildSettingInfo].value:
+    if False: # ctx.attr.dev[BuildSettingInfo].value:
         build_executor = t_executor
     else:
         # we can always infer build_emitter from target_executor

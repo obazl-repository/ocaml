@@ -8,7 +8,7 @@ load("//bzl:rules.bzl",
      # "build_tool",
      "compiler_module",
      "compiler_signature",
-     "ocaml_tool"
+     "ocaml_tools"
 )
 # load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
@@ -43,7 +43,7 @@ SIG_OPTS    = []
 # ocamldep$(EXE): $(OCAMLDEP)
 # ocamldep.opt$(EXE): $(call byte2native, $(OCAMLDEP))
 
-ocaml_tool(
+ocaml_tools(
     name = "ocamldep",
     main = ":Ocamldep",
     prologue = [
@@ -55,7 +55,7 @@ ocaml_tool(
 ################################################################
 # Profiling: https://ocaml.org/manual/profil.html
 # The OCaml profiling compilers: ocamlcp, ocamloptp, ocamlprof
-ocaml_tool(
+ocaml_tools(
     name = "ocamlprof",
     prologue = [
         "//config:Config",
@@ -84,7 +84,7 @@ ocaml_tool(
     # toolchains = ["//toolchain/profile/ocaml"]
 )
 
-ocaml_tool(
+ocaml_tools(
     name = "ocamlcp",
     main = ":Ocamlcp",
     prologue = [
@@ -109,7 +109,7 @@ ocaml_tool(
 )
 
 # profiling compiler
-ocaml_tool(
+ocaml_tools(
     name = "ocamloptp",
     main = ":Ocamloptp",
     prologue = [
@@ -135,7 +135,7 @@ ocaml_tool(
 
 ################################################################
 # To help building mixed-mode libraries (OCaml + C)
-ocaml_tool(
+ocaml_tools(
     name = "ocamlmklib",
     main = ":Ocamlmklib",
     prologue = [
@@ -152,7 +152,7 @@ ocaml_tool(
 #        local_store.cmo load_path.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
 # ocamlmktop$(EXE): $(OCAMLMKTOP)
 # ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
-ocaml_tool(
+ocaml_tools(
     name = "ocamlmktop",
     main = ":Ocamlmktop",
     prologue = [
@@ -174,7 +174,7 @@ ocaml_tool(
 
 ################################################################
 # Reading cmt files
-ocaml_tool(
+ocaml_tools(
     name = "ocamlcmt",
     main = ":Ocamlcmt",
     prologue = [
@@ -192,7 +192,7 @@ ocaml_tool(
 # dumpobj$(EXE): $(DUMPOBJ)
 # dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
 
-ocaml_tool(
+ocaml_tools(
     name = "dumpobj",
     main = ":Dumpobj",
     prologue = [
@@ -204,7 +204,7 @@ ocaml_tool(
 
 ################################################################
 ## ocamlobjinfo - Display info on compiled files
-ocaml_tool(
+ocaml_tools(
     name = "ocamlobjinfo",
     main = ":Objinfo",
     prologue = [
@@ -230,7 +230,7 @@ ocaml_tool(
 #         primreq.cmo
 # primreq$(EXE): $(PRIMREQ)
 # primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
-ocaml_tool(
+ocaml_tools(
     name = "primreq",
     main = ":Primreq",
     prologue = [
@@ -241,7 +241,7 @@ ocaml_tool(
 
 ################
 # Copy a bytecode executable, stripping debug info
-ocaml_tool(
+ocaml_tools(
     name = "stripdebug",
     main = ":Stripdebug",
     prologue = [
@@ -688,7 +688,7 @@ compiler_module(
 #        cmpbyt.cmo
 # cmpbyt$(EXE): $(CMPBYT)
 # cmpbyt.opt$(EXE): $(call byte2native, $(CMPBYT))
-ocaml_tool(
+ocaml_tools(
     name = "cmpbyt",
     main = ":Cmpbyt",
     prologue = [

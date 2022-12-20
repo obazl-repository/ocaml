@@ -75,11 +75,14 @@ def tc_compiler_out_transition_impl(settings, attr, debug):
     if config_executor == "boot":
         print("ctxn BASE CASE")
         compiler = "//boot:ocamlc.boot"
+        # lexer    = "//boot:ocamllex.boot"
     elif (config_executor == "baseline"):
         print("ctxn BASELINE TRANSITION")
         compiler = "//bin:ocamlcc"
+        # lexer    = "//lex:ocamllex"
     else:
         compiler = "//bin:ocamlcc"
+        # lexer    = "//lex:ocamllex"
 
 
     # elif (config_executor == "vm" and config_emitter == "vm"):
@@ -112,65 +115,65 @@ def tc_compiler_out_transition_impl(settings, attr, debug):
         "//config/target/emitter" : config_emitter,
 
         "//toolchain:compiler": compiler,
-        "//toolchain:lexer"   : settings["//toolchain:lexer"],
+        # "//toolchain:lexer"   : lexer,
         "//toolchain:runtime" : settings["//toolchain:runtime"],
         "//toolchain:cvt_emit" : settings["//toolchain:cvt_emit"]
     }
 
 ##############################################
-def tc_lexer_out_transition_impl(settings, attr, debug):
+# def tc_lexer_out_transition_impl(settings, attr, debug):
 
-    debug = True
-    if debug: print("tc_lexer_out_transition")
+#     debug = True
+#     if debug: print("tc_lexer_out_transition")
 
-    config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
+#     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
-    # compiler = settings["//toolchain:compiler"]
-    # lexer = settings["//toolchain:lexer"]
+#     # compiler = settings["//toolchain:compiler"]
+#     # lexer = settings["//toolchain:lexer"]
 
-    if debug:
-        print("//toolchain:lexer:  %s" % settings["//toolchain:lexer"])
+#     if debug:
+#         print("//toolchain:lexer:  %s" % settings["//toolchain:lexer"])
 
-    if config_executor == "boot":
-        print("lextxn BASE CASE")
-        lexer    = "//boot:ocamllex.boot"
-    # elif (config_executor == "baseline"):
-    #     print("lextxn BASELINE TRANSITION")
-    #     lexer    = "//lex:ocamllex.byte"
-    #     # lexer    = "//boot:ocamllex.boot"
-    else:
-        lexer    = "//lex:ocamllex.byte"
+#     if config_executor == "boot":
+#         print("lextxn BASE CASE")
+#         lexer    = "//boot:ocamllex.boot"
+#     # elif (config_executor == "baseline"):
+#     #     print("lextxn BASELINE TRANSITION")
+#     #     lexer    = "//lex:ocamllex.byte"
+#     #     # lexer    = "//boot:ocamllex.boot"
+#     else:
+#         lexer    = "//lex:ocamllex"
 
-    # elif (config_executor == "vm" and config_emitter == "vm"):
-    #     print("lextxn VM-VM TRANSITION")
-    #     lexer    = "//lex:ocamllex.byte"
-    # elif (config_executor == "vm" and config_emitter == "sys"):
-    #     print("lextxn VM-SYS TRANSITION")
-    #     lexer    = "//lex:ocamllex.byte"
-    # elif (config_executor == "sys" and config_emitter == "sys"):
-    #     print("lextxn SYS-SYS TRANSITION")
-    #     lexer    = "//lex:ocamllex.byte"
-    # elif (config_executor == "sys" and config_emitter == "vm"):
-    #     print("lextxn SYS-VM TRANSITION")
-    #     lexer    = "//lex:ocamllex.byte"
-    # else:
-    #     fail("xxxxxxxxxxxxxxxx %s" % config_executor)
+#     # elif (config_executor == "vm" and config_emitter == "vm"):
+#     #     print("lextxn VM-VM TRANSITION")
+#     #     lexer    = "//lex:ocamllex.byte"
+#     # elif (config_executor == "vm" and config_emitter == "sys"):
+#     #     print("lextxn VM-SYS TRANSITION")
+#     #     lexer    = "//lex:ocamllex.byte"
+#     # elif (config_executor == "sys" and config_emitter == "sys"):
+#     #     print("lextxn SYS-SYS TRANSITION")
+#     #     lexer    = "//lex:ocamllex.byte"
+#     # elif (config_executor == "sys" and config_emitter == "vm"):
+#     #     print("lextxn SYS-VM TRANSITION")
+#     #     lexer    = "//lex:ocamllex.byte"
+#     # else:
+#     #     fail("xxxxxxxxxxxxxxxx %s" % config_executor)
 
-    if debug:
-        print("setting //config/target/executor: %s" % config_executor)
-        print("setting //config/target/emitter: %s" % config_emitter)
-        # print("setting //toolchain:compiler %s" % compiler)
-        print("setting //toolchain:lexer %s" % lexer)
+#     if debug:
+#         print("setting //config/target/executor: %s" % config_executor)
+#         print("setting //config/target/emitter: %s" % config_emitter)
+#         # print("setting //toolchain:compiler %s" % compiler)
+#         print("setting //toolchain:lexer %s" % lexer)
 
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
+#     return {
+#         "//config/target/executor": config_executor,
+#         "//config/target/emitter" : config_emitter,
 
-        "//toolchain:compiler": settings["//toolchain:compiler"],
-        "//toolchain:lexer"   : lexer,
-        "//toolchain:runtime" : settings["//toolchain:runtime"],
-        "//toolchain:cvt_emit" : settings["//toolchain:cvt_emit"]
-    }
+#         "//toolchain:compiler": settings["//toolchain:compiler"],
+#         "//toolchain:lexer"   : lexer,
+#         "//toolchain:runtime" : settings["//toolchain:runtime"],
+#         "//toolchain:cvt_emit" : settings["//toolchain:cvt_emit"]
+#     }
 
 ##############################################
 def tc_runtime_out_transition_impl(settings, attr, debug):
@@ -222,7 +225,7 @@ def tc_runtime_out_transition_impl(settings, attr, debug):
         "//config/target/executor": config_executor,
         "//config/target/emitter" : config_emitter,
         "//toolchain:compiler"    : settings["//toolchain:compiler"],
-        "//toolchain:lexer"       : settings["//toolchain:lexer"],
+        # "//toolchain:lexer"       : settings["//toolchain:lexer"],
         "//toolchain:runtime"     : runtime
     }
 
@@ -240,10 +243,6 @@ def tc_mustache_transition_impl(settings, attr, debug):
         "//config/target/emitter" : "boot",
 
         "//toolchain:compiler" : "//boot:ocamlc.boot",
-        "//toolchain:lexer"    : "//boot:ocamllex.boot",
-        "//toolchain:runtime"  : "//runtime:camlrun",
-    }
-
 ##############################################
 def tc_boot_in_transition_impl(settings, attr, debug):
     debug = True
@@ -306,7 +305,7 @@ def reset_config_transition_impl(settings, attr):
         "//config/target/emitter" : "boot",
 
         "//toolchain:compiler" : "//boot:ocamlc.boot",
-        "//toolchain:lexer"    : "//boot:ocamllex.boot",
+        # "//toolchain:lexer"    : "//boot:ocamllex.boot",
         "//toolchain:runtime"  : settings["//toolchain:runtime"]
     }
 

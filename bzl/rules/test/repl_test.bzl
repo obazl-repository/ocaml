@@ -164,7 +164,7 @@ repl_test = rule(
 
         _runtime = attr.label(
             allow_single_file = True,
-            default = "//toolchain/dev:runtime",
+            default = "//toolchain:runtime",
             executable = False,
             # cfg = reset_cc_config_transition ## only build once
             # default = "//config/runtime" # label flag set by transition

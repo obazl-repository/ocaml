@@ -22,35 +22,28 @@ def expect_test_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc.workdir
-
-    # (target_executor, target_emitter,
-    #  config_executor, config_emitter,
-    #  workdir) = get_workdir(ctx, tc)
-
-    # if debug == True:
-    #     print("EXPECT_TEST: %s" % ctx.label)
-    #     print("config_executor: %s" % config_executor)
-    #     print("config_emitter: %s" % config_emitter)
-
-    if tc.config_executor in ["boot", "vm"]:
+    if tc.config_executor in ["boot", "baseline", "vm"]:
         ext      = ".byte"
     else:
         ext      = ".opt"
 
     exe_name = ctx.label.name + ext
 
-    exe = executable_impl(ctx, tc, exe_name, workdir)
+    exe = executable_impl(ctx, tc, exe_name, tc.workdir)
 
     if debug:
         print("exe: %s" % exe)
-        for f in exe[0].default_runfiles.files.to_list():
-            print("RF: %s" % f)
+        print("exe[di]: %s" % exe[0].files)
+        # print("exe[di]file to run: %s" % exe[0].files_to_run)
+        # for f in exe[0].default_runfiles.files.to_list():
+        #     print("RF: %s" % f)
+        print("ocamlrun: %s" % tc.ocamlrun)
 
     pgm = exe[0].files.to_list()[0]
 
-    if tc.config_executor in ["boot", "vm"]:
-        ocamlrun = exe[0].default_runfiles.files.to_list()[0]
+    if tc.config_executor in ["boot", "baseline","vm"]:
+        # ocamlrun = exe[0].default_runfiles.files.to_list()[0]
+        ocamlrun = tc.ocamlrun
         pgm_cmd = ocamlrun.short_path + " " + pgm.short_path
     else:
         ocamlrun = None
@@ -64,7 +57,11 @@ def expect_test_impl(ctx):
     stdout = ctx.attr.stdout
 
     if debug:
+        print("tc.name: %s" % tc.name)
         print("ocamlrun: %s" % ocamlrun)
+        print("tc.compiler: %s" % tc.compiler)
+        # print("tc.lexer: %s" % tc.lexer)
+        print("tc.config_executor: %s" % tc.config_executor)
         print("pgm: %s" % pgm)
         print("STDOUT: %s" % stdout)
 
@@ -137,7 +134,7 @@ def expect_test_impl(ctx):
 
 #         _runtime = attr.label(
 #             allow_single_file = True,
-#             default = "//toolchain/dev:runtime",
+#             default = "//toolchain:runtime",
 #             executable = False,
 #             # cfg = reset_cc_config_transition ## only build once
 #             # default = "//config/runtime" # label flag set by transition

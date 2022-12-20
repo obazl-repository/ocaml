@@ -3,14 +3,14 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//bzl/transitions:tool_transitions.bzl",
+load("//bzl/transitions:ocaml_transitions.bzl",
      "ocamlc_byte_in_transition",
      "ocamlopt_byte_in_transition",
      "ocamlopt_opt_in_transition",
      "ocamlc_opt_in_transition")
 
 ##############################
-def _ocaml_compiler_impl(ctx):
+def _ocaml_compiler_r_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
@@ -45,8 +45,8 @@ def _ocaml_compiler_impl(ctx):
     return executable_impl(ctx, tc, exe_name, workdir)
 
 #####################
-ocaml_compiler = rule(
-    implementation = _ocaml_compiler_impl,
+ocaml_compiler_r = rule(
+    implementation = _ocaml_compiler_r_impl,
     doc = "Builds a compiler",
 
     attrs = dict(

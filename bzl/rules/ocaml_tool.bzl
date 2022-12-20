@@ -8,7 +8,58 @@ load("//bzl/transitions:tool_transitions.bzl",
      "ocaml_tool_sys_in_transition")
 
 ##############################
+def _ocaml_tool_r_impl(ctx):
+
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
+
+    workdir = tc.workdir
+
+    print("OCAML TOOL.BYTE emitter: %s" % tc.config_emitter)
+
+    if tc.config_emitter == "sys":
+        # ext = ".opt"
+        workdir = "_sys/"
+    else:
+        # ext = ".byte"
+        workdir = "_vm/"
+
+    exe_name = ctx.label.name
+
+    return executable_impl(ctx, tc, exe_name, workdir)
+
+#######################
+ocaml_tool_r = rule(
+    implementation = _ocaml_tool_r_impl,
+
+    attrs = dict(
+        executable_attrs(),
+
+        vm_only = attr.bool(default = False),
+
+        _runtime = attr.label(
+            allow_single_file = True,
+            default = "//toolchain:runtime",
+            executable = False,
+        ),
+
+        _rule = attr.string( default = "ocaml_tool_r" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
+    ),
+    executable = True,
+    fragments = ["cpp"],
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+##############################
 def _ocaml_tool_vm_impl(ctx):
+
+    debug = True
+    if debug:
+        print("ocaml_tool_vm: %s" % ctx.label)
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
@@ -36,11 +87,11 @@ ocaml_tool_vm = rule(
 
         vm_only = attr.bool(default = False),
 
-        _runtime = attr.label(
-            allow_single_file = True,
-            default = "//toolchain/dev:runtime",
-            executable = False,
-        ),
+        # _runtime = attr.label(
+        #     allow_single_file = True,
+        #     default = "//toolchain:runtime",
+        #     executable = False,
+        # ),
 
         _rule = attr.string( default = "ocaml_tool_vm" ),
         _allowlist_function_transition = attr.label(
@@ -84,7 +135,7 @@ ocaml_tool_sys = rule(
 
         _runtime = attr.label(
             allow_single_file = True,
-            default = "//toolchain/dev:runtime",
+            default = "//toolchain:runtime",
             executable = False,
         ),
 
@@ -104,7 +155,7 @@ ocaml_tool_sys = rule(
 ################################################################
 ####  MACRO
 ################################################################
-def ocaml_tool(name, main,
+def ocaml_tools(name, main,
                prologue = None,
                visibility = ["//visibility:public"],
                **kwargs):

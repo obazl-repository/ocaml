@@ -98,6 +98,7 @@ def progress_msg(workdir, ctx):
                 "ocamlopt_opt", "ocamlc_opt",
                 "build_tool_vm", "build_tool_sys",
                 "ocaml_lex",
+                "ocaml_tool_r",
                 "ocaml_tool_vm", "ocaml_tool_sys",
                 "test_executable"]:
         action = "Linking"

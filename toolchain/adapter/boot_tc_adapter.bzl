@@ -6,7 +6,7 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 load("//bzl/transitions:tc_transitions.bzl",
      "tc_boot_in_transition",
-     "tc_lexer_out_transition",
+     # "tc_lexer_out_transition",
      "tc_runtime_out_transition")
 
 load(":tc_utils.bzl",
@@ -24,67 +24,67 @@ def _executable(ctx, tool):
         print("BOOT tc.executable entry")
         print("tc.name: %s" % ctx.attr.name)
 
-    if False: # ctx.attr.dev[BuildSettingInfo].value:
+    if ctx.attr.dev[BuildSettingInfo].value:
         # native only
         if tool == "compiler":
             return ctx.file.compiler
-        else:
-            return ctx.file.lexer
+        # else:
+        #     return ctx.file.lexer
     else:
         if debug:
-            print("lx tc.build_executor: %s" % tc_build_executor(ctx))
+            print("boot_tc build_executor: %s" % tc_build_executor(ctx))
         ## tc.compiler runfiles: bottom element is always ocamlrun
         if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
-            if type(ctx.attr.lexer) == "list":
-                ## built tool, transitioned
-                if tool == "compiler":
-                    xocamlrun =  ctx.attr.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
-                else:
-                    xocamlrun =  ctx.attr.lexer[DefaultInfo].default_runfiles.files.to_list()[0]
-                if debug:
-                    print("lx XOCAMLRUN: %s" % xocamlrun)
-                return xocamlrun
+            # if type(ctx.attr.lexer) == "list":
+            #     ## built tool, transitioned
+            #     if tool == "compiler":
+            #         xocamlrun =  ctx.attr.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+            #     else:
+            #         xocamlrun =  ctx.attr.lexer[DefaultInfo].default_runfiles.files.to_list()[0]
+            #     if debug:
+            #         print("boot_tc XOCAMLRUN: %s" % xocamlrun)
+            #     return xocamlrun
 
-            else:
-                ## boot exer
-                if debug:
-                    print("lx TX: %s" % ctx.attr.lexer[DefaultInfo])
-                if tool == "compiler":
-                    ocamlrun = ctx.attr.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
-                else:
-                    ocamlrun = ctx.attr.lexer[DefaultInfo].default_runfiles.files.to_list()[0]
-
-                if debug:
-                    print("lx OCAMLRUN: %s" % ocamlrun)
-                return ocamlrun
-        else:
+            # else:
+            ## boot exer
             if debug:
-                print("lx executable: returning %s" % ctx.attr.lexer)
+                print("lx TX: %s" % ctx.attr.lexer[DefaultInfo])
+            if tool == "compiler":
+                ocamlrun = ctx.attr.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+            else:
+                ocamlrun = ctx.attr.lexer[DefaultInfo].default_runfiles.files.to_list()[0]
+
+            if debug:
+                print("lx OCAMLRUN: %s" % ocamlrun)
+            return ocamlrun
+        else:
+            # if debug:
+            #     print("lx executable: returning %s" % ctx.attr.lexer)
 
             if tool == "compiler":
                 if ctx.attr.dev[BuildSettingInfo].value:
                     return ctx.file.compiler
                 else:
                     return ctx.attr.compiler[DefaultInfo].files_to_run.executable
-            else:
-                if ctx.attr.dev[BuildSettingInfo].value:
-                    return ctx.file.lexer
-                else:
-                    return ctx.attr.lexer[DefaultInfo].files_to_run.executable
+            # else:
+            #     if ctx.attr.dev[BuildSettingInfo].value:
+            #         return ctx.file.lexer
+            #     else:
+            #         return ctx.attr.lexer[DefaultInfo].files_to_run.executable
 
 ###################
 # returns attr with runfiles
-def _lexer(ctx):
-    debug = False
-    if debug:
-        print("tc_lexer")
-        print("tc.name: %s" % ctx.attr.name)
+# def _lexer(ctx):
+#     debug = False
+#     if debug:
+#         print("tc_lexer")
+#         print("tc.name: %s" % ctx.attr.name)
 
-    if ctx.attr.dev:
-        # native only
-        return ctx.attr.lexer
-    else:
-        return ctx.attr.lexer
+#     if ctx.attr.dev:
+#         # native only
+#         return ctx.attr.lexer
+#     else:
+#         return ctx.attr.lexer
 
 #################
 def _tool_arg(ctx, tool):
@@ -95,41 +95,55 @@ def _tool_arg(ctx, tool):
         print("lx dev mode? %s" % ctx.attr.dev[BuildSettingInfo].value)
         print("lx build executor: %s" % tc_build_executor(ctx))
         print("lx config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
+        print("lx compiler: %s" % ctx.attr.compiler)
+        # print("lx lexer:    %s" % ctx.attr.lexer)
 
     # if ctx.attr.dev[BuildSettingInfo].value:
     #     fail()
 
-    if tool == "lexer":
-        if type(ctx.attr.lexer) == "list":
-            tcc = ctx.attr.lexer[0][DefaultInfo].files_to_run.executable
-        else:
-            tcc = ctx.attr.lexer[DefaultInfo].files_to_run.executable
-    else: # tool == "compiler":
-        if type(ctx.attr.compiler) == "list":
-            tcc = ctx.attr.compiler[0][DefaultInfo].files_to_run.executable
-        else:
-            tcc = ctx.attr.compiler[DefaultInfo].files_to_run.executable
+    if ctx.attr.dev[BuildSettingInfo].value:
+        return None
+
+    # if tool == "lexer":
+    #     if type(ctx.attr.lexer) == "list":
+    #         tcc = ctx.attr.lexer[0][DefaultInfo].files_to_run.executable
+    #     else:
+    #         tcc = ctx.attr.lexer[DefaultInfo].files_to_run.executable
+    # else: # tool == "compiler":
+    if type(ctx.attr.compiler) == "list":
+        tcc = ctx.attr.compiler[0][DefaultInfo].files_to_run.executable
+    else:
+        tcc = ctx.attr.compiler[DefaultInfo].files_to_run.executable
     print("tcc: %s" % tcc)
+    print("tcc.compiler: %s" % ctx.file.compiler)
+    print("tcc.lexer: %s" % ctx.file.lexer)
 
     if ctx.attr.dev[BuildSettingInfo].value:
         if tool == "compiler":
             return ctx.file.compiler
-        else:
-            return ctx.file.lexer
+        # else:
+        #     return ctx.file.lexer
     else:
         if ctx.attr.config_executor[BuildSettingInfo].value in [
             "boot", "baseline", "vm"]:
             # most recently built compiler
             return tcc
-        else:
-            # return tc.lexer[DefaultInfo].files_to_run.executable
-            return None
+        # else:
+        #     # return tc.lexer[DefaultInfo].files_to_run.executable
+        #     return None
 
 ##########################################
 def _boot_toolchain_adapter_impl(ctx):
 
-    config_executor = ctx.attr.config_executor[BuildSettingInfo].value
-    config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
+    print("BOOT TC ADAPTER: %s" % ctx.label)
+
+    _config_executor = ctx.attr.config_executor[BuildSettingInfo].value
+    _config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
+
+    print("BOOT TC config_executor: %s" % _config_executor)
+    print("BOOT TC config_emitter:  %s" % _config_emitter)
+    print("BOOT TC compiler:  %s" % ctx.attr.compiler)
+    # print("BOOT TC lexer:     %s" % ctx.attr.lexer)
 
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
@@ -137,8 +151,8 @@ def _boot_toolchain_adapter_impl(ctx):
 
         build_executor         = tc_build_executor(ctx),
 
-        config_executor        = config_executor,
-        config_emitter         = config_emitter,
+        config_executor        = _config_executor,
+        config_emitter         = _config_emitter,
 
         workdir                = tc_workdir(ctx),
 
@@ -148,12 +162,12 @@ def _boot_toolchain_adapter_impl(ctx):
 
         ## core tools
         compiler               = ctx.attr.compiler,
-        cexecutable            = _executable(ctx, "compiler"),
-        compiler_arg           = _tool_arg(ctx, "compiler"),
+        cexecutable            = tc_executable(ctx, "compiler"),
+        compiler_arg           = tc_tool_arg(ctx), #"compiler"),
 
-        lexer                  = ctx.attr.lexer,
-        lexecutable            = _executable(ctx, "lexer"),
-        lexer_arg              = _tool_arg(ctx, "lexer"),
+        # lexer                  = ctx.attr.lexer,
+        # lexecutable            = tc_executable(ctx, "lexer"),
+        # lexer_arg              = _tool_arg(ctx, "lexer"),
 
         cvt_emit               = ctx.file.cvt_emit,
 
@@ -207,20 +221,21 @@ boot_toolchain_adapter = rule(
         ################################
         ## Core Tools
         "compiler": attr.label(
-            default = "//boot:ocamlc.boot",
+            default = "//toolchain:compiler",
             allow_single_file = True,
             executable = True,
             cfg = "exec"
             # cfg = tc_boot_out_transition
         ),
 
-        "lexer": attr.label(
-            default = "//boot:ocamllex.boot",
-            allow_single_file = True,
-            executable = True,
-            cfg = "exec",
-            # cfg = tc_lexer_out_transition
-        ),
+        # "lexer": attr.label(
+        #     # default = "//boot:ocamllex.boot",
+        #     default = "//toolchain:lexer",
+        #     allow_single_file = True,
+        #     executable = True,
+        #     cfg = "exec",
+        #     # cfg = tc_lexer_out_transition
+        # ),
 
         "cvt_emit": attr.label(
             default = "//boot:ocamllex.boot", # fake, will be transitioned

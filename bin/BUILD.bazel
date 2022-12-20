@@ -1,12 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl",
-     "ocamlc_byte",
-     "ocaml_compiler",
+     "ocaml_compiler_r",
      "ocaml_compilers")
 
 ## FIXME: support flambda
-ocaml_compiler(
+ocaml_compiler_r(
     name = "ocamlcc",
     opts = [ ] + select({
         # ocamlc.byte: ["-compat-32"]

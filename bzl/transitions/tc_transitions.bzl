@@ -3,7 +3,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(":transitions.bzl",
      "tc_boot_in_transition_impl",
      "tc_compiler_out_transition_impl",
-     "tc_lexer_out_transition_impl",
+     # "tc_lexer_out_transition_impl",
      "tc_runtime_out_transition_impl",
      "tc_mustache_transition_impl",
      "reset_config_transition_impl")
@@ -31,7 +31,7 @@ tc_compiler_out_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
         "//toolchain:runtime",
         "//toolchain:cvt_emit",
     ],
@@ -40,47 +40,52 @@ tc_compiler_out_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
         "//toolchain:runtime",
         "//toolchain:cvt_emit",
     ]
 )
 
 #####################################################
-def _tc_lexer_out_transition_impl(settings, attr):
+# def _tc_lexer_out_transition_impl(settings, attr):
 
-    ## called for tc.compiler and tc.lexer
-    ## so we should see this twice per config
+#     ## called for tc.compiler and tc.lexer
+#     ## so we should see this twice per config
 
-    debug = True
+#     debug = True
 
-    if debug:
-        print("ENTRY: tc_lexer_out_transition")
-        print("tc name: %s" % attr.name)
-        # print("attrs: %s" % attr)
+#     if debug:
+#         print("ENTRY: tc_lexer_out_transition")
+#         print("tc name: %s" % attr.name)
+#         print("test mode? %s" % settings["//config:test"])
 
-    return tc_lexer_out_transition_impl(settings, attr, debug)
+#     if settings["//config:test"]:
+#         print("lx identity txn ")
+#         return {}
 
-#######################
-tc_lexer_out_transition = transition(
-    implementation = _tc_lexer_out_transition_impl,
-    inputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
+#     return tc_lexer_out_transition_impl(settings, attr, debug)
 
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-    ],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-        "//toolchain:cvt_emit",
-    ]
-)
+# #######################
+# tc_lexer_out_transition = transition(
+#     implementation = _tc_lexer_out_transition_impl,
+#     inputs = [
+#         "//config:test",
+#         "//config/target/executor",
+#         "//config/target/emitter",
+#         "//toolchain:compiler",
+#         "//toolchain:lexer",
+#         "//toolchain:runtime",
+#         "//toolchain:cvt_emit",
+#     ],
+#     outputs = [
+#         "//config/target/executor",
+#         "//config/target/emitter",
+#         "//toolchain:compiler",
+#         "//toolchain:lexer",
+#         "//toolchain:runtime",
+#         "//toolchain:cvt_emit",
+#     ]
+# )
 #####################################################
 def _tc_runtime_out_transition_impl(settings, attr):
 
@@ -103,7 +108,7 @@ tc_runtime_out_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
         "//toolchain:runtime",
     ],
     outputs = [
@@ -111,7 +116,8 @@ tc_runtime_out_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
+        # "//toolchain:cvt_emit",
         "//toolchain:runtime",
     ]
 )
@@ -140,7 +146,7 @@ tc_mustache_out_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
         "//toolchain:runtime",
     ],
     outputs = [
@@ -148,7 +154,7 @@ tc_mustache_out_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
         "//toolchain:runtime",
     ]
 )
@@ -177,7 +183,7 @@ tc_boot_in_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
         "//toolchain:runtime",
 
         "//config:dev",
@@ -187,7 +193,7 @@ tc_boot_in_transition = transition(
         "//config/target/emitter",
 
         "//toolchain:compiler",
-        "//toolchain:lexer",
+        # "//toolchain:lexer",
         "//toolchain:runtime",
     ]
 )
