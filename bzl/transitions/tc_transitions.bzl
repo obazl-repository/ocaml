@@ -31,7 +31,7 @@ def _tc_compiler_out_transition_impl(settings, attr):
 tc_compiler_out_transition = transition(
     implementation = _tc_compiler_out_transition_impl,
     inputs = [
-        "//config/test",
+        "//config:test",
         "//config/target/executor",
         "//config/target/emitter",
 

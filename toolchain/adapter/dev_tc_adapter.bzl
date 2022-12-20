@@ -44,9 +44,6 @@ def _dev_toolchain_adapter_impl(ctx):
         repl                   = ctx.file.repl,
         vmlibs                 = ctx.files.vmlibs,
         linkmode               = ctx.attr.linkmode,
-        ## runtime
-        # stdlib                 = ctx.attr.stdlib,
-        # std_exit               = ctx.attr.std_exit,
 
         ##FIXME: camlheaders only for vm executor
         ## should we have separate tcs for vm and sys executors?

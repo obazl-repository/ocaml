@@ -9,7 +9,6 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 load("//bzl/transitions:tc_transitions.bzl",
      "tc_compiler_out_transition",
-     # "tc_lexer_out_transition",
      "tc_runtime_out_transition")
 
 load(":tc_utils.bzl",
@@ -42,9 +41,6 @@ def _toolchain_adapter_impl(ctx):
         repl                   = ctx.file.repl,
         vmlibs                 = ctx.files.vmlibs,
         linkmode               = ctx.attr.linkmode,
-        ## runtime
-        # stdlib                 = ctx.attr.stdlib,
-        # std_exit               = ctx.attr.std_exit,
 
         ##FIXME: camlheaders only for vm executor
         ## should we have separate tcs for vm and sys executors?
@@ -135,20 +131,6 @@ toolchain_adapter = rule(
         ),
 
         #### runtime stuff ####
-        # "stdlib": attr.label(
-        #     default   = "//toolchain:stdlib",
-        #     executable = False,
-        #     # allow_single_file = True,
-        #     # cfg = "exec",
-        # ),
-
-        # "std_exit": attr.label(
-        #     # default = Label("//stdlib:Std_exit"),
-        #     executable = False,
-        #     allow_single_file = True,
-        #     # cfg = "exec",
-        # ),
-
         ##FIXME: only for VM executor
         # "camlheaders": attr.label_list(
         #     allow_files = True,
