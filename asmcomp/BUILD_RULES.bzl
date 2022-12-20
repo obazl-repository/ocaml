@@ -2,42 +2,28 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
-# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
+## cvt_emit must be run by ctx.actions.run_shell, so it needs its own
+## run rule.  Compare rule run_ocamllex (in lex/BUILD_RULES.bzl)
 
-# rule: cvt_emit runs //tools:cvt_emit.byte
-
-# incoming transition to ensure this is only built once.
-# use ctx.actions.expand_template, six times
+## Does not use toolchain, pgm is in _tools attribute.
 
 ########################
-def _run_cvt_emit(ctx):
+def _run_cvt_emit_impl(ctx):
 
     debug_bootstrap = False
     debug = True
 
-    # tc = ctx.toolchains["//toolchain/type:boot"]
-
-    # workdir = tc.workdir
-
-    # exec_tools = [
-    #     tc.cexecutable, ## ocamlrun,
-    #     ctx.file._tool
-    # ]
-
-    # if tc.build_executor == "sys":
-    #     executable_cmd = tc.cvt_emit
-    # else:
-    #     executable_cmd = tc.ocamlrun.path
-
-    # print("EXEC TOOLS: %s" % exec_tools)
-    # print("exe cmd: %s" % executable_cmd)
-
     print("cvt_emit: %s" % ctx.file._tool)
     print("cvt_emit rfs: %s" % ctx.attr._tool[DefaultInfo].default_runfiles.files)
 
-    print("cvt emit _tool: %s" % ctx.attr._tool)
+    print("cvt emit _tool: %s" % ctx.file._tool)
 
-    ocamlrun =  ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list()[0]
+    if ctx.attr._dev[BuildSettingInfo].value:
+        ## tool tgts are just files w/o runfiles
+        ocamlrun = ctx.file._tool
+    else:
+        ocamlrun =  ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list()[0]
+
     executable_cmd = ocamlrun.path + " " + ctx.file._tool.path
 
     pfx = ctx.label.package
@@ -71,7 +57,7 @@ def _run_cvt_emit(ctx):
 
 #####################
 run_cvt_emit = rule(
-    implementation = _run_cvt_emit,
+    implementation = _run_cvt_emit_impl,
     doc = "Preprocess .mlp files",
     attrs = {
         "src"   : attr.label(
