@@ -119,11 +119,20 @@ def progress_msg(workdir, ctx):
     cmode = ctx.var["COMPILATION_MODE"]
     if cmode == "fastbuild": cmode = "fb"
 
-    msg = "{m} [{c} > {x}/{em}]: {ws}//{pkg}:{tgt} {action} {rule}".format(
+    if ctx.attr._test[BuildSettingInfo].value:
+        lbrack = "("
+        rbrack = ")"
+    else:
+        lbrack = "["
+        rbrack = "]"
+
+    msg = "{m} {lbrack}{c} :- {x}>{em}{rbrack}: {ws}//{pkg}:{tgt} {action} {rule}".format(
         m   = cmode,
+        lbrack = lbrack,
         c   = tc.compiler[DefaultInfo].files_to_run.executable.basename,
         x   = tc.config_executor,
         em  = tc.config_emitter,
+        rbrack = rbrack,
         # wd  = workdir,
         # m  = ctx.attr._compilation_mode,
         rule= rule,
