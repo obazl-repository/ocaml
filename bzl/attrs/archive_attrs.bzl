@@ -20,6 +20,8 @@ def archive_attrs():
             doc          = "List of OCaml options. Will override configurable default options."
         ),
 
+        _test = attr.label(default = "//config:test"),
+
         _verbose = attr.label(default = "//config/ocaml/archive:verbose"),
 
         use_prims = attr.bool( # overrides global _use_prims

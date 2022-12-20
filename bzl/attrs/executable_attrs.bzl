@@ -50,6 +50,8 @@ def executable_attrs():
             doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
+        _test = attr.label(default = "//config:test"),
+
         _verbose = attr.label(default = "//config/ocaml/link:verbose"),
 
         use_prims = attr.bool( # overrides global _use_prims

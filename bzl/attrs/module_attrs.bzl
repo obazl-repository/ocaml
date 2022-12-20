@@ -20,6 +20,8 @@ def module_attrs():
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
 
+        _test = attr.label(default = "//config:test"),
+
         use_prims = attr.bool( # overrides global _use_prims
             doc = "Undocumented flag, heavily used in bootstrapping",
         ),

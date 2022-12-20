@@ -10,6 +10,8 @@ def _vv_test_in_transition_impl(settings, attr):
         "//config/target/executor": "vm",
         "//config/target/emitter" : "vm",
         "//toolchain/dev:runtime"  : "@baseline//lib:libcamlrun.a"
+        "//config:test"           : True,
+        "//config/target/executor": config_executor,
     }
 
 #######################

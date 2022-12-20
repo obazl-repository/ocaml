@@ -19,7 +19,11 @@ def _tc_compiler_out_transition_impl(settings, attr):
     if debug:
         print("ENTRY: tc_compiler_out_transition")
         print("tc name: %s" % attr.name)
-        # print("attrs: %s" % attr)
+        print("test mode? %s" % settings["//config:test"])
+
+    if settings["//config:test"]:
+        print("identity txn ")
+        return {}
 
     return tc_compiler_out_transition_impl(settings, attr, debug)
 
@@ -27,6 +31,7 @@ def _tc_compiler_out_transition_impl(settings, attr):
 tc_compiler_out_transition = transition(
     implementation = _tc_compiler_out_transition_impl,
     inputs = [
+        "//config/test",
         "//config/target/executor",
         "//config/target/emitter",
 

@@ -10,7 +10,13 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
 
     if debug:
         print("ENTRY: dev_tc_compiler_out_transition")
+        print("bld tgt: %s" % attr.name)
         print("tc name: %s" % attr.name)
+        print("test mode?: %s" % settings["//config:test"])
+
+    if settings["//config:test"]:
+        print("id txn ")
+        return {}
 
     ## we use the CLI string flags in //config/...
     ## to set string settings in //toolchain/...
@@ -80,6 +86,7 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
 dev_tc_compiler_out_transition = transition(
     implementation = _dev_tc_compiler_out_transition_impl,
     inputs = [
+        "//config:test",
         "//config/target/executor",
         "//config/target/emitter",
         # "//toolchain/dev:camlheaders",

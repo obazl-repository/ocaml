@@ -182,6 +182,9 @@ string_flag(name = "target_host",
 
 string_list_flag(name = "manifest", build_setting_default = [])
 
+bool_flag( name = "test", build_setting_default = False)
+config_setting(name = "test?", flag_values = {":test": "True"})
+
 bool_flag( name = "dev", build_setting_default = False)
 config_setting(name = "dev?", flag_values = {":dev": "True"})
 
