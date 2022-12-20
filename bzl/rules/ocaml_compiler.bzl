@@ -22,7 +22,7 @@ def _ocaml_compiler_r_impl(ctx):
     if executor == "boot":
         exe_name = "ocamlc.byte"
     elif executor == "baseline":
-        exe_name = "ocamlc.byte"
+        exe_name = "ocamlc.baseline"
     elif executor == "vm":
         if emitter == "vm":
             exe_name = "ocamlc.byte"
@@ -58,7 +58,6 @@ ocaml_compiler_r = rule(
 
         _rule = attr.string( default = "ocaml_compiler" ),
     ),
-    # cfg = compiler_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -72,35 +71,7 @@ def _ocamlc_byte_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc.workdir
-
-    executor = tc.config_executor
-    emitter  = tc.config_emitter
-
-    if executor == "boot":
-        exe_name = "ocamlc.byte"
-    elif executor == "baseline":
-        exe_name = "ocamlc.byte"
-    elif executor == "vm":
-        if emitter == "vm":
-            exe_name = "ocamlc.byte"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.byte"
-        else:
-            fail("unknown emitter: %s" % emitter)
-    elif executor in ["sys"]:
-        if emitter in ["boot", "vm"]:
-            exe_name = "ocamlc.opt"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.opt"
-        else:
-            fail("sys unknown emitter: %s" % emitter)
-    elif executor == "unspecified":
-        fail("unspecified executor: %s" % executor)
-    else:
-        fail("unknown executor: %s" % executor)
-
-    return executable_impl(ctx, tc, exe_name, workdir)
+    return executable_impl(ctx, tc, "ocamlc.byte", tc.workdir)
 
 #####################
 ocamlc_byte = rule(
@@ -127,35 +98,7 @@ def _ocamlopt_byte_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc.workdir
-
-    executor = tc.config_executor
-    emitter  = tc.config_emitter
-
-    if executor == "boot":
-        exe_name = "ocamlc.byte"
-    elif executor == "baseline":
-        exe_name = "ocamlc.byte"
-    elif executor == "vm":
-        if emitter == "vm":
-            exe_name = "ocamlc.byte"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.byte"
-        else:
-            fail("unknown emitter: %s" % emitter)
-    elif executor in ["sys"]:
-        if emitter in ["boot", "vm"]:
-            exe_name = "ocamlc.opt"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.opt"
-        else:
-            fail("sys unknown emitter: %s" % emitter)
-    elif executor == "unspecified":
-        fail("unspecified executor: %s" % executor)
-    else:
-        fail("unknown executor: %s" % executor)
-
-    return executable_impl(ctx, tc, exe_name, workdir)
+    return executable_impl(ctx, tc, "ocamlopt.byte", tc.workdir)
 
 #####################
 ocamlopt_byte = rule(
@@ -182,35 +125,7 @@ def _ocamlopt_opt_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc.workdir
-
-    executor = tc.config_executor
-    emitter  = tc.config_emitter
-
-    if executor == "boot":
-        exe_name = "ocamlc.byte"
-    elif executor == "baseline":
-        exe_name = "ocamlc.byte"
-    elif executor == "vm":
-        if emitter == "vm":
-            exe_name = "ocamlc.byte"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.byte"
-        else:
-            fail("unknown emitter: %s" % emitter)
-    elif executor in ["sys"]:
-        if emitter in ["boot", "vm"]:
-            exe_name = "ocamlc.opt"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.opt"
-        else:
-            fail("sys unknown emitter: %s" % emitter)
-    elif executor == "unspecified":
-        fail("unspecified executor: %s" % executor)
-    else:
-        fail("unknown executor: %s" % executor)
-
-    return executable_impl(ctx, tc, exe_name, workdir)
+    return executable_impl(ctx, tc, "ocamlopt.opt", tc.workdir)
 
 #####################
 ocamlopt_opt = rule(
@@ -237,35 +152,7 @@ def _ocamlc_opt_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    workdir = tc.workdir
-
-    executor = tc.config_executor
-    emitter  = tc.config_emitter
-
-    if executor == "boot":
-        exe_name = "ocamlc.byte"
-    elif executor == "baseline":
-        exe_name = "ocamlc.byte"
-    elif executor == "vm":
-        if emitter == "vm":
-            exe_name = "ocamlc.byte"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.byte"
-        else:
-            fail("unknown emitter: %s" % emitter)
-    elif executor in ["sys"]:
-        if emitter in ["boot", "vm"]:
-            exe_name = "ocamlc.opt"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.opt"
-        else:
-            fail("sys unknown emitter: %s" % emitter)
-    elif executor == "unspecified":
-        fail("unspecified executor: %s" % executor)
-    else:
-        fail("unknown executor: %s" % executor)
-
-    return executable_impl(ctx, tc, exe_name, workdir)
+    return executable_impl(ctx, tc, "ocamlc.opt", tc.workdir)
 
 #####################
 ocamlc_opt = rule(
