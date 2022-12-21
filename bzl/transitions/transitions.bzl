@@ -60,69 +60,6 @@ def _tc_target_transitions(settings, attr, debug):
     return (config_executor, config_emitter)
 
 ##############################################
-def tc_compiler_out_transition_impl(settings, attr, debug):
-
-    debug = True
-    if debug: print("tc_compiler_out_transition")
-
-    return {}
-
-    config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
-
-    # compiler = settings["//toolchain:compiler"]
-    # lexer = settings["//toolchain:lexer"]
-
-    if debug:
-        print("//toolchain:compiler:  %s" % settings["//toolchain:compiler"])
-    if config_executor == "boot":
-        print("ctxn BASE CASE")
-        compiler = "//boot:ocamlc.boot"
-        # lexer    = "//boot:ocamllex.boot"
-    elif (config_executor == "baseline"):
-        print("ctxn BASELINE TRANSITION")
-        compiler = "//bin:ocamlcc"
-        # lexer    = "//lex:ocamllex"
-    else:
-        compiler = "//bin:ocamlcc"
-        # lexer    = "//lex:ocamllex"
-
-
-    # elif (config_executor == "vm" and config_emitter == "vm"):
-    #     print("ctxn VM-VM TRANSITION (ocamlopt.byte > ocamlc.byte)")
-    #     compiler = "//bin:ocamlcc"
-
-    # elif (config_executor == "vm" and config_emitter == "sys"):
-    #     print("ctxn VM-SYS TRANSITION")
-    #     compiler = "//bin:ocamlcc"
-
-    # elif (config_executor == "sys" and config_emitter == "sys"):
-    #     print("ctxn SYS-SYS TRANSITION")
-    #     compiler = "//bin:ocamlcc"
-
-    # elif (config_executor == "sys" and config_emitter == "vm"):
-    #     print("ctxn SYS-VM TRANSITION")
-    #     compiler = "//bin:ocamlcc"
-
-    # else:
-    #     fail("xxxxxxxxxxxxxxxx %s" % config_executor)
-
-    if debug:
-        print("setting //config/target/executor: %s" % config_executor)
-        print("setting //config/target/emitter: %s" % config_emitter)
-        print("setting //toolchain:compiler %s" % compiler)
-        # print("setting //toolchain:lexer %s" % lexer)
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-
-        "//toolchain:compiler": compiler,
-        # "//toolchain:lexer"   : lexer,
-        "//toolchain:runtime" : settings["//toolchain:runtime"],
-        "//toolchain:cvt_emit" : settings["//toolchain:cvt_emit"]
-    }
-
-##############################################
 # def tc_lexer_out_transition_impl(settings, attr, debug):
 
 #     debug = True
@@ -180,8 +117,15 @@ def tc_compiler_out_transition_impl(settings, attr, debug):
 ##############################################
 def tc_runtime_out_transition_impl(settings, attr, debug):
 
+    protocol = settings["//config/build/protocol"]
+
     debug = True
     if debug: print("tc_runtime_out_transition")
+
+    fail("TCR")
+
+    if protocol == "boot":
+        return {}
 
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
@@ -211,7 +155,7 @@ def tc_runtime_out_transition_impl(settings, attr, debug):
         print("rttxn SYS-VM TRANSITION")
         rt_target  = "camlrun"
 
-    if settings["//config/build/protocol"] == "dev":
+    if protocol == "dev":
         runtime = "@baseline//lib:libasmrun.a"
         # runtime = "@baseline//lib:lib" + rt_target + ".a"
     else:

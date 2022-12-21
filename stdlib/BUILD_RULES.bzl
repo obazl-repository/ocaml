@@ -11,7 +11,7 @@ load("//bzl/actions:module_impl.bzl", "module_impl")
 load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
 load("//bzl/actions:signature_impl.bzl", "signature_impl")
 
-# load("//bzl/transitions:tc_transitions.bzl", "stdlib_in_transition")
+load("//bzl/transitions:ocaml_transitions.bzl", "ocaml_in_transition")
 
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
@@ -44,7 +44,11 @@ stdlib_signature = rule(
             default = "//stdlib:Stdlib"
         ),
         _rule = attr.string( default = "stdlib_signature" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
+    # cfg = ocaml_in_transition,
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     executable = False,
     toolchains = ["//toolchain/type:ocaml",
@@ -80,9 +84,12 @@ stdlib_module = rule(
             doc = "The compiler always opens Stdlib, so everything depends on it.",
             default = "//stdlib:Stdlib"
         ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
         _rule = attr.string( default = "stdlib_module" ),
     ),
-    # cfg = compile_mode_in_transition,
+    # cfg = ocaml_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
     # fragments = ["platform", "cpp"],
@@ -113,8 +120,11 @@ stdlib_internal_signature = rule(
         ),
         # no _stdlib_resolver
         _rule = attr.string( default = "stdlib_internal_signature" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
-    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    # cfg = ocaml_in_transition,
     executable = False,
     toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
@@ -141,8 +151,11 @@ stdlib_internal_module = rule(
         ),
         # no _stdlib_resolver
         _rule = attr.string( default = "stdlib_internal_module" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
-    # cfg = compile_mode_in_transition,
+    # cfg = ocaml_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
     # fragments = ["platform", "cpp"],
@@ -178,8 +191,11 @@ kernel_signature = rule(
         ),
         # no _stdlib_resolver
         _rule = attr.string( default = "kernel_signature" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
-    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    # cfg = ocaml_in_transition,
     executable = False,
     toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
@@ -209,8 +225,11 @@ kernel_module = rule(
         ),
         # no _stdlib_resolver
         _rule = attr.string( default = "kernel_module" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
-    # cfg = compile_mode_in_transition,
+    # cfg = ocaml_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
     # fragments = ["platform", "cpp"],

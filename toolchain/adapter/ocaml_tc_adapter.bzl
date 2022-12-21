@@ -8,8 +8,10 @@ load("//toolchain:transitions.bzl", "tool_out_transition")
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 load("//bzl/transitions:tc_transitions.bzl",
-     "tc_compiler_out_transition",
      "tc_runtime_out_transition")
+
+load("//bzl/transitions:ocaml_transitions.bzl",
+     "ocaml_tc_compiler_out_transition")
 
 load(":tc_utils.bzl",
      "tc_build_executor",
@@ -19,7 +21,7 @@ load(":tc_utils.bzl",
      "tc_workdir")
 
 #################################
-def _toolchain_adapter_impl(ctx):
+def _ocaml_tc_adapter_impl(ctx):
 
     _config_executor = ctx.attr.config_executor[BuildSettingInfo].value
     _config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
@@ -66,8 +68,8 @@ def _toolchain_adapter_impl(ctx):
 
 ###################################
 ## the rule interface
-toolchain_adapter = rule(
-    _toolchain_adapter_impl,
+ocaml_tc_adapter = rule(
+    _ocaml_tc_adapter_impl,
     doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
     attrs = {
         "protocol": attr.label(default = "//config/build/protocol"),
@@ -145,7 +147,7 @@ toolchain_adapter = rule(
             allow_single_file = True,
             executable = True,
             # cfg = "exec"
-            cfg = tc_compiler_out_transition
+            cfg = ocaml_tc_compiler_out_transition
         ),
 
         # "lexer": attr.label(
@@ -153,25 +155,25 @@ toolchain_adapter = rule(
         #     default = "//toolchain:lexer",
         #     allow_single_file = True,
         #     executable = True,
-        #     # cfg = tc_compiler_out_transition
+        #     # cfg = ocaml_tc_compiler_out_transition
         #     cfg = tc_lexer_out_transition
         # ),
 
-        "cvt_emit": attr.label(
-            default = "//boot:ocamllex.boot", # fake, will be transitioned
-            # default = "//toolchain:cvt_emit",
-            allow_single_file = True,
-            executable = True,
-            cfg = "exec",
-            # cfg = tc_lexer_out_transition
-        ),
+        # "cvt_emit": attr.label(
+        #     default = "//boot:ocamllex.boot", # fake, will be transitioned
+        #     # default = "//toolchain:cvt_emit",
+        #     allow_single_file = True,
+        #     executable = True,
+        #     cfg = "exec",
+        #     # cfg = tc_lexer_out_transition
+        # ),
 
         # "yaccer": attr.label(
         #     default = "//yacc:ocamlyacc",
         #     allow_single_file = True,
         #     executable = True,
         #     # cfg = "exec",
-        #     cfg = tc_compiler_out_transition
+        #     cfg = ocaml_tc_compiler_out_transition
         # ),
 
         "copts" : attr.string_list(
@@ -211,7 +213,7 @@ toolchain_adapter = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
-    # cfg = tc_compiler_out_transition, # toolchain_in_transition,
+    # cfg = ocaml_tc_compiler_out_transition, # toolchain_in_transition,
     provides = [platform_common.ToolchainInfo],
 
     ## NB: config frags evidently expose CLI opts like `--cxxopt`;

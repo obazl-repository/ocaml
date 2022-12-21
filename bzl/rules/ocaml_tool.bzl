@@ -3,7 +3,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//bzl/transitions:tool_transitions.bzl",
+load("//bzl/transitions:ocaml_transitions.bzl",
      "ocaml_tool_vm_in_transition",
      "ocaml_tool_sys_in_transition")
 

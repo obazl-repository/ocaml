@@ -140,8 +140,8 @@ dev_toolchain_adapter = rule(
             allow_single_file = True,
             # allow_files = True,
             executable = True,
-            cfg = "exec"
-            # cfg = dev_tc_compiler_out_transition
+            # cfg = "exec"
+            cfg = dev_tc_compiler_out_transition
         ),
 
         # "lexer": attr.label(

@@ -6,7 +6,7 @@ load("//bzl:providers.bzl",
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
 load("//bzl/transitions:tc_transitions.bzl",
-     "tc_compiler_out_transition",
+     # "tc_compiler_out_transition",
      # "tc_lexer_out_transition",
      "tc_runtime_out_transition")
 

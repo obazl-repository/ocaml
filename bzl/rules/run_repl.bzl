@@ -1,9 +1,6 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
-load("//bzl/transitions:dev_transitions.bzl",
-     "dev_tc_compiler_out_transition")
-
 load("//bzl:providers.bzl", "BootInfo", "ModuleInfo", "SigInfo")
 
 ##############################
@@ -77,9 +74,6 @@ run_repl = rule(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         # ),
     ),
-    # cfg = reset_config_transition,
-    # cfg = "exec",
-    # cfg = dev_tc_compiler_out_transition,
     executable = True,
     toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",

@@ -5,10 +5,7 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
-load("//bzl/transitions:dev_transitions.bzl",
-     "dev_tc_compiler_out_transition")
-
-load("//bzl/transitions:test_transitions.bzl",
+load(":test_transitions.bzl",
      "vv_test_in_transition",
      # "vs_test_in_transition",
      "ss_test_in_transition",

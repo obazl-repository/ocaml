@@ -1,11 +1,6 @@
 load(":inline_expect_impl.bzl", "inline_expect_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
-
-load("//bzl/transitions:dev_transitions.bzl",
-     "dev_tc_compiler_out_transition")
-
 ##############################
 def _inline_expect_test_impl(ctx):
 
@@ -83,13 +78,10 @@ inline_expect_test = rule(
         ),
 
         _rule = attr.string( default = "inline_expect_test" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
     ),
-    # cfg = reset_config_transition,
-    # cfg = "exec",
-    cfg = dev_tc_compiler_out_transition,
     test = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",

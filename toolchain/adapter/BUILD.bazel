@@ -2,7 +2,7 @@ exports_files(["BUILD.bazel"])
 
 load("//toolchain/adapter:boot_tc_adapter.bzl", "boot_toolchain_adapter")
 load("//toolchain/adapter:dev_tc_adapter.bzl", "dev_toolchain_adapter")
-load("//toolchain/adapter:ocaml_tc_adapter.bzl", "toolchain_adapter")
+load("//toolchain/adapter:ocaml_tc_adapter.bzl", "ocaml_tc_adapter")
 load("//toolchain/adapter:mustache_tc_adapter.bzl", "mustache_toolchain_adapter")
 
 ## NB: these are all the same, but for debugging they need different
@@ -65,7 +65,7 @@ dev_toolchain_adapter(
 )
 
 ##################
-toolchain_adapter(
+ocaml_tc_adapter(
     name        = "default",
     copts       = [
         "-nostdlib",  ## inserted by rule
@@ -91,7 +91,7 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-toolchain_adapter(
+ocaml_tc_adapter(
     name        = "boot",
     copts       = [
         "-nostdlib",  ## inserted by rule
@@ -117,7 +117,7 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-toolchain_adapter(
+ocaml_tc_adapter(
     name        = "ocamlc.byte",
     copts       = [
         "-nostdlib",  ## inserted by rule
@@ -144,7 +144,7 @@ toolchain_adapter(
 )
 
 # alias(name = "boot.ocamlopt.byte", actual = ":ocamlopt.byte")
-toolchain_adapter(
+ocaml_tc_adapter(
     name        = "boot.ocamlopt.byte",
     copts       = [
         "-nostdlib",  ## inserted by rule
@@ -170,7 +170,7 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-toolchain_adapter(
+ocaml_tc_adapter(
     name        = "ocamlopt.byte",
     copts       = [
         "-nostdlib",  ## inserted by rule
@@ -196,7 +196,7 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-toolchain_adapter(
+ocaml_tc_adapter(
     name        = "ocamlopt.opt",
     copts       = [
         "-nostdlib",  ## inserted by rule
@@ -222,7 +222,7 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-toolchain_adapter(
+ocaml_tc_adapter(
     name        = "ocamlc.opt",
     copts       = [
         "-nostdlib",  ## inserted by rule
@@ -248,175 +248,7 @@ toolchain_adapter(
     # primitives  = "//runtime:primitives",
 )
 
-# ##################
-# toolchain_adapter(
-#     name        = "vv_vv",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config/ocaml/compile:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
-# toolchain_adapter(
-#     name        = "vv_vs",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config/ocaml/compile:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
-# toolchain_adapter(
-#     name        = "vs_ss",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config/ocaml/compile:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
-# toolchain_adapter(
-#     name        = "vs_sv",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config/ocaml/compile:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
-# toolchain_adapter(
-#     name        = "ss_ss",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config/ocaml/compile:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
-# toolchain_adapter(
-#     name        = "ss_sv",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config/ocaml/compile:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
-# toolchain_adapter(
-#     name        = "sv_vv",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config/ocaml/compile:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
-# toolchain_adapter(
-#     name        = "sv_vs",
-#     copts       = [ ## compile opts (sigs/modules only)
-#         "-nostdlib",  ## inserted by rule
-#         "-strict-sequence",
-#         # "-warn-error", "+A",
-#     ] + select({
-#         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config:principal?" : ["-principal"],
-#         "//conditions:default": []
-#     }) + select({
-#         "//config/ocaml/compile:absname?" : ["-absname"],
-#         "//conditions:default": []
-#     }),
-#     linkopts    = [],
-#     # warnings  - use defaults
-#     # primitives  = "//runtime:primitives",
-# )
-
+################################################################
 mustache_toolchain_adapter(name = "mustache")
 
 boot_toolchain_adapter(
