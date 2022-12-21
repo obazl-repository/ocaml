@@ -20,7 +20,7 @@ def archive_attrs():
             doc          = "List of OCaml options. Will override configurable default options."
         ),
 
-        _test = attr.label(default = "//config:test"),
+        _protocol = attr.label(default = "//config/build/protocol"),
 
         _verbose = attr.label(default = "//config/ocaml/archive:verbose"),
 

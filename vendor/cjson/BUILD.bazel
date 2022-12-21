@@ -1,1 +1,23 @@
-exports_files(["cJSON.c", "cJSON.h"])
+cc_library(
+    name = "cjson",
+    linkstatic = True,
+    srcs = ["cJSON.c", "cJSON.h"],
+    copts = [
+        "-x", "c",
+        # "-Wall",
+        # "-pedantic",
+        # "-I", "vendor",
+        # "-DTOOL=MUSTACH_TOOL_CJSON"
+    ] + select({
+        "//platform/os:macos?": ["-std=c11"],
+        "//platform/os:linux?": [],
+        "//conditions:default":  [] #"-std=c11"]
+    }) + select({
+        "//config/mode:pedantic?": ["-pedantic"],
+        "//conditions:default":  []
+    }),
+    visibility = [
+        "//vendor:__subpackages__",
+    ],
+)
+

@@ -5,8 +5,6 @@ load("//bzl:providers.bzl",
 
 load("//toolchain:transitions.bzl", "tool_out_transition")
 
-load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
-
 load("//bzl/transitions:tc_transitions.bzl",
      "tc_compiler_out_transition",
      # "tc_lexer_out_transition",
@@ -57,16 +55,20 @@ def tc_build_executor(ctx):
 
         elif (t_executor == "sys" and t_emitter == "sys"):
             # target: ocamlopt.opt
-            if stack == "fixed-point":
-                if baseline:
-                    # _baseline/ocamlopt.opt built by _fp/ocamlopt.byte
-                    build_executor = "vm"
-                else:
-                    # _fp/ocamlopt.opt built by _baseline/ocamlopt.opt
-                    build_executor = "sys"
-            else:
-                # built by ocamlopt.byte
-                build_executor = "vm"
+            build_executor = "sys"
+            # if stack == "fixed-point":
+            #     if baseline:
+            #         # _baseline/ocamlopt.opt built by _fp/ocamlopt.byte
+            #         build_executor = "vm"
+            #     else:
+            #         # _fp/ocamlopt.opt built by _baseline/ocamlopt.opt
+            #         build_executor = "sys"
+            # else:
+            #     # built by ocamlopt.byte
+            #     if ctx.attr.dev[BuildSettingInfo].value:
+            #         build_executor = "sys"
+            #     else:
+            #         build_executor = "vm"
 
         elif (t_executor == "sys" and t_emitter == "vm"):
             # target: ocamlc.opt
@@ -86,23 +88,34 @@ def tc_build_executor(ctx):
 
 #################
 def tc_tool_arg(ctx):
+
     debug = True
+
+    tc_config_executor = ctx.attr.config_executor[BuildSettingInfo].value
 
     if debug:
         print("TC.TOOL_ARG: %s" % ctx.label)
         print("tc.build_executor: %s" % tc_build_executor(ctx))
-        print("tc.config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
+        print("tc.config_executor: %s" % tc_config_executor)
+
+    if ctx.file.compiler.basename.endswith(".opt"):
+        return None
+    else:
+        return ctx.file.compiler
 
     if type(ctx.attr.compiler) == "list":
         tcc = ctx.attr.compiler[0][DefaultInfo].files_to_run.executable
     else:
         tcc = ctx.attr.compiler[DefaultInfo].files_to_run.executable
     if debug:
-        print("tc.compiler: %s" % tcc)
+        print("tc.compiler: %s" % tcc.path)
 
-    if ctx.attr.dev[BuildSettingInfo].value:
-        print("returning DEV toolarg: none")
-        return None
+    if ctx.attr.protocol[BuildSettingInfo].value == "dev":
+        if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
+        # if tc_config_executor:
+            return tcc
+        else:
+            return None
     else:
         # if ctx.attr.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
         if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
@@ -116,39 +129,75 @@ def tc_tool_arg(ctx):
 
 ###################
 ## returns file object
-def tc_executable(ctx):
+def tc_executable(ctx, tool):
+
     debug = True
+
     if debug:
-        print("_executable")
+        print("ENTRY tc_executable for tool: %s" % tool)
         print("tc.name: %s" % ctx.attr.name)
 
-    if ctx.attr.dev[BuildSettingInfo].value:
-        # native only
-        if debug: print("dev executable: %s" % ctx.attr.compiler)
-        return ctx.attr.compiler # ctx.file.compiler?
+    if (ctx.file.compiler.basename.endswith(".byte")
+        or ctx.file.compiler.basename.endswith(".boot")):
+        return ctx.file.ocamlrun
+    elif ctx.file.compiler.basename.endswith(".opt"):
+        return ctx.file.compiler
+    else:
+        fail("XXXXXXXXXXXXXXXX")
+
+    tc_config_executor = ctx.attr.config_executor[BuildSettingInfo].value
+
+    if ctx.attr.protocol[BuildSettingInfo].value == "dev":
+        if tool == "compiler":
+            ## default: sys mode
+            # if tc_config_executor in ["boot", "baseline", "vm"]:
+            if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
+                ocamlrun =  ctx.file.ocamlrun
+                return ocamlrun
+            else:
+                return ctx.file.compiler
+
+            # if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
+            #     ocamlrun =  ctx.file.ocamlrun
+            #     return ocamlrun
+            # else:
+            #     return ctx.file.compiler
+        else:
+            if ctx.attr.config_executor in ["boot", "baseline", "vm"]:
+                ocamlrun =  ctx.file.ocamlrun
+                return ocamlrun
+            # else:
+            #     return ctx.file.lexer
     else:
         ## tc.compiler runfiles: bottom element is always ocamlrun
-        if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
-            if type(ctx.attr.compiler) == "list":
-                ## built compiler, transitioned
+        # if tc_build_executor(ctx) in ["boot", "baseline", "vm"]:
+        if (ctx.file.compiler.basename.endswith(".byte")
+            or ctx.file.compiler.basename.endswith(".boot")):
+            return ctx.file.ocamlrun
+            # if type(ctx.attr.compiler) == "list":
+            #     ## built compiler, transitioned
 
-                xocamlrun =  ctx.attr.compiler[0][DefaultInfo].default_runfiles.files.to_list()[0]
-                if debug:
-                    print("XOCAMLRUN: %s" % xocamlrun)
-                return xocamlrun
+            #     xocamlrun =  ctx.attr.compiler[0][DefaultInfo].default_runfiles.files.to_list()[0]
+            #     if debug:
+            #         print("XOCAMLRUN: %s" % xocamlrun)
+            #     return xocamlrun
 
-            else:
-                ## boot compiler
-                if debug:
-                    print("TX: %s" % ctx.attr.compiler[DefaultInfo])
-                ocamlrun = ctx.attr.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
-                if debug:
-                    print("OCAMLRUN: %s" % ocamlrun)
-                return ocamlrun
+            # else:
+            #     ## boot compiler
+            #     if debug:
+            #         print("TX: %s" % ctx.attr.compiler[DefaultInfo])
+            #     ocamlrun = ctx.attr.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+            #     if debug:
+            #         print("OCAMLRUN: %s" % ocamlrun)
+                # return ocamlrun
         else:
+            print("lbl: %s" % ctx.label)
+            print("ocamlrun: %s" % ctx.file.ocamlrun)
+            # fail("XXXXXXXXXXXXXXXX")
+
             if debug:
-                print("returning ctx.attr.ex: %s" % ctx.attr.compiler[0][DefaultInfo].files_to_run.executable)
-            return ctx.attr.compiler[0][DefaultInfo].files_to_run.executable
+                print("returning ctx.file.compiler: %s" % ctx.file.compiler)
+            return ctx.file.compiler
 
 ####################
 def tc_compiler(ctx):
@@ -174,7 +223,7 @@ def tc_workdir(ctx):
         workdir = "_baseline/"
 
     # elif (config_executor == "vm" and config_emitter == "boot"):
-    #     if tc.dev:
+    #     if tc.protocol == "dev":
     #         # dev mode, passing only --//config/target/executor=vm
     #         workdir = "_ocamlc.opt/"
     #     else:
@@ -187,7 +236,7 @@ def tc_workdir(ctx):
         workdir = "_ocamlopt.byte/"
 
     # elif (config_executor == "sys" and config_emitter == "boot"):
-    #     if tc.dev:
+    #     if tc.protocol == "dev":
     #         # dev mode, passing only --//config/target/executor=sys
     #         workdir = "_ocamlopt.opt/"
     #     else:

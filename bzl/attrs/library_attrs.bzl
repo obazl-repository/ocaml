@@ -16,7 +16,7 @@ def library_attrs():
             doc          = "List of OCaml options. Will override configurable default options."
         ),
 
-        _test = attr.label(default = "//config:test"),
+        _protocol = attr.label(default = "//config/build/protocol"),
 
         ## GLOBAL CONFIGURABLE DEFAULTS (all ppx_* rules)
         # _debug           = attr.label(default = ws + "//debug"),

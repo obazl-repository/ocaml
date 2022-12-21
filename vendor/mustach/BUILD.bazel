@@ -8,9 +8,8 @@ cc_binary(
         "mustach-wrap.c", "mustach-wrap.h",
         "main.c",
         "mustach-cjson.c", "mustach-cjson.h",
-
-        "//vendor/cjson:cJSON.c", "//vendor/cjson:cJSON.h"
     ],
+    deps = ["//vendor/cjson"],
     copts = [
         "-x", "c",
         # "-Wall",

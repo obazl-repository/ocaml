@@ -1,39 +1,41 @@
 ##########################################################
 def _ocamlc_byte_in_transition_impl(settings, attr):
     debug = True
-    if debug: print("ocamlc_byte_in_transition")
+    if debug: print("ocamlc_byte_in_transition: %s" % attr.name)
+
+    protocol = settings["//config/build/protocol"]
 
     config_executor = "vm"
     config_emitter  = "vm"
 
-    if settings["//config:test"] == True:
-        compiler = "@baseline//bin:ocamlc.byte"
-        # lexer    = "@baseline//bin:ocamllex.byte"
-        cvt_emit = "@baseline//bin:cvt_emit.byte"
-        runtime  = "@baseline//lib:libasmrun.a"
+    if protocol == "unspecified":
+        protocol = "boot"
+        compiler = "//boot:ocamlc.byte"
+        runtime  = "//runtime:camlrun"
+        cvt_emit = settings["//toolchain:cvt_emit"]
 
-    elif settings["//config:dev"] == True:
-        # if settings["//config:test"] == True:
-        #     compiler = "@baseline//bin:ocamlc.opt"
-        #     lexer    = "@baseline//bin:ocamllex.opt"
-        #     cvt_emit = "@baseline//bin:cvt_emit.opt"
-        #     runtime  = "@baseline//lib:libasmrun.a"
-        # else:
+    elif protocol == "boot":
+        compiler = "//boot:ocamlc.boot"
+        runtime  = "//runtime:camlrun"
+        cvt_emit = settings["//toolchain:cvt_emit"]
+
+    elif protocol == "test":
+        compiler = "@baseline//bin:ocamlc.byte"
+        runtime  = "@baseline//lib:libasmrun.a"
+        cvt_emit = "@baseline//bin:cvt_emit.byte"
+
+    elif protocol == "dev":
         ## use coldstart ocamlc.opt to build ocamlc.byte
         config_executor = "sys"
         config_emitter  = "vm"
         compiler = "@baseline//bin:ocamlc.opt"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
         runtime  = "@baseline//lib:libasmrun.a"
+        cvt_emit = "@baseline//bin:cvt_emit.opt"
     else:
-        # no change
-        config_executor = settings["//config/target/executor"]
-        config_emitter  = settings["//config/target/emitter"]
-        compiler = settings["//toolchain:compiler"]
-        runtime  = settings["//toolchain:runtime"]
-        cvt_emit = settings["//toolchain:cvt_emit"]
+        fail("Protocol not yet supported: %s" % protocol)
 
     if debug:
+        print("setting //config/build/protocol:  %s" % protocol)
         print("setting //config/target/executor: %s" % config_executor)
         print("setting //config/target/emitter:  %s" % config_emitter)
         print("setting //toolchain:compiler:     %s" % compiler)
@@ -41,6 +43,7 @@ def _ocamlc_byte_in_transition_impl(settings, attr):
         print("setting//toolchain:cvt_emit:      %s" % cvt_emit)
 
     return {
+        "//config/build/protocol" : protocol,
         "//config/target/executor": config_executor,
         "//config/target/emitter" : config_emitter,
         "//toolchain:compiler"  : compiler,
@@ -52,8 +55,7 @@ def _ocamlc_byte_in_transition_impl(settings, attr):
 ocamlc_byte_in_transition = transition(
     implementation = _ocamlc_byte_in_transition_impl,
     inputs = [
-        "//config:dev",
-        "//config:test",
+        "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",
@@ -61,6 +63,7 @@ ocamlc_byte_in_transition = transition(
         "//toolchain:cvt_emit"
     ],
     outputs = [
+        "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",
@@ -73,37 +76,41 @@ ocamlc_byte_in_transition = transition(
 def _ocamlopt_byte_in_transition_impl(settings, attr):
     debug = True
     if debug:
-        print("ocamlopt_byte_in_transition")
+        print("ocamlopt_byte_in_transition: %s" % attr.name)
 
-    ## build host: sys>vm, target: vm>sys
-    config_executor = "sys"
-    config_emitter  = "vm"
+    protocol = settings["//config/build/protocol"]
 
-    if settings["//config:dev"] == True:
+    config_executor = "vm"
+    config_emitter  = "sys"
+
+    if protocol == "unspecified":
+        protocol = "boot"
+        config_executor = "vm"
+        config_emitter  = "sys"
+        compiler = "//boot:ocamlc.byte"
+        runtime  = "//runtime:camlrun"
+        cvt_emit = settings["//toolchain:cvt_emit"]
+
+    elif protocol == "boot":
+        config_executor = "sys"
+        config_emitter  = "sys"
+        compiler = "//boot:ocamlopt.byte"
+        runtime  = "//runtime:camlrun"
+        cvt_emit = settings["//toolchain:cvt_emit"]
+
+    elif protocol == "dev":
         # use ocamlc.opt to build ocamlopt.byte
         compiler = "@baseline//bin:ocamlc.opt"
         # lexer    = "@baseline//bin:ocamllex.opt"
         runtime  = "@baseline//lib:libasmrun.a"
         cvt_emit = "@baseline//bin:cvt_emit.opt"
     else:
-        config_executor = settings["//config/target/executor"]
-        config_emitter  = settings["//config/target/emitter"]
-        compiler = settings["//toolchain:compiler"]
-        # lexer    = settings["//toolchain:lexer"]
-        runtime  = settings["//toolchain:runtime"]
-        cvt_emit = settings["//toolchain:cvt_emit"]
-
-        # compiler = "//bin:ocamlcc"
-        # lexer    = "//lex:ocamllex"
-        # runtime  = "//runtime:asmrun"
-        # cvt_emit = settings["//toolchain:cvt_emit"]
-
+        fail("Protocol not yet supported: %s" % protocol)
 
     return {
         "//config/target/executor": config_executor,
         "//config/target/emitter" : config_emitter,
         "//toolchain:compiler"  : compiler,
-        # "//toolchain:lexer"     : lexer,
         "//toolchain:runtime"   : runtime,
         "//toolchain:cvt_emit"  : cvt_emit
     }
@@ -112,7 +119,7 @@ def _ocamlopt_byte_in_transition_impl(settings, attr):
 ocamlopt_byte_in_transition = transition(
     implementation = _ocamlopt_byte_in_transition_impl,
     inputs = [
-        "//config:dev",
+        "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",
@@ -133,12 +140,29 @@ ocamlopt_byte_in_transition = transition(
 ##########################################################
 def _ocamlopt_opt_in_transition_impl(settings, attr):
     debug = True
-    if debug: print("ocamlopt_opt_in_transition")
+    if debug: print("ocamlopt_opt_in_transition: %s" % attr.name)
+
+    protocol = settings["//config/build/protocol"]
 
     config_executor = "sys"
     config_emitter  = "sys"
 
-    if settings["//config:dev"] == True:
+    if protocol == "unspecified":
+        protocol = "boot"
+        config_executor = "sys"
+        config_emitter  = "sys"
+        compiler = "//boot:ocamlopt.byte"
+        runtime  = "//runtime:asmrun"
+        cvt_emit = settings["//toolchain:cvt_emit"]
+
+    elif protocol == "boot":
+        config_executor = "sys"
+        config_emitter  = "sys"
+        compiler = "//boot:ocamlopt.byte"
+        runtime  = "//runtime:asmrun"
+        cvt_emit = settings["//toolchain:cvt_emit"]
+
+    elif protocol == "dev":
         print("sys/sys DEVTXN")
         # we're targeting ocamlopt.opt, so we use same
         compiler = "@baseline//bin:ocamlopt.opt"
@@ -146,19 +170,7 @@ def _ocamlopt_opt_in_transition_impl(settings, attr):
         cvt_emit = "@baseline//bin:cvt_emit.opt"
         runtime  = "@baseline//lib:libasmrun.a"
     else:
-        print("NODEVTXN")
-        config_executor = settings["//config/target/executor"]
-        config_emitter  = settings["//config/target/emitter"]
-        compiler = settings["//toolchain:compiler"]
-        # lexer    = settings["//toolchain:lexer"]
-        runtime  = settings["//toolchain:runtime"]
-        cvt_emit = settings["//toolchain:cvt_emit"]
-
-        # compiler = "//bin:ocamlopt.opt"
-        # lexer    = "//lex:ocamllex.opt"
-        # runtime  = "//runtime:asmrun"
-        # cvt_emit = settings["//toolchain:cvt_emit"]
-
+        fail("Protocol not yet supported: %s" % protocol)
 
     return {
         "//config/target/executor": config_executor,
@@ -173,7 +185,7 @@ def _ocamlopt_opt_in_transition_impl(settings, attr):
 ocamlopt_opt_in_transition = transition(
     implementation = _ocamlopt_opt_in_transition_impl,
     inputs = [
-        "//config:dev",
+        "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",
@@ -194,23 +206,24 @@ ocamlopt_opt_in_transition = transition(
 ##########################################################
 def _ocamlc_opt_in_transition_impl(settings, attr):
     debug = True
-    if debug: print("ocamlc_opt_in_transition")
+    if debug: print("ocamlc_opt_in_transition: %s" % attr.name)
 
     config_executor = "sys"
     config_emitter  = "sys"
 
-    if settings["//config:dev"] == True:
+    if settings["//config/build/protocol"] == "dev":
         # we're targeting ocamlc.opt, so we use ocamlopt.opt
         compiler = "@baseline//bin:ocamlopt.opt"
         # lexer    = "@baseline//bin:ocamllex.opt"
         cvt_emit = "@baseline//bin:cvt_emit.opt"
         runtime  = "@baseline//lib:libasmrun.a"
     else:
-        config_executor = settings["//config/target/executor"]
-        config_emitter  = settings["//config/target/emitter"]
-        compiler = settings["//toolchain:compiler"]
-        # lexer    = settings["//toolchain:lexer"]
-        runtime  = settings["//toolchain:runtime"]
+        config_executor = "sys"
+        config_emitter  = "vm"
+
+        compiler = "//bin:ocamlopt.opt"
+        runtime  = "//runtime:asmrun"
+
         cvt_emit = settings["//toolchain:cvt_emit"]
 
     return {
@@ -226,7 +239,7 @@ def _ocamlc_opt_in_transition_impl(settings, attr):
 ocamlc_opt_in_transition = transition(
     implementation = _ocamlc_opt_in_transition_impl,
     inputs = [
-        "//config:dev",
+        "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",

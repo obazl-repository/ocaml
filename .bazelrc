@@ -2,10 +2,8 @@
 build --flag_alias=tgt=//config/target/executor
 build --flag_alias=stdlib=//testsuite/tests:with-stdlib
 
-# build --experimental_output_directory_naming_scheme=diff_against_baseline
-
-query --notool_deps
-query --noimplicit_deps
+# "may improve build speed for builds that use transitions."
+build --experimental_output_directory_naming_scheme=diff_against_baseline
 
 build:ccv --//config/ocaml/compile:verbose
 build:ccv --//config/ocaml/link:verbose
@@ -28,15 +26,13 @@ common:dev --//config:dev
 common --color=yes
 common:show --subcommands=pretty_print
 common:show --verbose_failures
-
 ## suppress INFO msgs etc. emitted by 'bazel run'
 # common:q --nobuild
-common:q --noshow_progress
 common:q --ui_event_filters=-info
+common:q --noshow_progress
 # common:q --ui_event_filters=-stdout
 # common:q --ui_event_filters=-stderr
 
-## now the default: build --incompatible_override_toolchain_transition
 build --incompatible_enable_cc_toolchain_resolution
 #build --toolchain_resolution_debug=.*
 #build --toolchain_resolution_debug=@bazel_tools//tools/cpp:toolchain_type

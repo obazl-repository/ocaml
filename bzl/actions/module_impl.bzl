@@ -45,7 +45,7 @@ def module_impl(ctx, module_name):
     #########################
     args = ctx.actions.args()
 
-    # if tc.dev:
+    # if tc.protocol == "dev":
 
     toolarg = tc.tool_arg
     if toolarg:
@@ -60,8 +60,14 @@ def module_impl(ctx, module_name):
     # in dev mode: defaults to native tools
     # e.g. ocamlopt.byte is built by ocamlc.opt
 
-    if tc.dev:
-        if tc.config_executor == "sys":
+    if debug:
+        print("TGT: %s" % ctx.label)
+        print("tc.build_executor: %s" % tc.build_executor)
+        print("tc.config_executor: %s" % tc.config_executor)
+        print("tc.config_emitter: %s" % tc.config_emitter)
+
+    if tc.protocol == "dev":
+        if tc.config_emitter == "sys":
             ext = ".cmx"
         else:
             ext = ".cmo"

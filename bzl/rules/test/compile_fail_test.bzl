@@ -375,7 +375,7 @@ def _compile_fail_test(ctx):
     # args.append("echo PWD: $PWD;")
 
     executable = None
-    if tc.dev:
+    if tc.protocol == "dev":
         ocamlrun = None
         effective_compiler = tc.compiler
     else:
@@ -601,7 +601,7 @@ def _compile_fail_test(ctx):
     #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
     # print("runfiles tc.compiler: %s" % tc.compiler)
     # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
-    # if tc.dev:
+    # if tc.protocol == "dev":
     #     runfiles.append(tc.ocamlrun)
     # elif ocamlrun:
     #     runfiles.extend(tc.compiler[DefaultInfo].default_runfiles.files.to_list())

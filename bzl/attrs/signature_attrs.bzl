@@ -19,7 +19,7 @@ def signature_attrs():
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
 
-        _test = attr.label(default = "//config:test"),
+        _protocol = attr.label(default = "//config/build/protocol"),
 
         # no point in -verbose for sigs, they never invoke external cmds
         # _verbose = attr.label(default = "//config/ocaml/compile:verbose"),

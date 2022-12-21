@@ -60,14 +60,14 @@ def executable_impl(ctx, tc, exe_name, workdir):
         args.add(tc.compiler_arg)
 
     # executable = None
-    # if tc.dev:
+    # if tc.protocol == "dev":
     #     ocamlrun = None
     # else:
     #     ocamlrun = tc.ocamlrun
     #     # effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
     # effective_compiler = tc.compiler
 
-    # if tc.dev:
+    # if tc.protocol == "dev":
     #     build_executor = "opt"
     # elif (target_executor == "unspecified"):
     #     if (config_executor == "sys"):
@@ -496,7 +496,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     # print("runfiles tc.compiler: %s" % tc.compiler)
     # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
     runfiles.append(tc.ocamlrun)
-    # if tc.dev:
+    # if tc.protocol == "dev":
     # elif ocamlrun:
     #     runfiles.extend(tc.ocamlrun)
 

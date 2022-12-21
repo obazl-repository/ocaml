@@ -52,9 +52,9 @@ ocaml_compiler_r = rule(
     attrs = dict(
         executable_attrs(),
 
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
 
         _rule = attr.string( default = "ocaml_compiler" ),
     ),
@@ -68,6 +68,9 @@ ocaml_compiler_r = rule(
 ################################################################
 ##############################
 def _ocamlc_byte_impl(ctx):
+
+    if not ctx.label.name.endswith(".byte"):
+        fail("Target name for rule ocamlc_byte must end in '.byte'")
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
@@ -96,6 +99,9 @@ ocamlc_byte = rule(
 ##############################
 def _ocamlopt_byte_impl(ctx):
 
+    if not ctx.label.name.endswith(".byte"):
+        fail("Target name for rule ocamlopt_byte must end in '.byte'")
+
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     return executable_impl(ctx, tc, "ocamlopt.byte", tc.workdir)
@@ -123,6 +129,9 @@ ocamlopt_byte = rule(
 ##############################
 def _ocamlopt_opt_impl(ctx):
 
+    if not ctx.label.name.endswith(".opt"):
+        fail("Target name for rule ocamlopt_opt must end in '.opt'")
+
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     return executable_impl(ctx, tc, "ocamlopt.opt", tc.workdir)
@@ -149,6 +158,9 @@ ocamlopt_opt = rule(
 
 ##############################
 def _ocamlc_opt_impl(ctx):
+
+    if not ctx.label.name.endswith(".opt"):
+        fail("Target name for rule ocamlc_opt must end in '.opt'")
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 

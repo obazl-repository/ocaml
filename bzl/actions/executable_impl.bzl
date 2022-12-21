@@ -66,8 +66,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     manifest = []
 
-    aggregate_deps(ctx, ctx.attr._stdlib, depsets, manifest)
-    aggregate_deps(ctx, ctx.attr._std_exit, depsets, manifest)
+    aggregate_deps(ctx, ctx.attr.stdlib, depsets, manifest)
+    aggregate_deps(ctx, ctx.attr.std_exit, depsets, manifest)
 
     for dep in ctx.attr.prologue:
         aggregate_deps(ctx, dep, depsets, manifest)
@@ -136,7 +136,11 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
         # for f in ctx.files._runtime: ## libasmrun.a
         # for f in tc.runtime: ## libasmrun.a
-        print("tc.RUNTIME: %s" % tc.runtime)
+
+        print("tc.RUNTIME: %s" % tc.runtime.path)
+
+        args.add(tc.runtime.path)
+
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
         ## NB: Asmlink looks for libasmrun.a in the std search
         ## space (-I dirs), not the link srch space (-L dirs)
@@ -154,7 +158,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
             # runtime_files.append(f)
             # # will add -L<f.dirname> below
             # cc_libdirs.append(f.dirname)
-        print("tc.RUNTIME: %s" % tc.runtime)
+        print("custom tc.RUNTIME: %s" % tc.runtime)
         runtime_depsets.append(tc.runtime[0][DefaultInfo].files)
         # will add -L<f.dirname> below
         cc_libdirs.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
@@ -189,12 +193,10 @@ def executable_impl(ctx, tc, exe_name, workdir):
     for path in paths_depset.to_list():
         includes.append(path)
 
-    if ctx.file._stdlib:
-        includes.append(ctx.file._stdlib.dirname)
-    # for f in ctx.files._stdlib:
-    #     includes.append(f)
+    if ctx.file.stdlib:
+        includes.append(ctx.file.stdlib.dirname)
 
-    # includes.append(ctx.file._std_exit.dirname)
+    # includes.append(ctx.file.std_exit.dirname)
 
     ##FIXME: if we're *building* a sys compiler we need to add
     ## libasmrun.a to runfiles, and if we're *using* a sys compiler we
@@ -237,7 +239,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
         transitive = [cli_link_deps_depset]
     )
 
-    if config_executor in ["boot", "baseline", "vm"]:
+    if tc.config_executor in ["boot", "baseline", "vm"]:
         # camlheaders only used by this rule so no need to put in tc
         # but camlheaders tgt is tc-dependent (uses tc.ocamlrun.path)
         camlheaders = ctx.files._camlheaders
@@ -297,7 +299,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     inputs_depset = depset(
         direct = []
-        + [ctx.file._std_exit]
+        + [ctx.file.std_exit]
         + [ctx.file.main] if ctx.file.main else []
         # compiler runfiles *should* contain camlheader files & stdlib:
         # + ctx.files._camlheaders
@@ -312,10 +314,9 @@ def executable_impl(ctx, tc, exe_name, workdir):
              [tc.executable]
             + runtime_files
             + toolarg_input
-            + [ctx.file._stdlib]
+            + [ctx.file.stdlib]
             # ctx.files._camlheaders
             # + ctx.files._runtime
-            # + ctx.files._stdlib
             + camlheaders
         )]
         #FIXME: primitives should be provided by target, not tc?
@@ -397,7 +398,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
     # print("runfiles tc.compiler: %s" % tc.compiler)
     # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
-    if tc.dev:
+    if tc.protocol == "dev":
         runfiles.append(tc.ocamlrun)
     # elif ocamlrun:
 

@@ -88,6 +88,8 @@ bootstrap_repl = rule(
         #     default = "//stdlib",
         #     allow_single_file = True
         # ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
         _rule = attr.string( default = "bootstrap_repl" ),
     ),

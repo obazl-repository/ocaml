@@ -10,7 +10,7 @@ def _coldstart_transition_impl(settings, attr):
         emitter  = settings["//config/target/emitter"]
 
     return {
-        "//config:dev": False,
+        "//config/build/protocol": "boot",
         "//config/target/executor": executor,
         "//config/target/emitter" : emitter
     }
@@ -22,7 +22,7 @@ _coldstart_transition = transition(
         "//config/target/emitter"
     ],
     outputs = [
-        "//config:dev",
+        "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter"
     ]

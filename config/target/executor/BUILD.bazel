@@ -2,7 +2,9 @@ load("//config:BUILD.bzl", "target_executor_constraint")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 
 string_flag( name = "executor",
-             values = ["boot", "baseline", "vm", "sys", "unspecified"],
+             values = ["boot", "baseline", "vm", "sys",
+                       "null", ## used only by reset_cc_config_transition
+                       "unspecified"],
              build_setting_default = "boot",
              visibility = [
                  "//boot:__pkg__",

@@ -3,6 +3,9 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain", "use_cpp_toolchain")
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 
+load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
+
+
 ## exports rules: config_cc_toolchain, config_mkexe
 
 DISABLED_FEATURES = [
@@ -472,7 +475,10 @@ ocaml_cc_config = rule(
         ),
         "_tool" : attr.label(
             allow_single_file = True,
-            default = "//vendor/merge_json"
+            default = "//vendor/merge_json",
+            executable = True,
+            cfg = reset_cc_config_transition
+            # cfg = "exec"
         ),
         "_flambda": attr.label(
             default = "//config/ocaml:flambda"
@@ -490,6 +496,9 @@ ocaml_cc_config = rule(
             executable = True,
             cfg = "exec"
         ),
+
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     },
     toolchains = use_cpp_toolchain(),
     fragments = ["apple", "cpp", "platform"],

@@ -43,9 +43,9 @@ ocaml_tool_r = rule(
         ),
 
         _rule = attr.string( default = "ocaml_tool_r" ),
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
     ),
     executable = True,
     fragments = ["cpp"],

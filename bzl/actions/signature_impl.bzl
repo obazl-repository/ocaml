@@ -28,6 +28,8 @@ def signature_impl(ctx, module_name):
     from_name = basename[:1].capitalize() + basename[1:]
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
+    # print("SIG n: %s" % ctx.label.name)
+    # print("SIG tc.name: %s" % tc.name)
 
     workdir = tc.workdir
 
@@ -35,7 +37,8 @@ def signature_impl(ctx, module_name):
     args = ctx.actions.args()
 
     toolarg = tc.tool_arg
-    print("SIG tool_arg: %s" % toolarg)
+    if ctx.label.name == "CamlinternalFormatBasics_cmi":
+        print("SIG tool_arg: %s" % toolarg)
     if toolarg:
         args.add(toolarg.path)
         toolarg_input = [toolarg]
@@ -177,7 +180,7 @@ def signature_impl(ctx, module_name):
         print("tgt: %s" % ctx.label)
         print("tc.executable: %s" % tc.executable)
         print("tc.tool_arg: %s" % tc.tool_arg)
-        print("tc.dev: %s" % tc.dev)
+        print("tc.protocol: %s" % tc.protocol)
 
     resolver = []
     if hasattr(ctx.attr, "ns"):
@@ -271,7 +274,9 @@ def signature_impl(ctx, module_name):
 
     ##########################################
     sigexe = tc.executable
-    print("SIGexe: %s" % sigexe)
+    if ctx.label.name == "CamlinternalFormatBasics_cmi":
+        print("SIGtc.name: %s" % tc.name)
+        print("SIGexe: %s" % sigexe)
     ################  ACTION  ################
     ctx.actions.run(
         executable = sigexe,

@@ -1,19 +1,16 @@
 cc_binary(
     name = "merge_json",
-    # alwayslink = True,
-    # linkstatic = True,
     srcs = [
-        # COREOBJS := mustach.o mustach-wrap.o
         "merge_json.c",
         "ansi_colors.h",
-        "//vendor/cjson:cJSON.c", "//vendor/cjson:cJSON.h"
     ],
+    deps = ["//vendor/cjson"],
     copts = [
         "-x", "c",
         # "-Wall",
         # "-pedantic",
         "-I", "vendor",
-        "-DTOOL=MUSTACH_TOOL_CJSON"
+        # "-DTOOL=MUSTACH_TOOL_CJSON"
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],

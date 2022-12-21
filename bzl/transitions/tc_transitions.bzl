@@ -1,12 +1,12 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load(":transitions.bzl",
-     "tc_boot_in_transition_impl",
+     # "tc_boot_in_transition_impl",
      "tc_compiler_out_transition_impl",
-     # "tc_lexer_out_transition_impl",
      "tc_runtime_out_transition_impl",
      "tc_mustache_transition_impl",
-     "reset_config_transition_impl")
+     # "reset_config_transition_impl"
+     )
 
 #####################################################
 def _tc_compiler_out_transition_impl(settings, attr):
@@ -19,10 +19,14 @@ def _tc_compiler_out_transition_impl(settings, attr):
     if debug:
         print("ENTRY: tc_compiler_out_transition")
         print("tc name: %s" % attr.name)
-        print("test mode? %s" % settings["//config:test"])
+        print("protocol: %s" % settings["//config/build/protocol"])
 
-    if settings["//config:test"]:
+    if settings["//config/build/protocol"] == "test":
         print("identity txn ")
+        return {}
+
+    if settings["//config/build/protocol"] == "boot":
+        print("boot identity txn ")
         return {}
 
     return tc_compiler_out_transition_impl(settings, attr, debug)
@@ -31,7 +35,7 @@ def _tc_compiler_out_transition_impl(settings, attr):
 tc_compiler_out_transition = transition(
     implementation = _tc_compiler_out_transition_impl,
     inputs = [
-        "//config:test",
+        "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter",
 
@@ -52,46 +56,6 @@ tc_compiler_out_transition = transition(
 )
 
 #####################################################
-# def _tc_lexer_out_transition_impl(settings, attr):
-
-#     ## called for tc.compiler and tc.lexer
-#     ## so we should see this twice per config
-
-#     debug = True
-
-#     if debug:
-#         print("ENTRY: tc_lexer_out_transition")
-#         print("tc name: %s" % attr.name)
-#         print("test mode? %s" % settings["//config:test"])
-
-#     if settings["//config:test"]:
-#         print("lx identity txn ")
-#         return {}
-
-#     return tc_lexer_out_transition_impl(settings, attr, debug)
-
-# #######################
-# tc_lexer_out_transition = transition(
-#     implementation = _tc_lexer_out_transition_impl,
-#     inputs = [
-#         "//config:test",
-#         "//config/target/executor",
-#         "//config/target/emitter",
-#         "//toolchain:compiler",
-#         "//toolchain:lexer",
-#         "//toolchain:runtime",
-#         "//toolchain:cvt_emit",
-#     ],
-#     outputs = [
-#         "//config/target/executor",
-#         "//config/target/emitter",
-#         "//toolchain:compiler",
-#         "//toolchain:lexer",
-#         "//toolchain:runtime",
-#         "//toolchain:cvt_emit",
-#     ]
-# )
-#####################################################
 def _tc_runtime_out_transition_impl(settings, attr):
 
     debug = True
@@ -107,7 +71,7 @@ def _tc_runtime_out_transition_impl(settings, attr):
 tc_runtime_out_transition = transition(
     implementation = _tc_runtime_out_transition_impl,
     inputs = [
-        "//config:dev",
+        "//config/build/protocol",
 
         "//config/target/executor",
         "//config/target/emitter",
@@ -164,41 +128,3 @@ tc_mustache_out_transition = transition(
     ]
 )
 
-#####################################################
-def _tc_boot_in_transition_impl(settings, attr):
-
-    ## called for tc.compiler and tc.lexer
-    ## so we should see this twice per config
-
-    debug = True
-
-    if debug:
-        print("ENTRY: tc_boot_in_transition")
-        print("tc name: %s" % attr.name)
-        # print("attrs: %s" % attr)
-
-    return tc_boot_in_transition_impl(settings, attr, debug)
-
-#######################
-tc_boot_in_transition = transition(
-    implementation = _tc_boot_in_transition_impl,
-
-    inputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-
-        "//toolchain:compiler",
-        # "//toolchain:lexer",
-        "//toolchain:runtime",
-
-        "//config:dev",
-    ],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-
-        "//toolchain:compiler",
-        # "//toolchain:lexer",
-        "//toolchain:runtime",
-    ]
-)

@@ -1,3 +1,176 @@
+##########################################################
+def _ocaml_tool_vm_in_transition_impl(settings, attr):
+    debug = True
+    if debug: print("ocaml_tool_vm_in_transition")
+
+    config_executor = "vm"
+    config_emitter  = "vm"
+
+    if settings["//config/build/protocol"] == "dev":
+        compiler = "@baseline//bin:ocamlc.opt"
+        # lexer    = "@baseline//bin:ocamllex.opt"
+        cvt_emit = "@baseline//bin:cvt_emit.opt"
+        runtime  = "@baseline//lib:libasmrun.a"
+    else:
+        compiler = "//bin:ocamlc.byte"
+        # lexer    = "//lex:ocamllex.byte"
+        runtime  = "//runtime:asmrun"
+        cvt_emit = "//asmcomp:cvt_emit.opt"
+
+    return {
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"  : compiler,
+        # "//toolchain:lexer"     : lexer,
+        "//toolchain:runtime"   : runtime,
+        "//toolchain:cvt_emit"  : cvt_emit
+    }
+
+################################################################
+ocaml_tool_vm_in_transition = transition(
+    implementation = _ocaml_tool_vm_in_transition_impl,
+    inputs = [
+        "//config/build/protocol",
+    ],
+    outputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        # "//toolchain:lexer",
+        "//toolchain:runtime",
+        "//toolchain:cvt_emit"
+    ]
+)
+
+##########################################################
+def _ocaml_tool_sys_in_transition_impl(settings, attr):
+    debug = True
+    if debug: print("ocaml_tool_sys_in_transition")
+
+    config_executor = "sys"
+    config_emitter  = "sys"
+
+    if settings["//config/build/protocol"] == "dev":
+        compiler = "@baseline//bin:ocamlopt.opt"
+        # lexer    = "@baseline//bin:ocamllex.opt"
+        cvt_emit = "@baseline//bin:cvt_emit.opt"
+        runtime  = "@baseline//lib:libasmrun.a"
+    else:
+        compiler = "//bin:ocamlc.byte"
+        # lexer    = "//lex:ocamllex.opt"
+        runtime  = "//runtime:asmrun"
+        cvt_emit = "//toolchain:cvt_emit"
+
+    return {
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"  : compiler,
+        # "//toolchain:lexer"     : lexer,
+        "//toolchain:runtime"   : runtime,
+        "//toolchain:cvt_emit"  : cvt_emit
+    }
+
+################################################################
+ocaml_tool_sys_in_transition = transition(
+    implementation = _ocaml_tool_sys_in_transition_impl,
+    inputs = [
+        "//config/build/protocol",
+    ],
+    outputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        # "//toolchain:lexer",
+        "//toolchain:runtime",
+        "//toolchain:cvt_emit"
+    ]
+)
+
+################################################################
+##########################################################
+def _build_tool_vm_in_transition_impl(settings, attr):
+    debug = True
+    if debug: print("build_tool_vm_in_transition")
+
+    config_executor = "vm"
+    config_emitter  = "vm"
+
+    if settings["//config/build/protocol"] == "dev":
+        compiler = "@baseline//bin:ocamlc.opt"
+        # lexer    = "@baseline//bin:ocamllex.opt"
+        cvt_emit = "@baseline//bin:cvt_emit.opt"
+        runtime  = "@baseline//lib:libasmrun.a"
+    else:
+        compiler = "//bin:ocamlc.byte"
+        # lexer    = "//lex:ocamllex.byte"
+        runtime  = "//runtime:asmrun"
+        cvt_emit = "//asmcomp:cvt_emit"
+        ## settings["//toolchain:cvt_emit"]
+
+    return {
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"  : compiler,
+        # "//toolchain:lexer"     : lexer,
+        "//toolchain:runtime"   : runtime,
+        "//toolchain:cvt_emit"  : cvt_emit
+    }
+
+################################################################
+build_tool_vm_in_transition = transition(
+    implementation = _build_tool_vm_in_transition_impl,
+    inputs = ["//config/build/protocol"],
+    outputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        # "//toolchain:lexer",
+        "//toolchain:runtime",
+        "//toolchain:cvt_emit"
+    ]
+)
+
+##########################################################
+def _build_tool_sys_in_transition_impl(settings, attr):
+    debug = True
+    if debug: print("build_tool_sys_in_transition")
+
+    config_executor = "sys"
+    config_emitter  = "sys"
+
+    if settings["//config/build/protocol"] == "dev":
+        compiler = "@baseline//bin:ocamlopt.opt"
+        # lexer    = "@baseline//bin:ocamllex.opt"
+        cvt_emit = "@baseline//bin:cvt_emit.opt"
+        runtime  = "@baseline//lib:libasmrun.a"
+    else:
+        compiler = "//bin:ocamlopt.opt"
+        # lexer    = "//lex:ocamllex.opt"
+        runtime  = "//runtime:asmrun"
+        cvt_emit = "//asmcomp:cvt_emit"
+        ## settings["//toolchain:cvt_emit"]
+
+    return {
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"  : compiler,
+        # "//toolchain:lexer"     : lexer,
+        "//toolchain:runtime"   : runtime
+    }
+
+################################################################
+build_tool_sys_in_transition = transition(
+    implementation = _build_tool_sys_in_transition_impl,
+    inputs = ["//config/build/protocol"],
+    outputs = [
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        # "//toolchain:lexer",
+        "//toolchain:runtime",
+    ]
+)
+
 #####################################################
 # def _ocaml_tool_in_transition_impl(settings, attr, debug):
 
@@ -156,319 +329,3 @@
 #         "//toolchain:cvt_emit"
 #     ]
 # )
-
-##########################################################
-##########################################################
-def _ocaml_tool_vm_in_transition_impl(settings, attr):
-    debug = True
-    if debug: print("ocaml_tool_vm_in_transition")
-
-    config_executor = "vm"
-    config_emitter  = "vm"
-    compiler = "//bin:ocamlc.byte"
-    lexer    = "//lex:ocamllex.byte"
-    runtime  = "//runtime:asmrun"
-    # cvt_emit = "//asmcomp:cvt_emit.opt"
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"  : compiler,
-        "//toolchain:lexer"     : lexer,
-        "//toolchain:runtime"   : runtime,
-        # "//toolchain:cvt_emit"  : cvt_emit
-    }
-
-################################################################
-ocaml_tool_vm_in_transition = transition(
-    implementation = _ocaml_tool_vm_in_transition_impl,
-    inputs = [],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-        # "//toolchain:cvt_emit"
-    ]
-)
-
-##########################################################
-def _ocaml_tool_sys_in_transition_impl(settings, attr):
-    debug = True
-    if debug: print("ocaml_tool_sys_in_transition")
-
-    config_executor = "sys"
-    config_emitter  = "sys"
-    compiler = "//bin:ocamlc.byte"
-    lexer    = "//lex:ocamllex.opt"
-    runtime  = "//runtime:asmrun"
-    # cvt_emit = "//toolchain:cvt_emit"
-
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"  : compiler,
-        "//toolchain:lexer"     : lexer,
-        "//toolchain:runtime"   : runtime,
-        # "//toolchain:cvt_emit"  : cvt_emit
-    }
-
-################################################################
-ocaml_tool_sys_in_transition = transition(
-    implementation = _ocaml_tool_sys_in_transition_impl,
-    inputs = [],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-        # "//toolchain:cvt_emit"
-    ]
-)
-
-##########################################################
-def _ocamlc_byte_in_transition_impl(settings, attr):
-    debug = True
-    if debug: print("ocamlc_byte_in_transition")
-
-    config_executor = "vm"
-    config_emitter  = "vm"
-
-    if settings["//config:dev"] == True:
-        ## use ocamlc.opt to build ocamlc.byte
-        compiler = "@baseline//bin:ocamlc.opt"
-        lexer    = "@baseline//bin:ocamllex.opt"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
-        runtime  = "@baseline//bin:ocamlrun"
-    else:
-        compiler = "//bin:ocamlc.opt"
-        lexer    = "//lex:ocamllex.opt"
-        runtime  = "//runtime:asmrun"
-        cvt_emit = settings["//toolchain:cvt_emit"]
-
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"  : compiler,
-        "//toolchain:lexer"     : lexer,
-        "//toolchain:runtime"   : runtime,
-        "//toolchain:cvt_emit"  : cvt_emit
-    }
-
-################################################################
-ocamlc_byte_in_transition = transition(
-    implementation = _ocamlc_byte_in_transition_impl,
-    inputs = ["//config:dev", "//toolchain:cvt_emit"],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-        "//toolchain:cvt_emit"
-    ]
-)
-
-##########################################################
-def _ocamlopt_byte_in_transition_impl(settings, attr):
-    debug = True
-    if debug:
-        print("ocamlopt_byte_in_transition")
-
-    ## build target: vm/sys
-    config_executor = "vm"
-    config_emitter  = "sys"
-
-    if settings["//config:dev"] == True:
-        # use ocamlc.opt to build ocamlopt.byte
-        compiler = "@baseline//bin:ocamlc.opt"
-        lexer    = "@baseline//bin:ocamllex.opt"
-        runtime  = "@baseline//bin:ocamlrun"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
-    else:
-        compiler = "//bin:ocamlcc"
-        lexer    = "//lex:ocamllex"
-        runtime  = "//runtime:asmrun"
-        cvt_emit = settings["//toolchain:cvt_emit"]
-
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"  : compiler,
-        "//toolchain:lexer"     : lexer,
-        "//toolchain:runtime"   : runtime,
-        "//toolchain:cvt_emit"  : cvt_emit
-    }
-
-################################################################
-ocamlopt_byte_in_transition = transition(
-    implementation = _ocamlopt_byte_in_transition_impl,
-    inputs = ["//config:dev", "//toolchain:cvt_emit"],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-        "//toolchain:cvt_emit"
-    ]
-)
-
-##########################################################
-def _ocamlopt_opt_in_transition_impl(settings, attr):
-    debug = True
-    if debug: print("ocamlopt_opt_in_transition")
-
-    config_executor = "sys"
-    config_emitter  = "sys"
-
-    if settings["//config:dev"] == True:
-        # we're targeting ocamlopt.opt, so we use same
-        compiler = "@baseline//bin:ocamlopt.opt"
-        lexer    = "@baseline//bin:ocamllex.opt"
-        runtime  = "@baseline//bin:ocamlrun"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
-    else:
-        compiler = "//bin:ocamlopt.opt"
-        lexer    = "//lex:ocamllex.opt"
-        runtime  = "//runtime:asmrun"
-        cvt_emit = settings["//toolchain:cvt_emit"]
-
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"  : compiler,
-        "//toolchain:lexer"     : lexer,
-        "//toolchain:runtime"   : runtime,
-        "//toolchain:cvt_emit"  : cvt_emit
-    }
-
-################################################################
-ocamlopt_opt_in_transition = transition(
-    implementation = _ocamlopt_opt_in_transition_impl,
-    inputs = ["//config:dev", "//toolchain:cvt_emit"],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-        "//toolchain:cvt_emit"
-    ]
-)
-
-##########################################################
-def _ocamlc_opt_in_transition_impl(settings, attr):
-    debug = True
-    if debug: print("ocamlc_opt_in_transition")
-
-    config_executor = "sys"
-    config_emitter  = "vm"
-
-    if settings["//config:dev"] == True:
-        # we're targeting ocamlc.opt, so we use ocamlopt.opt
-        compiler = "@baseline//bin:ocamlopt.opt"
-        lexer    = "@baseline//bin:ocamllex.opt"
-        runtime  = "@baseline//bin:ocamlrun"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
-    else:
-        compiler = "//bin:ocamlc.opt"
-        lexer    = "//lex:ocamllex.opt"
-        runtime  = "//runtime:asmrun"
-        cvt_emit = settings["//toolchain:cvt_emit"]
-
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"  : compiler,
-        "//toolchain:lexer"     : lexer,
-        "//toolchain:runtime"   : runtime,
-        "//toolchain:cvt_emit"  : cvt_emit
-    }
-
-################################################################
-ocamlc_opt_in_transition = transition(
-    implementation = _ocamlc_opt_in_transition_impl,
-    inputs = ["//config:dev", "//toolchain:cvt_emit"],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-        "//toolchain:cvt_emit"
-    ]
-)
-
-################################################################
-##########################################################
-def _build_tool_vm_in_transition_impl(settings, attr):
-    debug = True
-    if debug: print("build_tool_vm_in_transition")
-
-    config_executor = "vm"
-    config_emitter  = "vm"
-    compiler = "//bin:ocamlc.byte"
-    lexer    = "//lex:ocamllex.byte"
-    runtime  = "//runtime:asmrun"
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"  : compiler,
-        "//toolchain:lexer"     : lexer,
-        "//toolchain:runtime"   : runtime
-    }
-
-################################################################
-build_tool_vm_in_transition = transition(
-    implementation = _build_tool_vm_in_transition_impl,
-    inputs = [],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-    ]
-)
-
-##########################################################
-def _build_tool_sys_in_transition_impl(settings, attr):
-    debug = True
-    if debug: print("build_tool_sys_in_transition")
-
-    config_executor = "sys"
-    config_emitter  = "sys"
-    compiler = "//bin:ocamlc.byte"
-    lexer    = "//lex:ocamllex.opt"
-    runtime  = "//runtime:asmrun"
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"  : compiler,
-        "//toolchain:lexer"     : lexer,
-        "//toolchain:runtime"   : runtime
-    }
-
-################################################################
-build_tool_sys_in_transition = transition(
-    implementation = _build_tool_sys_in_transition_impl,
-    inputs = [],
-    outputs = [
-        "//config/target/executor",
-        "//config/target/emitter",
-        "//toolchain:compiler",
-        "//toolchain:lexer",
-        "//toolchain:runtime",
-    ]
-)
-

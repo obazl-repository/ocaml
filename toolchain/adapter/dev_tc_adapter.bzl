@@ -28,7 +28,7 @@ def _dev_toolchain_adapter_impl(ctx):
 
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
-        dev                    = ctx.attr.dev,
+        protocol               = ctx.attr.protocol,
 
         build_executor         = tc_build_executor(ctx),
 
@@ -50,7 +50,7 @@ def _dev_toolchain_adapter_impl(ctx):
         # camlheaders            = ctx.files.camlheaders,
 
         ## core tools
-        executable             = _executable(ctx),
+        executable             = tc_executable(ctx, "compiler"),
         tool_arg               = tc_tool_arg(ctx),
 
         compiler               = tc_compiler(ctx),
@@ -68,7 +68,7 @@ def _dev_toolchain_adapter_impl(ctx):
 dev_toolchain_adapter = rule(
     _dev_toolchain_adapter_impl,
     attrs = {
-        "dev": attr.label(default = "//config:dev"),
+        "protocol": attr.label(default = "//config/build/protocol"),
         "config_executor": attr.label(default = "//config/target/executor"),
         "config_emitter" : attr.label(default = "//config/target/emitter"),
 

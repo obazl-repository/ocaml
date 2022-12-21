@@ -14,7 +14,7 @@ def get_build_executor(tc):
         print("config_executor %s" % config_executor)
         print("config_emitter  %s" % config_emitter)
 
-    if tc.dev:
+    if tc.protocol == "dev":
         build_executor = "opt"
     # elif (target_executor == "unspecified"):
     #     if (config_executor == "sys"):
@@ -56,7 +56,7 @@ def get_build_executor(tc):
 
 # def configure_action(ctx, tc):
 #     executable = None
-#     if tc.dev:
+#     if tc.protocol == "dev":
 #         ocamlrun = None
 #         effective_compiler = tc.compiler
 #     else:
@@ -119,7 +119,7 @@ def progress_msg(workdir, ctx):
     cmode = ctx.var["COMPILATION_MODE"]
     if cmode == "fastbuild": cmode = "fb"
 
-    if ctx.attr._test[BuildSettingInfo].value:
+    if ctx.attr._protocol[BuildSettingInfo].value == "test":
         lbrack = "("
         rbrack = ")"
     else:

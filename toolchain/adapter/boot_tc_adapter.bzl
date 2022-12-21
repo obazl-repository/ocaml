@@ -5,9 +5,9 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 # load("//toolchain:tc_transitions.bzl", "tool_out_transition")
 
 load("//bzl/transitions:tc_transitions.bzl",
-     "tc_boot_in_transition",
-     # "tc_lexer_out_transition",
      "tc_runtime_out_transition")
+load("//bzl/transitions:boot_transitions.bzl",
+     "tc_boot_in_transition")
 
 load(":tc_utils.bzl",
      "tc_build_executor",
@@ -24,7 +24,7 @@ def _executable(ctx, tool):
         print("BOOT tc.executable entry")
         print("tc.name: %s" % ctx.attr.name)
 
-    if ctx.attr.dev[BuildSettingInfo].value:
+    if ctx.attr.protocol[BuildSettingInfo].value == "dev":
         # native only
         if tool == "compiler":
             return ctx.file.compiler
@@ -62,12 +62,12 @@ def _executable(ctx, tool):
             #     print("lx executable: returning %s" % ctx.attr.lexer)
 
             if tool == "compiler":
-                if ctx.attr.dev[BuildSettingInfo].value:
+                if ctx.attr.protocol[BuildSettingInfo].value == "dev":
                     return ctx.file.compiler
                 else:
                     return ctx.attr.compiler[DefaultInfo].files_to_run.executable
             # else:
-            #     if ctx.attr.dev[BuildSettingInfo].value:
+            #     if ctx.attr.protocol[BuildSettingInfo].value:
             #         return ctx.file.lexer
             #     else:
             #         return ctx.attr.lexer[DefaultInfo].files_to_run.executable
@@ -80,7 +80,7 @@ def _executable(ctx, tool):
 #         print("tc_lexer")
 #         print("tc.name: %s" % ctx.attr.name)
 
-#     if ctx.attr.dev:
+#     if ctx.attr.protocol:
 #         # native only
 #         return ctx.attr.lexer
 #     else:
@@ -92,16 +92,16 @@ def _tool_arg(ctx, tool):
 
     if debug:
         print("boot_tc _TOOL_ARG for %s" % tool)
-        print("lx dev mode? %s" % ctx.attr.dev[BuildSettingInfo].value)
+        print("lx protocol %s" % ctx.attr.protocol[BuildSettingInfo].value)
         print("lx build executor: %s" % tc_build_executor(ctx))
         print("lx config_executor: %s" % ctx.attr.config_executor[BuildSettingInfo].value)
         print("lx compiler: %s" % ctx.attr.compiler)
         # print("lx lexer:    %s" % ctx.attr.lexer)
 
-    # if ctx.attr.dev[BuildSettingInfo].value:
+    # if ctx.attr.protocol[BuildSettingInfo].value:
     #     fail()
 
-    if ctx.attr.dev[BuildSettingInfo].value:
+    if ctx.attr.protocol[BuildSettingInfo].value == "dev":
         return None
 
     # if tool == "lexer":
@@ -118,7 +118,7 @@ def _tool_arg(ctx, tool):
     print("tcc.compiler: %s" % ctx.file.compiler)
     print("tcc.lexer: %s" % ctx.file.lexer)
 
-    if ctx.attr.dev[BuildSettingInfo].value:
+    if ctx.attr.protocol[BuildSettingInfo].value == "dev":
         if tool == "compiler":
             return ctx.file.compiler
         # else:
@@ -147,7 +147,7 @@ def _boot_toolchain_adapter_impl(ctx):
 
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
-        dev                    = ctx.attr.dev,
+        protocol               = ctx.attr.protocol,
 
         build_executor         = tc_build_executor(ctx),
 
@@ -186,7 +186,7 @@ boot_toolchain_adapter = rule(
     _boot_toolchain_adapter_impl,
     doc = "Toolchain for building build_tool preprocessors",
     attrs = {
-        "dev": attr.label(default = "//config:dev"),
+        "protocol": attr.label(default = "//config/build/protocol"),
 
         "config_executor": attr.label(default = "//config/target/executor"),
         "config_emitter" : attr.label(default = "//config/target/emitter"),
@@ -205,12 +205,12 @@ boot_toolchain_adapter = rule(
         # "target_runtime" : attr.label(default = "//toolchain:runtime"),
         "runtime": attr.label( # the lib, not ocamlrun
             doc = "Batch interpreter. ocamlrun, usually",
-            # default = "//toolchain:runtime",
-            default = "//runtime:camlrun",
+            default = "//toolchain:runtime",
+            # default = "//runtime:camlrun",
             allow_single_file = True,
             executable = False,
             # cfg = "exec"
-            cfg = tc_runtime_out_transition
+            cfg = reset_cc_config_transition
         ),
 
         "vmargs": attr.label( ## string list

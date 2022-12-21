@@ -26,7 +26,7 @@ def _toolchain_adapter_impl(ctx):
 
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
-        dev                    = ctx.attr.dev,
+        protocol               = ctx.attr.protocol,
 
         build_executor         = tc_build_executor(ctx),
 
@@ -47,7 +47,7 @@ def _toolchain_adapter_impl(ctx):
         # camlheaders            = ctx.files.camlheaders,
 
         ## core tools
-        executable             = tc_executable(ctx),
+        executable             = tc_executable(ctx, "compiler"),
         tool_arg               = tc_tool_arg(ctx),
 
         compiler               = tc_compiler(ctx),
@@ -70,7 +70,7 @@ toolchain_adapter = rule(
     _toolchain_adapter_impl,
     doc = "Defines a toolchain for bootstrapping the OCaml toolchain",
     attrs = {
-        "dev": attr.label(default = "//config:dev"),
+        "protocol": attr.label(default = "//config/build/protocol"),
         # "build_host": attr.string(
         #     doc     = "OCaml host platform: vm (bytecode) or an arch.",
         #     default = "vm"
@@ -107,7 +107,8 @@ toolchain_adapter = rule(
             allow_single_file = True,
             executable = False,
             # cfg = "exec"
-            cfg = tc_runtime_out_transition
+            cfg = reset_cc_config_transition
+            # cfg = tc_runtime_out_transition
         ),
 
         "vmargs": attr.label( ## string list
@@ -141,7 +142,7 @@ toolchain_adapter = rule(
         ## Core Tools
         "compiler": attr.label(
             default = "//toolchain:compiler",
-            allow_files = True,
+            allow_single_file = True,
             executable = True,
             # cfg = "exec"
             cfg = tc_compiler_out_transition
@@ -155,6 +156,15 @@ toolchain_adapter = rule(
         #     # cfg = tc_compiler_out_transition
         #     cfg = tc_lexer_out_transition
         # ),
+
+        "cvt_emit": attr.label(
+            default = "//boot:ocamllex.boot", # fake, will be transitioned
+            # default = "//toolchain:cvt_emit",
+            allow_single_file = True,
+            executable = True,
+            cfg = "exec",
+            # cfg = tc_lexer_out_transition
+        ),
 
         # "yaccer": attr.label(
         #     default = "//yacc:ocamlyacc",

@@ -258,7 +258,7 @@ def lambda_expect_impl(ctx, exe_name):  ## , tc):
     #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
     # print("runfiles tc.compiler: %s" % tc.compiler)
     # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
-    # if tc.dev:
+    # if tc.protocol == "dev":
     #     runfiles.append(tc.ocamlrun)
     # elif ocamlrun:
     #     runfiles.append(tc.compiler[DefaultInfo].default_runfiles.files.to_list)

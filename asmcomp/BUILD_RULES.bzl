@@ -2,6 +2,8 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
+load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
+
 ## cvt_emit must be run by ctx.actions.run_shell, so it needs its own
 ## run rule.  Compare rule run_ocamllex (in lex/BUILD_RULES.bzl)
 
@@ -18,11 +20,12 @@ def _run_cvt_emit_impl(ctx):
 
     print("cvt emit _tool: %s" % ctx.file._tool)
 
-    if ctx.attr._dev[BuildSettingInfo].value:
+    if ctx.attr._protocol[BuildSettingInfo].value == "dev":
         ## tool tgts are just files w/o runfiles
         ocamlrun = ctx.file._tool
     else:
-        ocamlrun =  ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list()[0]
+        ocamlrun = ctx.file._ocamlrun
+        # ocamlrun =  ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list()[0]
 
     executable_cmd = ocamlrun.path + " " + ctx.file._tool.path
 
@@ -72,8 +75,17 @@ run_cvt_emit = rule(
             default = "//toolchain:cvt_emit"
             # cfg = tool_reset_transition
         ),
-        # "_allowlist_function_transition": attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+        "_ocamlrun" : attr.label(
+            allow_single_file = True,
+            default = "//runtime:ocamlrun",
+            executable = True,
+            # cfg = "exec"
+            cfg = reset_cc_config_transition
+        ),
+
+        "_protocol" : attr.label(default = "//config/build/protocol"),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
     incompatible_use_toolchain_transition = True, #FIXME: obsolete?

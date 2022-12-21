@@ -23,9 +23,9 @@ echo "`cat ${RUNFILES_MANIFEST_FILE}`"
 
 # set -x
 
-echo "PWD: $(PWD)"
-echo "BUILD_WORKSPACE_DIRECTORY: $BUILD_WORKSPACE_DIRECTORY"
-echo "BUILD_WORKING_DIRECTORY: $BUILD_WORKING_DIRECTORY"
+# echo "PWD: $(PWD)"
+# echo "BUILD_WORKSPACE_DIRECTORY: $BUILD_WORKSPACE_DIRECTORY"
+# echo "BUILD_WORKING_DIRECTORY: $BUILD_WORKING_DIRECTORY"
 
 BOOTDIR=$BUILD_WORKSPACE_DIRECTORY/.baseline
 
@@ -43,13 +43,13 @@ echo "Installing WORKSPACE and BUILD files"
 # echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/bin/BUILD.bazel
 # echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/lib/BUILD.bazel
 
-echo "Getting executor and emitter"
+# echo "Getting executor and emitter"
 
-EXECUTOR=`cat $(rlocation ocamlcc/boot/executor)`
-EMITTER=`cat $(rlocation ocamlcc/boot/emitter)`
+# EXECUTOR=`cat $(rlocation ocamlcc/boot/executor)`
+# EMITTER=`cat $(rlocation ocamlcc/boot/emitter)`
 
-echo "Executor: ${EXECUTOR}"
-echo "Emitter: ${EMITTER}"
+# echo "Executor: ${EXECUTOR}"
+# echo "Emitter: ${EMITTER}"
 
 echo "Installing programs"
 
@@ -107,26 +107,30 @@ echo "Installing programs"
 #     exit 1
 # fi
 
-cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
-cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) $BOOTDIR/bin/
-cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) $BOOTDIR/bin/
-cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) $BOOTDIR/bin/
+cp -f $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
+cp -f $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) $BOOTDIR/bin/
+cp -f $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) $BOOTDIR/bin/
+cp -f $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) $BOOTDIR/bin/
 
-cp -vf $(rlocation ocamlcc/lex/_sys/ocamllex.opt) $BOOTDIR/bin/
-cp -vf $(rlocation ocamlcc/lex/_vm/ocamllex.byte) $BOOTDIR/bin/
+cp -f $(rlocation ocamlcc/lex/_sys/ocamllex.opt) $BOOTDIR/bin/
+cp -f $(rlocation ocamlcc/lex/_vm/ocamllex.byte) $BOOTDIR/bin/
 
-cp -vf $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
+cp -f $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
+
+cp -f $(rlocation ocamlcc/asmcomp/_ocamlc.byte/cvt_emit.byte) $BOOTDIR/bin
+cp -f $(rlocation ocamlcc/asmcomp/_ocamlopt.opt/cvt_emit.opt) $BOOTDIR/bin
 
 echo "Installing libs"
 
-cp -vf $(rlocation ocamlcc/runtime/libasmrun.a) $BOOTDIR/lib
-cp -vf $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
-cp -vf $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
+cp -f $(rlocation ocamlcc/runtime/libasmrun.a) $BOOTDIR/lib
+cp -f $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
+cp -f $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
 
 echo "Setting permissions"
 
 # chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
 # chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
+chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/ocamlrun
 chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*.opt
 chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
 chmod -vf ugo=+r-xw $BOOTDIR/lib/*.a

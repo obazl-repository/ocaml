@@ -52,7 +52,8 @@ boot_library(
 # compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
 # 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
 
-boot_archive(
+#boot_archive(
+boot_library(
     name = "ocamlbytecomp",
     # opts = select({
     #     "//bzl/toolchain:boot": [],

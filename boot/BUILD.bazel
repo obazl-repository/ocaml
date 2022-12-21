@@ -1,6 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//bzl/rules:boot_import_vm_executable.bzl", "boot_import_vm_executable")
+load("//bzl:rules.bzl",
+     "boot_import_vm_executable",
+     "ocamlc_byte",
+     "ocamlopt_byte",
+     "ocamlopt_opt",
+     "ocamlc_opt")
+
+
 load(":BUILD_RULES.bzl", "boot_coldstart", "boot_setup")
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
@@ -23,17 +30,13 @@ boot_coldstart(
         "//bin:ocamlc.opt",  ## runfiles contain all 4
         "//lex:ocamllex.byte",
         "//lex:ocamllex.opt",
+        "//stdlib",
+        "//stdlib:Std_exit",
+        "//asmcomp:cvt_emit.byte",
+        "//asmcomp:cvt_emit.opt",
         "//yacc:ocamlyacc",
         "@bazel_tools//tools/bash/runfiles",
-        # "//stdlib:stdlib",
-        # "//stdlib:Std_exit",
-        # "//stdlib:Std_exit_cmi",
-        # "//stdlib:Stdlib_cmi",
-        ##FIXME: deal with camlheaders
-        # "//config/camlheaders",
     ],
-    # deps = [
-    # ],
 )
 
 boot_setup(
@@ -69,6 +72,90 @@ boot_import_vm_executable(
     name = "ocamlc.boot",
     tool = "ocamlc",
     # runtime = "//runtime:ocamlrun"
+)
+
+ocamlc_byte(
+    name = "ocamlc.byte",
+    stdlib   = "//stdlib",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp"
+    ],
+    main = "//driver:Main",
+    opts = [ ] + select({
+        # ocamlc.byte: ["-compat-32"]
+        "//conditions:default": []
+    }) + [
+    ] + select({
+        "//platform/target/os:linux?": [
+            "-cclib", "-lm",
+            "-cclib", "-ldl",
+            "-cclib", "-lpthread",
+        ],
+        "//conditions:default": []
+    }),
+    visibility             = ["//visibility:public"]
+)
+
+ocamlopt_byte(
+    name = "ocamlopt.byte",
+    stdlib   = "//stdlib",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//asmcomp:ocamloptcomp"
+    ],
+    main = "//driver:Optmain",
+    opts = [ ] + select({
+        # ocamlc.byte: ["-compat-32"]
+        "//conditions:default": []
+    }) + [
+    ] + select({
+        "//platform/target/os:linux?": [
+            "-cclib", "-lm",
+            "-cclib", "-ldl",
+            "-cclib", "-lpthread",
+        ],
+        "//conditions:default": []
+    }),
+    visibility             = ["//visibility:public"]
+)
+
+ocamlopt_opt(
+    name = "ocamlopt.opt",
+    stdlib   = "//stdlib",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//asmcomp:ocamloptcomp"
+    ],
+    main = "//driver:Optmain",
+    opts = [ ] + select({
+        "//platform/target/os:linux?": [
+            "-cclib", "-lm",
+            "-cclib", "-ldl",
+            "-cclib", "-lpthread",
+        ],
+        "//conditions:default": []
+    }),
+    visibility             = ["//visibility:public"]
+)
+
+ocamlc_opt(
+    name = "ocamlc.opt",
+    stdlib   = "//stdlib",
+    prologue = [
+        "//compilerlibs:ocamlcommon",
+        "//asmcomp:ocamloptcomp"
+    ],
+    main = "//driver:Optmain",
+    opts = [ ] + select({
+        "//platform/target/os:linux?": [
+            "-cclib", "-lm",
+            "-cclib", "-ldl",
+            "-cclib", "-lpthread",
+        ],
+        "//conditions:default": []
+    }),
+    visibility             = ["//visibility:public"]
 )
 
 sh_binary(

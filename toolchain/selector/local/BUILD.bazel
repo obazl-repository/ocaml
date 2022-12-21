@@ -15,7 +15,7 @@ toolchain_selector(
     target_host_configuration = [
         # "//config/target/executor:sys_executor?",
         # "//config/target/emitter:vm_emitter?",
-        "//config:dev?"
+        "//config/build/protocol:dev?"
     ]
 )
 

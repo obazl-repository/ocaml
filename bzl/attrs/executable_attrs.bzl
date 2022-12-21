@@ -50,7 +50,7 @@ def executable_attrs():
             doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
-        _test = attr.label(default = "//config:test"),
+        _protocol = attr.label(default = "//config/build/protocol"),
 
         _verbose = attr.label(default = "//config/ocaml/link:verbose"),
 
@@ -70,19 +70,24 @@ def executable_attrs():
         ## _runtime attr goes in each rule - boot_compiler etc. need
         ## it, but build_tool does not.
 
-        ## The compiler always expects to find stdlib.cm{x}a (hardocded)
-        ## UNLESS -nopervasives?
-        _stdlib = attr.label(
-            doc = "Stdlib",
-            default = "//stdlib", # archive, not resolver
-            allow_single_file = True, # won't work with boot_library
-            # cfg = exe_deps_out_transition,
-        ),
-
-        _std_exit = attr.label(
+        # std_exit is required to get a runnable executable
+        # linker is hardcoded to look for std_exit.cmx?a
+        std_exit = attr.label(
             doc = "Module linked last in every executable.",
             default = "//stdlib:Std_exit",
             allow_single_file = True,
+            # cfg = exe_deps_out_transition,
+        ),
+
+        ## stdlib is NOT required to get a runnable,
+        ## but since it is so commonly used the compiler
+        ## opens it by default.
+        ## linker is hardcoded to look for stdlib.cmx?a
+        ## UNLESS -nopervasives?
+        stdlib = attr.label(
+            doc = "Stdlib",
+            default = "//stdlib", # archive, not resolver
+            allow_single_file = True, # won't work with boot_library
             # cfg = exe_deps_out_transition,
         ),
 
@@ -112,8 +117,8 @@ def executable_attrs():
             ## make the same compilation_mode transition
             cfg = reset_cc_config_transition
         ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
         cc_linkall = attr.label_list(
             ## equivalent to cc_library's "alwayslink"
             doc     = "True: use `-whole-archive` (GCC toolchain) or `-force_load` (Clang toolchain). Deps in this attribute must also be listed in cc_deps.",
