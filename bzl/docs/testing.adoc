@@ -1,0 +1,40 @@
+= testing
+
+
+== tags
+
+* `--test_tag_filters=foo,bar`
+
+== test suites
+
+https://bazel.build/reference/test-encyclopedia#tag-conventions
+
+Tags: small, medium, large, smoke
+
+"smoke	test_suite convention; means it should be run before committing code changes into the version control system"
+
+=== private test suites
+
+You can define _ad-hoc_ `test_suite` rules in `private/BUILD.bazel`.
+
+For example suppose you are making changes involving ints. Relevant
+tests may be scattered throughout `testsuite/tests`; you can create a
+custom test suite that will run just the tests you want, such as:
+
+[source,python]
+.private/BUILD.bazel
+----
+test_suite(
+    name = "ints",
+    tests = [
+        "//testsuite/tests/basic:bigints_test",
+        "//testsuite/tests/basic:boxedints_test",
+        "//testsuite/tests/basic:divint_test",
+        "//testsuite/tests/basic:min_int_test",
+        "//testsuite/tests/int64-unboxing:test_test:",
+        "//testsuite/tests/lib-int:test_test:",
+        "//testsuite/tests/lib-int64:test_test:",
+        ## etc.
+    ]
+)
+---
