@@ -35,7 +35,11 @@ def archive_impl(ctx):
     else:
         toolarg_input = []
 
-    if tc.config_executor == "sys":
+    tgt_name = ctx.label.name
+    if ctx.label.name.endswith(".cmxa"):
+        tgt_name = ctx.label.name[:-5]
+        ext = ".cmxa"
+    elif tc.config_executor == "sys":
         ext = ".cmxa"
     else:
         ext = ".cma"
@@ -47,9 +51,9 @@ def archive_impl(ctx):
         if ctx.attr.ns:
             archive_name = ctx.attr.ns ## normalize_module_name(ctx.attr.ns)
         else:
-            archive_name = ctx.label.name ## normalize_module_name(ctx.label.name)
+            archive_name = tgt_name ## normalize_module_name(ctx.label.name)
     else:
-        archive_name = ctx.label.name ## normalize_module_name(ctx.label.name)
+        archive_name = tgt_name ## normalize_module_name(ctx.label.name)
 
     if debug:
         print("archive_name: %s" % archive_name)

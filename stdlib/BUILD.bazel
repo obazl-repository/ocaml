@@ -6,8 +6,10 @@ load("//bzl:rules.bzl",
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 load(":BUILD_RULES.bzl",
-     "kernel_module",
+     "kernel_module", "kernel_module_cmx",
      "kernel_signature",
+     "stdlib_archive",
+     "stdlib_archive_cmxa",
      "stdlib_internal_signature",
      "stdlib_internal_module",
      "stdlib_module",
@@ -38,8 +40,17 @@ LABEL_OPTS = ["-nolabels"]
 # stdlib_archive(
 # boot_library won't work because the compiler is hard-coded to expect stdlib.cma
 
-boot_archive(
+stdlib_archive(
     name       = "stdlib",
+    # opts = ["-linkall"],
+    ## makefiles pass -use-prims. does that make sense, for an archive?
+    manifest   = STDLIB_MANIFEST,
+    # data = ["//runtime:asmrun"],
+    visibility = ["//visibility:public"],
+)
+
+stdlib_archive_cmxa(
+    name       = "stdlib.cmxa",
     # opts = ["-linkall"],
     ## makefiles pass -use-prims. does that make sense, for an archive?
     manifest   = STDLIB_MANIFEST,
@@ -1702,6 +1713,13 @@ kernel_signature(
 
 kernel_module(
     name   = "Std_exit",
+    struct = "std_exit.ml",
+    sig    = ":Std_exit_cmi",
+    deps = [":Stdlib"]
+)
+
+kernel_module_cmx(
+    name   = "Std_exit.cmx",
     struct = "std_exit.ml",
     sig    = ":Std_exit_cmi",
     deps = [":Stdlib"]

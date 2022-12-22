@@ -4,7 +4,76 @@ load("//bzl:rules.bzl",
      "ocaml_compiler_r",
      "ocaml_compilers")
 
-## FIXME: support flambda
+################################################################
+## ocaml_compilers is a macro; it expands to: ocamlc_byte,
+## ocamlopt_byte ocamlopt_opt, ocamlc_opt
+
+ocaml_compilers(
+    name = "ocamlcc",
+    visibility             = ["//visibility:public"]
+)
+
+## to run the compilers directly from the cmd line:
+sh_binary(
+    name = "ocamlc.byte.sh",
+    srcs = ["ocamlc.byte.shell"],
+    env  = {"VERBOSE": "true"},
+    data = [
+        ":ocamlc.byte",
+        "//runtime:ocamlrun",
+        "//stdlib",
+        "//stdlib:Std_exit",
+        "//config/camlheaders",
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ]
+)
+
+sh_binary(
+    name = "ocamlopt.byte.sh",
+    srcs = ["ocamlopt.byte.shell"],
+    env  = {"VERBOSE": "true",
+            "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    data = [
+        ":ocamlopt.byte",
+        "//runtime:asmrun",
+        "//stdlib:stdlib.cmxa",
+        "//stdlib:Std_exit.cmx",
+        "//config/camlheaders",
+        "@bazel_tools//tools/cpp:current_cc_toolchain"
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ],
+    toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain"]
+)
+
+sh_binary(
+    name = "ocamlopt.opt.sh",
+    srcs = ["ocamlopt.opt.shell"],
+    env  = {"VERBOSE": "true",
+            "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    data = [
+        ":ocamlopt.opt",
+        "//runtime:asmrun",
+        "//config/camlheaders",
+        "@bazel_tools//tools/cpp:current_cc_toolchain"
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ],
+    toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain"]
+)
+
+################################################################
+## recursive builds. abandoned. they work, but at the cost of
+## duplicated builds of some of the code.
 ocaml_compiler_r(
     name = "ocamlcc_r",
     stdlib   = "//stdlib",
@@ -73,16 +142,6 @@ ocaml_compiler_r(
         ]
     }),
     # cc_deps = ["//runtime:asmrun"],
-    visibility             = ["//visibility:public"]
-)
-
-################################################################
-## macro, expands to:
-## ocamlc_byte, ocamlopt_byte
-## ocamlopt_opt, ocamlc_opt
-
-ocaml_compilers(
-    name = "ocamlcc",
     visibility             = ["//visibility:public"]
 )
 

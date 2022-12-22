@@ -415,14 +415,11 @@ def executable_impl(ctx, tc, exe_name, workdir):
       )
     else:
         myrunfiles = ctx.runfiles(
-            # files = ctx.files.data, # + runfiles,
+            files =[ctx.file.stdlib, ctx.file.std_exit],
             transitive_files =  depset(
-                transitive = runfiles + [ # depset(direct=runfiles),
-                              depset(direct=ctx.files.data)]
-                # direct=compiler_runfiles,
-                # transitive = [depset(
-                #     # [ctx.file._std_exit, ctx.file._stdlib]
-                # )]
+                transitive = runfiles + [
+                    depset(direct=ctx.files.data),
+                ]
             )
         )
 

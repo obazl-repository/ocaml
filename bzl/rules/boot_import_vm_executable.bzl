@@ -13,13 +13,13 @@ def _boot_import_vm_executable(ctx):
     ctx.actions.symlink(output = tool,
                         target_file = ctx.file.tool)
 
-    runfiles = ctx.runfiles(
-        files = [ctx.file._ocamlrun]
-    )
+    # runfiles = ctx.runfiles(
+    #     files = [ctx.file._ocamlrun]
+    # )
 
     defaultInfo = DefaultInfo(
         executable = tool,
-        runfiles   = runfiles
+        # runfiles   = runfiles
     )
     return defaultInfo
 
@@ -33,13 +33,13 @@ boot_import_vm_executable = rule(
         tool = attr.label(
             allow_single_file = True,
         ),
-        _ocamlrun = attr.label(
-            allow_single_file = True,
-            default = "//runtime:ocamlrun",
-            executable = True,
-            # cfg = "exec"
-            cfg = reset_cc_config_transition
-        ),
+        # _ocamlrun = attr.label(
+        #     allow_single_file = True,
+        #     default = "//toolchain:ocamlrun",
+        #     executable = True,
+        #     # cfg = "exec"
+        #     cfg = reset_cc_config_transition
+        # ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     ),

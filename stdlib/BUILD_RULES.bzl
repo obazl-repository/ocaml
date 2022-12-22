@@ -11,10 +11,47 @@ load("//bzl/actions:module_impl.bzl", "module_impl")
 load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
 load("//bzl/actions:signature_impl.bzl", "signature_impl")
 
-load("//bzl/rules:ocaml_transitions.bzl", "ocaml_in_transition")
+load("//bzl/rules:ocaml_transitions.bzl",
+     "ocaml_stdlib_cmxa_in_transition",
+     "ocaml_in_transition")
 
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
+#####################
+stdlib_archive = rule(
+    implementation = archive_impl,
+    doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
+    attrs = dict(
+        archive_attrs(),
+        _rule = attr.string( default = "boot_archive" ),
+    ),
+    provides = [OcamlArchiveProvider, BootInfo],
+    executable = False,
+    # fragments = ["platform", "cpp"],
+    # host_fragments = ["platform",  "cpp"],
+    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:ocaml",
+                  # ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+stdlib_archive_cmxa = rule(
+    implementation = archive_impl,
+    doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
+    attrs = dict(
+        archive_attrs(),
+        _rule = attr.string( default = "boot_archive" ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+    ),
+    provides = [OcamlArchiveProvider, BootInfo],
+    executable = False,
+    cfg = ocaml_stdlib_cmxa_in_transition,
+    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:ocaml",
+                  # ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
 
 ################################################################
 def _stdlib_signature_impl(ctx):
@@ -230,6 +267,33 @@ kernel_module = rule(
         # ),
     ),
     # cfg = ocaml_in_transition,
+    provides = [BootInfo,ModuleInfo],
+    executable = False,
+    # fragments = ["platform", "cpp"],
+    # host_fragments = ["platform",  "cpp"],
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+####################
+kernel_module_cmx = rule(
+    implementation = _kernel_module_impl,
+    doc = "Compiles a non-namespace module in stdlib pkg.",
+    attrs = dict(
+        module_attrs(),
+        _opts = attr.string_list(
+            # default = ["-nostdlib"] # in toolchain copts
+            ## CamlinternalFormatBasics.ml[i] add "-nopervasives"
+        ),
+        # no _stdlib_resolver
+        _rule = attr.string( default = "kernel_module" ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
+    ),
+    cfg = ocaml_stdlib_cmxa_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
     # fragments = ["platform", "cpp"],

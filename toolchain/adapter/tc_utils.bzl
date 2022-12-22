@@ -217,7 +217,7 @@ def tc_workdir(ctx):
     config_executor = ctx.attr.config_executor[BuildSettingInfo].value
     config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
-    if protocol == "unspecified":
+    if protocol == "boot":
         workdir = "_boot/"
 
     elif (config_executor == "boot"):

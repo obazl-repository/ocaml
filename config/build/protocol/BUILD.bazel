@@ -1,0 +1,29 @@
+################################################################
+#### build protocols:  boot, dev, test, release
+
+load("@bazel_skylib//rules:common_settings.bzl",
+     "string_flag", "string_setting"
+)
+
+string_setting(
+    name = "protocol",
+    build_setting_default = "boot",
+    values = ["boot", "dev", "test", "release", "unspecified", "null"],
+    visibility = ["//visibility:public"]
+)
+
+config_setting(name = "boot?",
+               flag_values = {":protocol": "build"})
+
+config_setting(name = "dev?",
+               flag_values = {":protocol": "dev"})
+
+config_setting(name = "test?",
+               flag_values = {":protocol": "test"})
+
+config_setting(name = "release?",
+               flag_values = {":protocol": "release"})
+
+config_setting(name = "unspecified?",
+               flag_values = {":protocol": "unspecified"})
+

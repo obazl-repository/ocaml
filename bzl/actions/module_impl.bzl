@@ -66,16 +66,22 @@ def module_impl(ctx, module_name):
         print("tc.config_executor: %s" % tc.config_executor)
         print("tc.config_emitter: %s" % tc.config_emitter)
 
-    if tc.protocol == "dev":
-        if tc.config_emitter == "sys":
-            ext = ".cmx"
-        else:
-            ext = ".cmo"
+    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    if compiler.basename == "ocamlopt.byte":
+        ext = ".cmx"
+    elif compiler.basename == "ocamlopt.opt":
+        ext = ".cmx"
     else:
-        if tc.config_executor == "sys":
-            ext = ".cmx"
+        if tc.protocol == "dev":
+            if tc.config_emitter == "sys":
+                ext = ".cmx"
+            else:
+                ext = ".cmo"
         else:
-            ext = ".cmo"
+            if tc.config_executor == "sys":
+                ext = ".cmx"
+            else:
+                ext = ".cmo"
 
     ################################################################
     ################  OUTPUTS  ################

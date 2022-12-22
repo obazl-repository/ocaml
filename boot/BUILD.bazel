@@ -114,7 +114,7 @@ sh_binary(
     data = [
         ":ocamlopt.byte",
         "//runtime:ocamlrun",
-        "//stdlib",
+        "//stdlib:stdlib.cmxa",
         "//config/camlheaders",
         "@bazel_tools//tools/cpp:current_cc_toolchain"
     ],
