@@ -661,37 +661,33 @@ def _ocamlc_opt_in_transition_impl(settings, attr):
     config_executor = "sys"
     config_emitter  = "vm"
 
-    if protocol == "unspecified":
-        protocol = "boot"
+    if protocol == "boot":
         config_executor = "sys"
         config_emitter  = "sys"
         compiler = "//bin:ocamlopt.byte"
-        runtime  = "//runtime:asmrun"
-        cvt_emit = settings["//toolchain:cvt_emit"]
+        runtime  = "//runtime:camlrun"
 
-    elif protocol == "boot":
+    elif protocol == "baseline":
         config_executor = "sys"
         config_emitter  = "vm"
-        compiler = "//boot:ocamlopt.opt"
-        runtime  = "//runtime:asmrun"
-        cvt_emit = settings["//toolchain:cvt_emit"]
+        compiler = "//boot:ocamlopt.byte"
+        runtime  = "//runtime:camlrun"
 
-    elif protocol == "dev":
-        # we're targeting ocamlc.opt, so we use ocamlopt.opt
-        compiler = "@baseline//bin:ocamlopt.opt"
-        # lexer    = "@baseline//bin:ocamllex.opt"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
-        runtime  = "@baseline//lib:libasmrun.a"
+    # elif protocol == "dev":
+    #     # we're targeting ocamlc.opt, so we use ocamlopt.opt
+    #     compiler = "@baseline//bin:ocamlopt.opt"
+    #     # lexer    = "@baseline//bin:ocamllex.opt"
+    #     cvt_emit = "@baseline//bin:cvt_emit.opt"
+    #     runtime  = "@baseline//lib:libasmrun.a"
+
     else:
-        fail("Protocol not yet supported: %s" % protocol)
+        fail("Protocol not supported for this target: %s" % protocol)
 
     return {
         "//config/target/executor": config_executor,
         "//config/target/emitter" : config_emitter,
         "//toolchain:compiler"  : compiler,
-        # "//toolchain:lexer"     : lexer,
         "//toolchain:runtime"   : runtime,
-        "//toolchain:cvt_emit"  : cvt_emit
     }
 
 ################################################################
@@ -702,17 +698,13 @@ ocamlc_opt_in_transition = transition(
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",
-        # "//toolchain:lexer",
         "//toolchain:runtime",
-        "//toolchain:cvt_emit"
     ],
     outputs = [
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",
-        # "//toolchain:lexer",
         "//toolchain:runtime",
-        "//toolchain:cvt_emit"
     ]
 )
 

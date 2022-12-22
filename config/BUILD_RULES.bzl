@@ -5,6 +5,7 @@ load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
+load(":BUILD_CC_LINK.bzl", "link_config")
 
 ## exports rules: config_cc_toolchain, config_mkexe
 
@@ -49,7 +50,7 @@ def cc_tc_config_map(ctx):
 
     # print("VERSION FILE: %s" % ctx.version_file)
 
-    feature_configuration = cc_common.configure_features(
+    feature_config = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = tc,
         requested_features = ctx.features,
@@ -110,13 +111,13 @@ def cc_tc_config_map(ctx):
     config_map["sysroot"] = tc.sysroot
     config_map["target_gnu_system_name"] = tc.target_gnu_system_name
     config_map["built_in_include_directories"] = tc.built_in_include_directories
-    config_map["dynamic_runtime_lib"] = tc.dynamic_runtime_lib(feature_configuration = feature_configuration).to_list()
-    config_map["static_runtime_lib"] = tc.static_runtime_lib(feature_configuration = feature_configuration).to_list()
-    config_map["for_dynamic_libs_needs_pic"] = tc.needs_pic_for_dynamic_libraries(feature_configuration = feature_configuration)
+    config_map["dynamic_runtime_lib"] = tc.dynamic_runtime_lib(feature_configuration = feature_config).to_list()
+    config_map["static_runtime_lib"] = tc.static_runtime_lib(feature_configuration = feature_config).to_list()
+    config_map["for_dynamic_libs_needs_pic"] = tc.needs_pic_for_dynamic_libraries(feature_configuration = feature_config)
 
 
     c_compiler_path = cc_common.get_tool_for_action(
-        feature_configuration = feature_configuration,
+        feature_configuration = feature_config,
         action_name = ACTION_NAMES.c_compile
     )
 
@@ -130,7 +131,7 @@ def cc_tc_config_map(ctx):
     # output_file = ctx.actions.declare_file(ofile + ".o")
 
     c_compile_variables = cc_common.create_compile_variables(
-        feature_configuration = feature_configuration,
+        feature_configuration = feature_config,
         cc_toolchain = tc,
         # source_file = source_file.path,
         # output_file = output_file.path,
@@ -140,8 +141,12 @@ def cc_tc_config_map(ctx):
     # print("c_compile_variables: %s" % c_compile_variables)
     # config_map["c_compile_variables"] = str(c_compile_variables)
 
+    link_map = link_config(ctx, tc, feature_config)
+    print("LINK MAP: %s" % link_map)
+    config_map |= link_map
+
     compile_cmd_line = cc_common.get_memory_inefficient_command_line(
-        feature_configuration = feature_configuration,
+        feature_configuration = feature_config,
         action_name = ACTION_NAMES.c_compile,
         variables = c_compile_variables,
     )
@@ -149,42 +154,14 @@ def cc_tc_config_map(ctx):
     config_map["c_compile_cmd_line"] = compile_cmd_line
 
     cmd_line = cc_common.get_memory_inefficient_command_line(
-        feature_configuration = feature_configuration,
-        action_name = ACTION_NAMES.cpp_link_executable,
-        variables = c_compile_variables,
-    )
-    config_map["cpp_link_exe_cmd_line"] = cmd_line
-
-    cmd_line = cc_common.get_memory_inefficient_command_line(
-        feature_configuration = feature_configuration,
-        action_name = ACTION_NAMES.cpp_link_dynamic_library,
-        variables = c_compile_variables,
-    )
-    config_map["cpp_link_dso_cmd_line"] = cmd_line
-
-    cmd_line = cc_common.get_memory_inefficient_command_line(
-        feature_configuration = feature_configuration,
-        action_name = ACTION_NAMES.cpp_link_nodeps_dynamic_library,
-        variables = c_compile_variables,
-    )
-    config_map["cpp_link_nodeps_dso_cmd_line"] = cmd_line
-
-    cmd_line = cc_common.get_memory_inefficient_command_line(
-        feature_configuration = feature_configuration,
-        action_name = ACTION_NAMES.cpp_link_static_library,
-        variables = c_compile_variables,
-    )
-    config_map["cpp_link_static_cmd_line"] = cmd_line
-
-    cmd_line = cc_common.get_memory_inefficient_command_line(
-        feature_configuration = feature_configuration,
+        feature_configuration = feature_config,
         action_name = ACTION_NAMES.cc_flags_make_variable,
         variables = c_compile_variables,
     )
     config_map["cc_flags_make_variable"] = cmd_line
 
     cmd_line = cc_common.get_memory_inefficient_command_line(
-        feature_configuration = feature_configuration,
+        feature_configuration = feature_config,
         action_name = ACTION_NAMES.assemble,
         variables = c_compile_variables,
     )
@@ -194,17 +171,20 @@ def cc_tc_config_map(ctx):
     ] if tc.cpu.startswith("darwin") else []
 
     cmd_line = cc_common.get_memory_inefficient_command_line(
-        feature_configuration = feature_configuration,
+        feature_configuration = feature_config,
         action_name = ACTION_NAMES.preprocess_assemble,
         variables = c_compile_variables,
     )
     config_map["preprocess_assemble_cmd_line"] = cmd_line
 
-    env = cc_common.get_environment_variables(
-        feature_configuration = feature_configuration,
+    compile_env = cc_common.get_environment_variables(
+        feature_configuration = feature_config,
         action_name = ACTION_NAMES.c_compile,
         variables = c_compile_variables,
     )
+    print("ENV: %s"% compile_env)
+    config_map |= compile_env
+    print("config_map: %s" % config_map)
 
     # cc_ccontexts =  []
     # for dep in ctx.attr.deps:
@@ -287,10 +267,13 @@ def _config_cc_toolchain_impl(ctx):
         compiler = config_map["compiler"],
         compiler_executable = config_map["compiler_executable"],
         copts = config_map["copts"],
-        cpp_link_dso_cmd_line = config_map["cpp_link_dso_cmd_line"],
+
+        # cpp_link_dso_cmd_line = config_map["cpp_link_dso_cmd_line"],
         cpp_link_exe_cmd_line = config_map["cpp_link_exe_cmd_line"],
-        cpp_link_nodeps_dso_cmd_line = config_map["cpp_link_nodeps_dso_cmd_line"],
-        cpp_link_static_cmd_line = config_map["cpp_link_static_cmd_line"],
+        # cpp_link_nodeps_dso_cmd_line = config_map["cpp_link_nodeps_dso_cmd_line"],
+        # cpp_link_static_cmd_line = config_map["cpp_link_static_cmd_line"],
+
+
         cpu = config_map["cpu"],
         dynamic_runtime_lib = config_map["dynamic_runtime_lib"],
         for_dynamic_libs_needs_pic = config_map["for_dynamic_libs_needs_pic"],
@@ -397,6 +380,7 @@ def _ocaml_cc_config_impl(ctx):
     # json_map["ar"] = cc_config_map["AR"]
 
     assembler  = cc_config_map["c_compiler_path"]
+    # assembler  = cc_config_map["C_COMPILER"]
     arglist = cc_config_map["assemble_cmd_line"]
     # arglist = cc_config_map["preprocess_assemble_cmd_line"]
     arglist.extend(ctx.attr.asmopts)
@@ -404,7 +388,25 @@ def _ocaml_cc_config_impl(ctx):
         arglist.append("-v")
     asmargs = " ".join(arglist)
 
-    json_map["asm"] = assembler + " -c " + asmargs
+    ## this is ugly but required if we want to use the xcode tc on
+    ## mac. NB we could set these env vars in the build rules, but
+    ## then builds would fail when run outside of Bazel, unless the
+    ## user sets them in the shell.
+
+    ## ocaml uses system(3) to run assemble/link actions
+    ## so do we need to use 'exec env -' ???
+    ## envsetup = "exec env - "
+    # envsetup = ""
+    ## what about a fresh env? safer?
+    envsetup = "exec env -i - "
+    if ctx.attr._xcode_developer_dir[BuildSettingInfo].value:
+        envsetup = envsetup + "DEVELOPER_DIR={}".format(
+            ctx.attr._xcode_developer_dir[BuildSettingInfo].value)
+    if ctx.attr._xcode_sdkroot[BuildSettingInfo].value:
+        envsetup = envsetup + " SDKROOT={} ".format(
+            ctx.attr._xcode_sdkroot[BuildSettingInfo].value)
+
+    json_map["asm"] = envsetup + assembler + " -c " + asmargs
 
     linker  = cc_config_map["c_compiler_path"]
     arglist = []
@@ -416,7 +418,7 @@ def _ocaml_cc_config_impl(ctx):
     # maczig:
     # linkargs = " rc"
 
-    json_map["mkexe_cmd"] = linker + " " + linkargs
+    json_map["mkexe_cmd"] = envsetup + linker + " " + linkargs
 
     if ctx.attr._flambda[BuildSettingInfo].value:
         json_map["flambda"] =  True
@@ -497,10 +499,18 @@ ocaml_cc_config = rule(
             cfg = "exec"
         ),
 
+        "_xcode_sdkroot": attr.label(
+            default = "@ocaml_xcode//env:sdkroot"
+        ),
+        "_xcode_developer_dir": attr.label(
+            default = "@ocaml_xcode//env:developer_dir"
+        ),
+
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     },
-    toolchains = use_cpp_toolchain(),
+    toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
+    # toolchains = use_cpp_toolchain(),
     fragments = ["apple", "cpp", "platform"],
 )
 
@@ -578,13 +588,13 @@ ocaml_cc_config = rule(
 #     config_map["sysroot"] = tc.sysroot
 #     config_map["target_gnu_system_name"] = tc.target_gnu_system_name
 #     config_map["built_in_include_directories"] = tc.built_in_include_directories
-#     config_map["dynamic_runtime_lib"] = tc.dynamic_runtime_lib(feature_configuration = feature_configuration).to_list()
-#     config_map["static_runtime_lib"] = tc.static_runtime_lib(feature_configuration = feature_configuration).to_list()
-#     config_map["for_dynamic_libs_needs_pic"] = tc.needs_pic_for_dynamic_libraries(feature_configuration = feature_configuration)
+#     config_map["dynamic_runtime_lib"] = tc.dynamic_runtime_lib(feature_configuration = feature_config).to_list()
+#     config_map["static_runtime_lib"] = tc.static_runtime_lib(feature_configuration = feature_config).to_list()
+#     config_map["for_dynamic_libs_needs_pic"] = tc.needs_pic_for_dynamic_libraries(feature_configuration = feature_config)
 
 
 #     c_compiler_path = cc_common.get_tool_for_action(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.c_compile
 #     )
 
@@ -597,7 +607,7 @@ ocaml_cc_config = rule(
 #     # output_file = ctx.actions.declare_file(ofile + ".o")
 
 #     c_compile_variables = cc_common.create_compile_variables(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         cc_toolchain = tc,
 #         # source_file = source_file.path,
 #         # output_file = output_file.path,
@@ -608,7 +618,7 @@ ocaml_cc_config = rule(
 #     # config_map["c_compile_variables"] = str(c_compile_variables)
 
 #     compile_cmd_line = cc_common.get_memory_inefficient_command_line(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.c_compile,
 #         variables = c_compile_variables,
 #     )
@@ -616,42 +626,42 @@ ocaml_cc_config = rule(
 #     config_map["c_compile_cmd_line"] = compile_cmd_line
 
 #     cmd_line = cc_common.get_memory_inefficient_command_line(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.cpp_link_executable,
 #         variables = c_compile_variables,
 #     )
 #     config_map["cpp_link_exe_cmd_line"] = cmd_line
 
 #     cmd_line = cc_common.get_memory_inefficient_command_line(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.cpp_link_dynamic_library,
 #         variables = c_compile_variables,
 #     )
 #     config_map["cpp_link_dso_cmd_line"] = cmd_line
 
 #     cmd_line = cc_common.get_memory_inefficient_command_line(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.cpp_link_nodeps_dynamic_library,
 #         variables = c_compile_variables,
 #     )
 #     config_map["cpp_link_nodeps_dso_cmd_line"] = cmd_line
 
 #     cmd_line = cc_common.get_memory_inefficient_command_line(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.cpp_link_static_library,
 #         variables = c_compile_variables,
 #     )
 #     config_map["cpp_link_static_cmd_line"] = cmd_line
 
 #     cmd_line = cc_common.get_memory_inefficient_command_line(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.cc_flags_make_variable,
 #         variables = c_compile_variables,
 #     )
 #     config_map["cc_flags_make_variable"] = cmd_line
 
 #     cmd_line = cc_common.get_memory_inefficient_command_line(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.assemble,
 #         variables = c_compile_variables,
 #     )
@@ -661,14 +671,14 @@ ocaml_cc_config = rule(
 #     ] if tc.cpu.startswith("darwin") else []
 
 #     cmd_line = cc_common.get_memory_inefficient_command_line(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.preprocess_assemble,
 #         variables = c_compile_variables,
 #     )
 #     config_map["preprocess_assemble_cmd_line"] = cmd_line
 
 #     env = cc_common.get_environment_variables(
-#         feature_configuration = feature_configuration,
+#         feature_configuration = feature_config,
 #         action_name = ACTION_NAMES.c_compile,
 #         variables = c_compile_variables,
 #     )

@@ -3,7 +3,7 @@ workspace(name = "ocamlcc")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-load("//:WORKSPACE.bzl", "obazl_deps")
+load("//:WORKSPACE.bzl", "obazl_deps", "ocaml_xcode")
 obazl_deps()
 
 ## coldstart snapshot for development:
@@ -11,6 +11,8 @@ local_repository(
     name = "baseline",
     path = ".baseline"
 )
+
+ocaml_xcode()
 
 # load("//bzl:rules.bzl",
 #      "new_local_pkg_repository")

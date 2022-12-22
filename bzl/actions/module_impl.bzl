@@ -563,10 +563,16 @@ def module_impl(ctx, module_name):
     # if ctx.attr._rule == "compile_fail_test":
     #     script = gen_compile_script(ctx, executable, args)
 
+    env = {}
+    ## xcode env vars are added by config, no need here
+    # if ctx.attr._xcode_developer_dir[BuildSettingInfo].value:
+    #     env["DEVELOPER_DIR"] = ctx.attr._xcode_developer_dir[BuildSettingInfo].value
+    # if ctx.attr._xcode_sdkroot[BuildSettingInfo].value:
+    #     env["SDKROOT"] = ctx.attr._xcode_sdkroot[BuildSettingInfo].value
+
     ################
     ctx.actions.run(
-        env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
-               "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+        env        = env,
         executable = tc.executable.path,
         # executable = tc.compiler[DefaultInfo].files_to_run,
         arguments = [args],

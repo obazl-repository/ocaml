@@ -363,8 +363,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     ################
     ctx.actions.run(
-        env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
-               "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+        # env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+        #        "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
         executable = tc.executable.path,
         arguments = [args],
         inputs = inputs_depset,

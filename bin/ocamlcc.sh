@@ -5,10 +5,12 @@
 # Function to echo commands
 exe() { echo "\$ ${@/eval/}" ; "$@" ; }
 
+# echo "VERBOSE: $VERBOSE"
 # echo "args: $@"
+
 COMPILER=$1
 shift
-echo "COMPILER: $COMPILER"
+# echo "COMPILER: $COMPILER"
 
 # --- begin runfiles.bash initialization v2 ---
 # Copy-pasted from the Bazel Bash runfiles library v2.
@@ -25,31 +27,41 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
 # echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
 # echo "`cat ${RUNFILES_MANIFEST_FILE}`"
 
+OCAMLRUN=""
+RUNTIMEDIR=""
+CAMLHEADERS=""
+
 if [ $COMPILER = "ocamlc.byte" ]
 then
-    # OCAMLRUN=$(rlocation ocamlcc/runtime/ocamlrun)
     OCAMLRUN=runtime/ocamlrun
-    # COMPILER=$(rlocation ocamlcc/bin/_boot/ocamlc.byte)
     COMPILER=bin/_boot/ocamlc.byte
-    EXEC="$OCAMLRUN $COMPILER"
-    RUNTIMEDIR=""
-    CAMLHEADERS=`dirname $(rlocation ocamlcc/config/camlheaders/camlheader)`
+    CAMLHEADERS="-I `dirname $(rlocation ocamlcc/config/camlheaders/camlheader)`"
     STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/_boot/stdlib.cma)`
+
 elif [ $COMPILER = "ocamlopt.byte" ]
 then
-    # OCAMLRUN=$(rlocation ocamlcc/runtime/ocamlrun)
     OCAMLRUN=runtime/ocamlrun
-    # COMPILER=$(rlocation ocamlcc/bin/_boot/ocamlopt.byte)
     COMPILER=bin/_boot/ocamlopt.byte
-    EXEC="$OCAMLRUN $COMPILER"
     RUNTIMEDIR=`dirname $(rlocation ocamlcc/runtime/libasmrun.a)`
-    CAMLHEADERS=`dirname $(rlocation ocamlcc/config/camlheaders/camlheader)`
     STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/_boot/stdlib.cmxa)`
+
+elif [ $COMPILER = "ocamlopt.opt" ]
+then
+    COMPILER=bin/_boot/ocamlopt.opt
+    RUNTIMEDIR=`dirname $(rlocation ocamlcc/runtime/libasmrun.a)`
+    STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/_boot/stdlib.cmxa)`
+
+elif [ $COMPILER = "ocamlc.opt" ]
+then
+    COMPILER=bin/_boot/ocamlc.opt
+    RUNTIMEDIR=`dirname $(rlocation ocamlcc/runtime/libcamlrun.a)`
+    CAMLHEADERS="-I `dirname $(rlocation ocamlcc/config/camlheaders/camlheader)`"
+    STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/_boot/stdlib.cma)`
+else
+    echo "BAD COMPILER ARG: $COMPILER"
 fi
 
-CMD="$EXEC -nostdlib -I $STDLIBDIR  -I $CAMLHEADERS -I $RUNTIMEDIR $@"
-
-# echo "VERBOSE: $VERBOSE"
+CMD="$OCAMLRUN $COMPILER -nostdlib -I $STDLIBDIR $CAMLHEADERS -I $RUNTIMEDIR $@"
 
 if [ $VERBOSE = "true" ]
 then

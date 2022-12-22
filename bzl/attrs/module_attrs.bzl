@@ -105,6 +105,13 @@ def module_attrs():
             default = "//config/ocaml/cc/asm:keep"
         ),
 
+        _xcode_sdkroot = attr.label(
+            default = "@ocaml_xcode//env:sdkroot"
+        ),
+        _xcode_developer_dir = attr.label(
+            default = "@ocaml_xcode//env:developer_dir"
+        )
+
         # _sdkpath = attr.label(
         #     default = Label("@ocaml//:sdkpath") # ppx also uses this
         # ),

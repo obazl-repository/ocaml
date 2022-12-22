@@ -1,0 +1,29 @@
+= macos stuff
+
+On the mac Bazel needs DEVELOPER_DIR and SDKROOT.
+
+Some useful cmds:
+
+* `xcodebuild -sdk -version`
+
+* `xcrun --show-sdk-path`
+
+=> /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+
+* `xcrun --sdk macosx --show-sdk-path`
+
+=> /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
+
+
+* `xcode-select -p` - prints path of selected DEVELOPER_DIR
+
+=> /Applications/Xcode.app/Contents/Developer
+
+
+This tells bazel to NOT use xcode:
+
+export BAZEL_USE_CPP_ONLY_TOOLCHAIN=1
+
+
+https://www.smileykeith.com/2021/03/08/locking-xcode-in-bazel/
+

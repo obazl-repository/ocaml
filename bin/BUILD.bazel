@@ -4,6 +4,13 @@ load("//bzl:rules.bzl",
      "ocaml_compiler_r",
      "ocaml_compilers")
 
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_setting")
+
+bool_flag(name = "verbose", build_setting_default = False,
+          visibility = ["//visibility:public"])
+config_setting(name = "verbose?", flag_values = {":verbose": "True"})
+
 ################################################################
 ## ocaml_compilers is a macro; it expands to: ocamlc_byte,
 ## ocamlopt_byte ocamlopt_opt, ocamlc_opt
@@ -14,10 +21,18 @@ ocaml_compilers(
 )
 
 ## to run the compilers directly from the cmd line:
+
+# xcodebuild -sdk -version
+# xcrun --sdk macosx --show-sdk-path
+
 sh_binary(
     name = "ocamlc.byte.sh",
-    srcs = ["ocamlc.byte.shell"],
-    env  = {"VERBOSE": "true"},
+    srcs = ["ocamlcc.sh"],
+    env  = select({
+        ":verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+    args = ["ocamlc.byte"],
     data = [
         ":ocamlc.byte",
         "//runtime:ocamlrun",
@@ -33,16 +48,17 @@ sh_binary(
 
 sh_binary(
     name = "ocamlopt.byte.sh",
-    srcs = ["ocamlopt.byte.shell"],
-    env  = {"VERBOSE": "true",
-            "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
-            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    srcs = ["ocamlcc.sh"],
+    env  = select({
+        ":verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+    args = ["ocamlopt.byte"],
     data = [
         ":ocamlopt.byte",
         "//runtime:asmrun",
         "//stdlib:stdlib.cmxa",
         "//stdlib:Std_exit.cmx",
-        "//config/camlheaders",
         "@bazel_tools//tools/cpp:current_cc_toolchain"
     ],
     deps = [
@@ -54,14 +70,16 @@ sh_binary(
 
 sh_binary(
     name = "ocamlopt.opt.sh",
-    srcs = ["ocamlopt.opt.shell"],
-    env  = {"VERBOSE": "true",
-            "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
-            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    srcs = ["ocamlcc.sh"],
+    env  = select({
+        ":verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+    args = ["ocamlopt.opt"],
     data = [
         ":ocamlopt.opt",
         "//runtime:asmrun",
-        "//config/camlheaders",
+        # "//config/camlheaders",
         "@bazel_tools//tools/cpp:current_cc_toolchain"
     ],
     deps = [
@@ -73,22 +91,25 @@ sh_binary(
 
 sh_binary(
     name = "ocamlc.opt.sh",
-    srcs = ["ocamlc.opt.shell"],
-    env  = {"VERBOSE": "true",
-            "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
-            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    srcs = ["ocamlcc.sh"],
+    env  = select({
+        ":verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+    args = ["ocamlc.opt"],
     data = [
         ":ocamlc.opt",
-        # "//runtime:asmrun",
+        "//runtime:camlrun",
         "//config/camlheaders",
-        "@bazel_tools//tools/cpp:current_cc_toolchain"
+        "//stdlib",
+        "//stdlib:Std_exit",
     ],
     deps = [
          # for the runfiles lib used in ocamlc.sh:
         "@bazel_tools//tools/bash/runfiles"
-    ],
-    toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain"]
+    ]
 )
+
 
 ################################################################
 ## recursive builds. abandoned. they work, but at the cost of

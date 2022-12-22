@@ -85,6 +85,7 @@ mustache(
     # stdlib = "//stdlib"
 )
 
+#FIXME: add sh_binary that configures DEVELOPER_DIR, SDKROOT for mac
 ocaml_cc_config(
     name = "config_json",
     json = "config.initial.json",
@@ -138,7 +139,14 @@ config_mkexe(
 
 config_cc_toolchain(
     name = "config.cc",
-    out  = "config_cc.json"
+    out  = "config_cc.json",
+    # env  = select({
+    #     # mac...
+    #     "//conditions:default": {
+    #         "DEVELOPER_DIR": `xcode-select -p`
+    #         "SDKROOT": `xcsrun --show-sdk-path`
+    #     }
+    # })
 )
 
 compiler_module(

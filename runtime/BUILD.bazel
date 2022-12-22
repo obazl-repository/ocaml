@@ -61,7 +61,6 @@ cc_library(
         "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
-
     ] + select({
         "//platform/os:macos?": ["-std=c11"],
         "//platform/os:linux?": [],
@@ -90,9 +89,13 @@ cc_library(
     })
     ,
     defines = RUNTIME_DEFINES,
-    toolchains = ["//profile/system/local"],
+    toolchains = [
+        "//profile/system/local",
+        # "@bazel_tools//tools/cpp:current_cc_host_toolchain"
+    ],
     visibility = [
         "//:__pkg__",
+        "//bin:__pkg__",
         "//boot:__subpackages__",
         "//lib:__pkg__",
         "//toolchain/adapter:__pkg__"
