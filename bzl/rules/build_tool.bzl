@@ -16,6 +16,8 @@ load("//bzl/transitions:tool_transitions.bzl",
 ##############################
 def _build_tool_vm_impl(ctx):
 
+    print("BUILD_TOOL_VM: %s" % ctx.label)
+
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     workdir = tc.workdir
@@ -45,6 +47,8 @@ build_tool_vm = rule(
 
 ################################################################
 def _build_tool_sys_impl(ctx):
+
+    print("BUILD_TOOL_SYS: %s" % ctx.label)
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 

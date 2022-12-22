@@ -225,7 +225,7 @@ def _compile_fail_test(ctx):
     # direct_linkargs.append(out_cm_)
     default_outputs.append(out_cm_)
 
-    _options = get_options(ctx.attr._rule, ctx)
+    (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
     if ("-bin-annot" in _options):
         _options.remove("-bin-annot")
          # or ("-bin-annot" in tc.copts) ):

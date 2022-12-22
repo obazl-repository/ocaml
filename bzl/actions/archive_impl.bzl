@@ -117,7 +117,7 @@ def archive_impl(ctx):
 
     args.add_all(tc.linkopts)
 
-    _options = get_options(ctx.attr._rule, ctx)
+    (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
 
     ## Submodules can be listed in ctx.files.submodules in any order,

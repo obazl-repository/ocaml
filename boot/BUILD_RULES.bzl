@@ -10,14 +10,16 @@ def _coldstart_transition_impl(settings, attr):
         emitter  = settings["//config/target/emitter"]
 
     return {
-        "//config/build/protocol": "boot",
+        "//config/build/protocol": "baseline",
         "//config/target/executor": executor,
         "//config/target/emitter" : emitter
     }
 
+###################################
 _coldstart_transition = transition(
     implementation = _coldstart_transition_impl,
     inputs = [
+        # "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter"
     ],
@@ -91,6 +93,9 @@ boot_coldstart = rule(
             executable = True,
             cfg = "exec",
             default = "//boot:coldstart.sh",
+        ),
+        compilers = attr.label_list(
+            allow_files = True
         ),
         data = attr.label_list(
             allow_files = True

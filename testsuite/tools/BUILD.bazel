@@ -1,4 +1,4 @@
-load("//bzl:rules.bzl", "ocaml_tool")
+load("//bzl:rules.bzl", "ocaml_tool_vm")
 load("//bzl/rules/test:rules.bzl",
      "test_archive",
      "test_executable",
@@ -7,7 +7,7 @@ load("//bzl/rules/test:rules.bzl",
      "test_signature",
 )
 
-load("//lex:BUILD_RULES.bzl", "lex")
+load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
 MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
@@ -43,9 +43,8 @@ environment_group(
     ],
 )
 
-
 ## FIXME: only build VM version. build should fail for ocamlopt.[byte|opt]
-ocaml_tool(
+ocaml_tool_vm(
     name = "inline_expect",
     vm_only = True,
     prologue = [
@@ -156,7 +155,7 @@ test_module(
     ]
 )
 
-lex(
+run_ocamllex(
     name = "lexcmm_ml",
     src  = "lexcmm.mll",
     out  = "lexcmm.ml",

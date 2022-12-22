@@ -33,16 +33,16 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     # tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    config_executor = tc.config_executor
+    # config_executor = tc.config_executor
 
     if hasattr(ctx.attr, "vm_only"):
         if ctx.attr.vm_only:
-            if config_executor == "sys":
+            if tc.config_executor == "sys":
                 fail("This target can only be built for vm executor. Try passing --//config/target/executor=vm")
 
     if debug:
         print("tc.name: %s" % tc.name)
-        # print("config_executor: %s" % config_executor)
+        # print("config_executor: %s" % tc.config_executor)
         # print("config_emitter: %s" % config_emitter)
         print("tc.compiler: %s" % tc.compiler)
         # for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
@@ -121,7 +121,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     runtime_depsets = []
     cc_libdirs    = []
 
-    if config_executor == "sys":  ## target_executor
+    if tc.config_executor == "sys":  ## target_executor
 
         ## if target_executor(tc) == "sys"
 
@@ -137,8 +137,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
         # for f in ctx.files._runtime: ## libasmrun.a
         # for f in tc.runtime: ## libasmrun.a
 
+        print("tc.COMPILER: %s" % tc.compiler)
         print("tc.RUNTIME: %s" % tc.runtime.path)
-
         args.add(tc.runtime.path)
 
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
@@ -168,7 +168,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     # if ext == ".cmx":
     #     args.add("-dstartup")
 
-    _options = get_options(rule, ctx)
+    (_options, cancel_opts) = get_options(rule, ctx)
     args.add_all(_options)
 
     for w in ctx.attr.warnings:

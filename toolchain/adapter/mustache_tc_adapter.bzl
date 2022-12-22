@@ -58,7 +58,7 @@ mustache_toolchain_adapter = rule(
     _mustache_toolchain_adapter_impl,
     attrs = {
         "mustach": attr.label(
-            default = "//vendor/mustach",
+            default = "//toolchain:mustach",
             allow_single_file = True,
             executable = True,
             # cfg = "exec",

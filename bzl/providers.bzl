@@ -25,7 +25,8 @@ def _ModuleInfo_init(*,
                      struct = None,
                      struct_src = None,
                      cmt = None,
-                     ofile = None):
+                     ofile = None,
+                     files = None):
     return {
         "sig" : sig,
         "sig_src": sig_src,
@@ -33,7 +34,8 @@ def _ModuleInfo_init(*,
         "struct": struct,
         "struct_src": struct_src,
         "cmt": cmt,
-        "ofile": ofile
+        "ofile": ofile,
+        "files": files
     }
 
 ModuleInfo, _new_moduleinfo = provider(
@@ -45,7 +47,8 @@ ModuleInfo, _new_moduleinfo = provider(
         "struct": "One .cmo or .cmx file",
         "struct_src": "One .ml file",
         "cmt"  : "One .cmt file",
-        "ofile" : "One .o file if struct is .cmx"
+        "ofile" : "One .o file if struct is .cmx",
+        "files": "Depset of the above"
     },
     init = _ModuleInfo_init
 )

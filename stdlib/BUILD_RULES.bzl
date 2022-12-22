@@ -11,7 +11,7 @@ load("//bzl/actions:module_impl.bzl", "module_impl")
 load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
 load("//bzl/actions:signature_impl.bzl", "signature_impl")
 
-load("//bzl/transitions:ocaml_transitions.bzl", "ocaml_in_transition")
+load("//bzl/rules:ocaml_transitions.bzl", "ocaml_in_transition")
 
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
@@ -71,10 +71,10 @@ stdlib_module = rule(
     doc = "Compiles a module with the bootstrap compiler.",
     attrs = dict(
         module_attrs(),
-        stdlib_primitives = attr.bool(default = False),
-        _stdlib = attr.label(
-            default = "//stdlib:Stdlib"
-        ),
+        # stdlib_primitives = attr.bool(default = False),
+        # _stdlib = attr.label(
+        #     default = "//stdlib:Stdlib"
+        # ),
         _opts = attr.string_list(
             # default = ["-nopervasives"]
             # default = ["-nostdlib"], # in tc.copts

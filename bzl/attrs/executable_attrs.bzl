@@ -85,7 +85,7 @@ def executable_attrs():
         ## linker is hardcoded to look for stdlib.cmx?a
         ## UNLESS -nopervasives?
         stdlib = attr.label(
-            doc = "Stdlib",
+            doc = "Stdlib archive", ## (not stdlib.cmx?a")
             default = "//stdlib", # archive, not resolver
             allow_single_file = True, # won't work with boot_library
             # cfg = exe_deps_out_transition,

@@ -1,7 +1,7 @@
 ##############################################
 def tc_boot_in_transition_impl(settings, attr, debug):
     debug = True
-
+    fail("BOOTINTX")
     executor = settings["//config/target/executor"]
     emitter  = settings["//config/target/emitter"]
     compiler = settings["//toolchain:compiler"]

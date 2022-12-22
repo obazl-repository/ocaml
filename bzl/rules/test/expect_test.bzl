@@ -26,7 +26,7 @@ load(":expect_test_impl.bzl", "expect_test_impl")
 ## then diffs it against expected output.
 
 #######################
-expect_vv_test = rule(
+ocamlc_byte_expect_test = rule(
     implementation = expect_test_impl,
     doc = "Compile and test an OCaml program.",
     attrs = dict(
@@ -99,27 +99,27 @@ def expect_test(name, stdout, expect, main, timeout = "short",
                 **kwargs):
 
     if name.endswith("_test"):
-        stem = name[:-5]
-    else:
         stem = name
+    else:
+        stem = name + "_test"
 
-    vv_name = stem + "_ocamlc.byte_test"
-    vs_name = stem + "_ocamlopt.byte_test"
-    ss_name = stem + "_ocamlopt.opt_test"
-    sv_name = stem + "_ocamlc.opt_test"
+    vv_name = "ocamlc.byte." + name
+    vs_name = "ocamlopt.byte." + name
+    ss_name = "ocamlopt.opt." + name
+    sv_name = "ocamlc.opt." + name
 
     native.test_suite(
         name  = name,
         tests = [vv_name, ss_name]
     )
 
-    expect_vv_test(
+    ocamlc_byte_expect_test(
         name    = vv_name,
         stdout  = stdout,
         expect  = expect,
         main    = main,
         timeout = timeout,
-        tags    = ["vv"],
+        tags    = ["ocamlc.byte"],
         **kwargs
     )
 
@@ -129,6 +129,6 @@ def expect_test(name, stdout, expect, main, timeout = "short",
         expect  = expect,
         main    = main,
         timeout = timeout,
-        tags    = ["ss"],
+        tags    = ["ocamlopt.opt"],
         **kwargs
     )

@@ -2,10 +2,11 @@ package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl",
      "boot_import_vm_executable",
-     "ocamlc_byte",
-     "ocamlopt_byte",
-     "ocamlopt_opt",
-     "ocamlc_opt")
+     "boot_ocamlc_byte",
+     "boot_ocamlopt_byte",
+     "boot_ocamlopt_opt",
+     "boot_ocamlc_opt",
+     "boot_ocaml_compilers")
 
 
 load(":BUILD_RULES.bzl", "boot_coldstart", "boot_setup")
@@ -17,24 +18,29 @@ load(":BUILD_RULES.bzl", "boot_coldstart", "boot_setup")
 ## Package //boot contains pre-compiled OCaml executables (ocamlc,
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
 
-alias(name = "coldstart", actual = ":bootstrap")
+alias(name = "bootstrap", actual = ":coldstart")
 
 boot_coldstart(
-    name = "bootstrap",
+    name = "coldstart",
     runner = "coldstart_runner.sh",
     runtimes = [
         "//runtime:asmrun",
         "//runtime:camlrun",
     ],
+    compilers = [
+        ":ocamlc.byte", ":ocamlopt.byte",
+        ":ocamlc.opt",  ":ocamlopt.opt"
+    ],
     data = [
-        "//bin:ocamlc.opt",  ## runfiles contain all 4
         "//lex:ocamllex.byte",
         "//lex:ocamllex.opt",
-        "//stdlib",
-        "//stdlib:Std_exit",
+        "//yacc:ocamlyacc",
+        "//vendor/mustach",
+        ## the shell script could obtain the following from the preceding:
+        # "//stdlib",
+        # "//stdlib:Std_exit",
         "//asmcomp:cvt_emit.byte",
         "//asmcomp:cvt_emit.opt",
-        "//yacc:ocamlyacc",
         "@bazel_tools//tools/bash/runfiles",
     ],
 )
@@ -74,89 +80,135 @@ boot_import_vm_executable(
     # runtime = "//runtime:ocamlrun"
 )
 
-ocamlc_byte(
-    name = "ocamlc.byte",
-    stdlib   = "//stdlib",
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp"
-    ],
-    main = "//driver:Main",
-    opts = [ ] + select({
-        # ocamlc.byte: ["-compat-32"]
-        "//conditions:default": []
-    }) + [
-    ] + select({
-        "//platform/target/os:linux?": [
-            "-cclib", "-lm",
-            "-cclib", "-ldl",
-            "-cclib", "-lpthread",
-        ],
-        "//conditions:default": []
-    }),
+boot_ocaml_compilers(
+    name = "ocamlcc",
     visibility             = ["//visibility:public"]
 )
 
-ocamlopt_byte(
-    name = "ocamlopt.byte",
-    stdlib   = "//stdlib",
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//asmcomp:ocamloptcomp"
+sh_binary(
+    name = "ocamlc.byte.sh",
+    srcs = ["ocamlc.byte.shell"],
+    env  = {"VERBOSE": "false"},
+    data = [
+        ":ocamlc.byte",
+        "//runtime:ocamlrun",
+        "//stdlib",
+        "//config/camlheaders",
+
+        # We cannot depend on Std_exit on pain of circularity.
+        # It depends on Stdlib, which is compiled by this tool.
+        # "//stdlib:Std_exit"
     ],
-    main = "//driver:Optmain",
-    opts = [ ] + select({
-        # ocamlc.byte: ["-compat-32"]
-        "//conditions:default": []
-    }) + [
-    ] + select({
-        "//platform/target/os:linux?": [
-            "-cclib", "-lm",
-            "-cclib", "-ldl",
-            "-cclib", "-lpthread",
-        ],
-        "//conditions:default": []
-    }),
-    visibility             = ["//visibility:public"]
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ]
 )
 
-ocamlopt_opt(
-    name = "ocamlopt.opt",
-    stdlib   = "//stdlib",
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//asmcomp:ocamloptcomp"
+sh_binary(
+    name = "ocamlopt.byte.sh",
+    srcs = ["ocamlopt.byte.shell"],
+    env  = {"VERBOSE": "false",
+            "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    data = [
+        ":ocamlopt.byte",
+        "//runtime:ocamlrun",
+        "//stdlib",
+        "//config/camlheaders",
+        "@bazel_tools//tools/cpp:current_cc_toolchain"
     ],
-    main = "//driver:Optmain",
-    opts = [ ] + select({
-        "//platform/target/os:linux?": [
-            "-cclib", "-lm",
-            "-cclib", "-ldl",
-            "-cclib", "-lpthread",
-        ],
-        "//conditions:default": []
-    }),
-    visibility             = ["//visibility:public"]
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ],
+    toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain"]
 )
 
-ocamlc_opt(
-    name = "ocamlc.opt",
-    stdlib   = "//stdlib",
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//asmcomp:ocamloptcomp"
-    ],
-    main = "//driver:Optmain",
-    opts = [ ] + select({
-        "//platform/target/os:linux?": [
-            "-cclib", "-lm",
-            "-cclib", "-ldl",
-            "-cclib", "-lpthread",
-        ],
-        "//conditions:default": []
-    }),
-    visibility             = ["//visibility:public"]
-)
+
+# boot_ocamlc_byte(
+#     name = "ocamlc.byte",
+#     stdlib   = "//stdlib",
+#     prologue = [
+#         "//compilerlibs:ocamlcommon",
+#         "//bytecomp:ocamlbytecomp"
+#     ],
+#     main = "//driver:Main",
+#     opts = [ ] + select({
+#         # ocamlc.byte: ["-compat-32"]
+#         "//conditions:default": []
+#     }) + [
+#     ] + select({
+#         "//platform/target/os:linux?": [
+#             "-cclib", "-lm",
+#             "-cclib", "-ldl",
+#             "-cclib", "-lpthread",
+#         ],
+#         "//conditions:default": []
+#     }),
+#     visibility             = ["//visibility:public"]
+# )
+
+# boot_ocamlopt_byte(
+#     name = "ocamlopt.byte",
+#     # stdlib   = "//stdlib",
+#     prologue = [
+#         "//compilerlibs:ocamlcommon",
+#         "//asmcomp:ocamloptcomp"
+#     ],
+#     main = "//driver:Optmain",
+#     opts = [ ] + select({
+#         # ocamlc.byte: ["-compat-32"]
+#         "//conditions:default": []
+#     }) + [
+#     ] + select({
+#         "//platform/target/os:linux?": [
+#             "-cclib", "-lm",
+#             "-cclib", "-ldl",
+#             "-cclib", "-lpthread",
+#         ],
+#         "//conditions:default": []
+#     }),
+#     visibility             = ["//visibility:public"]
+# )
+
+# boot_ocamlopt_opt(
+#     name = "ocamlopt.opt",
+#     stdlib   = "//stdlib",
+#     prologue = [
+#         "//compilerlibs:ocamlcommon",
+#         "//asmcomp:ocamloptcomp"
+#     ],
+#     main = "//driver:Optmain",
+#     opts = [ ] + select({
+#         "//platform/target/os:linux?": [
+#             "-cclib", "-lm",
+#             "-cclib", "-ldl",
+#             "-cclib", "-lpthread",
+#         ],
+#         "//conditions:default": []
+#     }),
+#     visibility             = ["//visibility:public"]
+# )
+
+# boot_ocamlc_opt(
+#     name = "ocamlc.opt",
+#     stdlib   = "//stdlib",
+#     prologue = [
+#         "//compilerlibs:ocamlcommon",
+#         "//asmcomp:ocamloptcomp"
+#     ],
+#     main = "//driver:Optmain",
+#     opts = [ ] + select({
+#         "//platform/target/os:linux?": [
+#             "-cclib", "-lm",
+#             "-cclib", "-ldl",
+#             "-cclib", "-lpthread",
+#         ],
+#         "//conditions:default": []
+#     }),
+#     visibility             = ["//visibility:public"]
+# )
 
 sh_binary(
     name = "ocamlc.sh",

@@ -119,19 +119,42 @@ def progress_msg(workdir, ctx):
     cmode = ctx.var["COMPILATION_MODE"]
     if cmode == "fastbuild": cmode = "fb"
 
-    if ctx.attr._protocol[BuildSettingInfo].value == "test":
-        lbrack = "("
-        rbrack = ")"
-    else:
+    protocol = ctx.attr._protocol[BuildSettingInfo].value
+    if protocol == "boot":
+        lbrack = "<"
+        rbrack = ">"
+    elif protocol == "test":
         lbrack = "["
         rbrack = "]"
+    elif protocol == "dev":
+        lbrack = "[["
+        rbrack = "]]"
+    elif protocol == "unspecified":
+        lbrack = "{"
+        rbrack = "}"
+    else:
+        lbrack = "??"
+        rbrack = "??"
 
-    msg = "{m} {lbrack}{c} :- {x}>{em}{rbrack}: {ws}//{pkg}:{tgt} {action} {rule}".format(
+    if tc.config_executor == "sys":
+        x = "opt"
+        if tc.config_emitter == "sys":
+            em = "ocamlopt"
+        else:
+            em = "ocamlc"
+    else:
+        x = "byte"
+        if tc.config_emitter == "sys":
+            em = "ocamlopt"
+        else:
+            em = "ocamlc"
+
+    msg = "{m} {lbrack}{c}{rbrack}: {ws}//{pkg}:{tgt} {action} {rule}".format(
         m   = cmode,
         lbrack = lbrack,
         c   = tc.compiler[DefaultInfo].files_to_run.executable.basename,
-        x   = tc.config_executor,
-        em  = tc.config_emitter,
+        x   = x,
+        em  = em,
         rbrack = rbrack,
         # wd  = workdir,
         # m  = ctx.attr._compilation_mode,

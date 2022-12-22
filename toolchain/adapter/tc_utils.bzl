@@ -138,12 +138,13 @@ def tc_executable(ctx, tool):
         print("tc.name: %s" % ctx.attr.name)
 
     if (ctx.file.compiler.basename.endswith(".byte")
-        or ctx.file.compiler.basename.endswith(".boot")):
+        or ctx.file.compiler.basename.endswith(".boot")
+        or ctx.file.compiler.basename.endswith(".baseline")):
         return ctx.file.ocamlrun
     elif ctx.file.compiler.basename.endswith(".opt"):
         return ctx.file.compiler
     else:
-        fail("XXXXXXXXXXXXXXXX")
+        fail("bad compiler basename: %s" % ctx.file.compiler.basename)
 
     tc_config_executor = ctx.attr.config_executor[BuildSettingInfo].value
 
@@ -209,13 +210,17 @@ def tc_compiler(ctx):
         return ctx.attr.compiler
 
 ###################
-## FIXME: merge tc_build_executor and tc_workdir
 def tc_workdir(ctx):
+
+    protocol = ctx.attr.protocol[BuildSettingInfo].value
 
     config_executor = ctx.attr.config_executor[BuildSettingInfo].value
     config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
-    if (config_executor == "boot"):
+    if protocol == "unspecified":
+        workdir = "_boot/"
+
+    elif (config_executor == "boot"):
         workdir = "_boot/"
         # fail("WHY BOOT?")
 
@@ -252,5 +257,7 @@ def tc_workdir(ctx):
         print("config_executor: %s" % config_executor)
         print("config_emitter: %s" % config_emitter)
         fail("BAD CONFIG")
+
+    # workdir = ctx.attr.name + "/"
 
     return workdir

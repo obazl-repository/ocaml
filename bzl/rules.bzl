@@ -6,6 +6,14 @@ load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
 
 load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
+load("//bzl/rules:ocaml_boot_compiler.bzl",
+     _boot_import_vm_executable = "boot_import_vm_executable",
+     _boot_ocamlc_byte = "boot_ocamlc_byte",
+     _boot_ocamlopt_byte = "boot_ocamlopt_byte",
+     _boot_ocamlopt_opt = "boot_ocamlopt_opt",
+     _boot_ocamlc_opt = "boot_ocamlc_opt",
+     _boot_ocaml_compilers = "boot_ocaml_compilers")
+
 load("//bzl/rules:ocaml_compiler.bzl",
      _ocaml_compiler_r = "ocaml_compiler_r",
      _ocamlc_byte = "ocamlc_byte",
@@ -14,7 +22,10 @@ load("//bzl/rules:ocaml_compiler.bzl",
      _ocamlc_opt = "ocamlc_opt",
      _ocaml_compilers = "ocaml_compilers")
 
-load("//bzl/rules:build_tool.bzl", _build_tool = "build_tool")
+load("//bzl/rules:build_tool.bzl",
+     _build_tool_vm = "build_tool_vm",
+     _build_tool    = "build_tool")
+
 load("//bzl/rules:ocaml_tool.bzl",
      _ocaml_tool_r = "ocaml_tool_r",
      _ocaml_tools = "ocaml_tools",
@@ -22,9 +33,6 @@ load("//bzl/rules:ocaml_tool.bzl",
      _ocaml_tool_sys = "ocaml_tool_sys",
      )
 load("//bzl/rules:build_module.bzl", _build_module = "build_module")
-
-load("//bzl/rules:boot_import_vm_executable.bzl",
-     _boot_import_vm_executable = "boot_import_vm_executable")
 
 load("//bzl/rules:boot_config.bzl",
      _boot_config = "boot_config")
@@ -60,7 +68,7 @@ build_module      = _build_module
 ocaml_module      = _build_module ### TEMPORARY until //testsuite cleanup
 
 build_tool      = _build_tool
-boot_import_vm_executable      = _boot_import_vm_executable
+build_tool_vm   = _build_tool_vm
 
 boot_config      = _boot_config
 boot_archive      = _boot_archive
@@ -79,17 +87,23 @@ bootstrap_repl   = _bootstrap_repl
 boot_signature   = _boot_signature
 compiler_signature   = _compiler_signature
 
-# boot_compiler    = _boot_compiler
-ocaml_compiler_r   = _ocaml_compiler_r
-ocamlc_byte        = _ocamlc_byte
-ocamlopt_byte      = _ocamlopt_byte
-ocamlopt_opt       = _ocamlopt_opt
-ocamlc_opt         = _ocamlc_opt
-ocaml_compilers    = _ocaml_compilers
-ocaml_tool_r       = _ocaml_tool_r
-ocaml_tools        = _ocaml_tools
-ocaml_tool_vm      = _ocaml_tool_vm
-ocaml_tool_sys     = _ocaml_tool_sys
+boot_import_vm_executable = _boot_import_vm_executable
+boot_ocamlc_byte          = _boot_ocamlc_byte
+boot_ocamlopt_byte        = _boot_ocamlopt_byte
+boot_ocamlopt_opt         = _boot_ocamlopt_opt
+boot_ocamlc_opt           = _boot_ocamlc_opt
+boot_ocaml_compilers      = _boot_ocaml_compilers
+
+ocaml_compiler_r          = _ocaml_compiler_r
+ocamlc_byte               = _ocamlc_byte
+ocamlopt_byte             = _ocamlopt_byte
+ocamlopt_opt              = _ocamlopt_opt
+ocamlc_opt                = _ocamlc_opt
+ocaml_compilers           = _ocaml_compilers
+ocaml_tool_r              = _ocaml_tool_r
+ocaml_tools               = _ocaml_tools
+ocaml_tool_vm             = _ocaml_tool_vm
+ocaml_tool_sys            = _ocaml_tool_sys
 
 # ocamlc_runtime    = _ocamlc_runtime
 # ocamlc_fixpoint    = _ocamlc_fixpoint

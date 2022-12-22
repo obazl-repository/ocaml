@@ -221,8 +221,11 @@ def get_options(rule, ctx):
     ################################################################
     ## MUST COME LAST - instance opts override configurable defaults
 
+    cancel_opts = []
     for opt in ctx.attr.opts:
-        if opt not in NEGATION_OPTS:
+        if opt in NEGATION_OPTS:
+            cancel_opts.append(opt[3:])
+        else:
             options.append(opt)
 
     if hasattr(ctx.attr, "stdlib_primitives"):
@@ -230,5 +233,5 @@ def get_options(rule, ctx):
             if "-nopervasives" in options:
                 options.remove("-nopervasives")
 
-    return options
+    return options, cancel_opts
 

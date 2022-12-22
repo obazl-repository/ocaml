@@ -13,7 +13,7 @@ def build_packed_module(
 
     args = ctx.actions.args()
 
-    _options = get_options(ctx.attr._rule, ctx)
+    (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
     args.add_all(_options)
 
     args.add("-pack")

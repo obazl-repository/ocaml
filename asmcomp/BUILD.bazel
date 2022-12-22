@@ -2,7 +2,7 @@ load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
      "build_module",
-     "build_tool",
+     "build_tool_vm",
      "compiler_module",
      "compiler_signature",
 )
@@ -791,8 +791,8 @@ compiler_signature(
 
 ##FIXME: this should only be built as a vm executable and run once
 # ocaml_tool(
-build_tool(
-    name = "cvt_emit",
+build_tool_vm(
+    name = "cvt_emit.byte",
     main = ":Cvt_emit",
     # opts = [
     #     "-verbose"
@@ -1776,8 +1776,8 @@ compiler_signature(
 # compilerlibs/ocamloptcomp.cma: $(OPTCOMP_CMI) $(OPTCOMP)
 # 	$(CAMLC) -a -o $@ $(OPTCOMP)
 
-# boot_library(
-boot_archive(
+boot_library(
+#boot_archive(
     name    = "ocamloptcomp",
     visibility = [
         "//visibility:public",

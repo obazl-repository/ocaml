@@ -239,7 +239,7 @@ def module_impl(ctx, module_name):
     # direct_linkargs.append(out_cm_)
     default_outputs.append(out_cm_)
 
-    _options = get_options(ctx.attr._rule, ctx)
+    (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
     if ( ("-bin-annot" in _options)
          or ("-bin-annot" in tc.copts) ):
         out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
@@ -389,23 +389,40 @@ def module_impl(ctx, module_name):
             nsname = resolver.struct.basename[:-4]
             args.add_all(["-open", nsname])
 
-    # if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-    #     if ctx.attr.stdlib_primitives:
-            includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
+            # includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
             direct_inputs.append(ctx.attr.ns[ModuleInfo].sig)
             direct_inputs.append(ctx.attr.ns[ModuleInfo].struct)
+    # if hasattr(ctx.attr, "ns"):
+    #     if ctx.attr.ns:
+    #         includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
+
+    stdlib_depset =[]
+    if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+        if ctx.attr.stdlib_primitives:
+            if hasattr(ctx.attr, "_stdlib"):
+                print("stdlib: %s" % ctx.attr._stdlib[ModuleInfo].files)
+                includes.append(ctx.file._stdlib.dirname)
+                stdlib_depset.append(ctx.attr._stdlib[ModuleInfo].files)
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
+
+    tc_opts = []
 
     if not ctx.attr.nocopts:
         # for opt in tc.copts:
         #     if opt not in NEGATION_OPTS:
         #         args.add(opt)
         #     else:
-        args.add_all(tc.copts)
+        # args.add_all(tc.copts)
+        tc_opts.extend(tc.copts)
 
-    args.add_all(tc.structopts)
+    # args.add_all(tc.structopts)
+    tc_opts.extend(tc.structopts)
+
+    for opt in tc_opts:
+        if opt not in cancel_opts:
+            args.add(opt)
 
     args.add_all(tc.warnings[BuildSettingInfo].value)
 
@@ -419,6 +436,7 @@ def module_impl(ctx, module_name):
             if dep.label.package == "stdlib":
                 if "-nopervasives" in _options:
                     _options.remove("-nopervasives")
+
     args.add_all(_options)
 
     #FIXME: make a function for the dump stuff
@@ -473,10 +491,6 @@ def module_impl(ctx, module_name):
 
     # OCaml srcs use three namespaces:
     #     Stdlib, Dynlink_compilerlibs, Ocamldebug
-    if hasattr(ctx.attr, "ns"):
-        if ctx.attr.ns:
-            includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
-
     ################ Direct Deps ################
 
     #NB: this will (may?) put stdlib in search path, even if target
@@ -504,6 +518,7 @@ def module_impl(ctx, module_name):
         transitive = []
         + merged_input_depsets
         + [tc.compiler[DefaultInfo].default_runfiles.files]
+        + stdlib_depset
         # + ns_deps
         # + bottomup_ns_inputs
         ## depend on cc tc - makes bazel stuff accessible to ocaml's
@@ -585,7 +600,8 @@ def module_impl(ctx, module_name):
         struct = out_cm_,
         struct_src = in_structfile,
         cmt = out_cmt,
-        ofile  = moduleInfo_ofile
+        ofile  = moduleInfo_ofile,
+        files = moduleInfo_depset
     )
 
     providers.append(moduleInfo)

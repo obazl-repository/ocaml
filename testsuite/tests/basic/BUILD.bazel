@@ -112,6 +112,7 @@ test_module(
 test_module( # not a test, used by unit_naming_test
     name   = "CamlCase",
     struct = "camlCase.ml",
+    deps   = ["//stdlib:Stdlib"]
 )
 ################################################################
 
@@ -244,6 +245,7 @@ expect_test(
 test_module(
     name   = "Eval_order_4",
     struct = "eval_order_4.ml",
+    deps   = ["//stdlib:Stdlib"]
 )
 
 ############
@@ -535,6 +537,7 @@ test_module(
         "-no-strict-sequence",
         # "-w", "-21-5"
     ],
+    stdlib_primitives =  True
 )
 
 ############
@@ -674,5 +677,7 @@ expect_test(
 test_module(
     name   = "Zero_divided_by_n",
     struct = "zero_divided_by_n.ml",
+    opts   = ["-nopervasives"],
+    deps   = ["//stdlib:Stdlib"],
 )
 

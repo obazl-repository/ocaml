@@ -6,7 +6,7 @@ load("//bzl:rules.bzl",
 
 ## FIXME: support flambda
 ocaml_compiler_r(
-    name = "ocamlcc",
+    name = "ocamlcc_r",
     stdlib   = "//stdlib",
     prologue = ["//compilerlibs:ocamlcommon",
                 ] + select({
@@ -82,73 +82,7 @@ ocaml_compiler_r(
 ## ocamlopt_opt, ocamlc_opt
 
 ocaml_compilers(
-    name = "compilers",
-    stdlib   = "//stdlib",
-    prologue = ["//compilerlibs:ocamlcommon",
-                ] + select({
-        # "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],
-        # "//config/target:baseline_sys?": ["//asmcomp:ocamloptcomp"],
-        # "//config/target:ult_sys?": ["//asmcomp:ocamloptcomp"],
-
-        "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
-
-        "//conditions:default": ["//bytecomp:ocamlbytecomp"]
-    }),
-    main = select({
-        # "//config/target:baseline_vm?": "//driver:Main",
-        # "//config/target:baseline_sys?": "//driver:Optmain",
-        # "//config/target:ult_sys?": "//driver:Optmain",
-
-        "//config/target/emitter:sys_emitter?": "//driver:Optmain",
-
-        "//conditions:default": "//driver:Main"
-    }),
-    opts = [ ] + select({
-        # ocamlc.byte: ["-compat-32"]
-        "//conditions:default": []
-    }) + [
-        ## use --//config/ocaml/link:verbose instead
-        # "-verbose",
-
-        ## for testing (linux):
-        # "-cc", "gcc",  ## cancels mkexe
-        # "-ccopt", "-B/usr/bin",
-        # "-ccopt", "-B/usr/lib",
-        # "-ccopt", "-B/usr/lib/gcc/x86_64-linux-gnu/9",
-        ## bazel-generated args:
-        # "-ccopt", "-fuse-ld=gold",
-        # "-ccopt", "-fno-use-linker-plugin",
-        # "-ccopt", "-Wl,-no-as-needed",
-        # "-ccopt", "-Wl,-z,relro,-z,now",
-        # "-ccopt", "-pass-exit-codes",
-        # "-ccopt", "-lstdc++",
-
-        # "-ccopt", "-Wl,-export_dynamic",
-        # "-ccopt", "-Wl,-all_load"
-    ] + select({
-        "//platform/target/os:linux?": [
-            "-cclib", "-lm",
-            "-cclib", "-ldl",
-            "-cclib", "-lpthread",
-        ],
-        "//conditions:default": []
-    }),
-    cc_linkopts = select({
-        "@platforms//os:macos": [ ## FIXME: default tc, not zig
-            # "-Wl,-v", # prints config, search paths
-            # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
-            # "-t", # -Wl-v plus logs each file the linker loads.
-            # "-why_load" # Log why each object file in a static library
-            #             # is loaded. That is, what symbol was needed.
-            ## zig linker opts
-            # "-v",
-            ],
-        "@platforms//os:linux": [
-            # "-Wl,--verbose"
-            ##FIXME: depends on linker used (bfd, gold, etc.)
-        ]
-    }),
-    # cc_deps = ["//runtime:asmrun"],
+    name = "ocamlcc",
     visibility             = ["//visibility:public"]
 )
 

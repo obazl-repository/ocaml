@@ -53,84 +53,47 @@ echo "Installing WORKSPACE and BUILD files"
 
 echo "Installing programs"
 
-# if [ ${EXECUTOR} == "vm" ]; then
+cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
+STDLIBDIR=`dirname $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte)`
+STDLIBDIR="`dirname $STDLIBDIR`"
+STDLIBDIR="`dirname $STDLIBDIR`"
 
-#     if [ ${EMITTER} == "vm" ]; then
+cp -vf $STDLIBDIR/stdlib/_ocamlc.byte/* $BOOTDIR/lib
 
-#         cp -vf $(rlocation ocamlcc/lex/_ocamlc.byte/ocamllex.byte) \
-#            $BOOTDIR/bin/
-#         cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) \
-#            $BOOTDIR/bin/
+cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) $BOOTDIR/bin/
+cp -vf $(rlocation ocamlcc/boot/_ocamlopt.byte/ocamlopt.byte) $BOOTDIR/bin/
+# ocamlcc/boot/_ocamlopt.byte/ocamlopt.byte
+cp -vf $(rlocation ocamlcc/boot/_ocamlopt.opt/ocamlopt.opt) $BOOTDIR/bin/
 
-#     elif [ ${EMITTER} == "sys" ]; then
+STDLIBDIR=`dirname $(rlocation ocamlcc/boot/_ocamlopt.opt/ocamlopt.opt)`
+STDLIBDIR="`dirname $STDLIBDIR`"
+STDLIBDIR="`dirname $STDLIBDIR`"
 
-#         cp -vf $(rlocation ocamlcc/lex/_ocamlopt.byte/ocamllex.byte) \
-#            $BOOTDIR/bin/
-#         cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) \
-#            $BOOTDIR/bin/
+cp -vf $STDLIBDIR/stdlib/_ocamlopt.opt/* $BOOTDIR/lib
 
-#     else
-#         echo >&2 "ERROR: unknown emitter: ${EMITTER}"
-#         exit 1
-#     fi
+cp -vf $(rlocation ocamlcc/lex/_ocamlopt.opt/ocamllex.opt) $BOOTDIR/bin/
+## ocamlcc/lex/_ocamlopt.opt/ocamllex.opt
+cp -vf $(rlocation ocamlcc/lex/_vm/ocamllex.byte) $BOOTDIR/bin/
 
-# elif [ ${EXECUTOR} == "sys" ]; then
+cp -vf $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
 
-#     ## include entire stack of compilers:
-#     cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) \
-#        $BOOTDIR/bin/
-#     cp -vf $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) \
-#        $BOOTDIR/bin/
-
-#     cp -vf $(rlocation ocamlcc/lex/_ocamlc.opt/ocamllex.opt) \
-#        $BOOTDIR/bin/
-
-#     cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) \
-#        $BOOTDIR/bin/
-
-#     if [ ${EMITTER} == "vm" ]; then
-
-#         cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) \
-#            $BOOTDIR/bin/
-
-#     elif [ ${EMITTER} == "sys" ]; then
-#         echo
-#         # cp -vf $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) \
-#         #    $BOOTDIR/bin/
-
-#     else
-#         echo >&2 "ERROR: unknown emitter: ${EMITTER}"
-#         exit 1
-#     fi
-# else
-#     echo >&2 "ERROR: unknown executor: ${EXECUTOR}"
-#     exit 1
-# fi
-
-cp -f $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
-cp -f $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) $BOOTDIR/bin/
-cp -f $(rlocation ocamlcc/bin/_ocamlopt.byte/ocamlopt.byte) $BOOTDIR/bin/
-cp -f $(rlocation ocamlcc/bin/_ocamlopt.opt/ocamlopt.opt) $BOOTDIR/bin/
-
-cp -f $(rlocation ocamlcc/lex/_sys/ocamllex.opt) $BOOTDIR/bin/
-cp -f $(rlocation ocamlcc/lex/_vm/ocamllex.byte) $BOOTDIR/bin/
-
-cp -f $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
-
-cp -f $(rlocation ocamlcc/asmcomp/_ocamlc.byte/cvt_emit.byte) $BOOTDIR/bin
-cp -f $(rlocation ocamlcc/asmcomp/_ocamlopt.opt/cvt_emit.opt) $BOOTDIR/bin
+cp -vf $(rlocation ocamlcc/asmcomp/_ocamlc.byte/cvt_emit.byte) $BOOTDIR/bin
+cp -vf $(rlocation ocamlcc/asmcomp/_ocamlopt.opt/cvt_emit.opt) $BOOTDIR/bin
 
 echo "Installing libs"
 
-cp -f $(rlocation ocamlcc/runtime/libasmrun.a) $BOOTDIR/lib
-cp -f $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
-cp -f $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
+cp -vf $(rlocation ocamlcc/runtime/libasmrun.a) $BOOTDIR/lib
+cp -vf $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
+cp -vf $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
+
+cp -vf $(rlocation ocamlcc/vendor/mustach/mustach) $BOOTDIR/bin
 
 echo "Setting permissions"
 
 # chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
 # chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
 chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/ocamlrun
+chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/mustach
 chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*.opt
 chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
 chmod -vf ugo=+r-xw $BOOTDIR/lib/*.a

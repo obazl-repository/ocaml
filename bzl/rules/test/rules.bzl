@@ -4,10 +4,10 @@ load("//bzl/rules/test:repl_test.bzl", _repl_test = "repl_test")
 load("//bzl/rules/test:expect_test.bzl",
      _expect_test = "expect_test")
 
-load("//bzl/rules/test:expect_vv_test.bzl",
-     _expect_vv_test = "expect_vv_test")
-load("//bzl/rules/test:expect_ss_test.bzl",
-     _expect_ss_test = "expect_ss_test")
+# load("//bzl/rules/test:expect_vv_test.bzl",
+#      _expect_vv_test = "expect_vv_test")
+# load("//bzl/rules/test:expect_ss_test.bzl",
+#      _expect_ss_test = "expect_ss_test")
 
 load("//bzl/rules/test:compile_fail_test.bzl",
      _compile_fail_test = "compile_fail_test")
@@ -33,8 +33,8 @@ load("//bzl/rules/test:test_signature.bzl", _test_signature = "test_signature")
 ocaml_test = _ocaml_test
 repl_test = _repl_test
 
-expect_vv_test = _expect_vv_test
-expect_ss_test = _expect_ss_test
+# expect_vv_test = _expect_vv_test
+# expect_ss_test = _expect_ss_test
 expect_test = _expect_test
 
 compile_fail_test = _compile_fail_test

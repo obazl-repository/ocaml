@@ -3,7 +3,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//bzl/transitions:ocaml_transitions.bzl",
+load(":ocaml_transitions.bzl",
      "ocaml_tool_vm_in_transition",
      "ocaml_tool_sys_in_transition")
 
@@ -109,20 +109,14 @@ ocaml_tool_vm = rule(
 ################################################################
 def _ocaml_tool_sys_impl(ctx):
 
+    if not ctx.label.name.endswith(".opt"):
+        fail("Target name for rule ocaml_tool_sys must end in '.opt'")
+
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-
-    workdir = tc.workdir
-
-    if tc.config_emitter == "vm":
-        # ext = ".byte"
-        workdir = "_vm/"
-    else:
-        # ext = ".opt"
-        workdir = "_sys/"
 
     exe_name = ctx.label.name
 
-    return executable_impl(ctx, tc, exe_name, workdir)
+    return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 #######################
 ocaml_tool_sys = rule(

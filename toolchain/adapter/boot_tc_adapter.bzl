@@ -169,7 +169,7 @@ def _boot_toolchain_adapter_impl(ctx):
         # lexecutable            = tc_executable(ctx, "lexer"),
         # lexer_arg              = _tool_arg(ctx, "lexer"),
 
-        cvt_emit               = ctx.file.cvt_emit,
+        # cvt_emit               = ctx.file.cvt_emit,
 
         runtime                = ctx.file.runtime,
         copts                  = ctx.attr.copts,
@@ -237,14 +237,14 @@ boot_toolchain_adapter = rule(
         #     # cfg = tc_lexer_out_transition
         # ),
 
-        "cvt_emit": attr.label(
-            default = "//boot:ocamllex.boot", # fake, will be transitioned
-            # default = "//toolchain:cvt_emit",
-            allow_single_file = True,
-            executable = True,
-            cfg = "exec",
-            # cfg = tc_lexer_out_transition
-        ),
+        # "cvt_emit": attr.label(
+        #     default = "//boot:ocamllex.boot", # fake, will be transitioned
+        #     # default = "//toolchain:cvt_emit",
+        #     allow_single_file = True,
+        #     executable = True,
+        #     cfg = "exec",
+        #     # cfg = tc_lexer_out_transition
+        # ),
 
         # "yaccer": attr.label(
         #     default = "//yacc:ocamlyacc",

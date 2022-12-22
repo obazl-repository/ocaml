@@ -19,6 +19,12 @@ label_setting(name="cvt_emit",
               build_setting_default = "//asmcomp:cvt_emit.byte",
               visibility = ["//visibility:public"])
 
+label_setting(name="mustach",
+              build_setting_default = "//vendor/mustach",
+              visibility = ["//visibility:public"])
+
+## not used:
+
 label_setting(name="stdlib",
               build_setting_default = "//stdlib",
               visibility = ["//visibility:public"])

@@ -26,32 +26,15 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     # if ctx.label.name == "test":
         # debug = True
 
-    # print("++ EXECUTABLE {}".format(ctx.label))
-
     if debug:
-        print("EXECUTABLE TARGET: {kind}: {tgt}".format(
+        print("inline_expect: {kind}: {tgt}".format(
             kind = ctx.attr._rule,
             tgt  = ctx.label.name
         ))
 
-    # cc_toolchain = find_cpp_toolchain(ctx)
-
-    # tc = ctx.toolchains["//toolchain/type:ocaml"]
-
-    # workdir = tc.workdir
-    # (target_executor, target_emitter,
-    #  config_executor, config_emitter,
-    #  workdir) = get_workdir(ctx, tc)
-
-    executor = tc.config_executor[BuildSettingInfo].value
-    emitter  = tc.config_emitter[BuildSettingInfo].value
-
-    # if target_executor == "unspecified":
-    #     executor = config_executor
-    #     emitter  = config_emitter
-    # else:
-    #     executor = target_executor
-    #     emitter  = target_emitter
+    # config_executor = tc.config_executor
+    # executor = tc.config_executor[BuildSettingInfo].value
+    # emitter  = tc.config_emitter[BuildSettingInfo].value
 
     ################################################################
     ################  DEPS  ################
@@ -101,45 +84,9 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     includes  = []
 
     #########################
-    # args = ctx.actions.args()
     args = []
 
-    # args.add("#!/bin/bash")
-
-    # executable = None
-    # if tc.protocol == "dev":
-    #     ocamlrun = None
-    #     effective_compiler = tc.compiler
-    # else:
-    #     ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
-    #     effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
-
-    # if tc.protocol == "dev":
-    #     build_executor = "opt"
-    # elif (target_executor == "unspecified"):
-    #     if (config_executor == "sys"):
-    #         if config_emitter == "sys":
-    #             # ss built from ocamlopt.byte
-    #             build_executor = "vm"
-    #         else:
-    #             # sv built from ocamlopt.opt
-    #             build_executor = "sys"
-    #     else:
-    #         build_executor = "vm"
-    # elif target_executor in ["boot", "baseline", "vm"]:
-    #     build_executor = "vm"
-    # elif (target_executor == "sys" and target_emitter == "sys"):
-    #     ## ss always built by vs (ocamlopt.byte)
-    #     build_executor = "vm"
-    # elif (target_executor == "sys" and target_emitter == "vm"):
-    #     ## sv built by ss
-    #     build_executor = "sys"
-
-    # if build_executor == "vm":
-    #     executable = ocamlrun
-    #     args.add(effective_compiler.path)
-    # else:
-    #     executable = effective_compiler
+    args.append(tc.ocamlrun.short_path)
 
     executable = ctx.file._tool
     print("EXPECT executable: %s" % ctx.attr._tool)
@@ -168,7 +115,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     ## runtime_files are link-time deps, not to be confused with
     ## runfiles, which are runtime deps.
     runtime_files = []
-    if executor == "sys":
+    if tc.config_executor == "sys":
         # native compilers need libasmrun
         # WARNING: if we do not add libasmrun.a as a dep here,
         # OCaml will try to link /usr/local/lib/ocaml/libasmrun.a
@@ -208,7 +155,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
 
     # args.add_all(tc.linkopts)
 
-    _options = get_options(rule, ctx)
+    (_options, cancel_opts) = get_options(rule, ctx)
     args.extend(_options)
 
     # if ctx.attr.cc_linkopts:
@@ -281,25 +228,6 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
         # + [depset(action_inputs_ccdep_filelist)]
     )
     mnemonic = "OcamlInlineExpectTest"
-
-    ################
-    # ctx.actions.run(
-    #     env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
-    #            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
-    #     executable = executable.path,
-    #     arguments = [args],
-    #     inputs = inputs_depset,
-    #     outputs = [out_exe],
-    #     tools = [
-    #         executable,
-    #         # tc.compiler[DefaultInfo].default_runfiles.files,
-    #         # tc.compiler[DefaultInfo].files_to_run
-    #     ],
-    #     mnemonic = mnemonic,
-    #     progress_message = progress_msg(workdir, ctx)
-    # )
-    ################
-    # args.append(ctx.file._stdlib.short_path)
 
     args.append("-I")
     args.append("stdlib/{}".format(workdir))

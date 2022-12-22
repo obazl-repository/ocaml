@@ -241,7 +241,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     # if ext == ".cmx":
     #     args.add("-dstartup")
 
-    _options = get_options(rule, ctx)
+    (_options, cancel_opts) = get_options(rule, ctx)
     args.add_all(_options)
 
     for w in ctx.attr.warnings:

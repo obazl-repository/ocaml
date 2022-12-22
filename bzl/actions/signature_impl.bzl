@@ -113,7 +113,7 @@ def signature_impl(ctx, module_name):
     out_cmi = ctx.actions.declare_file(ocmi)
     action_outputs.append(out_cmi)
 
-    _options = get_options(ctx.attr._rule, ctx)
+    (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
     if ( ("-bin-annot" in _options)
          or ("-bin-annot" in tc.copts) ):
         out_cmti = ctx.actions.declare_file(workdir + module_name + ".cmti")

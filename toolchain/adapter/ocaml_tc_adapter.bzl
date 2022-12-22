@@ -10,7 +10,7 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 load("//bzl/transitions:tc_transitions.bzl",
      "tc_runtime_out_transition")
 
-load("//bzl/transitions:ocaml_transitions.bzl",
+load("//bzl/rules:ocaml_transitions.bzl",
      "ocaml_tc_compiler_out_transition")
 
 load(":tc_utils.bzl",
@@ -54,7 +54,7 @@ def _ocaml_tc_adapter_impl(ctx):
 
         compiler               = tc_compiler(ctx),
         # lexer                  = ctx.attr.lexer,
-        cvt_emit               = ctx.file.cvt_emit,
+        # cvt_emit               = ctx.file.cvt_emit,
 
         runtime                = ctx.file.runtime,
         copts                  = ctx.attr.copts,

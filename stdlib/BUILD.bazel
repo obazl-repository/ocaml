@@ -1,8 +1,6 @@
 load("//bzl:rules.bzl",
      "boot_archive",
-     # "boot_camlheaders",
      "boot_library",
-     "boot_signature",
      )
 
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
@@ -665,7 +663,7 @@ stdlib_module(
 stdlib_signature(
     name = "Stdlib.Either_cmi",
     src  = "either.mli",
-    stdlib_primitives = True
+    # stdlib_primitives = True
 )
 
 stdlib_module(

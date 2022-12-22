@@ -10,12 +10,18 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
     ## so we should see this twice per config
 
     debug = True
+    fail("DDDDEV")
+
+    protocol = settings["//config/build/protocol"]
+
+    if protocol == "boot":
+        return {}
 
     if debug:
         print("ENTRY: dev_tc_compiler_out_transition")
         print("bld tgt: %s" % attr.name)
         print("tc name: %s" % attr.name)
-        print("protocol: %s" % settings["//config/build/protocol"])
+        print("protocol: %s" % protocol)
 
     if settings["//config/build/protocol"] == "test":
         print("id txn ")
@@ -67,7 +73,7 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
     if config_executor in ["boot", "baseline", "vm"]:
         ## vm emitter
         compiler = "@baseline//bin:ocamlc.opt"
-        runtime = "@baseline//lib:libcamlrun.a"
+        runtime = "@baseline//lib:libasmrun.a"
     else:
         compiler = "@baseline//bin:ocamlopt.opt"
         runtime = "@baseline//lib:libasmrun.a"

@@ -2,22 +2,34 @@
 ##########################################################
 def _build_tool_vm_in_transition_impl(settings, attr):
     debug = True
+
+    protocol = settings["//config/build/protocol"]
+
     if debug: print("build_tool_vm_in_transition")
 
     config_executor = "vm"
     config_emitter  = "vm"
 
-    if settings["//config/build/protocol"] == "dev":
+    if protocol == "unspecified":
+        # protocol = "boot"
+        config_executor = "boot"
+        config_emitter  = "boot"
+        compiler = "//boot:ocamlc.boot"
+        runtime  = "//runtime:camlrun"
+        # cvt_emit = settings["//toolchain:cvt_emit"]
+
+    elif protocol == "boot":
+        compiler = "//boot:ocamlc.boot"
+        runtime  = "//runtime:camlrun"
+        # cvt_emit = "//asmcomp:cvt_emit"
+        ## settings["//toolchain:cvt_emit"]
+    elif protocol == "dev":
         compiler = "@baseline//bin:ocamlc.opt"
         # lexer    = "@baseline//bin:ocamllex.opt"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
+        # cvt_emit = "@baseline//bin:cvt_emit.opt"
         runtime  = "@baseline//lib:libasmrun.a"
     else:
-        compiler = "//bin:ocamlc.byte"
-        # lexer    = "//lex:ocamllex.byte"
-        runtime  = "//runtime:asmrun"
-        cvt_emit = "//asmcomp:cvt_emit"
-        ## settings["//toolchain:cvt_emit"]
+        fail("Protocol not yet supported: %s" % protocol)
 
     return {
         "//config/target/executor": config_executor,
@@ -25,7 +37,7 @@ def _build_tool_vm_in_transition_impl(settings, attr):
         "//toolchain:compiler"  : compiler,
         # "//toolchain:lexer"     : lexer,
         "//toolchain:runtime"   : runtime,
-        "//toolchain:cvt_emit"  : cvt_emit
+        # "//toolchain:cvt_emit"  : cvt_emit
     }
 
 ################################################################
@@ -38,7 +50,7 @@ build_tool_vm_in_transition = transition(
         "//toolchain:compiler",
         # "//toolchain:lexer",
         "//toolchain:runtime",
-        "//toolchain:cvt_emit"
+        # "//toolchain:cvt_emit"
     ]
 )
 

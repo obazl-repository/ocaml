@@ -6,7 +6,7 @@ load("//bzl:rules.bzl",
      "build_tool",
      "compiler_module",
      "compiler_signature",
-     "ocaml_tool"
+     "ocaml_tool_vm"
 )
 
 # load("//config:CONFIG.bzl",
@@ -45,7 +45,7 @@ SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
 
 # ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -I toplevel/byte -linkall -o ocaml.tmp compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma compilerlibs/ocamltoplevel.cma toplevel/topstart.cmo
 
-ocaml_tool(
+ocaml_tool_vm(
     name = "ocaml.tmp",
     prologue = [
         "//compilerlibs:ocamlcommon",

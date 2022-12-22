@@ -88,7 +88,6 @@ run_cvt_emit = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     # toolchains = ["//toolchain/type:boot",
     #               "@bazel_tools//tools/cpp:toolchain_type"]
 )
