@@ -71,6 +71,25 @@ sh_binary(
     toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain"]
 )
 
+sh_binary(
+    name = "ocamlc.opt.sh",
+    srcs = ["ocamlc.opt.shell"],
+    env  = {"VERBOSE": "true",
+            "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    data = [
+        ":ocamlc.opt",
+        # "//runtime:asmrun",
+        "//config/camlheaders",
+        "@bazel_tools//tools/cpp:current_cc_toolchain"
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ],
+    toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain"]
+)
+
 ################################################################
 ## recursive builds. abandoned. they work, but at the cost of
 ## duplicated builds of some of the code.
