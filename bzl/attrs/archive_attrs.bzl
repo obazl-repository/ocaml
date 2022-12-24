@@ -12,9 +12,12 @@ def archive_attrs():
 
     return dict(
 
-        # _stage = attr.label(
-        #     default = "//config/stage"
-        # ),
+        archive = attr.bool(
+            ## no default
+        ),
+        _archive = attr.label(
+            default = "//config/ocaml/compiler/libs:archive"
+        ),
 
         opts             = attr.string_list(
             doc          = "List of OCaml options. Will override configurable default options."

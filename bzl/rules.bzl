@@ -50,6 +50,8 @@ load("//bzl/rules:boot_module.bzl", _boot_module = "boot_module")
 load("//bzl/rules:boot_signature.bzl", _boot_signature = "boot_signature")
 load("//bzl/rules:boot_library.bzl", _boot_library = "boot_library")
 
+load("//bzl/rules:compiler_library.bzl",
+     _compiler_library = "compiler_library")
 load("//bzl/rules:compiler_module.bzl", _compiler_module = "compiler_module")
 load("//bzl/rules:compiler_signature.bzl", _compiler_signature = "compiler_signature")
 
@@ -78,6 +80,8 @@ boot_archive      = _boot_archive
 ocaml_library  = _boot_library
 boot_library  = _boot_library
 boot_module      = _boot_module
+
+compiler_library     = _compiler_library
 compiler_module      = _compiler_module
 # bootstrap_ns = _bootstrap_ns
 # bootstrap_preprocess  = _bootstrap_preprocess

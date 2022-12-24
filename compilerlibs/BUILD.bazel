@@ -1,6 +1,7 @@
 load("//bzl:rules.bzl",
      "boot_archive",
-     "boot_library")
+     "boot_library",
+     "compiler_library")
 
 ## NB: there is no compelling reason that we should put these targets
 ## here in this empty directory. Better to build locally; for example,
@@ -22,8 +23,9 @@ load("//bzl:rules.bzl",
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
 ## no //middle_end stuff:
-#boot_library(
-boot_archive(
+# boot_library(
+# boot_archive(
+compiler_library(
     name = "ocamlcommon",
     opts = ["-linkall"],
     manifest  = [

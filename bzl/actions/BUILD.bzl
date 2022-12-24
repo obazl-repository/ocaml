@@ -113,6 +113,11 @@ def progress_msg(workdir, ctx):
         action = "Testing"
     elif rule in ["run_ocamllex"]:
         action = "Running ocamllex"
+    elif rule == "compiler_library":
+        if ctx.attr.archive:
+            action = "Archiving compiler lib"
+        else:
+            action = "Packaging compiler lib"
     else:
         fail(rule)
 

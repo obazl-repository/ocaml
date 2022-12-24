@@ -1,6 +1,7 @@
 load("//bzl:rules.bzl",
      "boot_archive",
      "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -24,45 +25,13 @@ MODULE_OPTS = []
 SIG_OPTS    = []
 
 ## dev/test: build everthing
-boot_library(
-    name = "bytecomp",
-    manifest  = [
-        ":Bytegen",
-        ":Bytelibrarian",
-        ":Bytelink",
-        ":Bytepackager",
-        ":Bytesections",
-        ":Dll",
-        ":Emitcode",
-        ":Instruct",
-        ":Meta",
-        ":Printinstr",
-        ":Symtable",
-    ],
-    visibility = [
-        "//visibility:public",
-        # "//toolsuite:__pkg__",
-    ]
-)
-
 ################################################################
-## compilerlibs/Makefile.compilerlibs
-# compilerlibs/ocamlbytecomp.cma: $(BYTECOMP_CMI) $(BYTECOMP)
-# 	$(CAMLC) -a -o $@ $(BYTECOMP)
-# compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
-# 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
+# makefile target is in compilerlibs/Makefile.compilerlibs
 
-boot_archive(
-#boot_library(
-    name = "ocamlbytecomp",
-    # opts = select({
-    #     "//bzl/toolchain:boot": [],
-    #     "//bzl/toolchain:bc_bc": [],
-    #     "//bzl/toolchain:n_bc": [],
-    #     "//bzl/toolchain:bc_n": [],
-    #     "//bzl/toolchain:n_n": []
-    # }),
-    manifest  = [
+compiler_library(
+    name     = "ocamlbytecomp",
+    # archive  = True,
+    manifest = [
         ":Bytegen",
         ":Bytelibrarian",
         ":Bytelink",
@@ -75,9 +44,6 @@ boot_archive(
         "//driver:Compile",
         "//driver:Maindriver"
     ],
-    # manifest = [
-    #     "//bytecomp:ocamlbytecomp",
-    # ],
     visibility = [
         "@baseline//:__subpackages__",
         "//bin:__subpackages__",

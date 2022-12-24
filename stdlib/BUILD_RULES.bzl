@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//boot:BUILD_RULES.bzl", "ocamlc_boot_in_transition")
@@ -6,6 +7,7 @@ load("//bzl:providers.bzl", "BootInfo", "ModuleInfo", "OcamlArchiveProvider")
 
 load("//bzl/attrs:archive_attrs.bzl", "archive_attrs")
 load("//bzl/actions:archive_impl.bzl", "archive_impl")
+load("//bzl/actions:library_impl.bzl", "library_impl")
 
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 load("//bzl/actions:module_impl.bzl", "module_impl")
@@ -19,9 +21,16 @@ load("//bzl/rules:ocaml_transitions.bzl",
 
 load(":BUILD.bzl", "STDLIB_MANIFEST")
 
+def _stdlib_archive_impl(ctx):
+
+    if (ctx.attr.archive or ctx.attr._archive[BuildSettingInfo].value):
+        return archive_impl(ctx)
+    else:
+        return library_impl(ctx)
+
 #####################
 stdlib_archive = rule(
-    implementation = archive_impl,
+    implementation = _stdlib_archive_impl,
     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
     attrs = dict(
         archive_attrs(),
@@ -29,7 +38,7 @@ stdlib_archive = rule(
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     ),
-    provides = [OcamlArchiveProvider, BootInfo],
+    # provides = [OcamlArchiveProvider, BootInfo],
     executable = False,
     # cfg = ocamlc_boot_in_transition,
     toolchains = ["//toolchain/type:ocaml",

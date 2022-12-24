@@ -140,7 +140,7 @@ def _boot_import_vm_executable(ctx):
                         target_file = ctx.file.tool)
 
     runfiles = ctx.runfiles(
-        files = [ctx.file._stdlib]
+        files = ctx.files._stdlib
     )
 
     defaultInfo = DefaultInfo(
@@ -165,7 +165,7 @@ boot_import_vm_executable = rule(
         _stdlib = attr.label(
             doc = "Stdlib archive", ## (not stdlib.cmx?a")
             default = "//stdlib", # archive, not resolver
-            allow_single_file = True, # won't work with boot_library
+            # allow_single_file = True, # won't work with boot_library
             executable = False,
             cfg = "exec"
             # cfg = exe_deps_out_transition,
