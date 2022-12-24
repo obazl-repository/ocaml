@@ -1,0 +1,108 @@
+## compiler targets built by @baseline compilers
+
+## intended as compiler deps of test rules e.g. expect_test
+
+## not intended as direct cli build targets except to verify build protocol
+
+exports_files(glob(["**"]))
+
+package(default_visibility = ["//visibility:public"])
+
+load("@ocamlcc//bzl:rules.bzl",
+     "ocaml_compiler_r",
+     "ocaml_compilers",
+     "ocamlc_byte")
+
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_setting")
+
+bool_flag(name = "verbose", build_setting_default = False,
+          visibility = ["//visibility:public"])
+config_setting(name = "verbose?", flag_values = {":verbose": "True"})
+
+################################################################
+## ocaml_compilers is a macro; it expands to: ocamlc_byte,
+## ocamlopt_byte ocamlopt_opt, ocamlc_opt
+
+# ocaml_compilers(
+#     name = "ocamlcc",
+#     visibility             = ["//visibility:public"]
+# )
+
+ocamlc_byte(
+    name = "ocamlc.byte",
+    # stdlib   = "//stdlib",
+    prologue = [
+        "//stdlib",
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp"
+    ],
+    main = "//driver:Main",
+    opts = [ ] + select({
+        # ocamlc.byte: ["-compat-32"]
+        "//conditions:default": []
+    }) + [
+    ] + select({
+        "//platform/target/os:linux?": [
+            "-cclib", "-lm",
+            "-cclib", "-ldl",
+            "-cclib", "-lpthread",
+        ],
+        "//conditions:default": []
+    }),
+    visibility             = ["//visibility:public"]
+)
+
+
+##TODO: this code is the same as that in //bin except for the compiler
+##labels.  Macroize them. E.g.:
+# ocamlc_byte_runner(
+#     name     = "ocamlc.byte.sh",
+#     compiler = ":ocamlc.byte"
+# )
+
+sh_binary(
+    name = "ocamlc.byte.sh",
+    srcs = ["@ocamlcc//bin:ocamlcc.sh"],
+    env  = select({
+        ":verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "true"}
+    }),
+    args = ["$(rootpath @ocamlcc//runtime:ocamlrun)",
+            "$(rootpath :ocamlc.byte)",
+            "$(rlocationpath @ocamlcc//stdlib:stdlib)"],
+    data = [
+        "@ocamlcc//runtime:ocamlrun",
+        ":ocamlc.byte",
+        "@ocamlcc//stdlib",
+        "@ocamlcc//stdlib:Std_exit",
+        "@ocamlcc//config/camlheaders",
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ]
+)
+
+sh_binary(
+    name = "ocamlopt.opt.sh",
+    srcs = ["ocamlcc.sh"],
+    env  = select({
+        ":verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+    args = ["ocamlopt.opt"],
+    data = [
+        ":ocamlopt.opt",
+        "@ocamlcc//runtime:asmrun",
+        # "@ocamlcc//config/camlheaders",
+        "@bazel_tools//tools/cpp:current_cc_toolchain"
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ],
+    toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain"]
+)
+
+

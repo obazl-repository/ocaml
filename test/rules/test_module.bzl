@@ -1,0 +1,85 @@
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
+load("//bzl:providers.bzl", "BootInfo", "ModuleInfo")
+load("//bzl/attrs:module_attrs.bzl", "module_attrs")
+load("//bzl/actions:module_impl.bzl", "module_impl")
+
+######################
+def _test_module_impl(ctx):
+
+    (this, extension) = paths.split_extension(ctx.file.struct.basename)
+    module_name = this[:1].capitalize() + this[1:]
+
+    return module_impl(ctx, module_name)
+
+####################
+test_module_ = rule(
+    implementation = _test_module_impl,
+    doc = "Compiles a module.",
+    attrs = dict(
+        module_attrs(),
+        dump = attr.string_list(),
+        # open_stdlib = attr.bool(),
+        open = attr.label_list(
+            # usually //stdlib:Stdlib
+        ),
+        stdlib_primitives = attr.bool(default = False),
+        _stdlib = attr.label(
+            ## only added to depgraph if stdlib_primitives == True
+            allow_single_file = True,
+            # default = "//stdlib:Stdlib"
+        ),
+        # _resolver = attr.label(
+        #     doc = "The compiler always opens Stdlib, so everything depends on it.",
+        #     default = "//stdlib:Stdlib"
+        # ),
+
+        _rule = attr.string( default = "test_module" ),
+    ),
+
+    ##FIXME: transition to set protocol = test
+    # cfg = compile_mode_in_transition,
+
+
+    provides = [BootInfo,ModuleInfo],
+    executable = False,
+    # fragments = ["platform", "cpp"],
+    # host_fragments = ["platform",  "cpp"],
+    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+################################################################
+##  MACRO: adds tag attribute
+def test_module(name,
+                visibility = ["//visibility:public"],
+                **kwargs):
+
+    if name.endswith(".cmo") or name.endswith(".cmx"):
+        fail("test_module target names are automatically suffixed with .cmo and .cmx; do not include in name attribute.")
+
+
+    test_module_(
+        name   = name,
+        visibility = visibility,
+        tags   = ["test_module"],
+        **kwargs
+    )
+
+    # test_module_vm(
+    #     name   = name + ".cmo",
+    #     visibility = visibility,
+    #     tags   = ["test_module", "cmo"],
+    #     **kwargs
+    # )
+
+    # test_module_sys(
+    #     name   = name + ".cmx",
+    #     visibility = visibility,
+    #     tags   = ["test_module", "cmx"],
+    #     **kwargs
+    # )
+
+
