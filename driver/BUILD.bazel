@@ -114,17 +114,18 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Compile_common", ## (Driver Compile_common)
-        "//typing:Typedtree",
-        "//lambda:Translmod",
-        "//lambda:Simplif",
-        "//utils:Profile",
-        "//lambda:Printlambda",
-        "//bytecomp:Printinstr",
-        "//utils:Misc",
+        "//bytecomp:Bytegen",
         "//bytecomp:Emitcode",
+        "//bytecomp:Printinstr",
+        "//lambda:Printlambda",
+        "//lambda:Simplif",
+        "//lambda:Translmod",
+        "//stdlib:Stdlib",
+        "//typing:Typedtree",
         "//utils:Clflags",
-        "//bytecomp:Bytegen"
+        "//utils:Misc",
+        "//utils:Profile",
+        ":Compile_common", ## (Driver Compile_common)
     ],
     visibility = ["//bytecomp:__pkg__"]
 )

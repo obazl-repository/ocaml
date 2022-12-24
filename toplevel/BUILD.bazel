@@ -4,9 +4,10 @@ load("//bzl:rules.bzl",
      "boot_library",
      "bootstrap_repl",
      "build_tool",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
-     "ocaml_tool_vm"
+     "ocaml_tool_vm",
 )
 
 # load("//config:CONFIG.bzl",
@@ -45,6 +46,7 @@ SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
 
 # ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -I toplevel/byte -linkall -o ocaml.tmp compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma compilerlibs/ocamltoplevel.cma toplevel/topstart.cmo
 
+## TEMPORARY until we get expunge working
 ocaml_tool_vm(
     name = "ocaml.tmp",
     prologue = [
@@ -166,7 +168,7 @@ TOPLEVEL_CMI = [
     ":Toploop_cmi",
 ]
 
-boot_archive(
+compiler_library(
     name = "ocamltoplevel", # //toplevel:archive instead of ocamltoplevel?
     manifest  = TOPLEVEL,
     # deps      = TOPLEVEL_CMI

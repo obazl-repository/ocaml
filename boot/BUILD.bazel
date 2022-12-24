@@ -49,6 +49,7 @@ boot_coldstart(
         # "//lex:ocamllex.opt",
         # "//yacc:ocamlyacc",
         "//vendor/mustach",
+        "//vendor/merge_json",
 
         ## the shell script could obtain the following from the preceding:
         # "//stdlib",
@@ -56,7 +57,7 @@ boot_coldstart(
 
         # "//asmcomp:cvt_emit.byte",
 
-        # "//asmcomp:cvt_emit.opt",
+        # "//asmcomp:cvt_emit.byte",
 
         "@bazel_tools//tools/bash/runfiles",
     ],

@@ -195,7 +195,6 @@ def ocaml_compilers(name,
 
     ocamlc_byte(
         name = "ocamlc.byte",
-        # stdlib   = "@//stdlib",
         prologue = [
             # "//stdlib:primitives",
             # "//stdlib:Stdlib",

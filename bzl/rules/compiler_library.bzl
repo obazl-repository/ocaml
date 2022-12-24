@@ -8,9 +8,9 @@ load("//bzl/actions:library_impl.bzl", "library_impl")
 
 def _compiler_library_impl(ctx):
 
-    print("COMPILER LIB: %s" % ctx.attr.archive)
-    print(" local arch: %s" % ctx.attr.archive)
-    print(" global arch %s" % ctx.attr._archive[BuildSettingInfo].value)
+    # print("COMPILER LIB: %s" % ctx.attr.archive)
+    # print(" local arch: %s" % ctx.attr.archive)
+    # print(" global arch %s" % ctx.attr._archive[BuildSettingInfo].value)
 
     if (ctx.attr.archive or ctx.attr._archive[BuildSettingInfo].value):
         return archive_impl(ctx)

@@ -129,7 +129,8 @@ def aggregate_deps(ctx,
 
 def merge_depsets(depsets, fld):
     # print("merging %s" % fld)
-    # print("unmerged fld: %s" % getattr(depsets.deps, fld))
+    # if fld == "cli_link_deps":
+    #     print("unmerged fld: %s" % getattr(depsets.deps, fld))
     deps = getattr(depsets.deps, fld)
     if deps:
         # print("DEPS: %s" % deps)

@@ -1,3 +1,22 @@
+## ocaml_tool rules: used to build ocaml tools:
+#    //tools:ocamlobjinfo etc.
+#    //lex:ocamllex
+#    //testsuite/tools:inline_expect
+#    //toplevel:ocaml.tmp (temporary until we get expunge working)
+
+# (in contrast to build_tool rules, which build tools used internally
+# by the build protocols.)
+
+# ocaml_tools: macro, expands to ocaml_tool_vm, ocaml_tool_sys
+
+## the _vm version uses @baseline/bin/ocamlc.opt to build the tools
+## the _sys version uses @baseline/bin/ocamlopt.opt to build the tools
+
+## CAVEAT: these do NOT rebuild the compiler; to use a new version of the
+## compiler to build them, run coldstart to install the new versions
+## in .baseline/.
+
+
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
@@ -85,7 +104,7 @@ ocaml_tool_vm = rule(
     attrs = dict(
         executable_attrs(),
 
-        vm_only = attr.bool(default = False),
+        # vm_only = attr.bool(default = False),
 
         # _runtime = attr.label(
         #     allow_single_file = True,

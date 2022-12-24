@@ -84,12 +84,12 @@ stdlib_signature = rule(
         ),
         stdlib_primitives = attr.bool(default = False),
         _stdlib = attr.label(
-            default = "//stdlib:Stdlib"
+            # default = "//stdlib:Stdlib"
         ),
         # _resolver = attr.label(
         ns = attr.label(
             doc = "The compiler always opens Stdlib, so everything depends on it.",
-            default = "//stdlib:Stdlib"
+            # default = "//stdlib:Stdlib"
         ),
         _rule = attr.string( default = "stdlib_signature" ),
         # _allowlist_function_transition = attr.label(
@@ -130,7 +130,7 @@ stdlib_module = rule(
         # _resolver = attr.label(
         ns = attr.label(
             doc = "The compiler always opens Stdlib, so everything depends on it.",
-            default = "//stdlib:Stdlib"
+            # default = "//stdlib:Stdlib"
         ),
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"

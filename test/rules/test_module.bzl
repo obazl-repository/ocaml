@@ -20,9 +20,6 @@ test_module_ = rule(
         module_attrs(),
         dump = attr.string_list(),
         # open_stdlib = attr.bool(),
-        open = attr.label_list(
-            # usually //stdlib:Stdlib
-        ),
         stdlib_primitives = attr.bool(default = False),
         _stdlib = attr.label(
             ## only added to depgraph if stdlib_primitives == True

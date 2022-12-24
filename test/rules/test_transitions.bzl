@@ -22,7 +22,7 @@ def _vv_test_in_transition_impl(settings, attr):
     ocamlrun = "//runtime:ocamlrun"
     runtime  = "@baseline//lib:libcamlrun.a"
     # mustach  = "@baseline//bin:mustach"
-    # cvt_emit = "@baseline//bin:cvt_emit.opt"
+    # cvt_emit = "@baseline//bin:cvt_emit.byte"
 
     if debug:
         print("setting executor:  %s" % config_executor)
@@ -72,18 +72,18 @@ def _ss_test_in_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
-    if protocol == "unspecified":
-        protocol = "test"
-        config_executor = "sys"
-        config_emitter  = "sys"
-        ## we only want to rebuild the compiler, not the bld tools
-        compiler = "//bin:ocamlopt.opt"
-        ocamlrun = "//runtime:ocamlrun"
-        runtime  = "@baseline//lib:libasmrun.a"
-        mustach  = "@baseline//bin:mustach"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
-    else:
-        fail("Protocol not yet supported for test: %s" % protocol)
+    protocol = "test"
+
+    config_executor = "sys"
+    config_emitter  = "sys"
+    ## we only want to rebuild the compiler, not the bld tools
+    compiler = "//bin:ocamlopt.opt"
+    ocamlrun = "//runtime:ocamlrun"
+    runtime  = "@baseline//lib:libasmrun.a"
+    mustach  = "@baseline//bin:mustach"
+    cvt_emit = "@baseline//bin:cvt_emit.byte"
+    # else:
+    #     fail("Protocol not yet supported for test: %s" % protocol)
 
     if debug:
         print("setting executor:  %s" % config_executor)

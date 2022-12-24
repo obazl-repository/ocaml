@@ -142,6 +142,7 @@ compiler_signature(
     src  = "lambda.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Primitives_cmi",
         ":Debuginfo_cmi",
         "//typing:Types_cmi",
         "//typing:Primitive_cmi",
@@ -203,6 +204,7 @@ compiler_signature(
     src  = "matching.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Primitives_cmi",
         ":Lambda_cmi",
         ":Debuginfo_cmi",
         "//parsing:Asttypes_cmi",
@@ -321,19 +323,19 @@ compiler_module(
     sig    = "Simplif_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        ":Tmc",
-        "//utils:Warnings",
-        "//typing:Primitive",
-        "//stdlib:Stdlib.Option",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//typing:Ident",
+        "//typing:Primitive",
         "//utils:Clflags",
+        "//utils:Warnings",
+        ":Debuginfo",
+        ":Lambda",
+        ":Tmc",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -361,6 +363,7 @@ compiler_module(
     struct = "switch.ml",
     sig    = "Switch_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Map",
@@ -391,6 +394,7 @@ compiler_module(
     sig    = "Tmc_cmi",
     opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
     deps   = [
+        "//stdlib:Stdlib",
         ":Lambda"
     ],
 )
@@ -584,6 +588,7 @@ compiler_signature(
     src  = "translmod.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Primitives_cmi",
         ":Lambda_cmi",
         ":Debuginfo_cmi",
         "//parsing:Asttypes_cmi",
@@ -619,6 +624,7 @@ compiler_signature(
     src  = "translobj.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Primitives_cmi",
         ":Lambda_cmi",
         ":Debuginfo_cmi",
         "//parsing:Asttypes_cmi",

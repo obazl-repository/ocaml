@@ -291,6 +291,7 @@ compiler_module(
     struct = "bytesections.ml",
     sig    = "Bytesections_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.String",
@@ -321,6 +322,7 @@ compiler_module(
     struct = "dll.ml",
     sig    = "Dll_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.Sys",
@@ -388,6 +390,7 @@ compiler_signature(
     src  = "emitcode.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Primitives_cmi",
         "//parsing:Asttypes_cmi",
         "//file_formats:Cmo_format_cmi",
         "//typing:Ident_cmi",
@@ -402,6 +405,7 @@ compiler_module(
     sig    = "Instruct_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Primitives",
         "//lambda:Lambda",
         "//typing:Types",
         "//typing:Subst",
@@ -421,6 +425,7 @@ compiler_signature(
     src  = "instruct.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Primitives_cmi",
         "//lambda:Lambda_cmi",
         "//typing:Types_cmi",
         "//typing:Subst_cmi",

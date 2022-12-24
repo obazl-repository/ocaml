@@ -79,6 +79,7 @@ stdlib_archive_cmxa(
 # depend on itself! So it can build independently of stdlib.cma.
 
 #stdlib_resolver(
+alias(name = "Primitives", actual = ":Stdlib")
 kernel_module(
     name   = "Stdlib",
     struct = "stdlib_ml",
@@ -104,6 +105,7 @@ mustache(
     template = "stdlib.ml.mustache"
 )
 
+alias(name = "Primitives_cmi", actual = ":Stdlib_cmi")
 kernel_signature(
     name = "Stdlib_cmi",
     src  = "stdlib_mli",
@@ -210,12 +212,12 @@ stdlib_internal_module(
     warnings = ["fragile-match"],
     deps   = [
         ":CamlinternalFormatBasics",
-        ":Stdlib.Buffer", ## (Stdlib Buffer)
-        ":Stdlib.Bytes", ## (Stdlib Bytes)
-        ":Stdlib.Char", ## (Stdlib Char)
-        ":Stdlib.Int", ## (Stdlib Int)
-        ":Stdlib.Sys", ## (Stdlib Sys)
-        ":Stdlib.String", ## (Stdlib String)
+        ":Stdlib.Buffer",
+        ":Stdlib.Bytes",
+        ":Stdlib.Char",
+        ":Stdlib.Int",
+        ":Stdlib.Sys",
+        ":Stdlib.String",
     ],
 )
 
@@ -266,6 +268,7 @@ stdlib_internal_module(
         # "//platform/target:sys?": ["-afl-inst-ratio", "0"],
         "//conditions:default": []
     }),
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         ":Stdlib.Obj",
         ":Stdlib.Sys",
@@ -419,14 +422,12 @@ stdlib_module(
     struct = "atomic.ml",
     name   = "Stdlib.Atomic",
     sig    = "Stdlib.Atomic_cmi",
-    opts = ["-nopervasives"],
-    deps   = [],
+    deps   = [":Stdlib"]
 )
 
 stdlib_signature(
     name = "Stdlib.Atomic_cmi",
     src  = "atomic.mli",
-    opts = ["-nopervasives"],
 )
 
 stdlib_module(
@@ -450,15 +451,18 @@ stdlib_signature(
     name = "Stdlib.Bigarray_cmi",
     src  = "bigarray.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Complex_cmi"],
+    deps   = [
+        ":Stdlib",
+        ":Stdlib.Complex_cmi"
+    ],
 )
 
 stdlib_module(
     name   = "Stdlib.Bool",
     struct = "bool.ml",
     sig    = "Stdlib.Bool_cmi",
-    opts = MODULE_OPTS,  #  + ["-nopervasives"],
-    use_prims = True
+    opts   = MODULE_OPTS,
+    deps   = [":Stdlib"]
 )
 
 stdlib_signature(
@@ -599,7 +603,10 @@ stdlib_signature(
     name = "Stdlib.Condition_cmi",
     src  = "condition.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Mutex_cmi"],
+    deps   = [
+        ":Stdlib",
+        ":Stdlib.Mutex_cmi"
+    ],
 )
 
 stdlib_module(
@@ -890,15 +897,13 @@ stdlib_module(
     struct = "int.ml",
     sig    = "Stdlib.Int_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Stdlib"
-    ],
+    deps   = [":Stdlib"],
 )
 
 stdlib_signature(
     name = "Stdlib.Int_cmi",
     src  = "int.mli",
-    opts = ["-nopervasives"],
+    # opts = ["-nopervasives"],
 )
 
 stdlib_module(
@@ -975,6 +980,7 @@ stdlib_signature(
     name = "Stdlib.Lexing_cmi",
     src  = "lexing.mli",
     opts = SIG_OPTS,
+    deps = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -1094,6 +1100,7 @@ stdlib_signature(
     name = "Stdlib.Mutex_cmi",
     src  = "mutex.mli",
     opts = SIG_OPTS,
+    deps   = [":Stdlib"]
 )
 
 stdlib_module(
@@ -1343,6 +1350,7 @@ stdlib_module(
     #     mode:native  ["-inline", 9]
     # })
     deps   = [
+        ":Stdlib",
         ":CamlinternalFormatBasics",
         ":CamlinternalFormat",
         ":Stdlib.Buffer",
@@ -1359,6 +1367,7 @@ stdlib_signature(
     src   = "scanf.mli",
     opts  = SIG_OPTS,
     warnings = ["fragile-match"],
+    deps  = [":Stdlib"]
 )
 
 stdlib_module(
@@ -1397,7 +1406,10 @@ stdlib_signature(
     name = "Stdlib.Seq_cmi",
     src  = "seq.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Either_cmi"],
+    deps   = [
+        ":Stdlib",
+        ":Stdlib.Either_cmi"
+    ],
 )
 
 stdlib_module(
@@ -1534,14 +1546,14 @@ stdlib_module(
     #     "//config:sig_src?"   : ["//stdlib:Stdlib"],
     #     "//conditions:default": []
     # }),
-
     opts = MODULE_OPTS,
+    deps = [":Stdlib"]
 )
 
 stdlib_signature(
     name = "Stdlib.Sys_cmi",
     src  = "sys.mli",
-    opts = ["-nopervasives"],
+    deps = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -1574,7 +1586,7 @@ stdlib_module(
     deps    = select({
         "//config:sig_src?"   : ["//stdlib:Stdlib"],
         "//conditions:default": []
-    }),
+    }) + [":Stdlib"],
     opts = MODULE_OPTS,
 )
 
@@ -1715,12 +1727,12 @@ kernel_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
     sig    = ":Std_exit_cmi",
-    deps = [":Stdlib"]
+    deps   = [":Stdlib"]
 )
 
 kernel_module_cmx(
     name   = "Std_exit.cmx",
     struct = "std_exit.ml",
     sig    = ":Std_exit_cmi",
-    deps = [":Stdlib"]
+    deps   = [":Stdlib"]
 )

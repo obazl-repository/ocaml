@@ -35,6 +35,7 @@ compiler_module(
     name   = "Config",
     struct = "config.ml",
     sig    = "Config_cmi",
+    open   = ["//stdlib:Stdlib"],
     deps   = [ # [
         # "//config:Config_cc",
         "//stdlib:Stdlib.List",
@@ -42,8 +43,6 @@ compiler_module(
         "//stdlib:Stdlib.Option", # if not bootstrapping?
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-
-        # "//stdlib"
     ],
     visibility = [
         "//asmcomp:__subpackages__",

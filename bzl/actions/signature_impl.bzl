@@ -203,12 +203,26 @@ def signature_impl(ctx, module_name):
                       w if w.startswith("-")
                       else "-" + w])
 
+    open_stdlib = False
     for dep in ctx.attr.deps:
-        if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-            if dep.label.package == "stdlib":
-                if "-nopervasives" in _options:
-                    _options.remove("-nopervasives")
+        depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        if dep.label.name.startswith("Stdlib"):
+            includes.append(dep.files.to_list()[0].dirname)
+            open_stdlib = True
+
+    # for dep in ctx.attr.deps:
+    #     if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+    #         if dep.label.package == "stdlib":
+    #             if "-nopervasives" in _options:
+    #                 _options.remove("-nopervasives")
+
     args.add_all(_options)
+
+    args.add("-nopervasives")
+    # args.add("-nocwd")
+
+    if open_stdlib:
+        args.add("-open", "Stdlib")
 
     if hasattr(ctx.attr, "ns"):
         if ctx.attr.ns:
@@ -218,11 +232,11 @@ def signature_impl(ctx, module_name):
             direct_inputs.append(ctx.attr.ns[ModuleInfo].struct)
 
 
-    if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-        if ctx.attr.stdlib_primitives:
-            includes.append(ctx.attr._stdlib[ModuleInfo].sig.dirname)
-            direct_inputs.append(ctx.attr._stdlib[ModuleInfo].sig)
-            direct_inputs.append(ctx.attr._stdlib[ModuleInfo].struct)
+    # if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+    #     if ctx.attr.stdlib_primitives:
+    #         includes.append(ctx.attr._stdlib[ModuleInfo].sig.dirname)
+    #         direct_inputs.append(ctx.attr._stdlib[ModuleInfo].sig)
+    #         direct_inputs.append(ctx.attr._stdlib[ModuleInfo].struct)
 
     ccInfo_list = []
 
@@ -230,12 +244,12 @@ def signature_impl(ctx, module_name):
 
     args.add_all(includes, before_each="-I", uniquify = True)
 
+    # args.add("-I", mlifile.dirname)
+
     if sig_src.extension == "ml":
         args.add("-i")
     else:
         args.add("-c")
-
-    args.add("-o", out_cmi)
 
     pack_ns = False
     if hasattr(ctx.attr, "_pack_ns"):
@@ -247,6 +261,8 @@ def signature_impl(ctx, module_name):
         args.add("-for-pack", pack_ns)
 
     args.add("-intf", mlifile)
+
+    args.add("-o", out_cmi)
 
     if ctx.files.data:
         direct_inputs.extend(ctx.files.data)

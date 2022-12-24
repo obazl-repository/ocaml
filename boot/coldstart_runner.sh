@@ -78,7 +78,7 @@ STDLIBDIR="`dirname $STDLIBDIR`"
 # cp -vf $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
 
 # cp -vf $(rlocation ocamlcc/asmcomp/_ocamlc.byte/cvt_emit.byte) $BOOTDIR/bin
-# cp -vf $(rlocation ocamlcc/asmcomp/_ocamlopt.opt/cvt_emit.opt) $BOOTDIR/bin
+# cp -vf $(rlocation ocamlcc/asmcomp/_ocamlopt.opt/cvt_emit.byte) $BOOTDIR/bin
 
 # echo "Installing libs"
 

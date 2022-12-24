@@ -55,6 +55,10 @@ def executable_attrs():
             doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
+        _archive = attr.label(
+            default = "//config/ocaml/compiler/libs:archive"
+        ),
+
         _protocol = attr.label(default = "//config/build/protocol"),
 
         _verbose = attr.label(default = "//config/ocaml/link:verbose"),

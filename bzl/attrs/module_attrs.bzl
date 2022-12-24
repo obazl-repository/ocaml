@@ -20,6 +20,10 @@ def module_attrs():
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
 
+        open = attr.label_list(
+            # usually //stdlib:Stdlib
+        ),
+
         _protocol = attr.label(default = "//config/build/protocol"),
 
         use_prims = attr.bool( # overrides global _use_prims

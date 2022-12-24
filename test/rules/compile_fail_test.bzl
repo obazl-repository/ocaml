@@ -55,10 +55,26 @@ def _compile_fail_test(ctx):
     #     executor = target_executor
     #     emitter  = target_emitter
 
-    if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
-        ext = ".cmo"
-    else:
+    # if tc.config_executor[BuildSettingInfo].value in ["boot", "baseline", "vm"]:
+    #     ext = ".cmo"
+    # else:
+    #     ext = ".cmx"
+    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    if compiler.basename == "ocamlopt.byte":
         ext = ".cmx"
+    elif compiler.basename == "ocamlopt.opt":
+        ext = ".cmx"
+    else:
+        if tc.protocol == "dev":
+            if tc.config_emitter == "sys":
+                ext = ".cmx"
+            else:
+                ext = ".cmo"
+        else:
+            if tc.config_executor == "sys":
+                ext = ".cmx"
+            else:
+                ext = ".cmo"
 
     ################################################################
     ################  OUTPUTS  ################
@@ -372,29 +388,38 @@ def _compile_fail_test(ctx):
     #########################
     args = [] ## ctx.actions.args()
 
+    args.append(tc.executable.path)
+
+    toolarg = tc.tool_arg
+    if toolarg:
+        args.append(toolarg.path)
+        toolarg_input = [toolarg]
+    else:
+        toolarg_input = []
+
     # args.append("echo PWD: $PWD;")
 
-    executable = None
-    if tc.protocol == "dev":
-        ocamlrun = None
-        effective_compiler = tc.compiler
-    else:
-        ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
-        effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    # executable = None
+    # if tc.protocol == "dev":
+    #     ocamlrun = None
+    #     effective_compiler = tc.compiler
+    # else:
+    #     ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
+    #     effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
-    build_executor = get_build_executor(tc)
+    # build_executor = get_build_executor(tc)
 
-    runfiles = []
+    # runfiles = []
 
-    if build_executor == "vm":
-        executable = ocamlrun
-        args.append(executable)
-        args.append(effective_compiler.short_path)
-        runfiles.extend([executable, effective_compiler])
-    else:
-        executable = effective_compiler
-        args.append(executable.short_path)
-        runfiles.extend([executable])
+    # if build_executor == "vm":
+    #     executable = ocamlrun
+    #     args.append(executable)
+    #     args.append(effective_compiler.short_path)
+    #     runfiles.extend([executable, effective_compiler])
+    # else:
+    #     executable = effective_compiler
+    #     args.append(executable.short_path)
+    #     runfiles.extend([executable])
 
     # ocamlrun = tc.compiler[DefaultInfo].default_runfiles.files.to_list()[0]
     # effective_compiler = tc.compiler[DefaultInfo].files_to_run.executable
@@ -552,7 +577,9 @@ def _compile_fail_test(ctx):
         + direct_inputs
         + depsets.deps.mli
         + resolver_deps
-        + [effective_compiler]
+        # + [effective_compiler]
+        + [tc.executable]
+        + toolarg_input
         ,
         transitive = []
         + merged_input_depsets
@@ -596,7 +623,7 @@ def _compile_fail_test(ctx):
     )
 
     ################################################################
-    # runfiles = []
+    runfiles = []
     # if ocamlrun:
     #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
     # print("runfiles tc.compiler: %s" % tc.compiler)

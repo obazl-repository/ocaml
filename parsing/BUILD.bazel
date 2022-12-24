@@ -377,7 +377,6 @@ compiler_signature(
 compiler_module(
     name   = "CamlinternalMenhirLib",
     struct = "camlinternalMenhirLib.ml",
-    # struct = "//boot/menhir:menhirLib.ml",
     sig    = "CamlinternalMenhirLib_cmi",
     opts = MODULE_OPTS,
     deps   = [
@@ -425,6 +424,7 @@ compiler_module(
     sig    = "Lexer_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Lexing",
         "//utils:Misc",
         ":Parser"
     ],
@@ -447,6 +447,7 @@ compiler_signature(
     src  = "lexer.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Lexing",
         ":Parser_cmi"
     ]
 )
@@ -595,6 +596,7 @@ compiler_module(
     deps   = [
         ":Ast_helper",
         ":CamlinternalMenhirLib",
+        "//stdlib:Stdlib.Parsing",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -628,6 +630,7 @@ compiler_signature(
     src  = "parser.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//stdlib:Stdlib.Lexing_cmi",
         ":CamlinternalMenhirLib_cmi",
         ":Docstrings_cmi",
         ":Location_cmi"

@@ -84,6 +84,15 @@ def executable_impl(ctx, tc, exe_name, workdir):
         transitive = [merge_depsets(depsets, "cli_link_deps")]
     )
 
+    # for ds in cli_link_deps_depset.to_list():
+    #     print("LINKDEPS ds: %s" % ds)
+    # for ds in sigs_depset.to_list():
+    #     print("SIGDEPS ds: %s" % ds.path)
+
+    # if ctx.label.name == "cvt_emit.byte":
+    #     fail()
+
+
     afiles_depset  = depset(
         order=dsorder,
         transitive = [merge_depsets(depsets, "afiles")]
@@ -271,15 +280,19 @@ def executable_impl(ctx, tc, exe_name, workdir):
             runtime_files.append(f)
             includes.append(f.dirname)
 
-    for dep in filtering_depset.to_list():
-        if dep in manifest:
-            args.add(dep)
-
-    # ## 'main' dep must come last on cmd line
-    if ctx.file.main:
-        args.add(ctx.file.main)
-
     args.add("-nopervasives")
+
+    ## Choice: either use filtering_depset or cli_link_deps, not both
+    if ctx.attr._archive[BuildSettingInfo].value:
+        for dep in filtering_depset.to_list():
+            if dep in manifest:
+                args.add(dep)
+        # ## 'main' dep must come last on cmd line
+        if ctx.file.main:
+            args.add(ctx.file.main)
+    else:
+        for dep in cli_link_deps_depset.to_list():
+            args.add(dep)
 
     args.add("-o", out_exe)
 

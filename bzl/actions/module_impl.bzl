@@ -295,10 +295,14 @@ def module_impl(ctx, module_name):
             depsets.deps.mli.append(ctx.file.sig)
             # FIXME: add cmi to depsets
             if provider_output_cmi:
-                depsets.deps.cmi.append(provider_output_cmi)
+                depsets.deps.sigs.append(depset([provider_output_cmi]))
 
+    open_stdlib = False
     for dep in ctx.attr.deps:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        if dep.label.name.startswith("Stdlib"):
+            includes.append(dep.files.to_list()[0].dirname)
+            open_stdlib = True
         ## Now what if this module is to be archived, and this dep is
         ## a sibling submodule? If it is a sibling it goes in
         ## archived_cmx, or if it is a cmo we drop it since it will be
@@ -340,6 +344,10 @@ def module_impl(ctx, module_name):
     #     fail("x")
 
     ## build depsets here, use for OcamlProvider and OutputGroupInfo
+    # if ctx.label.name == "Instruct":
+    #     print("LBL %s" % ctx.label)
+    #     print("DS SIGS: %s" % depsets.deps.sigs)
+
     sigs_depset = depset(
         order=dsorder,
         direct = [provider_output_cmi],
@@ -414,23 +422,6 @@ def module_impl(ctx, module_name):
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
 
-    if ctx.attr._rule == "test_module":
-        args.add("-nopervasives")
-
-    # if hasattr(ctx.attr, "open_stdlib"):
-    #     if ctx.attr.open_stdlib:
-    #         args.add("-open", "Stdlib")
-
-    if hasattr(ctx.attr, "open"):
-        if ctx.attr.open:
-            for o in ctx.attr.open:
-                direct_inputs.append(o[ModuleInfo].sig)
-                direct_inputs.append(o[ModuleInfo].struct)
-                for elt in o.files.to_list():
-                    includes.append(elt.dirname)
-                args.add("-open", o.label.name)
-
-
     tc_opts = []
 
     if not ctx.attr.nocopts:
@@ -454,6 +445,26 @@ def module_impl(ctx, module_name):
         args.add_all(["-w",
                       w if w.startswith("-")
                       else "-" + w])
+
+    args.add("-nopervasives")
+    args.add("-nocwd")
+
+    # if ctx.label.name == "CamlinternalMenhirLib":
+    # if hasattr(ctx.attr, "open_stdlib"):
+    #     if ctx.attr.open_stdlib:
+    #         args.add("-open", "Stdlib")
+
+    # if hasattr(ctx.attr, "open"):
+    #     if ctx.attr.open:
+    #         for o in ctx.attr.open:
+    #             direct_inputs.append(o[ModuleInfo].sig)
+    #             direct_inputs.append(o[ModuleInfo].struct)
+    #             for elt in o.files.to_list():
+    #                 includes.append(elt.dirname)
+    #             args.add("-open", o.label.name)
+
+    if open_stdlib:
+        args.add("-open", "Stdlib")
 
     # for dep in ctx.attr.deps:
     #     if hasattr(ctx.attr, "stdlib_primitives"): # test rules
@@ -509,8 +520,8 @@ def module_impl(ctx, module_name):
                     args.add("-dcmm")
 
     merged_input_depsets = [merge_depsets(depsets, "sigs")]
+    merged_input_depsets.append(merge_depsets(depsets, "cli_link_deps"))
     if ext == ".cmx":
-        merged_input_depsets.append(merge_depsets(depsets, "cli_link_deps"))
         merged_input_depsets.append(archived_cmx_depset)
 
     # OCaml srcs use three namespaces:
@@ -520,6 +531,7 @@ def module_impl(ctx, module_name):
     #NB: this will (may?) put stdlib in search path, even if target
     # does not depend on stdlib. that's ok because target may depend
     # on primitives that are exported by //stdlib:Stdlib
+
     includes.extend(paths_depset.to_list())
 
     runtime_deps = []
@@ -569,6 +581,7 @@ def module_impl(ctx, module_name):
         args.add(sig_src)
         args.add(in_structfile) # structfile)
     else:
+        args.add("-I", in_structfile.dirname)
         args.add("-impl", in_structfile) # structfile)
         args.add("-o", out_cm_)
 

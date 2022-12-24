@@ -43,40 +43,18 @@ environment_group(
     ],
 )
 
-## FIXME: only build VM version. build should fail for ocamlopt.[byte|opt]
+# ../../boot/ocamlrun ../../ocamlc -nostdlib -I ../../stdlib -linkall -o expect_test ../../compilerlibs/ocamlcommon.cma ../../compilerlibs/ocamlbytecomp.cma ../../compilerlibs/ocamltoplevel.cma expect_test.cmo
+
 ocaml_tool_vm(
     name = "inline_expect",
-    vm_only = True,
     prologue = [
-        # "//stdlib",
-        # "//stdlib:CamlinternalMod", #FIXME: should not be necessary?
-        ## NB: makefiles don't need to list CamlinternalMod as a dep,
-        ## since they can get away with providing directories
-        ## containing deps. But with Bazel we have to list everything
-        ## explicitly. But still, why do we need to link it? Why can't
-        ## the compiler find it in the provided stdlib dir? The std
-        ## builds do; why not this one?
+        "//stdlib",
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         "//toplevel:ocamltoplevel"
     ],
     main = ":Expect_test",
-    opts = ["-linkall", "-verbose"],
-    cc_linkopts = select({
-        "@platforms//os:macos": [ ## FIXME: default tc, not zig
-            # "-Wl,-v", # prints config, search paths
-            # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
-            # "-t", # -Wl-v plus logs each file the linker loads.
-            # "-why_load" # Log why each object file in a static library
-            #             # is loaded. That is, what symbol was needed.
-            ## zig linker opts
-            # "-v",
-            ],
-        "@platforms//os:linux": [
-            # "-Wl,--verbose"
-            ##FIXME: depends on linker used (bfd, gold, etc.)
-        ]
-    }),
+    opts = ["-linkall"],
     visibility = [
         "//ocamltest:__pkg__",
         "//testsuite:__subpackages__"

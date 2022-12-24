@@ -72,8 +72,8 @@ inline_expect_test = rule(
 
         _stdlib = attr.label(
             doc = "Stdlib",
-            default = "//stdlib", # archive, not resolver
-            allow_single_file = True, # won't work with boot_library
+            # default = "//stdlib", # archive, not resolver
+            # allow_single_file = True, # won't work with boot_library
             # cfg = exe_deps_out_transition,
         ),
 

@@ -19,8 +19,100 @@ stdlib archive), we must explicitly pass `["-open", "Stdlib"].
 
 === -nopervasives
 
-This really has two meanings:
+NOTE: Sometimes `Stdlib` is used as a namespace resolver; sometimes it
+is used as a provider of primitives. In the latter case we use alias
+`//stdlib:Primitives` (or `//stdlib:Primitives_cmi`), just to be a
+little more explicity about the nature of Stdlib dependencies.
 
+The compilers in a release default to `-pervasives`; this means that
+the linker will load and open `stdlib.cmx?a`. This does more than just
+make the submodules of the Stdlib namespace accessible without the
+`Stdlib.` prefix; it also exposes a collection of language primitives,
+like integer operators ( `+`, `-`, etc.), comparison operators (`=`,
+`<>`), and many others.
+
+This is purely a convenience for users; it saves them the trouble of
+explicitly depending on and opening `Stdlib`. Since virtually all user
+code will depend on at least one primitive, or a Stdlib submodule, so
+loading `stdlib.cmx?a` and opening `Stdlib` makes sense.
+
+However, for compiler development this is ineffecient. It makes
+everything dependent on `stdlib.cmx?a`.
+
+Example: `stdlib/atomic.ml` does not depend on anything in stdlib so
+there is no reason to load `stdlib.cmx?a` nor to open `Stdlib`.
+
+Example: `//testsuite/tests/basic/array.ml`. The Bazel target to build
+ module `Array` from this file is `//testsuite/tests/basic:Arrays`;
+ building it with no dependencies produces the following error:
+
+----
+3 | let failed = ref false
+                 ^^^
+Error: Unbound value ref
+----
+
+This code uses `ref`, which is a primitive; that makes it dependent on
+ the `Stdlib` module (Bazel target `//stdlib:Stdlib`). Adding that as
+ a dependency results in the following error:
+
+----
+39 |   Gc.full_major();
+       ^^^^^^^^^^^^^
+Error: The module Gc is an alias for module Stdlib__Gc, which is missing
+----
+
+This tells us that the compiler was able to find symbol `Gc` in an
+aliasing equation of the form `module Gc = Stdlib__Gc`; this equation
+is found in the `Stdlib` module, which we just loaded and opened. Now
+we need to make submodule `Gc` available, so we list its Bazel target
+label as a dependency: `//stdlib:Stdlib.Gc`.
+
+With that the build succeeds.
+
+How it works: the Bazel rules (for building the OCamlcc compilers; not
+the general rules in `rules_ocaml`) always pass `-nopervasives`. In
+other words, they do _not_ assume that everything depends on a
+primitive or a `Stdlib` submodule. This forces the build code to be
+explicit about dependencies. A build target that depends on a
+primitive must list `//stdlib:Stdlib` as a dependency and put
+`["-open", "Stdlib"]` in the `opts` attribute. A target that depends
+on a `Stdlib` submodule must additionally list the submodule as a
+dependency.
+
+To make this less inconvenient the Bazel rules can make the following inferences:
+
+* if a `Stdlib` submodule is a dependency, either direct or indirect,
+  then `-open Stdlib` should be added to the command line (partially overriding
+  `-nopervasives`);
+* if an explicitly listed dependency (e.g. `//stdlib:Stdlib.Gc`)
+  depends on `//stdlib:Stdlib`, then it counts as an indirect
+  dependency, and will automatically be added to the target's list of
+  dependencies, so it need not be explicitly listed as a direct dependency.
+
+* most but not all submodules in `Stdlib` depend either directly or
+  indirectly on the `Stdlib` module, so listing a submodule as a
+  direct dependency will usually suffice to ensure that `Stdlib` is
+  loaded. Exceptions: `Atomic`.
+
+[WARNING]
+====
+`arrays.ml` also references Stdlib submodule `Array`, as you
+can discover by running
+----
+$ ocamldep -I stdlib testsuite/tests/basic/arrays.ml
+----
+We do not need to list it explicitly because it is in the dependency
+graph of module `Gc`, and the Bazel build rules automatically include
+transitive dependencies.
+====
+
+
+== obsolete notes:
+
+This really has several meanings:
+
+* the linker depends on stdlib.cmx?a by default; -nopervasives disables this
 * disable the default "-open Stdlib"
 * this module does not depend on any primitives
 
@@ -28,13 +120,13 @@ In other words, the Stdlib resolver serves a dual purpose. It acts as
 the resolver for the `Stdlib` namespace, but it also exports some
 primitives.
 
-Some modules do not depend on any "pervasives"; for example
+Some modules do not depend on any Sdtlib submodules; for example
 `stdlib/std_exit.mli`. But `stdlib/std_exit.ml` does depend on a
 primitive - `do_at_exit` - so we must list `//stdlib:Stdlib` as its
-dependency.
+dependency, and furthermore we must open it by passing `-open Stdlib`.
 
 Some modules may depend on a submodule in Stdlib, but not on any
-"pervasives". Listing `//stdlib:Stdlib` as a dependency would suffice
+primitives. Listing `//stdlib:Stdlib` as a dependency would suffice
 to make the compile work, but fails to indicate lack of a `pervasives`
 dependency. To make that more explicit case we can pass
 `-nopervasives` to indicate the latter, but to satisfy the former we
@@ -44,4 +136,4 @@ Examples are `//utils:Arg_helper_cmi` and `//utils:Binutils_cmi`.
 
 [Well, actually if we have something that depends on a Stdlib
 submodule and also needs `//stdlib:Stdlib` we can't tell whether it
-needs pervasives or not without inspecting it...]
+needs primitives or not without inspecting it...]

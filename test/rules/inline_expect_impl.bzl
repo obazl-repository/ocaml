@@ -42,7 +42,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
 
     manifest = []
 
-    aggregate_deps(ctx, ctx.attr._stdlib, depsets, manifest)
+    # aggregate_deps(ctx, ctx.attr._stdlib, depsets, manifest)
     # aggregate_deps(ctx, ctx.attr._std_exit, depsets, manifest)
 
     for dep in ctx.attr.deps:
@@ -207,7 +207,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
         + [depset(
             runtime_files
             # + [effective_compiler]
-            + [ctx.file._stdlib]
+            # + [ctx.file._stdlib]
             # ctx.files._camlheaders
             # + ctx.files._runtime
             # + ctx.files._stdlib
@@ -229,10 +229,10 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     )
     mnemonic = "OcamlInlineExpectTest"
 
-    args.append("-I")
-    args.append("stdlib/{}".format(workdir))
-    # last arg:
-    args.append(ctx.file.src.path + ";")
+    # args.append("-I")
+    # args.append("stdlib/{}".format(workdir))
+    # # last arg:
+    # args.append(ctx.file.src.path + ";")
 
     runner = ctx.actions.declare_file(workdir + ctx.file.src.basename + ".test_runner.sh")
 
@@ -278,7 +278,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     runfiles = []
     # runfiles.append(executable)
     runfiles.append(ctx.file.src)
-    runfiles.append(ctx.file._stdlib)
+    # runfiles.append(ctx.file._stdlib)
     for f in ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list():
         runfiles.append(f)
     # if ocamlrun:

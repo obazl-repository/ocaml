@@ -87,11 +87,9 @@ expect_test(
 test_module(
     name   = "Arrays",
     struct = "arrays.ml",
-    opts   = ["-nopervasives", "-open", "Stdlib"],
-    deps   = ["//stdlib:Stdlib", "//stdlib:primitives",] + select({
+    deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Gc"]
-        # "//conditions:default": ["//stdlib"]
     })
 )
 
@@ -680,7 +678,7 @@ expect_test(
 test_module(
     name   = "Trigraph",
     struct = "trigraph.ml",
-    open   = ["//stdlib:Stdlib"]
+    deps   = ["//stdlib:Stdlib"]
 )
 
 ############

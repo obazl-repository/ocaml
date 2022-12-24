@@ -226,7 +226,7 @@ def tc_workdir(ctx):
     if compiler.basename == "ocamlc.boot":
         return "_boot/"
     else:
-        return paths.basename(compiler.dirname) + ":" + compiler.basename.replace(".", "_") + "/"
+        return paths.basename(compiler.dirname) + "_" + compiler.basename.replace(".", "_") + "/"
 
     if ctx.file.compiler.path == "bin:ocamlc.byte":
         if protocol == "boot":

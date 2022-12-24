@@ -25,7 +25,7 @@
 bool debug;
 bool verbose;
 
-static cJSON item[1];
+/* static cJSON item[1]; */
 
 cJSON *read_json(char *json_file) {
     errno = 0;
@@ -54,7 +54,7 @@ cJSON *read_json(char *json_file) {
         return NULL;
     }
 #ifdef DEBUG
-    printf("readed: %d\n", filea_sz);
+    printf("readed: %llu\n", filea_sz);
 #endif
 
     cJSON *json = cJSON_Parse((char*)buffer);
@@ -79,13 +79,13 @@ cJSON *merge_json(char *filea, char *fileb, char *output)
 
     cJSON *jsona = read_json(filea);
     if (jsona == NULL) {
-        printf(RED, "failed to read jsona: %s\n", filea);
+        printf(RED "failed to read jsona: %s\n", filea);
         return NULL;
     }
     /* printf("readed jsona\n"); */
     cJSON *jsonb = read_json(fileb);
     if (jsonb == NULL) {
-        printf(RED, "failed to read jsonb: %s\n", fileb);
+        printf(RED "failed to read jsonb: %s\n", fileb);
         cJSON_Delete(jsona);
         return NULL;
     }
@@ -107,6 +107,9 @@ cJSON *merge_json(char *filea, char *fileb, char *output)
         printf("jsonb item: %s : %s\n", item->string, item_str);
 #endif
         cJSON_bool ok = cJSON_HasObjectItem(jsona, item->string);
+        if (!ok) {
+            ;                   /* FIXME: handle error */
+        }
 #ifdef DEBUG
         printf("in jsona? %d\n", ok);
 #endif
@@ -125,6 +128,9 @@ cJSON *merge_json(char *filea, char *fileb, char *output)
             /* adding item transfers ownership, which would crash delete */
             cJSON *new_item = cJSON_Duplicate(item, cJSON_False);
             cJSON_bool ok = cJSON_AddItemToObject(jsona, item->string, new_item);
+            if (!ok) {
+                /* FIXME: handle error */
+            }
         }
         free(item_str);
     }
@@ -160,7 +166,7 @@ void save_json(char *output, cJSON *map)
 {
     char * json_string = cJSON_Print(map);
 #ifdef DEBUG
-    printf(json_string);
+    printf("%s\n", json_string);
 #endif
     errno = 0;
     FILE *ostream;
@@ -170,7 +176,8 @@ void save_json(char *output, cJSON *map)
         free(json_string);
         return;
     }
-    fprintf(ostream, json_string);
+
+    fprintf(ostream, "%s", json_string);
     fclose(ostream);
     free(json_string);
 }

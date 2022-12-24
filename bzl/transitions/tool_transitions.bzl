@@ -33,10 +33,10 @@ def _build_tool_vm_in_transition_impl(settings, attr):
         # cvt_emit = "//asmcomp:cvt_emit"
         ## settings["//toolchain:cvt_emit"]
 
-    elif protocol == "dev":
+    elif protocol == "test":
         compiler = "@baseline//bin:ocamlc.opt"
-        # lexer    = "@baseline//bin:ocamllex.opt"
-        # cvt_emit = "@baseline//bin:cvt_emit.opt"
+        lexer    = "@baseline//bin:ocamllex.opt"
+        cvt_emit = "@baseline//bin:cvt_emit.byte"
         runtime  = "@baseline//lib:libasmrun.a"
     else:
         fail("Protocol not yet supported: %s" % protocol)
@@ -75,7 +75,7 @@ def _build_tool_sys_in_transition_impl(settings, attr):
     if settings["//config/build/protocol"] == "dev":
         compiler = "@baseline//bin:ocamlopt.opt"
         # lexer    = "@baseline//bin:ocamllex.opt"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
+        cvt_emit = "@baseline//bin:cvt_emit.byte"
         runtime  = "@baseline//lib:libasmrun.a"
     else:
         compiler = "//bin:ocamlopt.opt"

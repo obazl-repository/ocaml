@@ -326,13 +326,13 @@ def _ocaml_tool_vm_in_transition_impl(settings, attr):
     elif protocol == "dev":
         compiler = "@baseline//boot:ocamlc.opt"
         # lexer    = "@baseline//boot:ocamllex.opt"
-        cvt_emit = "@baseline//bin:cvt_emit.opt"
+        cvt_emit = "@baseline//bin:cvt_emit.byte"
         runtime  = "@baseline//lib:libasmrun.a"
     else:
         compiler = "//boot:ocamlc.byte"
         # lexer    = "//lex:ocamllex.byte"
         runtime  = "//runtime:asmrun"
-        cvt_emit = "//asmcomp:cvt_emit.opt"
+        cvt_emit = "//asmcomp:cvt_emit.byte"
 
     return {
         "//config/target/executor": config_executor,
@@ -383,7 +383,7 @@ def _ocaml_tool_sys_in_transition_impl(settings, attr):
     # elif protocol == "dev":
     #     compiler = "@baseline//boot:ocamlopt.opt"
     #     # lexer    = "@baseline//boot:ocamllex.opt"
-    #     cvt_emit = "@baseline//bin:cvt_emit.opt"
+    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
     #     runtime  = "@baseline//lib:libasmrun.a"
 
     else:

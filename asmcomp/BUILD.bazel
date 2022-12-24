@@ -797,6 +797,14 @@ build_tool_vm(
     # opts = [
     #     "-verbose"
     # ],
+    # prologue = [
+    #     "//stdlib:Stdlib",
+    #     "//stdlib:primitives",
+    #     "//stdlib:Stdlib.Lexing",
+    #     "//stdlib:Stdlib.Printf",
+    #     "//stdlib:Stdlib.Sys",
+    #     "//stdlib:Stdlib.Array",
+    # ],
     visibility = ["//boot:__pkg__", "//asmcomp:__subpackages__"]
 )
 

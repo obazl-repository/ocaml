@@ -8,7 +8,7 @@ load("//bzl:providers.bzl",
      "OcamlLibraryMarker")
 
 ####################
-def archive_attrs():
+def archive_attrs(): ##FIXME: rename library_attrs
 
     return dict(
 

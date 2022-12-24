@@ -154,6 +154,7 @@ compiler_module(
     struct = "arg_helper.ml",
     sig    = "Arg_helper_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -181,6 +182,7 @@ compiler_module(
     name   = "Binutils",
     struct = "binutils.ml",
     sig    = "Binutils_cmi",
+    open   = ["//stdlib:Stdlib"],
     opts = MODULE_OPTS,
     ## DEMO: we can depend on individual submodules instead of the entire lib
     deps   = [
@@ -224,6 +226,7 @@ compiler_module(
     struct = "build_path_prefix_map.ml",
     sig    = "Build_path_prefix_map_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -288,11 +291,11 @@ compiler_module(
     sig    = "Clflags_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Profile", ## (Utils Profile)
-        ":Numbers", ## (Utils Numbers)
-        ":Misc", ## (Utils Misc)
-        "//config:Config", ## (Utils Config)
-        ":Arg_helper", ## (Utils Arg_helper)
+        ":Profile",
+        ":Numbers",
+        ":Misc",
+        "//config:Config",
+        ":Arg_helper",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
@@ -438,6 +441,7 @@ compiler_module(
     struct = "consistbl.ml",
     sig    = "Consistbl_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Set",
@@ -475,6 +479,7 @@ compiler_module(
     sig    = "Diffing_cmi",
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Option",
@@ -504,6 +509,7 @@ compiler_module(
     struct = "diffing_with_keys.ml",
     sig    = "Diffing_with_keys_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Misc", ## (Utils Misc)
@@ -532,9 +538,8 @@ compiler_module(
     name   = "Domainstate",
     struct = "domainstate_ml",
     sig    = "Domainstate_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-    ],
+    opts   = MODULE_OPTS,
+    deps   = ["//stdlib:Stdlib"],
     visibility = ["//asmcomp:__subpackages__"]
 )
 
@@ -612,6 +617,7 @@ compiler_module(
     struct = "identifiable.ml",
     sig    = "Identifiable_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         ":Misc", ## (Utils Misc)
         "//stdlib:Stdlib.Set",
@@ -654,6 +660,7 @@ compiler_module(
     sig    = "Int_replace_polymorphic_compare_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//stdlib:Stdlib",
     ],
     visibility = [
         "//lambda:__pkg__",
@@ -675,6 +682,7 @@ compiler_module(
     struct = "lazy_backtrack.ml",
     sig    = "Lazy_backtrack_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.Either",
@@ -701,15 +709,16 @@ compiler_module(
     struct = "load_path.ml",
     sig    = "Load_path_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
-        ":Misc", ## (Utils Misc)
-        ":Local_store", ## (Utils Local_store)
-        "//config:Config", ## (Utils Config)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
+        "//config:Config",
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+        ":Local_store",
+        ":Misc",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -741,6 +750,7 @@ compiler_module(
     struct = "local_store.ml",
     sig    = "Local_store_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Fun",
@@ -837,6 +847,7 @@ compiler_module(
     struct = "numbers.ml",
     sig    = "Numbers_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         ":Misc",
         ":Identifiable",
@@ -975,6 +986,7 @@ compiler_module(
     struct = "terminfo.ml",
     sig    = "Terminfo_cmi",
     opts = MODULE_OPTS,
+    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Printf",
