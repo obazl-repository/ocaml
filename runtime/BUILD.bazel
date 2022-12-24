@@ -46,7 +46,7 @@ cc_library(
         "//runtime:bytecode_only_c_sources",
     ],
     deps = [
-        ":addrmap",
+        # ":addrmap",
         ":hdrs",
         "//runtime/caml:hdrs",
         "//runtime/caml:domain_state_h",
@@ -1023,50 +1023,50 @@ string_list_flag(name = "args", build_setting_default = [],
 
 
 ################################################################
-cc_library( ## TODO: make a macro
-    name = "addrmap",
-    linkstatic = True,
-    srcs = ["addrmap.c", "alloc.c"],
-    deps = [
-        "//runtime/caml:hdrs",
-        "//runtime/caml:domain_state_h",
-        "//runtime/caml:s_h",
-        ":primitives_h"
-    ],
-    copts = [
-        # "-x", "c",
-        "-Iruntime/caml",
-        "-I$(GENDIR)/runtime/caml",
-        "$(OC_CFLAGS)",
-        "$(OC_CPPFLAGS)",
-    ] + select({
-        "//platform/os:macos?": ["-std=c11"],
-        "//platform/os:linux?": [],
-        "//conditions:default":  [] #"-std=c11"]
-    }) + select({
-        "//config/mode:pedantic?": ["-pedantic"],
-        "//conditions:default":  []
-    }) + select({
-        ":fastbuild?": [
-            # Bazel adds -DDEBUG on macos; why?
-            "-UDEBUG"
-        ],
-        "//conditions:default":  []
-    }) + OPTIMIZATION_FLAGS
-    ,
-    linkopts = ["$(OC_LDFLAGS)"]
-    + select({
-        # "//runtime:msan?": ["-fsanitize=leak", "-fPIE", "-pie"],
-        "//conditions:default": []
-    }) + select({
-        # "//runtime:asan": ["-fsanitize=address"],
-        "//conditions:default": []
-    })
-    ,
-    defines = RUNTIME_DEFINES,
-    # defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
-    # defines = CC_DEFINES,
-    toolchains = ["//profile/system/local"],
-    visibility = ["//visibility:public"]
-)
+# cc_library( ## TODO: make a macro
+#     name = "addrmap",
+#     linkstatic = True,
+#     srcs = ["addrmap.c", "alloc.c"],
+#     deps = [
+#         "//runtime/caml:hdrs",
+#         "//runtime/caml:domain_state_h",
+#         "//runtime/caml:s_h",
+#         ":primitives_h"
+#     ],
+#     copts = [
+#         # "-x", "c",
+#         "-Iruntime/caml",
+#         "-I$(GENDIR)/runtime/caml",
+#         "$(OC_CFLAGS)",
+#         "$(OC_CPPFLAGS)",
+#     ] + select({
+#         "//platform/os:macos?": ["-std=c11"],
+#         "//platform/os:linux?": [],
+#         "//conditions:default":  [] #"-std=c11"]
+#     }) + select({
+#         "//config/mode:pedantic?": ["-pedantic"],
+#         "//conditions:default":  []
+#     }) + select({
+#         ":fastbuild?": [
+#             # Bazel adds -DDEBUG on macos; why?
+#             "-UDEBUG"
+#         ],
+#         "//conditions:default":  []
+#     }) + OPTIMIZATION_FLAGS
+#     ,
+#     linkopts = ["$(OC_LDFLAGS)"]
+#     + select({
+#         # "//runtime:msan?": ["-fsanitize=leak", "-fPIE", "-pie"],
+#         "//conditions:default": []
+#     }) + select({
+#         # "//runtime:asan": ["-fsanitize=address"],
+#         "//conditions:default": []
+#     })
+#     ,
+#     defines = RUNTIME_DEFINES,
+#     # defines = ["CAMLDLLIMPORT=", "IN_CAML_RUNTIME"] + CC_DEFINES,
+#     # defines = CC_DEFINES,
+#     toolchains = ["//profile/system/local"],
+#     visibility = ["//visibility:public"]
+# )
 

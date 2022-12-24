@@ -37,8 +37,8 @@ def signature_impl(ctx, module_name):
     args = ctx.actions.args()
 
     toolarg = tc.tool_arg
-    if ctx.label.name == "CamlinternalFormatBasics_cmi":
-        print("SIG tool_arg: %s" % toolarg)
+    # if ctx.label.name == "CamlinternalFormatBasics_cmi":
+    #     print("SIG tool_arg: %s" % toolarg)
     if toolarg:
         args.add(toolarg.path)
         toolarg_input = [toolarg]
@@ -269,14 +269,14 @@ def signature_impl(ctx, module_name):
         # + depsets.deps.sigs
         # + depsets.deps.archives
         # + ns_resolver_depset
-        + [tc.compiler[DefaultInfo].default_runfiles.files]
+        # + [tc.compiler[DefaultInfo].default_runfiles.files]
     )
 
     ##########################################
     sigexe = tc.executable
-    if ctx.label.name == "CamlinternalFormatBasics_cmi":
-        print("SIGtc.name: %s" % tc.name)
-        print("SIGexe: %s" % sigexe)
+    # if ctx.label.name == "CamlinternalFormatBasics_cmi":
+    #     print("SIGtc.name: %s" % tc.name)
+    #     print("SIGexe: %s" % sigexe)
     ################  ACTION  ################
     ctx.actions.run(
         executable = sigexe,

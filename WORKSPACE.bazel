@@ -9,7 +9,10 @@ obazl_deps()
 ## coldstart snapshot for development:
 local_repository(
     name = "baseline",
-    path = ".baseline"
+    path = ".baseline",
+    repo_mapping = {
+        "@baseline": "@ocamlcc"
+    }
 )
 
 ocaml_xcode()

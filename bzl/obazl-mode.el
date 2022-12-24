@@ -207,7 +207,7 @@
       (write-region
        (concat (format "## %s\n\n" this-dir)
                ;; FIXME: dsl parser must discover needed rules
-               "load(\"//bzl/rules/test:rules.bzl\", \"repl_test\")\n")
+               "load(\"//test:rules.bzl\", \"repl_test\")\n")
        nil bazel-file)
       (dolist (f files-list)
         (let ((relf (format "%s%s" this-dir f)))
@@ -243,7 +243,7 @@
 
     (goto-char (point-min))
     (erase-buffer)
-    (insert "load(\"//bzl/rules/test:rules.bzl\", \"repl_test\")\n")
+    (insert "load(\"//test:rules.bzl\", \"repl_test\")\n")
     (insert "\n")
 
     (insert "test_suite(\n")

@@ -1,4 +1,4 @@
-load("//bzl/rules/test:rules.bzl", "repl_test")
+load("//test:rules.bzl", "repl_test")
 
 test_suite(
     name  = "tests",

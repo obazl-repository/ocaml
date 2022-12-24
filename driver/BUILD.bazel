@@ -262,9 +262,11 @@ compiler_module(
         "//stdlib:Stdlib.Format",
     ],
     visibility = [
-        "//bin:__pkg__",
+        "@baseline//:__subpackages__",
+        "//bin:__subpackages__",
         "//boot:__subpackages__",
-        "//dev:__subpackages__"
+        "//dev:__subpackages__",
+        "//test:__pkg__",
     ]
 )
 
@@ -456,10 +458,12 @@ compiler_module(
         ":Optmaindriver",
     ],
     visibility = [
+        "@baseline//:__subpackages__",
+        "//:__pkg__",
+        "//bin:__subpackages__",
         "//boot:__subpackages__",
-        "//bin:__pkg__",
         "//dev:__subpackages__",
-        "//:__pkg__"
+        "//test:__pkg__",
     ]
 )
 

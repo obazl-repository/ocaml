@@ -66,6 +66,9 @@ def _ocaml_tc_compiler_out_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
+    if protocol == "preboot":
+        return {}
+
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
 
     if debug:
@@ -95,7 +98,8 @@ def _ocaml_tc_compiler_out_transition_impl(settings, attr):
         print("//toolchain:compiler:  %s" % settings["//toolchain:compiler"])
     if config_executor == "boot":
         print("ctxn BASE CASE")
-        compiler = "//boot:ocamlc.boot"
+        fail()
+        # compiler = "//boot:ocamlc.boot"
         # lexer    = "//boot:ocamllex.boot"
     elif (config_executor == "baseline"):
         print("ctxn BASELINE TRANSITION")
@@ -188,7 +192,8 @@ def prot_toplevel(config_executor, config_emitter):
         if config_emitter in ["boot", "vm"]:
             # config_emitter = "vm"
             # use boot ocamlc to build vm>vm
-            compiler = "//boot:ocamlc.boot"
+            # compiler = "//boot:ocamlc.boot"
+            fail()
             runtime  = "//runtime:camlrun"
         elif config_emitter == "sys":
             # use vm>vm to build vm>sys
@@ -230,7 +235,8 @@ def prot_boot(config_executor, config_emitter):
         if config_emitter in ["boot", "vm"]:
             # config_emitter = "vm"
             # use boot ocamlc to build vm>vm
-            compiler = "//boot:ocamlc.boot"
+            # compiler = "//boot:ocamlc.boot"
+            fail()
             runtime  = "//runtime:camlrun"
         elif config_emitter == "sys":
             # use vm>vm to build vm>sys
@@ -256,6 +262,10 @@ def _ocaml_in_transition_impl(settings, attr):
     debug = True
 
     protocol        = settings["//config/build/protocol"]
+
+    if protocol == "preboot":
+        return {}
+
     config_executor = settings["//config/target/executor"]
     config_emitter  = settings["//config/target/emitter"]
     compiler        = settings["//toolchain:compiler"]
@@ -300,6 +310,9 @@ def _ocaml_tool_vm_in_transition_impl(settings, attr):
     if debug: print("ocaml_tool_vm_in_transition")
 
     protocol = settings["//config/build/protocol"]
+
+    if protocol == "preboot":
+        return {}
 
     config_executor = "vm"
     config_emitter  = "vm"
@@ -411,18 +424,25 @@ def _boot_ocamlc_byte_in_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
+    if protocol == "preboot":
+        return {}
+
     config_executor = "vm"
     config_emitter  = "vm"
+
+    compiler = None
 
     if protocol == "boot":
         config_executor = "boot"
         config_emitter  = "boot"
-        compiler = "//boot:ocamlc.boot"
+        # compiler = "//boot:ocamlc.boot"
+        fail()
         runtime  = "//runtime:camlrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
     elif protocol == "baseline":
-        compiler = "//boot:ocamlc.boot"
+        # compiler = "//boot:ocamlc.boot"
+        fail()
         runtime  = "//runtime:camlrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
@@ -433,7 +453,7 @@ def _boot_ocamlc_byte_in_transition_impl(settings, attr):
         print("setting //config/build/protocol:  %s" % protocol)
         print("setting //config/target/executor: %s" % config_executor)
         print("setting //config/target/emitter:  %s" % config_emitter)
-        print("setting //toolchain:compiler:     %s" % compiler)
+        # print("setting //toolchain:compiler:     %s" % compiler)
         print("setting//toolchain:runtime:       %s" % runtime)
         # print("setting//toolchain:cvt_emit:      %s" % cvt_emit)
 
@@ -475,13 +495,19 @@ def _boot_ocamlopt_byte_in_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
+    if protocol == "preboot":
+        return {}
+
     config_executor = "vm"
     config_emitter  = "sys"
+
+    compiler = None
 
     if protocol == "boot":
         config_executor = "boot"
         config_emitter  = "boot"
-        compiler = "//boot:ocamlc.boot"
+        # compiler = "//boot:ocamlc.boot"
+        fail()
         runtime  = "//runtime:camlrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
         # config_executor = "vm"
@@ -493,7 +519,8 @@ def _boot_ocamlopt_byte_in_transition_impl(settings, attr):
     elif protocol == "baseline":
         config_executor = "vm"
         config_emitter  = "sys"
-        compiler = "//boot:ocamlc.boot"
+        # compiler = "//boot:ocamlc.boot"
+        fail()
         runtime  = "//runtime:asmrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 

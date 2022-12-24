@@ -106,7 +106,7 @@ def progress_msg(workdir, ctx):
         action = "Compiling"
     elif rule in ["compiler_signature", "stdlib_signature", "stdlib_internal_signature", "kernel_signature", "test_signature", "tool_signature", "ns_signature"]:
         action = "Compiling"
-    elif rule in ["boot_archive", "test_archive"]:
+    elif rule in ["boot_archive", "test_archive", "stdlib_archive"]:
         action = "Archiving"
     elif rule in ["ocaml_test", "expect_test", "lambda_expect_test",
                   "compile_fail_test"]:
@@ -123,13 +123,10 @@ def progress_msg(workdir, ctx):
     if protocol == "boot":
         lbrack = "<"
         rbrack = ">"
-    elif protocol == "test":
+    elif protocol == "baseline":
         lbrack = "["
         rbrack = "]"
-    elif protocol == "dev":
-        lbrack = "[["
-        rbrack = "]]"
-    elif protocol == "unspecified":
+    elif protocol == "test":
         lbrack = "{"
         rbrack = "}"
     else:

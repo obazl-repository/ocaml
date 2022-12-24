@@ -5,24 +5,34 @@ def _build_tool_vm_in_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
+    if protocol == "preboot":
+        return {}
+
     if debug: print("build_tool_vm_in_transition")
 
     config_executor = "vm"
     config_emitter  = "vm"
 
-    if protocol == "unspecified":
-        # protocol = "boot"
-        config_executor = "boot"
-        config_emitter  = "boot"
-        compiler = "//boot:ocamlc.boot"
-        runtime  = "//runtime:camlrun"
-        # cvt_emit = settings["//toolchain:cvt_emit"]
+    # if protocol == "unspecified":
+    #     # protocol = "boot"
+    #     config_executor = "boot"
+    #     config_emitter  = "boot"
+    #     compiler = "//boot:ocamlc.boot"
+    #     runtime  = "//runtime:camlrun"
+    #     # cvt_emit = settings["//toolchain:cvt_emit"]
 
-    elif protocol == "boot":
+    if protocol == "boot":
         compiler = "//boot:ocamlc.boot"
         runtime  = "//runtime:camlrun"
         # cvt_emit = "//asmcomp:cvt_emit"
         ## settings["//toolchain:cvt_emit"]
+
+    elif protocol == "baseline":
+        compiler = "//boot:ocamlc.byte"
+        runtime  = "//runtime:camlrun"
+        # cvt_emit = "//asmcomp:cvt_emit"
+        ## settings["//toolchain:cvt_emit"]
+
     elif protocol == "dev":
         compiler = "@baseline//bin:ocamlc.opt"
         # lexer    = "@baseline//bin:ocamllex.opt"

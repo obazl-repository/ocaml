@@ -195,18 +195,22 @@ def ocaml_compilers(name,
 
     ocamlc_byte(
         name = "ocamlc.byte",
-        stdlib   = "//stdlib",
+        # stdlib   = "@//stdlib",
         prologue = [
-            "//compilerlibs:ocamlcommon",
-            "//bytecomp:ocamlbytecomp"
+            # "//stdlib:primitives",
+            # "//stdlib:Stdlib",
+            # "//stdlib:Stdlib.Arg",
+            "//stdlib",
+            "@//compilerlibs:ocamlcommon",
+            "@//bytecomp:ocamlbytecomp"
         ],
-        main = "//driver:Main",
+        main = "@//driver:Main",
         opts = [ ] + select({
             # ocamlc.byte: ["-compat-32"]
         "//conditions:default": []
         }) + [
         ] + select({
-            "//platform/target/os:linux?": [
+            "@//platform/target/os:linux?": [
                 "-cclib", "-lm",
                 "-cclib", "-ldl",
                 "-cclib", "-lpthread",
@@ -241,7 +245,7 @@ def ocaml_compilers(name,
 
     ocamlopt_opt(
         name = "ocamlopt.opt",
-        stdlib   = "//stdlib",
+        # stdlib   = "//stdlib",
         prologue = [
             "//compilerlibs:ocamlcommon",
             "//asmcomp:ocamloptcomp"
@@ -260,7 +264,7 @@ def ocaml_compilers(name,
 
     ocamlc_opt(
         name = "ocamlc.opt",
-        stdlib   = "//stdlib",
+        # stdlib   = "//stdlib",
         prologue = [
             "//compilerlibs:ocamlcommon",
             "//bytecomp:ocamlbytecomp"

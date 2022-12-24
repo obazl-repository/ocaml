@@ -1,8 +1,10 @@
 #!/bin/bash
 
-# echo "HELLO"
-
-# echo "args: $@"
+echo "ARGS: $@"
+for arg in "$@"
+do
+    echo "ARG: $arg"
+done
 
 # --- begin runfiles.bash initialization v2 ---
 # Copy-pasted from the Bazel Bash runfiles library v2.
@@ -18,6 +20,8 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
 
 echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
 echo "`cat ${RUNFILES_MANIFEST_FILE}`"
+
+exit 0
 
 # echo "camlheader: $(rlocation ocamlcc/config/camlheaders/camlheader)"
 
@@ -43,60 +47,57 @@ echo "Installing WORKSPACE and BUILD files"
 # echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/bin/BUILD.bazel
 # echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/lib/BUILD.bazel
 
-# echo "Getting executor and emitter"
-
-# EXECUTOR=`cat $(rlocation ocamlcc/boot/executor)`
-# EMITTER=`cat $(rlocation ocamlcc/boot/emitter)`
-
-# echo "Executor: ${EXECUTOR}"
-# echo "Emitter: ${EMITTER}"
-
 echo "Installing programs"
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+cp -vf $(rlocation $2) $BOOTDIR/bin/
+cp -vf $(rlocation $3) $BOOTDIR/bin/
 
-cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
-STDLIBDIR=`dirname $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte)`
+echo "Installing stdib"
+
+# cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
+# STDLIBDIR=`dirname $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte)`
+# STDLIBDIR="`dirname $STDLIBDIR`"
+# STDLIBDIR="`dirname $STDLIBDIR`"
+
+# cp -vf $STDLIBDIR/stdlib/_ocamlc.byte/* $BOOTDIR/lib
+# cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) $BOOTDIR/bin/
+# cp -vf $(rlocation ocamlcc/boot/_ocamlopt.byte/ocamlopt.byte) $BOOTDIR/bin/
+# # ocamlcc/boot/_ocamlopt.byte/ocamlopt.byte
+# cp -vf $(rlocation ocamlcc/boot/_ocamlopt.opt/ocamlopt.opt) $BOOTDIR/bin/
+
+STDLIBDIR=`dirname $(rlocation $4)`
 STDLIBDIR="`dirname $STDLIBDIR`"
 STDLIBDIR="`dirname $STDLIBDIR`"
 
-cp -vf $STDLIBDIR/stdlib/_ocamlc.byte/* $BOOTDIR/lib
+# cp -vf $STDLIBDIR/stdlib/_ocamlopt.opt/* $BOOTDIR/lib
 
-cp -vf $(rlocation ocamlcc/bin/_ocamlc.opt/ocamlc.opt) $BOOTDIR/bin/
-cp -vf $(rlocation ocamlcc/boot/_ocamlopt.byte/ocamlopt.byte) $BOOTDIR/bin/
-# ocamlcc/boot/_ocamlopt.byte/ocamlopt.byte
-cp -vf $(rlocation ocamlcc/boot/_ocamlopt.opt/ocamlopt.opt) $BOOTDIR/bin/
+# cp -vf $(rlocation ocamlcc/lex/_ocamlopt.opt/ocamllex.opt) $BOOTDIR/bin/
+# ## ocamlcc/lex/_ocamlopt.opt/ocamllex.opt
+# cp -vf $(rlocation ocamlcc/lex/_vm/ocamllex.byte) $BOOTDIR/bin/
 
-STDLIBDIR=`dirname $(rlocation ocamlcc/boot/_ocamlopt.opt/ocamlopt.opt)`
-STDLIBDIR="`dirname $STDLIBDIR`"
-STDLIBDIR="`dirname $STDLIBDIR`"
+# cp -vf $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
 
-cp -vf $STDLIBDIR/stdlib/_ocamlopt.opt/* $BOOTDIR/lib
+# cp -vf $(rlocation ocamlcc/asmcomp/_ocamlc.byte/cvt_emit.byte) $BOOTDIR/bin
+# cp -vf $(rlocation ocamlcc/asmcomp/_ocamlopt.opt/cvt_emit.opt) $BOOTDIR/bin
 
-cp -vf $(rlocation ocamlcc/lex/_ocamlopt.opt/ocamllex.opt) $BOOTDIR/bin/
-## ocamlcc/lex/_ocamlopt.opt/ocamllex.opt
-cp -vf $(rlocation ocamlcc/lex/_vm/ocamllex.byte) $BOOTDIR/bin/
+# echo "Installing libs"
 
-cp -vf $(rlocation ocamlcc/yacc/ocamlyacc) $BOOTDIR/bin
+# cp -vf $(rlocation ocamlcc/runtime/libasmrun.a) $BOOTDIR/lib
+# cp -vf $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
+# cp -vf $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
 
-cp -vf $(rlocation ocamlcc/asmcomp/_ocamlc.byte/cvt_emit.byte) $BOOTDIR/bin
-cp -vf $(rlocation ocamlcc/asmcomp/_ocamlopt.opt/cvt_emit.opt) $BOOTDIR/bin
-
-echo "Installing libs"
-
-cp -vf $(rlocation ocamlcc/runtime/libasmrun.a) $BOOTDIR/lib
-cp -vf $(rlocation ocamlcc/runtime/libcamlrun.a) $BOOTDIR/lib
-cp -vf $(rlocation ocamlcc/runtime/ocamlrun) $BOOTDIR/bin
-
-cp -vf $(rlocation ocamlcc/vendor/mustach/mustach) $BOOTDIR/bin
+# cp -vf $(rlocation ocamlcc/vendor/mustach/mustach) $BOOTDIR/bin
 
 echo "Setting permissions"
 
 # chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
 # chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
-chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/ocamlrun
-chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/mustach
-chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*.opt
-chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
-chmod -vf ugo=+r-xw $BOOTDIR/lib/*.a
+
+# chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/ocamlrun
+# chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/mustach
+# chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*.opt
+# chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
+# chmod -vf ugo=+r-xw $BOOTDIR/lib/*.a
 
 echo "Coldstart completed."
 

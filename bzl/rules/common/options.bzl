@@ -228,10 +228,10 @@ def get_options(rule, ctx):
         else:
             options.append(opt)
 
-    if hasattr(ctx.attr, "stdlib_primitives"):
-        if ctx.attr.stdlib_primitives:
-            if "-nopervasives" in options:
-                options.remove("-nopervasives")
+    # if hasattr(ctx.attr, "stdlib_primitives"):
+    #     if ctx.attr.stdlib_primitives:
+    #         if "-nopervasives" in options:
+    #             options.remove("-nopervasives")
 
     return options, cancel_opts
 

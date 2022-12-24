@@ -140,7 +140,7 @@ def _boot_import_vm_executable(ctx):
                         target_file = ctx.file.tool)
 
     runfiles = ctx.runfiles(
-        files = [ctx.file._ocamlrun]
+        files = [ctx.file._stdlib]
     )
 
     defaultInfo = DefaultInfo(
@@ -157,17 +157,29 @@ boot_import_vm_executable = rule(
 
     attrs = dict(
         tool = attr.label(
+            mandatory = True,
             allow_single_file = True,
         ),
-        _ocamlrun = attr.label(
-            allow_single_file = True,
-            default = "//runtime:ocamlrun",
-            executable = True,
-            # cfg = "exec"
-            cfg = reset_cc_config_transition
+        # stdlib is a runtime dep of the linker, so we need to build
+        # it and add it runfiles.
+        _stdlib = attr.label(
+            doc = "Stdlib archive", ## (not stdlib.cmx?a")
+            default = "//stdlib", # archive, not resolver
+            allow_single_file = True, # won't work with boot_library
+            executable = False,
+            cfg = "exec"
+            # cfg = exe_deps_out_transition,
         ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+
+        # _ocamlrun = attr.label(
+        #     allow_single_file = True,
+        #     default = "//runtime:ocamlrun",
+        #     executable = True,
+        #     # cfg = "exec"
+        #     cfg = reset_cc_config_transition
+        # ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     ),
     # executable = True,
     # cfg = exec

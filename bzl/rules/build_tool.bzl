@@ -8,7 +8,8 @@ load("//bzl/actions:executable_impl.bzl", "executable_impl")
 
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-load("//bzl/transitions:boot_transitions.bzl", "tc_boot_in_transition")
+# load("//bzl/transitions:boot_transitions.bzl", "tc_boot_in_transition")
+
 load("//bzl/transitions:tool_transitions.bzl",
      "build_tool_vm_in_transition",
      "build_tool_sys_in_transition")

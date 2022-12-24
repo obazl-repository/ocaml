@@ -98,8 +98,8 @@ ocaml_tc_adapter = rule(
             allow_single_file = True,
             default = "//toolchain:ocamlrun",
             executable = True,
-            # cfg = "exec"
-            cfg = reset_cc_config_transition
+            cfg = "exec"
+            # cfg = reset_cc_config_transition
         ),
 
         ## Virtual Machine
@@ -108,8 +108,8 @@ ocaml_tc_adapter = rule(
             default = "//toolchain:runtime",
             allow_single_file = True,
             executable = False,
-            # cfg = "exec"
-            cfg = reset_cc_config_transition
+            cfg = "exec"
+            # cfg = reset_cc_config_transition
             # cfg = tc_runtime_out_transition
         ),
 

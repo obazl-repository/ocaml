@@ -1,4 +1,4 @@
-load("//bzl/rules/test:rules.bzl",
+load("//test:rules.bzl",
      "test_archive",
      "test_executable",
      "test_library",
@@ -58,6 +58,28 @@ expect_test(
     name    = "arrays_test",
     stdout  = "arrays.stdout",
     expect  = "arrays.reference",
+    prologue = [
+        ## FIXME: these are all deps of :Arrays;
+        ## they should be added automatically.
+        "//stdlib:primitives",
+        "//stdlib:Stdlib",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Atomic",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Sys",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Seq",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Uchar",
+    ],
     main    = ":Arrays",
     timeout = "short",
 )
@@ -65,9 +87,11 @@ expect_test(
 test_module(
     name   = "Arrays",
     struct = "arrays.ml",
-    deps   = select({
+    opts   = ["-nopervasives", "-open", "Stdlib"],
+    deps   = ["//stdlib:Stdlib", "//stdlib:primitives",] + select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Gc"]
+        # "//conditions:default": ["//stdlib"]
     })
 )
 
@@ -215,6 +239,7 @@ expect_test(
 test_module(
     name   = "Eval_order_2",
     struct = "eval_order_2.ml",
+    deps   = ["//stdlib:Stdlib"]
 )
 
 ############
@@ -305,6 +330,7 @@ expect_test(
 test_module(
     name   = "Float",
     struct = "float.ml",
+    # deps   = ["//stdlib:Stdlib"]
     deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Printf"]

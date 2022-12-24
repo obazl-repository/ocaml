@@ -26,9 +26,9 @@ def link_config(ctx, tc, feature_config):
         action_name = ACTION_NAMES.cpp_link_executable,
         variables = c_link_variables,
     )
-    print("link env: %s"% link_env)
+    # print("link env: %s"% link_env)
     config_map |= link_env
-    print("config_map: %s" % config_map)
+    # print("config_map: %s" % config_map)
 
     return config_map
 

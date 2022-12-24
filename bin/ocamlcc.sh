@@ -8,9 +8,20 @@ exe() { echo "\$ ${@/eval/}" ; "$@" ; }
 # echo "VERBOSE: $VERBOSE"
 # echo "args: $@"
 
-COMPILER=$1
+OCAMLRUN=$1
 shift
-# echo "COMPILER: $COMPILER"
+COMPILER_PATH=$1
+shift
+STDLIB_RLOC=$1
+shift
+
+COMPILER=$(basename $COMPILER_PATH)
+
+# ROOTPATH=$1
+# shift
+
+# echo "COMPILER_PATH: $COMPILER_PATH"
+# echo "ROOTPATH: $ROOTPATH"
 
 # --- begin runfiles.bash initialization v2 ---
 # Copy-pasted from the Bazel Bash runfiles library v2.
@@ -25,43 +36,48 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
 # --- end runfiles.bash initialization v2 ---
 
 # echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
-# echo "`cat ${RUNFILES_MANIFEST_FILE}`"
+echo "`cat ${RUNFILES_MANIFEST_FILE}`"
 
-OCAMLRUN=""
+# OCAMLRUN=""
 RUNTIMEDIR=""
 CAMLHEADERS=""
 
+WD=_boot
+
+echo "STDLIB_RLOC: $STDLIB_RLOC"
+STDLIBDIR=$(dirname $(rlocation $STDLIB_RLOC))
+
 if [ $COMPILER = "ocamlc.byte" ]
 then
-    OCAMLRUN=runtime/ocamlrun
-    COMPILER=bin/_boot/ocamlc.byte
+    # OCAMLRUN=runtime/ocamlrun
+    # COMPILER=$BINDIR/ocamlc.byte
     CAMLHEADERS="-I `dirname $(rlocation ocamlcc/config/camlheaders/camlheader)`"
-    STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/_boot/stdlib.cma)`
+    # STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/${WD}/stdlib.cma)`
 
 elif [ $COMPILER = "ocamlopt.byte" ]
 then
-    OCAMLRUN=runtime/ocamlrun
-    COMPILER=bin/_boot/ocamlopt.byte
-    RUNTIMEDIR=`dirname $(rlocation ocamlcc/runtime/libasmrun.a)`
-    STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/_boot/stdlib.cmxa)`
+    # OCAMLRUN=runtime/ocamlrun
+    # COMPILER=bin/_boot/ocamlopt.byte
+    RUNTIMEDIR=$(dirname $(rlocation ocamlcc/runtime/libasmrun.a))
+    # STDLIBDIR=$(dirname $(rlocation ocamlcc/stdlib/${WD}/stdlib.cmxa))
 
 elif [ $COMPILER = "ocamlopt.opt" ]
 then
     COMPILER=bin/_boot/ocamlopt.opt
     RUNTIMEDIR=`dirname $(rlocation ocamlcc/runtime/libasmrun.a)`
-    STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/_boot/stdlib.cmxa)`
+    # STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/${WD}/stdlib.cmxa)`
 
 elif [ $COMPILER = "ocamlc.opt" ]
 then
     COMPILER=bin/_boot/ocamlc.opt
     RUNTIMEDIR=`dirname $(rlocation ocamlcc/runtime/libcamlrun.a)`
     CAMLHEADERS="-I `dirname $(rlocation ocamlcc/config/camlheaders/camlheader)`"
-    STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/_boot/stdlib.cma)`
+    # STDLIBDIR=`dirname $(rlocation ocamlcc/stdlib/${WD}/stdlib.cma)`
 else
     echo "BAD COMPILER ARG: $COMPILER"
 fi
 
-CMD="$OCAMLRUN $COMPILER -nostdlib -I $STDLIBDIR $CAMLHEADERS -I $RUNTIMEDIR $@"
+CMD="$OCAMLRUN $COMPILER_PATH -nostdlib -I $STDLIBDIR $CAMLHEADERS -I $RUNTIMEDIR $@"
 
 if [ $VERBOSE = "true" ]
 then

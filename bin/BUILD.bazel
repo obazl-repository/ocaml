@@ -7,6 +7,8 @@ load("//bzl:rules.bzl",
 load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag", "string_setting")
 
+exports_files(["ocamlcc.sh"])
+
 bool_flag(name = "verbose", build_setting_default = False,
           visibility = ["//visibility:public"])
 config_setting(name = "verbose?", flag_values = {":verbose": "True"})
@@ -17,7 +19,7 @@ config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 
 ocaml_compilers(
     name = "ocamlcc",
-    visibility             = ["//visibility:public"]
+    visibility = ["//visibility:public"]
 )
 
 ## to run the compilers directly from the cmd line:
@@ -32,10 +34,12 @@ sh_binary(
         ":verbose?": {"VERBOSE": "true"},
         "//conditions:default": {"VERBOSE": "false"}
     }),
-    args = ["ocamlc.byte"],
+    args = ["$(rootpath //runtime:ocamlrun)",
+            "$(rootpath :ocamlc.byte)",
+            "$(rlocationpath //stdlib:stdlib)"],
     data = [
-        ":ocamlc.byte",
         "//runtime:ocamlrun",
+        ":ocamlc.byte",
         "//stdlib",
         "//stdlib:Std_exit",
         "//config/camlheaders",
@@ -53,8 +57,11 @@ sh_binary(
         ":verbose?": {"VERBOSE": "true"},
         "//conditions:default": {"VERBOSE": "false"}
     }),
-    args = ["ocamlopt.byte"],
+    args = ["$(rootpath //runtime:ocamlrun)",
+            "$(rootpath :ocamlopt.byte)",
+            "$(rlocationpath //stdlib:stdlib.cmxa)",],
     data = [
+        "//runtime:ocamlrun",
         ":ocamlopt.byte",
         "//runtime:asmrun",
         "//stdlib:stdlib.cmxa",
@@ -116,7 +123,7 @@ sh_binary(
 ## duplicated builds of some of the code.
 ocaml_compiler_r(
     name = "ocamlcc_r",
-    stdlib   = "//stdlib",
+    # stdlib   = "//stdlib",
     prologue = ["//compilerlibs:ocamlcommon",
                 ] + select({
         # "//config/target:baseline_vm?": ["//bytecomp:ocamlbytecomp"],

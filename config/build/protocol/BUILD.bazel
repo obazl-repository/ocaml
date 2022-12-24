@@ -5,15 +5,23 @@ load("@bazel_skylib//rules:common_settings.bzl",
      "string_flag", "string_setting"
 )
 
-string_setting(
+# string_setting(
+string_flag( # for testing
     name = "protocol",
     build_setting_default = "boot",
-    values = ["boot", "dev", "test", "release", "unspecified", "null"],
+    values = ["preboot", "boot", "baseline",
+              "dev", "test", "release", "unspecified", "null"],
     visibility = ["//visibility:public"]
 )
 
+config_setting(name = "preboot?",
+               flag_values = {":protocol": "preboot"})
+
 config_setting(name = "boot?",
-               flag_values = {":protocol": "build"})
+               flag_values = {":protocol": "boot"})
+
+config_setting(name = "baseline?",
+               flag_values = {":protocol": "baseline"})
 
 config_setting(name = "dev?",
                flag_values = {":protocol": "dev"})

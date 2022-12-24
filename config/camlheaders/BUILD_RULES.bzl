@@ -15,8 +15,14 @@ def _camlheaders_impl(ctx):
     ctx.actions.write(
         output = f,
         content = "#!{f}\n".format(
-            ## FIXME: should we get ocamlrun from tc.compiler runfiles?
-            f = tc.ocamlrun.path
+
+            ## FIXME: what depends on this? just the exec rules? if we
+            ## depend on ocamlrun then they will be rebuilt whenever
+            ## it changes.
+
+            # f = tc.ocamlrun.path
+
+            f = "/dev/null"
         )
     )
     fur = ctx.actions.declare_file("camlheader_ur")

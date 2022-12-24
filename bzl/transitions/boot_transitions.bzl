@@ -24,7 +24,8 @@ def tc_boot_in_transition_impl(settings, attr, debug):
         executor = settings["//config/target/executor"]
         emitter  = settings["//config/target/emitter"]
     else:
-        compiler = "//boot:ocamlc.boot"
+        # compiler = "//boot:ocamlc.boot"
+        fail()
         # lexer    = "//boot:ocamllex.boot"
         runtime  = "//runtime:asmrun"
 

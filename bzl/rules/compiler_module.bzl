@@ -18,11 +18,10 @@ compiler_module = rule(
     doc = "Compiles a module with the bootstrap compiler.",
     attrs = dict(
         module_attrs(),
-        _stdlib_resolver = attr.label(
-            doc = "The commpiler always opens Stdlib, so everything depends on it.",
-
-            default = "//stdlib:Stdlib"
-        ),
+        # stdlib only a runtime linker dep
+        # _stdlib_resolver = attr.label(
+        #     default = "//stdlib:Stdlib"
+        # ),
         _rule = attr.string( default = "compiler_module" ),
     ),
     # cfg = compile_mode_in_transition,

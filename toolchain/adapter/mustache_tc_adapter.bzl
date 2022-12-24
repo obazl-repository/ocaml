@@ -61,8 +61,8 @@ mustache_toolchain_adapter = rule(
             default = "//toolchain:mustach",
             allow_single_file = True,
             executable = True,
-            # cfg = "exec",
-            cfg = reset_mustach_cc_config_transition,
+            cfg = "exec",
+            # cfg = reset_mustach_cc_config_transition,
             # cfg = tc_mustache_out_transition
         ),
 

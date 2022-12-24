@@ -402,13 +402,13 @@ def module_impl(ctx, module_name):
     #     if ctx.attr.ns:
     #         includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
 
-    stdlib_depset =[]
-    if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-        if ctx.attr.stdlib_primitives:
-            if hasattr(ctx.attr, "_stdlib"):
-                print("stdlib: %s" % ctx.attr._stdlib[ModuleInfo].files)
-                includes.append(ctx.file._stdlib.dirname)
-                stdlib_depset.append(ctx.attr._stdlib[ModuleInfo].files)
+    # stdlib_depset =[]
+    # if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+    #     if ctx.attr.stdlib_primitives:
+    #         if hasattr(ctx.attr, "_stdlib"):
+    #             print("stdlib: %s" % ctx.attr._stdlib[ModuleInfo].files)
+    #             includes.append(ctx.file._stdlib.dirname)
+    #             stdlib_depset.append(ctx.attr._stdlib[ModuleInfo].files)
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -437,11 +437,11 @@ def module_impl(ctx, module_name):
                       w if w.startswith("-")
                       else "-" + w])
 
-    for dep in ctx.attr.deps:
-        if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-            if dep.label.package == "stdlib":
-                if "-nopervasives" in _options:
-                    _options.remove("-nopervasives")
+    # for dep in ctx.attr.deps:
+    #     if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+    #         if dep.label.package == "stdlib":
+    #             if "-nopervasives" in _options:
+    #                 _options.remove("-nopervasives")
 
     args.add_all(_options)
 
@@ -523,8 +523,8 @@ def module_impl(ctx, module_name):
         ,
         transitive = []
         + merged_input_depsets
-        + [tc.compiler[DefaultInfo].default_runfiles.files]
-        + stdlib_depset
+        # + [tc.compiler[DefaultInfo].default_runfiles.files]
+        # + stdlib_depset
         # + ns_deps
         # + bottomup_ns_inputs
         ## depend on cc tc - makes bazel stuff accessible to ocaml's

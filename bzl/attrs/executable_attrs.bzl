@@ -13,8 +13,13 @@ def executable_attrs():
 
     attrs = dict(
 
-        # _stage = attr.label(
-        #     default = "//config/stage"
+        # ocamlrun = attr.label(
+        #     doc = "ocaml",
+        #     allow_single_file = True,
+        #     default = "//toolchain:ocamlrun",
+        #     executable = True,
+        #     # cfg = "exec"
+        #     cfg = reset_cc_config_transition
         # ),
 
         prologue = attr.label_list(
@@ -70,7 +75,21 @@ def executable_attrs():
         ## _runtime attr goes in each rule - boot_compiler etc. need
         ## it, but build_tool does not.
 
-        # std_exit is required to get a runnable executable
+        ## stdlib is a _runtime_ dep of the linker;
+        ## the linker is hardcoded to look for stdlib.cmx?a
+        ## (UNLESS -nopervasives?)
+
+        ## which means it is a runtime dep of the linker we're using
+        ## to build this target, which we get from the toolchain. So
+        ## it is _not_ a dependency of this target.
+        stdlib = attr.label(
+            doc = "Stdlib archive", ## (not stdlib.cmx?a")
+            # default = "//stdlib:primitives", # archive, not resolver
+            # allow_single_file = True, # won't work with boot_library
+            # cfg = exe_deps_out_transition,
+        ),
+
+        # ditto for std_exit - it's a runtime dep of the linker.
         # linker is hardcoded to look for std_exit.cmx?a
         std_exit = attr.label(
             doc = "Module linked last in every executable.",
@@ -79,18 +98,7 @@ def executable_attrs():
             # cfg = exe_deps_out_transition,
         ),
 
-        ## stdlib is NOT required to get a runnable,
-        ## but since it is so commonly used the compiler
-        ## opens it by default.
-        ## linker is hardcoded to look for stdlib.cmx?a
-        ## UNLESS -nopervasives?
-        stdlib = attr.label(
-            doc = "Stdlib archive", ## (not stdlib.cmx?a")
-            default = "//stdlib", # archive, not resolver
-            allow_single_file = True, # won't work with boot_library
-            # cfg = exe_deps_out_transition,
-        ),
-
+        ## and ditto for camlheaders
         _camlheaders = attr.label_list(
             allow_files = True,
             default = ["//config/camlheaders"]

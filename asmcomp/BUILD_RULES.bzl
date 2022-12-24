@@ -77,10 +77,10 @@ run_cvt_emit = rule(
         ),
         "_ocamlrun" : attr.label(
             allow_single_file = True,
-            default = "//runtime:ocamlrun",
+            default = "//toolchain:ocamlrun",
             executable = True,
-            # cfg = "exec"
-            cfg = reset_cc_config_transition
+            cfg = "exec"
+            # cfg = reset_cc_config_transition
         ),
 
         "_protocol" : attr.label(default = "//config/build/protocol"),

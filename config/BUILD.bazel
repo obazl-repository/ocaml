@@ -85,7 +85,6 @@ mustache(
     # stdlib = "//stdlib"
 )
 
-#FIXME: add sh_binary that configures DEVELOPER_DIR, SDKROOT for mac
 ocaml_cc_config(
     name = "config_json",
     json = "config.initial.json",
@@ -209,7 +208,7 @@ label_flag( name = "primitives",
 string_list_flag(name = "warnings",
                  build_setting_default = [
                      # "-w", "+a-4-9-41-42-44-45-48",
-                     "-warn-error", "+A"])
+                     "-warn-error", "+a"])
 
 config_setting(
     name = "macos_fastbuild?",

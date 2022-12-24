@@ -1,18 +1,106 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
+################################################################
+def _ocamlc_boot_in_transition_impl(settings, attr):
+
+    print("OCAMLC_BOOT TG")
+
+    return {
+        "//config/build/protocol": "preboot",
+        "//toolchain:compiler"   : "//boot:ocamlc"
+    }
+
+###################################
+ocamlc_boot_in_transition = transition(
+    implementation = _ocamlc_boot_in_transition_impl,
+    inputs = [],
+    outputs = [
+        "//config/build/protocol",
+        "//toolchain:compiler"
+    ]
+)
+
+################################################################
+def _ocamlc_boot_impl(ctx):
+
+    tool = ctx.actions.declare_file(ctx.label.name)
+
+    ctx.actions.symlink(output = tool,
+                        target_file = ctx.file.tool)
+
+    runfiles = ctx.runfiles(
+        files = [ctx.file._stdlib]
+    )
+
+    defaultInfo = DefaultInfo(
+        executable = tool,
+        runfiles   = runfiles
+    )
+    return defaultInfo
+
+#####################
+ocamlc_boot = rule(
+    implementation = _ocamlc_boot_impl,
+
+    doc = "Imports the precompiled ocamlc, uses it to build stdlib and adds to runfiles",
+
+    attrs = dict(
+        tool = attr.label(
+            mandatory = True,
+            allow_single_file = True,
+        ),
+        # stdlib is a runtime dep of the linker, so we need to build
+        # it and add it runfiles.
+        _stdlib = attr.label(
+            doc = "Stdlib archive", ## (not stdlib.cmx?a")
+            default = "//stdlib", # archive, not resolver
+            allow_single_file = True, # won't work with boot_library
+            executable = False,
+            # cfg = "exec"
+            # cfg = ocamlc_boot_in_transition
+        ),
+
+        # std_exit = attr.label(
+        #     doc = "Module linked last in every executable.",
+        #     default = "//stdlib:Std_exit",
+        #     allow_single_file = True,
+        #     # cfg = exe_deps_out_transition,
+        # ),
+
+        ## and ditto for camlheaders
+        # _camlheaders = attr.label_list(
+        #     allow_files = True,
+        #     default = ["//config/camlheaders"]
+        # ),
+
+        # _ocamlrun = attr.label(
+        #     allow_single_file = True,
+        #     default = "//runtime:ocamlrun",
+        #     executable = True,
+        #     # cfg = "exec"
+        #     cfg = reset_cc_config_transition
+        # ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+    ),
+    # executable = True,
+    cfg = ocamlc_boot_in_transition
+)
+
+################################################################
 def _coldstart_transition_impl(settings, attr):
 
-    if settings["//config/target/executor"] == "boot":
-        executor = "sys"
-        emitter  = "vm"
-    else:
-        executor = settings["//config/target/executor"]
-        emitter  = settings["//config/target/emitter"]
+    # if settings["//config/target/executor"] == "boot":
+    #     executor = "sys"
+    #     emitter  = "vm"
+    # else:
+    #     executor = settings["//config/target/executor"]
+    #     emitter  = settings["//config/target/emitter"]
 
     return {
         "//config/build/protocol": "baseline",
-        "//config/target/executor": executor,
-        "//config/target/emitter" : emitter
+        # "//config/target/executor": executor,
+        # "//config/target/emitter" : emitter
     }
 
 ###################################
@@ -20,13 +108,13 @@ _coldstart_transition = transition(
     implementation = _coldstart_transition_impl,
     inputs = [
         # "//config/build/protocol",
-        "//config/target/executor",
-        "//config/target/emitter"
+        # "//config/target/executor",
+        # "//config/target/emitter"
     ],
     outputs = [
         "//config/build/protocol",
-        "//config/target/executor",
-        "//config/target/emitter"
+        # "//config/target/executor",
+        # "//config/target/emitter"
     ]
 )
 

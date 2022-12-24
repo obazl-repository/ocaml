@@ -6,14 +6,17 @@ load("//bzl:rules.bzl",
      "boot_ocamlopt_byte",
      "boot_ocamlopt_opt",
      "boot_ocamlc_opt",
-     "boot_ocaml_compilers")
+     "boot_ocaml_compilers",
+     "ocaml_compilers")
 
-
-load(":BUILD_RULES.bzl", "boot_coldstart", "boot_setup")
+load(":BUILD_RULES.bzl",
+     "ocamlc_boot",
+     "boot_coldstart",
+     "boot_setup")
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
-# exports_files(["ocamlc", "ocamllex"])
+exports_files(["ocamlc", "ocamllex"])
 
 ## Package //boot contains pre-compiled OCaml executables (ocamlc,
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
@@ -27,20 +30,34 @@ boot_coldstart(
         "//runtime:asmrun",
         "//runtime:camlrun",
     ],
-    compilers = [
-        ":ocamlc.byte", ":ocamlopt.byte",
-        ":ocamlc.opt",  ":ocamlopt.opt"
+    args = [
+        "$(rootpath @baseline//:ocamlc.byte)",
+        # "$(rootpath //bin/baseline:ocamlc.byte)",
+        # "$(rlocationpath //bin/baseline:ocamlc.byte)",
+        # "$(execpath //bin/baseline:ocamlc.byte)",
+        # "$(rlocationpath //bin/baseline:ocamlopt.byte)",
+        # "$(rlocationpath //bin/baseline:ocamlc.opt)",
+        # "$(rlocationpath //bin/baseline:ocamlopt.opt)",
     ],
     data = [
-        "//lex:ocamllex.byte",
-        "//lex:ocamllex.opt",
-        "//yacc:ocamlyacc",
+        "@baseline//:ocamlc.byte",
+        # "//bin/baseline:ocamlc.byte",
+        # "//bin/baseline:ocamlopt.byte",
+        # "//bin/baseline:ocamlc.opt",
+        # "//bin/baseline:ocamlopt.opt",
+        # "//lex:ocamllex.byte",
+        # "//lex:ocamllex.opt",
+        # "//yacc:ocamlyacc",
         "//vendor/mustach",
+
         ## the shell script could obtain the following from the preceding:
         # "//stdlib",
         # "//stdlib:Std_exit",
-        "//asmcomp:cvt_emit.byte",
-        "//asmcomp:cvt_emit.opt",
+
+        # "//asmcomp:cvt_emit.byte",
+
+        # "//asmcomp:cvt_emit.opt",
+
         "@bazel_tools//tools/bash/runfiles",
     ],
 )
@@ -74,16 +91,21 @@ sh_binary(
 )
 
 ################################################################
-boot_import_vm_executable(
+ocamlc_boot(
     name = "ocamlc.boot",
-    tool = "ocamlc",
+    tool = ":ocamlc",
     # runtime = "//runtime:ocamlrun"
 )
 
-boot_ocaml_compilers(
+ocaml_compilers(
     name = "ocamlcc",
-    visibility             = ["//visibility:public"]
+    visibility = ["//visibility:public"]
 )
+
+# boot_ocaml_compilers(
+#     name = "ocamlcc",
+#     visibility             = ["//visibility:public"]
+# )
 
 sh_binary(
     name = "ocamlc.byte.sh",

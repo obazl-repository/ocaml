@@ -34,5 +34,5 @@ label_setting(name="std_exit",
               visibility = ["//visibility:public"])
 
 label_setting(name="camlheaders",
-              build_setting_default = "//stdlib:camlheaders",
+              build_setting_default = "//config:camlheaders",
               visibility = ["//visibility:public"])

@@ -44,15 +44,16 @@ bool_flag( name = "xmo", build_setting_default = False)
 config_setting(name = "xmo?", flag_values = {":xmo": "True"})
 
 
-label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
+label_flag( name = "camlheaders",
+            build_setting_default = "//config:camlheaders")
 
 label_flag( name = "primitives",
             build_setting_default = "//runtime:primitives")
 
-string_list_flag(name = "warnings",
-                 build_setting_default = [
-                     # "-w", "+a-4-9-41-42-44-45-48",
-                     "-warn-error", "+A"])
+# string_list_flag(name = "warnings",
+#                  build_setting_default = [
+#                      # "-w", "+a-4-9-41-42-44-45-48",
+#                      "-warn-error", "@a"])
 
 ################################################################
 config_setting(

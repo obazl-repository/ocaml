@@ -1,5 +1,7 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+load("//boot:BUILD_RULES.bzl", "ocamlc_boot_in_transition")
+
 load("//bzl:providers.bzl", "BootInfo", "ModuleInfo", "OcamlArchiveProvider")
 
 load("//bzl/attrs:archive_attrs.bzl", "archive_attrs")
@@ -23,13 +25,13 @@ stdlib_archive = rule(
     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
     attrs = dict(
         archive_attrs(),
-        _rule = attr.string( default = "boot_archive" ),
+        _rule = attr.string( default = "stdlib_archive" ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     ),
     provides = [OcamlArchiveProvider, BootInfo],
     executable = False,
-    # fragments = ["platform", "cpp"],
-    # host_fragments = ["platform",  "cpp"],
-    incompatible_use_toolchain_transition = True, #FIXME: obsolete?
+    # cfg = ocamlc_boot_in_transition,
     toolchains = ["//toolchain/type:ocaml",
                   # ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]

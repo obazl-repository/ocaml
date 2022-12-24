@@ -22,8 +22,8 @@ load("//bzl:rules.bzl",
 # COMMON = $(UTILS) $(PARSING) $(TYPING) $(LAMBDA) $(COMP)
 
 ## no //middle_end stuff:
-boot_library(
-# boot_archive(
+#boot_library(
+boot_archive(
     name = "ocamlcommon",
     opts = ["-linkall"],
     manifest  = [
@@ -37,12 +37,14 @@ boot_library(
         "//typing:ocamlcommon",
     ],
     visibility = [
-        "//bin:__pkg__",  # the new compiler
+        "@baseline//:__subpackages__",
+        "//bin:__subpackages__",
         "//boot:__subpackages__",
         "//debugger:__pkg__",
         "//dev:__subpackages__",
         "//fixpoint:__pkg__",
         "//ocamltest:__pkg__",
+        "//test:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",

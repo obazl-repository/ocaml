@@ -77,8 +77,8 @@ dev_toolchain_adapter = rule(
             allow_single_file = True,
             default = "//toolchain:ocamlrun",
             executable = True,
-            # cfg = "exec"
-            cfg = reset_cc_config_transition
+            cfg = "exec"
+            # cfg = reset_cc_config_transition
         ),
 
         "runtime": attr.label(
@@ -86,8 +86,8 @@ dev_toolchain_adapter = rule(
             allow_single_file = True,
             default = "//toolchain:runtime",
             executable = False,
-            # cfg = "exec"
-            cfg = reset_cc_config_transition
+            cfg = "exec"
+            # cfg = reset_cc_config_transition
         ),
 
         "vmargs": attr.label( ## string list

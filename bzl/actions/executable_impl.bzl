@@ -66,7 +66,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     manifest = []
 
-    aggregate_deps(ctx, ctx.attr.stdlib, depsets, manifest)
+    # aggregate_deps(ctx, ctx.attr.stdlib, depsets, manifest)
     aggregate_deps(ctx, ctx.attr.std_exit, depsets, manifest)
 
     for dep in ctx.attr.prologue:
@@ -106,6 +106,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     ################
     includes  = []
+    if ctx.attr._protocol == "test":
+        workdir = ""
     out_exe = ctx.actions.declare_file(workdir + exe_name)
 
     primitives_depset = []
@@ -193,10 +195,11 @@ def executable_impl(ctx, tc, exe_name, workdir):
     for path in paths_depset.to_list():
         includes.append(path)
 
-    if ctx.file.stdlib:
-        includes.append(ctx.file.stdlib.dirname)
+    # if ctx.file.stdlib:
+    #     includes.append(ctx.file.stdlib.dirname)
+    # includes.append(ctx.files.stdlib[0].dirname)
 
-    # includes.append(ctx.file.std_exit.dirname)
+    includes.append(ctx.file.std_exit.dirname)
 
     ##FIXME: if we're *building* a sys compiler we need to add
     ## libasmrun.a to runfiles, and if we're *using* a sys compiler we
@@ -276,7 +279,17 @@ def executable_impl(ctx, tc, exe_name, workdir):
     if ctx.file.main:
         args.add(ctx.file.main)
 
+    args.add("-nopervasives")
+
     args.add("-o", out_exe)
+
+    ################################################################
+    if ctx.label.name == "ocamlc.byte":
+        print("runfiles for: %s" % ctx.label)
+        print(tc.compiler[DefaultInfo].default_runfiles.files)
+        for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+            print("RF: %s" % f)
+        # fail()
 
     runfiles = []
     # if ...:
@@ -299,7 +312,6 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     inputs_depset = depset(
         direct = []
-        + [ctx.file.std_exit]
         + [ctx.file.main] if ctx.file.main else []
         # compiler runfiles *should* contain camlheader files & stdlib:
         # + ctx.files._camlheaders
@@ -312,9 +324,10 @@ def executable_impl(ctx, tc, exe_name, workdir):
         + runtime_depsets
         + [depset(
              [tc.executable]
+            # + ctx.files.stdlib
             + runtime_files
             + toolarg_input
-            + [ctx.file.stdlib]
+            + [ctx.file.std_exit]
             # ctx.files._camlheaders
             # + ctx.files._runtime
             + camlheaders
@@ -415,7 +428,10 @@ def executable_impl(ctx, tc, exe_name, workdir):
       )
     else:
         myrunfiles = ctx.runfiles(
-            files =[ctx.file.stdlib, ctx.file.std_exit],
+            files =[
+                # ctx.file.stdlib,
+                ctx.file.std_exit
+            ],
             transitive_files =  depset(
                 transitive = runfiles + [
                     depset(direct=ctx.files.data),

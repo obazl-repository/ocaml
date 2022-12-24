@@ -1,9 +1,12 @@
 ##############################################
 def _ocaml_stdlib_cmxa_in_transition_impl(settings, attr):
 
-    debug = True
+    debug = False
 
     protocol = settings["//config/build/protocol"]
+
+    if protocol == "preboot":
+        return {}
 
     return {
         "//config/target/executor": "vm",
@@ -37,7 +40,7 @@ ocaml_stdlib_cmxa_in_transition = transition(
 
 ##############################################
 def _tc_target_transitions(settings, attr, debug):
-    debug = True
+    debug = False
     if debug: print("tc_target_transitions")
 
     ## we use the CLI string flags in //config/...
@@ -99,7 +102,7 @@ def _ocaml_tc_compiler_out_transition_impl(settings, attr):
     ## called for tc.compiler and tc.lexer
     ## so we should see this twice per config
 
-    debug = True
+    debug = False
 
     protocol = settings["//config/build/protocol"]
 
@@ -113,14 +116,17 @@ def _ocaml_tc_compiler_out_transition_impl(settings, attr):
         print("config_emitter: %s" % config_emitter)
         print("runtime:  %s" % settings["//toolchain:runtime"])
 
-    if protocol == "unspecified":
+    if protocol == "preboot":
         return {}
 
     if protocol == "boot":
         return {}
 
+    if protocol == "baseline":
+        return {}
+
     if protocol == "test":
-        print("identity txn ")
+        # print("identity txn ")
         return {}
 
     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
@@ -132,7 +138,8 @@ def _ocaml_tc_compiler_out_transition_impl(settings, attr):
         print("//toolchain:compiler:  %s" % settings["//toolchain:compiler"])
     if config_executor == "boot":
         print("ctxn BASE CASE")
-        compiler = "//boot:ocamlc.boot"
+        # compiler = "//boot:ocamlc.boot"
+        fail()
         # lexer    = "//boot:ocamllex.boot"
     elif (config_executor == "baseline"):
         print("ctxn BASELINE TRANSITION")
@@ -225,7 +232,8 @@ def prot_toplevel(config_executor, config_emitter):
         if config_emitter in ["boot", "vm"]:
             # config_emitter = "vm"
             # use boot ocamlc to build vm>vm
-            compiler = "//boot:ocamlc.boot"
+            # compiler = "//boot:ocamlc.boot"
+            fail()
             runtime  = "//runtime:camlrun"
         elif config_emitter == "sys":
             # use vm>vm to build vm>sys
@@ -267,7 +275,8 @@ def prot_boot(config_executor, config_emitter):
         if config_emitter in ["boot", "vm"]:
             # config_emitter = "vm"
             # use boot ocamlc to build vm>vm
-            compiler = "//boot:ocamlc.boot"
+            # compiler = "//boot:ocamlc.boot"
+            fail()
             runtime  = "//runtime:camlrun"
         elif config_emitter == "sys":
             # use vm>vm to build vm>sys
@@ -290,9 +299,13 @@ def prot_boot(config_executor, config_emitter):
 
 ##########################################################
 def _ocaml_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
 
     protocol        = settings["//config/build/protocol"]
+
+    if protocol == "preboot":
+        return {}
+
     config_executor = settings["//config/target/executor"]
     config_emitter  = settings["//config/target/emitter"]
     compiler        = settings["//toolchain:compiler"]
@@ -333,10 +346,13 @@ ocaml_in_transition = transition(
 
 ##########################################################
 def _ocaml_tool_vm_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
     if debug: print("ocaml_tool_vm_in_transition")
 
     protocol = settings["//config/build/protocol"]
+
+    if protocol == "preboot":
+        return {}
 
     config_executor = "vm"
     config_emitter  = "vm"
@@ -385,7 +401,7 @@ ocaml_tool_vm_in_transition = transition(
 
 ##########################################################
 def _ocaml_tool_sys_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
     if debug: print("ocaml_tool_sys_in_transition")
 
     protocol = settings["//config/build/protocol"]
@@ -448,25 +464,35 @@ def _ocamlc_byte_in_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
+    if protocol == "preboot":
+        return {}
+
     config_executor = "vm"
     config_emitter  = "vm"
 
     if protocol == "boot":  ## default, from the cmd line
+        # goal: build _boot/ocamlc.byte from boot/ocamlc.boot
         config_executor = "boot"
         config_emitter  = "boot"
-        compiler = "//boot:ocamlc.boot"
+        # compiler = "//boot:ocamlc.boot"
+        fail()
         runtime  = "//runtime:camlrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
     elif protocol == "baseline":
-        compiler = "//boot:ocamlc.boot"
+        # goal: build _boot/ocamlc.byte from boot/ocamlc.boot
+        # then _baseline/ocamlc.byte from _boot/ocamlc.byte
+        protocol = "boot"
+        # config_executor = "vm"
+        # config_emitter  = "vm"
+        compiler = "//boot:ocamlc.byte"
         runtime  = "//runtime:camlrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
-    # elif protocol == "test":  #FIXME: rename "dev"?
-    #     compiler = "@baseline//bin:ocamlc.byte"
-    #     runtime  = "@baseline//lib:libasmrun.a"
-    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
+    elif protocol == "test":
+        compiler = "@baseline//bin:ocamlc.byte"
+        runtime  = "@baseline//lib:libasmrun.a"
+        cvt_emit = "@baseline//bin:cvt_emit.byte"
 
     # elif protocol == "dev":
     #     ## use coldstart ocamlc.opt to build ocamlc.byte
@@ -519,7 +545,7 @@ ocamlc_byte_in_transition = transition(
 
 ##########################################################
 def _ocamlopt_byte_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
     if debug:
         print("ocamlopt_byte_in_transition: %s" % attr.name)
 
@@ -531,14 +557,15 @@ def _ocamlopt_byte_in_transition_impl(settings, attr):
     if protocol == "boot":
         config_executor = "boot"
         config_emitter  = "boot"
-        compiler = "//boot:ocamlc.boot"
+        # compiler = "//boot:ocamlc.boot"
+        fail()
         runtime  = "//runtime:camlrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
     elif protocol == "baseline":
         config_executor = "vm"
         config_emitter  = "sys"
-        compiler = "//boot:ocamlc.byte"
+        compiler = "//bin/baseline:ocamlc.byte"
         runtime  = "//runtime:camlrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
@@ -582,7 +609,7 @@ ocamlopt_byte_in_transition = transition(
 
 ##########################################################
 def _ocamlopt_opt_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
     if debug: print("ocamlopt_opt_in_transition: %s" % attr.name)
 
     protocol = settings["//config/build/protocol"]
@@ -600,7 +627,7 @@ def _ocamlopt_opt_in_transition_impl(settings, attr):
     elif protocol == "baseline":
         config_executor = "sys"
         config_emitter  = "sys"
-        compiler = "//boot:ocamlopt.byte"
+        compiler = "//bin/baseline:ocamlopt.byte"
         runtime  = "//runtime:asmrun"      ##FIXME ???
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
@@ -653,7 +680,7 @@ ocamlopt_opt_in_transition = transition(
 
 ##########################################################
 def _ocamlc_opt_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
     if debug: print("ocamlc_opt_in_transition: %s" % attr.name)
 
     protocol = settings["//config/build/protocol"]
@@ -670,7 +697,7 @@ def _ocamlc_opt_in_transition_impl(settings, attr):
     elif protocol == "baseline":
         config_executor = "sys"
         config_emitter  = "vm"
-        compiler = "//boot:ocamlopt.byte"
+        compiler = "//bin/baseline:ocamlopt.opt"
         runtime  = "//runtime:camlrun"
 
     # elif protocol == "dev":

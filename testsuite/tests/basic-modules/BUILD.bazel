@@ -1,4 +1,4 @@
-load("//bzl/rules/test:rules.bzl",
+load("//test:rules.bzl",
      "test_archive",
      "test_executable",
      "test_library",

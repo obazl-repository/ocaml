@@ -8,7 +8,7 @@ load("//bzl:rules.bzl",
 )
 load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
-load("//config:CONFIG.bzl", "w")
+load("//config:WARNINGS.bzl", "w")
 
 ## make log: >vm uses -use-prims, >sys does not
 # ./boot/ocamlrun ./boot/ocamlc
@@ -211,7 +211,7 @@ compiler_module(
     struct = "CSEgen.ml",
     sig    = "CSEgen_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Cmm",
         ":Mach",
@@ -918,7 +918,7 @@ compiler_module(
     struct = "emitaux.ml",
     sig    = "Emitaux_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//lambda:Debuginfo",
         "//stdlib:Stdlib.Char",
@@ -1058,7 +1058,7 @@ compiler_module(
     struct = "linearize.ml",
     sig    = "Linearize_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Reg",
         ":Proc",
@@ -1091,7 +1091,7 @@ compiler_module(
     struct = "linscan.ml",
     sig    = "Linscan_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Reg",
         ":Proc",
@@ -1166,7 +1166,7 @@ compiler_module(
     struct = "polling.ml",
     sig    = "Polling_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         ":Mach",
         ":Dataflow",
@@ -1253,7 +1253,7 @@ compiler_module(
     struct = "printmach.ml",
     sig    = "Printmach_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//lambda:Debuginfo",
         "//stdlib:Stdlib.Array",
@@ -1425,7 +1425,7 @@ compiler_module(
     struct = "schedgen.ml",
     sig    = "Schedgen_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//utils:Clflags",
         ":Cmm",
@@ -1510,7 +1510,7 @@ compiler_module(
     struct = "selectgen.ml",
     sig    = "Selectgen_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//stdlib:Stdlib.Int",
         ":Cmm",
@@ -1737,7 +1737,7 @@ compiler_module(
     struct = "x86_proc.ml",
     sig    = "X86_proc_cmi",
     opts = MODULE_OPTS,
-    warnings = [NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",

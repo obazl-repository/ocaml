@@ -8,7 +8,7 @@ load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 package(default_visibility = ["//visibility:public"])
 
-load("//config:CONFIG.bzl", "w") # warnings struct
+load("//config:WARNINGS.bzl", "w")
 
 exports_files([
     "bytesections.mli", "bytesections.ml",
@@ -52,8 +52,8 @@ boot_library(
 # compilerlibs/ocamlbytecomp.cmxa: $(BYTECOMP_CMI) $(BYTECOMP:.cmo=.cmx)
 # 	$(CAMLOPT) -a $(OCAML_NATDYNLINKOPTS) -o $@ $(BYTECOMP:.cmo=.cmx)
 
-#boot_archive(
-boot_library(
+boot_archive(
+#boot_library(
     name = "ocamlbytecomp",
     # opts = select({
     #     "//bzl/toolchain:boot": [],
@@ -79,12 +79,14 @@ boot_library(
     #     "//bytecomp:ocamlbytecomp",
     # ],
     visibility = [
-        "//bin:__pkg__",  # the new compiler
+        "@baseline//:__subpackages__",
+        "//bin:__subpackages__",
         "//boot:__subpackages__",
         "//dev:__subpackages__",
         "//compilers:__subpackages__",
         "//fixpoint:__pkg__",
         "//ocamltest:__pkg__",
+        "//test:__pkg__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//utils:__pkg__",
@@ -144,7 +146,20 @@ compiler_module(
     name   = "Bytegen",
     struct = "bytegen.ml",
     sig    = "Bytegen_cmi",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + [
+        # "-w", "+a-4-9-40-41-42-44-45-48",
+        # "-w", "+a",
+        # "-warn-error", "@a",
+        # "-w", "-4-9-32-41-42-44"
+    ],
+    warnings = [
+        w.AMBIGUOUS_NAME_41,
+        w.DISAMBIGUATED_NAME_42,
+        w.OPEN_SHADOW_IDENTIFIER_44,
+        w.FRAGILE_MATCH_4,
+        w.MISSING_RECORD_FIELD_PATTERN_9,
+        w.UNUSED_VALUE_DECLARATION_32,
+    ],
     deps   = [
         "//lambda:Debuginfo",
         "//lambda:Lambda",

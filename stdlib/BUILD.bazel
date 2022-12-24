@@ -51,7 +51,7 @@ stdlib_archive(
 
 stdlib_archive_cmxa(
     name       = "stdlib.cmxa",
-    # opts = ["-linkall"],
+    # opts = ["-verbose"],
     ## makefiles pass -use-prims. does that make sense, for an archive?
     manifest   = STDLIB_MANIFEST,
     # data = ["//runtime:asmrun"],

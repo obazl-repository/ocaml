@@ -2,7 +2,7 @@ load("//bzl:rules.bzl",
      "tool_module",
      "tool_signature")
 
-load("//bzl/rules/test:rules.bzl",
+load("//test:rules.bzl",
      "test_archive",
      "test_executable",
      "test_library")

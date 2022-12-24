@@ -1,3 +1,4 @@
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl:providers.bzl",
@@ -12,7 +13,7 @@ load("//bzl/transitions:tc_transitions.bzl",
 
 #################
 def tc_build_executor(ctx):
-    debug = True
+    debug = False
     if debug:
         print("tc.build_executor: %s" % ctx.label)
 
@@ -83,13 +84,13 @@ def tc_build_executor(ctx):
         else:
             build_executor = "ERROR"
 
-    print("inferred build executor == %s" % build_executor)
+    # print("inferred build executor == %s" % build_executor)
     return build_executor
 
 #################
 def tc_tool_arg(ctx):
 
-    debug = True
+    debug = False
 
     tc_config_executor = ctx.attr.config_executor[BuildSettingInfo].value
 
@@ -131,7 +132,7 @@ def tc_tool_arg(ctx):
 ## returns file object
 def tc_executable(ctx, tool):
 
-    debug = True
+    debug = False
 
     if debug:
         print("ENTRY tc_executable for tool: %s" % tool)
@@ -139,7 +140,8 @@ def tc_executable(ctx, tool):
 
     if (ctx.file.compiler.basename.endswith(".byte")
         or ctx.file.compiler.basename.endswith(".boot")
-        or ctx.file.compiler.basename.endswith(".baseline")):
+        or ctx.file.compiler.basename.endswith(".baseline")
+        or ctx.file.compiler.basename == ("ocamlc")):
         return ctx.file.ocamlrun
     elif ctx.file.compiler.basename.endswith(".opt"):
         return ctx.file.compiler
@@ -214,18 +216,36 @@ def tc_workdir(ctx):
 
     protocol = ctx.attr.protocol[BuildSettingInfo].value
 
+    if protocol == "test":
+        workdir = "_test"
+
     config_executor = ctx.attr.config_executor[BuildSettingInfo].value
     config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
-    if protocol == "boot":
+    compiler = ctx.file.compiler
+    if compiler.basename == "ocamlc.boot":
+        return "_boot/"
+    else:
+        return paths.basename(compiler.dirname) + ":" + compiler.basename.replace(".", "_") + "/"
+
+    if ctx.file.compiler.path == "bin:ocamlc.byte":
+        if protocol == "boot":
+            workdir = "_boot/"
+        else:
+            workdir = "_baseline/"
+
+    elif protocol == "boot":
         workdir = "_boot/"
 
+    elif protocol == "baseline":
+        workdir = "_baseline/"
+
     elif (config_executor == "boot"):
-        workdir = "_boot/"
+        workdir = "_xboot/"
         # fail("WHY BOOT?")
 
     elif (config_executor == "baseline"):
-        workdir = "_baseline/"
+        workdir = "_xbaseline/"
 
     # elif (config_executor == "vm" and config_emitter == "boot"):
     #     if tc.protocol == "dev":
@@ -235,7 +255,7 @@ def tc_workdir(ctx):
     #         workdir = "_ocamlc.byte/"
 
     elif (config_executor == "vm" and config_emitter == "vm"):
-        workdir = "_ocamlc.byte/"
+        workdir = "_xocamlc.byte/"
 
     elif (config_executor == "vm" and config_emitter == "sys"):
         workdir = "_ocamlopt.byte/"

@@ -35,7 +35,7 @@ def _reset_cc_config_transition_impl(settings, attr):
         "//config/target/executor": "null",
         "//config/target/emitter" : "null",
 
-        "//toolchain:compiler" : "//boot:ocamlc.boot",
+        # "//toolchain:compiler" : "//boot:ocamlc.boot",
         "//toolchain:ocamlrun" : "//runtime:ocamlrun",
         "//toolchain:runtime"  : "//runtime:asmrun",
         # "//toolchain:cvt_emit" : "//:BUILD.bazel",
@@ -56,7 +56,7 @@ reset_cc_config_transition = transition(
         "//config/target/executor",
         "//config/target/emitter",
 
-        "//toolchain:compiler",
+        # "//toolchain:compiler",
         "//toolchain:runtime",
         "//toolchain:ocamlrun",
         # "//toolchain:cvt_emit"

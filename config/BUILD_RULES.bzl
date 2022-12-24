@@ -142,7 +142,7 @@ def cc_tc_config_map(ctx):
     # config_map["c_compile_variables"] = str(c_compile_variables)
 
     link_map = link_config(ctx, tc, feature_config)
-    print("LINK MAP: %s" % link_map)
+    # print("LINK MAP: %s" % link_map)
     config_map |= link_map
 
     compile_cmd_line = cc_common.get_memory_inefficient_command_line(
@@ -182,9 +182,9 @@ def cc_tc_config_map(ctx):
         action_name = ACTION_NAMES.c_compile,
         variables = c_compile_variables,
     )
-    print("ENV: %s"% compile_env)
+    # print("ENV: %s"% compile_env)
     config_map |= compile_env
-    print("config_map: %s" % config_map)
+    # print("config_map: %s" % config_map)
 
     # cc_ccontexts =  []
     # for dep in ctx.attr.deps:
