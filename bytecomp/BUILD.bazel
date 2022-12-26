@@ -126,23 +126,25 @@ compiler_module(
         w.MISSING_RECORD_FIELD_PATTERN_9,
         w.UNUSED_VALUE_DECLARATION_32,
     ],
-    deps   = [
-        "//lambda:Debuginfo",
-        "//lambda:Lambda",
-        "//lambda:Matching",
-        "//lambda:Switch",
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Stack",
+    ],
+    deps   = [
+        "//config:Config",
+        "//lambda:Debuginfo",
+        "//lambda:Lambda",
+        "//lambda:Matching",
+        "//lambda:Switch",
         "//typing:Env",
         "//typing:Ident",
         "//typing:Primitive",
         "//typing:Subst",
         "//typing:Types",
         "//utils:Clflags",
-        "//config:Config",
         "//utils:Misc",
         ":Instruct",
     ],
@@ -168,16 +170,18 @@ compiler_module(
     sig    = "Bytelibrarian_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Emitcode",
-        ":Bytelink",
-        "//stdlib:Stdlib.String",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
         "//config:Config",
+        "//parsing:Location",
         "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        ":Bytelink",
+        ":Emitcode",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//driver:__pkg__"
@@ -190,6 +194,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//file_formats:Cmo_format_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ],
 )
@@ -200,36 +206,36 @@ compiler_module(
     sig    = "Bytelink_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Symtable",
-        ":Instruct",
-        ":Emitcode",
-        ":Dll",
-        ":Bytesections",
-        "//utils:Warnings",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Option",
         "//bytecomp:Opcodes",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Marshal",
-        ## (LongString)
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//utils:Consistbl",
         "//config:Config",
-        "//utils:Clflags",
-        "//stdlib:Stdlib.Char",
+        "//parsing:Location",
+        "//typing:Ident",
         "//utils:Ccomp",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Array",
+        "//utils:Clflags",
+        "//utils:Consistbl",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Bytesections",
+        ":Dll",
+        ":Emitcode",
+        ":Instruct",
+        ":Symtable",
     ],
-    ## "//stdlib:camlheader"
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Marshal",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
 compiler_signature(
@@ -237,10 +243,12 @@ compiler_signature(
     src  = "bytelink.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Symtable_cmi",
-        "//utils:Misc_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//file_formats:Cmo_format_cmi",
+        "//utils:Misc_cmi",
+        ":Symtable_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
     ],
 )
 
@@ -250,26 +258,28 @@ compiler_module(
     sig    = "Bytepackager_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Instruct",
-        ":Emitcode",
-        ":Bytelink",
-        ":Bytegen",
-        "//typing:Typemod",
-        "//lambda:Translmod",
-        "//typing:Subst",
-        "//lambda:Simplif",
-        "//lambda:Printlambda",
-        "//typing:Path",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Env",
         "//config:Config",
+        "//lambda:Printlambda",
+        "//lambda:Simplif",
+        "//lambda:Translmod",
+        "//parsing:Location",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Subst",
+        "//typing:Typemod",
         "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        ":Bytegen",
+        ":Bytelink",
+        ":Emitcode",
+        ":Instruct",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -280,9 +290,11 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//file_formats:Cmo_format_cmi",
+        "//typing:Env_cmi",
         "//typing:Ident_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-        "//typing:Env_cmi"
     ],
 )
 
@@ -293,10 +305,12 @@ compiler_module(
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
     deps   = [
-        "//stdlib:Stdlib",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.List",
         "//config:Config"
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -311,7 +325,7 @@ compiler_signature(
     name = "Bytesections_cmi",
     src  = "bytesections.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib_cmi"],
+    stdlib_deps   = ["//stdlib:Stdlib_cmi"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -324,16 +338,18 @@ compiler_module(
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
     deps   = [
-        "//stdlib:Stdlib",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
         "//config:Config",
         "//utils:Binutils",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -345,7 +361,7 @@ compiler_signature(
     name = "Dll_cmi",
     src  = "dll.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib_cmi"],
+    stdlib_deps   = ["//stdlib:Stdlib_cmi"],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
     ]
@@ -357,8 +373,20 @@ compiler_module(
     sig    = "Emitcode_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//config:Config",
         "//lambda:Translmod",
         "//parsing:Location",
+        "//typing:Btype",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Primitive",
+        "//utils:Clflags",
+        "//utils:Misc",
+        ":Bytegen",
+        ":Instruct",
+        ":Opcodes",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Filename",
@@ -367,17 +395,6 @@ compiler_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Marshal",
         "//stdlib:Stdlib.Sys",
-        "//typing:Ident",
-        "//typing:Primitive",
-        "//utils:Clflags",
-        "//config:Config",
-        "//utils:Misc",
-        ":Bytegen",
-        ":Instruct",
-        ":Opcodes",
-        "//typing:Btype",
-        "//typing:Env",
-        ## (LongString)
     ],
     visibility = [
         "//driver:__pkg__",
@@ -390,12 +407,14 @@ compiler_signature(
     src  = "emitcode.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Primitives_cmi",
-        "//parsing:Asttypes_cmi",
         "//file_formats:Cmo_format_cmi",
+        "//parsing:Asttypes_cmi",
         "//typing:Ident_cmi",
         "//utils:Misc_cmi",
         ":Instruct_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
     ],
 )
 
@@ -405,13 +424,15 @@ compiler_module(
     sig    = "Instruct_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Primitives",
         "//lambda:Lambda",
-        "//typing:Types",
-        "//typing:Subst",
         "//parsing:Location",
-        "//typing:Ident",
         "//typing:Env",
+        "//typing:Ident",
+        "//typing:Subst",
+        "//typing:Types",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
     ],
     visibility = [
         "//debugger:__pkg__",
@@ -425,13 +446,15 @@ compiler_signature(
     src  = "instruct.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Primitives_cmi",
         "//lambda:Lambda_cmi",
-        "//typing:Types_cmi",
-        "//typing:Subst_cmi",
         "//parsing:Location_cmi",
-        "//typing:Ident_cmi",
         "//typing:Env_cmi",
+        "//typing:Ident_cmi",
+        "//typing:Subst_cmi",
+        "//typing:Types_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
     ],
     visibility = [
         "//debugger:__pkg__",
@@ -447,6 +470,8 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Instruct",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Obj",
     ],
     visibility = [
@@ -461,6 +486,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Instruct_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Obj_cmi",
     ],
     visibility = [
@@ -482,7 +509,7 @@ compiler_module(
     # sig    = ":Opcodes_cmi",
     opts = MODULE_OPTS + ["-open", "Stdlib"],
     warnings = [w.MISSING_MLI],
-    deps   = ["//stdlib:Stdlib"],
+    stdlib_deps   = ["//stdlib:Stdlib"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -587,15 +614,17 @@ compiler_module(
     sig    = "Printinstr_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//lambda:Printlambda",
         "//lambda:Lambda",
-        ":Instruct",
+        "//lambda:Printlambda",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
         "//typing:Ident",
-        "//stdlib:Stdlib.Format",
+        ":Instruct",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -609,6 +638,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Instruct_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ],
 )
@@ -619,8 +650,18 @@ compiler_module(
     sig    = "Symtable_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//config:Config",
         "//lambda:Runtimedef",
         "//parsing:Location",
+        "//typing:Ident",
+        "//typing:Predef",
+        "//utils:Clflags",
+        "//utils:Misc",
+        ":Bytesections",
+        ":Dll",
+        ":Meta",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Buffer",
         "//stdlib:Stdlib.Char",
@@ -632,15 +673,6 @@ compiler_module(
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Sys",
-        "//typing:Ident",
-        "//typing:Predef",
-        "//utils:Clflags",
-        "//config:Config",
-        "//utils:Misc",
-        ":Bytesections",
-        ":Dll",
-        ":Meta",
-        #### (LongString)
     ],
     visibility = [
         "//debugger:__pkg__",
@@ -657,11 +689,13 @@ compiler_signature(
     deps   = [
         "//file_formats:Cmo_format_cmi",
         "//parsing:Asttypes_cmi",
+        "//typing:Ident_cmi",
+        "//utils:Misc_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi",
         "//stdlib:Stdlib.Format_cmi",
         "//stdlib:Stdlib.Obj_cmi",
-        "//typing:Ident_cmi",
-        "//utils:Misc_cmi",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__"
