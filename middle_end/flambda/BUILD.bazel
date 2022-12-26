@@ -148,17 +148,19 @@ compiler_module(
     sig    = "Alias_analysis_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Allocated_const",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end/flambda/base_types:Var_within_closure",
         "//middle_end/flambda/base_types:Tag",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Allocated_const",
+        "//middle_end/flambda:Flambda",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
         "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
-    ]
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -166,15 +168,17 @@ compiler_signature(
     src  = "alias_analysis.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end/flambda:Allocated_const_cmi",
-        "//middle_end:Variable_cmi",
-        "//middle_end:Symbol_cmi",
         "//middle_end/flambda/base_types:Tag_cmi",
-        "//stdlib:Stdlib.Format_cmi",
+        "//middle_end/flambda:Allocated_const_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end:Symbol_cmi",
+        "//middle_end:Variable_cmi",
         "//parsing:Asttypes_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -183,21 +187,23 @@ compiler_module(
     sig    = "Allocated_const_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Nativeint",
-        "//stdlib:Stdlib.List",
         "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int32",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
-    ]
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
     name = "Allocated_const_cmi",
     src  = "allocated_const.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Format_cmi",
     ]
 )
@@ -208,26 +214,28 @@ compiler_module(
     sig    = "Augment_specialised_args_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Pass_wrapper",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Internal_variable_names",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//utils:Identifiable",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
-        "//middle_end/flambda/base_types:Closure_origin",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Closure_origin",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Pass_wrapper",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Variable",
         "//utils:Clflags",
-    ]
+        "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -235,11 +243,11 @@ compiler_signature(
     src  = "augment_specialised_args.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end:Backend_intf_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_cost_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Inlining_cost_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end:Backend_intf_cmi",
         "//middle_end:Variable_cmi",
     ]
 )
@@ -250,31 +258,33 @@ compiler_module(
     sig    = "Build_export_info_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Traverse_for_exported_symbols",
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Invariant_params",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Find_recursive_functions",
-        "//middle_end/flambda:Export_info",
-        "//middle_end/flambda:Allocated_const",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Compilenv",
-        "//middle_end:Compilation_unit",
-        "//middle_end:Clambda",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Tag",
-        "//stdlib:Stdlib.String",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//middle_end/flambda/base_types:Export_id",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Export_id",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Allocated_const",
+        "//middle_end/flambda:Export_info",
+        "//middle_end/flambda:Find_recursive_functions",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Invariant_params",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end/flambda:Traverse_for_exported_symbols",
+        "//middle_end:Clambda",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Compilenv",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
         "//utils:Clflags",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
@@ -282,9 +292,9 @@ compiler_signature(
     src  = "build_export_info.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Flambda_cmi",
         "//middle_end/flambda:Export_info_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Backend_intf_cmi",
     ]
 )
@@ -295,37 +305,39 @@ compiler_module(
     sig    = "Closure_conversion_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Lift_code",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Closure_conversion_aux",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Internal_variable_names",
-        "//middle_end:Convert_primitives",
-        "//middle_end:Compilation_unit",
-        "//middle_end:Clambda_primitives",
-        "//middle_end/flambda/base_types:Tag",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//middle_end/flambda/base_types:Static_exception",
-        "//lambda:Simplif",
-        "//typing:Predef",
-        "//stdlib:Stdlib.Option",
-        "//utils:Numbers",
-        "//middle_end/flambda/base_types:Mutable_variable",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//typing:Ident",
-        "//lambda:Debuginfo",
         "//config:Config",
-        "//middle_end/flambda/base_types:Closure_origin",
+        "//lambda:Debuginfo",
+        "//lambda:Simplif",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Closure_origin",
+        "//middle_end/flambda/base_types:Mutable_variable",
+        "//middle_end/flambda/base_types:Static_exception",
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda:Closure_conversion_aux",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Lift_code",
+        "//middle_end/flambda:Parameter",
+        "//middle_end:Clambda_primitives",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Convert_primitives",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//typing:Ident",
+        "//typing:Predef",
         "//utils:Clflags",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        "//utils:Numbers",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
 compiler_signature(
@@ -333,10 +345,10 @@ compiler_signature(
     src  = "closure_conversion.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Backend_intf_cmi",
+        "//parsing:Asttypes_cmi",
         "//typing:Ident_cmi",
     ]
 )
@@ -347,18 +359,20 @@ compiler_module(
     sig    = "Closure_conversion_aux_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end/flambda/base_types:Static_exception",
-        "//stdlib:Stdlib.Printexc",
-        "//utils:Numbers",
         "//middle_end/flambda/base_types:Mutable_variable",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Int",
+        "//middle_end/flambda/base_types:Static_exception",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
         "//typing:Ident",
-    ]
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        "//utils:Numbers",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printexc",
+    ],
 )
 
 compiler_signature(
@@ -366,10 +380,10 @@ compiler_signature(
     src  = "closure_conversion_aux.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end:Variable_cmi",
-        "//middle_end:Symbol_cmi",
-        "//middle_end/flambda/base_types:Static_exception_cmi",
         "//middle_end/flambda/base_types:Mutable_variable_cmi",
+        "//middle_end/flambda/base_types:Static_exception_cmi",
+        "//middle_end:Symbol_cmi",
+        "//middle_end:Variable_cmi",
         "//typing:Ident_cmi",
     ]
 )
@@ -380,14 +394,16 @@ compiler_module(
     sig    = "Closure_offsets_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
         "//middle_end/flambda/base_types:Closure_id",
-    ]
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end:Variable",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -395,10 +411,10 @@ compiler_signature(
     src  = "closure_offsets.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end/flambda/base_types:Var_within_closure_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda/base_types:Var_within_closure_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
     ]
 )
 
@@ -409,12 +425,14 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//middle_end/flambda:Flambda",
-        "//middle_end:Semantics_of_primitives",
         "//middle_end:Clambda_primitives",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.List",
+        "//middle_end:Semantics_of_primitives",
         "//utils:Int_replace_polymorphic_compare",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+    ],
 )
 
 compiler_signature(
@@ -422,9 +440,9 @@ compiler_signature(
     src  = "effect_analysis.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -434,21 +452,23 @@ compiler_module(
     sig    = "Export_info_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Compilation_unit",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Tag",
-        "//stdlib:Stdlib.String",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//stdlib:Stdlib.Queue",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//middle_end/flambda/base_types:Export_id",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Export_id",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Queue",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -462,18 +482,20 @@ compiler_signature(
     src  = "export_info.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
-        "//middle_end:Symbol_cmi",
-        "//middle_end:Compilation_unit_cmi",
-        "//middle_end/flambda/base_types:Var_within_closure_cmi",
-        "//middle_end/flambda/base_types:Tag_cmi",
-        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
-        "//stdlib:Stdlib.Format_cmi",
-        "//middle_end/flambda/base_types:Export_id_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda/base_types:Export_id_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
+        "//middle_end/flambda/base_types:Tag_cmi",
+        "//middle_end/flambda/base_types:Var_within_closure_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
+        "//middle_end:Compilation_unit_cmi",
+        "//middle_end:Symbol_cmi",
+        "//middle_end:Variable_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = [
         "//file_formats:__pkg__",
@@ -487,20 +509,22 @@ compiler_module(
     sig    = "Export_info_for_pack_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Export_info",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Compilation_unit",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Set_of_closures_origin",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//stdlib:Stdlib.Option",
-        "//middle_end/flambda/base_types:Export_id",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Export_id",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Set_of_closures_origin",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Export_info",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Option",
     ],
     visibility = ["//asmcomp:__pkg__"]
 )
@@ -521,19 +545,21 @@ compiler_module(
     sig    = "Extract_projections_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Freshening",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Freshening",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -541,9 +567,9 @@ compiler_signature(
     src  = "extract_projections.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Variable_cmi",
     ]
 )
@@ -554,14 +580,16 @@ compiler_module(
     sig    = "Find_recursive_functions_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Flambda_utils",
         "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
         "//middle_end:Variable",
-        "//utils:Strongly_connected_components",
-        "//stdlib:Stdlib.List",
         "//utils:Int_replace_polymorphic_compare",
+        "//utils:Strongly_connected_components",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -569,10 +597,10 @@ compiler_signature(
     src  = "find_recursive_functions.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Backend_intf_cmi",
+        "//middle_end:Variable_cmi",
     ]
 )
 
@@ -599,6 +627,13 @@ compiler_module(
         "//middle_end:Printclambda_primitives",
         "//middle_end:Symbol",
         "//middle_end:Variable",
+        "//utils:Clflags",
+        "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        "//utils:Numbers",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -607,11 +642,6 @@ compiler_module(
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
-        "//utils:Clflags",
-        "//utils:Identifiable",
-        "//utils:Int_replace_polymorphic_compare",
-        "//utils:Misc",
-        "//utils:Numbers",
     ],
     visibility = ["//middle_end/flambda/base_types:__pkg__"]
 )
@@ -621,24 +651,26 @@ compiler_signature(
     src  = "flambda.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Allocated_const_cmi",
-        ":Parameter_cmi",
-        ":Projection_cmi",
-        "//middle_end:Clambda_primitives_cmi",
-        "//middle_end:Symbol_cmi",
-        "//middle_end:Variable_cmi",
-        "//middle_end/flambda/base_types:Tag_cmi",
-        "//middle_end/flambda/base_types:Static_exception_cmi",
-        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
-        "//middle_end/flambda/base_types:Set_of_closures_origin_cmi",
-        "//utils:Numbers_cmi",
-        "//middle_end/flambda/base_types:Mutable_variable_cmi",
-        "//utils:Identifiable_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//lambda:Debuginfo_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
         "//middle_end/flambda/base_types:Closure_origin_cmi",
+        "//middle_end/flambda/base_types:Mutable_variable_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_origin_cmi",
+        "//middle_end/flambda/base_types:Static_exception_cmi",
+        "//middle_end/flambda/base_types:Tag_cmi",
+        "//middle_end:Clambda_primitives_cmi",
+        "//middle_end:Symbol_cmi",
+        "//middle_end:Variable_cmi",
         "//parsing:Asttypes_cmi",
+        "//utils:Identifiable_cmi",
+        "//utils:Numbers_cmi",
+        ":Allocated_const_cmi",
+        ":Parameter_cmi",
+        ":Projection_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = ["//middle_end/flambda/base_types:__pkg__"]
 )
@@ -649,31 +681,33 @@ compiler_module(
     sig    = "Flambda_invariants_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Allocated_const",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Printclambda_primitives",
-        "//middle_end:Compilation_unit",
-        "//middle_end:Clambda_primitives",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Tag",
-        "//middle_end/flambda/base_types:Static_exception",
-        "//middle_end/flambda/base_types:Set_of_closures_origin",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Option",
-        "//utils:Numbers",
-        "//middle_end/flambda/base_types:Mutable_variable",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
         "//middle_end/flambda/base_types:Closure_id",
-    ]
+        "//middle_end/flambda/base_types:Mutable_variable",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Set_of_closures_origin",
+        "//middle_end/flambda/base_types:Static_exception",
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Allocated_const",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Clambda_primitives",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Printclambda_primitives",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Numbers",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printexc",
+    ],
 )
 
 compiler_signature(
@@ -681,9 +715,9 @@ compiler_signature(
     src  = "flambda_invariants.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -693,13 +727,15 @@ compiler_module(
     sig    = "Flambda_iterators_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Projection",
         "//middle_end:Variable",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.List",
         "//utils:Int_replace_polymorphic_compare",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+    ],
 )
 
 compiler_signature(
@@ -707,10 +743,10 @@ compiler_signature(
     src  = "flambda_iterators.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Symbol_cmi",
+        "//middle_end:Variable_cmi",
     ]
 )
 
@@ -720,42 +756,44 @@ compiler_module(
     sig    = "Flambda_middle_end_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Un_anf",
-        "//middle_end/flambda:Share_constants",
-        "//middle_end/flambda:Remove_unused_program_constructs",
-        "//middle_end/flambda:Remove_unused_closure_vars",
-        "//middle_end/flambda:Ref_to_variables",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Lift_let_to_initialize_symbol",
-        "//middle_end/flambda:Lift_constants",
-        "//middle_end/flambda:Lift_code",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Inline_and_simplify",
-        "//middle_end/flambda:Initialize_symbol_to_let_symbol",
-        "//middle_end/flambda:Flambda_to_clambda",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda_invariants",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Closure_conversion",
-        "//middle_end/flambda:Build_export_info",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Printclambda",
-        "//middle_end:Linkage_name",
-        "//middle_end:Compilenv",
-        "//middle_end:Clambda",
-        "//utils:Warnings",
-        "//stdlib:Stdlib.Set",
-        "//utils:Profile",
-        "//stdlib:Stdlib.Printexc",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda:Build_export_info",
+        "//middle_end/flambda:Closure_conversion",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_invariants",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_to_clambda",
+        "//middle_end/flambda:Initialize_symbol_to_let_symbol",
+        "//middle_end/flambda:Inline_and_simplify",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Lift_code",
+        "//middle_end/flambda:Lift_constants",
+        "//middle_end/flambda:Lift_let_to_initialize_symbol",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Ref_to_variables",
+        "//middle_end/flambda:Remove_unused_closure_vars",
+        "//middle_end/flambda:Remove_unused_program_constructs",
+        "//middle_end/flambda:Share_constants",
+        "//middle_end/flambda:Un_anf",
+        "//middle_end:Clambda",
+        "//middle_end:Compilenv",
+        "//middle_end:Linkage_name",
+        "//middle_end:Printclambda",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//parsing:Location",
         "//utils:Clflags",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        "//utils:Profile",
+        "//utils:Warnings",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Set",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -770,8 +808,10 @@ compiler_signature(
     deps   = [
         "//middle_end:Clambda_cmi",
         "//middle_end:Backend_intf_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -780,41 +820,43 @@ compiler_module(
     sig    = "Flambda_to_clambda_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Un_anf",
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Initialize_symbol_to_let_symbol",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Export_info",
-        "//middle_end/flambda:Closure_offsets",
-        "//middle_end/flambda:Allocated_const",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Linkage_name",
-        "//middle_end:Compilenv",
-        "//middle_end:Compilation_unit",
-        "//middle_end:Clambda",
-        "//middle_end:Backend_var",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Tag",
-        "//middle_end/flambda/base_types:Static_exception",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//typing:Primitive",
-        "//stdlib:Stdlib.Option",
-        "//utils:Numbers",
-        "//middle_end/flambda/base_types:Mutable_variable",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Mutable_variable",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Static_exception",
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Allocated_const",
+        "//middle_end/flambda:Closure_offsets",
+        "//middle_end/flambda:Export_info",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Initialize_symbol_to_let_symbol",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end/flambda:Un_anf",
+        "//middle_end:Backend_var",
+        "//middle_end:Clambda",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Compilenv",
+        "//middle_end:Linkage_name",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//typing:Primitive",
         "//utils:Clflags",
-        "//stdlib:Stdlib.Char",
+        "//utils:Misc",
+        "//utils:Numbers",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+    ],
 )
 
 compiler_signature(
@@ -822,13 +864,15 @@ compiler_signature(
     src  = "flambda_to_clambda.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Flambda_cmi",
         "//middle_end/flambda:Export_info_cmi",
-        "//middle_end:Symbol_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Clambda_cmi",
+        "//middle_end:Symbol_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -837,33 +881,35 @@ compiler_module(
     sig    = "Flambda_utils_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Allocated_const",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Internal_variable_names",
-        "//middle_end:Compilation_unit",
-        "//middle_end:Clambda_primitives",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//lambda:Switch",
-        "//stdlib:Stdlib.String",
-        "//middle_end/flambda/base_types:Static_exception",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//stdlib:Stdlib.Queue",
-        "//stdlib:Stdlib.Option",
-        "//utils:Numbers",
-        "//middle_end/flambda/base_types:Mutable_variable",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
-        "//middle_end/flambda/base_types:Closure_origin",
+        "//lambda:Switch",
         "//middle_end/flambda/base_types:Closure_id",
-    ]
+        "//middle_end/flambda/base_types:Closure_origin",
+        "//middle_end/flambda/base_types:Mutable_variable",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Static_exception",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Allocated_const",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Clambda_primitives",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        "//utils:Numbers",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Queue",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
@@ -871,18 +917,18 @@ compiler_signature(
     src  = "flambda_utils.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Parameter_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
-        "//middle_end:Symbol_cmi",
-        "//middle_end:Internal_variable_names_cmi",
-        "//middle_end/flambda/base_types:Var_within_closure_cmi",
-        "//middle_end/flambda/base_types:Tag_cmi",
         "//lambda:Switch_cmi",
-        "//middle_end/flambda/base_types:Static_exception_cmi",
-        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
+        "//middle_end/flambda/base_types:Static_exception_cmi",
+        "//middle_end/flambda/base_types:Tag_cmi",
+        "//middle_end/flambda/base_types:Var_within_closure_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Parameter_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end:Internal_variable_names_cmi",
+        "//middle_end:Symbol_cmi",
+        "//middle_end:Variable_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )
@@ -893,23 +939,25 @@ compiler_module(
     sig    = "Freshening_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Static_exception",
-        "//middle_end/flambda/base_types:Mutable_variable",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//utils:Identifiable",
-        "//stdlib:Stdlib.Format",
         "//middle_end/flambda/base_types:Closure_id",
-    ]
+        "//middle_end/flambda/base_types:Mutable_variable",
+        "//middle_end/flambda/base_types:Static_exception",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -917,16 +965,18 @@ compiler_signature(
     src  = "freshening.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
-        "//middle_end:Symbol_cmi",
-        "//middle_end/flambda/base_types:Var_within_closure_cmi",
-        "//middle_end/flambda/base_types:Static_exception_cmi",
-        "//middle_end/flambda/base_types:Mutable_variable_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
-    ]
+        "//middle_end/flambda/base_types:Mutable_variable_cmi",
+        "//middle_end/flambda/base_types:Static_exception_cmi",
+        "//middle_end/flambda/base_types:Var_within_closure_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end:Symbol_cmi",
+        "//middle_end:Variable_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -935,24 +985,26 @@ compiler_module(
     sig    = "Import_approx_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Freshening",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Export_info",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Compilenv",
-        "//middle_end:Compilation_unit",
-        "//middle_end:Clambda",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Format",
-        "//middle_end/flambda/base_types:Export_id",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Export_id",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Export_info",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Freshening",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Clambda",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Compilenv",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -962,9 +1014,9 @@ compiler_signature(
     src  = "import_approx.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
         "//middle_end:Symbol_cmi",
     ]
 )
@@ -975,22 +1027,24 @@ compiler_module(
     sig    = "Inconstant_idents_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Compilation_unit",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//stdlib:Stdlib.Queue",
-        "//stdlib:Stdlib.Option",
-        "//utils:Numbers",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//utils:Identifiable",
         "//middle_end/flambda/base_types:Closure_id",
-    ]
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Numbers",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Queue",
+    ],
 )
 
 compiler_signature(
@@ -998,13 +1052,13 @@ compiler_signature(
     src  = "inconstant_idents.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
-        "//middle_end:Compilation_unit_cmi",
-        "//middle_end:Backend_intf_cmi",
         "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end:Backend_intf_cmi",
+        "//middle_end:Compilation_unit_cmi",
+        "//middle_end:Variable_cmi",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1014,13 +1068,15 @@ compiler_module(
     sig    = "Initialize_symbol_to_let_symbol_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
         "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Projection",
         "//middle_end:Variable",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
         "//utils:Int_replace_polymorphic_compare",
-    ]
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -1028,8 +1084,8 @@ compiler_signature(
     src  = "initialize_symbol_to_let_symbol.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
     ]
 )
 
@@ -1039,51 +1095,53 @@ compiler_module(
     sig    = "Inline_and_simplify_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Unbox_specialised_args",
-        "//middle_end/flambda:Unbox_free_vars_of_closures",
-        "//middle_end/flambda:Unbox_closures",
-        "//middle_end/flambda:Simplify_primitives",
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Remove_unused_arguments",
-        "//middle_end/flambda:Remove_free_vars_equal_to_args",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Lift_code",
-        "//middle_end/flambda:Invariant_params",
-        "//middle_end/flambda:Inlining_stats",
-        "//middle_end/flambda:Inlining_decision",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Freshening",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Find_recursive_functions",
-        "//middle_end/flambda:Effect_analysis",
-        "//middle_end/flambda:Allocated_const",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Internal_variable_names",
-        "//middle_end:Clambda_primitives",
-        "//utils:Warnings",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Tag",
-        "//stdlib:Stdlib.String",
-        "//middle_end/flambda/base_types:Static_exception",
-        "//stdlib:Stdlib.Printf",
-        "//typing:Predef",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
-        "//lambda:Debuginfo",
         "//config:Config",
-        "//middle_end/flambda/base_types:Closure_origin",
+        "//lambda:Debuginfo",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Closure_origin",
+        "//middle_end/flambda/base_types:Static_exception",
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Allocated_const",
+        "//middle_end/flambda:Effect_analysis",
+        "//middle_end/flambda:Find_recursive_functions",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Freshening",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Inlining_decision",
+        "//middle_end/flambda:Inlining_stats",
+        "//middle_end/flambda:Invariant_params",
+        "//middle_end/flambda:Lift_code",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Remove_free_vars_equal_to_args",
+        "//middle_end/flambda:Remove_unused_arguments",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end/flambda:Simplify_primitives",
+        "//middle_end/flambda:Unbox_closures",
+        "//middle_end/flambda:Unbox_free_vars_of_closures",
+        "//middle_end/flambda:Unbox_specialised_args",
+        "//middle_end:Clambda_primitives",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//parsing:Location",
+        "//typing:Ident",
+        "//typing:Predef",
         "//utils:Clflags",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        "//utils:Warnings",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
@@ -1091,14 +1149,16 @@ compiler_signature(
     src  = "inline_and_simplify.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
         "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Backend_intf_cmi",
+        "//middle_end:Variable_cmi",
+        "//parsing:Asttypes_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -1107,35 +1167,35 @@ compiler_module(
     sig    = "Inline_and_simplify_aux_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Inlining_stats",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Freshening",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Compilation_unit",
-
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Static_exception",
-        "//middle_end/flambda/base_types:Set_of_closures_origin",
-        "//stdlib:Stdlib.Printexc",
-        "//middle_end/flambda/base_types:Mutable_variable",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lazy",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
-        "//middle_end/flambda/base_types:Closure_origin",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Closure_origin",
+        "//middle_end/flambda/base_types:Mutable_variable",
+        "//middle_end/flambda/base_types:Set_of_closures_origin",
+        "//middle_end/flambda/base_types:Static_exception",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Freshening",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Inlining_stats",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
         "//utils:Clflags",
-    ]
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printexc",
+    ],
 )
 
 compiler_signature(
@@ -1158,9 +1218,11 @@ compiler_signature(
         "//middle_end:Backend_intf_cmi",
         "//middle_end:Symbol_cmi",
         "//middle_end:Variable_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
         "//stdlib:Stdlib.Lazy_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -1169,24 +1231,26 @@ compiler_module(
     sig    = "Inlining_cost_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Flambda_iterators",
         "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Projection",
         "//middle_end:Clambda_primitives",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
+        "//middle_end:Variable",
         "//typing:Primitive",
-        "//stdlib:Stdlib.Option",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lazy",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Float",
         "//utils:Clflags",
-    ]
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Float",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
@@ -1194,10 +1258,13 @@ compiler_signature(
     src  = "inlining_cost.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//parsing:Asttypes_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -1206,23 +1273,25 @@ compiler_module(
     sig    = "Inlining_decision_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Inlining_transforms",
-        "//middle_end/flambda:Inlining_stats_types",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lazy",
-        "//utils:Int_replace_polymorphic_compare",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Inlining_stats_types",
+        "//middle_end/flambda:Inlining_transforms",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Variable",
         "//utils:Clflags",
-    ]
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -1230,14 +1299,14 @@ compiler_signature(
     src  = "inlining_decision.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_decision_intf_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
         "//lambda:Debuginfo_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Inlining_decision_intf_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
+        "//middle_end:Variable_cmi",
     ]
 )
 
@@ -1246,13 +1315,13 @@ compiler_signature(
     src  = "inlining_decision_intf.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
         "//lambda:Debuginfo_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
+        "//middle_end:Variable_cmi",
     ]
 )
 
@@ -1262,17 +1331,19 @@ compiler_module(
     sig    = "Inlining_stats_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Inlining_stats_types",
-        "//stdlib:Stdlib.String",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda:Inlining_stats_types",
         "//utils:Clflags",
-    ]
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
@@ -1280,9 +1351,9 @@ compiler_signature(
     src  = "inlining_stats.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Inlining_stats_types_cmi",
         "//lambda:Debuginfo_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda:Inlining_stats_types_cmi",
     ]
 )
 
@@ -1293,10 +1364,12 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//middle_end/flambda:Inlining_cost",
-        "//stdlib:Stdlib.String",
         "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
-    ]
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
@@ -1305,8 +1378,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//middle_end/flambda:Inlining_cost_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -1315,25 +1390,27 @@ compiler_module(
     sig    = "Inlining_transforms_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Internal_variable_names",
-        "//middle_end:Compilation_unit",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lazy",
-        "//utils:Int_replace_polymorphic_compare",
         "//lambda:Debuginfo",
-        "//middle_end/flambda/base_types:Closure_origin",
         "//middle_end/flambda/base_types:Closure_id",
-    ]
+        "//middle_end/flambda/base_types:Closure_origin",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -1341,14 +1418,14 @@ compiler_signature(
     src  = "inlining_transforms.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_decision_intf_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
         "//lambda:Debuginfo_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Inlining_decision_intf_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
+        "//middle_end:Variable_cmi",
     ]
 )
 
@@ -1358,20 +1435,22 @@ compiler_module(
     sig    = "Invariant_params_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Format",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
         "//utils:Clflags",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -1379,10 +1458,10 @@ compiler_signature(
     src  = "invariant_params.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Backend_intf_cmi",
+        "//middle_end:Variable_cmi",
     ]
 )
 
@@ -1392,17 +1471,19 @@ compiler_module(
     sig    = "Lift_code_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Compilation_unit",
-        "//utils:Strongly_connected_components",
         "//middle_end/flambda/base_types:Mutable_variable",
-        "//stdlib:Stdlib.List",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Variable",
         "//utils:Int_replace_polymorphic_compare",
+        "//utils:Strongly_connected_components",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -1410,10 +1491,10 @@ compiler_signature(
     src  = "lift_code.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Internal_variable_names_cmi",
+        "//middle_end:Variable_cmi",
     ]
 )
 
@@ -1423,28 +1504,30 @@ compiler_module(
     sig    = "Lift_constants_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Inconstant_idents",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Allocated_const",
-        "//middle_end/flambda:Alias_analysis",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Internal_variable_names",
-        "//middle_end:Compilation_unit",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Tag",
-        "//utils:Strongly_connected_components",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Format",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Alias_analysis",
+        "//middle_end/flambda:Allocated_const",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Inconstant_idents",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        "//utils:Strongly_connected_components",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -1452,10 +1535,10 @@ compiler_signature(
     src  = "lift_constants.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Backend_intf_cmi",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1465,17 +1548,19 @@ compiler_module(
     sig    = "Lift_let_to_initialize_symbol_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Internal_variable_names",
-        "//middle_end/flambda/base_types:Tag",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
         "//lambda:Debuginfo",
-    ]
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -1483,10 +1568,10 @@ compiler_signature(
     src  = "lift_let_to_initialize_symbol.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Backend_intf_cmi",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1497,10 +1582,12 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//middle_end:Variable",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
         "//utils:Identifiable",
-    ]
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -1520,9 +1607,11 @@ compiler_module(
     sig    = "Pass_wrapper_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//utils:Clflags",
         "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
-        "//utils:Clflags"
     ]
 )
 
@@ -1530,7 +1619,7 @@ compiler_signature(
     name = "Pass_wrapper_cmi",
     src  = "pass_wrapper.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Format_cmi",
     ]
 )
@@ -1541,16 +1630,15 @@ compiler_module(
     sig    = "Projection_cmi",
     opts = MODULE_OPTS,
     deps   = [
-# Error: Module `Closure_id' is unavailable (required by `Projection')
-# Target //:ocamlopt failed to build
         "//middle_end/flambda/base_types:Closure_id",
-        "//middle_end:Variable",
-        "//utils:Int_replace_polymorphic_compare",
-
         "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end:Variable",
         "//utils:Identifiable",
-        "//stdlib:Stdlib.Hashtbl",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
     ]
 )
 
@@ -1559,11 +1647,13 @@ compiler_signature(
     src  = "projection.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end:Variable_cmi",
+        "//middle_end/flambda/base_types:Closure_id_cmi",
         "//middle_end/flambda/base_types:Var_within_closure_cmi",
+        "//middle_end:Variable_cmi",
         "//utils:Identifiable_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-        "//middle_end/flambda/base_types:Closure_id_cmi"
     ]
 )
 
@@ -1573,16 +1663,18 @@ compiler_module(
     sig    = "Ref_to_variables_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end:Internal_variable_names",
-        "//stdlib:Stdlib.Option",
         "//middle_end/flambda/base_types:Mutable_variable",
-        "//stdlib:Stdlib.List",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Variable",
         "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
     ]
 )
 
@@ -1591,9 +1683,9 @@ compiler_signature(
     src  = "ref_to_variables.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -1603,14 +1695,16 @@ compiler_module(
     sig    = "Remove_free_vars_equal_to_args_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Pass_wrapper",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Flambda_utils",
         "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Pass_wrapper",
+        "//middle_end/flambda:Projection",
         "//middle_end:Variable",
-        "//stdlib:Stdlib.List",
         "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -1619,8 +1713,10 @@ compiler_signature(
     src  = "remove_free_vars_equal_to_args.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ]
 )
@@ -1631,21 +1727,23 @@ compiler_module(
     sig    = "Remove_unused_arguments_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Invariant_params",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Find_recursive_functions",
-        "//middle_end:Variable",
-        "//middle_end:Compilation_unit",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Format",
-        "//middle_end/flambda/base_types:Closure_origin",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Closure_origin",
+        "//middle_end/flambda:Find_recursive_functions",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Invariant_params",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Variable",
         "//utils:Clflags",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -1654,8 +1752,8 @@ compiler_signature(
     src  = "remove_unused_arguments.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Backend_intf_cmi",
     ]
 )
@@ -1666,15 +1764,18 @@ compiler_module(
     sig    = "Remove_unused_closure_vars_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Variable",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//utils:Int_replace_polymorphic_compare",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
     ]
 )
 
@@ -1683,8 +1784,8 @@ compiler_signature(
     src  = "remove_unused_closure_vars.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
     ]
 )
 
@@ -1694,12 +1795,14 @@ compiler_module(
     sig    = "Remove_unused_program_constructs_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Flambda",
         "//middle_end/flambda:Effect_analysis",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Projection",
         "//middle_end:Symbol",
-        "//stdlib:Stdlib.List",
         "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -1708,8 +1811,8 @@ compiler_signature(
     src  = "remove_unused_program_constructs.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
     ]
 )
 
@@ -1719,12 +1822,14 @@ compiler_module(
     sig    = "Share_constants_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Flambda_iterators",
         "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Projection",
         "//middle_end:Symbol",
-        "//stdlib:Stdlib.List",
         "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -1733,8 +1838,8 @@ compiler_signature(
     src  = "share_constants.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
     ]
 )
 
@@ -1744,40 +1849,42 @@ compiler_module(
     sig    = "Simple_value_approx_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Parameter",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Freshening",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Effect_analysis",
-        "//middle_end/flambda:Allocated_const",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Internal_variable_names",
-        "//middle_end:Compilation_unit",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Tag",
-        "//stdlib:Stdlib.String",
-        "//middle_end/flambda/base_types:Set_of_closures_origin",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Obj",
-        "//stdlib:Stdlib.Nativeint",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lazy",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int32",
-        "//stdlib:Stdlib.Format",
-        "//middle_end/flambda/base_types:Export_id",
         "//lambda:Debuginfo",
-        "//middle_end/flambda/base_types:Closure_origin",
         "//middle_end/flambda/base_types:Closure_id",
-        "//stdlib:Stdlib.Char",
+        "//middle_end/flambda/base_types:Closure_origin",
+        "//middle_end/flambda/base_types:Export_id",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Set_of_closures_origin",
+        "//middle_end/flambda/base_types:Tag",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Allocated_const",
+        "//middle_end/flambda:Effect_analysis",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Freshening",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Parameter",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Internal_variable_names",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -1786,22 +1893,24 @@ compiler_signature(
     src  = "simple_value_approx.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Parameter_cmi",
-        "//middle_end/flambda:Freshening_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
-        "//middle_end:Symbol_cmi",
-        "//middle_end/flambda/base_types:Var_within_closure_cmi",
-        "//middle_end/flambda/base_types:Tag_cmi",
-        "//middle_end/flambda/base_types:Set_of_closures_origin_cmi",
-        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
-        "//stdlib:Stdlib.Lazy_cmi",
-        "//stdlib:Stdlib.Format_cmi",
-        "//middle_end/flambda/base_types:Export_id_cmi",
         "//lambda:Debuginfo_cmi",
-        "//middle_end/flambda/base_types:Closure_origin_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda/base_types:Closure_origin_cmi",
+        "//middle_end/flambda/base_types:Export_id_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_origin_cmi",
+        "//middle_end/flambda/base_types:Tag_cmi",
+        "//middle_end/flambda/base_types:Var_within_closure_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Freshening_cmi",
+        "//middle_end/flambda:Parameter_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end:Symbol_cmi",
+        "//middle_end:Variable_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Lazy_cmi",
     ],
     visibility = ["//middle_end:__pkg__"]
 )
@@ -1813,15 +1922,17 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//middle_end:Clambda_primitives",
-        "//stdlib:Stdlib.Int32",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Nativeint",
         "//utils:Int_replace_polymorphic_compare",
         ":Flambda",
         ":Inlining_cost",
         ":Projection",
         ":Simple_value_approx",
         ":Simplify_common",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Nativeint",
     ]
 )
 
@@ -1832,9 +1943,11 @@ compiler_signature(
     deps   = [
         "//parsing:Asttypes_cmi",
         ":Simplify_boxed_integer_ops_intf_cmi",
-        "//stdlib:Stdlib.Nativeint_cmi",
-        "//stdlib:Stdlib.Int64_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Int32_cmi",
+        "//stdlib:Stdlib.Int64_cmi",
+        "//stdlib:Stdlib.Nativeint_cmi",
     ]
 )
 
@@ -1843,10 +1956,10 @@ compiler_signature(
     src  = "simplify_boxed_integer_ops_intf.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_cost_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inlining_cost_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
         "//middle_end:Clambda_primitives_cmi",
         "//parsing:Asttypes_cmi",
     ]
@@ -1858,11 +1971,11 @@ compiler_module(
     sig    = "Simplify_common_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Flambda",
         "//middle_end/flambda:Effect_analysis",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
         "//utils:Int_replace_polymorphic_compare",
     ]
 )
@@ -1872,10 +1985,10 @@ compiler_signature(
     src  = "simplify_common.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_cost_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inlining_cost_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
     ]
 )
 
@@ -1885,27 +1998,29 @@ compiler_module(
     sig    = "Simplify_primitives_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simplify_common",
-        "//middle_end/flambda:Simplify_boxed_integer_ops",
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Flambda",
-        "//middle_end:Symbol",
-        "//middle_end:Semantics_of_primitives",
-        "//middle_end:Clambda_primitives",
         "//middle_end/flambda/base_types:Tag",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Nativeint",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int32",
-        "//stdlib:Stdlib.Float",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end/flambda:Simplify_boxed_integer_ops",
+        "//middle_end/flambda:Simplify_common",
+        "//middle_end:Clambda_primitives",
+        "//middle_end:Semantics_of_primitives",
+        "//middle_end:Symbol",
         "//utils:Clflags",
-        "//stdlib:Stdlib.Char",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Float",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -1914,13 +2029,13 @@ compiler_signature(
     src  = "simplify_primitives.mli",
     opts = SIG_OPTS,
     deps   = [
-       "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_cost_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end:Variable_cmi",
-        "//middle_end:Clambda_primitives_cmi",
         "//lambda:Debuginfo_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inlining_cost_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
+        "//middle_end:Clambda_primitives_cmi",
+        "//middle_end:Variable_cmi",
         "//parsing:Asttypes_cmi",
     ]
 )
@@ -1931,21 +2046,23 @@ compiler_module(
     sig    = "Traverse_for_exported_symbols_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx",
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Export_info",
-        "//middle_end:Variable",
-        "//middle_end:Symbol",
-        "//middle_end:Compilation_unit",
-        "//middle_end/flambda/base_types:Var_within_closure",
-        "//middle_end/flambda/base_types:Set_of_closures_id",
-        "//stdlib:Stdlib.Queue",
-        "//utils:Misc",
-        "//middle_end/flambda/base_types:Export_id",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda/base_types:Export_id",
+        "//middle_end/flambda/base_types:Set_of_closures_id",
+        "//middle_end/flambda/base_types:Var_within_closure",
+        "//middle_end/flambda:Export_info",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Projection",
+        "//middle_end/flambda:Simple_value_approx",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Symbol",
+        "//middle_end:Variable",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Queue",
     ]
 )
 
@@ -1954,15 +2071,15 @@ compiler_signature(
     src  = "traverse_for_exported_symbols.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Simple_value_approx_cmi",
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Flambda_cmi",
-        "//middle_end/flambda:Export_info_cmi",
-        "//middle_end:Symbol_cmi",
-        "//middle_end/flambda/base_types:Var_within_closure_cmi",
-        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
-        "//middle_end/flambda/base_types:Export_id_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda/base_types:Export_id_cmi",
+        "//middle_end/flambda/base_types:Set_of_closures_id_cmi",
+        "//middle_end/flambda/base_types:Var_within_closure_cmi",
+        "//middle_end/flambda:Export_info_cmi",
+        "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Projection_cmi",
+        "//middle_end/flambda:Simple_value_approx_cmi",
+        "//middle_end:Symbol_cmi",
     ]
 )
 
@@ -1972,19 +2089,21 @@ compiler_module(
     sig    = "Un_anf_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end:Symbol",
-        "//middle_end:Semantics_of_primitives",
-        "//middle_end:Printclambda",
-        "//middle_end:Clambda_primitives",
-        "//middle_end:Clambda",
-        "//middle_end:Backend_var",
-        "//stdlib:Stdlib.Option",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
+        "//middle_end:Backend_var",
+        "//middle_end:Clambda",
+        "//middle_end:Clambda_primitives",
+        "//middle_end:Printclambda",
+        "//middle_end:Semantics_of_primitives",
+        "//middle_end:Symbol",
         "//utils:Clflags",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
     ]
 )
 
@@ -1993,9 +2112,11 @@ compiler_signature(
     src  = "un_anf.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end:Symbol_cmi",
         "//middle_end:Clambda_cmi",
+        "//middle_end:Symbol_cmi",
+        "//parsing:Asttypes_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ]
 )
@@ -2006,17 +2127,20 @@ compiler_module(
     sig    = "Unbox_closures_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Augment_specialised_args",
-        "//middle_end:Variable",
-        "//utils:Int_replace_polymorphic_compare",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda:Augment_specialised_args",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Projection",
+        "//middle_end:Variable",
         "//utils:Clflags",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
     ]
 )
 
@@ -2025,10 +2149,10 @@ compiler_signature(
     src  = "unbox_closures.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_cost_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Inlining_cost_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Variable_cmi",
     ]
 )
@@ -2039,19 +2163,22 @@ compiler_module(
     sig    = "Unbox_free_vars_of_closures_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Pass_wrapper",
-        "//middle_end/flambda:Inlining_cost",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Flambda_utils",
-        "//middle_end/flambda:Flambda_iterators",
-        "//middle_end/flambda:Flambda",
         "//middle_end/flambda:Extract_projections",
-        "//middle_end:Variable",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Flambda_iterators",
+        "//middle_end/flambda:Flambda_utils",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Inlining_cost",
+        "//middle_end/flambda:Pass_wrapper",
+        "//middle_end/flambda:Projection",
         "//middle_end:Internal_variable_names",
-        "//utils:Misc",
-        "//utils:Int_replace_polymorphic_compare",
+        "//middle_end:Variable",
         "//utils:Clflags",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
     ]
 )
 
@@ -2060,10 +2187,10 @@ compiler_signature(
     src  = "unbox_free_vars_of_closures.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_cost_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Inlining_cost_cmi",
+        "//middle_end/flambda:Projection_cmi",
     ]
 )
 
@@ -2073,15 +2200,18 @@ compiler_module(
     sig    = "Unbox_specialised_args_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection",
-        "//middle_end/flambda:Invariant_params",
-        "//middle_end/flambda:Inline_and_simplify_aux",
-        "//middle_end/flambda:Flambda",
-        "//middle_end/flambda:Extract_projections",
         "//middle_end/flambda:Augment_specialised_args",
+        "//middle_end/flambda:Extract_projections",
+        "//middle_end/flambda:Flambda",
+        "//middle_end/flambda:Inline_and_simplify_aux",
+        "//middle_end/flambda:Invariant_params",
+        "//middle_end/flambda:Projection",
         "//middle_end:Variable",
-        "//utils:Int_replace_polymorphic_compare",
         "//utils:Clflags",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
     ]
 )
 
@@ -2090,10 +2220,10 @@ compiler_signature(
     src  = "unbox_specialised_args.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end/flambda:Projection_cmi",
-        "//middle_end/flambda:Inlining_cost_cmi",
-        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
         "//middle_end/flambda:Flambda_cmi",
+        "//middle_end/flambda:Inline_and_simplify_aux_cmi",
+        "//middle_end/flambda:Inlining_cost_cmi",
+        "//middle_end/flambda:Projection_cmi",
         "//middle_end:Variable_cmi",
     ]
 )

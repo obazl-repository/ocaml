@@ -81,10 +81,10 @@ compiler_signature(
     src  = "backend_intf.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Symbol_cmi",
+        "//middle_end/flambda/base_types:Closure_id_cmi",
         "//middle_end/flambda:Simple_value_approx_cmi",
         "//typing:Ident_cmi",
-        "//middle_end/flambda/base_types:Closure_id_cmi",
+        ":Symbol_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -99,11 +99,13 @@ compiler_module(
     sig    = "Backend_var_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//lambda:Debuginfo",
         "//typing:Ident",
         "//typing:Path",
-        "//stdlib:Stdlib.Format",
-        "//lambda:Debuginfo",
         "//utils:Clflags",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -117,10 +119,12 @@ compiler_signature(
     src  = "backend_var.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Path_cmi",
+        "//lambda:Debuginfo_cmi",
         "//typing:Ident_cmi",
+        "//typing:Path_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-        "//lambda:Debuginfo_cmi"
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -134,15 +138,17 @@ compiler_module(
     sig    = "Clambda_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
-        ":Backend_var", ## (Middle_end Backend_var)
-        "//lambda:Debuginfo", ## (Lambda Debuginfo)
-        "//stdlib:Stdlib.String",
-        "//typing:Path",
-        "//stdlib:Stdlib.Nativeint",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int32",
+        "//lambda:Debuginfo",
         "//typing:Ident",
+        "//typing:Path",
+        ":Backend_var",
+        ":Clambda_primitives",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -155,12 +161,12 @@ compiler_signature(
     src  = "clambda.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Clambda_primitives_cmi",
-        ":Backend_var_cmi",
         "//lambda:Debuginfo_cmi",
-        "//typing:Path_cmi",
-        "//typing:Ident_cmi",
         "//parsing:Asttypes_cmi",
+        "//typing:Ident_cmi",
+        "//typing:Path_cmi",
+        ":Backend_var_cmi",
+        ":Clambda_primitives_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -176,8 +182,11 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//lambda:Lambda",
-        "//typing:Types",
         "//typing:Primitive",
+        "//typing:Types",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
     ],
     visibility = ["//middle_end:__subpackages__"]
 )
@@ -187,10 +196,10 @@ compiler_signature(
     src  = "clambda_primitives.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Types_cmi",
-        "//typing:Primitive_cmi",
         "//lambda:Lambda_cmi",
-        "//parsing:Asttypes_cmi"
+        "//parsing:Asttypes_cmi",
+        "//typing:Primitive_cmi",
+        "//typing:Types_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -201,14 +210,16 @@ compiler_module(
     sig    = "Compilation_unit_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Linkage_name", ## (Middle_end Linkage_name)
-        "//stdlib:Stdlib.String",
-        "//utils:Misc",
-        "//utils:Int_replace_polymorphic_compare",
-        "//utils:Identifiable",
         "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
+        "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        ":Linkage_name",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -222,9 +233,9 @@ compiler_signature(
     src  = "compilation_unit.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linkage_name_cmi",
+        "//typing:Ident_cmi",
         "//utils:Identifiable_cmi",
-        "//typing:Ident_cmi"
+        ":Linkage_name_cmi",
     ],
     visibility = [
         "//middle_end/flambda:__pkg__",
@@ -238,31 +249,31 @@ compiler_module(
     sig    = "Compilenv_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Symbol", ## (Middle_end Symbol)
-        ":Linkage_name", ## (Middle_end Linkage_name)
-        ":Compilation_unit", ## (Middle_end Compilation_unit)
-        ":Clambda", ## (Middle_end Clambda)
-        "//utils:Warnings",
-        "//stdlib:Stdlib.String",
-        ## (Simple_value_approx)
-        ## (Set_of_closures_id)
-        "//typing:Path",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Map",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//middle_end/flambda:Export_info",
-        "//typing:Env",
-        "//stdlib:Stdlib.Digest",
         "//config:Config",
         "//middle_end/flambda/base_types:Closure_id",
+        "//middle_end/flambda:Export_info",
+        "//parsing:Location",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Path",
         "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Clambda",
+        ":Compilation_unit",
+        ":Linkage_name",
+        ":Symbol",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -277,17 +288,19 @@ compiler_signature(
     src  = "compilenv.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Symbol_cmi",
-        ":Linkage_name_cmi",
-        ":Compilation_unit_cmi",
-        ":Clambda_cmi",
-        "//typing:Ident_cmi",
-        "//stdlib:Stdlib.Format_cmi",
-        "//middle_end/flambda:Export_info_cmi",
-        "//stdlib:Stdlib.Digest_cmi",
         "//file_formats:Cmx_format_cmi",
         "//middle_end/flambda/base_types:Closure_id_cmi",
+        "//middle_end/flambda:Export_info_cmi",
+        "//typing:Ident_cmi",
+        ":Clambda_cmi",
+        ":Compilation_unit_cmi",
+        ":Linkage_name_cmi",
+        ":Symbol_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -296,9 +309,9 @@ compiler_module(
     sig    = "Convert_primitives_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
         "//lambda:Printlambda",
         "//utils:Misc",
+        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
     ],
     visibility = ["//middle_end:__subpackages__"]
 )
@@ -308,8 +321,8 @@ compiler_signature(
     src  = "convert_primitives.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Clambda_primitives_cmi",
         "//parsing:Asttypes_cmi",
+        ":Clambda_primitives_cmi",
     ],
 )
 
@@ -319,12 +332,14 @@ compiler_module(
     sig    = "Internal_variable_names_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//parsing:Location",
-        "//lambda:Lambda",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
         "//lambda:Debuginfo",
+        "//lambda:Lambda",
+        "//parsing:Location",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -348,11 +363,13 @@ compiler_module(
     sig    = "Linkage_name_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.String",
-        "//utils:Int_replace_polymorphic_compare",
         "//utils:Identifiable",
-        "//stdlib:Stdlib.Hashtbl",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//middle_end/flambda:__pkg__",
@@ -375,15 +392,17 @@ compiler_module(
     sig    = "Printclambda_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
-        ":Clambda", ## (Middle_end Clambda)
-        ":Backend_var", ## (Middle_end Backend_var)
-        "//stdlib:Stdlib.String",
         "//lambda:Printlambda",
-        "//stdlib:Stdlib.List",
         "//typing:Ident",
-        "//stdlib:Stdlib.Format",
+        ":Backend_var", ## (Middle_end Backend_var)
+        ":Clambda", ## (Middle_end Clambda)
+        ":Printclambda_primitives", ## (Middle_end Printclambda_primitives)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//middle_end:__subpackages__",
@@ -396,8 +415,8 @@ compiler_signature(
     src  = "printclambda.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Clambda_cmi",
         "//stdlib:Stdlib.Format_cmi",
+        ":Clambda_cmi",
     ],
 )
 
@@ -407,13 +426,15 @@ compiler_module(
     sig    = "Printclambda_primitives_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end:Clambda_primitives", ## (Middle_end Clambda_primitives)
-        "//lambda:Printlambda", ## (Lambda Printlambda)
-        "//lambda:Lambda", ## (Lambda Lambda)
-        "//lambda:Debuginfo", ## (Lambda Debuginfo)
-        "//stdlib:Stdlib.Printf",
+        "//lambda:Debuginfo",
+        "//lambda:Lambda",
+        "//lambda:Printlambda",
+        "//middle_end:Clambda_primitives",
         "//typing:Primitive",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Printf",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -423,10 +444,12 @@ compiler_signature(
     src  = "printclambda_primitives.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Clambda_primitives_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//parsing:Asttypes_cmi",
+        ":Clambda_primitives_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -435,7 +458,7 @@ compiler_module(
     sig    = "Semantics_of_primitives_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Clambda_primitives", ## (Middle_end Clambda_primitives)
+        ":Clambda_primitives",
     ],
     visibility = ["//middle_end:__subpackages__"]
 )
@@ -445,8 +468,8 @@ compiler_signature(
     src  = "semantics_of_primitives.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Clambda_primitives_cmi",
         "//parsing:Asttypes_cmi",
+        ":Clambda_primitives_cmi",
     ],
 )
 
@@ -456,12 +479,14 @@ compiler_module(
     sig    = "Symbol_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Variable", ## (Middle_end Variable)
-        ":Linkage_name", ## (Middle_end Linkage_name)
-        ":Compilation_unit", ## (Middle_end Compilation_unit)
-        "//utils:Misc",
-        "//utils:Int_replace_polymorphic_compare",
         "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        ":Compilation_unit",
+        ":Linkage_name",
+        ":Variable",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
     ],
     visibility = [
@@ -475,10 +500,12 @@ compiler_signature(
     src  = "symbol.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Variable_cmi",
-        ":Linkage_name_cmi",
-        ":Compilation_unit_cmi",
         "//utils:Identifiable_cmi",
+        ":Compilation_unit_cmi",
+        ":Linkage_name_cmi",
+        ":Variable_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
@@ -490,16 +517,17 @@ compiler_module(
     sig    = "Variable_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Internal_variable_names", ## (Middle_end Internal_variable_names)
-        ":Compilation_unit", ## (Middle_end Compilation_unit)
-        ## (T)
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Int",
-        "//utils:Identifiable",
         "//typing:Ident",
+        "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        ":Compilation_unit",
+        ":Internal_variable_names",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
     ],
     visibility = ["//middle_end/flambda:__subpackages__"]
 )
@@ -509,10 +537,12 @@ compiler_signature(
     src  = "variable.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Internal_variable_names_cmi",
-        ":Compilation_unit_cmi",
-        "//utils:Identifiable_cmi",
         "//typing:Ident_cmi",
+        "//utils:Identifiable_cmi",
+        ":Compilation_unit_cmi",
+        ":Internal_variable_names_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = ["//middle_end/flambda:__subpackages__"]

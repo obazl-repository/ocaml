@@ -69,12 +69,14 @@ compiler_signature(
     src  = "closure_element.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end:Variable_cmi",
         "//middle_end:Compilation_unit_cmi",
-        "//stdlib:Stdlib.Set_cmi",
-        "//stdlib:Stdlib.Map_cmi",
+        "//middle_end:Variable_cmi",
         "//utils:Identifiable_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Map_cmi",
+        "//stdlib:Stdlib.Set_cmi",
+    ],
 )
 
 compiler_module(
@@ -83,8 +85,8 @@ compiler_module(
     sig    = "Closure_id_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Closure_element",
         "//utils:Int_replace_polymorphic_compare",
+        ":Closure_element",
     ],
     visibility = [
         "//:__pkg__",
@@ -110,8 +112,8 @@ compiler_module(
     sig    = "Closure_origin_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Closure_id",
         "//utils:Int_replace_polymorphic_compare",
+        ":Closure_id",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -121,9 +123,9 @@ compiler_signature(
     src  = "closure_origin.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Closure_id_cmi",
         "//middle_end:Compilation_unit_cmi",
         "//utils:Identifiable_cmi",
+        ":Closure_id_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -134,10 +136,10 @@ compiler_module(
     sig    = "Export_id_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Id_types",
         "//middle_end:Compilation_unit",
+        "//utils:Identifiable",
         "//utils:Int_replace_polymorphic_compare",
-        "//utils:Identifiable"
+        ":Id_types",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -159,13 +161,15 @@ compiler_module(
     sig    = "Id_types_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Printf",
-        "//utils:Int_replace_polymorphic_compare",
-        "//stdlib:Stdlib.Int",
         "//utils:Identifiable",
-        "//stdlib:Stdlib.Hashtbl",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
-    ]
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Printf",
+    ],
 )
 
 compiler_signature(
@@ -174,8 +178,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//utils:Identifiable_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -195,11 +201,13 @@ compiler_signature(
     src  = "mutable_variable.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//middle_end:Variable_cmi",
-        "//middle_end:Internal_variable_names_cmi",
         "//middle_end:Compilation_unit_cmi",
-        "//utils:Identifiable_cmi",
+        "//middle_end:Internal_variable_names_cmi",
+        "//middle_end:Variable_cmi",
         "//typing:Ident_cmi",
+        "//utils:Identifiable_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
@@ -211,10 +219,10 @@ compiler_module(
     sig    = "Set_of_closures_id_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Id_types",
         "//middle_end:Compilation_unit",
-        "//utils:Int_replace_polymorphic_compare",
         "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        ":Id_types",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -236,8 +244,8 @@ compiler_module(
     sig    = "Set_of_closures_origin_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Set_of_closures_id",
         "//utils:Int_replace_polymorphic_compare",
+        ":Set_of_closures_id",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -247,9 +255,9 @@ compiler_signature(
     src  = "set_of_closures_origin.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Set_of_closures_id_cmi",
         "//middle_end:Compilation_unit_cmi",
         "//utils:Identifiable_cmi",
+        ":Set_of_closures_id_cmi",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -261,8 +269,8 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//lambda:Lambda",
-        "//utils:Numbers",
         "//utils:Int_replace_polymorphic_compare",
+        "//utils:Numbers",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -283,12 +291,14 @@ compiler_module(
     sig    = "Tag_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Numbers",
-        "//utils:Misc",
-        "//utils:Int_replace_polymorphic_compare",
         "//utils:Identifiable",
+        "//utils:Int_replace_polymorphic_compare",
+        "//utils:Misc",
+        "//utils:Numbers",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printf",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -309,8 +319,8 @@ compiler_module(
     sig    = "Var_within_closure_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Closure_element",
         "//utils:Int_replace_polymorphic_compare",
+        ":Closure_element",
     ],
     visibility = [
         "//middle_end/flambda:__pkg__",

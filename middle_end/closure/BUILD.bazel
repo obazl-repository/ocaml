@@ -27,34 +27,36 @@ compiler_module(
     sig    = "Closure_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//middle_end:Semantics_of_primitives",
-        "//middle_end:Convert_primitives",
-        "//middle_end:Compilenv",
-        "//middle_end:Clambda_primitives",
-        "//middle_end:Clambda",
-        "//middle_end:Backend_var",
-        "//lambda:Switch",
-        "//lambda:Simplif",
-        "//lambda:Lambda",
-        "//lambda:Debuginfo",
-        "//utils:Warnings",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//typing:Primitive",
-        "//stdlib:Stdlib.Option",
-        "//utils:Numbers",
-        "//stdlib:Stdlib.Nativeint",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int32",
-        "//typing:Ident",
-        "//typing:Env",
         "//config:Config",
+        "//lambda:Debuginfo",
+        "//lambda:Lambda",
+        "//lambda:Simplif",
+        "//lambda:Switch",
+        "//middle_end:Backend_var",
+        "//middle_end:Clambda",
+        "//middle_end:Clambda_primitives",
+        "//middle_end:Compilenv",
+        "//middle_end:Convert_primitives",
+        "//middle_end:Semantics_of_primitives",
+        "//parsing:Location",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Primitive",
         "//utils:Clflags",
-        "//stdlib:Stdlib.Char",
+        "//utils:Misc",
+        "//utils:Numbers",
+        "//utils:Warnings",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = ["//middle_end:__pkg__"]
 )
@@ -64,9 +66,9 @@ compiler_signature(
     src  = "closure.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Asttypes_cmi",
-        "//middle_end:Clambda_cmi",
         "//middle_end:Backend_intf_cmi",
+        "//middle_end:Clambda_cmi",
+        "//parsing:Asttypes_cmi",
     ]
 )
 
@@ -76,15 +78,17 @@ compiler_module(
     sig    = "Closure_middle_end_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Closure",
-        "//middle_end:Printclambda", ## (Middle_end Printclambda)
-        "//middle_end:Compilenv", ## (Middle_end Compilenv)
-        "//middle_end:Clambda", ## (Middle_end Clambda)
-        "//typing:Path",
-        "//stdlib:Stdlib.List",
+        "//middle_end:Clambda",
+        "//middle_end:Compilenv",
+        "//middle_end:Printclambda",
         "//typing:Ident",
-        "//stdlib:Stdlib.Format",
+        "//typing:Path",
         "//utils:Clflags",
+        ":Closure",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -99,7 +103,9 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//middle_end:Clambda_cmi",
-        "//middle_end:Backend_intf_cmi", ## (Middle_end Backend_intf)
+        "//middle_end:Backend_intf_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ]
 )
