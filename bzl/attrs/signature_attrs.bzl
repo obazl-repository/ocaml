@@ -1,3 +1,6 @@
+load("//bzl:providers.bzl", "StdlibSigMarker")
+
+
 #######################
 def signature_attrs():
 
@@ -65,6 +68,11 @@ def signature_attrs():
         # pack = attr.string(
         #     doc = "Experimental",
         # ),
+
+        stdlib_deps = attr.label_list(
+            doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
+            providers = [StdlibSigMarker]
+        ),
 
         deps = attr.label_list(
             doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",

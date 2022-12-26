@@ -15,7 +15,7 @@ load(":BUILD_RULES.bzl",
      "stdlib_module",
      "stdlib_signature")
 
-load(":BUILD.bzl", "STDLIB_MANIFEST")
+load(":BUILD_STDLIB.bzl", "STDLIB_MANIFEST")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -90,7 +90,7 @@ kernel_module(
         "-no-alias-deps",
     ],
     warnings = [NO_CMI_FILE],
-    deps = [":CamlinternalFormatBasics",],
+    stdlib_deps = [":CamlinternalFormatBasics",],
 )
 
 # WARNING: if we run this as a separate task (instead of passing the
@@ -114,7 +114,7 @@ kernel_signature(
         "-no-alias-deps",
     ],
     warnings = [NO_CMI_FILE],
-    deps   = [
+    stdlib_deps   = [
         ":CamlinternalFormatBasics_cmi",
     ],
 )
@@ -208,9 +208,8 @@ stdlib_internal_module(
     #     "//config:sig_src?"   : "camlinternalformat.mli",
     #     "//conditions:default": "CamlinternalFormat_cmi"
     # }),
-    opts = ["-open", "Stdlib"],
     warnings = ["fragile-match"],
-    deps   = [
+    stdlib_deps   = [
         ":CamlinternalFormatBasics",
         ":Stdlib.Buffer",
         ":Stdlib.Bytes",
@@ -224,10 +223,9 @@ stdlib_internal_module(
 stdlib_internal_signature(
     name = "CamlinternalFormat_cmi",
     src  = "camlinternalFormat.mli",
-    opts = ["-open", "Stdlib"],
     warnings = ["fragile-match"],
-    deps   = [
-        ":CamlinternalFormatBasics",
+    stdlib_deps   = [
+        ":CamlinternalFormatBasics_cmi",
 
         # Depends on Buffer, but we need to go through the ns Stdlib.
         # The problem is we cannot express a dependency on an ns
@@ -268,8 +266,8 @@ stdlib_internal_module(
         # "//platform/target:sys?": ["-afl-inst-ratio", "0"],
         "//conditions:default": []
     }),
-    open   = ["//stdlib:Stdlib"],
-    deps   = [
+    # open   = ["//stdlib:Stdlib"],
+    stdlib_deps   = [
         ":Stdlib.Obj",
         ":Stdlib.Sys",
     ],
@@ -278,15 +276,15 @@ stdlib_internal_module(
 stdlib_internal_signature(
     name = "CamlinternalLazy_cmi",
     src  = "camlinternalLazy.mli",
-    deps = [":Stdlib_cmi"]
+    stdlib_deps = [":Stdlib_cmi"]
 )
 
 stdlib_internal_module(
     name   = "CamlinternalMod",
     struct = "camlinternalMod.ml",
     sig    = "CamlinternalMod_cmi",
-    opts = ["-open", "Stdlib"],
-    deps   = [
+    # opts = ["-open", "Stdlib"],
+    stdlib_deps   = [
         ":CamlinternalOO", ## (CamlinternalOO)
         ":CamlinternalLazy", ## (CamlinternalOO)
         ":Stdlib.Obj", ## (Stdlib Obj)
@@ -299,8 +297,8 @@ stdlib_internal_signature(
     name = "CamlinternalMod_cmi",
     src  = "camlinternalMod.mli",
     # opts = ["-nopervasives", "-open", "Stdlib"],
-    deps   = [
-        ":Stdlib",
+    stdlib_deps   = [
+        ":Stdlib_cmi",
         ":Stdlib.Obj_cmi",
     ],
 )
@@ -309,7 +307,7 @@ stdlib_internal_module(
     name   = "CamlinternalOO",
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
-    opts = ["-open", "Stdlib"],
+    # opts = ["-open", "Stdlib"],
     # + select({
     #     # "//platform/target:vm?": [],
     #     # "//platform/target:sys?": [
@@ -318,7 +316,7 @@ stdlib_internal_module(
     #     # ],
     #     "//conditions:default": []
     # }),
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
         ":Stdlib.Obj",
@@ -332,7 +330,7 @@ stdlib_internal_module(
 stdlib_internal_signature(
     name = "CamlinternalOO_cmi",
     src  = "camlinternalOO.mli",
-    deps   = [":Stdlib", ":Stdlib.Obj_cmi"]
+    stdlib_deps   = [":Stdlib_cmi", ":Stdlib.Obj_cmi"]
 )
 
 #########################################################
@@ -343,7 +341,7 @@ stdlib_module(
     struct = "arg.ml",
     sig    = "Stdlib.Arg_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
         ":Stdlib.Printf",
@@ -358,7 +356,7 @@ stdlib_signature(
     name = "Stdlib.Arg_cmi",
     src  = "arg.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys_cmi",
         ":Stdlib.String_cmi",
         ":Stdlib.Printf_cmi",
@@ -374,7 +372,7 @@ stdlib_module(
     struct = "array.ml",
     sig    = "Stdlib.Array_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq",
     ],
 )
@@ -383,7 +381,7 @@ stdlib_signature(
     name = "Stdlib.Array_cmi",
     src  = "array.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq_cmi",
     ],
 )
@@ -393,7 +391,7 @@ stdlib_module(
     struct = "arrayLabels.ml",
     sig    = "Stdlib.ArrayLabels_cmi",
     opts = MODULE_OPTS + LABEL_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Array"
     ],
 )
@@ -402,7 +400,7 @@ stdlib_signature(
     name = "Stdlib.ArrayLabels_cmi",
     src  = "arrayLabels.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq_cmi",
     ],
 )
@@ -422,7 +420,7 @@ stdlib_module(
     struct = "atomic.ml",
     name   = "Stdlib.Atomic",
     sig    = "Stdlib.Atomic_cmi",
-    deps   = [":Stdlib"]
+    stdlib_deps   = [":Stdlib"]
 )
 
 stdlib_signature(
@@ -435,7 +433,7 @@ stdlib_module(
     struct = "bigarray.ml",
     sig    = "Stdlib.Bigarray_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.Complex",
         ":Stdlib.Array",
@@ -451,8 +449,8 @@ stdlib_signature(
     name = "Stdlib.Bigarray_cmi",
     src  = "bigarray.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib",
+    stdlib_deps   = [
+        ":Stdlib_cmi",
         ":Stdlib.Complex_cmi"
     ],
 )
@@ -462,7 +460,7 @@ stdlib_module(
     struct = "bool.ml",
     sig    = "Stdlib.Bool_cmi",
     opts   = MODULE_OPTS,
-    deps   = [":Stdlib"]
+    stdlib_deps   = [":Stdlib"]
 )
 
 stdlib_signature(
@@ -480,7 +478,7 @@ stdlib_module(
     #     mode:native :-inline 3
     #     mode:bc: ["-w" "+A"]
     # }),
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Uchar",
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -494,7 +492,7 @@ stdlib_signature(
     name = "Stdlib.Buffer_cmi",
     src  = "buffer.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Uchar_cmi",
         ":Stdlib.Seq_cmi",
     ],
@@ -505,7 +503,7 @@ stdlib_module(
     struct = "bytes.ml",
     sig    = "Stdlib.Bytes_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Char",
         ":Stdlib.Int",
         ":Stdlib.Seq",
@@ -518,7 +516,7 @@ stdlib_signature(
     name = "Stdlib.Bytes_cmi",
     src  = "bytes.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Int_cmi",
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi",
@@ -530,7 +528,7 @@ stdlib_module(
     struct = "bytesLabels.ml",
     sig    = "Stdlib.BytesLabels_cmi",
     opts = MODULE_OPTS + LABEL_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Bytes",
     ],
 )
@@ -539,7 +537,7 @@ stdlib_signature(
     name = "Stdlib.BytesLabels_cmi",
     src  = "bytesLabels.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
@@ -550,7 +548,7 @@ stdlib_module(
     struct = "callback.ml",
     sig    = "Stdlib.Callback_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Obj"
     ],
 )
@@ -559,7 +557,7 @@ stdlib_signature(
     name = "Stdlib.Callback_cmi",
     src  = "callback.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.In_channel_cmi"]
+    stdlib_deps   = [":Stdlib.In_channel_cmi"]
 )
 
 stdlib_module(
@@ -567,14 +565,14 @@ stdlib_module(
     struct = "char.ml",
     sig    = "Stdlib.Char_cmi",
     opts = MODULE_OPTS,
-    deps   = [":Stdlib"],
+    stdlib_deps   = [":Stdlib"],
 )
 
 stdlib_signature(
     name = "Stdlib.Char_cmi",
     src  = "char.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib_cmi"],
+    stdlib_deps   = [":Stdlib_cmi"],
 )
 
 stdlib_module(
@@ -582,7 +580,7 @@ stdlib_module(
     struct = "complex.ml",
     sig    = "Stdlib.Complex_cmi",
     opts = MODULE_OPTS,
-    deps   = ["Stdlib.Float"],
+    stdlib_deps   = ["Stdlib.Float"],
 )
 
 stdlib_signature(
@@ -596,15 +594,15 @@ stdlib_module(
     struct = "condition.ml",
     sig    = "Stdlib.Condition_cmi",
     opts = MODULE_OPTS,
-    deps   = [":Stdlib.Mutex"],
+    stdlib_deps   = [":Stdlib.Mutex"],
 )
 
 stdlib_signature(
     name = "Stdlib.Condition_cmi",
     src  = "condition.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib",
+    stdlib_deps   = [
+        ":Stdlib_cmi",
         ":Stdlib.Mutex_cmi"
     ],
 )
@@ -614,7 +612,7 @@ stdlib_module(
     struct = "digest.ml",
     sig    = "Stdlib.Digest_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.String",
         ":Stdlib.Char",
         ":Stdlib.Bytes",
@@ -625,7 +623,7 @@ stdlib_signature(
     name = "Stdlib.Digest_cmi",
     src  = "digest.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.In_channel_cmi"]
+    stdlib_deps   = [":Stdlib.In_channel_cmi"]
 )
 
 stdlib_module(
@@ -633,8 +631,8 @@ stdlib_module(
     struct = "domain.ml",
     sig    = "Stdlib.Domain_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        "Stdlib",
+    stdlib_deps   = [
+        ":Stdlib",
         "Stdlib.Array",
         "Stdlib.Atomic",
         "Stdlib.Condition",
@@ -657,7 +655,7 @@ stdlib_module(
     sig    = "Stdlib.Effect_cmi",
     opts = MODULE_OPTS,
     warnings = ["41"],
-    deps   = [
+    stdlib_deps   = [
         "Stdlib.Callback",
         "Stdlib.Obj",
         "Stdlib.Printexc",
@@ -669,7 +667,7 @@ stdlib_signature(
     name = "Stdlib.Effect_cmi",
     src  = "effect.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Printexc_cmi"],
+    stdlib_deps   = [":Stdlib.Printexc_cmi"],
 )
 
 stdlib_module(
@@ -689,7 +687,7 @@ stdlib_module(
     struct = "ephemeron.ml",
     sig    = "Stdlib.Ephemeron_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Array",
         ":Stdlib.Hashtbl",
         ":Stdlib.Int",
@@ -706,7 +704,7 @@ stdlib_signature(
     name = "Stdlib.Ephemeron_cmi",
     src  = "ephemeron.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Hashtbl_cmi"]
+    stdlib_deps   = [":Stdlib.Hashtbl_cmi"]
 )
 
 stdlib_module(
@@ -714,7 +712,7 @@ stdlib_module(
     struct = "filename.ml",
     sig    = "Stdlib.Filename_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Buffer",
         ":Stdlib.Domain",
         ":Stdlib.Fun",
@@ -730,7 +728,7 @@ stdlib_signature(
     name = "Stdlib.Filename_cmi",
     src  = "filename.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib_cmi"],
+    stdlib_deps   = [":Stdlib_cmi"],
 )
 
 stdlib_module(
@@ -738,7 +736,7 @@ stdlib_module(
     struct = "float.ml",
     sig    = "Stdlib.Float_cmi",
     opts = MODULE_OPTS + LABEL_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq",
         ":Stdlib.List",
         ":Stdlib.Array",
@@ -749,7 +747,7 @@ stdlib_signature(
     name = "Stdlib.Float_cmi",
     src  = "float.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib_cmi"
     ],
@@ -761,7 +759,7 @@ stdlib_module(
     sig    = "Stdlib.Format_cmi",
     opts = MODULE_OPTS,
     warnings = ["fragile-match"],
-    deps   = [
+    stdlib_deps   = [
         ":CamlinternalFormat",
         ":CamlinternalFormatBasics",
         ":Stdlib",
@@ -784,7 +782,7 @@ stdlib_signature(
     src  = "format.mli",
     opts = SIG_OPTS,
     warnings = ["fragile-match"],
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib_cmi",
         ":Stdlib.Buffer_cmi",
         ":Stdlib.Domain_cmi",
@@ -798,7 +796,7 @@ stdlib_module(
     struct = "fun.ml",
     sig    = "Stdlib.Fun_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Printexc",
     ],
 )
@@ -814,7 +812,7 @@ stdlib_module(
     struct = "gc.ml",
     sig    = "Stdlib.Gc_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
         ":Stdlib.Printf",
@@ -826,7 +824,7 @@ stdlib_signature(
     name = "Stdlib.Gc_cmi",
     src  = "gc.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Printexc_cmi"]
+    stdlib_deps   = [":Stdlib.Printexc_cmi"]
 )
 
 stdlib_module(
@@ -834,7 +832,7 @@ stdlib_module(
     struct = "genlex.ml",
     sig    = "Stdlib.Genlex_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Bytes",
         ":Stdlib.Char",
         ":Stdlib.Hashtbl",
@@ -848,7 +846,7 @@ stdlib_signature(
     name = "Stdlib.Genlex_cmi",
     src  = "genlex.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Stream_cmi"]
+    stdlib_deps   = [":Stdlib.Stream_cmi"]
 )
 
 stdlib_module(
@@ -856,7 +854,7 @@ stdlib_module(
     struct = "hashtbl.ml",
     sig    = "Stdlib.Hashtbl_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Array",
         ":Stdlib.Int",
         ":Stdlib.Lazy",
@@ -872,7 +870,7 @@ stdlib_signature(
     name = "Stdlib.Hashtbl_cmi",
     src  = "hashtbl.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Seq_cmi"]
+    stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -880,7 +878,7 @@ stdlib_module(
     struct = "in_channel.ml",
     sig    = "Stdlib.In_channel_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Fun"
     ],
 )
@@ -889,7 +887,7 @@ stdlib_signature(
     name = "Stdlib.In_channel_cmi",
     src  = "in_channel.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib_cmi"]
+    stdlib_deps   = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -897,7 +895,7 @@ stdlib_module(
     struct = "int.ml",
     sig    = "Stdlib.Int_cmi",
     opts = MODULE_OPTS,
-    deps   = [":Stdlib"],
+    stdlib_deps   = [":Primitives"],
 )
 
 stdlib_signature(
@@ -910,9 +908,8 @@ stdlib_module(
     name   = "Stdlib.Int32",
     struct = "int32.ml",
     sig    = "Stdlib.Int32_cmi",
-    opts = MODULE_OPTS + ["-no-alias-deps"],
-    deps   = [
-        # ":Stdlib_cmi",
+    stdlib_deps   = [
+        ":Stdlib",
         ":Stdlib.Sys",
     ],
 )
@@ -920,8 +917,7 @@ stdlib_module(
 stdlib_signature(
     name = "Stdlib.Int32_cmi",
     src  = "int32.mli",
-    opts = SIG_OPTS + ["-no-alias-deps"],
-    deps   = [":Stdlib.Sys_cmi"]
+    stdlib_deps   = [":Primitives_cmi"]
 )
 
 stdlib_module(
@@ -929,7 +925,7 @@ stdlib_module(
     struct = "int64.ml",
     sig    = "Stdlib.Int64_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib",
     ],
 )
@@ -948,7 +944,7 @@ stdlib_module(
     # + select({
     #     mode:native : ["-afl-inst-ratio 0"]
     # })
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Obj",
         ":CamlinternalLazy",
     ],
@@ -958,7 +954,7 @@ stdlib_signature(
     name = "Stdlib.Lazy_cmi",
     src  = "lazy.mli",
     opts = SIG_OPTS,
-    deps   = [":CamlinternalLazy_cmi"]
+    stdlib_deps   = [":CamlinternalLazy_cmi"]
 )
 
 stdlib_module(
@@ -966,7 +962,7 @@ stdlib_module(
     struct = "lexing.ml",
     sig    = "Stdlib.Lexing_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
         ":Stdlib.Int",
@@ -980,7 +976,7 @@ stdlib_signature(
     name = "Stdlib.Lexing_cmi",
     src  = "lexing.mli",
     opts = SIG_OPTS,
-    deps = [":Stdlib_cmi"]
+    stdlib_deps = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -988,7 +984,7 @@ stdlib_module(
     struct = "list.ml",
     sig    = "Stdlib.List_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.Seq",
         ":Stdlib.Either",
@@ -999,7 +995,7 @@ stdlib_signature(
     name = "Stdlib.List_cmi",
     src  = "list.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Either_cmi",
     ],
@@ -1010,7 +1006,7 @@ stdlib_module(
     struct = "listLabels.ml",
     sig    = "Stdlib.ListLabels_cmi",
     opts = MODULE_OPTS + LABEL_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.List",
     ],
 )
@@ -1019,7 +1015,7 @@ stdlib_signature(
     name = "Stdlib.ListLabels_cmi",
     src  = "listLabels.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Either_cmi",
     ],
@@ -1030,7 +1026,7 @@ stdlib_module(
     struct = "map.ml",
     sig    = "Stdlib.Map_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.List",
         ":Stdlib.Seq",
     ],
@@ -1040,7 +1036,7 @@ stdlib_signature(
     name = "Stdlib.Map_cmi",
     src  = "map.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Seq_cmi"]
+    stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1048,7 +1044,7 @@ stdlib_module(
     struct = "marshal.ml",
     sig    = "Stdlib.Marshal_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Bytes",
     ],
 )
@@ -1057,7 +1053,7 @@ stdlib_signature(
     name = "Stdlib.Marshal_cmi",
     src  = "marshal.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib_cmi"]
+    stdlib_deps   = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -1065,7 +1061,7 @@ stdlib_module(
     struct = "moreLabels.ml",
     sig    = "Stdlib.MoreLabels_cmi",
     opts = MODULE_OPTS + LABEL_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Set",
         ":Stdlib.Map",
         ":Stdlib.Hashtbl"
@@ -1076,7 +1072,7 @@ stdlib_signature(
     name = "Stdlib.MoreLabels_cmi",
     src  = "moreLabels.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Set_cmi",
         ":Stdlib.Seq_cmi",
         ":Stdlib.Map_cmi",
@@ -1089,7 +1085,7 @@ stdlib_module(
     struct = "mutex.ml",
     sig    = "Stdlib.Mutex_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         # ":Stdlib.Set",
         # ":Stdlib.Map",
         # ":Stdlib.Hashtbl"
@@ -1100,7 +1096,7 @@ stdlib_signature(
     name = "Stdlib.Mutex_cmi",
     src  = "mutex.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib"]
+    stdlib_deps   = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -1108,7 +1104,7 @@ stdlib_module(
     struct = "nativeint.ml",
     sig    = "Stdlib.Nativeint_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         # ":Stdlib_cmi",
         ":Stdlib.Sys",
     ],
@@ -1118,7 +1114,7 @@ stdlib_signature(
     name = "Stdlib.Nativeint_cmi",
     src  = "nativeint.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Sys_cmi"]
+    stdlib_deps   = [":Stdlib.Sys_cmi"]
 )
 
 stdlib_module(
@@ -1126,7 +1122,7 @@ stdlib_module(
     struct = "obj.ml",
     sig    = "Stdlib.Obj_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.Nativeint",
         ":Stdlib.Int32",
@@ -1137,7 +1133,7 @@ stdlib_signature(
     name = "Stdlib.Obj_cmi",
     src  = "obj.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Int32_cmi"]
+    stdlib_deps   = [":Stdlib.Int32_cmi"]
 )
 
 stdlib_module(
@@ -1145,7 +1141,7 @@ stdlib_module(
     struct = "oo.ml",
     sig    = "Stdlib.Oo_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":CamlinternalOO",
     ],
 )
@@ -1156,7 +1152,7 @@ stdlib_signature(
     opts = SIG_OPTS + [
         "-no-principal" ## Only place this flag is used
     ],
-    deps   = [":CamlinternalOO_cmi"]
+    stdlib_deps   = [":CamlinternalOO_cmi"]
 )
 
 stdlib_module(
@@ -1164,7 +1160,7 @@ stdlib_module(
     struct = "option.ml",
     sig    = "Stdlib.Option_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq",
     ],
 )
@@ -1173,7 +1169,7 @@ stdlib_signature(
     name = "Stdlib.Option_cmi",
     src  = "option.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Seq_cmi"]
+    stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1181,14 +1177,14 @@ stdlib_module(
     struct = "out_channel.ml",
     sig    = "Stdlib.Out_channel_cmi",
     opts = MODULE_OPTS,
-    deps   = [":Stdlib.Fun"],
+    stdlib_deps   = [":Stdlib.Fun"],
 )
 
 stdlib_signature(
     name = "Stdlib.Out_channel_cmi",
     src  = "out_channel.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib_cmi"],
+    stdlib_deps   = [":Stdlib_cmi"],
 )
 
 stdlib_module(
@@ -1196,7 +1192,7 @@ stdlib_module(
     struct = "parsing.ml",
     sig    = "Stdlib.Parsing_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Obj",
         ":Stdlib.Lexing",
         ":Stdlib.Array",
@@ -1208,7 +1204,7 @@ stdlib_signature(
     name = "Stdlib.Parsing_cmi",
     src  = "parsing.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Obj_cmi",
         ":Stdlib.Lexing_cmi",
     ],
@@ -1218,7 +1214,7 @@ stdlib_module(
     name   = "Stdlib.Pervasives",
     struct = "pervasives.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":CamlinternalFormatBasics",
         ## (LargeFile)
     ],
@@ -1234,7 +1230,7 @@ stdlib_module(
     struct = "printexc.ml",
     sig    = "Stdlib.Printexc_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib",
         ":Stdlib.Array",
         ":Stdlib.Atomic",
@@ -1248,7 +1244,7 @@ stdlib_signature(
     name = "Stdlib.Printexc_cmi",
     src  = "printexc.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Obj_cmi"]
+    stdlib_deps   = [":Stdlib.Obj_cmi"]
 )
 
 stdlib_module(
@@ -1257,7 +1253,7 @@ stdlib_module(
     sig    = "Stdlib.Printf_cmi",
     opts = MODULE_OPTS,
     warnings = ["fragile-match"],
-    deps   = [
+    stdlib_deps   = [
         # ":CamlinternalFormatBasics",
         ":CamlinternalFormat",
         ":Stdlib.Buffer",
@@ -1269,7 +1265,7 @@ stdlib_signature(
     src  = "printf.mli",
     opts = SIG_OPTS,
     warnings = ["fragile-match"],
-    deps   = [":Stdlib.Buffer_cmi"]
+    stdlib_deps   = [":Stdlib.Buffer_cmi"]
 )
 
 stdlib_module(
@@ -1277,7 +1273,7 @@ stdlib_module(
     struct = "queue.ml",
     sig    = "Stdlib.Queue_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib",
         ":Stdlib.Seq",
     ],
@@ -1287,7 +1283,7 @@ stdlib_signature(
     name = "Stdlib.Queue_cmi",
     src  = "queue.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Seq_cmi"]
+    stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1295,7 +1291,7 @@ stdlib_module(
     struct = "random.ml",
     sig    = "Stdlib.Random_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib",
         ":Stdlib.Array",
         ":Stdlib.Bytes",
@@ -1315,7 +1311,7 @@ stdlib_signature(
     name = "Stdlib.Random_cmi",
     src  = "random.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Nativeint_cmi",
         ":Stdlib.Int64_cmi",
         ":Stdlib.Int32_cmi",
@@ -1327,7 +1323,7 @@ stdlib_module(
     struct = "result.ml",
     sig    = "Stdlib.Result_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq",
         # ":Stdlib"
     ],
@@ -1337,7 +1333,7 @@ stdlib_signature(
     name = "Stdlib.Result_cmi",
     src  = "result.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Seq_cmi"]
+    stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1349,7 +1345,7 @@ stdlib_module(
     # + select({
     #     mode:native  ["-inline", 9]
     # })
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib",
         ":CamlinternalFormatBasics",
         ":CamlinternalFormat",
@@ -1367,7 +1363,7 @@ stdlib_signature(
     src   = "scanf.mli",
     opts  = SIG_OPTS,
     warnings = ["fragile-match"],
-    deps  = [":Stdlib"]
+    stdlib_deps  = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -1378,7 +1374,7 @@ stdlib_module(
     # + select({
     #     mode:native  ["-inline", 9]
     # })
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Condition",
         ":Stdlib.Mutex",
     ],
@@ -1395,7 +1391,7 @@ stdlib_module(
     name   = "Stdlib.Seq",
     sig    = "Stdlib.Seq_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Atomic",
         ":Stdlib.Either",
         ":Stdlib.Lazy"
@@ -1406,8 +1402,8 @@ stdlib_signature(
     name = "Stdlib.Seq_cmi",
     src  = "seq.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Stdlib",
+    stdlib_deps   = [
+        ":Stdlib_cmi",
         ":Stdlib.Either_cmi"
     ],
 )
@@ -1417,7 +1413,7 @@ stdlib_module(
     struct = "set.ml",
     sig    = "Stdlib.Set_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq",
         ":Stdlib.List",
     ],
@@ -1427,7 +1423,7 @@ stdlib_signature(
     name = "Stdlib.Set_cmi",
     src  = "set.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Seq_cmi"]
+    stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
 stdlib_module(
@@ -1435,7 +1431,7 @@ stdlib_module(
     struct = "stack.ml",
     sig    = "Stdlib.Stack_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq",
         ":Stdlib.List",
     ],
@@ -1445,7 +1441,7 @@ stdlib_signature(
     name = "Stdlib.Stack_cmi",
     src  = "stack.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Seq_cmi"],
+    stdlib_deps   = [":Stdlib.Seq_cmi"],
 )
 
 stdlib_module(
@@ -1453,7 +1449,7 @@ stdlib_module(
     struct = "stdLabels.ml",
     sig    = "Stdlib.StdLabels_cmi",
     opts = MODULE_OPTS + LABEL_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.StringLabels",
         ":Stdlib.ListLabels",
         ":Stdlib.BytesLabels",
@@ -1466,7 +1462,7 @@ stdlib_signature(
     name = "Stdlib.StdLabels_cmi",
     src  = "stdLabels.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.StringLabels_cmi",
         ":Stdlib.ListLabels_cmi",
         ":Stdlib.BytesLabels_cmi",
@@ -1479,7 +1475,7 @@ stdlib_module(
     struct = "stream.ml",
     sig    = "Stdlib.Stream_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":CamlinternalLazy",
         ":Stdlib.String",
         ":Stdlib.List",
@@ -1499,7 +1495,7 @@ stdlib_module(
     struct = "string.ml",
     sig    = "Stdlib.String_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Bytes",
     ],
 )
@@ -1508,7 +1504,7 @@ stdlib_signature(
     name = "Stdlib.String_cmi",
     src  = "string.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
@@ -1519,7 +1515,7 @@ stdlib_module(
     struct = "stringLabels.ml",
     sig    = "Stdlib.StringLabels_cmi",
     opts = MODULE_OPTS + LABEL_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.String",
     ],
 )
@@ -1528,7 +1524,7 @@ stdlib_signature(
     name = "Stdlib.StringLabels_cmi",
     src  = "stringLabels.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
@@ -1542,18 +1538,18 @@ stdlib_module(
     #     "//config:sig_src?"   : "sys.mli",
     #     "//conditions:default": ":Stdlib.Sys_cmi"
     # }),
-    # deps    = select({
+    # stdlib_deps    = select({
     #     "//config:sig_src?"   : ["//stdlib:Stdlib"],
     #     "//conditions:default": []
     # }),
     opts = MODULE_OPTS,
-    deps = [":Stdlib"]
+    stdlib_deps = [":Stdlib"]
 )
 
 stdlib_signature(
     name = "Stdlib.Sys_cmi",
     src  = "sys.mli",
-    deps = [":Stdlib_cmi"]
+    stdlib_deps = [":Stdlib_cmi"]
 )
 
 stdlib_module(
@@ -1561,7 +1557,7 @@ stdlib_module(
     struct = "uchar.ml",
     sig    = "Stdlib.Uchar_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Char",
     ],
 )
@@ -1570,7 +1566,7 @@ stdlib_signature(
     name = "Stdlib.Uchar_cmi",
     src  = "uchar.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Char_cmi"]
+    stdlib_deps   = [":Stdlib.Char_cmi"]
 )
 
 stdlib_module(
@@ -1578,12 +1574,12 @@ stdlib_module(
     struct = "unit.ml",
     # sig    = "Stdlib.Unit_cmi",
     ## NOTE: compiling with --//config:sig_src requires
-    ## "//stdlib:Stdlib" in deps
+    ## "//stdlib:Stdlib" in stdlib_deps
     sig    = select({
         "//config:sig_src?"   : "unit.mli",
         "//conditions:default": "Stdlib.Unit_cmi"
     }),
-    deps    = select({
+    stdlib_deps    = select({
         "//config:sig_src?"   : ["//stdlib:Stdlib"],
         "//conditions:default": []
     }) + [":Stdlib"],
@@ -1605,7 +1601,7 @@ stdlib_module(
         "//conditions:default": ":Stdlib.Weak_cmi"
     }),
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.Obj",
         ":Stdlib.Int",
@@ -1619,7 +1615,7 @@ stdlib_signature(
     name = "Stdlib.Weak_cmi",
     src  = "weak.mli",
     opts = SIG_OPTS,
-    deps   = [":Stdlib.Hashtbl_cmi"],
+    stdlib_deps   = [":Stdlib.Hashtbl_cmi"],
 )
 
 ################################################################
@@ -1727,12 +1723,12 @@ kernel_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
     sig    = ":Std_exit_cmi",
-    deps   = [":Stdlib"]
+    stdlib_deps   = [":Stdlib"]
 )
 
 kernel_module_cmx(
     name   = "Std_exit.cmx",
     struct = "std_exit.ml",
     sig    = ":Std_exit_cmi",
-    deps   = [":Stdlib"]
+    stdlib_deps = [":Stdlib"]
 )

@@ -132,5 +132,4 @@ STDLIB_MODULE_NAMES = [
     "Stdlib__Uchar",
     "Stdlib__Unit",
     "Stdlib__Weak",
-    # "Std_exit",
 ]

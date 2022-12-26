@@ -7,6 +7,8 @@ load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo", "DumpInfo", "ModuleInfo", "NsResolverInfo",
+     "CompilerMarker",
+     "StdlibStructMarker",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
 load("//bzl:functions.bzl", "get_module_name") #, "get_workdir")

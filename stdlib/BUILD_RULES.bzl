@@ -19,7 +19,7 @@ load("//bzl/rules:ocaml_transitions.bzl",
      "ocaml_stdlib_cmxa_in_transition",
      "ocaml_in_transition")
 
-load(":BUILD.bzl", "STDLIB_MANIFEST")
+load(":BUILD_STDLIB.bzl", "STDLIB_MANIFEST")
 
 def _stdlib_archive_impl(ctx):
 

@@ -155,12 +155,12 @@ compiler_module(
     sig    = "Arg_helper_cmi",
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
-    deps   = [
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Map",
+    stdlib_deps   = [
         "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -172,7 +172,7 @@ compiler_signature(
     name = "Arg_helper_cmi",
     src  = "arg_helper.mli",
     opts = SIG_OPTS + ["-nopervasives", "-open", "Stdlib"],
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.Map_cmi"
     ]
@@ -185,25 +185,21 @@ compiler_module(
     open   = ["//stdlib:Stdlib"],
     opts = MODULE_OPTS,
     ## DEMO: we can depend on individual submodules instead of the entire lib
-    deps   = [
-        ## "//stdlib" ## depend on entire Stdlib
-
-        ## depend on individual Stdlib submodules:
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Result",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lazy",
-        # "//stdlib:Stdlib.LargeFile",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int32",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Fun",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Bytes",
+    stdlib_deps   = [
         "//stdlib:Stdlib.Array"
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Result",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -216,7 +212,7 @@ compiler_signature(
     name = "Binutils_cmi",
     src  = "binutils.mli",
     opts = SIG_OPTS + ["-nopervasives", "-open", "Stdlib"],
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi",
         "//stdlib:Stdlib.Result_cmi"]
 )
@@ -227,12 +223,12 @@ compiler_module(
     sig    = "Build_path_prefix_map_cmi",
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
-    deps   = [
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Buffer",
+    stdlib_deps   = [
         "//stdlib:Stdlib"
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -245,7 +241,7 @@ compiler_signature(
     name = "Build_path_prefix_map_cmi",
     src  = "build_path_prefix_map.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi"
     ]
 )
@@ -256,11 +252,13 @@ compiler_module(
     sig    = "Ccomp_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Profile", ## (Utils Profile)
-        ":Misc", ## (Utils Misc)
-        ":Load_path", ## (Utils Load_path)
         "//config:Config", ## (Utils Config)
         ":Clflags", ## (Utils Clflags)
+        ":Load_path", ## (Utils Load_path)
+        ":Misc", ## (Utils Misc)
+        ":Profile", ## (Utils Profile)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
@@ -291,16 +289,18 @@ compiler_module(
     sig    = "Clflags_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Profile",
-        ":Numbers",
-        ":Misc",
         "//config:Config",
         ":Arg_helper",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
+        ":Misc",
+        ":Numbers",
+        ":Profile",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -325,10 +325,12 @@ compiler_signature(
     src  = "clflags.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Profile_cmi",
         ":Misc_cmi",
-        "//stdlib:Stdlib.Digest_cmi",
+        ":Profile_cmi",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Arg_cmi",
+        "//stdlib:Stdlib.Digest_cmi",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -443,12 +445,14 @@ compiler_module(
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
     deps   = [
-        ":Misc", ## (Utils Misc)
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
+        ":Misc",
+    stdlib_deps [
         "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set",
+    ],
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -463,10 +467,12 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Misc_cmi",
-        "//stdlib:Stdlib.Set_cmi",
-        "//stdlib:Stdlib.Map_cmi",
-        "//stdlib:Stdlib.Hashtbl_cmi",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//stdlib:Stdlib.Set_cmi",
     ],
     visibility = [
         "//typing:__pkg__"
@@ -481,11 +487,13 @@ compiler_module(
     warnings = [w.NAME_OUT_OF_SCOPE],
     open   = ["//stdlib:Stdlib"],
     deps   = [
-        ":Misc", ## (Utils Misc)
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
+        ":Misc",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
     ],
     visibility = ["//typing:__pkg__"]
 )
@@ -496,8 +504,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Misc_cmi",
-        "//stdlib:Stdlib.Format_cmi",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = [
         "//typing:__pkg__"
@@ -512,13 +522,15 @@ compiler_module(
     open   = ["//stdlib:Stdlib"],
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Misc", ## (Utils Misc)
-        ":Diffing", ## (Utils Diffing)
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Either",
+        ":Diffing",
+        ":Misc",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Either",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
     ],
     visibility = ["//typing:__pkg__"]
 )
@@ -529,6 +541,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Diffing_cmi",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = ["//typing:__pkg__"]
@@ -539,7 +553,7 @@ compiler_module(
     struct = "domainstate_ml",
     sig    = "Domainstate_cmi",
     opts   = MODULE_OPTS,
-    deps   = ["//stdlib:Stdlib"],
+    stdlib_deps = ["//stdlib:Stdlib"],
     visibility = ["//asmcomp:__subpackages__"]
 )
 
@@ -576,7 +590,7 @@ compiler_signature(
     name = "Domainstate_cmi",
     src  = "domainstate_mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib_cmi"]
+    stdlib_deps   = ["//stdlib:Stdlib_cmi"]
 )
 
 mustache(
@@ -620,12 +634,14 @@ compiler_module(
     open   = ["//stdlib:Stdlib"],
     deps   = [
         ":Misc", ## (Utils Misc)
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
     ],
     visibility = [
         "//middle_end:__subpackages__",
@@ -639,11 +655,11 @@ compiler_signature(
     name = "Identifiable_cmi",
     src  = "identifiable.mli",
     opts = SIG_OPTS,
-    deps   = [
-        "//stdlib:Stdlib.Set_cmi",
-        "//stdlib:Stdlib.Map_cmi",
-        "//stdlib:Stdlib.Hashtbl_cmi",
+    stdlib_deps   = [
         "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//stdlib:Stdlib.Set_cmi",
     ],
     visibility = [
         "//middle_end:__subpackages__",
@@ -659,7 +675,7 @@ compiler_module(
     struct = "int_replace_polymorphic_compare.ml",
     sig    = "Int_replace_polymorphic_compare_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib",
     ],
     visibility = [
@@ -674,7 +690,7 @@ compiler_signature(
     name = "Int_replace_polymorphic_compare_cmi",
     src  = "int_replace_polymorphic_compare.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib_cmi"]
+    stdlib_deps = ["//stdlib:Stdlib_cmi"]
 )
 
 compiler_module(
@@ -683,7 +699,7 @@ compiler_module(
     sig    = "Lazy_backtrack_cmi",
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.Either",
     ],
@@ -697,7 +713,7 @@ compiler_signature(
     name = "Lazy_backtrack_cmi",
     src  = "lazy_backtrack.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi",
         "//stdlib:Stdlib.Either_cmi",
     ],
@@ -712,13 +728,15 @@ compiler_module(
     open   = ["//stdlib:Stdlib"],
     deps   = [
         "//config:Config",
+        ":Local_store",
+        ":Misc",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-        ":Local_store",
-        ":Misc",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -739,7 +757,7 @@ compiler_signature(
     name = "Load_path_cmi",
     src  = "load_path.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi"
     ],
     visibility = ["//typing:__pkg__"]
@@ -751,9 +769,9 @@ compiler_module(
     sig    = "Local_store_cmi",
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
-    deps   = [
-        "//stdlib:Stdlib.List",
+    stdlib_deps   = [
         "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.List",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -766,7 +784,7 @@ compiler_signature(
     name = "Local_store_cmi",
     src  = "local_store.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi"
     ]
 )
@@ -777,28 +795,30 @@ compiler_module(
     sig    = "Misc_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//config:Config", ## (Utils Config)
-        ":Build_path_prefix_map", ## (Utils Build_path_prefix_map)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Nativeint",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int32",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Fun",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Buffer",
+        "//config:Config",
+        ":Build_path_prefix_map",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -825,12 +845,14 @@ compiler_signature(
     deps   = [
         "//config:Config_cmi",
         ":Build_path_prefix_map_cmi",
-        "//stdlib:Stdlib.String_cmi",
-        "//stdlib:Stdlib.Set_cmi",
-        "//stdlib:Stdlib.Map_cmi",
-        "//stdlib:Stdlib.Hashtbl_cmi",
-        "//stdlib:Stdlib.Format_cmi",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//stdlib:Stdlib.Set_cmi",
+        "//stdlib:Stdlib.String_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -849,16 +871,18 @@ compiler_module(
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
     deps   = [
-        ":Misc",
         ":Identifiable",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
+        ":Misc",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -874,10 +898,12 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Identifiable_cmi",
-        "//stdlib:Stdlib.Set_cmi",
-        "//stdlib:Stdlib.Map_cmi",
-        "//stdlib:Stdlib.Int64_cmi",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Int64_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//stdlib:Stdlib.Set_cmi",
     ],
     visibility = [
         "//middle_end:__subpackages__"
@@ -891,17 +917,19 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Misc",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Gc",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Float",
-        "//stdlib:Stdlib.Digest",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Float",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -916,8 +944,8 @@ compiler_signature(
     name = "Profile_cmi",
     src  = "profile.mli",
     opts = SIG_OPTS,
-    deps   = [
-        "//stdlib:Stdlib.Format",
+    stdlib_deps   = [
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -930,15 +958,17 @@ compiler_module(
     sig    = "Strongly_connected_components_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Numbers",
-        ":Misc",
         ":Identifiable",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Digest",
+        ":Misc",
+        ":Numbers",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set",
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
 )
@@ -949,9 +979,11 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Identifiable",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Map",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set",
     ]
 )
 
@@ -962,11 +994,13 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Misc",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int32",
-        "//stdlib:Stdlib.Format",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = ["//asmcomp:__pkg__"]
 )
@@ -975,8 +1009,8 @@ compiler_signature(
     name = "Targetint_cmi",
     src  = "targetint.mli",
     opts = SIG_OPTS,
-    deps   = [
-        "//stdlib:Stdlib.Format",
+    stdlib_deps   = [
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = ["//asmcomp:__pkg__"]
 )
@@ -987,9 +1021,9 @@ compiler_module(
     sig    = "Terminfo_cmi",
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
-    deps   = [
-        "//stdlib:Stdlib.Sys",
+    stdlib_deps   = [
         "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -1012,17 +1046,19 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Misc",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Array",
+    ],
+    stdlib_deps [
         "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -1041,9 +1077,9 @@ compiler_signature(
     name = "Warnings_cmi",
     src  = "warnings.mli",
     opts = SIG_OPTS,
-    deps   = [
-        "//stdlib:Stdlib.Lexing_cmi",
+    stdlib_deps   = [
         "//stdlib:Stdlib.Lazy_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
         "//stdlib:Stdlib.Sys_cmi",
     ],
     visibility = [

@@ -2,7 +2,9 @@ load("//bzl:providers.bzl",
      "OcamlArchiveProvider",
      "OcamlLibraryMarker",
      "OcamlSignatureProvider",
-     "ModuleInfo")
+     "ModuleInfo",
+     "CompilerMarker",
+     "StdlibStructMarker")
 
 ###################
 def module_attrs():
@@ -64,14 +66,24 @@ def module_attrs():
             # providers = [[OcamlSignatureProvider]],
         ),
 
+        _libs_archived = attr.label( # boolean
+            default = "//config/ocaml/compiler/libs:archived"
+        ),
+
         ################
+        stdlib_deps = attr.label_list(
+            doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
+            providers = [StdlibStructMarker]
+        ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
-            providers = [[OcamlArchiveProvider],
-                         [OcamlLibraryMarker],
-                         [OcamlSignatureProvider],
-                         [ModuleInfo],
-                         [CcInfo]],
+            providers = [
+                # [OcamlArchiveProvider],
+                # [OcamlLibraryMarker],
+                # [OcamlSignatureProvider],
+                [CompilerMarker, ModuleInfo],
+                [CcInfo]
+            ],
             # transition undoes changes that may have been made by ns_lib
             # cfg = compile_deps_out_transition,
         ),
