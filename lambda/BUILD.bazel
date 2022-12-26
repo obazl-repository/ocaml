@@ -74,15 +74,17 @@ compiler_module(
     sig    = "Debuginfo_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//utils:Int_replace_polymorphic_compare",
         "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
+        "//utils:Int_replace_polymorphic_compare",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -99,6 +101,8 @@ compiler_signature(
     deps   = [
         "//parsing:Asttypes_cmi",
         "//typing:Ident_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = [
@@ -113,17 +117,19 @@ compiler_module(
     sig    = "Lambda_cmi",
     opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
     deps   = [
-        ":Debuginfo",
-        "//typing:Types",
-        "//typing:Primitive",
-        "//typing:Path",
-        "//stdlib:Stdlib.Option",
-        "//utils:Misc",
         "//parsing:Longident",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
         "//typing:Env",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Primitive",
+        "//typing:Types",
         "//utils:Clflags",
+        "//utils:Misc",
+        ":Debuginfo",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -142,14 +148,16 @@ compiler_signature(
     src  = "lambda.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Primitives_cmi",
-        ":Debuginfo_cmi",
-        "//typing:Types_cmi",
-        "//typing:Primitive_cmi",
-        "//typing:Path_cmi",
-        "//typing:Ident_cmi",
-        "//typing:Env_cmi",
         "//parsing:Asttypes_cmi",
+        "//typing:Env_cmi",
+        "//typing:Ident_cmi",
+        "//typing:Path_cmi",
+        "//typing:Primitive_cmi",
+        "//typing:Types_cmi",
+        ":Debuginfo_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -166,35 +174,34 @@ compiler_module(
     sig    = "Matching_cmi",
     opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
     deps   = [
-        ":Switch", ## (Lambda Switch)
-        ":Printlambda", ## (Lambda Printlambda)
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        "//typing:Types",
-        "//typing:Typeopt",
-        "//typing:Typedtree",
-        ## (Printpat)
-        "//stdlib:Stdlib.Printf",
-        "//typing:Primitive",
-        "//typing:Predef",
-        ## (Patterns)
-        "//typing:Parmatch",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//parsing:Longident",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lazy",
-        "//typing:Ident",
-        ## (Head)
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
-        "//utils:Clflags",
-        "//stdlib:Stdlib.Char",
+        "//parsing:Longident",
         "//typing:Btype",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Parmatch",
+        "//typing:Predef",
+        "//typing:Primitive",
+        "//typing:Typedtree",
+        "//typing:Typeopt",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Misc",
+        ":Debuginfo",
+        ":Lambda",
+        ":Printlambda",
+        ":Switch",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
     ],
     visibility = ["//bytecomp:__pkg__"]
 )
@@ -204,14 +211,16 @@ compiler_signature(
     src  = "matching.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Primitives_cmi",
-        ":Lambda_cmi",
-        ":Debuginfo_cmi",
         "//parsing:Asttypes_cmi",
-        "//typing:Typedtree_cmi",
         "//parsing:Location_cmi",
         "//typing:Ident_cmi",
-    ]
+        "//typing:Typedtree_cmi",
+        ":Debuginfo_cmi",
+        ":Lambda_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 compiler_module(
@@ -220,19 +229,21 @@ compiler_module(
     sig    = "Printlambda_cmi",
     opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
     deps   = [
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        "//typing:Types",
-        "//stdlib:Stdlib.String",
-        "//typing:Printtyp",
-        "//stdlib:Stdlib.Printf",
-        "//typing:Primitive",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
         "//typing:Ident",
-        "//stdlib:Stdlib.Format",
+        "//typing:Primitive",
+        "//typing:Printtyp",
+        "//typing:Types",
         "//utils:Clflags",
+        ":Debuginfo",
+        ":Lambda",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -248,12 +259,14 @@ compiler_signature(
     src  = "printlambda.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Lambda_cmi",
-        ":Debuginfo_cmi",
-        "//parsing:Asttypes_cmi",
         "//typing:Types_cmi",
+        ":Debuginfo_cmi",
+        ":Lambda_cmi",
+    ],
+    stdlib_deps = [
+        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format_cmi",
-    ]
+    ],
 )
 
 ## root Makefile:
@@ -273,7 +286,7 @@ compiler_module(
     struct = "runtimedef_ml",
     sig    = "Runtimedef_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib"
     ],
     visibility = [
@@ -312,7 +325,7 @@ compiler_signature(
     name = "Runtimedef_cmi",
     src  = "runtimedef.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi"
     ],
 )
@@ -324,11 +337,6 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//parsing:Location",
-        "//stdlib:Stdlib.Fun",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Option",
         "//typing:Ident",
         "//typing:Primitive",
         "//utils:Clflags",
@@ -336,6 +344,13 @@ compiler_module(
         ":Debuginfo",
         ":Lambda",
         ":Tmc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -351,10 +366,10 @@ compiler_signature(
     src  = "simplif.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Lambda_cmi",
-        ":Debuginfo_cmi",
         "//parsing:Asttypes_cmi",
         "//typing:Ident_cmi",
+        ":Debuginfo_cmi",
+        ":Lambda_cmi",
     ]
 )
 
@@ -364,13 +379,13 @@ compiler_module(
     sig    = "Switch_cmi",
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
-    deps   = [
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Array",
+    stdlib_deps   = [
         "//stdlib:Stdlib"
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Printf",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -382,7 +397,7 @@ compiler_signature(
     name = "Switch_cmi",
     src  = "switch.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi"
     ],
     visibility = ["//middle_end/flambda:__pkg__"]
@@ -394,8 +409,10 @@ compiler_module(
     sig    = "Tmc_cmi",
     opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
     deps   = [
-        "//stdlib:Stdlib",
         ":Lambda"
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib",
     ],
 )
 
@@ -414,20 +431,22 @@ compiler_module(
     sig    = "Translattribute_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//config:Config",
         "//parsing:Location",
         "//parsing:Longident",
+        "//typing:Typedtree",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Debuginfo",
+        ":Lambda",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Result",
         "//stdlib:Stdlib.String",
-        "//typing:Typedtree",
-        "//config:Config",
-        "//utils:Misc",
-        "//utils:Warnings",
-        ":Debuginfo",
-        ":Lambda",
-    ]
+    ],
 )
 
 compiler_signature(
@@ -435,11 +454,11 @@ compiler_signature(
     src  = "translattribute.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Lambda_cmi",
-        ":Debuginfo_cmi",
-        "//typing:Typedtree_cmi",
-        "//parsing:Parsetree_cmi",
         "//parsing:Location_cmi",
+        "//parsing:Parsetree_cmi",
+        "//typing:Typedtree_cmi",
+        ":Debuginfo_cmi",
+        ":Lambda_cmi",
     ]
 )
 
@@ -449,28 +468,27 @@ compiler_module(
     sig    = "Translclass_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Translobj",
-        ":Translcore",
-        ":Matching",
-        ":Lambda",
-        ":Debuginfo",
-        "//typing:Types",
-        ## (Typeopt)
-        "//typing:Typedtree",
-        "//stdlib:Stdlib.String",
-        "//typing:Path",
-        "//stdlib:Stdlib.Obj",
-        ## (Meths)
-        ## (MethSet)
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
-        "//utils:Clflags",
-        "//stdlib:CamlinternalOO",
         "//typing:Btype",
-    ]
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Typedtree",
+        "//typing:Types",
+        "//utils:Clflags",
+        ":Debuginfo",
+        ":Lambda",
+        ":Matching",
+        ":Translcore",
+        ":Translobj",
+    ],
+    stdlib_deps = [
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
@@ -478,14 +496,16 @@ compiler_signature(
     src  = "translclass.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Lambda_cmi",
-        ":Debuginfo_cmi",
-         "//typing:Typedtree_cmi",
+        "//typing:Typedtree_cmi",
+        "//parsing:Asttypes_cmi",
         "//parsing:Location_cmi",
         "//typing:Ident_cmi",
+        ":Debuginfo_cmi",
+        ":Lambda_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-        "//parsing:Asttypes_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -494,36 +514,36 @@ compiler_module(
     sig    = "Translcore_cmi",
     opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
     deps   = [
-        ":Translprim", ## (Lambda Translprim)
-        ":Translobj", ## (Lambda Translobj)
-        ":Translattribute", ## (Lambda Translattribute)
-        ":Matching", ## (Lambda Matching)
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        "//typing:Types",
-        ## (Typeopt)
-        "//typing:Typedtree",
-        "//typing:Typecore",
-        "//typing:Printtyp",
-        "//stdlib:Stdlib.Printf",
-        "//typing:Primitive",
-        "//typing:Predef",
-        "//typing:Path",
-        ## (Parmatch)
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
         "//config:Config",
-        "//utils:Clflags",
+        "//parsing:Location",
+        "//parsing:Longident",
         "//typing:Btype",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Primitive",
+        "//typing:Printtyp",
+        "//typing:Typecore",
+        "//typing:Typedtree",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Misc",
+        ":Debuginfo",
+        ":Lambda",
+        ":Matching",
+        ":Translattribute",
+        ":Translobj",
+        ":Translprim",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+    ],
 )
 
 compiler_signature(
@@ -534,14 +554,16 @@ compiler_signature(
         "//parsing:Asttypes_cmi",
         "//parsing:Location_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//typing:Env_cmi",
         "//typing:Ident_cmi",
         "//typing:Path_cmi",
         "//typing:Typedtree_cmi",
         ":Debuginfo_cmi",
         ":Lambda_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -550,30 +572,32 @@ compiler_module(
     sig    = "Translmod_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Translprim", ## (Lambda Translprim)
-        ":Translobj", ## (Lambda Translobj)
-        ":Translcore", ## (Lambda Translcore)
-        ":Translclass", ## (Lambda Translclass)
-        ":Translattribute", ## (Lambda Translattribute)
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        "//typing:Types",
-        "//typing:Typedtree",
-        "//stdlib:Stdlib.Result",
-        "//typing:Primitive",
-        "//typing:Predef",
-        "//typing:Path",
-        "//stdlib:Stdlib.Option",
-        ## (Mtype)
-        "//utils:Misc",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
         "//typing:Ctype",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Primitive",
+        "//typing:Typedtree",
+        "//typing:Types",
         "//utils:Clflags",
+        "//utils:Misc",
+        ":Debuginfo", ## (Lambda Debuginfo)
+        ":Lambda", ## (Lambda Lambda)
+        ":Translattribute", ## (Lambda Translattribute)
+        ":Translclass", ## (Lambda Translclass)
+        ":Translcore", ## (Lambda Translcore)
+        ":Translobj", ## (Lambda Translobj)
+        ":Translprim", ## (Lambda Translprim)
+        ## (Mtype)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Result",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -588,15 +612,17 @@ compiler_signature(
     src  = "translmod.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Primitives_cmi",
-        ":Lambda_cmi",
-        ":Debuginfo_cmi",
         "//parsing:Asttypes_cmi",
-        "//typing:Typedtree_cmi",
-        "//typing:Primitive_cmi",
         "//parsing:Location_cmi",
         "//typing:Ident_cmi",
-    ]
+        "//typing:Primitive_cmi",
+        "//typing:Typedtree_cmi",
+        ":Debuginfo_cmi",
+        ":Lambda_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 compiler_module(
@@ -605,18 +631,20 @@ compiler_module(
     sig    = "Translobj_cmi",
     opts = MODULE_OPTS + ["-w", "-40"], ## name-out-of-scope
     deps   = [
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        "//typing:Primitive",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//typing:Env",
         "//config:Config",
-        "//utils:Clflags",
         "//typing:Btype",
-    ]
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Primitive",
+        "//utils:Clflags",
+        "//utils:Misc",
+        ":Debuginfo", ## (Lambda Debuginfo)
+        ":Lambda", ## (Lambda Lambda)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 compiler_signature(
@@ -624,13 +652,15 @@ compiler_signature(
     src  = "translobj.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Primitives_cmi",
-        ":Lambda_cmi",
-        ":Debuginfo_cmi",
         "//parsing:Asttypes_cmi",
-        "//typing:Ident_cmi",
         "//typing:Env_cmi",
-    ]
+        "//typing:Ident_cmi",
+        ":Debuginfo_cmi",
+        ":Lambda_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 compiler_module(
@@ -639,29 +669,31 @@ compiler_module(
     sig    = "Translprim_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Matching", ## (Lambda Matching)
-        ":Lambda", ## (Lambda Lambda)
-        ":Debuginfo", ## (Lambda Debuginfo)
-        "//typing:Types",
-        ## (Typeopt)
-        "//typing:Typedtree",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//typing:Primitive",
-        "//typing:Predef",
-        "//typing:Path",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Env",
         "//config:Config",
+        "//parsing:Location",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Primitive",
+        "//typing:Typedtree",
+        "//typing:Types",
         "//utils:Clflags",
-    ]
+        "//utils:Misc",
+        ":Debuginfo", ## (Lambda Debuginfo)
+        ":Lambda", ## (Lambda Lambda)
+        ":Matching", ## (Lambda Matching)
+        ## (Typeopt)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 compiler_signature(
@@ -669,17 +701,19 @@ compiler_signature(
     src  = "translprim.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Lambda_cmi",
-        ":Debuginfo_cmi",
+        "//typing:Typedtree_cmi",
         "//parsing:Asttypes_cmi",
-        "//typing:Types_cmi",
-         "//typing:Typedtree_cmi",
-        "//typing:Primitive_cmi",
-        "//typing:Path_cmi",
         "//parsing:Location_cmi",
-        "//typing:Ident_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//typing:Env_cmi",
-    ]
+        "//typing:Ident_cmi",
+        "//typing:Path_cmi",
+        "//typing:Primitive_cmi",
+        "//typing:Types_cmi",
+        ":Debuginfo_cmi",
+        ":Lambda_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
