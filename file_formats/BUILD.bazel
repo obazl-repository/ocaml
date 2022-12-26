@@ -57,13 +57,15 @@ compiler_module(
     sig    = "Cmi_format_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//typing:Types",
-        "//stdlib:Stdlib.String",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Digest",
         "//config:Config",
+        "//parsing:Location",
+        "//typing:Types",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//debugger:__pkg__",
@@ -80,8 +82,10 @@ compiler_signature(
     deps   = [
         "//typing:Types_cmi",
         "//utils:Misc_cmi",
-        "//stdlib:Stdlib.Format_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -95,9 +99,9 @@ compiler_signature(
     src  = "cmo_format.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//utils:Misc_cmi",
+        "//lambda:Lambda_cmi",
         "//typing:Ident_cmi",
-        "//lambda:Lambda_cmi"
+        "//utils:Misc_cmi",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -114,23 +118,25 @@ compiler_module(
     sig    = "Cmt_format_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Cmi_format", ## (File_formats Cmi_format)
-        "//typing:Types",
-        "//typing:Typedtree",
-        "//typing:Tast_mapper",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Option",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//parsing:Lexer",
-        "//typing:Env",
-        "//stdlib:Stdlib.Digest",
         "//config:Config",
+        "//parsing:Lexer",
+        "//parsing:Location",
+        "//typing:Env",
+        "//typing:Tast_mapper",
+        "//typing:Typedtree",
+        "//typing:Types",
         "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        ":Cmi_format",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//tools:__pkg__",
@@ -143,12 +149,14 @@ compiler_signature(
     src  = "cmt_format.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmi_format_cmi",
-        "//typing:Types_cmi",
-        "//typing:Typedtree_cmi",
-        "//utils:Misc_cmi",
         "//parsing:Location_cmi",
         "//typing:Env_cmi",
+        "//typing:Typedtree_cmi",
+        "//typing:Types_cmi",
+        "//utils:Misc_cmi",
+        ":Cmi_format_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi",
     ],
     visibility = [
@@ -161,10 +169,12 @@ compiler_signature(
     src  = "cmx_format.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//utils:Misc_cmi",
         "//middle_end/flambda:Export_info_cmi",
+        "//middle_end:Clambda_cmi",
+        "//utils:Misc_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi",
-        "//middle_end:Clambda_cmi"
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -179,6 +189,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//utils:Misc_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi"
     ],
     visibility = [
@@ -194,14 +206,16 @@ compiler_module(
     sig    = "Linear_format_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.String",
-        "//utils:Misc",
-        "//parsing:Location",
+        "//asmcomp:Cmm",
         "//asmcomp:Linear",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Digest",
         "//config:Config",
-        "//asmcomp:Cmm"
+        "//parsing:Location",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.String",
     ],
     visibility = ["//asmcomp:__pkg__"]
 )
@@ -211,9 +225,11 @@ compiler_signature(
     src  = "linear_format.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//asmcomp:Cmm_cmi",
         "//asmcomp:Linear_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi",
-        "//asmcomp:Cmm_cmi"
-    ]
+    ],
 )
 

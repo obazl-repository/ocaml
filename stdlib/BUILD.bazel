@@ -108,11 +108,11 @@ mustache(
 alias(name = "Primitives_cmi", actual = ":Stdlib_cmi")
 kernel_signature(
     name = "Stdlib_cmi",
-    src  = "stdlib_mli",
-    opts = SIG_OPTS + [
-        "-nopervasives",
-        "-no-alias-deps",
-    ],
+    src  = "stdlib.mli",
+    # opts = SIG_OPTS + [
+    #     "-nopervasives",
+    #     "-no-alias-deps",
+    # ],
     warnings = [NO_CMI_FILE],
     stdlib_deps   = [
         ":CamlinternalFormatBasics_cmi",

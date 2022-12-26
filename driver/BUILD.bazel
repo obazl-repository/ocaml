@@ -71,23 +71,16 @@ compiler_module(
     sig    = "Compenv_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//config:Config",
         "//parsing:Location",
-        # "//stdlib:Stdlib.Arg",
-        # "//stdlib:Stdlib.Filename",
-        # "//stdlib:Stdlib.Lexing",
-        # "//stdlib:Stdlib.List",
-        # "//stdlib:Stdlib.Option",
-        # "//stdlib:Stdlib.Printexc",
-        # "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Scanf",
-        # "//stdlib:Stdlib.String",
-        # "//stdlib:Stdlib.Sys",
         "//utils:Ccomp",
         "//utils:Clflags",
-        "//config:Config",
         "//utils:Misc",
         "//utils:Profile",
         "//utils:Warnings",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Scanf",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -101,10 +94,12 @@ compiler_signature(
     src  = "compenv.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         "//utils:Clflags_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg_cmi",
-    ]
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -120,12 +115,14 @@ compiler_module(
         "//lambda:Printlambda",
         "//lambda:Simplif",
         "//lambda:Translmod",
-        "//stdlib:Stdlib",
         "//typing:Typedtree",
         "//utils:Clflags",
         "//utils:Misc",
         "//utils:Profile",
-        ":Compile_common", ## (Driver Compile_common)
+        ":Compile_common",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib",
     ],
     visibility = ["//bytecomp:__pkg__"]
 )
@@ -135,11 +132,11 @@ compiler_signature(
     src  = "compile.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Compile_common_cmi",
-        "//typing:Typedtree_cmi",
         "//bytecomp:Instruct_cmi",
         "//typing:Ident_cmi",
+        "//typing:Typedtree_cmi",
         "//utils:Clflags_cmi",
+        ":Compile_common_cmi",
     ]
 )
 
@@ -150,28 +147,29 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Pparse", ## (Driver Pparse)
-        ":Compmisc", ## (Driver Compmisc)
-        ":Compenv", ## (Driver Compenv)
-        "//utils:Warnings",
-        "//typing:Typemod",
-        "//typing:Typedtree",
-        "//typing:Typecore",
-        "//stdlib:Stdlib.String",
-        "//utils:Profile",
-        "//typing:Printtyped",
-        "//typing:Printtyp",
-        "//parsing:Printast",
-        "//parsing:Pprintast",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//typing:Includemod",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
         "//config:Config",
-        ## (Compiler_pass)
-        "//utils:Clflags",
         "//parsing:Builtin_attributes",
+        "//parsing:Pprintast",
+        "//parsing:Printast",
+        "//typing:Env",
+        "//typing:Includemod",
+        "//typing:Printtyp",
+        "//typing:Printtyped",
+        "//typing:Typecore",
+        "//typing:Typedtree",
+        "//typing:Typemod",
+        "//utils:Clflags",
+        "//utils:Misc",
+        "//utils:Profile",
+        "//utils:Warnings",
+        ":Compenv",
+        ":Compmisc",
+        ":Pparse",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
     ],
     visibility = ["//bytecomp:__pkg__"]
 )
@@ -181,11 +179,13 @@ compiler_signature(
     src  = "compile_common.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Typedtree_cmi",
         "//parsing:Parsetree_cmi",
+        "//typing:Env_cmi",
+        "//typing:Typedtree_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-        "//typing:Env_cmi"
-    ]
+    ],
 )
 
 compiler_module(
@@ -196,10 +196,6 @@ compiler_module(
     deps   = [
         "//config:Config",
         "//parsing:Location",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Sys",
         "//typing:Env",
         "//typing:Ident",
         "//typing:Typemod",
@@ -209,9 +205,13 @@ compiler_module(
         "//utils:Misc",
         "//utils:Warnings",
         ":Compenv",
-
-        "//stdlib:Stdlib.Printf", # obazl
-
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -226,10 +226,12 @@ compiler_signature(
     src  = "compmisc.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         "//typing:Env_cmi",
         "//utils:Clflags_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -247,7 +249,7 @@ compiler_signature(
     name = "Errors_cmi",
     src  = "errors.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Format_cmi",
     ]
 )
@@ -258,9 +260,11 @@ compiler_module(
     opts = MODULE_OPTS,
 	warnings = [w.MISSING_MLI],
     deps   = [
-        ":Maindriver", ## (Driver Maindriver)
-        "//stdlib:Stdlib.Sys",
+        ":Maindriver",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "@baseline//:__subpackages__",
@@ -279,6 +283,13 @@ compiler_module(
     deps   = [
         "//config:Config",
         "//parsing:Location",
+        "//utils:Clflags",
+        "//utils:Misc",
+        "//utils:Profile",
+        "//utils:Warnings",
+        ":Compenv",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Format",
@@ -286,11 +297,6 @@ compiler_module(
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Sys",
-        "//utils:Clflags",
-        "//utils:Misc",
-        "//utils:Profile",
-        "//utils:Warnings",
-        ":Compenv",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -304,7 +310,7 @@ compiler_signature(
     name = "Main_args_cmi",
     src  = "main_args.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Arg_cmi",
     ]
 )
@@ -320,12 +326,6 @@ compiler_module(
         "//bytecomp:Bytepackager",
         "//config:Config",
         "//parsing:Location",
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
         "//utils:Clflags",
         "//utils:Profile",
         "//utils:Warnings",
@@ -334,6 +334,14 @@ compiler_module(
         ":Compmisc",
         ":Main_args",
         ":Makedepend",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//bytecomp:__pkg__"
@@ -344,7 +352,7 @@ compiler_signature(
     name = "Maindriver_cmi",
     src  = "maindriver.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Format_cmi",
     ]
 )
@@ -356,11 +364,19 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
+        "//config:Config",
         "//parsing:Depend",
         "//parsing:Lexer",
         "//parsing:Location",
         "//parsing:Parse",
         "//parsing:Parser",
+        "//utils:Clflags",
+        "//utils:Misc",
+        ":Compenv",
+        ":Pparse",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Bytes",
@@ -371,12 +387,6 @@ compiler_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib",
-        "//utils:Clflags",
-        "//config:Config",
-        "//utils:Misc",
-        ":Compenv",
-        ":Pparse",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -390,8 +400,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Parsetree_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -401,19 +413,22 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Compile_common", ## (Driver Compile_common)
-        "//typing:Typedtree",
-        "//lambda:Translmod",
-        "//lambda:Simplif",
-        "//utils:Profile",
-        "//lambda:Printlambda",
-        "//utils:Misc",
-        "//middle_end/flambda:Flambda_middle_end",
+        "//asmcomp:Asmgen",
         "//config:Config",
-        "//middle_end:Compilenv",
+        "//lambda:Printlambda",
+        "//lambda:Simplif",
+        "//lambda:Translmod",
         "//middle_end/closure:Closure_middle_end",
+        "//middle_end/flambda:Flambda_middle_end",
+        "//middle_end:Compilenv",
+        "//typing:Typedtree",
         "//utils:Clflags",
-        "//asmcomp:Asmgen"
+        "//utils:Misc",
+        "//utils:Profile",
+        ":Compile_common",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
     ],
     visibility = ["//asmcomp:__pkg__"]
 )
@@ -423,10 +438,10 @@ compiler_signature(
     src  = "optcompile.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Compile_common_cmi",
+        "//middle_end:Backend_intf_cmi",
         "//typing:Typedtree_cmi",
         "//utils:Clflags_cmi",
-        "//middle_end:Backend_intf_cmi"
+        ":Compile_common_cmi",
     ]
 )
 
@@ -445,9 +460,7 @@ compiler_signature(
     name = "Opterrors_cmi",
     src  = "opterrors.mli",
     opts = SIG_OPTS,
-    deps   = [
-        "//stdlib:Stdlib.Format_cmi",
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib.Format_cmi"]
 )
 
 compiler_module(
@@ -457,6 +470,9 @@ compiler_module(
 	warnings = [w.MISSING_MLI],
     deps   = [
         ":Optmaindriver",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
     ],
     visibility = [
         "@baseline//:__subpackages__",
@@ -475,29 +491,29 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Optcompile", ## (Driver Optcompile)
-        ":Makedepend", ## (Driver Makedepend)
-        ":Main_args", ## (Driver Main_args)
-        ":Compmisc", ## (Driver Compmisc)
-        ":Compenv", ## (Driver Compenv)
-        "//utils:Warnings",
-        "//stdlib:Stdlib.String",
-        "//utils:Profile",
-        "//asmcomp:Proc",
-        "//stdlib:Stdlib.Printf",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//middle_end/flambda:Import_approx",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//config:Config",
-        "//middle_end:Compilenv",
-        "//utils:Clflags",
-        "//asmcomp:Asmpackager",
-        ## (Asmlink)
         "//asmcomp:Asmlibrarian",
+        "//asmcomp:Asmpackager",
+        "//asmcomp:Proc",
+        "//config:Config",
+        "//middle_end/flambda:Import_approx",
+        "//middle_end:Compilenv",
+        "//parsing:Location",
+        "//utils:Clflags",
+        "//utils:Profile",
+        "//utils:Warnings",
+        ":Compenv",
+        ":Compmisc",
+        ":Main_args",
+        ":Makedepend",
+        ":Optcompile",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
-        ## (Arch)
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__pkg__"
@@ -510,8 +526,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//middle_end:Backend_intf_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-    ]
+    ],
 )
 
 compiler_module(
@@ -520,23 +538,25 @@ compiler_module(
     sig    = "Pparse_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//utils:Warnings",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//utils:Profile",
-        "//stdlib:Stdlib.Printf",
-        "//parsing:Parse",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
         "//config:Config",
-        "//utils:Clflags",
-        "//utils:Ccomp",
+        "//parsing:Ast_invariants",
         "//parsing:Ast_mapper",
-        "//parsing:Ast_invariants"
+        "//parsing:Location",
+        "//parsing:Parse",
+        "//utils:Ccomp",
+        "//utils:Clflags",
+        "//utils:Misc",
+        "//utils:Profile",
+        "//utils:Warnings",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -551,8 +571,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Lexing_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-    ]
+        "//stdlib:Stdlib.Lexing_cmi",
+    ],
 )
 

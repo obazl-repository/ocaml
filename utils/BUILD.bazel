@@ -277,7 +277,7 @@ compiler_signature(
     name = "Ccomp_cmi",
     src  = "ccomp.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi"
     ]
 )
@@ -1035,7 +1035,7 @@ compiler_signature(
     name = "Terminfo_cmi",
     src  = "terminfo.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib_cmi"]
+    stdlib_deps   = ["//stdlib:Stdlib_cmi"]
 )
 
 compiler_module(

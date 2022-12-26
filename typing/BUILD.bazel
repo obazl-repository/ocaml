@@ -202,7 +202,7 @@ compiler_signature(
         ":Types_cmi",
     ],
     stdlib_deps = [
-        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Set_cmi",
     ],
 )
 
@@ -818,7 +818,7 @@ compiler_signature(
         ":Outcometree_cmi",
     ],
     stdlib_deps = [
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Format_cmi",
     ],
 )
 
@@ -1214,14 +1214,16 @@ compiler_signature(
         "//parsing:Location_cmi",
         "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         ":Env_cmi",
         ":Errortrace_cmi",
         ":Ident_cmi",
         ":Outcometree_cmi",
         ":Path_cmi",
         ":Types_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -1312,7 +1314,7 @@ compiler_module(
 	warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//utils:Identifiable",
-        "//utils:Misc"
+        "//utils:Misc",
         ":Ident",
         ":Path",
     ],
@@ -1538,7 +1540,7 @@ compiler_signature(
         "//parsing:Parsetree_cmi"
     ],
     stdlib_deps = [
-        "//stdlib:Stdlib",
+        "//stdlib:Stdlib_cmi",
     ],
 )
 
@@ -2176,7 +2178,6 @@ compiler_module(
         "//parsing:Location",
         "//parsing:Longident",
         "//parsing:Pprintast",
-        "//stdlib:Stdlib.String",
         "//utils:Clflags",
         "//utils:Lazy_backtrack",
         "//utils:Misc",
@@ -2196,6 +2197,7 @@ compiler_module(
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
     ],
     visibility = ["//toplevel:__pkg__"]
 )
