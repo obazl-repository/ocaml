@@ -259,12 +259,12 @@ compiler_signature(
     src  = "printlambda.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//parsing:Asttypes_cmi",
         "//typing:Types_cmi",
         ":Debuginfo_cmi",
         ":Lambda_cmi",
     ],
     stdlib_deps = [
-        "//parsing:Asttypes_cmi",
         "//stdlib:Stdlib.Format_cmi",
     ],
 )
@@ -380,7 +380,7 @@ compiler_module(
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
     stdlib_deps   = [
-        "//stdlib:Stdlib"
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.List",

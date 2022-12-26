@@ -173,7 +173,7 @@ compiler_signature(
     src  = "arg_helper.mli",
     opts = SIG_OPTS + ["-nopervasives", "-open", "Stdlib"],
     stdlib_deps   = [
-        "//stdlib:Stdlib",
+        "//stdlib:Stdlib_cmi",
         "//stdlib:Stdlib.Map_cmi"
     ]
 )
@@ -184,9 +184,8 @@ compiler_module(
     sig    = "Binutils_cmi",
     open   = ["//stdlib:Stdlib"],
     opts = MODULE_OPTS,
-    ## DEMO: we can depend on individual submodules instead of the entire lib
     stdlib_deps   = [
-        "//stdlib:Stdlib.Array"
+        "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Fun",
@@ -224,7 +223,7 @@ compiler_module(
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
     stdlib_deps   = [
-        "//stdlib:Stdlib"
+        "//stdlib:Stdlib",
         "//stdlib:Stdlib.Buffer",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
@@ -295,7 +294,7 @@ compiler_module(
         ":Numbers",
         ":Profile",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.List",
@@ -328,7 +327,7 @@ compiler_signature(
         ":Misc_cmi",
         ":Profile_cmi",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg_cmi",
         "//stdlib:Stdlib.Digest_cmi",
     ],
@@ -446,13 +445,13 @@ compiler_module(
     open   = ["//stdlib:Stdlib"],
     deps   = [
         ":Misc",
-    stdlib_deps [
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.Set",
-    ],
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -468,7 +467,7 @@ compiler_signature(
     deps   = [
         ":Misc_cmi",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi",
         "//stdlib:Stdlib.Hashtbl_cmi",
         "//stdlib:Stdlib.Map_cmi",
@@ -489,7 +488,7 @@ compiler_module(
     deps   = [
         ":Misc",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
@@ -505,7 +504,7 @@ compiler_signature(
     deps   = [
         ":Misc_cmi",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi",
         "//stdlib:Stdlib.Format_cmi",
     ],
@@ -525,7 +524,7 @@ compiler_module(
         ":Diffing",
         ":Misc",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Either",
         "//stdlib:Stdlib.Format",
@@ -542,7 +541,7 @@ compiler_signature(
     deps   = [
         ":Diffing_cmi",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = ["//typing:__pkg__"]
@@ -635,7 +634,7 @@ compiler_module(
     deps   = [
         ":Misc", ## (Utils Misc)
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.List",
@@ -731,7 +730,7 @@ compiler_module(
         ":Local_store",
         ":Misc",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.List",
@@ -798,7 +797,7 @@ compiler_module(
         "//config:Config",
         ":Build_path_prefix_map",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Buffer",
         "//stdlib:Stdlib.Bytes",
@@ -846,7 +845,7 @@ compiler_signature(
         "//config:Config_cmi",
         ":Build_path_prefix_map_cmi",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest_cmi",
         "//stdlib:Stdlib.Format_cmi",
         "//stdlib:Stdlib.Hashtbl_cmi",
@@ -874,7 +873,7 @@ compiler_module(
         ":Identifiable",
         ":Misc",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -899,7 +898,7 @@ compiler_signature(
     deps   = [
         ":Identifiable_cmi",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Hashtbl_cmi",
         "//stdlib:Stdlib.Int64_cmi",
         "//stdlib:Stdlib.Map_cmi",
@@ -918,7 +917,7 @@ compiler_module(
     deps   = [
         ":Misc",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Digest",
         "//stdlib:Stdlib.Float",
@@ -962,7 +961,7 @@ compiler_module(
         ":Misc",
         ":Numbers",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Digest",
         "//stdlib:Stdlib.Hashtbl",
@@ -980,10 +979,10 @@ compiler_signature(
     deps   = [
         ":Identifiable",
     ],
-    stdlib_deps [
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.Set",
+    stdlib_deps = [
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Map_cmi",
+        "//stdlib:Stdlib.Set_cmi",
     ]
 )
 
@@ -995,7 +994,7 @@ compiler_module(
     deps   = [
         ":Misc",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Int32",
@@ -1047,7 +1046,7 @@ compiler_module(
     deps   = [
         ":Misc",
     ],
-    stdlib_deps [
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Char",

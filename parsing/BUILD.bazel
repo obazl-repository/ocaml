@@ -94,16 +94,18 @@ compiler_module(
     sig    = "Ast_helper_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Int32",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Nativeint",
         "//utils:Misc",
         ":Docstrings",
         ":Location",
         ":Longident",
         ":Syntaxerr",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -118,12 +120,14 @@ compiler_signature(
     src  = "ast_helper.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Asttypes_cmi",
         ":Docstrings_cmi",
         ":Location_cmi",
         ":Longident_cmi",
         ":Parsetree_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = [
         "//typing:__pkg__"
@@ -136,11 +140,13 @@ compiler_module(
     sig    = "Ast_invariants_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.List",
         ":Ast_iterator",
         ":Builtin_attributes",
         ":Longident",
         ":Syntaxerr",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -150,12 +156,14 @@ compiler_signature(
     src  = "ast_invariants.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Location_cmi",
         ":Longident_cmi",
         ":Asttypes_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -164,8 +172,10 @@ compiler_module(
     sig    = "Ast_iterator_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.List",
         ":Location",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
     ],
     visibility = [
         "//tools:__pkg__",
@@ -178,11 +188,13 @@ compiler_signature(
     src  = "ast_iterator.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Location_cmi",
         ":Longident_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -191,19 +203,21 @@ compiler_module(
     sig    = "Ast_mapper_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//config:Config",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        ":Ast_helper",
+        ":Location",
+        ":Longident",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Sys",
-        "//utils:Clflags",
-        "//config:Config",
-        "//utils:Load_path",
-        "//utils:Misc",
-        ":Ast_helper",
-        ":Location",
-        ":Longident",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -217,12 +231,14 @@ compiler_signature(
     src  = "ast_mapper.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
+        ":Asttypes_cmi",
         ":Location_cmi",
         ":Longident_cmi",
-        ":Asttypes_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_signature(
@@ -230,8 +246,10 @@ compiler_signature(
     src  = "asttypes.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Location_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -251,9 +269,11 @@ compiler_module(
     sig    = "Attr_helper_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        ":Location",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
-        ":Location",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -266,12 +286,14 @@ compiler_signature(
     src  = "attr_helper.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Asttypes_cmi",
         ":Location_cmi",
         ":Longident_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -280,15 +302,17 @@ compiler_module(
     sig    = "Builtin_attributes_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Location",
+        ":Longident",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Printf",
-        "//utils:Misc",
-        "//utils:Warnings",
-        ":Location",
-        ":Longident",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -302,13 +326,15 @@ compiler_signature(
     src  = "builtin_attributes.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         "//utils:Misc_cmi",
+        ":Asttypes_cmi",
         ":Location_cmi",
         ":Longident_cmi",
-        ":Asttypes_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -317,13 +343,15 @@ compiler_module(
     sig    = "Depend_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Option",
         "//utils:Clflags",
         "//utils:Misc",
         ":Builtin_attributes",
         ":Location",
         ":Longident",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -333,13 +361,15 @@ compiler_signature(
     src  = "depend.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         "//utils:Misc_cmi",
+        ":Asttypes_cmi",
         ":Location_cmi",
         ":Longident_cmi",
-        ":Asttypes_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -348,11 +378,13 @@ compiler_module(
     sig    = "Docstrings_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//utils:Warnings",
+        ":Location",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.List",
-        "//utils:Warnings",
-        ":Location",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -365,13 +397,15 @@ compiler_signature(
     src  = "docstrings.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
-        "//stdlib:Stdlib.Lazy_cmi",
-        "//stdlib:Stdlib.Lexing_cmi",
         ":Location_cmi",
         ":Longident_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Lazy_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
+    ],
 )
 
 compiler_module(
@@ -379,7 +413,7 @@ compiler_module(
     struct = "camlinternalMenhirLib.ml",
     sig    = "CamlinternalMenhirLib_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Lazy",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.List",
@@ -401,7 +435,7 @@ compiler_signature(
     name   = "CamlinternalMenhirLib_cmi",
     src    = "camlinternalMenhirLib.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Lazy_cmi",
         "//stdlib:Stdlib.Lexing_cmi",
         "//stdlib:Stdlib.Obj_cmi",
@@ -424,9 +458,11 @@ compiler_module(
     sig    = "Lexer_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Lexing",
         "//utils:Misc",
         ":Parser"
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -447,9 +483,11 @@ compiler_signature(
     src  = "lexer.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Lexing",
         ":Parser_cmi"
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing_cmi",
+    ],
 )
 
 compiler_module(
@@ -458,6 +496,13 @@ compiler_module(
     sig    = "Location_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//utils:Build_path_prefix_map",
+        "//utils:Clflags",
+        "//utils:Misc",
+        "//utils:Terminfo",
+        "//utils:Warnings",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.Buffer",
         "//stdlib:Stdlib.Bytes",
@@ -470,11 +515,6 @@ compiler_module(
         "//stdlib:Stdlib.Parsing",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-        "//utils:Build_path_prefix_map",
-        "//utils:Clflags",
-        "//utils:Misc",
-        "//utils:Terminfo",
-        "//utils:Warnings",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -499,10 +539,12 @@ compiler_signature(
     src  = "location.mli",
     opts = SIG_OPTS,
     deps   = [
+        "//utils:Warnings_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Buffer_cmi",
         "//stdlib:Stdlib.Format_cmi",
         "//stdlib:Stdlib.Lexing_cmi",
-        "//utils:Warnings_cmi",
     ],
     visibility = [
         "//bytecomp:__pkg__",
@@ -522,9 +564,11 @@ compiler_module(
     sig    = "Longident_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.String",
-        "//utils:Misc",
     ],
     visibility = [
         "//debugger:__pkg__",
@@ -541,9 +585,9 @@ compiler_signature(
     name = "Longident_cmi",
     src  = "longident.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi",
-       "//stdlib:Stdlib.Format_cmi"
+        "//stdlib:Stdlib.Format_cmi"
     ],
     visibility = [
         "//debugger:__pkg__",
@@ -558,14 +602,16 @@ compiler_module(
     sig    = "Parse_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Lexing",
         ":Docstrings",
         ":Lexer",
         ":Location",
         ":Parser",
         ":Pprintast",
         ":Syntaxerr",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -580,12 +626,14 @@ compiler_signature(
     src  = "parse.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
-        "//stdlib:Stdlib.Lexing_cmi",
         ":Location_cmi",
         ":Longident_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
+    ],
 )
 
 compiler_module(
@@ -596,6 +644,8 @@ compiler_module(
     deps   = [
         ":Ast_helper",
         ":CamlinternalMenhirLib",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Parsing",
     ],
     visibility = [
@@ -630,11 +680,13 @@ compiler_signature(
     src  = "parser.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Lexing_cmi",
         ":CamlinternalMenhirLib_cmi",
         ":Docstrings_cmi",
         ":Location_cmi"
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing_cmi",
+    ],
 )
 
 genrule(
@@ -654,10 +706,12 @@ compiler_signature(
     src  = "parsetree.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Asttypes_cmi",
         ":Location_cmi",
         ":Longident_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -676,13 +730,15 @@ compiler_module(
     sig    = "Pprintast_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        ":Ast_helper",
+        ":Location",
+        ":Longident",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.String",
-        ":Ast_helper",
-        ":Location",
-        ":Longident",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -697,12 +753,14 @@ compiler_signature(
     src  = "pprintast.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Location_cmi",
         ":Longident_cmi",
         ":Asttypes_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -711,16 +769,18 @@ compiler_module(
     sig    = "Printast_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//utils:Clflags",
+        ":Location",
+        ":Longident",
+        ":Pprintast",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.String",
-        "//utils:Clflags",
-        ":Location",
-        ":Longident",
-        ":Pprintast",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -735,12 +795,14 @@ compiler_signature(
     src  = "printast.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Location_cmi",
         ":Longident_cmi",
         ":Asttypes_cmi",
         ":Parsetree_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 compiler_module(
@@ -749,8 +811,10 @@ compiler_module(
     sig    = "Syntaxerr_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
         ":Location",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -764,8 +828,10 @@ compiler_signature(
     src  = "syntaxerr.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Location_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 

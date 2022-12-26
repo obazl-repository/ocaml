@@ -23,7 +23,7 @@ package(default_visibility = ["//visibility:public"])
 compiler_signature(
     name = "Config_cmi",
     src  = "config.mli",
-    deps   = ["//stdlib:Stdlib_cmi"],
+    stdlib_deps   = ["//stdlib:Stdlib_cmi"],
     visibility = [
         "//ocamltest:__pkg__",
         "//otherlibs/dynlink:__pkg__",
@@ -36,13 +36,13 @@ compiler_module(
     struct = "config.ml",
     sig    = "Config_cmi",
     open   = ["//stdlib:Stdlib"],
-    deps   = [ # [
-        # "//config:Config_cc",
+    stdlib_deps   = [
         "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Option", # if not bootstrapping?
+        "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
+        # "//config:Config_cc",
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -150,7 +150,7 @@ config_cc_toolchain(
 compiler_module(
     name   = "Config_cc_toolchain",
     struct = "config_cc_toolchain.ml",
-    deps   = ["//stdlib:Stdlib"]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
 mustache(
