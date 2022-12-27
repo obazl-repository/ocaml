@@ -138,12 +138,12 @@ expect_test(
 #     main    = ":Bigints",
 # )
 
-## expansion:
+## test_executable macro expansion:
 vv_test_executable(
-    ## note the trailing '_' in the name; this is so that the
+    ## note the leading '__' in the name; this is so that the
     ## unadorned name can be used for the runnable (sh_binary) target
     ## below.
-    name    = "bigints.vv.byte_",
+    name    = "__bigints.vv.byte",
     main    = ":Bigints",
 )
 ## to run the vv.byte executable:
@@ -155,9 +155,9 @@ sh_binary(
         "//conditions:default": {"VERBOSE": "false"}
     }),
     args = ["$(rootpath //runtime:ocamlrun)",
-            "$(rootpath :bigints.vv.byte_)"],
+            "$(rootpath :__bigints.vv.byte)"],
     data = ["//runtime:ocamlrun",
-            ":bigints.vv.byte_"],
+            ":__bigints.vv.byte"],
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
@@ -170,7 +170,7 @@ ss_test_executable(
     main    = ":Bigints",
 )
 sv_test_executable(
-    name    = "bigints.sv.byte_",
+    name    = "__bigints.sv.byte",
     main    = ":Bigints",
 )
 ## to run the vv.byte executable:
@@ -182,9 +182,9 @@ sh_binary(
         "//conditions:default": {"VERBOSE": "false"}
     }),
     args = ["$(rootpath //runtime:ocamlrun)",
-            "$(rootpath :bigints.sv.byte_)"],
+            "$(rootpath :__bigints.sv.byte)"],
     data = ["//runtime:ocamlrun",
-            ":bigints.sv.byte_"],
+            ":__bigints.sv.byte"],
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
