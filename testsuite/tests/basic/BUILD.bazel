@@ -5,12 +5,18 @@ load("//test:rules.bzl",
      "vs_test_executable",
      "ss_test_executable",
      "sv_test_executable",
+
+     "expect_test",
+     "expect_vv_test",
+     "expect_vs_test",
+     "expect_ss_test",
+     "expect_sv_test",
+
      "test_library",
      "test_module",
      "test_signature",
 
      "compile_fail_test",
-     "expect_test",
      "inline_expect_test",
      "ocaml_test",
 )
@@ -117,20 +123,49 @@ test_module(
 )
 
 ############
-expect_test(
-    name    = "bigints_test",
+# expect_test(
+#     name    = "bigints_test",
+#     stdout  = "bigints.stdout",
+#     expected = "bigints.reference",
+#     opts   = ["-nopervasives", "-open", "Stdlib"],
+#     # prologue = select({
+#     #     "//testsuite/tests:with-stdlib?":["//stdlib"],
+#     #     "//conditions:default": [
+#     #         "//stdlib:CamlinternalFormatBasics",
+#     #         "//stdlib:Stdlib",
+#     #         "//stdlib:Stdlib.Sys"
+#     #     ]
+#     # }),
+#     test_executable = ":Bigints",
+# )
+
+## expect_test macro expansion:
+expect_vv_test(
+    name    = "bigints_vv_test",
+    test_executable = ":__bigints.vv.byte",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
-    opts   = ["-nopervasives", "-open", "Stdlib"],
-    # prologue = select({
-    #     "//testsuite/tests:with-stdlib?":["//stdlib"],
-    #     "//conditions:default": [
-    #         "//stdlib:CamlinternalFormatBasics",
-    #         "//stdlib:Stdlib",
-    #         "//stdlib:Stdlib.Sys"
-    #     ]
-    # }),
-    test_executable = ":Bigints",
+)
+
+expect_vs_test(
+    name    = "bigints_vs_test",
+    test_executable = ":bigints.vs.opt",
+    stdout  = "bigints.stdout",
+    expected = "bigints.reference",
+)
+
+expect_ss_test(
+    name    = "bigints_ss_test",
+    test_executable = ":bigints.ss.opt",
+    stdout  = "bigints.stdout",
+    expected = "bigints.reference",
+)
+
+expect_sv_test(
+    name    = "bigints_sv_test",
+    test_executable = ":__bigints.sv.byte",
+    stdout  = "bigints.stdout",
+    expected = "bigints.reference",
 )
 
 # test_executable(

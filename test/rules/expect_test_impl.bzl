@@ -40,29 +40,41 @@ def expect_test_impl(ctx):
 
     ## see compiler_fail_test.bzl for starters
 
-    exe = executable_impl(ctx, tc, exe_name, tc.workdir)
-
-    # return exe
+    # exe = executable_impl(ctx, tc, exe_name, tc.workdir)
+    exe = ctx.file.test_executable
 
     if debug:
         print("exe: %s" % exe)
-        print("exe[0]: %s" % exe[0])
         print("tc.config_executor: %s" % tc.config_executor)
+        print("tc.config_emitter: %s" % tc.config_emitter)
 
-        print("exe[di]file to run: %s" % exe[0].files_to_run)
+        print("exe file to run: %s" % ctx.attr.test_executable.files_to_run.executable)
         # for f in exe[0].default_runfiles.files.to_list():
         #     print("RF: %s" % f)
         print("OCAMLRUN: %s" % tc.ocamlrun)
 
-    pgm = exe[0].files.to_list()[0]
+    # pgm = exe[0].files.to_list()[0]
+    pgm = ctx.file.test_executable
 
     if tc.config_executor in ["boot", "baseline","vm"]:
-        # ocamlrun = exe[0].default_runfiles.files.to_list()[0]
-        ocamlrun = tc.ocamlrun
-        pgm_cmd = ocamlrun.short_path + " ocamlcc/" + pgm.short_path
+        if tc.config_emitter == "sys":
+            ocamlrun = None
+            ocamlrun_path = ""
+            pgm_cmd = pgm.short_path
+        else:
+            ocamlrun_path = tc.ocamlrun.short_path
+            pgm_cmd = tc.ocamlrun.short_path + " ocamlcc/" + pgm.short_path
     else:
-        ocamlrun = None
-        pgm_cmd = pgm.short_path
+        if tc.config_emitter == "sys":
+            ocamlrun = None
+            ocamlrun_path = ""
+            pgm_cmd = pgm.short_path
+        else:
+            ocamlrun_path = tc.ocamlrun.short_path
+            pgm_cmd = tc.ocamlrun.short_path + " ocamlcc/" + pgm.short_path
+        # ocamlrun = None
+        # ocamlrun_path = ""
+        # pgm_cmd = pgm.short_path
 
     runner = ctx.actions.declare_file(ctx.attr.name + ".sh")
     # stdout = ctx.actions.declare_file(ctx.attr.stdout)
@@ -73,35 +85,42 @@ def expect_test_impl(ctx):
 
     if debug:
         print("tc.name: %s" % tc.name)
-        print("ocamlrun: %s" % ocamlrun)
-        print("tc.compiler: %s" % tc.compiler)
-        # print("tc.lexer: %s" % tc.lexer)
         print("tc.config_executor: %s" % tc.config_executor)
+        print("tc.compiler: %s" % tc.compiler)
         print("pgm: %s" % pgm)
+        print("ocamlrun: %s" % tc.ocamlrun)
+        print("pgm_cmd: %s" % pgm_cmd)
         print("STDOUT: %s" % stdout)
 
     cmd = "\n".join([
         # "{pgm} > ${{TEST_TMPDIR}}/{stdout};".format(
         "set -x;",
         "echo PWD: $PWD",
-        "echo OCAMLRUN: {};".format(ocamlrun.short_path),
-        # "\"{pgm} > ocamlcc/${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout}\";".format(
-        "\"{pgm}\";".format(
-            pgm=pgm_cmd,
-            # stdout = stdout
-        ),
-        "echo STDOUT: `cat {}`".format(stdout),
-        "diff -w {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
-            src = ctx.file.expected.path,
-            dst = stdout
-        ),
-        "if [ $? -eq 0 ]",
-        "then",
-        "    echo PASS",
-        "else",
-        "    echo FAIL",
-        "    exit 1",
-        "fi",
+        "echo OCAMLRUN: {};".format(ocamlrun_path),
+
+        "{ocamlrun} {pgm}".format(
+            ocamlrun = ocamlrun_path,
+            pgm = pgm.short_path),
+
+        # "echo `\"{pgm}\"`".format(pgm = pgm_cmd),
+
+        # "\"{pgm} > ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout}\";".format(
+        #     pgm=pgm_cmd,
+        #     stdout = stdout
+        # ),
+
+        # "echo STDOUT: `cat {}`".format(stdout),
+        # "diff -w {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
+        #     src = ctx.file.expected.path,
+        #     dst = stdout
+        # ),
+        # "if [ $? -eq 0 ]",
+        # "then",
+        # "    echo PASS",
+        # "else",
+        # "    echo FAIL",
+        # "    exit 1",
+        # "fi",
 
         # "cp -v ${{TEST_TMPDIR}}/{stdout} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(stdout=stdout),
         # "echo SH: %s" % runner.path,
@@ -127,7 +146,7 @@ def expect_test_impl(ctx):
         files = [runner, pgm],
         transitive_files =  depset([
             ctx.file.expected
-            ] + [ocamlrun] if ocamlrun else [],
+            ] + [tc.ocamlrun] if tc.ocamlrun else [],
         )
     )
 

@@ -10,7 +10,8 @@ load("//bzl:providers.bzl",
      "ModuleInfo",
      "new_deps_aggregator",
      "OcamlExecutableMarker",
-     "OcamlTestMarker"
+     "OcamlTestMarker",
+     "TestExecutableMarker"
 )
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
@@ -540,8 +541,9 @@ def executable_impl(ctx, tc, exe_name, workdir):
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "boot_executable":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule in ["test_executable"]:
-        exe_provider = OcamlExecutableMarker()
+    elif ctx.attr._rule in ["test_executable"
+                            ]:
+        exe_provider = TestExecutableMarker()
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_test":
@@ -553,7 +555,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     providers = [
         defaultInfo,
-        # exe_provider
+        exe_provider
     ]
     # print("out_exe: %s" % out_exe)
     # print("exe prov: %s" % defaultInfo)

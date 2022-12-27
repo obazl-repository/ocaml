@@ -1,6 +1,6 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:providers.bzl", "ModuleInfo")
+load("//bzl:providers.bzl", "ModuleInfo", "TestExecutableMarker")
 
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
@@ -38,7 +38,7 @@ expect_vv_test = rule(
             doc = "Label of test executable.",
             mandatory = True,
             allow_single_file = True,
-            providers = [[ModuleInfo]],
+            providers = [[TestExecutableMarker]],
             default = None,
             # cfg = exe_deps_out_transition,
         ),
@@ -80,7 +80,7 @@ expect_vs_test = rule(
             doc = "Label of test executable.",
             mandatory = True,
             allow_single_file = True,
-            # providers = [[ModuleInfo]], ##FIXME
+            providers = [[TestExecutableMarker]],
             default = None,
             # cfg = exe_deps_out_transition,
         ),
@@ -122,7 +122,7 @@ expect_ss_test = rule(
             doc = "Label of test executable.",
             mandatory = True,
             allow_single_file = True,
-            providers = [[ModuleInfo]],
+            providers = [[TestExecutableMarker]],
             default = None,
             # cfg = exe_deps_out_transition,
         ),
@@ -165,7 +165,7 @@ expect_sv_test = rule(
             doc = "Label of test executable.",
             mandatory = True,
             allow_single_file = True,
-            providers = [[ModuleInfo]],
+            providers = [[TestExecutableMarker]],
             default = None,
             # cfg = exe_deps_out_transition,
         ),
@@ -188,8 +188,7 @@ expect_sv_test = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
     ),
-    cfg = ss_test_in_transition,
-    # cfg = build_tool_sys_in_transition,
+    cfg = sv_test_in_transition,
     test = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -243,6 +242,16 @@ def expect_test(name,
 
     expect_ss_test(
         name     = ss_name,
+        stdout   = stdout,
+        expected = expected,
+        test_executable = test_executable,
+        timeout  = timeout,
+        tags     = ["ss"],
+        **kwargs
+    )
+
+    expect_sv_test(
+        name     = sv_name,
         stdout   = stdout,
         expected = expected,
         test_executable = test_executable,
