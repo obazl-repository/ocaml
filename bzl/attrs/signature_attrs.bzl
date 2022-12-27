@@ -1,4 +1,4 @@
-load("//bzl:providers.bzl", "StdlibSigMarker", "CompilerMarker")
+load("//bzl:providers.bzl", "StdlibSigMarker", "CompilerSigMarker")
 
 
 #######################
@@ -78,7 +78,7 @@ def signature_attrs():
             doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",
             # cfg = compile_mode_out_transition,
             providers = [
-                [CompilerMarker],
+                [CompilerSigMarker],
                 # BootInfo,  ## bug
 
                 # [OcamlArchiveProvider],

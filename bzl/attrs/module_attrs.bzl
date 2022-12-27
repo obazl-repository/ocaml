@@ -4,6 +4,7 @@ load("//bzl:providers.bzl",
      "OcamlSignatureProvider",
      "ModuleInfo",
      "CompilerMarker",
+     "CompilerSigMarker",
      "StdlibStructMarker")
 
 ###################
@@ -74,6 +75,10 @@ def module_attrs():
         stdlib_deps = attr.label_list(
             doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
             providers = [StdlibStructMarker]
+        ),
+        sig_deps = attr.label_list(
+            doc = "Sig deps",
+            providers = [CompilerSigMarker]
         ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",

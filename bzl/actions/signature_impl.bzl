@@ -8,7 +8,7 @@ load("//bzl:providers.bzl",
      "ModuleInfo",
      "SigInfo",
      "StdlibSigMarker",
-     "CompilerMarker",
+     "CompilerSigMarker",
      "new_deps_aggregator",
      "OcamlSignatureProvider")
 
@@ -397,8 +397,9 @@ def signature_impl(ctx, module_name):
 
     if ctx.attr._rule in [
         "compiler_signature",
+        "ns_signature"
     ]:
-        providers.append(CompilerMarker())
+        providers.append(CompilerSigMarker())
 
     if ccInfo_list:
         providers.append(

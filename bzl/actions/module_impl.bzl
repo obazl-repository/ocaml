@@ -327,6 +327,10 @@ def module_impl(ctx, module_name):
         #         open_stdlib = True
         #         stdlib_library_target = dep
 
+    if hasattr(ctx.attr, "sig_deps"):
+        for dep in ctx.attr.sig_deps:
+            depsets = aggregate_deps(ctx, dep, depsets, manifest)
+
     if hasattr(ctx.attr, "stdlib_deps"):
         if len(ctx.attr.stdlib_deps) > 0:
             if not ctx.label.name == "Stdlib":
@@ -696,6 +700,8 @@ def module_impl(ctx, module_name):
 
     if ctx.attr._rule in [
         "compiler_module", # "compiler_signature",
+        "ns_module",
+        "test_module"
     ]:
         providers.append(CompilerMarker())
 

@@ -102,7 +102,7 @@ def progress_msg(workdir, ctx):
                 "ocaml_tool_vm", "ocaml_tool_sys",
                 "test_executable"]:
         action = "Linking"
-    elif rule in ["compiler_module", "build_module", "stdlib_module", "stdlib_internal_module", "kernel_module", "test_module", "tool_module", "ns_module"]:
+    elif rule in ["compiler_module", "build_module", "stdlib_module", "stdlib_internal_module", "kernel_module", "test_module", "tool_module", "ns_module", "boot_module"]:
         action = "Compiling"
     elif rule in ["compiler_signature", "stdlib_signature", "stdlib_internal_signature", "kernel_signature", "test_signature", "tool_signature", "ns_signature"]:
         action = "Compiling"
