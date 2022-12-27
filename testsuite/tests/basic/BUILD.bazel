@@ -1,6 +1,8 @@
 load("//test:rules.bzl",
      "test_archive",
      "test_executable",
+     # "vv_test_executable",
+     # "ss_test_executable",
      "test_library",
      "test_module",
      "test_signature",
@@ -679,8 +681,17 @@ expect_test(
     main    = ":Trigraph",
 )
 
+# vv_test_executable(
+#     name    = "trigraph.byte",
+#     prologue = select({
+#         "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+#         "//conditions:default": []
+#     }),
+#     main    = ":Trigraph",
+# )
+
 test_executable(
-    name    = "trigraph.exe",
+    name    = "trigraph",
     prologue = select({
         "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
         "//conditions:default": []
@@ -693,7 +704,7 @@ test_module(
     struct = "trigraph.ml",
     # if --//config/ocaml/compiler/libs:archived? is set, then use
     # _stdlib and ignore these:
-    stdlib_deps = ["//stdlib"],
+    stdlib_deps = ["//stdlib:Stdlib"],
     # deps   = select({
     #     "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
     #     "//conditions:default": ["//stdlib:Primitives"]

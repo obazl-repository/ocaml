@@ -33,12 +33,14 @@ test_module_ = rule(
         #     doc = "The compiler always opens Stdlib, so everything depends on it.",
         #     default = "//stdlib:Stdlib"
         # ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
+        # _allowlist_function_transition = attr.label(
+        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        # ),
         _rule = attr.string( default = "test_module" ),
     ),
-    cfg = vv_test_in_transition,
+    ## Should not be run as direct CLI build, only as a dep of
+    ## toplevel test rule, which sets config.
+    # cfg = vv_test_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
     # fragments = ["platform", "cpp"],
