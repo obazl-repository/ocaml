@@ -90,6 +90,7 @@ compiler_signature(
         "//asmcomp:__pkg__",
         "//driver:__pkg__",
         "//middle_end:__subpackages__"
+        # "//toplevel/native:__pkg__"
     ]
 )
 
@@ -279,7 +280,8 @@ compiler_module(
         "//asmcomp:__subpackages__",
         "//driver:__pkg__",
         "//middle_end:__subpackages__",
-        "//testsuite:__subpackages__"
+        "//testsuite:__subpackages__",
+        "//toplevel/native:__pkg__"
     ]
 )
 

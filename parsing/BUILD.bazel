@@ -110,7 +110,7 @@ compiler_module(
     visibility = [
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
 )

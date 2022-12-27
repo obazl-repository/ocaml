@@ -831,8 +831,7 @@ compiler_module(
         "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
-        "//toplevel:__pkg__",
-        "//toplevel/byte:__pkg__",
+        "//toplevel:__subpackages__",
         "//typing:__pkg__"
     ]
 )
@@ -977,7 +976,7 @@ compiler_signature(
     src  = "strongly_connected_components.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Identifiable",
+        ":Identifiable_cmi",
     ],
     stdlib_deps = [
         "//stdlib:Stdlib.Hashtbl_cmi",

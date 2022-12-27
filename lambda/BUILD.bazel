@@ -138,8 +138,7 @@ compiler_module(
         "//middle_end:__subpackages__",
         "//otherlibs/dynlink:__pkg__",
         "//typing:__pkg__",
-
-        "//testsuite:__subpackages__"
+        "//testsuite:__subpackages__",
     ],
 )
 
@@ -164,7 +163,8 @@ compiler_signature(
         "//bytecomp:__pkg__",
         "//file_formats:__pkg__",
         "//middle_end:__pkg__",
-        "//typing:__pkg__"
+        "//typing:__pkg__",
+        "//toplevel/native:__pkg__"
     ]
 )
 
@@ -250,7 +250,7 @@ compiler_module(
         "//driver:__pkg__",
         "//middle_end:__pkg__",
         "//middle_end/flambda:__pkg__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -357,7 +357,7 @@ compiler_module(
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
         "//middle_end:__subpackages__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -603,7 +603,7 @@ compiler_module(
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 

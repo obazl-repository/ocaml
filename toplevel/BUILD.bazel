@@ -1,5 +1,5 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
+     # "boot_archive",
      # "boot_executable",
      "boot_library",
      "bootstrap_repl",
@@ -210,7 +210,7 @@ compiler_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.Sys",
-    ]
+    ],
     visibility = ["//utils:__pkg__"]
 )
 
@@ -230,7 +230,7 @@ compiler_module(
         "//typing:Env",
         "//typing:Ident",
         "//typing:Oprint",
-        "//typing:Outcometree_cmi",
+        # "//typing:Outcometree_cmi",
         "//typing:Path",
         "//typing:Predef",
         "//typing:Printtyp",
@@ -245,7 +245,7 @@ compiler_module(
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Printexc",
-    ]
+    ],
     visibility = ["//debugger:__pkg__"]
 )
 
@@ -254,13 +254,13 @@ compiler_signature(
     src  = "genprintval.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Env",
+        "//typing:Env_cmi",
         "//typing:Outcometree_cmi",
-        "//typing:Path",
-        "//typing:Types",
+        "//typing:Path_cmi",
+        "//typing:Types_cmi",
     ],
     stdlib_deps =[
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Format_cmi",
     ]
 )
 
@@ -280,13 +280,11 @@ compiler_module(
         "//parsing:Location",
         "//parsing:Longident",
         "//parsing:Parse",
-        "//parsing:Parsetree_cmi",
         "//parsing:Pprintast",
         "//parsing:Printast",
         "//typing:Env",
         "//typing:Ident",
         "//typing:Oprint",
-        "//typing:Outcometree_cmi",
         "//typing:Path",
         "//typing:Predef",
         "//utils:Clflags",
@@ -306,8 +304,8 @@ compiler_module(
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.String",
-    ]
-    visibility = ["//toplevel/byte:__pkg__"]
+    ],
+    visibility = ["//toplevel:__subpackages__"]
 )
 
 compiler_signature(
@@ -333,7 +331,8 @@ compiler_signature(
         "//stdlib:Stdlib.Hashtbl_cmi",
         "//stdlib:Stdlib.Lexing_cmi",
         "//stdlib:Stdlib.Obj_cmi",
-    ]
+    ],
+    visibility = ["//toplevel:__subpackages__"]
 )
 
 compiler_module(
@@ -346,10 +345,8 @@ compiler_module(
         "//config:Config",
         "//driver:Compenv",
         "//parsing:Ast_helper",
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
         "//typing:Btype",
         "//typing:Ctype",
         "//typing:Env",
@@ -365,6 +362,9 @@ compiler_module(
         ":Topeval",
         ":Toploop",
         ":Topprinters",
+
+        # "//parsing:Asttypes_cmi",
+        # "//parsing:Parsetree_cmi",
     ],
     stdlib_deps =[
         "//stdlib:Stdlib.Arg",
@@ -376,7 +376,7 @@ compiler_module(
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-    ]
+    ],
     visibility = ["//toplevel/byte:__pkg__"]
 )
 
@@ -385,10 +385,10 @@ compiler_signature(
     src  = "topdirs.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Longident",
+        "//parsing:Longident_cmi",
     ],
     stdlib_deps =[
-        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Format_cmi",
     ]
 )
 
@@ -411,18 +411,14 @@ compiler_module(
         "//bytecomp:Symtable",
         "//config:Config",
         "//driver:Compmisc",
-        "//file_formats:Cmo_format_cmi",
         "//lambda:Printlambda",
         "//lambda:Simplif",
         "//lambda:Translmod",
-        "//parsing:Asttypes_cmi",
         "//parsing:Location",
-        "//parsing:Parsetree_cmi",
         "//toplevel:Topcommon",
         "//typing:Env",
         "//typing:Ident",
         "//typing:Includemod",
-        "//typing:Outcometree_cmi",
         "//typing:Persistent_env",
         "//typing:Predef",
         "//typing:Printtyp",
@@ -445,7 +441,7 @@ compiler_module(
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.Sys",
-    ]
+    ],
     visibility = ["//toplevel:__pkg__"]
 )
 
@@ -454,13 +450,18 @@ compiler_signature(
     src  = "topeval.mli",
     opts = SIG_OPTS,
     deps   = [
+        # "//file_formats:Cmo_format_cmi",
+        # "//parsing:Asttypes_cmi",
+        # "//parsing:Parsetree_cmi",
+        # "//typing:Outcometree_cmi",
+
         "//parsing:Parsetree_cmi",
-        ":Topcommon",
+        ":Topcommon_cmi",
     ],
     stdlib_deps =[
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Obj",
-    ]
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
+    ],
     visibility = ["//toplevel:__subpackages__"]
 )
 
@@ -483,7 +484,7 @@ compiler_module(
         "//utils:Misc",
         "//utils:Warnings",
         ":Topcommon",
-        ":Topeval_cmi",
+        ":Topeval",
     ],
     stdlib_deps =[
         "//stdlib:Stdlib.Buffer",
@@ -494,11 +495,12 @@ compiler_module(
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Sys",
-    ]
+    ],
     visibility = [
         "//tools:__pkg__",
         "//toplevel/byte:__pkg__",
-        "//testsuite:__subpackages__"
+        "//testsuite:__subpackages__",
+        "//toplevel:__subpackages__"
     ]
 )
 
@@ -561,7 +563,7 @@ compiler_module(
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Sys",
-    ]
+    ],
     visibility = ["//toplevel:__pkg__"]
 )
 
@@ -569,7 +571,7 @@ compiler_signature(
     name = "Topmain_cmi",
     src  = "topmain.mli",
     opts = SIG_OPTS, # + ["-nopervasives"],
-    stdlib_deps   = ["//stdlib:Stdlib"],
+    stdlib_deps   = ["//stdlib:Stdlib_cmi"],
 )
 
 compiler_module(
@@ -586,10 +588,10 @@ compiler_signature(
     src  = "topprinters.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Types"
+        "//typing:Types_cmi"
     ],
     stdlib_deps =[
-        "//stdlib:Stdlib",
+        "//stdlib:Stdlib_cmi",
     ]
 )
 
@@ -611,9 +613,8 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//bytecomp:Meta",
-        "//parsing:Asttypes_cmi",
         "//parsing:Longident",
-        "//toplevel:Topcommon", ## (Toplevel Topcommon)
+        "//toplevel:Topcommon",
         "//typing:Ctype",
         "//typing:Path",
         "//typing:Predef",
@@ -621,11 +622,12 @@ compiler_module(
         "//typing:Types",
         "//utils:Misc",
         ":Topeval",
+        # "//parsing:Asttypes_cmi",
     ],
     stdlib_deps =[
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Obj",
-    ]
+    ],
     visibility = ["//toplevel:__pkg__"]
 )
 
@@ -634,15 +636,15 @@ compiler_signature(
     src  = "trace.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//parsing:Longident",
-        "//typing:Env",
-        "//typing:Path",
-        "//typing:Types",
+        "//parsing:Longident_cmi",
+        "//typing:Env_cmi",
+        "//typing:Path_cmi",
+        "//typing:Types_cmi",
     ],
     stdlib_deps =[
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Obj",
-    ]
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
+    ],
     visibility = ["//toplevel:__subpackages__"]
 )
 

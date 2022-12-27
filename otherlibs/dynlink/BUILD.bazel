@@ -100,11 +100,6 @@ compiler_module(
     ## in different namespaces we could also resolve against
     ## Dynlink_compilerlibs.
     deps   = [
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Obj",
-        "//stdlib:Stdlib.Printexc",
         ":Dynlink_compilerlibs.Config",
         ":Dynlink_common",
         ":Dynlink_types",
@@ -117,9 +112,6 @@ compiler_module(
             "//bytecomp:Opcodes",
             "//bytecomp:Symtable",
             "//file_formats:Cmo_format_cmi",
-            "//stdlib:Stdlib.Char",
-            "//stdlib:Stdlib.String",
-            "//stdlib:Stdlib.Sys",
             "//typing:Ident",
             "Dynlink_compilerlibs.Misc",
             ## (LongString)
@@ -131,9 +123,6 @@ compiler_module(
             "//bytecomp:Opcodes",
             "//bytecomp:Symtable",
             "//file_formats:Cmo_format_cmi",
-            "//stdlib:Stdlib.Char",
-            "//stdlib:Stdlib.String",
-            "//stdlib:Stdlib.Sys",
             "//typing:Ident",
             "Dynlink_compilerlibs.Misc",
             ## (LongString)
@@ -147,6 +136,32 @@ compiler_module(
     }) + select({
         ":pack_dynlink":  [":compilerlibs_packed"],
         "//conditions:default"   :  [":compilerlibs"],
+    }),
+    stdlib_deps   = [
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+    ] + select({
+        # "//platform/constraints/ocaml/emitter:vm_emitter?": [
+        "//config/target/executor:boot_executor?": [
+        # "//toolchain/target/executor:vm_executor?": [
+            "//stdlib:Stdlib.Char",
+            "//stdlib:Stdlib.String",
+            "//stdlib:Stdlib.Sys",
+        ],
+        "//config/target/executor:vm_executor?": [
+        # "//toolchain/target/executor:vm_executor?": [
+            "//stdlib:Stdlib.Char",
+            "//stdlib:Stdlib.String",
+            "//stdlib:Stdlib.Sys",
+        ],
+        # "//platform/constraints/ocaml/emitter:sys_emitter?": [
+        "//config/target/executor:sys_executor?": [
+        # "//toolchain/target/executor:sys_executor?": [
+
+        ]
     }),
 )
 
@@ -360,7 +375,7 @@ compiler_module(
         "-w", "-49",
     ],
     struct = "Dynlink_compilerlibs.ml",
-    deps   = ["//stdlib:Stdlib"]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
 ################################################################
@@ -370,7 +385,7 @@ ns_module(
     struct = "//utils:arg_helper.ml",
     sig    = ":Dynlink_compilerlibs.Arg_helper_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Printexc",
@@ -384,7 +399,7 @@ ns_signature(
     ns     = ":Dynlink_compilerlibs",
     src  = "//utils:arg_helper.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Map",
     ]
 )
@@ -396,11 +411,6 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Ast_helper_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Int32",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Nativeint",
         ":Dynlink_compilerlibs.Misc",
         ":Dynlink_compilerlibs.Asttypes_cmi",
         ":Dynlink_compilerlibs.Docstrings",
@@ -409,6 +419,13 @@ ns_module(
         ":Dynlink_compilerlibs.Parsetree_cmi",
         ":Dynlink_compilerlibs.Syntaxerr",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int32",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+    ]
 )
 
 ns_signature(
@@ -417,12 +434,14 @@ ns_signature(
     src  = "//parsing:ast_helper.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
         ":Dynlink_compilerlibs.Asttypes_cmi",
         ":Dynlink_compilerlibs.Docstrings",
         ":Dynlink_compilerlibs.Location",
         ":Dynlink_compilerlibs.Longident",
         ":Dynlink_compilerlibs.Parsetree_cmi",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -433,12 +452,6 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Ast_mapper_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Sys",
         ":Dynlink_compilerlibs.Clflags",
         ":Dynlink_compilerlibs.Config",
         ":Dynlink_compilerlibs.Load_path",
@@ -449,6 +462,14 @@ ns_module(
         ":Dynlink_compilerlibs.Longident",
         ":Dynlink_compilerlibs.Parsetree_cmi",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+    ]
 )
 
 ns_signature(
@@ -457,10 +478,12 @@ ns_signature(
     src  = "//parsing:ast_mapper.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
         ":Dynlink_compilerlibs.Location",
         ":Dynlink_compilerlibs.Longident",
         ":Dynlink_compilerlibs.Parsetree_cmi",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -470,9 +493,11 @@ ns_signature(
     src  = "//parsing:asttypes.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
         ":Dynlink_compilerlibs.Location",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
+    ]
 )
 
 ns_module(
@@ -482,12 +507,14 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Attr_helper_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
         ":Dynlink_compilerlibs.Asttypes_cmi",
         ":Dynlink_compilerlibs.Location",
         ":Dynlink_compilerlibs.Parsetree_cmi",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 ns_signature(
@@ -496,11 +523,13 @@ ns_signature(
     src  = "//parsing:attr_helper.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
         ":Dynlink_compilerlibs.Asttypes_cmi",
         ":Dynlink_compilerlibs.Location",
         ":Dynlink_compilerlibs.Longident",
         ":Dynlink_compilerlibs.Parsetree_cmi",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -510,7 +539,7 @@ ns_module(
     struct = "//utils:binutils.ml",
     sig    = "Dynlink_compilerlibs.Binutils_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Char",
@@ -533,7 +562,7 @@ ns_signature(
     ns     = ":Dynlink_compilerlibs",
     src  = "//utils:binutils.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Result",
     ]
 )
@@ -546,6 +575,12 @@ ns_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Dynlink_compilerlibs.Asttypes_cmi",
+        ":Dynlink_compilerlibs.Ident",
+        ":Dynlink_compilerlibs.Local_store",
+        ":Dynlink_compilerlibs.Path",
+        ":Dynlink_compilerlibs.Types",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -554,11 +589,7 @@ ns_module(
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.String",
-        ":Dynlink_compilerlibs.Local_store",
-        ":Dynlink_compilerlibs.Ident",
-        ":Dynlink_compilerlibs.Path",
-        ":Dynlink_compilerlibs.Types",
-    ],
+    ]
 )
 
 ns_signature(
@@ -566,10 +597,9 @@ ns_signature(
     ns     = ":Dynlink_compilerlibs",
     src  = "//typing:btype.mli",
     opts = SIG_OPTS,
-
     deps   = [
-        ":Dynlink_compilerlibs.Types",
         ":Dynlink_compilerlibs.Path",
+        ":Dynlink_compilerlibs.Types",
     ]
 )
 
@@ -579,7 +609,7 @@ ns_module(
     struct = "//utils:build_path_prefix_map.ml",
     sig    = "Dynlink_compilerlibs.Build_path_prefix_map_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Buffer",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
@@ -592,7 +622,7 @@ ns_signature(
     ns     = ":Dynlink_compilerlibs",
     src  = "//utils:build_path_prefix_map.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Result_cmi",
     ]
 )
@@ -604,11 +634,6 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Builtin_attributes_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Printf",
         ":Dynlink_compilerlibs.Misc",
         ":Dynlink_compilerlibs.Warnings",
         ":Dynlink_compilerlibs.Asttypes_cmi",
@@ -616,6 +641,13 @@ ns_module(
         ":Dynlink_compilerlibs.Longident",
         ":Dynlink_compilerlibs.Parsetree_cmi",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+    ]
 )
 
 ns_signature(
@@ -624,11 +656,13 @@ ns_signature(
     src  = "//parsing:builtin_attributes.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
         ":Dynlink_compilerlibs.Misc",
         ":Dynlink_compilerlibs.Location",
         ":Dynlink_compilerlibs.Longident",
         ":Dynlink_compilerlibs.Parsetree_cmi",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -639,10 +673,12 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Bytesections_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.List",
         ":Dynlink_compilerlibs.Config"
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 ns_signature(
@@ -650,7 +686,7 @@ ns_signature(
     ns     = ":Dynlink_compilerlibs",
     src  = "//bytecomp:bytesections.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Out_channel"
     ]
 )
@@ -662,17 +698,19 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Clflags_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
         ":Dynlink_compilerlibs.Arg_helper",
         ":Dynlink_compilerlibs.Config",
         ":Dynlink_compilerlibs.Misc",
         ":Dynlink_compilerlibs.Numbers",
         ":Dynlink_compilerlibs.Profile",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+    ]
 )
 
 ns_signature(
@@ -681,12 +719,14 @@ ns_signature(
     src  = "//utils:clflags.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Digest",
         ":Dynlink_compilerlibs.Misc",
         ":Dynlink_compilerlibs.Profile",
         ":Dynlink_compilerlibs.Profile_cmi",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Digest",
+    ]
 )
 
 ns_module(
@@ -696,13 +736,15 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Cmi_format_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.String",
         ":Dynlink_compilerlibs.Config",
         ":Dynlink_compilerlibs.Location",
         ":Dynlink_compilerlibs.Misc",
         ":Dynlink_compilerlibs.Types",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -712,11 +754,13 @@ ns_signature(
     src  = "//file_formats:cmi_format.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Format",
         ":Dynlink_compilerlibs.Misc",
         ":Dynlink_compilerlibs.Types",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Format",
+    ]
 )
 
 ns_signature(
@@ -738,8 +782,10 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Dynlink_compilerlibs.Misc_cmi",
-        "//stdlib:Stdlib.Digest"
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Digest"
+    ]
 )
 
 ns_module(
@@ -748,8 +794,7 @@ ns_module(
     struct = "//config:config_ml",
     sig    = ":Dynlink_compilerlibs.Config_cmi",
     opts = MODULE_OPTS,
-    deps   = [ # [
-        # "//config:Config_cc",
+    stdlib_deps   = [ # [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Printf",
@@ -763,7 +808,7 @@ ns_signature(
     ns     = ":Dynlink_compilerlibs",
     src  = "//config:config.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
@@ -779,12 +824,14 @@ ns_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Dynlink_compilerlibs.Misc",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Digest",
-    ],
+    ]
 )
 
 ns_signature(
@@ -794,6 +841,8 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Dynlink_compilerlibs.Misc",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.Map",
         "//stdlib:Stdlib.Hashtbl",
@@ -809,16 +858,18 @@ ns_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Dynlink_compilerlibs.Asttypes_cmi", # => ":Dynlink_compilerlibs.Location_cmi",
+        ":Dynlink_compilerlibs.Ident",
+        ":Dynlink_compilerlibs.Int_replace_polymorphic_compare",
         ":Dynlink_compilerlibs.Location",
+    ],
+    stdlib_deps =[
+    ]
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
-        ":Dynlink_compilerlibs.Ident",
-        ":Dynlink_compilerlibs.Int_replace_polymorphic_compare",
-    ],
 )
 
 ns_signature(
@@ -828,9 +879,11 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Dynlink_compilerlibs.Asttypes_cmi",
-        "//stdlib:Stdlib.Format",
         "Dynlink_compilerlibs.Ident_cmi",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
+    ]
 )
 
 ns_module(
@@ -840,13 +893,15 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Docstrings_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.List",
         ":Dynlink_compilerlibs.Warnings",
         ":Dynlink_compilerlibs.Location",
         ":Dynlink_compilerlibs.Parsetree_cmi",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 ns_signature(
@@ -855,12 +910,14 @@ ns_signature(
     src  = "//parsing:docstrings.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Lazy",
-        "//stdlib:Stdlib.Lexing",
         ":Dynlink_compilerlibs.Location",
         ":Dynlink_compilerlibs.Longident",
         ":Dynlink_compilerlibs.Parsetree_cmi",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.Lexing",
     ]
 )
 
@@ -871,15 +928,17 @@ ns_module(
     sig    = ":Dynlink_compilerlibs.Dll_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        ":Dynlink_compilerlibs.Binutils",
+        ":Dynlink_compilerlibs.Config",
+        ":Dynlink_compilerlibs.Misc",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-        ":Dynlink_compilerlibs.Binutils",
-        ":Dynlink_compilerlibs.Config",
-        ":Dynlink_compilerlibs.Misc",
     ]
 )
 
@@ -898,25 +957,17 @@ ns_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Dynlink_compilerlibs.Asttypes_cmi",
-        ":Dynlink_compilerlibs.Builtin_attributes",
-        ":Dynlink_compilerlibs.Location",
-        ":Dynlink_compilerlibs.Longident",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Lazy",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Seq",
-        ":Dynlink_compilerlibs.Datarepr",
         ":Dynlink_compilerlibs.Btype",
+        ":Dynlink_compilerlibs.Builtin_attributes",
         ":Dynlink_compilerlibs.Clflags",
         ":Dynlink_compilerlibs.Cmi_format",
+        ":Dynlink_compilerlibs.Datarepr",
         ":Dynlink_compilerlibs.Ident",
         ":Dynlink_compilerlibs.Lazy_backtrack",
         ":Dynlink_compilerlibs.Load_path",
         ":Dynlink_compilerlibs.Local_store",
+        ":Dynlink_compilerlibs.Location",
+        ":Dynlink_compilerlibs.Longident",
         ":Dynlink_compilerlibs.Misc",
         ":Dynlink_compilerlibs.Path",
         ":Dynlink_compilerlibs.Persistent_env",
@@ -926,6 +977,16 @@ ns_module(
         ":Dynlink_compilerlibs.Types",
         ":Dynlink_compilerlibs.Warnings",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lazy",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Seq",
+    ]
 )
 
 ns_signature(

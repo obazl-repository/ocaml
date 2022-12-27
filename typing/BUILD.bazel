@@ -665,7 +665,7 @@ compiler_module(
     ],
     visibility = [
         "//driver:__pkg__",
-        "//toplevel:__pkg__"
+        "//toplevel:__subpackages__"
     ]
 )
 
@@ -1067,8 +1067,7 @@ compiler_module(
         "//lambda:__pkg__",
         "//middle_end/flambda:__pkg__",
         "//otherlibs/dynlink:__pkg__",
-        "//toplevel:__pkg__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -1252,7 +1251,7 @@ compiler_module(
     ],
     visibility = [
         "//driver:__pkg__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -1661,7 +1660,7 @@ compiler_module(
     visibility = [
         "//driver:__pkg__",
         "//lambda:__pkg__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -1950,7 +1949,7 @@ compiler_module(
         "//driver:__pkg__",
         "//file_formats:__pkg__",
         "//lambda:__pkg__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 
@@ -2037,7 +2036,7 @@ compiler_module(
         "//asmcomp:__pkg__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
-        "//toplevel:__pkg__",
+        "//toplevel:__subpackages__",
     ]
 )
 

@@ -1,104 +1,138 @@
 load("//bzl:rules.bzl",
-     "boot_library",
-     "boot_module",
+     "compiler_library",
+     "compiler_module",
+     "compiler_signature",
 )
 
 MODULE_OPTS = ["-nostdlib"]
 
-boot_library(
+compiler_library(
     name = "toplevel_native_lib",
     manifest = [
         ":Topeval",
         ":Topmain",
-        ":Trace",
+        # ":Trace",
     ],
 )
 
-boot_module(
+compiler_module(
     name   = "Topeval",
     struct = "topeval.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Topcommon", ## (Toplevel Topcommon)
-        "//utils:Warnings",
-        "//typing:Types",
-        "//typing:Typemod",
-        "//typing:Typedtree",
-        "//typing:Typecore",
-        "//lambda:Translmod",
-        "//stdlib:Stdlib.Sys",
-        "//lambda:Simplif",
         "//asmcomp:Proc",
-        "//typing:Printtyped",
-        "//typing:Printtyp",
-        "//lambda:Printlambda",
-        "//stdlib:Stdlib.Printf",
-        "//typing:Predef",
-        "//parsing:Parsetree_cmi",
-        "//typing:Outcometree_cmi",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//typing:Includemod",
-        ## (Import_approx)
-        "//typing:Ident",
-        "//stdlib:Stdlib.Gc",
-        "//stdlib:Stdlib.Fun",
-        "//stdlib:Stdlib.Format",
-        ## (Flambda_middle_end)
-        "//stdlib:Stdlib.Filename",
-        "//typing:Env",
-        ## (Dynlink)
         "//config:Config",
         "//driver:Compmisc",
+        "//lambda:Printlambda",
+        "//lambda:Simplif",
+        "//lambda:Translmod",
         "//middle_end:Compilenv",
-        ## (Closure_middle_end)
-        "//utils:Clflags",
-        "//middle_end:Backend_intf_cmi",
-        "//parsing:Asttypes_cmi",
         "//parsing:Ast_helper",
-        ## (Asmlink)
-        ## (Asmgen)
+        "//parsing:Location",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Includemod",
+        "//typing:Predef",
+        "//typing:Printtyp",
+        "//typing:Printtyped",
+        "//typing:Typecore",
+        "//typing:Typedtree",
+        "//typing:Typemod",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        "//toplevel:Topcommon",
+        ":Tophooks"
+
+        # "//middle_end:Backend_intf_cmi",
+        # "//parsing:Asttypes_cmi",
+        # "//parsing:Parsetree_cmi",
+        # "//typing:Outcometree_cmi",
+
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Array",
-        ## (Arch)
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
-boot_module(
+compiler_module(
+    name   = "Tophooks",
+    struct = "tophooks.ml",
+    sig    = ":Tophooks_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        "//otherlibs/dynlink:Dynlink"
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Obj",
+    ]
+)
+
+compiler_signature(
+    name = "Tophooks_cmi",
+    src  = "tophooks.mli",
+    deps   = [
+        "//lambda:Lambda_cmi",
+        "//toplevel:Topcommon_cmi"
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
+    ],
+    # visibility = ["//toplevel:__subpackages__"]
+)
+
+compiler_module(
     name   = "Topmain",
     struct = "topmain.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Native", ## (Toplevel Native Topeval)
-        ":Toploop", ## (Toplevel Toploop)
-        ":Topcommon", ## (Toplevel Topcommon)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
+        "//driver:Compenv",
+        "//driver:Compmisc",
         "//driver:Main_args",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//driver:Compmisc",
-        "//driver:Compenv",
+        "//toplevel:Topcommon",
+        "//toplevel:Toploop",
         "//utils:Clflags",
-        "//stdlib:Stdlib.Array",
+        "//utils:Misc",
+        ":Topeval",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
-boot_module(
-    name   = "Trace",
-    struct = "trace.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        "//typing:Path",
-        "//stdlib:Stdlib.Obj",
-    ]
-)
+# compiler_module(
+#     name   = "Trace",
+#     struct = "trace.ml",
+#     sig    = "//toplevel:Trace_cmi
+#     opts = MODULE_OPTS + [
+#         "-w", "+a-4-9-40-41-42-44-45-48"
+#     ],
+#     deps   = [
+#         "//typing:Path",
+#     ],
+#     stdlib_deps =[
+#         "//stdlib:Primitives",
+#         "//stdlib:Stdlib.Obj",
+#     ]
+# )
 

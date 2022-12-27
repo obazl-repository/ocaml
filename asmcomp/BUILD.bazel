@@ -1396,7 +1396,8 @@ compiler_module(
     ],
     visibility = [
         # "//asmcomp:__subpackages__"
-        "//driver:__pkg__"
+        "//driver:__pkg__",
+        "//toplevel/native:__pkg__"
     ]
 )
 
