@@ -21,7 +21,9 @@ load("//test/rules:test_archive.bzl", _test_archive = "test_archive")
 load("//test/rules:test_executable.bzl",
      _test_executable = "test_executable",
      _vv_test_executable = "vv_test_executable",
-     _ss_test_executable = "ss_test_executable")
+     _vs_test_executable = "vs_test_executable",
+     _ss_test_executable = "ss_test_executable",
+     _sv_test_executable = "sv_test_executable")
 
 load("//test/rules:test_library.bzl", _test_library = "test_library")
 
@@ -47,7 +49,9 @@ lambda_expect_test = _lambda_expect_test
 test_archive = _test_archive
 test_executable = _test_executable
 vv_test_executable = _vv_test_executable
+vs_test_executable = _vs_test_executable
 ss_test_executable = _ss_test_executable
+sv_test_executable = _sv_test_executable
 test_library = _test_library
 test_module  = _test_module
 test_signature = _test_signature

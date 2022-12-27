@@ -180,3 +180,66 @@ ss_test_in_transition = transition(
         # "//toolchain:mustach"
     ]
 )
+
+################################################################
+def _sv_test_in_transition_impl(settings, attr):
+
+    debug = True
+
+    if debug:
+        print("sv_test_in_transition: %s" % attr.name)
+
+    protocol = settings["//config/build/protocol"]
+
+    if protocol == "test":
+        return {}
+
+    protocol = "test"
+
+    config_executor = "sys"
+    config_emitter  = "vm"
+
+    compiler = "//bin:ocamlc.opt"
+    # ocamlrun = "//runtime:ocamlrun"
+    runtime  = "@baseline//lib:libcamlrun.a"
+    # mustach  = "@baseline//bin:mustach"
+    # cvt_emit = "@baseline//bin:cvt_emit.byte"
+    # else:
+    #     fail("Protocol not yet supported for test: %s" % protocol)
+
+    if debug:
+        print("setting executor:  %s" % config_executor)
+        print("setting emitter:   %s" % config_emitter)
+        print("setting compiler:  %s" % compiler)
+        print("setting runtime:   %s" % runtime)
+        # print("setting cvt_emit:  %s" % cvt_emit)
+
+    return {
+        "//config/build/protocol" : protocol,
+        "//config/target/executor": config_executor,
+        "//config/target/emitter" : config_emitter,
+        "//toolchain:compiler"    : compiler,
+        "//toolchain:runtime"     : runtime,
+        # "//toolchain:ocamlrun"    : ocamlrun,
+        # "//toolchain:mustach"     : mustach
+    }
+
+#######################
+sv_test_in_transition = transition(
+    implementation = _sv_test_in_transition_impl,
+    inputs = [
+        "//config/build/protocol",
+        # "//config/target/executor",
+        # "//config/target/emitter",
+    ],
+    outputs = [
+        "//config/build/protocol",
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler",
+        "//toolchain:runtime",
+        # "//toolchain:ocamlrun",
+        # "//toolchain:cvt_emit",
+        # "//toolchain:mustach"
+    ]
+)

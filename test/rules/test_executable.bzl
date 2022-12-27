@@ -9,7 +9,8 @@ load("//bzl/transitions:dev_transitions.bzl",
 load(":test_transitions.bzl",
      "vv_test_in_transition",
      "vs_test_in_transition",
-     "ss_test_in_transition")
+     "ss_test_in_transition",
+     "sv_test_in_transition")
 
 ##############################
 def _test_executable_impl(ctx):
@@ -30,7 +31,7 @@ def _test_executable_impl(ctx):
 #######################
 vv_test_executable = rule(
     implementation = _test_executable_impl,
-    doc = "Links OCaml executable binary using the bootstrap toolchain",
+    doc = "Links OCaml executable binary using ocamlc.byte",
     attrs = dict(
         executable_attrs(),
         # _runtime = attr.label(
@@ -59,7 +60,7 @@ vv_test_executable = rule(
 #######################
 vs_test_executable = rule(
     implementation = _test_executable_impl,
-    doc = "Links OCaml executable binary using test ocamlopt.byte",
+    doc = "Links OCaml executable binary using ocamlopt.byte",
     attrs = dict(
         executable_attrs(),
         # _runtime = attr.label(
@@ -85,7 +86,7 @@ vs_test_executable = rule(
 #######################
 ss_test_executable = rule(
     implementation = _test_executable_impl,
-    doc = "Links OCaml executable binary using the bootstrap toolchain",
+    doc = "Links OCaml executable binary using ocamlopt.opt",
     attrs = dict(
         executable_attrs(),
         # _runtime = attr.label(
@@ -111,6 +112,35 @@ ss_test_executable = rule(
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
+#######################
+sv_test_executable = rule(
+    implementation = _test_executable_impl,
+    doc = "Links OCaml executable binary using ocamlc.opt",
+    attrs = dict(
+        executable_attrs(),
+        # _runtime = attr.label(
+        #     allow_single_file = True,
+        #     default = "//toolchain:runtime",
+        #     executable = False,
+        #     # cfg = reset_cc_config_transition ## only build once
+        #     # default = "//config/runtime" # label flag set by transition
+        # ),
+        _rule = attr.string( default = "test_executable" ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
+    ),
+    # cfg = reset_config_transition,
+    # cfg = "exec",
+    # cfg = dev_tc_compiler_out_transition,
+    cfg = sv_test_in_transition,
+    executable = True,
+    fragments = ["cpp"],
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
 ###############################################################
 ####  MACRO - generates two exec targets, vm and sys
 ################################################################
@@ -125,7 +155,7 @@ def test_executable(name, main,
 
     native.sh_binary(
         name = name + ".vv.byte.sh",
-        srcs = ["//test:ocamlcc.sh"],
+        srcs = ["//test/rules:test_executable.sh"],
         env  = select({
             "//test:verbose?": {"VERBOSE": "true"},
             "//conditions:default": {"VERBOSE": "false"}
@@ -143,7 +173,7 @@ def test_executable(name, main,
         ],
         deps = [
             # for the runfiles lib used in ocamlc.sh:
-        "@bazel_tools//tools/bash/runfiles"
+            "@bazel_tools//tools/bash/runfiles"
         ]
     )
 

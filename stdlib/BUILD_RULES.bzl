@@ -21,6 +21,7 @@ load("//bzl/rules:ocaml_transitions.bzl",
 
 load(":BUILD_STDLIB.bzl", "STDLIB_MANIFEST")
 
+##############################
 def _stdlib_archive_impl(ctx):
 
     if (ctx.attr.archive or ctx.attr._archive[BuildSettingInfo].value):

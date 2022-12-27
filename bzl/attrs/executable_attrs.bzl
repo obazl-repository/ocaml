@@ -8,47 +8,9 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
-#######################
-def executable_attrs():
+def exec_common_attrs():
 
-    attrs = dict(
-
-        # ocamlrun = attr.label(
-        #     doc = "ocaml",
-        #     allow_single_file = True,
-        #     default = "//toolchain:ocamlrun",
-        #     executable = True,
-        #     # cfg = "exec"
-        #     cfg = reset_cc_config_transition
-        # ),
-
-        prologue = attr.label_list(
-            doc = "List of OCaml dependencies.",
-            providers = [[OcamlArchiveProvider],
-                         [OcamlLibraryMarker],
-                         [ModuleInfo],
-                         [CcInfo]],
-            # cfg = exe_deps_out_transition,
-        ),
-
-        main = attr.label(
-            doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
-            mandatory = True,
-            allow_single_file = True,
-            providers = [[ModuleInfo]],
-            default = None,
-            # cfg = exe_deps_out_transition,
-        ),
-
-        epilogue = attr.label_list(
-            doc = "List of OCaml dependencies.",
-            providers = [[OcamlArchiveProvider],
-                         [OcamlLibraryMarker],
-                         [ModuleInfo],
-                         [CcInfo]],
-            # cfg = exe_deps_out_transition,
-        ),
-
+    return dict(
         opts             = attr.string_list( ),
 
         warnings         = attr.string_list(
@@ -163,6 +125,49 @@ def executable_attrs():
         _cc_toolchain = attr.label(
             default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
         ),
+    )
+
+#######################
+def executable_attrs():
+
+    attrs = dict(
+        exec_common_attrs(),
+        # ocamlrun = attr.label(
+        #     doc = "ocaml",
+        #     allow_single_file = True,
+        #     default = "//toolchain:ocamlrun",
+        #     executable = True,
+        #     # cfg = "exec"
+        #     cfg = reset_cc_config_transition
+        # ),
+
+        prologue = attr.label_list(
+            doc = "List of OCaml dependencies.",
+            providers = [[OcamlArchiveProvider],
+                         [OcamlLibraryMarker],
+                         [ModuleInfo],
+                         [CcInfo]],
+            # cfg = exe_deps_out_transition,
+        ),
+
+        main = attr.label(
+            doc = "Label of module containing entry point of executable. This module will be placed last in the list of dependencies.",
+            mandatory = True,
+            allow_single_file = True,
+            providers = [[ModuleInfo]],
+            default = None,
+            # cfg = exe_deps_out_transition,
+        ),
+
+        epilogue = attr.label_list(
+            doc = "List of OCaml dependencies.",
+            providers = [[OcamlArchiveProvider],
+                         [OcamlLibraryMarker],
+                         [ModuleInfo],
+                         [CcInfo]],
+            # cfg = exe_deps_out_transition,
+        ),
+
     )
 
     return attrs

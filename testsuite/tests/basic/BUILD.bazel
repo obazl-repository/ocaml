@@ -1,8 +1,10 @@
 load("//test:rules.bzl",
      "test_archive",
      "test_executable",
-     # "vv_test_executable",
-     # "ss_test_executable",
+     "vv_test_executable",
+     "vs_test_executable",
+     "ss_test_executable",
+     "sv_test_executable",
      "test_library",
      "test_module",
      "test_signature",
@@ -56,66 +58,141 @@ test_suite(
     ],
 )
 
+############
+## expect_test expands to: test_suite,
+## expect_vv_test, expect_vs_test,
+## expect_ss_test, expect_sv_test
 expect_test(
     name    = "arrays_test",
     stdout  = "arrays.stdout",
     expected = "arrays.reference",
-    prologue = [
-        ## FIXME: these are all deps of :Arrays;
-        ## they should be added automatically.
-        "//stdlib:primitives",
-        "//stdlib:Stdlib",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Buffer",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Gc",
-        "//stdlib:Stdlib.Atomic",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.Obj",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Seq",
-        "//stdlib:Stdlib.Lazy",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Uchar",
-    ],
-    main    = ":Arrays",
+    # prologue = [
+    #     ## FIXME: these are all deps of :Arrays;
+    #     ## they should be added automatically.
+    #     "//stdlib:primitives",
+    #     "//stdlib:Stdlib",
+    #     "//stdlib:Stdlib.Array",
+    #     "//stdlib:Stdlib.Buffer",
+    #     "//stdlib:Stdlib.Bytes",
+    #     "//stdlib:Stdlib.Char",
+    #     "//stdlib:Stdlib.Gc",
+    #     "//stdlib:Stdlib.Atomic",
+    #     "//stdlib:Stdlib.Int",
+    #     "//stdlib:Stdlib.List",
+    #     "//stdlib:Stdlib.Map",
+    #     "//stdlib:Stdlib.Obj",
+    #     "//stdlib:Stdlib.Sys",
+    #     "//stdlib:Stdlib.Printf",
+    #     "//stdlib:Stdlib.Seq",
+    #     "//stdlib:Stdlib.Lazy",
+    #     "//stdlib:Stdlib.String",
+    #     "//stdlib:Stdlib.Uchar",
+    # ],
+    test_executable = ":arrays",
     timeout = "short",
+)
+
+## test_executable expands to <x>_test_executable and sh_binary
+## targets (runners), where <x> = vv | vs | ss | sv indicates the
+## compiler used to build the code; and sh_binary targets for vv, sv
+## generated names. The sh_binary targets (arrays.vv.byte.sh,
+## arrays.sv.byte.sh) may be used to run the vm executables from the
+## cmd line (using 'bazel run' only). Test rules depend on the
+## executable targets but not the sh_binary ones.
+
+## NB: the arrays test emits nothing to stdout, so we demonstrate the
+## expansion below, for bigints.ml, which does write to stdout.
+test_executable(
+    name    = "arrays.vv.byte",
+    main    = ":Arrays",
 )
 
 test_module(
     name   = "Arrays",
     struct = "arrays.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Gc"]
     })
 )
 
+############
 expect_test(
     name    = "bigints_test",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
     opts   = ["-nopervasives", "-open", "Stdlib"],
-    prologue = select({
-        "//testsuite/tests:with-stdlib?":["//stdlib"],
-        "//conditions:default": [
-            "//stdlib:CamlinternalFormatBasics",
-            "//stdlib:Stdlib",
-            "//stdlib:Stdlib.Sys"
-        ]
-    }),
+    # prologue = select({
+    #     "//testsuite/tests:with-stdlib?":["//stdlib"],
+    #     "//conditions:default": [
+    #         "//stdlib:CamlinternalFormatBasics",
+    #         "//stdlib:Stdlib",
+    #         "//stdlib:Stdlib.Sys"
+    #     ]
+    # }),
+    test_executable = ":Bigints",
+)
+
+# test_executable(
+#     name    = "bigints",
+#     main    = ":Bigints",
+# )
+
+## expansion:
+vv_test_executable(
+    ## note the trailing '_' in the name; this is so that the
+    ## unadorned name can be used for the runnable (sh_binary) target
+    ## below.
+    name    = "bigints.vv.byte_",
     main    = ":Bigints",
+)
+## to run the vv.byte executable:
+sh_binary(
+    name = "bigints.vv.byte",
+    srcs = ["//test/rules:test_executable.sh"],
+    env  = select({
+        "//test:verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+    args = ["$(rootpath //runtime:ocamlrun)",
+            "$(rootpath :bigints.vv.byte_)"],
+    data = ["//runtime:ocamlrun",
+            ":bigints.vv.byte_"],
+    deps = ["@bazel_tools//tools/bash/runfiles"]
+)
+
+vs_test_executable(
+    name    = "bigints.vs.opt",
+    main    = ":Bigints",
+)
+ss_test_executable(
+    name    = "bigints.ss.opt",
+    main    = ":Bigints",
+)
+sv_test_executable(
+    name    = "bigints.sv.byte_",
+    main    = ":Bigints",
+)
+## to run the vv.byte executable:
+sh_binary(
+    name = "bigints.sv.byte",
+    srcs = ["//test/rules:test_executable.sh"],
+    env  = select({
+        "//test:verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+    args = ["$(rootpath //runtime:ocamlrun)",
+            "$(rootpath :bigints.sv.byte_)"],
+    data = ["//runtime:ocamlrun",
+            ":bigints.sv.byte_"],
+    deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
 test_module(
     name   = "Bigints",
     struct = "bigints.ml",
     open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Sys"]
     })
@@ -126,6 +203,11 @@ expect_test(
     name    = "boxedints_test",
     stdout  = "boxedints.stdout",
     expected = "boxedints.reference",
+    test_executable    = ":Boxedints",
+)
+
+test_executable(
+    name    = "boxedints",
     main    = ":Boxedints",
 )
 
@@ -133,7 +215,7 @@ test_module(
     name   = "Boxedints",
     struct = "boxedints.ml",
     open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.Hashtbl",
@@ -165,7 +247,7 @@ expect_test(
     name    = "constprop_test",
     stdout  = "constprop.stdout",
     expected = "constprop.ml.reference",
-    main    = ":Constprop",
+    test_executable    = ":Constprop",
 )
 
 test_module(
@@ -190,7 +272,7 @@ expect_test(
     name     = "divint_test",
     stdout   = "divint.stdout",
     expected = "divint.reference",
-    main     = ":Divint",
+    test_executable     = ":Divint",
 )
 
 test_module(
@@ -211,6 +293,11 @@ expect_test(
     name    = "equality_test",
     stdout  = "equality.stdout",
     expected = "equality.reference",
+    test_executable    = ":Equality",
+)
+
+test_executable(
+    name    = "equality",
     main    = ":Equality",
 )
 
@@ -218,7 +305,7 @@ test_module(
     name   = "Equality",
     struct = "equality.ml",
     open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Fun"]
     })
@@ -229,7 +316,7 @@ expect_test(
     name    = "eval_order_1_test",
     stdout  = "eval_order_1.stdout",
     expected = "eval_order_1.reference",
-    main    = ":Eval_order_1",
+    test_executable    = ":Eval_order_1",
 )
 
 test_module(
@@ -246,7 +333,7 @@ expect_test(
     name    = "eval_order_2_test",
     stdout  = "eval_order_2.stdout",
     expected = "eval_order_2.reference",
-    main    = ":Eval_order_2",
+    test_executable    = ":Eval_order_2",
 )
 
 test_module(
@@ -260,7 +347,7 @@ expect_test(
     name    = "eval_order_3_test",
     stdout  = "eval_order_3.stdout",
     expected = "eval_order_3.reference",
-    main    = ":Eval_order_3",
+    test_executable    = ":Eval_order_3",
 )
 
 test_module(
@@ -278,7 +365,7 @@ expect_test(
     name    = "eval_order_4_test",
     stdout  = "eval_order_4.stdout",
     expected = "eval_order_4.reference",
-    main    = ":Eval_order_4",
+    test_executable    = ":Eval_order_4",
 )
 
 test_module(
@@ -292,7 +379,7 @@ expect_test(
     name    = "eval_order_6_test",
     stdout  = "eval_order_6.stdout",
     expected = "eval_order_6.reference",
-    main    = ":Eval_order_6",
+    test_executable    = ":Eval_order_6",
 )
 
 test_module(
@@ -310,7 +397,7 @@ expect_test(
     name    = "eval_order_7_test",
     stdout  = "eval_order_7.stdout",
     expected = "eval_order_7.reference",
-    main    = ":Eval_order_7",
+    test_executable    = ":Eval_order_7",
 )
 
 test_module(
@@ -325,7 +412,7 @@ expect_test(
     name    = "eval_order_pr10283_test",
     stdout  = "eval_order_pr10283.stdout",
     expected = "eval_order_pr10283.reference",
-    main    = ":Eval_order_pr10283",
+    test_executable    = ":Eval_order_pr10283",
 )
 test_module(
     name   = "Eval_order_pr10283",
@@ -341,7 +428,7 @@ expect_test(
     name    = "float_test",
     stdout  = "float.stdout",
     expected = "float.reference",
-    main    = ":Float",
+    test_executable    = ":Float",
 )
 
 test_module(
@@ -359,7 +446,7 @@ expect_test(
     name    = "float_physical_equality_test",
     stdout  = "float_physical_equality.stdout",
     expected = "float_physical_equality.reference",
-    main    = ":Float_physical_equality",
+    test_executable    = ":Float_physical_equality",
 )
 
 test_module(
@@ -373,7 +460,7 @@ expect_test(
     name    = "includestruct_test",
     stdout  = "includestruct.stdout",
     expected = "includestruct.reference",
-    main    = ":Includestruct",
+    test_executable    = ":Includestruct",
 )
 
 test_module(
@@ -395,7 +482,7 @@ expect_test(
     name    = "localexn_test",
     stdout  = "localexn.stdout",
     expected = "localexn.reference",
-    main    = ":Localexn",
+    test_executable    = ":Localexn",
 )
 
 test_module(
@@ -409,7 +496,7 @@ expect_test(
     name    = "localfunction_test",
     stdout  = "localfunction.stdout",
     expected = "localfunction.reference",
-    main    = ":Localfunction",
+    test_executable    = ":Localfunction",
 )
 
 test_module(
@@ -426,7 +513,7 @@ expect_test(
     name    = "maps_test",
     stdout  = "maps.stdout",
     expected = "maps.reference",
-    main    = ":Maps",
+    test_executable    = ":Maps",
 )
 
 test_module(
@@ -446,7 +533,7 @@ expect_test(
     name    = "min_int_test",
     stdout  = "min_int.stdout",
     expected = "min_int.reference",
-    main    = ":Min_int",
+    test_executable    = ":Min_int",
 )
 
 test_module(
@@ -463,7 +550,7 @@ expect_test(
     name    = "opt_variants_test",
     stdout  = "opt_variants.stdout",
     expected = "opt_variants.reference",
-    main    = ":Opt_variants",
+    test_executable    = ":Opt_variants",
 )
 
 test_module(
@@ -488,7 +575,7 @@ expect_test(
     name    = "patmatch_test",
     stdout  = "patmatch.stdout",
     expected = "patmatch.reference",
-    main    = ":Patmatch",
+    test_executable    = ":Patmatch",
 )
 
 test_module(
@@ -535,7 +622,7 @@ expect_test(
     name    = "pr7253_test",
     stdout  = "pr7253.stdout",
     expected = "pr7253.reference",
-    main    = ":Pr7253",
+    test_executable    = ":Pr7253",
 )
 
 test_module(
@@ -554,7 +641,7 @@ expect_test(
     name    = "pr7533_test",
     stdout  = "pr7533.stdout",
     expected = "pr7533.reference",
-    main    = ":Pr7533",
+    test_executable    = ":Pr7533",
 )
 
 test_module(
@@ -574,7 +661,7 @@ expect_test(
     name    = "pr7657_test",
     stdout  = "pr7657.stdout",
     expected = "pr7657.reference",
-    main    = ":Pr7657",
+    test_executable    = ":Pr7657",
 )
 
 test_module(
@@ -593,7 +680,7 @@ expect_test(
     name    = "recvalues_test",
     stdout  = "recvalues.stdout",
     expected = "recvalues.reference",
-    main    = ":Recvalues",
+    test_executable    = ":Recvalues",
 )
 
 test_module(
@@ -613,7 +700,7 @@ expect_test(
     name    = "sets_test",
     stdout  = "sets.stdout",
     expected = "sets.reference",
-    main    = ":Sets",
+    test_executable    = ":Sets",
 )
 
 test_module(
@@ -630,7 +717,7 @@ expect_test(
     name    = "stringmatch_test",
     stdout  = "stringmatch.stdout",
     expected = "stringmatch.reference",
-    main    = ":Stringmatch",
+    test_executable    = ":Stringmatch",
 )
 
 test_module(
@@ -647,7 +734,7 @@ expect_test(
     name    = "switch_opts_test",
     stdout  = "switch_opts.stdout",
     expected = "switch_opts.reference",
-    main    = ":Switch_opts",
+    test_executable    = ":Switch_opts",
 )
 
 test_module(
@@ -664,7 +751,7 @@ expect_test(
     name    = "tailcalls_test",
     stdout  = "tailcalls.stdout",
     expected = "tailcalls.reference",
-    main    = ":Tailcalls",
+    test_executable    = ":Tailcalls",
 )
 
 test_module(
@@ -678,24 +765,15 @@ expect_test(
     name    = "trigraph_test",
     stdout  = "trigraph.stdout",
     expected = "trigraph.reference",
-    main    = ":Trigraph",
+    test_executable = ":trigraph",
 )
-
-# vv_test_executable(
-#     name    = "trigraph.byte",
-#     prologue = select({
-#         "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-#         "//conditions:default": []
-#     }),
-#     main    = ":Trigraph",
-# )
 
 test_executable(
     name    = "trigraph",
-    prologue = select({
-        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-        "//conditions:default": []
-    }),
+    # prologue = select({
+    #     "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+    #     "//conditions:default": []
+    # }),
     main    = ":Trigraph",
 )
 
@@ -716,8 +794,8 @@ expect_test(
     name    = "tuple_match_test",
     stdout  = "tuple_match.stdout",
     expected = "tuple_match.reference",
-    main    = ":Tuple_match",
-    prologue = ["//stdlib:Primitives"],
+    test_executable    = ":Tuple_match",
+    # prologue = ["//stdlib:Primitives"],
     opts = ["-open", "Stdlib"]
 )
 
@@ -747,7 +825,7 @@ expect_test(
     name    = "zero_divided_by_n_test",
     stdout  = "zero_divided_by_n.stdout",
     expected = "zero_divided_by_n.reference",
-    main    = ":Zero_divided_by_n",
+    test_executable    = ":Zero_divided_by_n",
 )
 
 test_module(

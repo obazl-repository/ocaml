@@ -282,7 +282,10 @@ def executable_impl(ctx, tc, exe_name, workdir):
         transitive = [cli_link_deps_depset]
     )
 
-    if tc.config_executor in ["boot", "baseline", "vm"]:
+    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+
+    # if tc.config_executor in ["boot", "baseline", "vm"]:
+    if compiler.basename in ["ocamlc.byte", "ocamlc.opt", "ocamlc.boot"]:
         # camlheaders only used by this rule so no need to put in tc
         # but camlheaders tgt is tc-dependent (uses tc.ocamlrun.path)
         camlheaders = ctx.files._camlheaders

@@ -1,9 +1,13 @@
 #!/bin/bash
 
+## NB: /bin/sh won't work, sorry
+
 # set -x
 
 # Function to echo commands
 exe() { echo "\$ ${@/eval/}" ; "$@" ; }
+
+# VERBOSE=
 
 # echo "VERBOSE: $VERBOSE"
 # echo "args: $@"
@@ -15,7 +19,7 @@ shift
 # STDLIB_RLOC=$1
 # shift
 
-TESTEXE=$(basename $TESTEXE_PATH)
+TESTEXE="$(basename $TESTEXE_PATH)"
 
 # echo "TESTEXE: $TESTEXE"
 

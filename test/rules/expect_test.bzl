@@ -1,15 +1,17 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+load("//bzl:providers.bzl", "ModuleInfo")
+
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
-load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
+load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load(":test_transitions.bzl",
      "vv_test_in_transition",
-     # "vs_test_in_transition",
+     "vs_test_in_transition",
      "ss_test_in_transition",
-     # "sv_test_in_transition"
+     "sv_test_in_transition"
      )
 
 load(":expect_test_impl.bzl", "expect_test_impl")
@@ -26,11 +28,20 @@ load(":expect_test_impl.bzl", "expect_test_impl")
 ## then diffs it against expected output.
 
 #######################
-ocamlc_byte_expect_test = rule(
+expect_vv_test = rule(
     implementation = expect_test_impl,
-    doc = "Compile and test an OCaml program.",
+    doc = "Run a test executable built with ocamlc.byte",
     attrs = dict(
-        executable_attrs(),
+        exec_common_attrs(),
+
+        test_executable = attr.label(
+            doc = "Label of test executable.",
+            mandatory = True,
+            allow_single_file = True,
+            providers = [[ModuleInfo]],
+            default = None,
+            # cfg = exe_deps_out_transition,
+        ),
 
         stdout   = attr.string( ),
         expected = attr.label(
@@ -59,11 +70,105 @@ ocamlc_byte_expect_test = rule(
 )
 
 #######################
+expect_vs_test = rule(
+    implementation = expect_test_impl,
+    doc = "Run a test executable built with ocamlopt.byte",
+    attrs = dict(
+        exec_common_attrs(),
+
+        test_executable = attr.label(
+            doc = "Label of test executable.",
+            mandatory = True,
+            allow_single_file = True,
+            # providers = [[ModuleInfo]], ##FIXME
+            default = None,
+            # cfg = exe_deps_out_transition,
+        ),
+
+        stdout   = attr.string( ),
+        expected = attr.label(
+            allow_single_file = True,
+        ),
+
+        _runtime = attr.label(
+            allow_single_file = True,
+            default = "//toolchain:runtime",
+            executable = False,
+            # cfg = reset_cc_config_transition ## only build once
+            # default = "//config/runtime" # label flag set by transition
+        ),
+
+        _rule = attr.string( default = "expect_test" ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
+    ),
+    cfg = vs_test_in_transition,
+    test = True,
+    fragments = ["cpp"],
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+#######################
 expect_ss_test = rule(
     implementation = expect_test_impl,
-    doc = "Compile and test an OCaml program.",
+    doc = "Run a test executable built with ocamlopt.opt",
     attrs = dict(
-        executable_attrs(),
+        exec_common_attrs(),
+
+        test_executable = attr.label(
+            doc = "Label of test executable.",
+            mandatory = True,
+            allow_single_file = True,
+            providers = [[ModuleInfo]],
+            default = None,
+            # cfg = exe_deps_out_transition,
+        ),
+
+        stdout   = attr.string( ),
+        expected = attr.label(
+            allow_single_file = True,
+        ),
+
+        _runtime = attr.label(
+            allow_single_file = True,
+            default = "//toolchain:runtime",
+            executable = False,
+            # cfg = reset_cc_config_transition ## only build once
+            # default = "//config/runtime" # label flag set by transition
+        ),
+
+        _rule = attr.string( default = "expect_test" ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
+    ),
+    cfg = ss_test_in_transition,
+    # cfg = build_tool_sys_in_transition,
+    test = True,
+    fragments = ["cpp"],
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
+
+#######################
+expect_sv_test = rule(
+    implementation = expect_test_impl,
+    doc = "Run a test executable built with ocamlc.opt",
+    attrs = dict(
+        exec_common_attrs(),
+
+        test_executable = attr.label(
+            doc = "Label of test executable.",
+            mandatory = True,
+            allow_single_file = True,
+            providers = [[ModuleInfo]],
+            default = None,
+            # cfg = exe_deps_out_transition,
+        ),
 
         stdout   = attr.string( ),
         expected = attr.label(
@@ -95,31 +200,44 @@ expect_ss_test = rule(
 ###############################################################
 ####  MACRO - generates two test targets plus on test_suite
 ################################################################
-def expect_test(name, stdout, expected, main, timeout = "short",
+def expect_test(name,
+                stdout, expected,
+                test_executable,
+                timeout = "short",
                 **kwargs):
 
     if name.endswith("_test"):
-        stem = name
+        stem = name[:-5]
     else:
-        stem = name + "_test"
+        stem = name
 
-    vv_name = "ocamlc.byte." + name
-    vs_name = "ocamlopt.byte." + name
-    ss_name = "ocamlopt.opt." + name
-    sv_name = "ocamlc.opt." + name
+    vv_name = stem + "_vv_test"
+    vs_name = stem + "_vs_test"
+    ss_name = stem + "_ss_test"
+    sv_name = stem + "_sv_test"
 
     native.test_suite(
-        name  = name,
-        tests = [vv_name, ss_name]
+        name  = stem + "_test",
+        tests = [vv_name, vs_name, ss_name] #, sv_name]
     )
 
-    ocamlc_byte_expect_test(
+    expect_vv_test(
         name     = vv_name,
         stdout   = stdout,
         expected = expected,
-        main     = main,
+        test_executable = test_executable,
         timeout  = timeout,
-        tags     = ["ocamlc.byte"],
+        tags     = ["vv"],
+        **kwargs
+    )
+
+    expect_vs_test(
+        name     = vs_name,
+        stdout   = stdout,
+        expected = expected,
+        test_executable = test_executable,
+        timeout  = timeout,
+        tags     = ["vs"],
         **kwargs
     )
 
@@ -127,8 +245,8 @@ def expect_test(name, stdout, expected, main, timeout = "short",
         name     = ss_name,
         stdout   = stdout,
         expected = expected,
-        main     = main,
+        test_executable = test_executable,
         timeout  = timeout,
-        tags     = ["ocamlopt.opt"],
+        tags     = ["ss"],
         **kwargs
     )
