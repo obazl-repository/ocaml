@@ -1,3 +1,5 @@
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
@@ -5,6 +7,7 @@ load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo",
+     "ModuleInfo",
      "new_deps_aggregator",
      "OcamlExecutableMarker",
      "OcamlTestMarker"
@@ -64,13 +67,30 @@ def executable_impl(ctx, tc, exe_name, workdir):
     ################  DEPS  ################
     depsets = new_deps_aggregator()
 
+    includes  = []
+
     manifest = []
 
     # aggregate_deps(ctx, ctx.attr.stdlib, depsets, manifest)
-    aggregate_deps(ctx, ctx.attr.std_exit, depsets, manifest)
+    # aggregate_deps(ctx, ctx.attr._std_exit, depsets, manifest)
+
+    open_stdlib = False
+    stdlib_module_target  = None
+    stdlib_library_target = None
 
     for dep in ctx.attr.prologue:
-        aggregate_deps(ctx, dep, depsets, manifest)
+        depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        # depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        if dep.label.name in ["Stdlib", "Primitives"]:
+            open_stdlib = True
+            stdlib_module_target = dep
+            break;
+        elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
+            open_stdlib = True
+        elif dep.label.name == "stdlib": ## stdlib archive OR library
+            open_stdlib = True
+            stdlib_library_target = dep
+            break;
 
     if ctx.attr.main:
         depsets = aggregate_deps(ctx, ctx.attr.main, depsets, manifest)
@@ -114,7 +134,6 @@ def executable_impl(ctx, tc, exe_name, workdir):
     )
 
     ################
-    includes  = []
     if ctx.attr._protocol == "test":
         workdir = ""
     out_exe = ctx.actions.declare_file(workdir + exe_name)
@@ -132,7 +151,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
     runtime_depsets = []
     cc_libdirs    = []
 
-    if tc.config_executor == "sys":  ## target_executor
+    # if tc.config_executor == "sys":  ## target_executor
+    if tc.compiler[DefaultInfo].files_to_run.executable.basename in ["ocamlopt.opt", "ocamlopt.byte"]:
 
         ## if target_executor(tc) == "sys"
 
@@ -174,13 +194,24 @@ def executable_impl(ctx, tc, exe_name, workdir):
         # will add -L<f.dirname> below
         cc_libdirs.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
 
-    args.add_all(tc.linkopts)
+    (_options, cancel_opts) = get_options(rule, ctx)
 
     # if ext == ".cmx":
     #     args.add("-dstartup")
 
-    (_options, cancel_opts) = get_options(rule, ctx)
+    if "-pervasives" in _options:
+        cancel_opts.append("-nopervasives")
+        _options.remove("-pervasives")
+    # else:
+    #     _options.append("-nopervasives")
+
+    for opt in tc.linkopts:
+        if opt not in cancel_opts:
+            args.add(opt)
+
     args.add_all(_options)
+
+    # args.add("-nopervasives")
 
     for w in ctx.attr.warnings:
         args.add_all(["-w",
@@ -208,7 +239,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     #     includes.append(ctx.file.stdlib.dirname)
     # includes.append(ctx.files.stdlib[0].dirname)
 
-    includes.append(ctx.file.std_exit.dirname)
+    includes.append(ctx.file._std_exit.dirname)
 
     ##FIXME: if we're *building* a sys compiler we need to add
     ## libasmrun.a to runfiles, and if we're *using* a sys compiler we
@@ -259,6 +290,27 @@ def executable_impl(ctx, tc, exe_name, workdir):
     else:
         camlheaders = []
 
+    if stdlib_module_target:
+        stdlib = ctx.expand_location("$(rootpath //stdlib:Stdlib)",
+                                     targets=[stdlib_module_target])
+        includes.append(paths.dirname(stdlib))
+        # cmd_args.append("-I")
+        # cmd_args.append(paths.dirname(stdlib))
+    elif stdlib_library_target:
+        if ctx.attr._libs_archived[BuildSettingInfo].value:
+            stdlib = ctx.expand_location("$(rootpath //stdlib)",
+                                         targets=[stdlib_library_target])
+            includes.append(paths.dirname(stdlib))
+            # cmd_args.append("-I")
+            # cmd_args.append(paths.dirname(stdlib))
+        else:
+            stdlibstr = ctx.expand_location("$(rootpaths //stdlib)",
+                                         targets=[stdlib_library_target])
+            stdlibs = stdlibstr.split(" ")
+            includes.append(paths.dirname(stdlibs[0]))
+            # cmd_args.append("-I")
+            # cmd_args.append(paths.dirname(stdlibs[0]))
+
     args.add_all(includes, before_each="-I", uniquify=True)
 
     if ctx.attr.cc_linkopts:
@@ -280,10 +332,8 @@ def executable_impl(ctx, tc, exe_name, workdir):
             runtime_files.append(f)
             includes.append(f.dirname)
 
-    args.add("-nopervasives")
-
     ## Choice: either use filtering_depset or cli_link_deps, not both
-    if ctx.attr._archive[BuildSettingInfo].value:
+    if ctx.attr._libs_archived[BuildSettingInfo].value:
         for dep in filtering_depset.to_list():
             if dep in manifest:
                 args.add(dep)
@@ -294,15 +344,20 @@ def executable_impl(ctx, tc, exe_name, workdir):
         for dep in cli_link_deps_depset.to_list():
             args.add(dep)
 
+    if hasattr(ctx.attr, "epilogue"):
+        args.add_all(ctx.files.epilogue)
+
+    args.add_all(ctx.files._std_exit)
+
     args.add("-o", out_exe)
 
     ################################################################
-    if ctx.label.name == "ocamlc.byte":
-        print("runfiles for: %s" % ctx.label)
-        print(tc.compiler[DefaultInfo].default_runfiles.files)
-        for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
-            print("RF: %s" % f)
-        # fail()
+    # if ctx.label.name == "ocamlc.byte":
+    #     print("runfiles for: %s" % ctx.label)
+    #     print(tc.compiler[DefaultInfo].default_runfiles.files)
+    #     for f in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
+    #         print("RF: %s" % f)
+    #     # fail()
 
     runfiles = []
     # if ...:
@@ -313,7 +368,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     # else:
     #     runfiles = []
 
-    ## action input deps sources:
+    ## action  deps sources:
     ##  a. the target attributes
     ##  b. the compiler
     ##  c. the toolchain?
@@ -322,6 +377,13 @@ def executable_impl(ctx, tc, exe_name, workdir):
 
     # print("lbl: %s" % ctx.label)
     # print("exe effective_compiler: %s" % effective_compiler.path)
+
+    std_exit_files = ctx.attr._std_exit[ModuleInfo].files
+    # if ctx.label.name in ["cvt_emit.byte", "ocamlopt.opt"]:
+    #     print("std_exit files: %s" % std_exit_files)
+    #     print("sig: %s" % ctx.attr._std_exit[ModuleInfo].sig)
+    #     print("struct: %s" % ctx.attr._std_exit[ModuleInfo].struct)
+
 
     inputs_depset = depset(
         direct = []
@@ -335,12 +397,14 @@ def executable_impl(ctx, tc, exe_name, workdir):
         ,
         transitive = []
         + runtime_depsets
+        + [std_exit_files]
         + [depset(
              [tc.executable]
+            + ctx.files.prologue  #
+            + ctx.files.epilogue
             # + ctx.files.stdlib
             + runtime_files
             + toolarg_input
-            + [ctx.file.std_exit]
             # ctx.files._camlheaders
             # + ctx.files._runtime
             + camlheaders
@@ -443,7 +507,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
         myrunfiles = ctx.runfiles(
             files =[
                 # ctx.file.stdlib,
-                ctx.file.std_exit
+                ctx.file._std_exit
             ],
             transitive_files =  depset(
                 transitive = runfiles + [
@@ -455,7 +519,7 @@ def executable_impl(ctx, tc, exe_name, workdir):
     ##########################
     defaultInfo = DefaultInfo(
         executable=out_exe,
-        files = depset([out_exe]),
+        # files = depset([out_exe]),
         runfiles = myrunfiles
     )
 

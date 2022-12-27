@@ -73,6 +73,8 @@ def module_impl(ctx, module_name):
         ext = ".cmx"
     elif compiler.basename == "ocamlopt.opt":
         ext = ".cmx"
+    elif compiler.basename == "ocamlopt.opt":
+        ext = ".cmx"
     else:
         if tc.protocol == "dev":
             if tc.config_emitter == "sys":
@@ -248,6 +250,13 @@ def module_impl(ctx, module_name):
     default_outputs.append(out_cm_)
 
     (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
+
+    if "-pervasives" in _options:
+        cancel_opts.append("-nopervasives")
+        _options.remove("-pervasives")
+    # else:
+    #     _options.append("-nopervasives")
+
     if ( ("-bin-annot" in _options)
          or ("-bin-annot" in tc.copts) ):
         out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
@@ -300,11 +309,41 @@ def module_impl(ctx, module_name):
                 depsets.deps.sigs.append(depset([provider_output_cmi]))
 
     open_stdlib = False
+    stdlib_module_target  = None
+    stdlib_primitives_target  = None
+    stdlib_library_target = None
+
     for dep in ctx.attr.deps:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
-        if dep.label.name.startswith("Stdlib"):
-            includes.append(dep.files.to_list()[0].dirname)
-            open_stdlib = True
+        # if len(ctx.attr.stdlib_deps) < 1:
+        # if dep.label.package == "stdlib":
+        #     if dep.label.name in ["Primitives", "Stdlib"]:
+        #         open_stdlib = True
+        #         stdlib_module_target = dep
+        #     # elif dep.label.name == "Stdlib":
+        #     #     open_stdlib = True
+        #     elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
+        #         open_stdlib = True
+        #     elif dep.label.name == "stdlib": ## stdlib archive OR library
+        #         open_stdlib = True
+        #         stdlib_library_target = dep
+
+    if hasattr(ctx.attr, "stdlib_deps"):
+        if len(ctx.attr.stdlib_deps) > 0:
+            if not ctx.label.name == "Stdlib":
+                open_stdlib = True
+        for dep in ctx.attr.stdlib_deps:
+            depsets = aggregate_deps(ctx, dep, depsets, manifest)
+            if dep.label.name == "Primitives":
+                stdlib_primitives_target = dep
+            elif dep.label.name == "Stdlib":  ## Stdlib resolver
+                stdlib_module_target = dep
+            elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
+                stdlib_module_target = dep
+            elif dep.label.name == "stdlib": ## stdlib archive OR library
+                stdlib_library_target = dep
+                break;
+
         ## Now what if this module is to be archived, and this dep is
         ## a sibling submodule? If it is a sibling it goes in
         ## archived_cmx, or if it is a cmo we drop it since it will be
@@ -425,7 +464,6 @@ def module_impl(ctx, module_name):
         args.add_all(ctx.attr._opts)
 
     tc_opts = []
-
     if not ctx.attr.nocopts:
         # for opt in tc.copts:
         #     if opt not in NEGATION_OPTS:
@@ -448,33 +486,12 @@ def module_impl(ctx, module_name):
                       w if w.startswith("-")
                       else "-" + w])
 
-    args.add("-nopervasives")
-    args.add("-nocwd")
-
-    # if ctx.label.name == "CamlinternalMenhirLib":
-    # if hasattr(ctx.attr, "open_stdlib"):
-    #     if ctx.attr.open_stdlib:
-    #         args.add("-open", "Stdlib")
-
-    # if hasattr(ctx.attr, "open"):
-    #     if ctx.attr.open:
-    #         for o in ctx.attr.open:
-    #             direct_inputs.append(o[ModuleInfo].sig)
-    #             direct_inputs.append(o[ModuleInfo].struct)
-    #             for elt in o.files.to_list():
-    #                 includes.append(elt.dirname)
-    #             args.add("-open", o.label.name)
+    args.add_all(_options)
 
     if open_stdlib:
+        ##NB: -no-alias-deps is about _link_ deps, not compile deps
+        args.add("-no-alias-deps") ##FIXME: control this w/flag?
         args.add("-open", "Stdlib")
-
-    # for dep in ctx.attr.deps:
-    #     if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-    #         if dep.label.package == "stdlib":
-    #             if "-nopervasives" in _options:
-    #                 _options.remove("-nopervasives")
-
-    args.add_all(_options)
 
     #FIXME: make a function for the dump stuff
     if hasattr(ctx.attr, "_lambda_expect_test"):
@@ -575,6 +592,27 @@ def module_impl(ctx, module_name):
     # includes.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
     includes.append(tc.runtime.dirname)
 
+    if stdlib_module_target:
+        includes.append(
+            # paths.dirname(
+                stdlib_module_target[DefaultInfo].files.to_list()[0].dirname
+        # )
+        )
+    # elif stdlib_primitives_target:
+    #     stdlib = ctx.expand_location("$(rootpath //stdlib:Primitives)",
+    #                                  targets=[stdlib_primitives_target])
+    #     includes.append(paths.dirname(stdlib))
+    elif stdlib_library_target:
+        if ctx.attr._libs_archived[BuildSettingInfo].value:
+            stdlib = ctx.expand_location("$(rootpath //stdlib)",
+                                         targets=[stdlib_library_target])
+            includes.append(paths.dirname(stdlib))
+        else:
+            stdlibstr = ctx.expand_location("$(rootpaths //stdlib)",
+                                         targets=[stdlib_library_target])
+            stdlibs = stdlibstr.split(" ")
+            includes.append(paths.dirname(stdlibs[0]))
+
     args.add_all(includes, before_each="-I", uniquify = True)
 
     args.add("-c")
@@ -637,7 +675,8 @@ def module_impl(ctx, module_name):
     moduleInfo_depset = depset(
         ## FIXME: add ofile?
         direct= [provider_output_cmi, out_cm_]
-        + [out_cmt] if out_cmt else [],
+        + ([moduleInfo_ofile] if moduleInfo_ofile else [])
+        + ([out_cmt] if out_cmt else [])
     )
     moduleInfo = ModuleInfo(
         sig    = provider_output_cmi,
@@ -648,6 +687,18 @@ def module_impl(ctx, module_name):
         ofile  = moduleInfo_ofile,
         files = moduleInfo_depset
     )
+
+    if ctx.attr._rule in [
+        "kernel_module", # "kernel_signature",
+        "stdlib_module", # "stdlib_signature",
+        "stdlib_internal_module", # "stdlib_internal_signature"
+    ]:
+        providers.append(StdlibStructMarker())
+
+    if ctx.attr._rule in [
+        "compiler_module", # "compiler_signature",
+    ]:
+        providers.append(CompilerMarker())
 
     providers.append(moduleInfo)
 

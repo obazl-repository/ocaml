@@ -15,10 +15,10 @@ def _run_cvt_emit_impl(ctx):
     debug_bootstrap = False
     debug = True
 
-    print("cvt_emit: %s" % ctx.file._tool)
-    print("cvt_emit rfs: %s" % ctx.attr._tool[DefaultInfo].default_runfiles.files)
+    # print("cvt_emit: %s" % ctx.file._tool)
+    # print("cvt_emit rfs: %s" % ctx.attr._tool[DefaultInfo].default_runfiles.files)
 
-    print("cvt emit _tool: %s" % ctx.file._tool)
+    # print("cvt emit _tool: %s" % ctx.file._tool)
 
     if ctx.attr._protocol[BuildSettingInfo].value == "dev":
         ## tool tgts are just files w/o runfiles

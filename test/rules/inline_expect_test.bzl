@@ -40,6 +40,9 @@ inline_expect_test = rule(
             cfg = "exec"
             # cfg = reset_cc_config_transition ## only build once
         ),
+        _runfiles_tool = attr.label(
+            default = "@bazel_tools//tools/bash/runfiles"
+        ),
 
         src = attr.label(
             mandatory = True,
@@ -70,12 +73,16 @@ inline_expect_test = rule(
             # default = "//config/runtime" # label flag set by transition
         ),
 
-        _stdlib = attr.label(
-            doc = "Stdlib",
-            # default = "//stdlib", # archive, not resolver
-            # allow_single_file = True, # won't work with boot_library
-            # cfg = exe_deps_out_transition,
+        _libs_archived = attr.label( # boolean
+            default = "//config/ocaml/compiler/libs:archived"
         ),
+
+        # _stdlib = attr.label(
+        #     doc = "Stdlib",
+        #     default = "//stdlib", # archive, not resolver
+        #     # allow_single_file = True, # won't work with boot_library
+        #     # cfg = exe_deps_out_transition,
+        # ),
 
         _rule = attr.string( default = "inline_expect_test" ),
         # _allowlist_function_transition = attr.label(

@@ -16,7 +16,7 @@ def archive_attrs(): ##FIXME: rename library_attrs
             ## no default
         ),
         _archive = attr.label(
-            default = "//config/ocaml/compiler/libs:archive"
+            default = "//config/ocaml/compiler/libs:archived"
         ),
 
         opts             = attr.string_list(

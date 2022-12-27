@@ -32,8 +32,8 @@ ocamlc_byte_expect_test = rule(
     attrs = dict(
         executable_attrs(),
 
-        stdout = attr.string( ),
-        expect = attr.label(
+        stdout   = attr.string( ),
+        expected = attr.label(
             allow_single_file = True,
         ),
 
@@ -65,8 +65,8 @@ expect_ss_test = rule(
     attrs = dict(
         executable_attrs(),
 
-        stdout = attr.string( ),
-        expect = attr.label(
+        stdout   = attr.string( ),
+        expected = attr.label(
             allow_single_file = True,
         ),
 
@@ -95,7 +95,7 @@ expect_ss_test = rule(
 ###############################################################
 ####  MACRO - generates two test targets plus on test_suite
 ################################################################
-def expect_test(name, stdout, expect, main, timeout = "short",
+def expect_test(name, stdout, expected, main, timeout = "short",
                 **kwargs):
 
     if name.endswith("_test"):
@@ -114,21 +114,21 @@ def expect_test(name, stdout, expect, main, timeout = "short",
     )
 
     ocamlc_byte_expect_test(
-        name    = vv_name,
-        stdout  = stdout,
-        expect  = expect,
-        main    = main,
-        timeout = timeout,
-        tags    = ["ocamlc.byte"],
+        name     = vv_name,
+        stdout   = stdout,
+        expected = expected,
+        main     = main,
+        timeout  = timeout,
+        tags     = ["ocamlc.byte"],
         **kwargs
     )
 
     expect_ss_test(
-        name    = ss_name,
-        stdout  = stdout,
-        expect  = expect,
-        main    = main,
-        timeout = timeout,
-        tags    = ["ocamlopt.opt"],
+        name     = ss_name,
+        stdout   = stdout,
+        expected = expected,
+        main     = main,
+        timeout  = timeout,
+        tags     = ["ocamlopt.opt"],
         **kwargs
     )

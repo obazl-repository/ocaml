@@ -29,9 +29,9 @@ label_setting(name="stdlib",
               build_setting_default = "//stdlib",
               visibility = ["//visibility:public"])
 
-label_setting(name="std_exit",
-              build_setting_default = "//stdlib:Std_exit",
-              visibility = ["//visibility:public"])
+# label_setting(name="std_exit",
+#               build_setting_default = "//stdlib:Std_exit",
+#               visibility = ["//visibility:public"])
 
 label_setting(name="camlheaders",
               build_setting_default = "//config:camlheaders",

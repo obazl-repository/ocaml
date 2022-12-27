@@ -415,9 +415,11 @@ compiler_signature(
     src  = "printclambda.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
         ":Clambda_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(

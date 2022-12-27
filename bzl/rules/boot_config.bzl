@@ -79,7 +79,7 @@ boot_config = rule(
         ),
         ocaml_stdlib_dir = attr.label(
             allow_single_file = True,
-            default = "//stdlib:Std_exit"
+            # default = "//stdlib:Std_exit"
         )
     ),
     toolchains = ["//toolchain/type:ocaml",

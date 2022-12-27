@@ -1,0 +1,17 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
+bool_flag(name = "archived",
+          build_setting_default = False,
+          visibility = [
+              "//visibility:public"
+              # "//asmcomp:__pkg__",
+              # "//bin:__pkg__",
+              # "//bytecomp:__pkg__",
+              # "//compilerlibs:__pkg__",
+              # "//stdlib:__pkg__",
+              # "//test:__pkg__",
+              # "//testsuite:__subpackages__",
+              # "//toplevel:__subpackages__"
+          ])
+
+config_setting(name = "archived?", flag_values = {":archived": "True"})

@@ -223,29 +223,44 @@ def tc_workdir(ctx):
     config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
     compiler = ctx.file.compiler
+
     if compiler.basename == "ocamlc.boot":
-        return "_boot/"
+        cc = "VV"
+    elif compiler.basename == "ocamlc.byte":
+        cc = "vv"
+    elif compiler.basename == "ocamlopt.byte":
+        cc = "vs"
+    elif compiler.basename == "ocamlopt.opt":
+        cc = "ss"
+    elif compiler.basename == "ocamlc.opt":
+        cc = "sv"
     else:
-        return paths.basename(compiler.dirname) + "_" + compiler.basename.replace(".", "_") + "/"
+        fail("Bad compiler name: %s" % compiler.basename)
 
-    if ctx.file.compiler.path == "bin:ocamlc.byte":
-        if protocol == "boot":
-            workdir = "_boot/"
-        else:
-            workdir = "_baseline/"
+    if compiler.basename == "ocamlc.boot":
+        return "_VV/"
+    else:
+        return paths.basename(compiler.dirname) + "_" + cc + "/"
+        # return paths.basename(compiler.dirname) + "_" + compiler.basename.replace(".", "_") + "/"
 
-    elif protocol == "boot":
-        workdir = "_boot/"
+    # if ctx.file.compiler.path == "bin:ocamlc.byte":
+    #     if protocol == "boot":
+    #         workdir = "_boot/"
+    #     else:
+    #         workdir = "_baseline/"
 
-    elif protocol == "baseline":
-        workdir = "_baseline/"
+    # elif protocol == "boot":
+    #     workdir = "_boot/"
 
-    elif (config_executor == "boot"):
-        workdir = "_xboot/"
-        # fail("WHY BOOT?")
+    # elif protocol == "baseline":
+    #     workdir = "_baseline/"
 
-    elif (config_executor == "baseline"):
-        workdir = "_xbaseline/"
+    # elif (config_executor == "boot"):
+    #     workdir = "_xboot/"
+    #     # fail("WHY BOOT?")
+
+    # elif (config_executor == "baseline"):
+    #     workdir = "_xbaseline/"
 
     # elif (config_executor == "vm" and config_emitter == "boot"):
     #     if tc.protocol == "dev":
@@ -254,30 +269,30 @@ def tc_workdir(ctx):
     #     else:
     #         workdir = "_ocamlc.byte/"
 
-    elif (config_executor == "vm" and config_emitter == "vm"):
-        workdir = "_xocamlc.byte/"
+    # elif (config_executor == "vm" and config_emitter == "vm"):
+    #     workdir = "_xocamlc.byte/"
 
-    elif (config_executor == "vm" and config_emitter == "sys"):
-        workdir = "_ocamlopt.byte/"
+    # elif (config_executor == "vm" and config_emitter == "sys"):
+    #     workdir = "_ocamlopt.byte/"
 
-    # elif (config_executor == "sys" and config_emitter == "boot"):
-    #     if tc.protocol == "dev":
-    #         # dev mode, passing only --//config/target/executor=sys
-    #         workdir = "_ocamlopt.opt/"
-    #     else:
-    #         workdir = "_ocamlc.opt/"
+    # # elif (config_executor == "sys" and config_emitter == "boot"):
+    # #     if tc.protocol == "dev":
+    # #         # dev mode, passing only --//config/target/executor=sys
+    # #         workdir = "_ocamlopt.opt/"
+    # #     else:
+    # #         workdir = "_ocamlc.opt/"
 
-    elif (config_executor == "sys" and config_emitter == "vm"):
-        workdir = "_ocamlc.opt/"
+    # elif (config_executor == "sys" and config_emitter == "vm"):
+    #     workdir = "_ocamlc.opt/"
 
-    elif (config_executor == "sys" and config_emitter == "sys"):
-        workdir = "_ocamlopt.opt/"
+    # elif (config_executor == "sys" and config_emitter == "sys"):
+    #     workdir = "_ocamlopt.opt/"
 
-    else:
-        print("config_executor: %s" % config_executor)
-        print("config_emitter: %s" % config_emitter)
-        fail("BAD CONFIG")
+    # else:
+    #     print("config_executor: %s" % config_executor)
+    #     print("config_emitter: %s" % config_emitter)
+    #     fail("BAD CONFIG")
 
-    # workdir = ctx.attr.name + "/"
+    # # workdir = ctx.attr.name + "/"
 
     return workdir

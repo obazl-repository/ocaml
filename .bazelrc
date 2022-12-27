@@ -2,6 +2,8 @@
 build --flag_alias=tgt=//config/target/executor
 build --flag_alias=stdlib=//testsuite/tests:with-stdlib
 
+build --nokeep_going
+
 # "may improve build speed for builds that use transitions."
 build --experimental_output_directory_naming_scheme=diff_against_baseline
 

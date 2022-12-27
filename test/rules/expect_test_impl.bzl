@@ -42,20 +42,24 @@ def expect_test_impl(ctx):
 
     exe = executable_impl(ctx, tc, exe_name, tc.workdir)
 
+    # return exe
+
     if debug:
         print("exe: %s" % exe)
-        print("exe[di]: %s" % exe[0].files)
-        # print("exe[di]file to run: %s" % exe[0].files_to_run)
+        print("exe[0]: %s" % exe[0])
+        print("tc.config_executor: %s" % tc.config_executor)
+
+        print("exe[di]file to run: %s" % exe[0].files_to_run)
         # for f in exe[0].default_runfiles.files.to_list():
         #     print("RF: %s" % f)
-        print("ocamlrun: %s" % tc.ocamlrun)
+        print("OCAMLRUN: %s" % tc.ocamlrun)
 
     pgm = exe[0].files.to_list()[0]
 
     if tc.config_executor in ["boot", "baseline","vm"]:
         # ocamlrun = exe[0].default_runfiles.files.to_list()[0]
         ocamlrun = tc.ocamlrun
-        pgm_cmd = ocamlrun.short_path + " " + pgm.short_path
+        pgm_cmd = ocamlrun.short_path + " ocamlcc/" + pgm.short_path
     else:
         ocamlrun = None
         pgm_cmd = pgm.short_path
@@ -78,12 +82,17 @@ def expect_test_impl(ctx):
 
     cmd = "\n".join([
         # "{pgm} > ${{TEST_TMPDIR}}/{stdout};".format(
-        "{pgm} > ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(
+        "set -x;",
+        "echo PWD: $PWD",
+        "echo OCAMLRUN: {};".format(ocamlrun.short_path),
+        # "\"{pgm} > ocamlcc/${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout}\";".format(
+        "\"{pgm}\";".format(
             pgm=pgm_cmd,
-            stdout = stdout
+            # stdout = stdout
         ),
+        "echo STDOUT: `cat {}`".format(stdout),
         "diff -w {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
-            src = ctx.file.expect.path,
+            src = ctx.file.expected.path,
             dst = stdout
         ),
         "if [ $? -eq 0 ]",
@@ -115,10 +124,11 @@ def expect_test_impl(ctx):
     )
 
     myrunfiles = ctx.runfiles(
-        files = [runner] + [ocamlrun] if ocamlrun else [],
+        files = [runner, pgm],
         transitive_files =  depset([
-            pgm, ctx.file.expect
-        ])
+            ctx.file.expected
+            ] + [ocamlrun] if ocamlrun else [],
+        )
     )
 
     defaultInfo = DefaultInfo(

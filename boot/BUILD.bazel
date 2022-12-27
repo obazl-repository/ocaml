@@ -27,20 +27,30 @@ boot_coldstart(
     name = "coldstart",
     runner = "coldstart_runner.sh",
     runtimes = [
-        "//runtime:asmrun",
+        # "//runtime:asmrun",
         "//runtime:camlrun",
     ],
     args = [
-        "$(rootpath @baseline//:ocamlc.byte)",
-        # "$(rootpath //bin/baseline:ocamlc.byte)",
+        # "$(rlocationpath //bin:ocamlc.opt)",
+        "$(rlocationpath //bin:ocamlopt.opt)",
+        "$(rlocationpath //bin:ocamlopt.byte)",
+        "$(rlocationpath //bin:ocamlc.byte)",
+
+        # "$(rlocationpath @baseline//:ocamlc.byte)",
         # "$(rlocationpath //bin/baseline:ocamlc.byte)",
-        # "$(execpath //bin/baseline:ocamlc.byte)",
+        # "$(rlocationpath //bin/baseline:ocamlc.byte)",
+        # "$(rlocationpath //bin/baseline:ocamlc.byte)",
         # "$(rlocationpath //bin/baseline:ocamlopt.byte)",
         # "$(rlocationpath //bin/baseline:ocamlc.opt)",
         # "$(rlocationpath //bin/baseline:ocamlopt.opt)",
     ],
     data = [
-        "@baseline//:ocamlc.byte",
+        # "//bin:ocamlc.opt",
+        "//bin:ocamlopt.opt",
+        "//bin:ocamlopt.byte",
+        "//bin:ocamlc.byte",
+
+        # "@baseline//:ocamlc.byte",
         # "//bin/baseline:ocamlc.byte",
         # "//bin/baseline:ocamlopt.byte",
         # "//bin/baseline:ocamlc.opt",
@@ -48,8 +58,8 @@ boot_coldstart(
         # "//lex:ocamllex.byte",
         # "//lex:ocamllex.opt",
         # "//yacc:ocamlyacc",
-        "//vendor/mustach",
-        "//vendor/merge_json",
+        # "//vendor/mustach",
+        # "//vendor/merge_json",
 
         ## the shell script could obtain the following from the preceding:
         # "//stdlib",

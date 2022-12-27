@@ -669,7 +669,7 @@ compile_fail_test = rule(
     doc = "Compiles a module with the bootstrap compiler.",
     attrs = dict(
         module_attrs(),
-        expect = attr.label(
+        expected = attr.label(
             mandatory = True,
             allow_single_file = True
         ),

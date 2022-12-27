@@ -35,14 +35,24 @@ load("//toolchain/adapter:mustache_tc_adapter.bzl", "mustache_toolchain_adapter"
 # -use-prims (ocamlc.byte, ocamlopt.byte only)
 # -cclib "-lm  -lpthread" (ocamlc.opt only)
 
+STD_COPTS = [
+    "-nocwd",
+    "-nostdlib",
+    "-nopervasives",
+    "-strict-sequence",
+]
+
+STD_LOPTS = [
+    # "-nocwd",
+    "-nostdlib",
+    "-nopervasives",
+    # "-strict-sequence",
+]
+
 ######################
 dev_toolchain_adapter(
     name        = "dev",
-    copts       = [ ## common opts: structs and sigs
-        "-nostdlib",  ## inserted by rule
-        # "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
@@ -53,7 +63,7 @@ dev_toolchain_adapter(
         "//config/ocaml:xmo?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
     sigopts     = [],
     structopts  = select({
         ## FIXME: -principal should not be used for boot stage
@@ -67,11 +77,7 @@ dev_toolchain_adapter(
 ##################
 ocaml_tc_adapter(
     name        = "default",
-    copts       = [
-        "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
@@ -86,18 +92,14 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:principal?" : ["-principal"],
         "//conditions:default": []
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
 
 ocaml_tc_adapter(
     name        = "boot",
-    copts       = [
-        "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
@@ -112,18 +114,14 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:principal?" : ["-principal"],
         "//conditions:default": []
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
 
 ocaml_tc_adapter(
     name        = "ocamlc.byte",
-    copts       = [
-        "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
@@ -138,7 +136,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:principal?" : ["-principal"],
         "//conditions:default": []
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -146,11 +144,7 @@ ocaml_tc_adapter(
 # alias(name = "boot.ocamlopt.byte", actual = ":ocamlopt.byte")
 ocaml_tc_adapter(
     name        = "boot.ocamlopt.byte",
-    copts       = [
-        "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
@@ -165,18 +159,14 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:principal?" : ["-principal"],
         "//conditions:default": []
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
 
 ocaml_tc_adapter(
     name        = "ocamlopt.byte",
-    copts       = [
-        "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
@@ -191,18 +181,14 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:principal?" : ["-principal"],
         "//conditions:default": []
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
 
 ocaml_tc_adapter(
     name        = "ocamlopt.opt",
-    copts       = [
-        "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
@@ -217,18 +203,14 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:principal?" : ["-principal"],
         "//conditions:default": []
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
 
 ocaml_tc_adapter(
     name        = "ocamlc.opt",
-    copts       = [
-        "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
@@ -243,7 +225,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:principal?" : ["-principal"],
         "//conditions:default": []
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -253,11 +235,7 @@ mustache_toolchain_adapter(name = "mustache")
 
 boot_toolchain_adapter(
     name        = "preproc",
-    copts       = [
-        "-nostdlib",  ## inserted by rule
-        "-strict-sequence",
-        # "-warn-error", "+A",
-    ] + select({
+    copts       = STD_COPTS + select({
         "//config/ocaml/compile:bin-annot?" : ["-bin-annot"],
         "//conditions:default": []
     }) + select({
@@ -272,7 +250,8 @@ boot_toolchain_adapter(
         "//config/ocaml/compile:principal?" : ["-principal"],
         "//conditions:default": []
     }),
-    linkopts    = ["-nostdlib"],
+    linkopts    = STD_LOPTS,
+
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )

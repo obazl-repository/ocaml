@@ -6,6 +6,9 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
 
+load(":test_transitions.bzl",
+     "vv_test_in_transition")
+
 ##############################
 def _test_executable_impl(ctx):
 
@@ -28,13 +31,13 @@ test_executable = rule(
     doc = "Links OCaml executable binary using the bootstrap toolchain",
     attrs = dict(
         executable_attrs(),
-        _runtime = attr.label(
-            allow_single_file = True,
-            default = "//toolchain:runtime",
-            executable = False,
-            # cfg = reset_cc_config_transition ## only build once
-            # default = "//config/runtime" # label flag set by transition
-        ),
+        # _runtime = attr.label(
+        #     allow_single_file = True,
+        #     default = "//toolchain:runtime",
+        #     executable = False,
+        #     # cfg = reset_cc_config_transition ## only build once
+        #     # default = "//config/runtime" # label flag set by transition
+        # ),
         _rule = attr.string( default = "test_executable" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
@@ -42,7 +45,8 @@ test_executable = rule(
     ),
     # cfg = reset_config_transition,
     # cfg = "exec",
-    cfg = dev_tc_compiler_out_transition,
+    # cfg = dev_tc_compiler_out_transition,
+    cfg = vv_test_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",

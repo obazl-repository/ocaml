@@ -13,6 +13,7 @@ def _build_module(ctx):
     return module_impl(ctx, module_name)
 
 ####################
+## only used for  //asmcomp:Cvt_emit, ?
 build_module = rule(
     implementation = _build_module,
     doc = "Compiles a module with the bootstrap compiler.",

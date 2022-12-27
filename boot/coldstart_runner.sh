@@ -1,10 +1,6 @@
 #!/bin/bash
 
 echo "ARGS: $@"
-for arg in "$@"
-do
-    echo "ARG: $arg"
-done
 
 # --- begin runfiles.bash initialization v2 ---
 # Copy-pasted from the Bazel Bash runfiles library v2.
@@ -18,8 +14,14 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
     { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
 # --- end runfiles.bash initialization v2 ---
 
-echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
-echo "`cat ${RUNFILES_MANIFEST_FILE}`"
+# echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
+# echo "`cat ${RUNFILES_MANIFEST_FILE}`"
+
+for arg in "$@"
+do
+    echo "ARG: $arg"
+    echo "rloc: $(rlocation $arg)"
+done
 
 exit 0
 

@@ -1,11 +1,137 @@
 = testing
+:toc: auto
+:toclevels: 3
 
 
-== tags
+== Default configuration
+
+By default tests do _not_ automatically load and open `Stdlib`. This
+is contrary to the default of the standard releases, which always load
+`stdlib.cmx?a` and open `Stdlib`; see link:stdlib.adoc[Stdlib] for
+justification.
+
+In practice this means that tests are built with options `-nostdlib`
+and `-nopervasives`, and each test target must explicitly enumerate
+its dependencies, including any dependency on either the `Stdlib`
+module or any submodules in the `Stdlib` namespace (i.e. contained in
+the `stdlib.cmx?a` archive). The Bazel rules will detect a dependency
+on the `Stdlib` module and automatically add `-open Stdlib` if such a
+dependency is detected.
+
+The build target for the `Stdlib` module is `//stdlib:Stdlib`. Since
+that module serves two purposes - it implements a set of primitives on
+the one hand, and it defines the aliasing equations for the `Stdlib`
+namespace on the other - we define an alias `//stdlib:Primitives`;
+this can be used to express dependencies a little more precisely. A
+module that depends on `Stdlib` for primitives but does not depend on
+any `Stdlb` submodules can express this by listing
+`//stdlib:Primitives` rather than `//stdlib:Stdlib` as a dependency.
+Note that this is intented solely a hint to the human reader.
+
+IMPORTANT: Do not confuse `//stdlib:Stdlib` and `//stdlib`; the former
+builds module `Stdlib`, the latter builds archive `stdlib.cmx?a`. It
+is not necesssary to depend on the archive in order to depend on a
+submodule.  See link:stdlib.adoc[Stdlib] for more information.
+
+If a test depends on primitives from `Stdlib`, or on submodules in
+stdlib, configure the target as follows:
+
+* module depends on primitives in module `Stdlib`, but not on
+  submodules in namespace `Stdlib`:
+ ** `deps = ["//stdlib:Primitives"]`
+* module depends on a submodule - say, `Bool`  in `Stdlib`, but not on any primitives:
+ ** `deps = ["//stdlib:Stdlib.Bool"]`
+* module depends on both a primitive and a submodule:
+ ** `deps = ["//stdlib:Primitives", "//stdlib:Stdlib.Bool"]`
+* if you do not care about fine-grained dependencies, you can just
+  depend on the archive, `//stdlib`. The drawback of this is that the
+  archive will be rebuilt whenever any of its submodules changes.
+
+FIXME: well, not necessarily. We can choose between archived and
+non-archived libraries. The default is non-archived, which means that
+`//stdib` delivers all the modules in `Stdlib`, unarchived.
+
+
+For example, running
+`testsuite/tests/basic:patmatch_for_multiple_test` without
+`deps=["//stdlib:Primitives"]` results in a longish error report, in
+which we find:
+
+----
+> 3 | | ((1, _, _) as x) -> ignore x; true
+>                           ^^^^^^
+> Error: Unbound value ignore
+----
+
+This tells us that the module depends on the `ignore` primitive, which
+is defined in module `Stdlib`. So this error can be corrected by
+adding `//stdlib:Primitives` as a dependency.
+
+
+== Test rules
+
+Source code: link:../../test/rules[test/rules]
+
+Common attributes: certain attributes are supported by all test rules; see link:https://bazel.build/reference/be/common-definitions#common-attributes-tests[Attributes common to all test rules] for more information.
+
+In particular:
+
+* `tags`: list of strings. Tags can be used to group tests; running
+tests with `--test_tag_filters=<tags>` will select targets annotated
+with the listed tags.  Currently we use the following tags:
+
+  ** `inline_expect`
+  ** `ocamlc.byte` - tests built using the ocamlc.byte compiler
+  ** `ocamlopt.opt` -  tests built using the ocamlopt.opt compiler
+
+
+=== rule: ocaml_test
+
+Standard unit tests, where test code is in the compiled test
+executable, which just reports pass//fail. No output files, so no
+actual/expected diffing (except within the test code itself).
+
+=== rule: ocaml_compile_test
+
+
+
+=== rule: expect_test
+
+Links test modules into a test executable; runs the executable, which
+must emit some result to stdout; redirects stdout to an "actual" file;
+compares actual to expected.
+
+Attributes:
+
+* `main`: the main module (required), which should be built using rule `test_module`
+* `prologue`: list of other module dependencies, which will be treated as deps of `main`
+* `stdout`: label; name of file to which stdout will be redirected (i.e. "actuals" file)
+* `expected`: label of the file containing expected output
+
+=== rule: inline_expect_test
+
+Runs the `testsuite/tools/expect_test.ml` tool (under the name
+`inline_expect`).
+
+Attributes:
+
+* `src` - a .ml file (or .mli?)
+
+
+=== rule: lambda_expect_test
+
+
+
+=== rule: compile_fail_test
+
+
+== Bazel stuff
+
+=== tags
 
 * `--test_tag_filters=foo,bar`
 
-== test suites
+=== test suites
 
 https://bazel.build/reference/test-encyclopedia#tag-conventions
 

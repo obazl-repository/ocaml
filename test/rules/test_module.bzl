@@ -4,6 +4,9 @@ load("//bzl:providers.bzl", "BootInfo", "ModuleInfo")
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 load("//bzl/actions:module_impl.bzl", "module_impl")
 
+load(":test_transitions.bzl",
+     "vv_test_in_transition")
+
 ######################
 def _test_module_impl(ctx):
 
@@ -30,14 +33,12 @@ test_module_ = rule(
         #     doc = "The compiler always opens Stdlib, so everything depends on it.",
         #     default = "//stdlib:Stdlib"
         # ),
-
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
         _rule = attr.string( default = "test_module" ),
     ),
-
-    ##FIXME: transition to set protocol = test
-    # cfg = compile_mode_in_transition,
-
-
+    cfg = vv_test_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
     # fragments = ["platform", "cpp"],

@@ -3,15 +3,39 @@
 def _build_tool_vm_in_transition_impl(settings, attr):
     debug = True
 
+    if debug:
+        print("TRANSITION: build_tool_vm_in_transition")
+        print("attr name: %s" % attr.name)
+
     protocol = settings["//config/build/protocol"]
 
-    if protocol == "preboot":
-        return {}
+    if debug:
+        print("protocol: %s" % protocol)
+        print("config_executor: %s" % settings["//config/target/executor"])
+        print("config_emitter: %s" % settings["//config/target/emitter"])
+        print("compiler: %s" % settings["//toolchain:compiler"])
+        print("runtime: %s" % settings["//toolchain:runtime"])
+        print("ocamlrun: %s" % settings["//toolchain:ocamlrun"])
 
-    if debug: print("build_tool_vm_in_transition")
+    protocol = "tool"
+    config_executor = "boot"
+    config_emitter  = "boot"
 
-    config_executor = "vm"
-    config_emitter  = "vm"
+    ## during coldstart use ocamlc.boot; after, @baseline//bin:ocamc.opt
+    compiler = "//boot:ocamlc.boot"
+    runtime  = "//runtime:camlrun"
+    ocamlrun = "//runtime:ocamlrun"
+
+    # compiler = "@baseline//bin:ocamlc.opt"
+    # runtime  = "@baseline//lib:libcamlrun.a"
+    # ocamlrun = "@baseline//bin:ocamlrun"
+
+
+    # protocol = settings["//config/build/protocol"]
+    # if protocol == "preboot":
+    #     return {}
+    # config_executor = "vm"
+    # config_emitter  = "vm"
 
     # if protocol == "unspecified":
     #     # protocol = "boot"
@@ -21,46 +45,61 @@ def _build_tool_vm_in_transition_impl(settings, attr):
     #     runtime  = "//runtime:camlrun"
     #     # cvt_emit = settings["//toolchain:cvt_emit"]
 
-    if protocol == "boot":
-        compiler = "//boot:ocamlc.boot"
-        runtime  = "//runtime:camlrun"
-        # cvt_emit = "//asmcomp:cvt_emit"
-        ## settings["//toolchain:cvt_emit"]
+    # if protocol == "boot":
+    #     compiler = "//boot:ocamlc.boot"
+    #     runtime  = "//runtime:camlrun"
+    #     # cvt_emit = "//asmcomp:cvt_emit"
+    #     ## settings["//toolchain:cvt_emit"]
 
-    elif protocol == "baseline":
-        compiler = "//boot:ocamlc.byte"
-        runtime  = "//runtime:camlrun"
-        # cvt_emit = "//asmcomp:cvt_emit"
-        ## settings["//toolchain:cvt_emit"]
+    # elif protocol == "baseline":
+    #     compiler = "//boot:ocamlc.byte"
+    #     runtime  = "//runtime:camlrun"
+    #     # cvt_emit = "//asmcomp:cvt_emit"
+    #     ## settings["//toolchain:cvt_emit"]
 
-    elif protocol == "test":
-        compiler = "@baseline//bin:ocamlc.opt"
-        lexer    = "@baseline//bin:ocamllex.opt"
-        cvt_emit = "@baseline//bin:cvt_emit.byte"
-        runtime  = "@baseline//lib:libasmrun.a"
-    else:
-        fail("Protocol not yet supported: %s" % protocol)
+    # elif protocol == "test":
+    #     compiler = "@baseline//bin:ocamlc.opt"
+    #     lexer    = "@baseline//bin:ocamllex.opt"
+    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
+    #     runtime  = "@baseline//lib:libasmrun.a"
+    # else:
+    #     fail("Protocol not yet supported: %s" % protocol)
+
+    if debug:
+        print("setting protocol to: %s" % protocol)
+        print("setting executor to: %s" % config_executor)
+        print("setting emitter to: %s" % config_emitter)
 
     return {
+
+        "//config/build/protocol": protocol,
         "//config/target/executor": config_executor,
         "//config/target/emitter" : config_emitter,
+
         "//toolchain:compiler"  : compiler,
-        # "//toolchain:lexer"     : lexer,
         "//toolchain:runtime"   : runtime,
-        # "//toolchain:cvt_emit"  : cvt_emit
+        "//toolchain:ocamlrun"  : ocamlrun,
     }
 
 ################################################################
 build_tool_vm_in_transition = transition(
     implementation = _build_tool_vm_in_transition_impl,
-    inputs = ["//config/build/protocol"],
-    outputs = [
+    inputs = [
+        "//config/build/protocol",
         "//config/target/executor",
         "//config/target/emitter",
         "//toolchain:compiler",
-        # "//toolchain:lexer",
+        "//toolchain:ocamlrun",
         "//toolchain:runtime",
-        # "//toolchain:cvt_emit"
+    ],
+    outputs = [
+        "//config/build/protocol",
+        "//config/target/executor",
+        "//config/target/emitter",
+
+        "//toolchain:compiler",
+        "//toolchain:runtime",
+        "//toolchain:ocamlrun",
     ]
 )
 

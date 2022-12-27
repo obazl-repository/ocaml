@@ -2,8 +2,14 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 ################################################################
 def _ocamlc_boot_in_transition_impl(settings, attr):
+    debug = True
 
-    print("OCAMLC_BOOT TG")
+    if debug:
+        print("TRANSITION: ocamlc_boot_in_transition")
+        print("protocol: %s" % settings["//config/build/protocol"])
+        print("compiler: %s" % settings["//toolchain:compiler"])
+
+    ## compiler should always be boot:ocamlc.boot
 
     return {
         "//config/build/protocol": "preboot",
@@ -13,7 +19,10 @@ def _ocamlc_boot_in_transition_impl(settings, attr):
 ###################################
 ocamlc_boot_in_transition = transition(
     implementation = _ocamlc_boot_in_transition_impl,
-    inputs = [],
+    inputs = [
+        "//config/build/protocol",
+        "//toolchain:compiler"
+    ],
     outputs = [
         "//config/build/protocol",
         "//toolchain:compiler"
@@ -29,7 +38,7 @@ def _ocamlc_boot_impl(ctx):
                         target_file = ctx.file.tool)
 
     runfiles = ctx.runfiles(
-        files = [ctx.file._stdlib]
+        # files = [ctx.file._stdlib]
     )
 
     defaultInfo = DefaultInfo(
@@ -51,14 +60,14 @@ ocamlc_boot = rule(
         ),
         # stdlib is a runtime dep of the linker, so we need to build
         # it and add it runfiles.
-        _stdlib = attr.label(
-            doc = "Stdlib archive", ## (not stdlib.cmx?a")
-            default = "//stdlib", # archive, not resolver
-            allow_single_file = True, # won't work with boot_library
-            executable = False,
-            # cfg = "exec"
-            # cfg = ocamlc_boot_in_transition
-        ),
+        # _stdlib = attr.label(
+        #     doc = "Stdlib archive", ## (not stdlib.cmx?a")
+        #     default = "//stdlib", # archive, not resolver
+        #     allow_single_file = True, # won't work with boot_library
+        #     executable = False,
+        #     # cfg = "exec"
+        #     # cfg = ocamlc_boot_in_transition
+        # ),
 
         # std_exit = attr.label(
         #     doc = "Module linked last in every executable.",
@@ -89,6 +98,15 @@ ocamlc_boot = rule(
 
 ################################################################
 def _coldstart_transition_impl(settings, attr):
+    debug = True
+
+    if debug:
+        print("TRANSITION: coldstart_transition")
+        print("protocol: %s" % settings["//config/build/protocol"])
+        print("compiler: %s" % settings["//toolchain:compiler"])
+        print("config_executor: %s" % settings["//config/target/executor"])
+        print("config_emitter: %s" % settings["//config/target/emitter"])
+        print("setting protocol to: boot")
 
     # if settings["//config/target/executor"] == "boot":
     #     executor = "sys"
@@ -98,7 +116,7 @@ def _coldstart_transition_impl(settings, attr):
     #     emitter  = settings["//config/target/emitter"]
 
     return {
-        "//config/build/protocol": "baseline",
+        "//config/build/protocol": "boot",
         # "//config/target/executor": executor,
         # "//config/target/emitter" : emitter
     }
@@ -107,9 +125,10 @@ def _coldstart_transition_impl(settings, attr):
 _coldstart_transition = transition(
     implementation = _coldstart_transition_impl,
     inputs = [
-        # "//config/build/protocol",
-        # "//config/target/executor",
-        # "//config/target/emitter"
+        "//config/build/protocol",
+        "//config/target/executor",
+        "//config/target/emitter",
+        "//toolchain:compiler"
     ],
     outputs = [
         "//config/build/protocol",

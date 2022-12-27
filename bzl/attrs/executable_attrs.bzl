@@ -55,8 +55,12 @@ def executable_attrs():
             doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
+        _libs_archived = attr.label( # boolean
+            default = "//config/ocaml/compiler/libs:archived"
+        ),
+
         _archive = attr.label(
-            default = "//config/ocaml/compiler/libs:archive"
+            default = "//config/ocaml/compiler/libs:archived"
         ),
 
         _protocol = attr.label(default = "//config/build/protocol"),
@@ -86,16 +90,20 @@ def executable_attrs():
         ## which means it is a runtime dep of the linker we're using
         ## to build this target, which we get from the toolchain. So
         ## it is _not_ a dependency of this target.
-        stdlib = attr.label(
-            doc = "Stdlib archive", ## (not stdlib.cmx?a")
-            # default = "//stdlib:primitives", # archive, not resolver
-            # allow_single_file = True, # won't work with boot_library
-            # cfg = exe_deps_out_transition,
-        ),
+        # stdlib = attr.label(
+        #     doc = "Stdlib archive", ## (not stdlib.cmx?a")
+        #     # default = "//stdlib:primitives", # archive, not resolver
+        #     # allow_single_file = True, # won't work with boot_library
+        #     # cfg = exe_deps_out_transition,
+        # ),
 
-        # ditto for std_exit - it's a runtime dep of the linker.
+        ## ALL executables depend on std_exit (lowercase hardcoded in
+        ## linker). We do not require the user to explicitly list it,
+        ## but we do add it to the command line.
+
+        # std_exit is a runtime dep of the linker.
         # linker is hardcoded to look for std_exit.cmx?a
-        std_exit = attr.label(
+        _std_exit = attr.label(
             doc = "Module linked last in every executable.",
             default = "//stdlib:Std_exit",
             allow_single_file = True,

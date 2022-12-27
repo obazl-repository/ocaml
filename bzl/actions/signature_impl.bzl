@@ -7,6 +7,8 @@ load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
      "SigInfo",
+     "StdlibSigMarker",
+     "CompilerMarker",
      "new_deps_aggregator",
      "OcamlSignatureProvider")
 
@@ -114,6 +116,13 @@ def signature_impl(ctx, module_name):
     action_outputs.append(out_cmi)
 
     (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
+
+    if "-pervasives" in _options:
+        cancel_opts.append("-nopervasives")
+        _options.remove("-pervasives")
+    # else:
+    #     _options.append("-nopervasives")
+
     if ( ("-bin-annot" in _options)
          or ("-bin-annot" in tc.copts) ):
         out_cmti = ctx.actions.declare_file(workdir + module_name + ".cmti")
@@ -132,8 +141,43 @@ def signature_impl(ctx, module_name):
 
     manifest = []
 
+    open_stdlib = False
+    no_alias_deps = False
+    stdlib_module_target  = None
+    stdlib_primitives_target  = None
+    stdlib_library_target = None
+
     for dep in ctx.attr.deps:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        # if len(ctx.attr.stdlib_deps) < 1:
+        # if dep.label.package == "stdlib":
+        #     if dep.label.name in ["Primitives", "Stdlib"]:
+        #         open_stdlib = True
+        #         stdlib_module_target = dep
+        #     # elif dep.label.name == "Stdlib":
+        #     #     open_stdlib = True
+        #     elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
+        #         open_stdlib = True
+        #     elif dep.label.name == "stdlib": ## stdlib archive OR library
+        #         open_stdlib = True
+        #         stdlib_library_target = dep
+
+    if hasattr(ctx.attr, "stdlib_deps"):
+        if len(ctx.attr.stdlib_deps) > 0:
+            no_alias_deps = True
+            if not ctx.label.name == "Stdlib_cmi":
+                open_stdlib = True
+        for dep in ctx.attr.stdlib_deps:
+            depsets = aggregate_deps(ctx, dep, depsets, manifest)
+            if dep.label.name == "Primitives":
+                stdlib_primitives_target = dep
+            elif dep.label.name == "Stdlib":  ## Stdlib resolver
+                stdlib_module_target = dep
+            elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
+                stdlib_module_target = dep
+            elif dep.label.name == "stdlib": ## stdlib archive OR library
+                stdlib_library_target = dep
+                break;
 
     if hasattr(ctx.attr, "ns"):
         if ctx.attr.ns:
@@ -193,8 +237,21 @@ def signature_impl(ctx, module_name):
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
 
+    tc_opts = []
     if not ctx.attr.nocopts:
-        args.add_all(tc.copts)
+        # for opt in tc.copts:
+        #     if opt not in NEGATION_OPTS:
+        #         args.add(opt)
+        #     else:
+        # args.add_all(tc.copts)
+        tc_opts.extend(tc.copts)
+
+    # args.add_all(tc.structopts)
+    tc_opts.extend(tc.structopts)
+
+    for opt in tc_opts:
+        if opt not in cancel_opts:
+            args.add(opt)
 
     args.add_all(tc.warnings[BuildSettingInfo].value)
 
@@ -203,24 +260,10 @@ def signature_impl(ctx, module_name):
                       w if w.startswith("-")
                       else "-" + w])
 
-    open_stdlib = False
-    for dep in ctx.attr.deps:
-        depsets = aggregate_deps(ctx, dep, depsets, manifest)
-        if dep.label.name.startswith("Stdlib"):
-            includes.append(dep.files.to_list()[0].dirname)
-            open_stdlib = True
-
-    # for dep in ctx.attr.deps:
-    #     if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-    #         if dep.label.package == "stdlib":
-    #             if "-nopervasives" in _options:
-    #                 _options.remove("-nopervasives")
-
     args.add_all(_options)
 
-    args.add("-nopervasives")
-    # args.add("-nocwd")
-
+    if no_alias_deps:
+        args.add("-no-alias-deps") ##FIXME: control this w/flag?
     if open_stdlib:
         args.add("-open", "Stdlib")
 
@@ -342,8 +385,20 @@ def signature_impl(ctx, module_name):
         defaultInfo,
         bootInfo,
         sigProvider,
-        sigInfo
+        sigInfo,
     ]
+
+    if ctx.attr._rule in [
+        "kernel_signature",
+        "stdlib_signature",
+        "stdlib_internal_signature"
+    ]:
+        providers.append(StdlibSigMarker())
+
+    if ctx.attr._rule in [
+        "compiler_signature",
+    ]:
+        providers.append(CompilerMarker())
 
     if ccInfo_list:
         providers.append(

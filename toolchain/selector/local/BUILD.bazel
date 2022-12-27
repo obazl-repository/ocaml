@@ -64,6 +64,7 @@ toolchain_selector(
     type           = "//toolchain/type:ocaml",
     adapter        = "//toolchain/adapter:ocamlc.byte",
     target_host_configuration = [
+        # "//config/build/protocol:std?",
         "//config/target/executor:vm_executor?",
         "//config/target/emitter:vm_emitter?"
     ]

@@ -3,6 +3,7 @@ load("//bzl:rules.bzl",
      "boot_library",
      "build_module",
      "build_tool_vm",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -87,7 +88,6 @@ boot_archive(
     visibility = ["//testsuite:__pkg__"],
 )
 
-# boot_archive(
 boot_library(
     name = "optcomp",
     visibility = [
@@ -217,13 +217,15 @@ compiler_module(
         ":Mach",
         ":Proc",
         ":Reg",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:CamlinternalOO"
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
+    ],
+    stdlib_deps = [
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -233,9 +235,9 @@ compiler_signature(
     src  = "CSEgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
-        ":Cmm_cmi",
         "//parsing:Asttypes_cmi",
+        ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -246,15 +248,17 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//lambda:Lambda",
-        # "//middle_end:Backend_var",
+        "//utils:Clflags",
+        ":Cmm",
+        "//middle_end:Backend_var",
+        # "//middle_end:ocamlmiddleend",
         #FIXME: bug in deps mgmt, import archive containing Backend_var
-        "//middle_end:ocamlmiddleend",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Random",
-        "//utils:Clflags",
-        ":Cmm",
-    ],
+    ]
 )
 
 compiler_signature(
@@ -262,9 +266,9 @@ compiler_signature(
     src  = "afl_instrument.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm_cmi",
         "//lambda:Debuginfo_cmi",
         "//parsing:Asttypes_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -285,6 +289,9 @@ compiler_module(
     deps   = [
         "//utils:Clflags"
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+    ]
 )
 
 compiler_signature(
@@ -298,7 +305,7 @@ compiler_signature(
         "//config/arch:riscv64"   : "//asmcomp/riscv:arch.mli",
         "//config/arch:s390x"   : "//asmcomp/s390x:arch.mli",
     }, no_match_error = "unknown arch"),
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Arg_cmi",
         "//stdlib:Stdlib.Format_cmi"
     ],
@@ -310,46 +317,47 @@ compiler_module(
     sig    = "Asmgen_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Split",
-        ":Spill",
-        ":Reg",
-        ":Printmach",
-        ":Printlinear",
-        ":Printcmm",
-        ":Polling",
-        ":Mach",
-        ":Liveness",
-        ":Linscan",
-        ":Linearize",
-        ":Linear",
-        ":Interval",
-        ":Interf",
-        ":Emitaux",
-        ":Deadcode",
-        ":Comballoc",
-        ":Coloring",
-        ":Cmmgen",
-        ":Cmm_invariants",
-        ":Cmm_helpers",
-        ":Cmm",
-        "//lambda:Translmod",
-        "//utils:Profile",
-        "//typing:Primitive",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//file_formats:Linear_format",
-        "//typing:Ident",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//config:Config",
-        ## (Compiler_pass)
-        "//middle_end:Compilenv",
-        "//utils:Clflags",
-        "//middle_end:Clambda",
 
-        # arch-dependent targets
+        "//config:Config",
+        "//file_formats:Linear_format",
+        "//lambda:Translmod",
+        "//middle_end:Clambda",
+        "//middle_end:Compilenv",
+        "//parsing:Location",
+        "//typing:Ident",
+        "//typing:Primitive",
+        "//utils:Clflags",
+        "//utils:Misc",
+        "//utils:Profile",
+        ":Cmm",
+        ":Cmm_helpers",
+        ":Cmm_invariants",
+        ":Cmmgen",
+        ":Coloring",
+        ":Comballoc",
+        ":Deadcode",
+        ":Emitaux",
+        ":Interf",
+        ":Interval",
+        ":Linear",
+        ":Linearize",
+        ":Linscan",
+        ":Liveness",
+        ":Mach",
+        ":Polling",
+        ":Printcmm",
+        ":Printlinear",
+        ":Printmach",
+        ":Reg",
+        ":Spill",
+        ":Split",
+        ## arch-specific tgts:
         ":CSE", ":Emit", ":Reload", ":Scheduling", ":Selection"
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
     ],
     visibility = [
         "//driver:__pkg__",
@@ -362,12 +370,14 @@ compiler_signature(
     src  = "asmgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Emitaux_cmi",
-        ":Cmm_cmi",
-        "//stdlib:Stdlib.Format_cmi",
+        "//middle_end:Backend_intf_cmi",
         "//middle_end:Clambda_cmi",
-        "//middle_end:Backend_intf_cmi"
+        ":Cmm_cmi",
+        ":Emitaux_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -376,19 +386,20 @@ compiler_module(
     sig    = "Asmlibrarian_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Asmlink",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//middle_end/flambda:Export_info",
         "//config:Config",
-        "//middle_end:Compilenv",
-        "//utils:Clflags",
+        "//middle_end/flambda:Export_info",
         "//middle_end:Clambda",
-        ## (Ccomp)
+        "//middle_end:Compilenv",
+        "//parsing:Location",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        ":Asmlink",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
     ],
     visibility = ["//driver:__pkg__"]
 )
@@ -399,8 +410,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//file_formats:Cmx_format_cmi",
-        "//stdlib:Stdlib.Format_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -409,31 +422,31 @@ compiler_module(
     sig    = "Asmlink_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Emitaux",
-        ":Emit",
-        ":Cmm_helpers",
-        ":Cmm",
-        ":Asmgen",
-        "//stdlib:Stdlib.Sys",
-        "//lambda:Runtimedef",
-        "//utils:Profile",
-        "//stdlib:Stdlib.Printf",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Digest",
-        ## (Consistbl)
         "//config:Config",
-        "//middle_end:Compilenv",
-        "//utils:Clflags",
+        "//lambda:Runtimedef",
         "//middle_end:Clambda",
-        ## (Ccomp)
-        "//stdlib:Stdlib.Array",
+        "//middle_end:Compilenv",
+        "//parsing:Location",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Profile",
+        ":Asmgen",
+        ":Cmm",
+        ":Cmm_helpers",
+        ":Emit",
+        ":Emitaux",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+    ]
 )
 
 compiler_signature(
@@ -443,10 +456,12 @@ compiler_signature(
     deps   = [
         "//file_formats:Cmx_format_cmi",
         "//middle_end:Backend_intf_cmi",
-        "//stdlib:Stdlib.Digest_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//utils:Misc_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -455,31 +470,33 @@ compiler_module(
     sig    = "Asmpackager_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Asmlink",
-        ":Asmgen",
-        "//typing:Typemod",
-        "//lambda:Translmod",
-        "//stdlib:Stdlib.String",
-        "//lambda:Simplif",
-        "//utils:Profile",
-        "//stdlib:Stdlib.Printf",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Format",
-        "//middle_end/flambda:Flambda_middle_end",
-        "//stdlib:Stdlib.Filename",
-        "//middle_end/flambda:Export_info_for_pack",
-        "//middle_end/flambda:Export_info",
-        "//typing:Env",
         "//config:Config",
-        "//middle_end:Compilenv",
-        "//middle_end:Compilation_unit",
+        "//lambda:Simplif",
+        "//lambda:Translmod",
         "//middle_end/closure:Closure_middle_end",
-        "//utils:Clflags",
+        "//middle_end/flambda:Export_info",
+        "//middle_end/flambda:Export_info_for_pack",
+        "//middle_end/flambda:Flambda_middle_end",
         "//middle_end:Clambda",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Compilenv",
+        "//parsing:Location",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Typemod",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Profile",
+        ":Asmgen",
+        ":Asmlink",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = [
         "//asmcomp:__pkg__",
@@ -492,11 +509,13 @@ compiler_signature(
     src  = "asmpackager.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Format_cmi",
-        "//typing:Env_cmi",
         "//file_formats:Cmx_format_cmi",
         "//middle_end:Backend_intf_cmi",
+        "//typing:Env_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -505,9 +524,12 @@ compiler_module(
     sig    = "Branch_relaxation_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Mach",
-        ":Linear",
         ":Cmm",
+        ":Linear",
+        ":Mach",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Hashtbl",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -517,8 +539,8 @@ compiler_signature(
     src  = "branch_relaxation.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear_cmi",
         ":Branch_relaxation_intf_cmi",
+        ":Linear_cmi",
     ],
 )
 
@@ -527,8 +549,8 @@ compiler_signature(
     src  = "branch_relaxation_intf.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear_cmi",
         ":Cmm_cmi",
+        ":Linear_cmi",
     ],
 )
 
@@ -550,14 +572,16 @@ compiler_module(
     sig    = "Cmm_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//lambda:Lambda",
-        ":Arch",
-        "//utils:Targetint",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
         "//lambda:Debuginfo",
+        "//lambda:Lambda",
         "//middle_end:Backend_var",
+        "//utils:Misc",
+        "//utils:Targetint",
+        ":Arch",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -571,11 +595,11 @@ compiler_signature(
     src  = "cmm.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//lambda:Lambda_cmi",
-        "//utils:Targetint_cmi",
         "//lambda:Debuginfo_cmi",
+        "//lambda:Lambda_cmi",
         "//middle_end:Backend_var_cmi",
         "//parsing:Asttypes_cmi",
+        "//utils:Targetint_cmi",
     ],
     visibility = [
         "//file_formats:__pkg__",
@@ -588,36 +612,34 @@ compiler_module(
     sig    = "Cmm_helpers_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Strmatch",
-        ":Proc",
-        ":Cmmgen_state",
-        ":Cmm",
-        ## (Targetint)
-        ## (Switch)
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//typing:Primitive",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Numbers",
-        "//stdlib:Stdlib.Nativeint",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Marshal",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int",
-        "//lambda:Debuginfo",
         "//config:Config",
-        "//middle_end:Compilenv",
-        "//utils:Clflags",
-        ## (Clambda_primitives)
-        "//middle_end:Clambda",
+        "//lambda:Debuginfo",
         "//middle_end:Backend_var",
-        "//stdlib:Stdlib.Array",
-        ## (Arch)
+        "//middle_end:Clambda",
+        "//middle_end:Compilenv",
+        "//typing:Primitive",
+        "//utils:Clflags",
+        "//utils:Misc",
+        "//utils:Numbers",
+        ":Cmm",
+        ":Cmmgen_state",
+        ":Proc",
+        ":Strmatch",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Marshal",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+    ]
 )
 
 compiler_signature(
@@ -630,12 +652,14 @@ compiler_signature(
         "//lambda:Debuginfo_cmi",
         "//middle_end:Clambda_cmi",
         "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Digest_cmi",
-        "//stdlib:Stdlib.Nativeint_cmi",
         "//typing:Primitive_cmi",
         ":Cmm_cmi",
         ":Cmmgen_state_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Nativeint_cmi",
+    ]
 )
 
 compiler_module(
@@ -644,13 +668,15 @@ compiler_module(
     sig    = "Cmm_invariants_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Cmm",
-        "//stdlib:Stdlib.Set",
         "//utils:Numbers",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Array",
+        ":Cmm",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Set",
+    ]
 )
 
 compiler_signature(
@@ -659,8 +685,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Cmm_cmi",
-        "//stdlib:Stdlib.Format_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -669,9 +697,22 @@ compiler_module(
     sig    = "Cmmgen_cmi",
     opts = MODULE_OPTS,
     deps   = [
+        "//config:Config",
         "//lambda:Debuginfo",
+        "//middle_end:Backend_var",
         "//middle_end:Clambda",
         "//middle_end:Compilenv",
+        "//typing:Primitive",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Misc",
+        ":Afl_instrument",
+        ":Arch",
+        ":Cmm",
+        ":Cmm_helpers",
+        ":Cmmgen_state",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.Int64",
@@ -680,18 +721,7 @@ compiler_module(
         "//stdlib:Stdlib.Nativeint",
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Option",
-        "//typing:Primitive",
-        "//typing:Types",
-        "//utils:Clflags",
-        "//config:Config",
-        "//utils:Misc",
-        ":Afl_instrument",
-        ":Cmm",
-        ":Cmm_helpers",
-        ":Cmmgen_state",
-        ":Arch",
-        "//middle_end:Backend_var",
-    ],
+    ]
 )
 
 compiler_signature(
@@ -699,9 +729,9 @@ compiler_signature(
     src  = "cmmgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm_cmi",
-        "//parsing:Asttypes_cmi",
         "//middle_end:Clambda_cmi",
+        "//parsing:Asttypes_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -711,14 +741,16 @@ compiler_module(
     sig    = "Cmmgen_state_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Cmm",
-        "//stdlib:Stdlib.Queue",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
-        "//middle_end:Compilenv",
         "//middle_end:Clambda",
+        "//middle_end:Compilenv",
+        "//utils:Misc",
+        ":Cmm",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Queue",
+    ]
 )
 
 compiler_signature(
@@ -726,9 +758,9 @@ compiler_signature(
     src  = "cmmgen_state.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm_cmi",
+        "//middle_end:Clambda_cmi",
         "//utils:Misc_cmi",
-        "//middle_end:Clambda_cmi"
+        ":Cmm_cmi",
     ],
 )
 
@@ -738,16 +770,18 @@ compiler_module(
     sig    = "Coloring_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
         ":Proc",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Array",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Set",
+    ]
 )
 
 compiler_signature(
@@ -762,14 +796,15 @@ compiler_module(
     sig    = "Comballoc_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
-        ":Mach",
-        "//stdlib:Stdlib.List",
-        "//lambda:Debuginfo",
         "//config:Config",
-        "//stdlib:Stdlib.Array",
-        ## (Arch)
+        "//lambda:Debuginfo",
+        ":Mach",
+        ":Reg",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -777,8 +812,8 @@ compiler_signature(
     src  = "comballoc.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -797,14 +832,16 @@ build_tool_vm(
     # opts = [
     #     "-verbose"
     # ],
-    # prologue = [
-    #     "//stdlib:Stdlib",
+    prologue = [
+        "//stdlib:Stdlib",
+        # "//stdlib:Primitives",
+
     #     "//stdlib:primitives",
     #     "//stdlib:Stdlib.Lexing",
     #     "//stdlib:Stdlib.Printf",
     #     "//stdlib:Stdlib.Sys",
     #     "//stdlib:Stdlib.Array",
-    # ],
+    ],
     visibility = ["//boot:__pkg__", "//asmcomp:__subpackages__"]
 )
 
@@ -813,7 +850,9 @@ build_module(
     struct = "cvt_emit_ml",
     opts = MODULE_OPTS,
     warnings = [w.MISSING_MLI],
-    deps   = [
+    stdlib_deps   = [
+        # "//stdlib",
+        "//stdlib:Primitives",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Sys",
@@ -833,12 +872,14 @@ compiler_module(
     sig    = "Dataflow_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Mach",
         ":Cmm",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Array",
+        ":Mach",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -846,8 +887,8 @@ compiler_signature(
     src  = "dataflow.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -857,17 +898,19 @@ compiler_module(
     sig    = "Deadcode_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
-        ":Proc",
-        ":Mach",
-        ":Cmm",
         "//utils:Numbers",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Array",
+        ":Cmm",
+        ":Mach",
+        ":Proc",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -875,8 +918,8 @@ compiler_signature(
     src  = "deadcode.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -898,15 +941,19 @@ compiler_module(
     }, no_match_error = "unknown arch"),
     sig = "Emit_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Proc",
+    deps   = [ ## FIXME: deps may depend on selected source
+        ## so mv this target to pltform subdirs?
+        "//middle_end:Compilenv",
+        "//utils:Domainstate",
         ":Branch_relaxation",
         ":Emitaux",
+        ":Proc",
         ":X86_dsl",
         ":X86_gas",
         ":X86_masm",
-        "//middle_end:Compilenv",
-        "//utils:Domainstate"
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array", # for amd64
     ],
     visibility = ["//testsuite:__subpackages__"]
 )
@@ -916,8 +963,8 @@ compiler_signature(
     src  = "emit.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear_cmi",
         ":Cmm_cmi",
+        ":Linear_cmi",
     ],
 )
 
@@ -928,7 +975,13 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
+        "//config:Config",
         "//lambda:Debuginfo",
+        "//utils:Clflags",
+        ":Arch",
+        ":Cmm",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Hashtbl",
@@ -939,11 +992,6 @@ compiler_module(
         "//stdlib:Stdlib.Nativeint",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
-        "//utils:Clflags",
-        "//config:Config",
-        ":Arch",
-        ":Cmm",
-        ## (Scoped_location)
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -956,12 +1004,14 @@ compiler_signature(
     src  = "emitaux.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear_cmi",
-        ":Emitenv_cmi",
-        ":Cmm_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//lambda:Debuginfo_cmi",
+        ":Cmm_cmi",
+        ":Emitenv_cmi",
+        ":Linear_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_signature(
@@ -969,8 +1019,8 @@ compiler_signature(
     src  = "emitenv.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear_cmi",
         ":Cmm_cmi",
+        ":Linear_cmi",
     ],
 )
 
@@ -980,17 +1030,19 @@ compiler_module(
     sig    = "Interf_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
-        ":Proc",
-        ":Mach",
         ":Cmm",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Array",
+        ":Mach",
+        ":Proc",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Set",
+    ]
 )
 
 compiler_signature(
@@ -998,8 +1050,8 @@ compiler_signature(
     src  = "interf.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -1009,15 +1061,17 @@ compiler_module(
     sig    = "Interval_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
-        ":Proc",
         ":Mach",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Array",
+        ":Proc",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -1025,9 +1079,9 @@ compiler_signature(
     src  = "interval.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg_cmi",
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
+        ":Reg_cmi",
     ],
 )
 
@@ -1037,10 +1091,10 @@ compiler_module(
     sig    = "Linear_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
-        ":Mach",
-        ":Cmm",
         "//lambda:Debuginfo",
+        ":Cmm",
+        ":Mach",
+        ":Reg",
     ],
     visibility = [
         "//asmcomp:__subpackages__",
@@ -1053,10 +1107,10 @@ compiler_signature(
     src  = "linear.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg_cmi",
-        ":Mach_cmi",
-        ":Cmm_cmi",
         "//lambda:Debuginfo_cmi",
+        ":Cmm_cmi",
+        ":Mach_cmi",
+        ":Reg_cmi",
     ],
     visibility = ["//file_formats:__pkg__"]
 )
@@ -1068,19 +1122,21 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Reg",
-        ":Proc",
-        ":Mach",
-        ":Linear",
-        ":Cmm",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
         "//lambda:Debuginfo",
-        "//stdlib:Stdlib.Array",
+        "//utils:Misc",
+        ":Cmm",
+        ":Linear",
+        ":Mach",
+        ":Proc",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -1088,9 +1144,9 @@ compiler_signature(
     src  = "linearize.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
-        ":Linear_cmi",
         ":Cmm_cmi",
+        ":Linear_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -1101,15 +1157,17 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Reg",
-        ":Proc",
         ":Interval",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Array",
+        ":Proc",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -1127,16 +1185,19 @@ compiler_module(
     sig    = "Liveness_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
-        ":Proc",
-        ":Printmach",
-        ":Mach",
-        ":Dataflow",
         "//utils:Misc",
+        ":Dataflow",
+        ":Mach",
+        ":Printmach",
+        ":Proc",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
+    ]
 )
 
 compiler_signature(
@@ -1144,8 +1205,8 @@ compiler_signature(
     src  = "liveness.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -1157,6 +1218,9 @@ compiler_module(
     deps   = [
         ":Reg",
     ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
+    ]
 )
 
 compiler_signature(
@@ -1176,14 +1240,16 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        ":Mach",
-        ":Dataflow",
-        ":Cmm",
-        "//utils:Numbers",
         "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Array",
+        "//utils:Numbers",
+        ":Cmm",
+        ":Dataflow",
+        ":Mach",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -1191,9 +1257,9 @@ compiler_signature(
     src  = "polling.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
-        ":Cmm_cmi",
         "//utils:Misc_cmi",
+        ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -1203,17 +1269,18 @@ compiler_module(
     sig    = "Printcmm_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Cmm",
-        ## (Targetint)
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Nativeint",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
-        "//utils:Clflags",
         "//middle_end:Backend_var",
-        "//stdlib:Stdlib.Array",
+        "//utils:Clflags",
+        ":Cmm",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Printf",
+    ]
 )
 
 compiler_signature(
@@ -1221,11 +1288,13 @@ compiler_signature(
     src  = "printcmm.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm_cmi",
-        "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//lambda:Debuginfo_cmi",
+        "//parsing:Asttypes_cmi",
+        ":Cmm_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -1234,15 +1303,17 @@ compiler_module(
     sig    = "Printlinear_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Printmach",
-        ":Mach",
-        ":Linear",
-        ":Cmm",
-        "//stdlib:Stdlib.Format",
         "//lambda:Debuginfo",
         "//utils:Clflags",
-        "//stdlib:Stdlib.Array",
+        ":Cmm",
+        ":Linear",
+        ":Mach",
+        ":Printmach",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+    ]
 )
 
 compiler_signature(
@@ -1250,10 +1321,12 @@ compiler_signature(
     src  = "printlinear.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Linear_cmi",
         ":Cmm_cmi",
-        "//stdlib:Stdlib.Format_cmi",
+        ":Linear_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -1264,12 +1337,6 @@ compiler_module(
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
         "//lambda:Debuginfo",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Nativeint",
-        "//stdlib:Stdlib.Printf",
         "//utils:Clflags",
         ":Cmm",
         ":Interval",
@@ -1278,6 +1345,14 @@ compiler_module(
         ":Proc",
         ":Reg",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
+        "//stdlib:Stdlib.Printf",
+    ]
 )
 
 compiler_signature(
@@ -1285,10 +1360,13 @@ compiler_signature(
     src  = "printmach.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg_cmi",
+        ":Interval_cmi",
         ":Mach_cmi",
-        ":Interval_cmi"
+        ":Reg_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ]
 )
 
 compiler_module(
@@ -1313,6 +1391,9 @@ compiler_module(
         ":Reg",
         ":X86_proc",
     ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
+    ],
     visibility = [
         # "//asmcomp:__subpackages__"
         "//driver:__pkg__"
@@ -1324,9 +1405,9 @@ compiler_signature(
     src  = "proc.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg_cmi",
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
+        ":Reg_cmi",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1337,14 +1418,16 @@ compiler_module(
     sig    = "Reg_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Cmm",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
         "//middle_end:Backend_var",
+        ":Cmm",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.String",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1354,11 +1437,13 @@ compiler_signature(
     src  = "reg.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm_cmi",
-        "//stdlib:Stdlib.Set_cmi",
-        "//stdlib:Stdlib.Map_cmi",
         "//middle_end:Backend_var_cmi",
+        ":Cmm_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Map_cmi",
+        "//stdlib:Stdlib.Set_cmi",
+    ]
 )
 
 compiler_module(
@@ -1375,13 +1460,12 @@ compiler_module(
     sig    = "Reload_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reloadgen",
-        # ":Reg",
-        # ":Mach",
-        # ":Cmm",
         "//utils:Misc",
-        "//stdlib:Stdlib.List",
+        ":Reloadgen",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1391,8 +1475,8 @@ compiler_signature(
     src  = "reload.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -1403,14 +1487,14 @@ compiler_module(
     opts = MODULE_OPTS,
     use_prims = True,
     deps   = [
-        ":Reg",
-        ":Mach",
-        ":Cmm",
         "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        ## FIXME: Stdlib.Array should include CamlinternalOO in its
-        ## depgraph, so we should not need to list it here.
+        ":Cmm",
+        ":Mach",
+        ":Reg",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
         "//stdlib:CamlinternalOO",
     ],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1421,9 +1505,9 @@ compiler_signature(
     src  = "reloadgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg_cmi",
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
+        ":Reg_cmi",
     ],
 )
 
@@ -1441,13 +1525,13 @@ compiler_module(
         ":Mach",
         ":Proc",
         ":Reg",
-
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Hashtbl",
+    ],
+    stdlib_deps = [
+        "//stdlib:CamlinternalOO",
         "//stdlib:Stdlib.Array",
-        "//stdlib:CamlinternalOO"
-        ## (Arch)
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1457,9 +1541,9 @@ compiler_signature(
     src  = "schedgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
-        ":Linear_cmi",
         ":Cmm_cmi",
+        ":Linear_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -1510,6 +1594,9 @@ compiler_module(
         ":Mach",
         ":Selectgen",
     ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
+    ],
     visibility = ["//asmcomp:__pkg__"]
 )
 
@@ -1520,27 +1607,28 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        "//stdlib:Stdlib.Int",
-        ":Cmm",
-        ":Mach",
-        ":Proc",
-        ":Polling",
-        ":Reg",
-        "//utils:Numbers",
-        "//stdlib:Stdlib.Nativeint",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int64",
         "//lambda:Debuginfo",
         "//middle_end:Backend_var",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:CamlinternalOO",
-        ## (Arch)
+        "//utils:Misc",
+        "//utils:Numbers",
+        ":Cmm",
+        ":Mach",
+        ":Polling",
+        ":Proc",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": [
     #         "//asmcomp/amd64:Proc",
     #     ]
     # }, no_match_error = "unknown arch"),
+    ],
+    stdlib_deps = [
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Nativeint",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1550,14 +1638,17 @@ compiler_signature(
     src  = "selectgen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Reg_cmi",
-        ":Mach_cmi",
-        ":Cmm_cmi",
-        "//utils:Misc_cmi",
         "//lambda:Debuginfo_cmi",
         "//middle_end:Backend_var_cmi",
         "//parsing:Asttypes_cmi",
+        "//utils:Misc_cmi",
+        ":Cmm_cmi",
+        ":Mach_cmi",
+        ":Reg_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ]
 )
 
 compiler_signature(
@@ -1565,9 +1656,9 @@ compiler_signature(
     src  = "selection.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
-        ":Cmm_cmi",
         "//utils:Misc_cmi",
+        ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -1577,19 +1668,21 @@ compiler_module(
     sig    = "Spill_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
-        ":Proc",
-        ":Mach",
-        ":Cmm",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Hashtbl",
         "//utils:Clflags",
-        "//stdlib:Stdlib.Array",
+        ":Cmm",
+        ":Mach",
+        ":Proc",
+        ":Reg",
     # ] + select({
     #     "//config/arch:x86_64": ["//asmcomp/amd64:Proc"],
     # }, no_match_error = "unsupported arch"),
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -1597,8 +1690,8 @@ compiler_signature(
     src  = "spill.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
         ":Proc_cmi"
    ],
 )
@@ -1609,13 +1702,15 @@ compiler_module(
     sig    = "Split_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Reg",
-        ":Mach",
-        ":Cmm",
         "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Array",
+        ":Cmm",
+        ":Mach",
+        ":Reg",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 compiler_signature(
@@ -1623,8 +1718,8 @@ compiler_signature(
     src  = "split.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Mach_cmi",
         ":Cmm_cmi",
+        ":Mach_cmi",
     ],
 )
 
@@ -1636,6 +1731,10 @@ compiler_module(
     deps   = [
         "//lambda:Debuginfo",
         "//middle_end:Backend_var",
+        ":Arch",
+        ":Cmm",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Char",
         "//stdlib:Stdlib.Int",
         "//stdlib:Stdlib.List",
@@ -1644,9 +1743,7 @@ compiler_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.String",
-        ":Arch",
-        ":Cmm",
-    ],
+    ]
 )
 
 compiler_signature(
@@ -1654,9 +1751,9 @@ compiler_signature(
     src  = "strmatch.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Cmm_cmi",
-        "//parsing:Asttypes_cmi",
         "//lambda:Debuginfo_cmi",
+        "//parsing:Asttypes_cmi",
+        ":Cmm_cmi",
     ],
 )
 
@@ -1673,6 +1770,8 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         ":X86_proc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Int64",
     ],
     visibility = ["//asmcomp:__subpackages__"]
@@ -1693,14 +1792,16 @@ compiler_module(
     sig    = "X86_gas_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":X86_proc",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
         "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int",
+        ":X86_proc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1710,9 +1811,11 @@ compiler_signature(
     src  = "x86_gas.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib_cmi",
         ":X86_ast_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib_cmi",
+    ]
 )
 
 compiler_module(
@@ -1722,6 +1825,8 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         ":X86_proc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Int64",
@@ -1735,9 +1840,11 @@ compiler_signature(
     src  = "x86_masm.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib_cmi",
         ":X86_ast_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib_cmi",
+    ]
 )
 
 compiler_module(
@@ -1747,16 +1854,18 @@ compiler_module(
     opts = MODULE_OPTS,
     warnings = [w.NAME_OUT_OF_SCOPE],
     deps   = [
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
         "//config:Config",
-        "//utils:Clflags",
-        "//stdlib:Stdlib.Char",
         "//utils:Ccomp",
+        "//utils:Clflags",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ],
     visibility = ["//asmcomp:__subpackages__"]
 )
@@ -1767,8 +1876,10 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":X86_ast_cmi",
-        "//stdlib:Stdlib.Buffer_cmi",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Buffer_cmi",
+    ]
 )
 
 ################################################################
@@ -1784,8 +1895,9 @@ compiler_signature(
 # compilerlibs/ocamloptcomp.cma: $(OPTCOMP_CMI) $(OPTCOMP)
 # 	$(CAMLC) -a -o $@ $(OPTCOMP)
 
-boot_library(
+# boot_library(
 #boot_archive(
+compiler_library(
     name    = "ocamloptcomp",
     visibility = [
         "//visibility:public",

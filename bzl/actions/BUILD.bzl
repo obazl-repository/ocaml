@@ -125,15 +125,18 @@ def progress_msg(workdir, ctx):
     if cmode == "fastbuild": cmode = "fb"
 
     protocol = ctx.attr._protocol[BuildSettingInfo].value
-    if protocol == "boot":
+    if protocol == "std":
         lbrack = "<"
         rbrack = ">"
-    elif protocol == "baseline":
+    elif protocol == "boot":
+        lbrack = "<<"
+        rbrack = ">>"
+    elif protocol == "test":
         lbrack = "["
         rbrack = "]"
-    elif protocol == "test":
-        lbrack = "{"
-        rbrack = "}"
+    elif protocol == "tool":
+        lbrack = "("
+        rbrack = ")"
     else:
         lbrack = "??"
         rbrack = "??"
