@@ -15,7 +15,7 @@ load("//bzl:rules.bzl",
 #      "ROOT_SIG_OPTS"
 #      )
 
-load("//stdlib:BUILD.bzl", "STDLIB_MODULE_NAMES")
+load("//stdlib:BUILD_STDLIB.bzl", "STDLIB_MODULE_NAMES")
 
 MODULE_OPTS = [] #ROOT_MODULE_OPTS
 SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
@@ -197,18 +197,20 @@ compiler_module(
     struct = "expunge.ml",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Sys",
+        "//bytecomp:Bytesections",
         "//bytecomp:Symtable",
         "//lambda:Runtimedef",
-        "//stdlib:Stdlib.Printexc",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
         "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Digest",
-        "//bytecomp:Bytesections",
-        "//stdlib:Stdlib.Array",
+        "//utils:Misc",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Sys",
+    ]
     visibility = ["//utils:__pkg__"]
 )
 
@@ -218,30 +220,32 @@ compiler_module(
     sig    = "Genprintval_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//typing:Types",
-        "//parsing:Syntaxerr",
-        "//typing:Printtyp",
-        "//stdlib:Stdlib.Printexc",
-        "//typing:Predef",
-        "//typing:Path",
-        "//parsing:Parse",
-        "//typing:Outcometree_cmi",
-        "//typing:Oprint",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//parsing:Longident",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
         "//parsing:Lexer",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//typing:Env",
-        "//typing:Datarepr",
-        "//typing:Ctype",
-        "//stdlib:Stdlib.Bytes",
+        "//parsing:Longident",
+        "//parsing:Parse",
+        "//parsing:Syntaxerr",
         "//typing:Btype",
+        "//typing:Ctype",
+        "//typing:Datarepr",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Oprint",
+        "//typing:Outcometree_cmi",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Printtyp",
+        "//typing:Types",
+        "//utils:Misc",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+    ]
     visibility = ["//debugger:__pkg__"]
 )
 
@@ -250,11 +254,13 @@ compiler_signature(
     src  = "genprintval.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Types",
-        "//typing:Path",
-        "//typing:Outcometree_cmi",
-        "//stdlib:Stdlib.Format",
         "//typing:Env",
+        "//typing:Outcometree_cmi",
+        "//typing:Path",
+        "//typing:Types",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -265,15 +271,30 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         "//bytecomp:Dll",
+        "//config:Config",
         "//driver:Compenv",
         "//driver:Compmisc",
-        "//parsing:Lexer",
+        "//driver:Pparse",
         "//parsing:Ast_helper",
+        "//parsing:Lexer",
         "//parsing:Location",
         "//parsing:Longident",
         "//parsing:Parse",
         "//parsing:Parsetree_cmi",
         "//parsing:Pprintast",
+        "//parsing:Printast",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Oprint",
+        "//typing:Outcometree_cmi",
+        "//typing:Path",
+        "//typing:Predef",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        ":Genprintval",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Buffer",
         "//stdlib:Stdlib.Bytes",
@@ -285,23 +306,7 @@ compiler_module(
         "//stdlib:Stdlib.Obj",
         "//stdlib:Stdlib.Printexc",
         "//stdlib:Stdlib.String",
-        "//typing:Env",
-        "//typing:Ident",
-        "//typing:Oprint",
-        "//typing:Outcometree_cmi",
-        "//typing:Path",
-        "//typing:Predef",
-        "//utils:Clflags",
-        "//config:Config",
-        "//utils:Load_path",
-        "//utils:Misc",
-        ":Genprintval",
-        "//driver:Pparse",
-        "//parsing:Printast",
-        ##"//otherlibs/str:Str",
-        #### (Mb)
-        #### (Mod)
-    ],
+    ]
     visibility = ["//toplevel/byte:__pkg__"]
 )
 
@@ -313,11 +318,6 @@ compiler_signature(
         "//parsing:Location_cmi",
         "//parsing:Longident_cmi",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Buffer_cmi",
-        "//stdlib:Stdlib.Format_cmi",
-        "//stdlib:Stdlib.Hashtbl_cmi",
-        "//stdlib:Stdlib.Lexing_cmi",
-        "//stdlib:Stdlib.Obj_cmi",
         "//typing:Env_cmi",
         "//typing:Ident_cmi",
         "//typing:Outcometree_cmi",
@@ -326,6 +326,13 @@ compiler_signature(
         "//typing:Types_cmi",
         "//utils:Warnings_cmi",
         ":Genprintval_cmi",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Buffer_cmi",
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
     ]
 )
 
@@ -335,39 +342,41 @@ compiler_module(
     sig    = "Topdirs_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Toploop",
-        ":Topeval",
-        ":Topprinters",
-        "//utils:Warnings",
-        "//typing:Types",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//typing:Printtyp",
-        "//typing:Predef",
-        "//typing:Path",
-        "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Env",
         "//bytecomp:Dll",
-        "//typing:Ctype",
         "//config:Config",
         "//driver:Compenv",
-        "//utils:Clflags",
-        "//typing:Btype",
-        "//parsing:Asttypes_cmi",
         "//parsing:Ast_helper",
-        "//stdlib:Stdlib.Arg",
+        "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//typing:Btype",
+        "//typing:Ctype",
+        "//typing:Env",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Printtyp",
+        "//typing:Types",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Topeval",
+        ":Toploop",
+        ":Topprinters",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ]
     visibility = ["//toplevel/byte:__pkg__"]
 )
 
@@ -377,6 +386,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Longident",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Format",
     ]
 )
@@ -398,6 +409,7 @@ compiler_module(
         "//bytecomp:Opcodes",
         "//bytecomp:Printinstr",
         "//bytecomp:Symtable",
+        "//config:Config",
         "//driver:Compmisc",
         "//file_formats:Cmo_format_cmi",
         "//lambda:Printlambda",
@@ -406,14 +418,6 @@ compiler_module(
         "//parsing:Asttypes_cmi",
         "//parsing:Location",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Fun",
-        "//stdlib:Stdlib.Gc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Obj",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Sys",
         "//toplevel:Topcommon",
         "//typing:Env",
         "//typing:Ident",
@@ -428,12 +432,20 @@ compiler_module(
         "//typing:Typemod",
         "//typing:Types",
         "//utils:Clflags",
-        "//config:Config",
         "//utils:Load_path",
         "//utils:Misc",
         "//utils:Warnings",
-        #### (LongString)
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Sys",
+    ]
     visibility = ["//toplevel:__pkg__"]
 )
 
@@ -442,11 +454,13 @@ compiler_signature(
     src  = "topeval.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Topcommon",
         "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Obj",
-        "//stdlib:Stdlib.Format",
+        ":Topcommon",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Obj",
+    ]
     visibility = ["//toplevel:__subpackages__"]
 )
 
@@ -456,29 +470,31 @@ compiler_module(
     sig    = "Toploop_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Topeval_cmi",
-        ":Topcommon",
-        "//utils:Warnings",
-        "//typing:Typetexp",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//parsing:Lexer",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Env",
         "//config:Config",
-        "//driver:Compmisc",
         "//driver:Compenv",
-        "//utils:Clflags",
-        "//stdlib:Stdlib.Buffer",
+        "//driver:Compmisc",
+        "//parsing:Lexer",
+        "//parsing:Location",
         "//typing:Btype",
+        "//typing:Env",
+        "//typing:Typetexp",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        "//utils:Misc",
+        "//utils:Warnings",
+        ":Topcommon",
+        ":Topeval_cmi",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+    ]
     visibility = [
         "//tools:__pkg__",
         "//toplevel/byte:__pkg__",
@@ -491,18 +507,20 @@ compiler_signature(
     src  = "toploop.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//utils:Warnings_cmi",
-        "//typing:Types_cmi",
-        "//typing:Path_cmi",
-        "//parsing:Parsetree_cmi",
-        "//typing:Outcometree_cmi",
-        "//stdlib:Stdlib.Obj_cmi",
-        "//parsing:Longident_cmi",
         "//parsing:Location_cmi",
-        "//stdlib:Stdlib.Lexing_cmi",
-        "//stdlib:Stdlib.Hashtbl_cmi",
-        "//stdlib:Stdlib.Format_cmi",
+        "//parsing:Longident_cmi",
+        "//parsing:Parsetree_cmi",
         "//typing:Env_cmi",
+        "//typing:Outcometree_cmi",
+        "//typing:Path_cmi",
+        "//typing:Types_cmi",
+        "//utils:Warnings_cmi",
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Hashtbl_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
     ]
 )
 
@@ -516,32 +534,34 @@ compiler_module(
     sig    = ":Topmain_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Trace",
-        ":Topeval",
-        "//toplevel:Toploop",
-        "//toplevel:Topdirs",
-        "//toplevel:Topcommon",
-        "//typing:Types",
-        "//stdlib:Stdlib.Sys",
-        "//typing:Printtyp",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Printexc",
-        "//typing:Path",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
+        "//driver:Compenv",
+        "//driver:Compmisc",
         "//driver:Main_args",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Env",
+        "//toplevel:Topcommon",
+        "//toplevel:Topdirs",
+        "//toplevel:Toploop",
         "//typing:Ctype",
-        "//driver:Compmisc",
-        "//driver:Compenv",
+        "//typing:Env",
+        "//typing:Path",
+        "//typing:Printtyp",
+        "//typing:Types",
         "//utils:Clflags",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Arg",
+        "//utils:Misc",
+        ":Topeval",
+        ":Trace",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+    ]
     visibility = ["//toplevel:__pkg__"]
 )
 
@@ -549,8 +569,7 @@ compiler_signature(
     name = "Topmain_cmi",
     src  = "topmain.mli",
     opts = SIG_OPTS, # + ["-nopervasives"],
-    deps   = ["//stdlib:Stdlib"],
-    # visibility = ["//toplevel:__subpackages__"]
+    stdlib_deps   = ["//stdlib:Stdlib"],
 )
 
 compiler_module(
@@ -567,19 +586,18 @@ compiler_signature(
     src  = "topprinters.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib",
         "//typing:Types"
     ],
-    # visibility = ["//toplevel:__subpackages__"]
+    stdlib_deps =[
+        "//stdlib:Stdlib",
+    ]
 )
 
 compiler_module(
     name   = "Topstart",
     struct = "topstart.ml",
     opts = MODULE_OPTS,
-    deps   = [
-        ":Topmain",
-    ]
+    deps   = [":Topmain"]
 )
 
 compiler_module(
@@ -592,20 +610,22 @@ compiler_module(
     sig    = ":Trace_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Topeval",
-        "//toplevel:Topcommon", ## (Toplevel Topcommon)
-        "//typing:Types",
-        "//typing:Printtyp",
-        "//typing:Predef",
-        "//typing:Path",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
         "//bytecomp:Meta",
-        "//parsing:Longident",
-        "//stdlib:Stdlib.Format",
-        "//typing:Ctype",
         "//parsing:Asttypes_cmi",
+        "//parsing:Longident",
+        "//toplevel:Topcommon", ## (Toplevel Topcommon)
+        "//typing:Ctype",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Printtyp",
+        "//typing:Types",
+        "//utils:Misc",
+        ":Topeval",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Obj",
+    ]
     visibility = ["//toplevel:__pkg__"]
 )
 
@@ -614,13 +634,15 @@ compiler_signature(
     src  = "trace.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Types",
-        "//typing:Path",
-        "//stdlib:Stdlib.Obj",
         "//parsing:Longident",
-        "//stdlib:Stdlib.Format",
         "//typing:Env",
+        "//typing:Path",
+        "//typing:Types",
     ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Obj",
+    ]
     visibility = ["//toplevel:__subpackages__"]
 )
 
