@@ -94,33 +94,36 @@ def expect_test_impl(ctx):
 
     cmd = "\n".join([
         # "{pgm} > ${{TEST_TMPDIR}}/{stdout};".format(
-        "set -x;",
-        "echo PWD: $PWD",
-        "echo OCAMLRUN: {};".format(ocamlrun_path),
+        # "#!/bin/bash",
+        # "set -x;",
+        # "echo PWD: $PWD",
+        # "echo OCAMLRUN: {};".format(ocamlrun_path),
 
-        "{ocamlrun} {pgm}".format(
-            ocamlrun = ocamlrun_path,
-            pgm = pgm.short_path),
+        # "{ocamlrun} {pgm}".format(
+        #     ocamlrun = ocamlrun_path,
+        #     pgm = pgm.short_path),
 
         # "echo `\"{pgm}\"`".format(pgm = pgm_cmd),
 
-        # "\"{pgm} > ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout}\";".format(
-        #     pgm=pgm_cmd,
-        #     stdout = stdout
-        # ),
+        "{ocamlrun} {pgm} {redir} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(
+            ocamlrun = ocamlrun_path,
+            redir = ">",
+            pgm      = pgm.short_path,
+            stdout = stdout
+        ),
 
-        # "echo STDOUT: `cat {}`".format(stdout),
-        # "diff -w {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
-        #     src = ctx.file.expected.path,
-        #     dst = stdout
-        # ),
-        # "if [ $? -eq 0 ]",
-        # "then",
-        # "    echo PASS",
-        # "else",
-        # "    echo FAIL",
-        # "    exit 1",
-        # "fi",
+        "diff -w {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
+            src = ctx.file.expected.path,
+            dst = stdout
+        ),
+
+        "if [ $? -eq 0 ]",
+        "then",
+        "    echo PASS",
+        "else",
+        "    echo FAIL",
+        "    exit 1",
+        "fi",
 
         # "cp -v ${{TEST_TMPDIR}}/{stdout} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(stdout=stdout),
         # "echo SH: %s" % runner.path,
