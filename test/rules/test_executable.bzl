@@ -147,26 +147,31 @@ sv_test_executable = rule(
 def test_executable(name, main,
                     **kwargs):
 
+    if main.startswith(":"):
+        main = main[1:]
+    else:
+        main = main
+
     vv_test_executable(
-        name    = name + ".vv.byte",
+        name    = "__" + main + ".vv.byte",
         main    = main,
         **kwargs
     )
 
     native.sh_binary(
-        name = name + ".vv.byte.sh",
+        name = main + ".vv.byte",
         srcs = ["//test/rules:test_executable.sh"],
         env  = select({
             "//test:verbose?": {"VERBOSE": "true"},
             "//conditions:default": {"VERBOSE": "false"}
         }),
         args = ["$(rootpath //runtime:ocamlrun)",
-                "$(rootpath :{}.vv.byte)".format(name),
+                "$(rootpath :__{}.vv.byte)".format(name),
                 # "$(rlocationpath //stdlib:stdlib)"
                 ],
         data = [
             "//runtime:ocamlrun",
-            ":{}.vv.byte".format(name),
+            ":__{}.vv.byte".format(name),
             # "//stdlib",
             # "//stdlib:Std_exit",
             # "//config/camlheaders",
@@ -178,20 +183,44 @@ def test_executable(name, main,
     )
 
     vs_test_executable(
-        name    = name + ".vs.opt",
+        name    = main + ".vs.opt",
         main    = main,
         **kwargs
     )
 
     ss_test_executable(
-        name    = name + ".ss.opt",
+        name    = main + ".ss.opt",
         main    = main,
         **kwargs
     )
 
-    # sv_test_executable(
-    #     name    = name + ".sv.byte",
-    #     main    = main,
-    #     **kwargs
-    # )
+    sv_test_executable(
+        name    = "__" + main + ".sv.byte",
+        main    = main,
+        **kwargs
+    )
+
+    native.sh_binary(
+        name = main + ".sv.byte",
+        srcs = ["//test/rules:test_executable.sh"],
+        env  = select({
+            "//test:verbose?": {"VERBOSE": "true"},
+            "//conditions:default": {"VERBOSE": "false"}
+        }),
+        args = ["$(rootpath //runtime:ocamlrun)",
+                "$(rootpath :__{}.sv.byte)".format(name),
+                # "$(rlocationpath //stdlib:stdlib)"
+                ],
+        data = [
+            "//runtime:ocamlrun",
+            ":__{}.sv.byte".format(name),
+            # "//stdlib",
+            # "//stdlib:Std_exit",
+            # "//config/camlheaders",
+        ],
+        deps = [
+            # for the runfiles lib used in ocamlc.sh:
+            "@bazel_tools//tools/bash/runfiles"
+        ]
+    )
 

@@ -70,32 +70,9 @@ test_suite(
 ## expect_ss_test, expect_sv_test
 expect_test(
     name    = "arrays_test",
+    test_module = ":Arrays",
     stdout  = "arrays.stdout",
     expected = "arrays.reference",
-    # prologue = [
-    #     ## FIXME: these are all deps of :Arrays;
-    #     ## they should be added automatically.
-    #     "//stdlib:primitives",
-    #     "//stdlib:Stdlib",
-    #     "//stdlib:Stdlib.Array",
-    #     "//stdlib:Stdlib.Buffer",
-    #     "//stdlib:Stdlib.Bytes",
-    #     "//stdlib:Stdlib.Char",
-    #     "//stdlib:Stdlib.Gc",
-    #     "//stdlib:Stdlib.Atomic",
-    #     "//stdlib:Stdlib.Int",
-    #     "//stdlib:Stdlib.List",
-    #     "//stdlib:Stdlib.Map",
-    #     "//stdlib:Stdlib.Obj",
-    #     "//stdlib:Stdlib.Sys",
-    #     "//stdlib:Stdlib.Printf",
-    #     "//stdlib:Stdlib.Seq",
-    #     "//stdlib:Stdlib.Lazy",
-    #     "//stdlib:Stdlib.String",
-    #     "//stdlib:Stdlib.Uchar",
-    # ],
-    test_executable = ":arrays",
-    timeout = "short",
 )
 
 ## test_executable expands to <x>_test_executable and sh_binary
@@ -108,10 +85,10 @@ expect_test(
 
 ## NB: the arrays test emits nothing to stdout, so we demonstrate the
 ## expansion below, for bigints.ml, which does write to stdout.
-test_executable(
-    name    = "arrays.vv.byte",
-    main    = ":Arrays",
-)
+# test_executable(
+#     name    = "arrays",
+#     main    = ":Arrays",
+# )
 
 test_module(
     name   = "Arrays",
@@ -158,7 +135,7 @@ expect_vv_test(
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
     timeout  = "short",
-    tags     = ["vv"],
+    tags     = ["vv", "vvss"],
 )
 
 expect_vs_test(
@@ -176,7 +153,7 @@ expect_ss_test(
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
     timeout  = "short",
-    tags     = ["ss"],
+    tags     = ["ss", "vvss"],
 )
 
 expect_sv_test(
@@ -255,16 +232,16 @@ test_module(
 
 ############
 expect_test(
-    name    = "boxedints_test",
-    stdout  = "boxedints.stdout",
-    expected = "boxedints.reference",
-    test_executable    = ":Boxedints",
+    name        = "boxedints_test",
+    test_module = ":Boxedints",
+    stdout      = "boxedints.stdout",
+    expected    = "boxedints.reference",
 )
 
-test_executable(
-    name    = "boxedints",
-    main    = ":Boxedints",
-)
+# test_executable(
+#     name    = "boxedints",
+#     main    = ":Boxedints",
+# )
 
 test_module(
     name   = "Boxedints",
@@ -300,9 +277,9 @@ test_module( # not a test, used by unit_naming_test
 ############
 expect_test(
     name    = "constprop_test",
+    test_module    = ":Constprop",
     stdout  = "constprop.stdout",
     expected = "constprop.ml.reference",
-    test_executable    = ":Constprop",
 )
 
 test_module(
@@ -310,7 +287,7 @@ test_module(
     struct = "constprop.ml.c",
     opts   = ["-pp", "cpp"],
     open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.Int64",
@@ -324,17 +301,17 @@ test_module(
 
 ############
 expect_test(
-    name     = "divint_test",
-    stdout   = "divint.stdout",
-    expected = "divint.reference",
-    test_executable     = ":Divint",
+    name        = "divint_test",
+    test_module = ":Divint",
+    stdout      = "divint.stdout",
+    expected    = "divint.reference",
 )
 
 test_module(
-    name   = "Divint",
-    struct = "divint.ml",
-    open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    name        = "Divint",
+    struct      = "divint.ml",
+    open        = ["//stdlib:Stdlib"],
+    stdlib_deps = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.List",
@@ -345,22 +322,17 @@ test_module(
 
 ############
 expect_test(
-    name    = "equality_test",
-    stdout  = "equality.stdout",
-    expected = "equality.reference",
-    test_executable    = ":Equality",
-)
-
-test_executable(
-    name    = "equality",
-    main    = ":Equality",
+    name        = "equality_test",
+    test_module = ":Equality",
+    stdout      = "equality.stdout",
+    expected    = "equality.reference",
 )
 
 test_module(
-    name   = "Equality",
-    struct = "equality.ml",
-    open   = ["//stdlib:Stdlib"],
-    stdlib_deps   = select({
+    name        = "Equality",
+    struct      = "equality.ml",
+    open        = ["//stdlib:Stdlib"],
+    stdlib_deps = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Fun"]
     })
@@ -371,13 +343,13 @@ expect_test(
     name    = "eval_order_1_test",
     stdout  = "eval_order_1.stdout",
     expected = "eval_order_1.reference",
-    test_executable    = ":Eval_order_1",
+    test_module    = ":Eval_order_1",
 )
 
 test_module(
     name   = "Eval_order_1",
     struct = "eval_order_1.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Printf"]
     })
@@ -388,13 +360,13 @@ expect_test(
     name    = "eval_order_2_test",
     stdout  = "eval_order_2.stdout",
     expected = "eval_order_2.reference",
-    test_executable    = ":Eval_order_2",
+    test_module    = ":Eval_order_2",
 )
 
 test_module(
     name   = "Eval_order_2",
     struct = "eval_order_2.ml",
-    deps   = ["//stdlib:Primitives"]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 ############
@@ -402,14 +374,14 @@ expect_test(
     name    = "eval_order_3_test",
     stdout  = "eval_order_3.stdout",
     expected = "eval_order_3.reference",
-    test_executable    = ":Eval_order_3",
+    test_module    = ":Eval_order_3",
 )
 
 test_module(
     name   = "Eval_order_3",
     struct = "eval_order_3.ml",
     open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Printf"]
     })
@@ -420,13 +392,13 @@ expect_test(
     name    = "eval_order_4_test",
     stdout  = "eval_order_4.stdout",
     expected = "eval_order_4.reference",
-    test_executable    = ":Eval_order_4",
+    test_module    = ":Eval_order_4",
 )
 
 test_module(
     name   = "Eval_order_4",
     struct = "eval_order_4.ml",
-    deps   = ["//stdlib:Primitives"]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 ############
@@ -434,14 +406,14 @@ expect_test(
     name    = "eval_order_6_test",
     stdout  = "eval_order_6.stdout",
     expected = "eval_order_6.reference",
-    test_executable    = ":Eval_order_6",
+    test_module    = ":Eval_order_6",
 )
 
 test_module(
     name   = "Eval_order_6",
     struct = "eval_order_6.ml",
     open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Int"]
     })
@@ -452,13 +424,13 @@ expect_test(
     name    = "eval_order_7_test",
     stdout  = "eval_order_7.stdout",
     expected = "eval_order_7.reference",
-    test_executable    = ":Eval_order_7",
+    test_module    = ":Eval_order_7",
 )
 
 test_module(
     name   = "Eval_order_7",
     struct = "eval_order_7.ml",
-    deps   = ["//stdlib:Primitives"],
+    stdlib_deps   = ["//stdlib:Primitives"],
     open   = ["//stdlib:Stdlib"],
 )
 
@@ -467,12 +439,12 @@ expect_test(
     name    = "eval_order_pr10283_test",
     stdout  = "eval_order_pr10283.stdout",
     expected = "eval_order_pr10283.reference",
-    test_executable    = ":Eval_order_pr10283",
+    test_module    = ":Eval_order_pr10283",
 )
 test_module(
     name   = "Eval_order_pr10283",
     struct = "eval_order_pr10283.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Printf"]
     })
@@ -483,14 +455,14 @@ expect_test(
     name    = "float_test",
     stdout  = "float.stdout",
     expected = "float.reference",
-    test_executable    = ":Float",
+    test_module    = ":Float",
 )
 
 test_module(
     name   = "Float",
     struct = "float.ml",
     open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Printf"]
     })
@@ -501,13 +473,13 @@ expect_test(
     name    = "float_physical_equality_test",
     stdout  = "float_physical_equality.stdout",
     expected = "float_physical_equality.reference",
-    test_executable    = ":Float_physical_equality",
+    test_module    = ":Float_physical_equality",
 )
 
 test_module(
     name   = "Float_physical_equality",
     struct = "float_physical_equality.ml",
-    deps   = ["//stdlib:Primitives"]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 ############
@@ -515,14 +487,14 @@ expect_test(
     name    = "includestruct_test",
     stdout  = "includestruct.stdout",
     expected = "includestruct.reference",
-    test_executable    = ":Includestruct",
+    test_module    = ":Includestruct",
 )
 
 test_module(
     name   = "Includestruct",
     struct = "includestruct.ml",
     open   = ["//stdlib:Stdlib"],
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:CamlinternalOO",
@@ -537,13 +509,13 @@ expect_test(
     name    = "localexn_test",
     stdout  = "localexn.stdout",
     expected = "localexn.reference",
-    test_executable    = ":Localexn",
+    test_module    = ":Localexn",
 )
 
 test_module(
     name   = "Localexn",
     struct = "localexn.ml",
-    deps   = ["//stdlib:Primitives"]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 ############
@@ -551,13 +523,13 @@ expect_test(
     name    = "localfunction_test",
     stdout  = "localfunction.stdout",
     expected = "localfunction.reference",
-    test_executable    = ":Localfunction",
+    test_module    = ":Localfunction",
 )
 
 test_module(
     name   = "Localfunction",
     struct = "localfunction.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Gc"]
     })
@@ -568,13 +540,13 @@ expect_test(
     name    = "maps_test",
     stdout  = "maps.stdout",
     expected = "maps.reference",
-    test_executable    = ":Maps",
+    test_module    = ":Maps",
 )
 
 test_module(
     name   = "Maps",
     struct = "maps.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.Map",
@@ -585,16 +557,16 @@ test_module(
 
 ############
 expect_test(
-    name    = "min_int_test",
-    stdout  = "min_int.stdout",
-    expected = "min_int.reference",
-    test_executable    = ":Min_int",
+    name        = "min_int_test",
+    test_module = ":Min_int",
+    stdout      = "min_int.stdout",
+    expected    = "min_int.reference",
 )
 
 test_module(
-    name   = "Min_int",
-    struct = "min_int.ml",
-    deps   = select({
+    name        = "Min_int",
+    struct      = "min_int.ml",
+    stdlib_deps = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Int"]
     })
@@ -605,13 +577,13 @@ expect_test(
     name    = "opt_variants_test",
     stdout  = "opt_variants.stdout",
     expected = "opt_variants.reference",
-    test_executable    = ":Opt_variants",
+    test_module    = ":Opt_variants",
 )
 
 test_module(
     name   = "Opt_variants",
     struct = "opt_variants.ml",
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.List",
@@ -630,13 +602,13 @@ expect_test(
     name    = "patmatch_test",
     stdout  = "patmatch.stdout",
     expected = "patmatch.reference",
-    test_executable    = ":Patmatch",
+    test_module    = ":Patmatch",
 )
 
 test_module(
     name   = "Patmatch",
     struct = "patmatch.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.List",
@@ -677,13 +649,13 @@ expect_test(
     name    = "pr7253_test",
     stdout  = "pr7253.stdout",
     expected = "pr7253.reference",
-    test_executable    = ":Pr7253",
+    test_module    = ":Pr7253",
 )
 
 test_module(
     name   = "Pr7253",
     struct = "pr7253.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.Printexc",
@@ -696,13 +668,13 @@ expect_test(
     name    = "pr7533_test",
     stdout  = "pr7533.stdout",
     expected = "pr7533.reference",
-    test_executable    = ":Pr7533",
+    test_module    = ":Pr7533",
 )
 
 test_module(
     name   = "Pr7533",
     struct = "pr7533.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.List",
@@ -716,18 +688,18 @@ expect_test(
     name    = "pr7657_test",
     stdout  = "pr7657.stdout",
     expected = "pr7657.reference",
-    test_executable    = ":Pr7657",
+    test_module    = ":Pr7657",
 )
 
 test_module(
     name   = "Pr7657",
     struct = "pr7657.ml",
-    # deps    = ["//stdlib:Primitives"]
+    # stdlib_deps    = ["//stdlib:Primitives"]
     opts   = [
         "-no-strict-sequence",
         # "-w", "-21-5"
     ],
-    deps  =["//stdlib:Primitives"]
+    stdlib_deps  =["//stdlib:Primitives"]
 )
 
 ############
@@ -735,13 +707,13 @@ expect_test(
     name    = "recvalues_test",
     stdout  = "recvalues.stdout",
     expected = "recvalues.reference",
-    test_executable    = ":Recvalues",
+    test_module    = ":Recvalues",
 )
 
 test_module(
     name   = "Recvalues",
     struct = "recvalues.ml",
-    deps   = select({
+    stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.Gc",
@@ -755,13 +727,13 @@ expect_test(
     name    = "sets_test",
     stdout  = "sets.stdout",
     expected = "sets.reference",
-    test_executable    = ":Sets",
+    test_module    = ":Sets",
 )
 
 test_module(
     name   = "Sets",
     struct = "sets.ml",
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.Printf",
     ]
@@ -772,13 +744,13 @@ expect_test(
     name    = "stringmatch_test",
     stdout  = "stringmatch.stdout",
     expected = "stringmatch.reference",
-    test_executable    = ":Stringmatch",
+    test_module    = ":Stringmatch",
 )
 
 test_module(
     name   = "Stringmatch",
     struct = "stringmatch.ml",
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.String",
 
     ]
@@ -789,13 +761,13 @@ expect_test(
     name    = "switch_opts_test",
     stdout  = "switch_opts.stdout",
     expected = "switch_opts.reference",
-    test_executable    = ":Switch_opts",
+    test_module    = ":Switch_opts",
 )
 
 test_module(
     name   = "Switch_opts",
     struct = "switch_opts.ml",
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
     ]
@@ -806,31 +778,31 @@ expect_test(
     name    = "tailcalls_test",
     stdout  = "tailcalls.stdout",
     expected = "tailcalls.reference",
-    test_executable    = ":Tailcalls",
+    test_module    = ":Tailcalls",
 )
 
 test_module(
     name   = "Tailcalls",
     struct = "tailcalls.ml",
-    deps   = ["//stdlib:Primitives"]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 ############
 expect_test(
     name    = "trigraph_test",
+    test_module = ":Trigraph",
     stdout  = "trigraph.stdout",
     expected = "trigraph.reference",
-    test_executable = ":trigraph",
 )
 
-test_executable(
-    name    = "trigraph",
-    # prologue = select({
-    #     "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-    #     "//conditions:default": []
-    # }),
-    main    = ":Trigraph",
-)
+# test_module(
+#     name    = "trigraph",
+#     # prologue = select({
+#     #     "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+#     #     "//conditions:default": []
+#     # }),
+#     main    = ":Trigraph",
+# )
 
 test_module(
     name   = "Trigraph",
@@ -838,7 +810,7 @@ test_module(
     # if --//config/ocaml/compiler/libs:archived? is set, then use
     # _stdlib and ignore these:
     stdlib_deps = ["//stdlib:Stdlib"],
-    # deps   = select({
+    # stdlib_deps   = select({
     #     "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
     #     "//conditions:default": ["//stdlib:Primitives"]
     # })
@@ -849,7 +821,7 @@ expect_test(
     name    = "tuple_match_test",
     stdout  = "tuple_match.stdout",
     expected = "tuple_match.reference",
-    test_executable    = ":Tuple_match",
+    test_module    = ":Tuple_match",
     # prologue = ["//stdlib:Primitives"],
     opts = ["-open", "Stdlib"]
 )
@@ -858,7 +830,7 @@ test_module(
     name   = "Tuple_match",
     struct = "tuple_match.ml",
     opts   = ["-open", "Stdlib"],
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.Gc",
         "//stdlib:Stdlib.Printf"
@@ -870,7 +842,7 @@ compile_fail_test(
     name   = "unit_naming_test",
     struct = "unit_naming.ml",
     expected = "unit_naming.compilers.reference",
-    deps   = [
+    stdlib_deps   = [
         ":CamlCase"
     ],
 )
@@ -880,13 +852,13 @@ expect_test(
     name    = "zero_divided_by_n_test",
     stdout  = "zero_divided_by_n.stdout",
     expected = "zero_divided_by_n.reference",
-    test_executable    = ":Zero_divided_by_n",
+    test_module    = ":Zero_divided_by_n",
 )
 
 test_module(
     name   = "Zero_divided_by_n",
     struct = "zero_divided_by_n.ml",
     opts   = ["-nopervasives"],
-    deps   = ["//stdlib:Stdlib"],
+    stdlib_deps   = ["//stdlib:Stdlib"],
 )
 

@@ -73,6 +73,7 @@ ocaml_tool_vm(
 ################
 test_executable(
     name = "codegen",
+    main = ":Codegen_main",
     opts = ["-w", "+40", "-g"],
     prologue = [
         "//compilerlibs:ocamlcommon",
@@ -81,11 +82,10 @@ test_executable(
         ":Parsecmm",
         ":Lexcmm",
     ],
-    main = ":Codegen_main"
 )
 
 
-################################################################
+############
 test_module(
     name   = "Codegen_main",
     struct = "codegen_main.ml",
@@ -95,18 +95,21 @@ test_module(
         "//asmcomp:Emit",
         "//asmcomp:Emitaux",
         "//middle_end:Compilenv",
+        "//utils:Clflags",
+        ":Lexcmm",
+        ":Parsecmm"
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Format",
         "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Parsing",
         "//stdlib:Stdlib.Printf",
-        "//utils:Clflags",
-        ":Lexcmm",
-        ":Parsecmm"
     ]
 )
 
+################
 test_module(
     name   = "Expect_test",
     struct = "expect_test.ml",
@@ -117,9 +120,10 @@ test_module(
         "//driver:Main_args",
         "//parsing:Location",
         "//parsing:Printast",
+        # "//parsing:Parsetree_cmi",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.StdLabels",
-
-        "//parsing:Parsetree_cmi",
     ]
 )
 
@@ -128,8 +132,10 @@ test_module(
     struct = "lexcmm.ml",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Scanf",
         ":Parsecmm"
+    ],
+    stdlib_deps =[
+        "//stdlib:Stdlib.Scanf",
     ]
 )
 
@@ -143,8 +149,6 @@ test_signature(
     name = "Lexcmm_cmi",
     src  = "lexcmm.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ]
 )
 
 test_module(
@@ -156,7 +160,8 @@ test_module(
         "//lambda:Lambda",
         "//parsing:Location",
         ":Parsecmmaux"
-    ]
+    ],
+    stdlib_deps = ["//stdlib:Stdlib.Parsing"]
 )
 
 genrule(
@@ -185,6 +190,8 @@ test_module(
         "//lambda:Lambda",
         "//middle_end:Backend_var",
         "//parsing:Location",
+    ],
+    stdlib_deps =[
         "//stdlib:Stdlib.Hashtbl",
         "//stdlib:Stdlib.String"
     ]

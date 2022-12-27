@@ -7,6 +7,8 @@ load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
+load("test_executable.bzl", _test_executable = "test_executable")
+
 load(":test_transitions.bzl",
      "vv_test_in_transition",
      "vs_test_in_transition",
@@ -201,7 +203,7 @@ expect_sv_test = rule(
 ################################################################
 def expect_test(name,
                 stdout, expected,
-                test_executable,
+                test_module,
                 timeout = "short",
                 **kwargs):
 
@@ -210,31 +212,41 @@ def expect_test(name,
     else:
         stem = name
 
-    vv_name = stem + "_vv_test"
-    vs_name = stem + "_vs_test"
-    ss_name = stem + "_ss_test"
-    sv_name = stem + "_sv_test"
+    if test_module.startswith(":"):
+        executable = test_module[1:]
+    else:
+        executable = test_module
+
+    vv_name = executable + "_vv_test"
+    vs_name = executable + "_vs_test"
+    ss_name = executable + "_ss_test"
+    sv_name = executable + "_sv_test"
+
+    _test_executable(
+        name    = executable,
+        main    = executable
+    )
 
     native.test_suite(
         name  = stem + "_test",
-        tests = [vv_name, vs_name, ss_name] #, sv_name]
+        tests = [vv_name, vs_name, ss_name, sv_name]
     )
 
     expect_vv_test(
         name     = vv_name,
+        test_executable = "__" + executable + ".vv.byte",
         stdout   = stdout,
         expected = expected,
-        test_executable = test_executable,
         timeout  = timeout,
-        tags     = ["vv"],
+        tags     = ["vv", "vvss"],
         **kwargs
     )
 
     expect_vs_test(
         name     = vs_name,
+        test_executable = executable + ".vs.opt",
         stdout   = stdout,
         expected = expected,
-        test_executable = test_executable,
         timeout  = timeout,
         tags     = ["vs"],
         **kwargs
@@ -242,19 +254,19 @@ def expect_test(name,
 
     expect_ss_test(
         name     = ss_name,
+        test_executable = executable + ".ss.opt",
         stdout   = stdout,
         expected = expected,
-        test_executable = test_executable,
         timeout  = timeout,
-        tags     = ["ss"],
+        tags     = ["ss", "vvss"],
         **kwargs
     )
 
     expect_sv_test(
         name     = sv_name,
+        test_executable = "__" + executable + ".vv.byte",
         stdout   = stdout,
         expected = expected,
-        test_executable = test_executable,
         timeout  = timeout,
         tags     = ["ss"],
         **kwargs
