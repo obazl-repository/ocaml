@@ -140,6 +140,16 @@ test_module(
 # )
 
 ## expect_test macro expansion:
+test_suite(
+    name = "bigints_test",
+    tests = [
+        ":bigints_vv_test",
+        ":bigints_vs_test",
+        ":bigints_ss_test",
+        ":bigints_sv_test",
+    ]
+)
+
 expect_vv_test(
     name    = "bigints_vv_test",
     test_executable = ":__bigints.vv.byte",
