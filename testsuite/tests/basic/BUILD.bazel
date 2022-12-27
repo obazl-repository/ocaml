@@ -139,6 +139,8 @@ test_module(
 #     test_executable = ":Bigints",
 # )
 
+## to run tests selectively pass --test_tag_filters=...
+
 ## expect_test macro expansion:
 test_suite(
     name = "bigints_test",
@@ -155,6 +157,8 @@ expect_vv_test(
     test_executable = ":__bigints.vv.byte",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
+    timeout  = "short",
+    tags     = ["vv"],
 )
 
 expect_vs_test(
@@ -162,6 +166,8 @@ expect_vs_test(
     test_executable = ":bigints.vs.opt",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
+    timeout  = "short",
+    tags     = ["vs"],
 )
 
 expect_ss_test(
@@ -169,6 +175,8 @@ expect_ss_test(
     test_executable = ":bigints.ss.opt",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
+    timeout  = "short",
+    tags     = ["ss"],
 )
 
 expect_sv_test(
@@ -176,6 +184,8 @@ expect_sv_test(
     test_executable = ":__bigints.sv.byte",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
+    timeout  = "short",
+    tags     = ["sv"],
 )
 
 # test_executable(
