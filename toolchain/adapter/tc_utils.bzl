@@ -229,11 +229,26 @@ def tc_workdir(ctx):
     elif compiler.basename == "ocamlc.byte":
         cc = "vv"
     elif compiler.basename == "ocamlopt.byte":
-        cc = "vs"
+        if ctx.attr.flambda:
+            cc = "vS"
+        else:
+            cc = "vs"
+    elif compiler.basename == "ocamloptx.byte":
+        cc = "vS"
     elif compiler.basename == "ocamlopt.opt":
-        cc = "ss"
+        if ctx.attr.flambda:
+            cc = "SS"
+        else:
+            cc = "ss"
+    elif compiler.basename == "ocamloptx.optx":
+        cc = "SS"
     elif compiler.basename == "ocamlc.opt":
-        cc = "sv"
+        if ctx.attr.flambda:
+            cc = "Sv"
+        else:
+            cc = "sv"
+    elif compiler.basename == "ocamlc.optx":
+        cc = "Sv"
     else:
         fail("Bad compiler name: %s" % compiler.basename)
 

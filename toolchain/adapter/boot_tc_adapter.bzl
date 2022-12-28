@@ -162,6 +162,8 @@ def _boot_toolchain_adapter_impl(ctx):
 
         ## core tools
         compiler               = ctx.attr.compiler,
+        flambda                = ctx.attr.flambda,
+
         # cexecutable            = tc_executable(ctx, "compiler"),
         compiler_arg           = tc_tool_arg(ctx), #"compiler"),
 
@@ -226,6 +228,10 @@ boot_toolchain_adapter = rule(
             executable = True,
             cfg = "exec"
             # cfg = tc_boot_out_transition
+        ),
+
+        "flambda": attr.label(
+            default = "//config/ocaml/flambda:enabled"
         ),
 
         # "lexer": attr.label(

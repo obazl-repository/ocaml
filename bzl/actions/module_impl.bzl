@@ -69,9 +69,16 @@ def module_impl(ctx, module_name):
         print("tc.config_emitter: %s" % tc.config_emitter)
 
     compiler = tc.compiler[DefaultInfo].files_to_run.executable
-    if compiler.basename in ["ocamlc.byte", "ocamlc.opt", "ocamlc.boot"]:
+    # 'optx' - flambda-built
+    if compiler.basename in [
+        "ocamlc.byte", "ocamlc.opt", "ocamlc.boot",
+        "ocamlc.optx",
+    ]:
         ext = ".cmo"
-    elif compiler.basename in ["ocamlopt.opt", "ocamlopt.byte"]:
+    elif compiler.basename in [
+        "ocamlopt.opt", "ocamlopt.byte",
+        "ocamloptx.optx", "ocamloptx.byte"
+    ]:
         ext = ".cmx"
     else:
         fail("bad compiler basename: %s" % compiler.basename)

@@ -53,6 +53,8 @@ def _ocaml_tc_adapter_impl(ctx):
         tool_arg               = tc_tool_arg(ctx),
 
         compiler               = tc_compiler(ctx),
+        flambda                = ctx.attr.flambda,
+
         # lexer                  = ctx.attr.lexer,
         # cvt_emit               = ctx.file.cvt_emit,
 
@@ -148,6 +150,10 @@ ocaml_tc_adapter = rule(
             executable = True,
             # cfg = "exec"
             cfg = ocaml_tc_compiler_out_transition
+        ),
+
+        "flambda": attr.label(
+            default = "//config/ocaml/flambda:enabled"
         ),
 
         # "lexer": attr.label(

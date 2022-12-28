@@ -153,7 +153,10 @@ def executable_impl(ctx, tc, exe_name, workdir):
     cc_libdirs    = []
 
     # if tc.config_executor == "sys":  ## target_executor
-    if tc.compiler[DefaultInfo].files_to_run.executable.basename in ["ocamlopt.opt", "ocamlopt.byte"]:
+    if tc.compiler[DefaultInfo].files_to_run.executable.basename in [
+        "ocamlopt.opt", "ocamlopt.byte",
+        "ocamloptx.optx", "ocamloptx.byte"
+    ]:
 
         ## if target_executor(tc) == "sys"
 

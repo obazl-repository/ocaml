@@ -104,7 +104,12 @@ def _ocamlopt_byte_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    return executable_impl(ctx, tc, "ocamlopt.byte", tc.workdir)
+    if tc.flambda:
+        exe_name = "ocamloptx.byte"
+    else:
+        exe_name = "ocamlopt.byte"
+
+    return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 #####################
 ocamlopt_byte = rule(
@@ -134,7 +139,12 @@ def _ocamlopt_opt_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    return executable_impl(ctx, tc, "ocamlopt.opt", tc.workdir)
+    if tc.flambda:
+        exe_name = "ocamloptx.optx"
+    else:
+        exe_name = "ocamlopt.opt"
+
+    return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 #####################
 ocamlopt_opt = rule(
@@ -164,7 +174,12 @@ def _ocamlc_opt_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    return executable_impl(ctx, tc, "ocamlc.opt", tc.workdir)
+    if tc.flambda:
+        exe_name = "ocamlc.optx"
+    else:
+        exe_name = "ocamlc.opt"
+
+    return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 #####################
 ocamlc_opt = rule(
