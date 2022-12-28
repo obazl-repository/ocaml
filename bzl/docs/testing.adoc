@@ -3,6 +3,83 @@
 :toclevels: 3
 
 
+== quickstart
+
+=== running tests
+
+Test target names are constructed from filename stems normalized to
+module names; they always have suffix `_test`. For example, from
+`arrays.ml` we get `Arrays_test` (suite of all tests for that file),
+`Arrays_vv_test`, `Arrays_vs_test`, `Arrays_ss_test`,
+`Arrays_sv_test`.
+
+* Run all the tests for `testsuite/tests/basic`:
+
+  ** `$ bazel test testsuite/tests/basic:tests`
+
+* Run all the `ocamlc.byte` tests for `testsuite/tests/basic`:
+
+  ** `$ bazel test testsuite/tests/basic:tests --test_tag_filters=vv`
+
+* Run all the `ocamlc.byte` and `ocamlopt.opt` tests for `testsuite/tests/basic`:
+
+  ** `$ bazel test testsuite/tests/basic:tests --test_tag_filters=vv,ss`
+
+* Run the test suite for `testsuite/tests/basic/arrays.ml`:
+
+  ** `$ bazel test testsuite/tests/basic:Arrays_test`
+
+* Run the `ocamlc.byte` test for `testsuite/tests/basic/arrays.ml`:
+
+  ** `$ bazel test testsuite/tests/basic:Arrays_test --test_tag_filters=vv`
+  ** or: `$ bazel test testsuite/tests/basic:Arrays_vv_test`
+
+* Run the `ocamlc.byte` and `ocamlopt.opt` tests for
+  `testsuite/tests/basic/arrays.ml`:
+
+  ** `$ bazel test testsuite/tests/basic:Arrays_test --test_tag_filters=vv,ss`
+
+=== building and linking test executables
+
+The `arrays.ml` test emits nothing to stdout, so for the following we
+will use `boxedints.ml` instead, which does.
+
+* Compile `testsuite/tests/basic:boxedints.ml`
+
+  ** `$ bazel build testsuite/tests/basic:Boxedints`
+
+* Link the test executables for `testsuite/tests/basic:boxedints.ml` without running them:
+
+  ** `$ bazel build testsuite/tests/basic:__Boxedints.vv.byte`   [NB: leading underscores]
+  ** `$ bazel build testsuite/tests/basic:Boxedints.vs.opt`
+  ** `$ bazel build testsuite/tests/basic:Boxedints.ss.opt`
+  ** `$ bazel build testsuite/tests/basic:__Boxedints.sv.byte`
+
+* Run the test executables directly (not using the test runner), to examine stdout:
+  ** `$ bazel run testsuite/tests/basic:Boxedints.vv.byte`
+  ** `$ bazel run testsuite/tests/basic:Boxedints.vs.opt`
+  ** `$ bazel run testsuite/tests/basic:Boxedints.ss.opt`
+  ** `$ bazel run testsuite/tests/basic:Boxedints.sv.byte`
+
+=== inspecting test targets
+
+* Expand all macros in `testsuite/tests/basic/BUILD.bazel`:
+
+  ** `$  bazel query --output=build testsuite/tests/basic/...`
+  ** or `$  bazel query --output=build 'testsuite/tests/basic/...:*'`
++
+CAUTION: You might have to quote anything containing an asterisk, depending on your shell.
++
+* Expand the `expect_test` macro for target `testsuite/tests/basic:Boxedints_test`:
+
+  ** `$  bazel query --output=build testsuite/tests/basic:Boxedints_test`
+
+* Expand the `test_executable` macro for target `testsuite/tests/basic:Boxedints.ss.opt`:
+
+  ** `$ bazel query --output=build testsuite/tests/basic:Boxedints.ss.opt`
+
+
+
 == Default configuration
 
 By default tests do _not_ automatically load and open `Stdlib`. This
@@ -81,8 +158,9 @@ tests with `--test_tag_filters=<tags>` will select targets annotated
 with the listed tags.  Currently we use the following tags:
 
   ** `inline_expect`
-  ** `ocamlc.byte` - tests built using the ocamlc.byte compiler
-  ** `ocamlopt.opt` -  tests built using the ocamlopt.opt compiler
+  ** `vv` - tests built using the ocamlc.byte compiler
+  ** `ss` -  tests built using the ocamlopt.opt compiler
+  ** `vvss` -  tests built using either ocamlc.byte or ocamlopt.opt
 
 
 === rule: ocaml_test
@@ -97,14 +175,49 @@ actual/expected diffing (except within the test code itself).
 
 === rule: expect_test
 
-Runs a test executable, which must emit some result to stdout;
-redirects stdout to an "actual" file; compares actual to expected.
+Expect tests run a test executable, which must emit some result to
+stdout; redirects stdout to an "actual" file; compares actual to
+expected.
 
-Attributes:
+There is one expect test rule per compiler; they are named using the
+abbreviations explained in link:terminology[symbols & terminology], in
+order to indicate which compiler is used to build the test. The naming
+schema is `expect_<compiler>_test`. For example, the `expect_vv_test`
+uses `ocamlc.byte` to build its target.
 
-* `test_executable`: the executable to run; must be built by rule `test_executable`
+Standard compilers:
+
+* `expect_vv_test` - ocamlc.byte
+* `expect_vs_test` - ocamlopt.byte
+* `expect_ss_test` - ocamlopt.opt
+* `expect_sv_test` - ocamlc.opt
+
+Flambda-enabled:
+
+* `expect_vS_test` - ocamloptx.byte
+* `expect_SS_test` - ocamloptx.optx
+* `expect_Ss_test` - ocamlopt.optx
+* `expect_Sv_test` - ocamlc.optx
+
+Rule attributes:
+
+* `test_executable`: the executable to run; must be built by rule `test_executable` (which see)
 * `stdout`: label; name of file to which stdout will be redirected (i.e. "actuals" file)
 * `expected`: label of the file containing expected output
+
+Test target naming schema: `<executable>_<compiler>_test`. For
+example, for `testsuite/tests/basic/bigints.ml` we have the following test targets:
+
+* `:Bigints_vv_test`
+* `:Bigints_vs_test`
+* `:Bigints_ss_test`
+* `:Bigints_sv_test`
+
+and similar for flambda.
+
+=== rule: text_executable
+
+
 
 === rule: inline_expect_test
 
@@ -123,11 +236,27 @@ Attributes:
 === rule: compile_fail_test
 
 
-== Bazel stuff
+== Working with Bazel tests
+
+=== inspecting test targets
+
+We use some macros to create test targets, so the actual Bazel code
+for the targets is hidden. To inspect the code you use Bazel's `query`
+facilities:
+
+* ` bazel query --output=build '//testsuite/tools/basic:*'
 
 === tags
 
-* `--test_tag_filters=foo,bar`
+Tests are annotated with "tag" strings, which can be used to select
+subsets of the tests. For example, all tests that use `ocamlc.byte` to
+build the test are tagged with `vv`. The `--test_tag_filters`
+command-line arg can be used to run tests for a given list of tags.
+For example to run all of the `ocamlc.byte` tests in `testsuite/tests/basic`:
+
+* `bazel test testsuite/tests/basic:tests --test_tag_filters=foo,bar`
+
+
 
 === test suites
 

@@ -1,5 +1,10 @@
 = staged builds
 
+NOTE: outdated. recursive builds with one `ocamlcc` target work but
+they're hard to debug and maintain, so we've switched to one target
+(and one rule) per compiler variant. The rules are all the same except
+for a few details; most of the code is shared.
+
 The legacy build system defines different targets for the different
 compiler variants: one for `ocamlc.byte`, one for
 `ocamlopt.byte`, etc.

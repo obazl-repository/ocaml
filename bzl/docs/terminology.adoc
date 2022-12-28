@@ -1,0 +1,104 @@
+= symbols & terminology
+
+
+
+
+== compiler names
+
+The compilers are composed of:
+
+* *Runtime* The runtime, written in C, contains the primitives, the
+   memory manager, and... some other stuff. Runtimes are specified as
+   <os>_<arch>, e.g. `macos_amd64` or as `sys`, indicating "whatever
+   the local system architecture is".
++
+NOTE: All compilers use a C runtime; for local builds (not involving
+cross-compilation) it is always `sys`, and it need not be mentioned
+explicitly.
+
+* *Executor* The executor is composed of two parts:
++
+  ** The *compiler* proper, and
+  ** The *command processor* or driver. The command processor is
+    resposible for accepting user requests and directing the
+    compiler's operations. For the standard compilers, user requests
+    are the arguments passed via the command line; for a service
+    working compiler, they would be protocol requests received from an
+    input stream.
++
+Executors are specified as `vm` or `sys`. For cross-compilation, `sys`
+executor implies whatever the runtime is (e.g. `linux_arm64`)
++
+* *Emitter* The emitter is responsible for emitting the compiled code.
+   There are two types: vm and sys.
+
+To fully specify a build target we need to specify all three parts.  The form is
+
+`<runtime>_<executor>_<emitter>`
+
+This level of explicitness is only needed for cross-compilation. For
+local builds, `<runtime>_` may be omitted.
+
+=== standard compiler names:
+
+Standard naming schema: `ocaml<emitter>.<executor>`, where `<emitter>`
+is `c` or `opt`, and `<executor>` is `byte` or `opt`. The bazel rules
+use standard naming for compiler names: `ocamlc.byte`,
+`ocamlopt.byte`, `ocamlopt.opt`, `ocamlc.opt`.
+
+Names for flambda-enabled compilers use `optx`:
+
+* `ocamloptx.byte` - vm executor, flambda emitter (emits flambda-optimized native code)
+* `ocamlc.optx` - executor: flambda-optimized native compiler emitting bytecode
+* `ocamloptx.optx` - flambda-optimized native compiler emitting flambda-optimized native code
+* `ocamlopt.optx` - flambda-optimized native compiler emitting (non-flambda) native code
+
+=== OBazl naming conventions
+
+Bazel rules and non-compiler build targets (e.g. test targets) use the
+following abbreviations:
+
+* `vv` - vm executor and emitter: `ocamlc.byte`
+* `vs` - vm executor, sys emitter:  `ocamlopt.byte`
+* `ss` - sys executor, sys emitter: `ocamlopt.opt`
+* `sv` - sys executor, vm emitter: `ocamlc.opt`
+
+Flambda uses upper-case:
+
+* `vS` - vm executor, flambda emitter:  `ocamloptx.byte`
+* `SS` - flambda executor, flambda emitter: `ocamloptx.optx`
+* `Sv` - flambda executor, vm emitter: `ocamlc.optx`
+* `Ss` - flambda executor, sys emitter: `ocamlopt.optx`
+
+Special case:  `VV` for `boot/ocamlc` (vm executor and emitter)
+
+These abbreviations are used to construct the working directory for
+compiler builds, thus encoding the provenance of each compiler. For
+example, the working directory for `ocamlopt.optx` is:
+
+    ocamlcc/bin/_VV_vS_SS_SS/ocamlopt.optx
+
+which indicates that `boot/ocamlc` built `ocamloptx.byte`, which built
+`ocamloptx.optx`, which built `ocamloptx.optx`, built built itself, which built the `ocamlopt.optx` shown. The actual build command that printed this is:
+
+----
+ bazel-out/darwin-fastbuild-ST-4ec7cbaf6f37/bin/bin/_VV_vS_SS/ocamloptx.optx \
+    bazel-out/darwin-opt-exec-2B5CBBC6-ST-3c4e7a86d990/bin/runtime/libasmrun.a \
+    -nostdlib \
+    ... other options ...
+    -I ... (include directives elided) ...
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_VV_vS_SS_SS/CamlinternalFormatBasics.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_VV_vS_SS_SS/Stdlib.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_VV_vS_SS_SS/Stdlib__Sys.cmx \
+    ... other module deps, elided ...
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/driver/_VV_vS_SS_SS/Optmaindriver.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/driver/_VV_vS_SS_SS/Optmain.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_VV_vS_SS_SS/std_exit.cmx \
+    -o \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/bin/_VV_vS_SS_SS/ocamlopt.optx)
+----
+
+In other works, the working directory indicates which compiler was
+used to build whatever it contains.
+
+The abbreviations are also used to name test rules and targets; see link:testing.adoc[testing] for more information.

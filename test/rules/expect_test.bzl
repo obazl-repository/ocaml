@@ -238,7 +238,7 @@ def expect_test(name,
         stdout   = stdout,
         expected = expected,
         timeout  = timeout,
-        tags     = ["vv", "vvss"],
+        tags     = ["vv"],
         **kwargs
     )
 
@@ -258,7 +258,7 @@ def expect_test(name,
         stdout   = stdout,
         expected = expected,
         timeout  = timeout,
-        tags     = ["ss", "vvss"],
+        tags     = ["ss",],
         **kwargs
     )
 
@@ -268,6 +268,8 @@ def expect_test(name,
         stdout   = stdout,
         expected = expected,
         timeout  = timeout,
-        tags     = ["ss"],
+        tags     = ["sv"],
         **kwargs
     )
+
+    ## TODO: flambda test rules
