@@ -1,0 +1,9 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_setting")
+
+## --//config/flambda:verbose
+## == compile-time flag -dflambda-verbose
+
+bool_flag(name = "verbose", build_setting_default = False,
+          visibility=["//config:__pkg__", "//toolchain/adapter:__pkg__"])
+config_setting(name = "verbose?", flag_values = {":verbose": "True"})

@@ -483,13 +483,13 @@ ocaml_cc_config = rule(
             # cfg = "exec"
         ),
         "_flambda": attr.label(
-            default = "//config/ocaml:flambda"
+            default = "//config/ocaml/flambda:enabled"
         ),
         "_with_flambda_invariants": attr.label(
-            default = "//config/ocaml:with_flambda_invariants"
+            default = "//config/ocaml/flambda/invariants:enabled"
         ),
         "_with_cmm_invariants": attr.label(
-            default = "//config/ocaml:with_cmm_invariants"
+            default = "//config/ocaml/cmm/invariants:enabled"
         ),
 
         "_clang": attr.label(

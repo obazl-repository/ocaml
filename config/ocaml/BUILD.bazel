@@ -19,9 +19,6 @@ config_setting(name = "absname?", flag_values = {":absname": "True"})
 bool_flag( name = "bin-annot", build_setting_default = True)
 config_setting(name = "bin-annot?", flag_values = {":bin-annot": "True"})
 
-bool_flag( name = "flambda", build_setting_default = False)
-config_setting(name = "flambda?", flag_values = {":flambda": "True"})
-
 bool_flag( name = "flat_float_array", build_setting_default = True)
 config_setting(name = "flat_float_array?",
                flag_values = {":flat_float_array": "True"})
@@ -35,10 +32,6 @@ config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
 bool_flag( name = "with_cmm_invariants", build_setting_default = False)
 config_setting(name = "with_cmm_invariants?",
                flag_values = {":with_cmm_invariants": "True"})
-
-bool_flag( name = "with_flambda_invariants", build_setting_default = False)
-config_setting(name = "with_flambda_invariants?",
-               flag_values = {":with_flambda_invariants": "True"})
 
 bool_flag( name = "xmo", build_setting_default = False)
 config_setting(name = "xmo?", flag_values = {":xmo": "True"})

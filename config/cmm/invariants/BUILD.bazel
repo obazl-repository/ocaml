@@ -1,0 +1,12 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_setting")
+
+# --//config/cmm/invariants:enabled
+# == compile-time arg -dcmm-invariants
+
+# for config-time flag --enable-cmm-invariants use
+# --//config/ocaml/cmm/invariants:enabled
+
+bool_flag(name = "enabled", build_setting_default = False,
+          visibility=["//config:__pkg__", "//toolchain/adapter:__pkg__"])
+config_setting(name = "enabled?", flag_values = {":enabled": "True"})
