@@ -97,14 +97,12 @@ actual/expected diffing (except within the test code itself).
 
 === rule: expect_test
 
-Links test modules into a test executable; runs the executable, which
-must emit some result to stdout; redirects stdout to an "actual" file;
-compares actual to expected.
+Runs a test executable, which must emit some result to stdout;
+redirects stdout to an "actual" file; compares actual to expected.
 
 Attributes:
 
-* `main`: the main module (required), which should be built using rule `test_module`
-* `prologue`: list of other module dependencies, which will be treated as deps of `main`
+* `test_executable`: the executable to run; must be built by rule `test_executable`
 * `stdout`: label; name of file to which stdout will be redirected (i.e. "actuals" file)
 * `expected`: label of the file containing expected output
 

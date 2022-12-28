@@ -1,0 +1,349 @@
+= config census
+:toc: auto
+:toclevels: 3
+
+== config categories
+
+Categories:
+
+* D: deployment configuration
+* B: build config
+* TC: toolchain config
+* SYS: system config
+* X:  sw config, e.g. version numbers
+
+An asterisk '*' marks items that are not needed for Bazel builds. All
+'D' items can be ignored for build purposes, but would be needed for
+deployment build targets. Most TC items can be derived from the Bazel
+toolchain.
+
+A bang '!' marks items that require some form of system interrogation or feature test,
+e.g. to test if a header file is present.
+
+A question mark marks items for which I'm not sure whether Bazel can
+derive the item or not, e.g. ENDIANNESS.
+
+
+[cols="1,1,1,3,10"]
+|===
+| *cat*
+| *setting*
+| *src*
+| *use*
+| notes
+
+| *B | TOP_BUILDDIR |? | Makefile.config | not in .configure
+| D | prefix | .configure | Makefile.config |
+| D | exec_prefix | .configure | Makefile.config |
+| D | BINDIR | .configure | Makefile.config | ${exec_prefix}/bin
+| D | datarootdir | .configure | Makefile.config | ${prefix}/share
+| D | LIBDIR | .configure | Makefile.config | ${exec_prefix}/lib/ocaml
+| D |STUBLIBDIR | .configure | Makefile.config | ${exec_prefix}/lib/ocaml/stublibs
+| D | MANDIR | .configure | Makefile.config | ${prefix}/man
+| D | PROGRAMS_MAN_DIR | .configure | Makefile.config | $(MANDIR)/man1
+| D | LIBRARIES_MAN_DIR | configure | Makefile.config | $(MANDIR)/man3
+
+| SYS | SHEBANGSCRIPTS | .configure | Makefile.config | hardcoded boolean, based on os
+| SYS | LONG_SHEBANG | .configure | Makefile.config | true if "expanded_bindir" > 115 chars
+| SYS | HASHBANGSCRIPTSs | =SHEBANGSCRIPTS | Makefile.config | for compatibility
+| *TC | LIBTOOL | .configure |Makefile.config |  $(TOP_BUILDDIR)/libtool
+
+| *TC | TOOLPREF | .configure | Makfile.config | @ac_tool_prefix@
+| *TC | CC | .configure | Makefile.config | handled by Bazel toolchain
+| !TC | CC_HAS_DEBUG_PREFIX_MAP | .configure | Makefile.config | see note below
+| !TC | AS_HAS_DEBUG_PREFIX_MAP | .configure | Makefile.config | see note below
+
+| *TC |OC_LDFLAGS | .configure | Makefile.config | derivable from Bazel tc
+| *TC |OC_DLL_LDFLAGS | .configure | Makefile.config | derivable from Bazel tc
+| *TC |OC_EXE_LDFLAGS | .configure | Makefile.config | derivable from Bazel tc
+| *TC | LDFLAGS | .configure | Makefile.config | derivable from Bazel tc
+| *TC | CPP | .configure | Makefile.config | derivable from Bazel tc
+| *TC | ARCMD | .configure | Makefile.config | ar cmd; derivable from Bazel tc
+| B | O | .configure | Makefile.config | Extension of object files
+| B | EXT_OBJ | .configure | Makefile.config | Extension of object files
+| *B | OUTPUTOBJ=-o $(EMPTY)  | .configure | Makefile.config | makefile-specific, no need in bazel
+| *B | A | .configure | Makefile.config | Extension of static libraries, derivable from bazel tc
+| *B | EXT_LIB | .configure | Makefile.config | Extension of static libraries, derivable from bazel tc
+| *B | S  | .configure | Makefile.config | Extension of asm srcs, derivable from bazel tc?
+| *B | EXT_ASM | .configure | Makefile.config |
+| *B | SO  | .configure | Makefile.config | Extension of shared libs, derivable from bazel tc?
+| *B | EXT_DLL | .configure | Makefile.config | Extension of shared libs, derivable from bazel tc?
+| *B | SHAREDLIB_CFLAGS | .configure | Makefile.config |
+| *B | RPATH | .configure | Makefile.config |
+
+| B | NATIVE_COMPILER | .configure | Makefile.config | user config (bool)
+| *SYS | ARCH | .configure | Makefile.config | detected by Bazel
+| *SYS | ARCH64 | .configure | Makefile.config | boolean;  detected by Bazel
+| ?SYS | ENDIANNESS | .configure | Makefile.config | boolean;  inferrable by Bazel?
+| ?SYS | MODEL | .configure | Makefile.config | only for ARCH=power
+| *SYS | SYSTEM | .configure | Makefile.config | OS; detected by bazel
+| *TC | ASM | .configure | Makefile.config | cmd and flags for running assembler; derivable from Bazel tc
+| *TC | SAPP | .configure | Makefile.config | cmd and flags for running preprocessor  and assembler; derivable from Bazel tc
+
+| D | INSTALL_BYTECODE_PROGRAMS | .configure | Makefile.config | user selection
+| *B | OTHERLIBRARIES | .configure | Makefile.config | user-selected enabled libs (dynlinke etc.); see note below
+| *SYS |UNIX_OR_WIN32 | .configure | Makefile.config | detected by Bazel
+| D | INSTALL_SOURCE_ARTIFACTS | .configure | Makefile.config | deployment choice
+
+OC_CFLAGS=-O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common
+CFLAGS=
+OC_CPPFLAGS=-I$(ROOTDIR)/runtime  -D_FILE_OFFSET_BITS=64 
+CPPFLAGS=
+OCAMLC_CFLAGS=-O2 -fno-strict-aliasing -fwrapv -pthread  
+
+OCAMLC_CPPFLAGS= -D_FILE_OFFSET_BITS=64 
+BYTECCLIBS= -lm  -lpthread
+EXE=
+OUTPUTEXE=-o $(EMPTY)
+SUPPORTS_SHARED_LIBRARIES=true
+MKSHAREDLIBRPATH=
+DYNLINKOPTS=
+NATDYNLINK=true
+NATDYNLINKOPTS=
+SYSLIB=-l$(1)
+MKLIB=rm -f $(1) && ar rc $(1) $(2)
+# #7678: ocamlopt uses these only to compile .c files, and the behaviour for the
+#        two drivers should be identical.
+OCAMLOPT_CFLAGS=-O2 -fno-strict-aliasing -fwrapv -pthread  
+OCAMLOPT_CPPFLAGS= -D_FILE_OFFSET_BITS=64 
+NATIVECCLIBS= -lm  -lpthread
+SYSTHREAD_SUPPORT=true
+PACKLD=ld -r -arch x86_64 -o $(EMPTY)
+CCOMPTYPE=cc
+TOOLCHAIN=cc
+CMXS=cmxs
+
+m4 macros in build-aux/ocaml_version.m4, to get version info:
+
+AC_SUBST([OCAML_DEVELOPMENT_VERSION], [OCAML__DEVELOPMENT_VERSION])
+AC_SUBST([OCAML_RELEASE_EXTRA], [OCAML__RELEASE_EXTRA])
+AC_SUBST([OCAML_VERSION_MAJOR], [OCAML__VERSION_MAJOR])
+AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
+AC_SUBST([OCAML_VERSION_PATCHLEVEL], [OCAML__VERSION_PATCHLEVEL])
+AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
+AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
+
+
+|===
+
+
+
+Notes:
+
+* CC_HAS_DEBUG_PREFIX_MAP: "-fdebug-prefix-map support by the C compiler".  The configure script sets it based on platform for some platforms, otherwise calls a custom macro, `OCAML_CC_HAS_DEBUG_PREFIX_MAP` from `aclocal.m4`, which runs a feature test.
+
+* AS_HAS_DEBUG_PREFIX_MAP: "Does the assembler support debug prefix map and CFI directives" - fixed for some platforms, otherwise two feature-detect macros: OCAML_AS_HAS_DEBUG_PREFIX_MAP, OCAML_AS_HAS_CFI_DIRECTIVES
+
+* OTHERLIBRARIES: not a config setting in Bazel; user just builds whatever is desired
+
+
+== OCaml config
+
+The following files are generated by preprocessing:
+
+[cols="1,1,2"]
+|===
+| *file* | *tool* | inputs
+| `lambda/runtimedef.ml` | `lambda/generate_runtimedef.sh` (tr, sed) | `runtime/caml/fail.h`, `runtime/primitives`
+| `asmcomp/emit.ml` | `tools/cvt_emit` (ocaml pgm)| `asmcomp/$(ARCH)/emit.mlp`
+3+| data files 
+| `camlheader[d\|i]?` | Makefile, `echo` | `$(BINDIR)` from `./configure`
+| `target_camlheader[d\|i]?` | Makefile, `echo` | `$(TARGET_BINDIR)` (=BINDIR)
+| `camlheader_ur` | Makefile, `echo` | 
+|===
+
+
+
+
+== CC config
+
+The following files contain information generated by `.configure`:
+
+* `runtime/caml/m.h`  (from `m.h.in`)
+* `runtime/caml/s.h` (from `s.h.in`)
+* `runtime/caml/version.h` (from `version.h.in`)
+
+The following C files are generated at build time:
+
+[cols="1,1,4"]
+|===
+| *file* | tool | inputs
+| `runtime/build_config.h` |`runtime/sak.exe` | normalizes c strings ROOTDIR, LIBDIR, HOST from .configure
+| `runtime/primitives` | `runtime/gen_primitives.sh` (running sed) | c files in runtime/ containing primitives (alloc.c, array.c, etc.)
+| `runtime/prims.c` | sed | `runtime/primitives`
+| `runtime/caml/jumptbl.h` | tr, sed | `runtime/caml/intruct.h`
+| `runtime/caml/opnames.h` | tr, sed | `runtime/caml/intruct.h`
+3+|  assembly code included in `runtime/amd64nt.asm` (windows only?)
+| `runtime/domain_state32.inc` | `runtime/gen_domain_state32_inc.awk` | `runtime/caml/domain_state.tbl`
+| `runtime/domain_state64.inc` | `runtime/gen_domain_state64_inc.awk` | `runtime/caml/domain_state.tbl`
+|===
+
+Also a data file:
+
+* `runtime/ld.conf` - not needed by Bazel build process
+
+The following C files are run through the CPP preprocessor to generate .ml/.mli files:
+
+* `utils/domainstate.ml.c`
+* `utils/domainstate.mli.c`
+* `runtime/caml/domain_state.tbl`
+
+
+.runtime/caml/m.h.in:
+----
+#undef ARCH_SIXTYFOUR
+#undef ARCH_BIG_ENDIAN
+#undef ARCH_ALIGN_DOUBLE
+#undef HAS_ARCH_CODE32
+#undef SIZEOF_INT
+#undef SIZEOF_LONG
+#undef SIZEOF_PTR
+#undef SIZEOF_SHORT
+#undef SIZEOF_LONGLONG
+#undef ARCH_INT64_TYPE
+#undef ARCH_UINT64_TYPE
+#undef ARCH_INT64_PRINTF_FORMAT
+#undef ARCH_ALIGN_INT64
+#undef PROFINFO_WIDTH
+#undef ASM_CFI_SUPPORTED
+#undef WITH_FRAME_POINTERS
+#define NO_NAKED_POINTERS 1
+#undef WITH_PROFINFO
+#undef CAML_WITH_FPIC
+#define CAML_SAFE_STRING 1
+#undef FLAT_FLOAT_ARRAY
+#undef FUNCTION_SECTIONS
+#undef SUPPORTS_ALIGNED_ATTRIBUTE
+#undef SUPPORTS_TREE_VECTORIZE
+#undef USE_MMAP_MAP_STACK
+----
+
+.runtime/caml/s.h.in:
+----
+#undef OCAML_OS_TYPE
+/* "Unix" | "Win32" |  "MacOS" */
+#undef POSIX_SIGNALS
+#undef BSD_SIGNALS
+#undef SUPPORT_DYNAMIC_LINKING
+#undef HAS_FULL_THREAD_VARIABLES
+#undef HAS_C99_FLOAT_OPS
+#undef HAS_WORKING_FMA
+#undef HAS_WORKING_ROUND
+#undef HAS_GETENTROPY
+#undef HAS_GETRUSAGE
+#undef HAS_TIMES
+#undef HAS_SECURE_GETENV
+#undef HAS___SECURE_GETENV
+#undef HAS_ISSETUGID
+#undef HAS_STDATOMIC_H
+#undef HAS_SYS_MMAN_H
+#undef HAS_SOCKETS
+#undef HAS_SOCKETPAIR
+#undef HAS_SOCKLEN_T
+#undef HAS_AFUNIX_H
+#undef HAS_INET_ATON
+#undef HAS_IPV6
+#undef HAS_STDINT_H
+#undef HAS_PTHREAD_NP_H
+#undef HAS_UNISTD
+#undef HAS_DIRENT
+#undef HAS_REWINDDIR
+#undef HAS_LOCKF
+#undef HAS_MKFIFO
+#undef HAS_GETCWD
+#undef HAS_SYSTEM
+#undef HAS_UTIME
+#undef HAS_UTIMES
+#undef HAS_FCHMOD
+#undef HAS_TRUNCATE
+#undef HAS_SELECT
+#undef HAS_SYS_SELECT_H
+#undef HAS_NANOSLEEP
+#undef HAS_SYMLINK
+#undef HAS_REALPATH
+#undef HAS_WAIT4
+#undef HAS_WAITPID
+#undef HAS_GETGROUPS
+#undef HAS_SETGROUPS
+#undef HAS_INITGROUPS
+#undef HAS_TERMIOS
+#undef HAS_SETITIMER
+#undef HAS_GETHOSTNAME
+#undef HAS_UNAME
+#undef HAS_GETTIMEOFDAY
+#undef HAS_MKTIME
+#undef HAS_SETSID
+#undef HAS_PUTENV
+#undef HAS_SETENV_UNSETENV
+#undef HAS_LOCALE_H
+#undef HAS_XLOCALE_H
+#undef HAS_STRTOD_L
+#undef HAS_MMAP
+#undef HAS_PWRITE
+#undef HAS_NANOSECOND_STAT
+#undef HAS_GETHOSTBYNAME_R
+#undef HAS_GETHOSTBYADDR_R 8
+#undef HAS_MKSTEMP
+#undef HAS_NICE
+#undef HAS_DUP3
+#undef HAS_PIPE2
+#undef HAS_ACCEPT4
+#undef HAS_GETAUXVAL
+#undef HAS_SYS_SHM_H
+#undef HAS_SHMAT
+#undef HAS_EXECVPE
+#undef HAS_POSIX_SPAWN
+#undef HAS_FFS
+#undef HAS_BITSCANFORWARD
+#undef HAS_SIGWAIT
+#undef HAS_HUGE_PAGES
+#undef HUGE_PAGE_SIZE
+#undef HAS_BROKEN_PRINTF
+#undef HAS_STRERROR
+#undef HAS_POSIX_MONOTONIC_CLOCK
+#undef HAS_MACH_ABSOLUTE_TIME
+#undef HAS_GNU_GETAFFINITY_NP
+#undef HAS_BSD_GETAFFINITY_NP
+----
+
+.runtest/caml/version.h.in
+----
+#undef OCAML_VERSION_MAJOR
+#undef OCAML_VERSION_MINOR
+#undef OCAML_VERSION_PATCHLEVEL
+#undef OCAML_VERSION_ADDITIONAL
+#undef OCAML_VERSION_EXTRA
+#undef OCAML_VERSION
+#undef OCAML_VERSION_STRING
+----
+
+== Feature Tests
+
+
+* OCAML_CC_HAS_DEBUG_PREFIX_MAP - runs AC_COMPILE_IFELSE
+* OCAML_AS_HAS_DEBUG_PREFIX_MAP - runs AC_COMPILE_IFELSE
+* OCAML_AS_HAS_CFI_DIRECTIVES - runs AC_COMPILE_IFELSE, maybe twice
+
+
+== config files
+
+./configure emits:
+
+Makefile.build_config
+Makefile.config
+stdlib/sys.ml
+ocamltest/ocamltest_config.ml
+utils/config.generated.ml
+
+runtime/caml/m.h
+runtime/caml/s.h
+runtime/caml/version.h
+
+manual/src/version.tex
+manual/src/html_processing/src/common.ml
+
+Bazel can ignore META, they would be produced by a deploy rule
+compilerlibs/META
+otherlibs/dynlink/META
+otherlibs/runtime_events/META
+stdlib/META

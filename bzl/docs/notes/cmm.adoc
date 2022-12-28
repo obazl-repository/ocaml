@@ -1,0 +1,9 @@
+= cmm
+
+Acronym for "c-minus-minus".  See link:https://en.wikipedia.org/wiki/C--[C--] (wikipedia) for background.
+
+OCaml uses a custom form of cmm as an intermediate representation.
+Developers may configure the compiler with `--enable-cmm-invariants`
+to enable "extra sanity checks" on the cmm. This is for native code
+only. The checks can also be enabled for a single compiler run by
+passing `-dcmm-invariants`.
