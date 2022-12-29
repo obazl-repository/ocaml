@@ -130,9 +130,6 @@ sv_test_executable = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
     ),
-    # cfg = reset_config_transition,
-    # cfg = "exec",
-    # cfg = dev_tc_compiler_out_transition,
     cfg = sv_test_in_transition,
     executable = True,
     fragments = ["cpp"],
@@ -153,25 +150,25 @@ def test_executable(name, main,
         main = main
 
     vv_test_executable(
-        name    = "__" + main + ".vv.byte",
+        name    = main + ".vv.byte",
         main    = main,
         **kwargs
     )
 
     native.sh_binary(
-        name = main + ".vv.byte",
+        name = main + ".vv.byte.sh",
         srcs = ["//test/rules:test_executable.sh"],
         env  = select({
             "//test:verbose?": {"VERBOSE": "true"},
             "//conditions:default": {"VERBOSE": "false"}
         }),
         args = ["$(rootpath //runtime:ocamlrun)",
-                "$(rootpath :__{}.vv.byte)".format(name),
+                "$(rootpath :{}.vv.byte)".format(name),
                 # "$(rlocationpath //stdlib:stdlib)"
                 ],
         data = [
             "//runtime:ocamlrun",
-            ":__{}.vv.byte".format(name),
+            ":{}.vv.byte".format(name),
             # "//stdlib",
             # "//stdlib:Std_exit",
             # "//config/camlheaders",
@@ -195,25 +192,25 @@ def test_executable(name, main,
     )
 
     sv_test_executable(
-        name    = "__" + main + ".sv.byte",
+        name    = main + ".sv.byte",
         main    = main,
         **kwargs
     )
 
     native.sh_binary(
-        name = main + ".sv.byte",
+        name = main + ".sv.byte.sh",
         srcs = ["//test/rules:test_executable.sh"],
         env  = select({
             "//test:verbose?": {"VERBOSE": "true"},
             "//conditions:default": {"VERBOSE": "false"}
         }),
         args = ["$(rootpath //runtime:ocamlrun)",
-                "$(rootpath :__{}.sv.byte)".format(name),
+                "$(rootpath :{}.sv.byte)".format(name),
                 # "$(rlocationpath //stdlib:stdlib)"
                 ],
         data = [
             "//runtime:ocamlrun",
-            ":__{}.sv.byte".format(name),
+            ":{}.sv.byte".format(name),
             # "//stdlib",
             # "//stdlib:Std_exit",
             # "//config/camlheaders",

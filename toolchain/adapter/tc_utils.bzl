@@ -101,6 +101,8 @@ def tc_tool_arg(ctx):
 
     if ctx.file.compiler.basename.endswith(".opt"):
         return None
+    elif ctx.file.compiler.basename.endswith(".optx"):
+        return None
     else:
         return ctx.file.compiler
 
@@ -144,6 +146,8 @@ def tc_executable(ctx, tool):
         or ctx.file.compiler.basename == ("ocamlc")):
         return ctx.file.ocamlrun
     elif ctx.file.compiler.basename.endswith(".opt"):
+        return ctx.file.compiler
+    elif ctx.file.compiler.basename.endswith(".optx"):
         return ctx.file.compiler
     else:
         fail("bad compiler basename: %s" % ctx.file.compiler.basename)

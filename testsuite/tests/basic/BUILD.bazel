@@ -69,7 +69,7 @@ test_suite(
 ## expect_vv_test, expect_vs_test,
 ## expect_ss_test, expect_sv_test
 expect_test(
-    name    = "arrays_test",
+    name    = "Arrays_test",
     test_module = ":Arrays",
     stdout  = "arrays.stdout",
     expected = "arrays.reference",
@@ -120,7 +120,7 @@ test_module(
 
 ## expect_test macro expansion:
 test_suite(
-    name = "bigints_test",
+    name = "Bigints_test",
     tests = [
         ":bigints_vv_test",
         ":bigints_vs_test",
@@ -232,7 +232,7 @@ test_module(
 
 ############
 expect_test(
-    name        = "boxedints_test",
+    name        = "Boxedints_test",
     test_module = ":Boxedints",
     stdout      = "boxedints.stdout",
     expected    = "boxedints.reference",

@@ -94,8 +94,10 @@ def progress_msg(workdir, ctx):
         tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     if rule in ["ocaml_compiler",
-                "ocamlc_byte", "ocamlopt_byte",
-                "ocamlopt_opt", "ocamlc_opt",
+                "ocamlc_byte",
+                "ocamlopt_byte", "ocamloptx_byte",
+                "ocamlopt_opt", "ocamloptx_optx",
+                "ocamlc_opt", "ocamlc_optx",
                 "build_tool_vm", "build_tool_sys",
                 "ocaml_lex",
                 "ocaml_tool_r",
@@ -154,9 +156,10 @@ def progress_msg(workdir, ctx):
         else:
             em = "ocamlc"
 
-    msg = "{m} {lbrack}{c}{rbrack}: {ws}//{pkg}:{tgt} {action} {rule}".format(
+    msg = "{m} {lbrack}{flambda}{c}{rbrack}: {ws}//{pkg}:{tgt} {action} {rule}".format(
         m   = cmode,
         lbrack = lbrack,
+        flambda = "!" if tc.flambda else "",
         c   = tc.compiler[DefaultInfo].files_to_run.executable.basename,
         x   = x,
         em  = em,

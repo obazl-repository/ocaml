@@ -23,7 +23,9 @@ load("//bzl/rules/common:DEPS.bzl",
      "merge_depsets")
 
 #########################
-def executable_impl(ctx, tc, exe_name, workdir):
+def executable_impl(ctx, tc, exe_name,
+                    workdir ##FIXME: remove
+                    ):
 
     debug = False
 
@@ -289,7 +291,11 @@ def executable_impl(ctx, tc, exe_name, workdir):
     compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     # if tc.config_executor in ["boot", "baseline", "vm"]:
-    if compiler.basename in ["ocamlc.byte", "ocamlc.opt", "ocamlc.boot"]:
+    if compiler.basename in [
+        "ocamlc.boot",
+        "ocamlc.byte",
+        "ocamlc.opt", "ocamlc.optx",
+    ]:
         # camlheaders only used by this rule so no need to put in tc
         # but camlheaders tgt is tc-dependent (uses tc.ocamlrun.path)
         camlheaders = ctx.files._camlheaders
@@ -441,8 +447,10 @@ def executable_impl(ctx, tc, exe_name, workdir):
         mnemonic = "LinkBootstrapTest"
     elif ctx.attr._rule in ["ocaml_compiler",
                             "build_tool_vm", "build_tool_sys",
-                            "ocamlc_byte", "ocamlopt_byte",
-                            "ocamlopt_opt", "ocamlc_opt"]:
+                            "ocamlc_byte",
+                            "ocamlopt_byte", "ocamloptx_byte",
+                            "ocamlopt_opt", "ocamloptx_optx",
+                            "ocamlc_opt", "ocamlc_optx"]:
         mnemonic = "LinkOcamlCompiler"
     elif ctx.attr._rule in ["ocamllex_byte", "ocamllex_opt"]:
         mnemonic = "LinkOCamlLex"
@@ -533,8 +541,10 @@ def executable_impl(ctx, tc, exe_name, workdir):
     exe_provider = None
     if ctx.attr._rule in ["ocaml_compiler",
                           "build_tool_vm", "build_tool_sys",
-                          "ocamlc_byte", "ocamlopt_byte",
-                          "ocamlopt_opt", "ocamlc_opt"]:
+                          "ocamlc_byte",
+                          "ocamlopt_byte", "ocamloptx_byte",
+                          "ocamlopt_opt", "ocamloptx_optx",
+                          "ocamlc_opt", "ocamlc_optx"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
         exe_provider = OcamlExecutableMarker()
