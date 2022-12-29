@@ -370,6 +370,8 @@ def _ocaml_cc_config_impl(ctx):
     cc_config_map = cc_tc_config_map(ctx)
     # print("cc_config_map: %s" % cc_config_map)
 
+    ## generate user_config.json, from attrs,
+    ## then merge with main json
     user_json = ctx.actions.declare_file("user_config.json")
 
     json_map = {}
@@ -441,11 +443,11 @@ def _ocaml_cc_config_impl(ctx):
     clang_tc = ctx.attr._clang
 
     ctx.actions.run(
-        executable = ctx.file._tool.path,
+        executable = ctx.file._merge_tool.path,
         arguments = [args],
         inputs    = [ctx.file.json, user_json] + clang_tc.files.to_list(),
         outputs   = [ctx.outputs.out],
-        tools = [ctx.file._tool],
+        tools = [ctx.file._merge_tool],
         mnemonic = "OCamlConfig",
         progress_message = "Generating config.json"
     )
@@ -475,7 +477,7 @@ ocaml_cc_config = rule(
         "_link_verbose": attr.label(
             default = "//config/ocaml/cc/link:verbose"
         ),
-        "_tool" : attr.label(
+        "_merge_tool" : attr.label(
             allow_single_file = True,
             default = "//vendor/merge_json",
             executable = True,
@@ -492,7 +494,17 @@ ocaml_cc_config = rule(
             default = "//config/ocaml/cmm/invariants:enabled"
         ),
 
-        "_clang": attr.label(
+        ## TODO: support the following ./configure options:
+        ## --enable-frame-pointers
+        ## --disable-cfi
+        ## --enable-imprecise-c99-float-ops
+        ## --enable-reserved-header-bits=BITS
+        ## --disable-flat-float-array
+        ## --disable-function-sections
+        ## --enable-mmap-map-stack
+        ## --with-afl
+
+        "_clang": attr.label( ##FIXME: not needed?
             default = "@local_config_cc//:wrapped_clang",
             allow_single_file = True,
             executable = True,
