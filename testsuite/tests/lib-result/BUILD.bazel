@@ -1,4 +1,4 @@
-load("//bzl:rules.bzl",
+load("//test:rules.bzl",
      "test_module",
      "ocaml_test",
 )

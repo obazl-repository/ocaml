@@ -1,6 +1,6 @@
 ## GENERATED FILE ##
 
-load("//bzl:rules.bzl",
+load("//test:rules.bzl",
      "ocaml_library",
      "ocaml_module",
 )
@@ -9,7 +9,7 @@ MODULE_OPTS = ["-nostdlib"]
 
 ocaml_library(
     name = "testsuite_tests_regression_pr9292_lib",
-    modules  = [
+    manifest  = [
         ":Pr9292",
     ],
 )

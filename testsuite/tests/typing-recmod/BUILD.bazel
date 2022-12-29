@@ -16,7 +16,7 @@ SIG_OPTS    = []
 
 # test_library(
 #     name = "testsuite_tests_typing-recmod_lib",
-#     modules  = [
+#     manifest  = [
 #         ":Gpr1626",
 #         ":Pr9494",
 #         ":T01bad",

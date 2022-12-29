@@ -1,6 +1,6 @@
 ## GENERATED FILE ##
 
-load("//bzl:rules.bzl",
+load("//test:rules.bzl",
      "ocaml_library",
      "ocaml_signature",
 )

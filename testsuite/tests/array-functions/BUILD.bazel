@@ -1,4 +1,4 @@
-load("//bzl:rules.bzl",
+load("//test:rules.bzl",
      "test_library",
      "test_module",
 )
@@ -7,7 +7,7 @@ MODULE_OPTS = ["-nostdlib"]
 
 # ocaml_library(
 #     name = "testsuite_tests_array-functions_lib",
-#     modules  = [
+#     manifest  = [
 #         ":Test",
 #     ],
 # )

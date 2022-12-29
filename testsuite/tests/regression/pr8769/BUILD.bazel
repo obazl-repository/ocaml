@@ -1,6 +1,6 @@
 ## GENERATED FILE ##
 
-load("//bzl:rules.bzl",
+load("//test:rules.bzl",
      "ocaml_library",
      "ocaml_module",
      "ocaml_signature",
@@ -11,7 +11,7 @@ SIG_OPTS = ["-nostdlib"]
 
 ocaml_library(
     name = "testsuite_tests_regression_pr8769_lib",
-    modules  = [
+    manifest  = [
         ":Fortuna",
         ":Pr8769",
         ":Rng",

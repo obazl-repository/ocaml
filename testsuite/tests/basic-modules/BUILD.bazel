@@ -33,12 +33,12 @@ ocaml_test(
     timeout = "short"
 )
 
-lambda_expect_test(
-    name   = "Anonymous_test",
-    struct   = "anonymous.ml",
-    expect   = "anonymous.ocamlc.reference",
-    deps = ["//stdlib"]         # FIXME: make this implicit?
-)
+# lambda_expect_test(
+#     name   = "Anonymous_test",
+#     struct   = "anonymous.ml",
+#     expect   = "anonymous.ocamlc.reference",
+#     stdlib_deps = ["//stdlib"]         # FIXME: make this implicit?
+# )
 
 test_module(
     name   = "Anonymous",
@@ -59,36 +59,26 @@ test_module(
     #     # "-dno-locations",
     #     # "-dno-unique-ids"
     # ],
-    deps = ["//stdlib"]
+    stdlib_deps = ["//stdlib"]
 )
 
-ocaml_test(
-    name = "main_test",
-    main = ":Main",
-    prologue = [
-        ":Offset",
-        ":Pr4008",
-        ":Pr7427",
-        ":Pr6726"
-    ],
-    timeout = "short"
-)
+# ocaml_test(
+#     name = "main_test",
+#     main = ":Main",
+#     prologue = [
+#         ":Offset",
+#         ":Pr4008",
+#         ":Pr7427",
+#         ":Pr6726"
+#     ],
+#     timeout = "short"
+# )
 
 expect_test(
     name     = "Main_expect_test",
+    test_module = ":Main",
     stdout   = "Main.stdout",
-    expect   = "main.reference",
-    prologue = [
-        # "//stdlib",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Set",
-        ":Offset",
-        ":Pr4008",
-        ":Pr7427",
-        ":Pr6726"
-    ],
-    main     = ":Main",
-    epilogue = [],
+    expected   = "main.reference",
     timeout = "short"
 )
 
@@ -97,39 +87,41 @@ test_module(
     struct = "main.ml",
     sig    = "Main_cmi",
     deps   = [
-        # "//stdlib",
-        # "//stdlib:Stdlib",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Set",
         ":Offset",
         ":Pr4008",
         ":Pr7427",
         ":Pr6726"
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
+    ],
 )
 
 test_signature(
     name = "Main_cmi",
     src  = "main.mli",
-    deps = ["//stdlib:Stdlib"]
+    stdlib_deps = ["//stdlib:Stdlib_cmi"]
 )
 
 test_module(
     name   = "Offset",
     struct = "offset.ml",
     deps   = [
+        ":Pr6726"
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.String",
-        ":Pr6726"
-    ]
+    ],
 )
 
 test_module(
     name   = "Pr4008",
     struct = "pr4008.ml",
-    deps   = [
-        "//stdlib:primitives",
-        # "//stdlib:CamlinternalMod",
+    stdlib_deps   = [
+        # "//stdlib:Primitives",
+        "//stdlib:CamlinternalMod",
         "//stdlib:Stdlib.List",
     ]
 )
@@ -137,13 +129,13 @@ test_module(
 test_module(
     name   = "Pr6726",
     struct = "pr6726.ml",
-    deps = ["//stdlib:Stdlib"]
+    stdlib_deps = ["//stdlib:Stdlib"]
 )
 
 test_module(
     name   = "Pr7427",
     struct = "pr7427.ml",
-    deps = ["//stdlib:Stdlib"]
+    stdlib_deps = ["//stdlib:Stdlib"]
 )
 
 inline_expect_test(
@@ -155,9 +147,9 @@ inline_expect_test(
 
 expect_test(
     name     = "Recursive_module_init_expect_test",
+    test_module = ":Recursive_module_init",
     stdout   = "Recursive_module_init.stdout",
-    expect   = "recursive_module_init.reference",
-    main     = ":Recursive_module_init",
+    expected = "recursive_module_init.reference",
     timeout = "short"
 )
 
@@ -165,7 +157,7 @@ test_module(
     name   = "Recursive_module_init",
     struct = "recursive_module_init.ml",
     # dump = ["lambda"],
-    deps = [
+    stdlib_deps = [
         "//stdlib:primitives",
         # "//stdlib:CamlinternalOO",
         # "//stdlib:CamlinternalMod",
