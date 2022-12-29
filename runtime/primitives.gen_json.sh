@@ -2,6 +2,8 @@
 
 ## usage:  ./runtime/primitives.gen_json.sh > runtime/primitives.json
 
+## Derived from runtime/gen_primitives.sh
+
 ## Use this to generate primitives.json. Not used in build process;
 ## only needed when primitives change. The primitives.json file should
 ## be under version control.
