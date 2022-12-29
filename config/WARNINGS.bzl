@@ -10,3 +10,4 @@ w = struct(
     NO_CMI_FIE  = "49",
     UNUSED_VALUE_DECLARATION_32 = "32",
 )
+

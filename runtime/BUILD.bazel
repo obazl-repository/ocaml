@@ -9,8 +9,6 @@ load("//bzl:rules.bzl", "cc_assemble")
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 load("//vendor/mustach:cc_mustache.bzl", "cc_mustache")
 
-load("//config:CONFIG.bzl", "ARCH")
-
 exports_files(["gen_primitives.sh", "primitives.json", "sync_posix.h"] + glob(["*.c"]))
 
 OPTIMIZATION_FLAGS = select({
@@ -152,10 +150,14 @@ cc_library(
         # to unify camlrun and asmrun targets, need to select these:
         "//conditions:default"   : [
             "NATIVE_CODE",
-            "TARGET_$(ARCH)",
+            ## custom make vars:
+            # "TARGET_$(ARCH)",
             "MODEL_$(MODEL)",
             "SYS_$(SYSTEM)"
-        ] #testing
+        ]
+    }) + select({
+        "//platform/arch:amd64?": ["TARGET_amd64"],
+        "//conditions:default"  : ["TARGET_$(ARCH)"]
     }),
     #BUG: zig builds the archive with 'rcsD' which causes link error
     #due to "absolute symbol". But linkopts is ignored. Dunno how to
@@ -200,8 +202,8 @@ cc_library(
 cc_assemble(
     name = "archasm",
     src = select({
-        "//platform:windows_x86_32?": ARCH + "nt.asm",
-        "//platform:windows_x86_64?": ARCH + "nt.asm",
+        "//platform:windows_x86_32?": "$(ARCH)nt.asm",
+        "//platform:windows_x86_64?": "$(ARCH)nt.asm",
         "//conditions:default"      : ":arch_s" # ARCH + ".S"
     }),
     deps = [
@@ -234,13 +236,15 @@ cc_assemble(
 # ARCH = "arm64"
 mustache(
     name = "arch_s",
-    out  = ARCH + ".S",
+    out  = "arch.S",
     json = "//runtime/caml:domain_state.json",
     template = select({
         # "//platform:windows_x86_32?": ARCH + "nt.asm.mustache",
         # "//platform:windows_x86_64?": ARCH + "nt.asm.mustache",
-        "//conditions:default"      : ARCH + ".S.mustache"
+        "//platform/arch:amd64?": "amd64.S.mustache",
+        # "//conditions:default"      : "$(ARCH).S.mustache"
     }),
+    toolchains = ["//profile/system/local"],
 )
 
 genrule(

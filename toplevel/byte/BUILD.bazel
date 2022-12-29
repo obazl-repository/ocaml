@@ -5,12 +5,6 @@ exports_files(["topeval.ml", "topmain.ml", "trace.ml"])
 #      "compiler_module",
 # )
 
-# load("//config:CONFIG.bzl",
-#      "ROOT_MODULE_OPTS",
-#      "ROOT_SIG_OPTS"
-#      )
-
-
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # SIG_OPTS    = ROOT_MODULE_OPTS # + ["-nopervasives"]
 

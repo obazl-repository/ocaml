@@ -4,10 +4,6 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
-load("//config:CONFIG.bzl",
-     "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS")
-
 MODULE_OPTS = []
 SIG_OPTS    = []
 

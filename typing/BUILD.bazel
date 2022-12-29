@@ -12,7 +12,7 @@ load("//bzl:rules.bzl",
      "boot_library",
      "compiler_signature")
 
-load("//config:CONFIG.bzl", "w") # warnings
+load("//config:WARNINGS.bzl", "w")
 
 package(default_visibility = ["//visibility:public"])
 

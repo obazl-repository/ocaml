@@ -1,6 +1,6 @@
 load("//bzl:rules.bzl",
      "boot_archive",
-     "boot_config",
+     # "boot_config",
      # "boot_executable",
      "boot_library",
      "build_tool",
@@ -8,7 +8,7 @@ load("//bzl:rules.bzl",
      "compiler_signature",
 )
 
-load("//config:CONFIG.bzl", "CPP", "w")
+load("//config:WARNINGS.bzl", "w")
 
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 

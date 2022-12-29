@@ -14,13 +14,6 @@ load("//bzl:rules.bzl",
 load(":BUILD_RULES.bzl", "run_ocamllex")
 load("//yacc:BUILD_RULES.bzl", "yacc")
 
-load("//config:CONFIG.bzl",
-     # "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS",
-     # "ROOT_MODULE_OPTS",
-     # "ROOT_SIG_OPTS"
-     )
-
 # MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS + [
 MODULE_OPTS = ["-strict-formats"]
 # = PLATFORM_CFLAGS + [

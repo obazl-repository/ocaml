@@ -10,15 +10,10 @@ load("//bzl:rules.bzl",
      "ocaml_tool_vm",
 )
 
-# load("//config:CONFIG.bzl",
-#      "ROOT_MODULE_OPTS",
-#      "ROOT_SIG_OPTS"
-#      )
-
 load("//stdlib:BUILD_STDLIB.bzl", "STDLIB_MODULE_NAMES")
 
-MODULE_OPTS = [] #ROOT_MODULE_OPTS
-SIG_OPTS    = [] #ROOT_MODULE_OPTS # + ["-nopervasives"]
+MODULE_OPTS = []
+SIG_OPTS    = []
 
 ################################################################
 ## the repl command is 'ocaml', which is a target in the root

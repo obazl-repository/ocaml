@@ -4,14 +4,8 @@ load("//bzl:rules.bzl",
      "boot_library",
 )
 
-load("//config:CONFIG.bzl",
-     "OC_COMMON_CFLAGS",
-     "PLATFORM_CFLAGS"
-     # "ROOT_MODULE_OPTS", "ROOT_SIG_OPTS"
-     )
-
-MODULE_OPTS = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
-SIG_OPTS    = OC_COMMON_CFLAGS + PLATFORM_CFLAGS
+MODULE_OPTS = []
+SIG_OPTS    = []
 
 # MODULE_OPTS = ROOT_MODULE_OPTS
 # SIG_OPTS = ROOT_SIG_OPTS

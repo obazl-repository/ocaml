@@ -16,7 +16,7 @@ exports_files([
     "check-parser-uptodate-or-warn.sh",
 ])
 
-load("//config:CONFIG.bzl", "w") # warnings
+load("//config:WARNINGS.bzl", "w")
 
 MODULE_OPTS = []
 SIG_OPTS    = []

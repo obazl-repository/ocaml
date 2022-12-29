@@ -1,7 +1,3 @@
-load("//config:CONFIG.bzl",
-     # "OC_CFLAGS",
-     "CFLAGS", "OC_LDFLAGS", "LDFLAGS")
-
 ## WARNING: there's a bug in closure.c, the prototype is (void) but the defn is (int n)
 
 ## macos make.log:
@@ -16,7 +12,8 @@ cc_binary(
         "closure.c", "error.c", "lalr.c", "lr0.c",
         "main.c", "mkpar.c", "output.c", "reader.c",
         "skeleton.c", "symtab.c", "verbose.c", "warshall.c",
-        "version.h", "defs.h",
+        # "version.h", # dep is on caml/version.h
+        "defs.h",
         "//runtime/caml:domain_state.h",
     ],
     # features = ["no_legacy_features"],
@@ -31,15 +28,15 @@ cc_binary(
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime", # build_config.h
         "-I$(GENDIR)/runtime/caml",
-        "$(OC_CFLAGS)",
-        "$(OC_CPPFLAGS)",
+        # "$(OC_CFLAGS)",
+        # "$(OC_CPPFLAGS)",
     ] + select({
         # if -c opt, the clang toolchain inserts -DNDEBUG
         # which causes a macro-redefined error
         # "mac bazel clang": ["-Wno-error=macro-redefined"] ## NDEBUG
         "//conditions:default": []
     }),
-    linkopts = ["$(OC_LDFLAGS)"],
+    # linkopts = ["$(OC_LDFLAGS)"],
     toolchains = ["//profile/system/local"],
     visibility = [
         "//:__pkg__",  # :toolchain target
@@ -52,11 +49,11 @@ cc_binary(
     ]
 )
 
-genrule(
-    name = "version_h",
-    outs = ["version.h"],
-    srcs = ["//:VERSION"],
-    cmd  =  "echo \"#define OCAML_VERSION \\\"\"" +
-            "`sed -e 1q $(location //:VERSION) | tr -d '\r'`\\\" > $@;"
-)
+# genrule( ##FIXME: where did this come from?
+#     name = "version_h",
+#     outs = ["version.h"],
+#     srcs = ["//:VERSION"],
+#     cmd  =  "echo \"#define OCAML_VERSION \\\"\"" +
+#             "`sed -e 1q $(location //:VERSION) | tr -d '\r'`\\\" > $@;"
+# )
 
