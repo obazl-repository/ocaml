@@ -234,7 +234,7 @@ def expect_test(name,
 
     expect_vv_test(
         name     = vv_name,
-        test_executable = "__" + executable + ".vv.byte",
+        test_executable = executable + ".vv.byte",
         stdout   = stdout,
         expected = expected,
         timeout  = timeout,
@@ -264,7 +264,7 @@ def expect_test(name,
 
     expect_sv_test(
         name     = sv_name,
-        test_executable = "__" + executable + ".vv.byte",
+        test_executable = executable + ".vv.byte",
         stdout   = stdout,
         expected = expected,
         timeout  = timeout,
