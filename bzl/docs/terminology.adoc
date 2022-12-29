@@ -1,13 +1,84 @@
 = symbols & terminology
 
 
+== terminology
 
+[[library]]Library::
+In the world of OCaml the term "library" is heavily
+  overloaded. It can mean... a lot of things. Here it has one
+  unambiguous meaning: a named collection of modules and signatures.
+  Libraries are expressed using `*_library` rules like `ocaml_library`
+  and `compiler_library`, which do no more than aggregate the modules
+  and signatures listed in their `manifest` attributes. This allows
+  client code to depend on a collection of modules by name without
+  archiving it. But libraries may also be archived, by setting the
+  `archive` attribute on a library rule.
+[[archive]]Archive::
+a library packaged as an OCaml archive file (.cma
+  or .cmxa file). Archives are expressed by library rules with
+  attribute `archive` set to True.
++
+NOTE: The OCaml sources use only a few librarys (which are expressed
+as archives in the legacy Makefile system); for example,
+`stdlib.cmx?a`, `ocamlbytecomp.cmx?a`. The ocamlcc Bazel build
+expresses these as unarchived libraries by default. A global switch,
+[.nowrap]`--//config/ocaml/compiler/libs:archived`, may be set to
+switch to archived libraries. For more information see link:stdlib.adoc[stdlib].
+
+Filesystem module (fs-module)::
+
+A module deterimined by a source file; for example, file `a.ml`,
+determines module `A`, which is thereby a filesystem module or
+fs-module for short.
+
+Namespace::
+
+OCaml does not have first-class namespaces, and it does not define a
+mapping between symbol "paths" like `A.B.C` and the file system. Each
+module effectively determines a namespace, but only for the symbols
+defined within it and symbols for fs-modules that the compiler can
+find in its search path. There is no built-in method for mapping the
+`B` in `A.B` to the file system (e.g. as a file `a/b.ml`). The OCaml
+namespace is "flat".
++
+This can be a problem because without namespacing name collisions are
+more likely. To prevent them two mechanisms are provided: "packed"
+modules and module aliasing. A packed module serves as a namespace for
+the modules it contains; no collisions are possible just because it
+physically contains its submodules. Module aliasing makes it possible
+to give modules names likely to be globally unique (usually by
+prefixing a psuedo-namespace string like `+Foo__+`) but still refer to
+them with short names. For example the `B` in `A.B` can be aliased to
+`A__B` (or `foobarbaz`, for that matter). Mangling the actual filename
+and using an alias to make it "nice" can prevent name collisions, but
+it's still not true namespacing. Or rather it's not "closed"
+namespacing; nothing forces reference to the mangled module name to go
+through the alias; aliasing does not make it an element of any
+hierarchical namespace.
++
+The compiler sources in the legacy Makefile system use one
+packed-module namespace (`Dynlink_compilerlibs`) and one aliasing
+namespace, `Stdlib`.
+
+
+[[resolver]]Resolver:: A resolver module (or just 'resolver' for
+short) is a module containing module aliasing equations used to
+implement OCaml's pseudo-namespaces. In the OCaml community this is
+often called a "wrapper", but we eschew this term since there is no
+real wrapping going on. A resolver merely provides information the
+compiler needs to resolve module symbols.
++
+The compiler only uses one aliasing namespace and thus one resolver
+module: `Stdlib`. The Bazel build adds a resolver for a second
+namespace, `Dynlink_compilerlibs`, which is implemented as a "packed"
+module the legacy Makefile system. See link:dynlink.adoc[dynlink] for
+more information.
 
 == compiler names
 
 The compilers are composed of:
 
-* *Runtime* The runtime, written in C, contains the primitives, the
+Runtime:: The runtime, written in C, contains the primitives, the
    memory manager, and... some other stuff. Runtimes are specified as
    <os>_<arch>, e.g. `macos_amd64` or as `sys`, indicating "whatever
    the local system architecture is".
@@ -16,7 +87,7 @@ NOTE: All compilers use a C runtime; for local builds (not involving
 cross-compilation) it is always `sys`, and it need not be mentioned
 explicitly.
 
-* *Executor* The executor is composed of two parts:
+Executor:: The executor is composed of two parts:
 +
   ** The *compiler* proper, and
   ** The *command processor* or driver. The command processor is
@@ -29,8 +100,9 @@ explicitly.
 Executors are specified as `vm` or `sys`. For cross-compilation, `sys`
 executor implies whatever the runtime is (e.g. `linux_arm64`)
 +
-* *Emitter* The emitter is responsible for emitting the compiled code.
-   There are two types: vm and sys.
+Emitter:: The emitter is responsible for emitting the compiled code.
+   Obviously the line between compiler and emitter is vague. There are
+   two types: vm and sys.
 
 To fully specify a build target we need to specify all three parts.  The form is
 
@@ -53,7 +125,7 @@ Names for flambda-enabled compilers use `optx`:
 * `ocamloptx.optx` - flambda-optimized native compiler emitting flambda-optimized native code
 * `ocamlopt.optx` - flambda-optimized native compiler emitting (non-flambda) native code
 
-=== OBazl naming conventions
+=== OCamlCC naming conventions
 
 Bazel rules and non-compiler build targets (e.g. test targets) use the
 following abbreviations:
@@ -79,7 +151,9 @@ example, the working directory for `ocamlopt.optx` is:
     ocamlcc/bin/_VV_vS_SS_SS/ocamlopt.optx
 
 which indicates that `boot/ocamlc` built `ocamloptx.byte`, which built
-`ocamloptx.optx`, which built `ocamloptx.optx`, built built itself, which built the `ocamlopt.optx` shown. The actual build command that printed this is:
+`ocamloptx.optx`, which built itself (another `ocamloptx.optx), which
+built the `ocamlopt.optx` shown. The actual build command that printed
+this is:
 
 ----
  bazel-out/darwin-fastbuild-ST-4ec7cbaf6f37/bin/bin/_VV_vS_SS/ocamloptx.optx \
@@ -98,7 +172,17 @@ which indicates that `boot/ocamlc` built `ocamloptx.byte`, which built
     bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/bin/_VV_vS_SS_SS/ocamlopt.optx)
 ----
 
-In other works, the working directory indicates which compiler was
+In other words, the working directory indicates which compiler was
 used to build whatever it contains.
+
+IMPORTANT: The build command excerpted above shows the effect of using
+unarchived libraries; with archiving enabled, the listed `.cmx`
+dependencies would be packaged into a few archive files.
+
+IMPORTANT: The listing also shows that the ocamlcc Bazel code makes
+all dependencies explicit. In a "standard" build, the standard library
+`stdlib.cmxa` (shown here unarchived), module `std_exit.cmx`, and
+`libasmrun.a` would be found and loaded automatically by the compiler
+and thus hidden from the user. The Bazel rules prioritize explicitness.
 
 The abbreviations are also used to name test rules and targets; see link:testing.adoc[testing] for more information.

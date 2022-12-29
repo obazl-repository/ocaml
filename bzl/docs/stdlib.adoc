@@ -1,6 +1,6 @@
 = stdlib
 
-The resolver `/stdlib:Stdlib` contains more than just module aliases
+The xref:terminology.adoc#resolver[resolver] module `/stdlib:Stdlib` contains more than just module aliases
 for the namespace. It follows that other modules may depend on it for
 something other than resolving references to stdib submodules.  In general:
 
