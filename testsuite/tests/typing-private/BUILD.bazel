@@ -1,19 +1,10 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_typing-private_lib",
-    manifest  = [
-        ":Invalid_private_row",
-        ":Private",
-    ],
-)
+MODULE_OPTS = []
 
 ocaml_module(
     name   = "Invalid_private_row",

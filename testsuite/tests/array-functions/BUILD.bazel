@@ -3,11 +3,11 @@ load("//test:rules.bzl",
      "test_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-# ocaml_library(
+# test_suite(
 #     name = "testsuite_tests_array-functions_lib",
-#     manifest  = [
+#     tests  = [
 #         ":Test",
 #     ],
 # )

@@ -12,7 +12,7 @@ load("//test:rules.bzl",
 
 test_library(
     name = "testsuite_tests_basic-modules_lib",
-    manifest = [
+    tests = [
         ":Anonymous",
         ":Main",
         ":Offset",

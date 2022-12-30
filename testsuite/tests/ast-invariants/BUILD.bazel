@@ -1,18 +1,15 @@
-## GENERATED FILE ##
-
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
-    name = "testsuite_tests_ast-invariants_lib",
-    manifest  = [
-        ":Test",
-    ],
-)
+# test_suite(
+#     name = "testsuite_tests_ast-invariants_lib",
+#     tests  = [
+#         ":Test",
+#     ],
+# )
 
 ocaml_module(
     name   = "Test",

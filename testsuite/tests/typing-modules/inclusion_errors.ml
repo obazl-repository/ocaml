@@ -1029,7 +1029,7 @@ Error: Signature mismatch:
        but not in the second
 |}];;
 
-(******************************* Type manifests *******************************)
+(******************************* Type testss *******************************)
 
 module M : sig
   type t = private [< `A | `B]

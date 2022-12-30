@@ -38,8 +38,8 @@ class string_gen =
           p fmt "# type %s:\n" t.ty_name;
           if self#must_display_types then
             (
-             p fmt "# manifest (Odoc_info.string_of_type_expr):\n<[%s]>\n"
-               (match t.ty_manifest with
+             p fmt "# tests (Odoc_info.string_of_type_expr):\n<[%s]>\n"
+               (match t.ty_tests with
                  None -> "None"
                | Some (Other e) -> Odoc_info.string_of_type_expr e
                | Some (Object_type fields) ->

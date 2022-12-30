@@ -71,7 +71,7 @@ module type S' = sig
   val x : u
 end;;
 
-let cast_value_under_manifest_equality (type t) (module M : S' with type t = t)
+let cast_value_under_tests_equality (type t) (module M : S' with type t = t)
     : (module S with type t = t) =
   let Refl = M.eq in
   (module M);;
@@ -85,7 +85,7 @@ module type S' =
     val eq : (t, unit t_aux) eq
     val x : u
   end
-val cast_value_under_manifest_equality :
+val cast_value_under_tests_equality :
   (module S' with type t = 't) -> (module S with type t = 't) = <fun>
 |}]
 

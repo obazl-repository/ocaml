@@ -11,7 +11,7 @@
 # Odoc_info.string_of_module_type ~complete: true :
 <[sig type a = A of { lbl : int; } end]>
 # type T04.A.a:
-# manifest (Odoc_info.string_of_type_expr):
+# tests (Odoc_info.string_of_type_expr):
 <[None]>
 #
 # module type T04.E:

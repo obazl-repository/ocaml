@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 load("//test:rules.bzl",
      "test_archive",
      "test_executable",

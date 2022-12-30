@@ -1,15 +1,14 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_utils_lib",
-    manifest  = [
+    tests  = [
         ":Edit_distance",
         ":Magic_number",
         ":Overflow_detection",

@@ -1,17 +1,5 @@
-## GENERATED FILE ##
-
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
-)
-
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_lib-unix_unix-execvpe_lib",
-    manifest  = [
-        ":Exec",
-    ],
 )
 
 ocaml_module(

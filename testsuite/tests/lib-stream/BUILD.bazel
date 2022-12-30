@@ -1,15 +1,14 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_lib-stream_lib",
-    manifest  = [
+    tests  = [
         ":Count_concat_bug",
         ":Mpr7769",
     ],

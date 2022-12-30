@@ -31,21 +31,21 @@
   type h = [ `A | `B of int | `C of string ]
 end]>
 # type T01.MT.t:
-# manifest (Odoc_info.string_of_type_expr):
+# tests (Odoc_info.string_of_type_expr):
 <[string ->
   int ->
   string ->
   string * string * string ->
   string * string * string -> string * string * string -> unit]>
 # type T01.MT.ob:
-# manifest (Odoc_info.string_of_type_expr):
+# tests (Odoc_info.string_of_type_expr):
 <[< f: int ; >]>
 # type T01.MT.obj_type:
-# manifest (Odoc_info.string_of_type_expr):
+# tests (Odoc_info.string_of_type_expr):
 <[< bar: float -> string ; f: int ; foo: int ; gee: int -> int * string ; >]>
 # type T01.MT.g:
-# manifest (Odoc_info.string_of_type_expr):
+# tests (Odoc_info.string_of_type_expr):
 <[[ `A ]]>
 # type T01.MT.h:
-# manifest (Odoc_info.string_of_type_expr):
+# tests (Odoc_info.string_of_type_expr):
 <[[ `A | `B of int | `C of string ]]>

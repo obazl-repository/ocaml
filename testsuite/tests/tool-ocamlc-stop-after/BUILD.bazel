@@ -1,17 +1,16 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
      "ocaml_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 SIG_OPTS = ["-nostdlib"]
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_tool-ocamlc-stop-after_lib",
-    manifest  = [
+    tests  = [
         ":Stop_after_parsing_impl",
         ":Stop_after_scheduling",
         ":Stop_after_typing_impl",

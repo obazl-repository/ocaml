@@ -1,15 +1,12 @@
-## GENERATED FILE ##
-
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_basic-float_lib",
-    manifest  = [
+    tests  = [
         ":Float_compare",
         ":Float_literals",
         ":Tfloat_hex",

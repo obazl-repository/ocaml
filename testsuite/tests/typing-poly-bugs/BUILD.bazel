@@ -1,15 +1,14 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_typing-poly-bugs_lib",
-    manifest  = [
+    tests  = [
         ":Pr5322_ok",
         ":Pr5673_ok",
         ":Pr6922_ok",

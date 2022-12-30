@@ -1,15 +1,14 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_match-exception-warnings_lib",
-    manifest  = [
+    tests  = [
         ":Exhaustiveness_warnings",
         ":No_mixing_under_guard",
         ":No_value_clauses",

@@ -1,20 +1,8 @@
-## GENERATED FILE ##
-
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_afl-instrumentation_lib",
-    manifest  = [
-        ":Afltest",
-        ":Harness",
-        ":Test",
-    ],
-)
+MODULE_OPTS = []
 
 ocaml_module(
     name   = "Afltest",

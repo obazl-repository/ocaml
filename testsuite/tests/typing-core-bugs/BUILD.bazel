@@ -1,15 +1,14 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_typing-core-bugs_lib",
-    manifest  = [
+    tests  = [
         ":Const_int_hint",
         ":Missing_rec_hint",
         ":Repeated_did_you_mean",

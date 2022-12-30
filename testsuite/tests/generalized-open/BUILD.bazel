@@ -1,15 +1,14 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_generalized-open_lib",
-    manifest  = [
+    tests  = [
         ":Accepted_batch",
         ":Accepted_expect",
         ":Clambda_optim",

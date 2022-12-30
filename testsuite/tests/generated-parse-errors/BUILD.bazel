@@ -1,7 +1,6 @@
 ## GENERATED FILE ##
 
 load("//bzl:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 

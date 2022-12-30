@@ -1,15 +1,14 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_typing-shadowing-of-pervasives-submodules_lib",
-    manifest  = [
+    tests  = [
         ":LargeFile",
         ":Redefine_largefile",
         ":Redefine_largefile_top",

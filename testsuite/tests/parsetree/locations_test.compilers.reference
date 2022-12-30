@@ -46,7 +46,7 @@ Ptop_def
           ptype_kind =
             Ptype_abstract
           ptype_private = Public
-          ptype_manifest =
+          ptype_tests =
             Some
               core_type (//toplevel//[2,1+9]..[2,1+12])
                 attribute "attr"
@@ -155,7 +155,7 @@ Ptop_def
                   ptype_kind =
                     Ptype_abstract
                   ptype_private = Public
-                  ptype_manifest =
+                  ptype_tests =
                     None
               ]
           ]
@@ -180,7 +180,7 @@ Ptop_def
                 ptype_kind =
                   Ptype_abstract
                 ptype_private = Public
-                ptype_manifest =
+                ptype_tests =
                   Some
                     core_type (//toplevel//[2,1+34]..[2,1+37])
                       Ptyp_constr "int" (//toplevel//[2,1+34]..[2,1+37])
@@ -207,7 +207,7 @@ Ptop_def
                 ptype_kind =
                   Ptype_abstract
                 ptype_private = Public
-                ptype_manifest =
+                ptype_tests =
                   Some
                     core_type (//toplevel//[2,1+35]..[2,1+38])
                       Ptyp_constr "int" (//toplevel//[2,1+35]..[2,1+38])

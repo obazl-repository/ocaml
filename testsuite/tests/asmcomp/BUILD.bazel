@@ -1,37 +1,34 @@
-## GENERATED FILE ##
-
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
-    name = "testsuite_tests_asmcomp_lib",
-    manifest  = [
-        ":0001-test",
-        ":Bind_tuples",
-        ":Compare",
-        ":Func_sections",
-        ":Is_static",
-        ":Is_static_flambda",
-        ":Is_static_flambda_dep",
-        ":Lift_mutable_let_flambda",
-        ":Optargs",
-        ":Polling_insertion",
-        ":Register_typing",
-        ":Register_typing_switch",
-        ":Simple_float_const",
-        ":Simple_float_const_opaque",
-        ":Static_float_array_flambda",
-        ":Static_float_array_flambda_opaque",
-        ":Staticalloc",
-        ":Try_checkbound",
-        ":Unrolling_flambda",
-        ":Unrolling_flambda2",
-    ],
-)
+# test_suite(
+#     name = "testsuite_tests_asmcomp_lib",
+#     tests  = [
+#         ":0001-test",
+#         ":Bind_tuples",
+#         ":Compare",
+#         ":Func_sections",
+#         ":Is_static",
+#         ":Is_static_flambda",
+#         ":Is_static_flambda_dep",
+#         ":Lift_mutable_let_flambda",
+#         ":Optargs",
+#         ":Polling_insertion",
+#         ":Register_typing",
+#         ":Register_typing_switch",
+#         ":Simple_float_const",
+#         ":Simple_float_const_opaque",
+#         ":Static_float_array_flambda",
+#         ":Static_float_array_flambda_opaque",
+#         ":Staticalloc",
+#         ":Try_checkbound",
+#         ":Unrolling_flambda",
+#         ":Unrolling_flambda2",
+#     ],
+# )
 
 ocaml_module(
     name   = "0001-test",

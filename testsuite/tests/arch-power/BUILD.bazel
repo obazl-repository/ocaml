@@ -1,18 +1,8 @@
-## GENERATED FILE ##
-
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
-
-ocaml_library(
-    name = "testsuite_tests_arch-power_lib",
-    manifest  = [
-        ":Exn_raise",
-    ],
-)
+MODULE_OPTS = []
 
 ocaml_module(
     name   = "Exn_raise",

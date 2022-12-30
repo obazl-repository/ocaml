@@ -1,17 +1,16 @@
-## GENERATED FILE ##
+
 
 load("//test:rules.bzl",
-     "ocaml_library",
      "ocaml_module",
      "ocaml_signature",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 SIG_OPTS = ["-nostdlib"]
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_basic-private_lib",
-    manifest  = [
+    tests  = [
         ":Length",
         ":Tlength",
     ],

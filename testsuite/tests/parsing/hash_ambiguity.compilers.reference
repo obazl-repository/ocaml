@@ -32,7 +32,7 @@
         ptype_kind =
           Ptype_abstract
         ptype_private = Public
-        ptype_manifest =
+        ptype_tests =
           Some
             core_type (hash_ambiguity.ml[9,169+12]..[9,169+27])
               Ptyp_alias "a"
@@ -72,7 +72,7 @@
                 None
             ]
         ptype_private = Public
-        ptype_manifest =
+        ptype_tests =
           None
     ]
   structure_item (hash_ambiguity.ml[17,453+0]..[17,453+32])
@@ -106,7 +106,7 @@
                 None
             ]
         ptype_private = Public
-        ptype_manifest =
+        ptype_tests =
           None
     ]
 ]

@@ -497,7 +497,7 @@
         ptype_kind =
           Ptype_abstract
         ptype_private = Public
-        ptype_manifest =
+        ptype_tests =
           Some
             core_type (shortcut_ext_attr.ml[61,1304+2]..[61,1304+22]) ghost
               Ptyp_extension "foo"
@@ -588,7 +588,7 @@
             ptype_kind =
               Ptype_abstract
             ptype_private = Public
-            ptype_manifest =
+            ptype_tests =
               Some
                 core_type (shortcut_ext_attr.ml[79,1615+19]..[79,1615+22])
                   Ptyp_constr "int" (shortcut_ext_attr.ml[79,1615+19]..[79,1615+22])
@@ -603,7 +603,7 @@
             ptype_kind =
               Ptype_abstract
             ptype_private = Public
-            ptype_manifest =
+            ptype_tests =
               Some
                 core_type (shortcut_ext_attr.ml[80,1638+14]..[80,1638+17])
                   Ptyp_constr "int" (shortcut_ext_attr.ml[80,1638+14]..[80,1638+17])
@@ -815,7 +815,7 @@
                     ptype_kind =
                       Ptype_abstract
                     ptype_private = Public
-                    ptype_manifest =
+                    ptype_tests =
                       Some
                         core_type (shortcut_ext_attr.ml[101,2020+21]..[101,2020+24])
                           Ptyp_constr "int" (shortcut_ext_attr.ml[101,2020+21]..[101,2020+24])
@@ -830,7 +830,7 @@
                     ptype_kind =
                       Ptype_abstract
                     ptype_private = Public
-                    ptype_manifest =
+                    ptype_tests =
                       Some
                         core_type (shortcut_ext_attr.ml[102,2045+17]..[102,2045+20])
                           Ptyp_constr "int" (shortcut_ext_attr.ml[102,2045+17]..[102,2045+20])
