@@ -613,7 +613,7 @@ def _compile_fail_test(ctx):
     args.extend([">", dump + ";"])
 
     ## now diff the output:
-    args.extend(["diff", "-w", dump, ctx.file.expect.path])
+    args.extend(["diff", "-w", dump, ctx.file.expected.path])
 
     script = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
     ctx.actions.write(
@@ -639,7 +639,7 @@ def _compile_fail_test(ctx):
 
     # print("DATA: %s" % ctx.files.data)
     myrunfiles = ctx.runfiles(
-        files = [ctx.file.struct, ctx.file.expect],
+        files = [ctx.file.struct, ctx.file.expected],
         transitive_files =  depset(
             transitive = [
                 depset(direct=runfiles),

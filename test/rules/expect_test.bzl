@@ -7,7 +7,7 @@ load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
-load("test_executable.bzl", _test_executable = "test_executable")
+load("test_executable.bzl", test_executable = "test_executable")
 
 load(":test_transitions.bzl",
      "vv_test_in_transition",
@@ -222,7 +222,7 @@ def expect_test(name,
     ss_name = executable + "_ss_test"
     sv_name = executable + "_sv_test"
 
-    _test_executable(
+    test_executable(
         name    = executable,
         main    = executable
     )

@@ -24,9 +24,9 @@ load("//test:rules.bzl",
 test_suite(
     name = "tests",
     tests = [
-        ":arrays_test",
-        ":bigints_test",
-        ":boxedints_test",
+        ":Arrays_test",
+        ":Bigints_test",
+        ":Boxedints_test",
         ":constprop_test",
         ":divint_test",
         ":equality_test",
