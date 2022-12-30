@@ -27,7 +27,7 @@ test_module_ = rule(
         _stdlib = attr.label(
             ## only added to depgraph if stdlib_primitives == True
             allow_single_file = True,
-            default = "//stdlib:Stdlib"
+            default = "//stdlib"
         ),
         # _resolver = attr.label(
         #     doc = "The compiler always opens Stdlib, so everything depends on it.",
@@ -39,7 +39,7 @@ test_module_ = rule(
         _rule = attr.string( default = "test_module" ),
     ),
     ## Should not be run as direct CLI build, only as a dep of
-    ## toplevel test rule, which sets config.
+    ## toplevel test rule, which sets config. (?)
     # cfg = vv_test_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,

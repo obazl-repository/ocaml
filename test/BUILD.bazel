@@ -29,7 +29,7 @@ OCAMLC_PROLOGUE = select({
     "//compilerlibs:ocamlcommon",
     "//bytecomp:ocamlbytecomp"
 ]
-OCAMLC_BYTE_MAIN = "//driver:Main"
+OCAMLC_MAIN = "//driver:Main"
 
 OCAMLOPT_PROLOGUE = select({
     "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
@@ -38,7 +38,7 @@ OCAMLOPT_PROLOGUE = select({
     "//compilerlibs:ocamlcommon",
     "//asmcomp:ocamloptcomp"
 ]
-OCAMLOPT_BYTE_MAIN = "//driver:Optmain"
+OCAMLOPT_MAIN = "//driver:Optmain"
 
 OCAML_COMPILER_OPTS = select({
     # ocamlc.byte: ["-compat-32"]
@@ -57,7 +57,7 @@ OCAML_COMPILER_OPTS = select({
 t_ocamlc_byte(
     name       = "ocamlc.byte",
     prologue   = OCAMLC_PROLOGUE,
-    main       = OCAMLC_BYTE_MAIN,
+    main       = OCAMLC_MAIN,
     opts       = OCAML_COMPILER_OPTS,
     visibility = ["//visibility:public"]
 )
@@ -89,7 +89,7 @@ sh_binary(
 t_ocamlopt_byte(
     name = "ocamlopt.byte",
     prologue = OCAMLOPT_PROLOGUE,
-    main = OCAMLOPT_BYTE_MAIN,
+    main = OCAMLOPT_MAIN,
     opts = OCAML_COMPILER_OPTS,
     visibility             = ["//visibility:public"]
 )
@@ -118,50 +118,20 @@ sh_binary(
 ################################################################
 ################
 t_ocamlopt_opt(
-    name = "ocamlopt.opt",
-    prologue = [
-        "//stdlib",
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp"
-    ],
-    main = "//driver:Main",
-    opts = [ ] + select({
-        # ocamlc.byte: ["-compat-32"]
-        "//conditions:default": []
-    }) + [
-    ] + select({
-        "//platform/target/os:linux?": [
-            "-cclib", "-lm",
-            "-cclib", "-ldl",
-            "-cclib", "-lpthread",
-        ],
-        "//conditions:default": []
-    }),
-    visibility             = ["//visibility:public"]
+    name       = "ocamlopt.opt",
+    prologue   = OCAMLOPT_PROLOGUE,
+    main       = OCAMLOPT_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
+    visibility = ["//visibility:public"]
 )
 
 ################################################################
 ################
 t_ocamlc_opt(
     name = "ocamlc.opt",
-    prologue = [
-        "//stdlib",
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp"
-    ],
-    main = "//driver:Main",
-    opts = [ ] + select({
-        # ocamlc.byte: ["-compat-32"]
-        "//conditions:default": []
-    }) + [
-    ] + select({
-        "//platform/target/os:linux?": [
-            "-cclib", "-lm",
-            "-cclib", "-ldl",
-            "-cclib", "-lpthread",
-        ],
-        "//conditions:default": []
-    }),
+    prologue   = OCAMLC_PROLOGUE,
+    main       = OCAMLC_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
     visibility             = ["//visibility:public"]
 )
 

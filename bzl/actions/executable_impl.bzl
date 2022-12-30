@@ -178,8 +178,8 @@ def executable_impl(ctx, tc, exe_name,
         # for f in ctx.files._runtime: ## libasmrun.a
         # for f in tc.runtime: ## libasmrun.a
 
-        print("tc.COMPILER: %s" % tc.compiler)
-        print("tc.RUNTIME: %s" % tc.runtime.path)
+        # print("tc.COMPILER: %s" % tc.compiler)
+        # print("tc.RUNTIME: %s" % tc.runtime.path)
         args.add(tc.runtime.path)
 
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
@@ -376,7 +376,12 @@ def executable_impl(ctx, tc, exe_name,
     ##FIXME: this logic is for building compilers only?
     ## ordinary executables might not list stdib archive dep?
 
-    if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+    if ("test_exe" in ctx.attr.tags):
+        # or "test_vs" in ctx.attr.tags):
+        # rule ss_test_executable has only 'main', no prologue
+        for dep in cli_link_deps_depset.to_list():
+            args.add(dep)
+    elif ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
         ## FIXME: this strategy works for archives, where we want to
         ## archive only those modules explicitly listed in manifest.
         ## but it does not executables.
@@ -399,7 +404,6 @@ def executable_impl(ctx, tc, exe_name,
     # for dep in cli_link_deps_depset.to_list():
     #     args.add(dep)
     # args.add(ctx.file.main)
-
 
     if hasattr(ctx.attr, "epilogue"):
         args.add_all(ctx.files.epilogue)
@@ -486,8 +490,8 @@ def executable_impl(ctx, tc, exe_name,
         # + [depset(action_inputs_ccdep_filelist)]
     )
 
-    if ctx.label.name == "ocamlopt.opt":
-        print("afiles: %s" % afiles_depset)
+    # if ctx.label.name == "ocamlopt.opt":
+    #     print("afiles: %s" % afiles_depset)
         # fail()
 
     if ctx.attr._rule == "boot_executable":

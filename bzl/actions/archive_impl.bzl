@@ -280,7 +280,7 @@ def archive_impl(ctx):
         ocamlArchiveProvider
     ]
 
-    print("boot provider:")
-    print(bootProvider)
+    # print("boot provider:")
+    # print(bootProvider)
 
     return providers

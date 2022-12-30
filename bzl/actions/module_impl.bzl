@@ -352,7 +352,6 @@ def module_impl(ctx, module_name):
                 stdlib_module_target = dep
             elif dep.label.name == "stdlib": ## stdlib archive OR library
                 stdlib_library_target = dep
-                break;
 
         ## Now what if this module is to be archived, and this dep is
         ## a sibling submodule? If it is a sibling it goes in

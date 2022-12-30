@@ -88,6 +88,7 @@ ss_test_executable = rule(
     implementation = _test_executable_impl,
     doc = "Links OCaml executable binary using ocamlopt.opt",
     attrs = dict(
+        ##FIXME: remove prologue, epilogue
         executable_attrs(),
         # _runtime = attr.label(
         #     allow_single_file = True,
@@ -155,6 +156,7 @@ def test_executable(name, main,
         main    = main,
         opts    = opts,  ##  + ["-pervasives"],
         # prologue = ["//stdlib"],
+        tags = ["test_exe"],
         **kwargs
     )
 
@@ -185,18 +187,21 @@ def test_executable(name, main,
     vs_test_executable(
         name    = main + ".vs.opt",
         main    = main,
+        tags    = ["test_exe"],
         **kwargs
     )
 
     ss_test_executable(
         name    = main + ".ss.opt",
         main    = main,
+        tags = ["test_exe"],
         **kwargs
     )
 
     sv_test_executable(
         name    = main + ".sv.byte",
         main    = main,
+        tags    = ["test_exe"],
         **kwargs
     )
 

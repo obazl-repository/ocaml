@@ -17,7 +17,7 @@ def _vv_test_in_transition_impl(settings, attr):
     ## we only want to rebuild the compiler, not the bld tools
     ## bin/test:ocamlc.byte is built by .baseline/bin:ocamlc.byte
     compiler = "//test:ocamlc.byte"
-    ocamlrun = "//runtime:ocamlrun"
+    ocamlrun = "@baseline//bin:ocamlrun"
     runtime  = "@baseline//lib:libcamlrun.a"
     # mustach  = "@baseline//bin:mustach"
     # cvt_emit = "@baseline//bin:cvt_emit.byte"
@@ -71,11 +71,10 @@ def _vs_test_in_transition_impl(settings, attr):
     config_executor = "vm"
     config_emitter  = "sys"
 
-    ## we only want to rebuild the compiler, not the bld tools
-    ## bin/test:ocamlc.byte is built by .baseline/bin:ocamlc.byte
-    compiler = "//bin:ocamlopt.byte"
-    runtime  = "//runtime:asmrun"
-    ocamlrun = "//runtime:ocamlrun"
+    compiler = "//test:ocamlopt.byte"
+    # runtime  = "//runtime:asmrun"
+    runtime  = "@baseline//lib:libasmrun.a"
+    ocamlrun = "@baseline//bin:ocamlrun"
 
     # runtime  = "@baseline//lib:libcamlrun.a"
     # mustach  = "@baseline//bin:mustach"
@@ -136,8 +135,9 @@ def _ss_test_in_transition_impl(settings, attr):
     config_executor = "sys"
     config_emitter  = "sys"
 
-    compiler = "//bin:ocamlopt.opt"
-    ocamlrun = "//runtime:ocamlrun"
+    compiler = "//test:ocamlopt.opt"
+    ocamlrun = "@baseline//bin:ocamlrun"
+    # ocamlrun = "//runtime:ocamlrun"
     runtime  = "@baseline//lib:libasmrun.a"
     # mustach  = "@baseline//bin:mustach"
     # cvt_emit = "@baseline//bin:cvt_emit.byte"
@@ -199,7 +199,7 @@ def _sv_test_in_transition_impl(settings, attr):
     config_executor = "sys"
     config_emitter  = "vm"
 
-    compiler = "//bin:ocamlc.opt"
+    compiler = "//test:ocamlc.opt"
     # ocamlrun = "//runtime:ocamlrun"
     runtime  = "@baseline//lib:libcamlrun.a"
     # mustach  = "@baseline//bin:mustach"
