@@ -1,4 +1,8 @@
 = stdlib
+:toc: auto
+:toclevels: 3
+
+== The Stdlib resolver module
 
 The xref:terminology.adoc#resolver[resolver] module `/stdlib:Stdlib` contains more than just module aliases
 for the namespace. It follows that other modules may depend on it for
@@ -25,11 +29,11 @@ is used as a provider of primitives. In the latter case we use alias
 little more explicity about the nature of Stdlib dependencies.
 
 The compilers in a release default to `-pervasives`; this means that
-the linker will load and open `stdlib.cmx?a`. This does more than just
-make the submodules of the Stdlib namespace accessible without the
-`Stdlib.` prefix; it also exposes a collection of language primitives,
-like integer operators ( `+`, `-`, etc.), comparison operators (`=`,
-`<>`), and many others.
+the linker will (silently) load `std_exit.cm[o|x]` and `stdlib.cmx?a`
+and open `Stdlib`. This makes the submodules of the
+Stdlib namespace accessible without the prefix `Stdlib.`; it also
+exposes a collection of language primitives, like integer operators (
+`+`, `-`, etc.), comparison operators (`=`, `<>`), and many others.
 
 This is purely a convenience for users; it saves them the trouble of
 explicitly depending on and opening `Stdlib`. Since virtually all user
@@ -39,8 +43,11 @@ loading `stdlib.cmx?a` and opening `Stdlib` makes sense.
 However, for compiler development this is ineffecient. It makes
 everything dependent on `stdlib.cmx?a`.
 
-Example: `stdlib/atomic.ml` does not depend on anything in stdlib so
-there is no reason to load `stdlib.cmx?a` nor to open `Stdlib`.
+IMPORTANT: By default, the Bazel builds always use `-nopervasives`.
+
+Example: `stdlib/atomic.ml` does not depend on any primitives or
+submodules in `Stdlib`, so there is no reason to load `stdlib.cmx?a`
+nor to open `Stdlib`.
 
 Example: `//testsuite/tests/basic/array.ml`. The Bazel target to build
  module `Array` from this file is `//testsuite/tests/basic:Arrays`;
@@ -54,7 +61,8 @@ Error: Unbound value ref
 
 This code uses `ref`, which is a primitive; that makes it dependent on
  the `Stdlib` module (Bazel target `//stdlib:Stdlib`). Adding that as
- a dependency results in the following error:
+ a dependency and adding `-open Stdlib` to the command line then
+ results in the following error:
 
 ----
 39 |   Gc.full_major();
@@ -66,12 +74,12 @@ This tells us that the compiler was able to find symbol `Gc` in an
 aliasing equation of the form `module Gc = Stdlib__Gc`; this equation
 is found in the `Stdlib` module, which we just loaded and opened. Now
 we need to make submodule `Gc` available, so we list its Bazel target
-label as a dependency: `//stdlib:Stdlib.Gc`.
+label `//stdlib:Stdlib.Gc` in the `stdlib_deps` attribute..
 
 With that the build succeeds.
 
-How it works: the Bazel rules (for building the OCamlcc compilers; not
-the general rules in `rules_ocaml`) always pass `-nopervasives`. In
+*How it works*: the Bazel rules (for building the OCamlcc compilers; not
+the general rules in `rules_ocaml`) always pass [nowrap]`-nopervasives`. In
 other words, they do _not_ assume that everything depends on a
 primitive or a `Stdlib` submodule. This forces the build code to be
 explicit about dependencies. A build target that depends on a
@@ -83,8 +91,8 @@ dependency.
 To make this less inconvenient the Bazel rules can make the following inferences:
 
 * if a `Stdlib` submodule is a dependency, either direct or indirect,
-  then `-open Stdlib` should be added to the command line (partially overriding
-  `-nopervasives`);
+  then `-open Stdlib` will be added to the command line (partially
+  overriding `-nopervasives`);
 * if an explicitly listed dependency (e.g. `//stdlib:Stdlib.Gc`)
   depends on `//stdlib:Stdlib`, then it counts as an indirect
   dependency, and will automatically be added to the target's list of
@@ -107,6 +115,92 @@ graph of module `Gc`, and the Bazel build rules automatically include
 transitive dependencies.
 ====
 
+== Compiler libs: to archive or not?
+
+The "compiler libs" here are the libraries required to build the
+compiler, not the `compiler-libs` exported as user libs. They are
+`ocamlcommon.cmx?a`, `ocamlbytecomp.cmx?a`, `ocamloptcomp.cmx?a`, and
+`stdlib.cmx?a`.
+
+Under Bazel we have the option of building the compilers with or
+without archived compiler libs. (See link:terminology[symbols &
+terminology] for an explanation of the difference.)
+
+IMPORTANT: This is separate from but related to `-nopervasives`. If we
+build with `-nopervasives`, then we can build with compiler libs
+archived or unarchived. But if we build without `-nopervasives` (i.e.
+the standard build strategy), then archiving is required, at least for
+the standard library, since the linker is hard-coded to look for
+`stdlib.cmx?a`. But the other compiler libs (`ocamlcommon`,
+`ocamlbytecomp`, `ocamloptcomp`) could still be built without
+archiving.
+
+== Examples
+
+* Build `ocamlc.byte` with unarchived compiler libs (the default):
+
+----
+$ bazel build //bin:ocamlc.byte
+...
+  bazel-out/darwin-opt-exec-2B5CBBC6-ST-39032ce6a851/bin/runtime/ocamlrun \
+    bazel-out/darwin-fastbuild-ST-942ffa46325e/bin/boot/ocamlc.boot \
+    -nostdlib \
+    -nopervasives \
+    -I ... elided include directives ...
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/config/camlheaders \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/stdlib/_BS/CamlinternalFormatBasics.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/stdlib/_BS/Stdlib.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/stdlib/_BS/Stdlib__Sys.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/stdlib/_BS/Stdlib__Atomic.cmo \
+    ... many deps elided ...
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bytecomp/_BS/Bytelink.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bytecomp/_BS/Bytelibrarian.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bytecomp/_BS/Bytepackager.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bytecomp/_BS/Printinstr.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/driver/_BS/Errors.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/driver/_BS/Compile.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/driver/_BS/Maindriver.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/driver/_BS/Main.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/stdlib/_BS/std_exit.cmo \
+    -o \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bin/_BS/ocamlc.byte)
+----
+
+
+* Build `ocamlc.byte` with archived compiler libs:
+
+----
+$ bazel build //bin:ocamlc.byte --//config/ocaml/compiler/libs:archived
+...
+ bazel-out/darwin-opt-exec-2B5CBBC6-ST-39032ce6a851/bin/runtime/ocamlrun \
+    bazel-out/darwin-fastbuild-ST-942ffa46325e/bin/boot/ocamlc.boot \
+    -nostdlib \
+    -nopervasives \
+    -I ... (elided) ...
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/config/camlheaders \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/stdlib/_BS/stdlib.cma \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/compilerlibs/_BS/ocamlcommon.cma \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bytecomp/_BS/ocamlbytecomp.cma \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/driver/_BS/Main.cmo \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/stdlib/_BS/std_exit.cmo \
+    -o \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bin/_BS/ocamlc.byte)
+----
+
+Notice that everything required for linking an executable is made
+explicit on the command line; in particular `stdlib.cma` and
+`std_exit.cmo`. If we were to build without `-nopervasives`, these
+dependencies would be not be expressed on the command line, since the
+linker is hard-coded to find them. In fact if we did list them on the
+command line the compiler would complain about double linking.
+
+== notes
+
+* if we pass std_exit on the cmd line and also -pervasives, we get a
+  "twice linked" error, since the compiler is hard-coded to pick up
+  std_exit.cm[o|x] but we also pass it on the cmd line. So if we want
+  to be explicit about the std_exit dep, we must pass `-nopervasives`.
+  Otherwise, it will be silently linked by the compiler.
 
 == obsolete notes:
 

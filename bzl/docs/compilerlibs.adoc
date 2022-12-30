@@ -275,7 +275,7 @@ The result is that our target for building `ocamlcommon.cma/cmxa`
 looks like this, in `compilerlibs/BUILD.bazel`:
 
 ```
-boot_archive(
+compiler_library(
     name = "ocamlcommon",
     opts = ["-linkall"],
     manifest  = [

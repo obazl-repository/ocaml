@@ -13,8 +13,9 @@ In the world of OCaml the term "library" is heavily
   client code to depend on a collection of modules by name without
   archiving it. But libraries may also be archived, by setting the
   `archive` attribute on a library rule.
+
 [[archive]]Archive::
-a library packaged as an OCaml archive file (.cma
+An archive is a library packaged as an OCaml archive file (.cma
   or .cmxa file). Archives are expressed by library rules with
   attribute `archive` set to True.
 +
@@ -74,6 +75,18 @@ namespace, `Dynlink_compilerlibs`, which is implemented as a "packed"
 module the legacy Makefile system. See link:dynlink.adoc[dynlink] for
 more information.
 
+Toolchain::
+A toolchain is ...
+
+Toolchain adapter::
+A tc is ...
+
+Toolchain selector::
+A tc selector ...
+
+Toolset::
+A toolset is a collection of tools.
+
 == compiler names
 
 The compilers are composed of:
@@ -124,6 +137,7 @@ Names for flambda-enabled compilers use `optx`:
 * `ocamlc.optx` - executor: flambda-optimized native compiler emitting bytecode
 * `ocamloptx.optx` - flambda-optimized native compiler emitting flambda-optimized native code
 * `ocamlopt.optx` - flambda-optimized native compiler emitting (non-flambda) native code
+* `ocamloptx.opt` - un-optimized native compiler emitting flambda native code
 
 === OCamlCC naming conventions
 
@@ -135,20 +149,21 @@ following abbreviations:
 * `ss` - sys executor, sys emitter: `ocamlopt.opt`
 * `sv` - sys executor, vm emitter: `ocamlc.opt`
 
-Flambda uses upper-case:
+Flambda uses 'x':
 
-* `vS` - vm executor, flambda emitter:  `ocamloptx.byte`
-* `SS` - flambda executor, flambda emitter: `ocamloptx.optx`
-* `Sv` - flambda executor, vm emitter: `ocamlc.optx`
-* `Ss` - flambda executor, sys emitter: `ocamlopt.optx`
+* `vx` - vm executor, flambda emitter:  `ocamloptx.byte`
+* `xx` - flambda executor, flambda emitter: `ocamloptx.optx`
+* `xv` - flambda executor, vm emitter: `ocamlc.optx`
+* `xs` - flambda executor, sys emitter: `ocamlopt.optx`
+* `sx` - sys executor, flambda emitter: `ocamloptx.opt`
 
-Special case:  `VV` for `boot/ocamlc` (vm executor and emitter)
+Special case:  `BS` for `boot/ocamlc` (vm executor and emitter)
 
 These abbreviations are used to construct the working directory for
 compiler builds, thus encoding the provenance of each compiler. For
 example, the working directory for `ocamlopt.optx` is:
 
-    ocamlcc/bin/_VV_vS_SS_SS/ocamlopt.optx
+    ocamlcc/bin/_BS_vx_xx_xx/ocamlopt.optx
 
 which indicates that `boot/ocamlc` built `ocamloptx.byte`, which built
 `ocamloptx.optx`, which built itself (another `ocamloptx.optx), which
@@ -156,20 +171,20 @@ built the `ocamlopt.optx` shown. The actual build command that printed
 this is:
 
 ----
- bazel-out/darwin-fastbuild-ST-4ec7cbaf6f37/bin/bin/_VV_vS_SS/ocamloptx.optx \
+[ bazel-out/darwin-fastbuild-ST-4ec7cbaf6f37/bin/bin/_BS_vx_xx/ocamloptx.optx \
     bazel-out/darwin-opt-exec-2B5CBBC6-ST-3c4e7a86d990/bin/runtime/libasmrun.a \
     -nostdlib \
     ... other options ...
     -I ... (include directives elided) ...
-    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_VV_vS_SS_SS/CamlinternalFormatBasics.cmx \
-    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_VV_vS_SS_SS/Stdlib.cmx \
-    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_VV_vS_SS_SS/Stdlib__Sys.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_BS_vx_xx_xx/CamlinternalFormatBasics.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_BS_vx_xx_xx/Stdlib.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_BS_vx_xx_xx/Stdlib__Sys.cmx \
     ... other module deps, elided ...
-    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/driver/_VV_vS_SS_SS/Optmaindriver.cmx \
-    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/driver/_VV_vS_SS_SS/Optmain.cmx \
-    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_VV_vS_SS_SS/std_exit.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/driver/_BS_vx_xx_xx/Optmaindriver.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/driver/_BS_vx_xx_xx/Optmain.cmx \
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/stdlib/_BS_vx_xx_xx/std_exit.cmx \
     -o \
-    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/bin/_VV_vS_SS_SS/ocamlopt.optx)
+    bazel-out/darwin-fastbuild-ST-163fcd87d216/bin/bin/_BS_vx_xx_xx/ocamlopt.optx)
 ----
 
 In other words, the working directory indicates which compiler was
