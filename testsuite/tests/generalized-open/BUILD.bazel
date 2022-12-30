@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -20,7 +20,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Accepted_batch",
     struct = "accepted_batch.ml",
     opts = MODULE_OPTS,
@@ -28,7 +28,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Accepted_expect",
     struct = "accepted_expect.ml",
     opts = MODULE_OPTS,
@@ -36,7 +36,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Clambda_optim",
     struct = "clambda_optim.ml",
     opts = MODULE_OPTS,
@@ -44,7 +44,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Expansiveness",
     struct = "expansiveness.ml",
     opts = MODULE_OPTS,
@@ -52,7 +52,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Funct_body",
     struct = "funct_body.ml",
     opts = MODULE_OPTS,
@@ -60,7 +60,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Gpr1506",
     struct = "gpr1506.ml",
     opts = MODULE_OPTS,
@@ -68,7 +68,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr10048",
     struct = "pr10048.ml",
     opts = MODULE_OPTS,
@@ -76,7 +76,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Shadowing",
     struct = "shadowing.ml",
     opts = MODULE_OPTS,

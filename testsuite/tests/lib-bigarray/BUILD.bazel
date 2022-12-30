@@ -23,8 +23,8 @@ test_suite(
 expect_test(
     name    = "Bigarrays_test",
     stdout  = "Bigarrays.stdout",
-    expect  = "bigarrays.reference",
-    main    = ":Bigarrays",
+    expected= "bigarrays.reference",
+    test_module = ":Bigarrays",
     timeout = "short"
 )
 
@@ -43,8 +43,8 @@ test_module(
 expect_test(
     name     = "Change_layout_test",
     stdout   = "change_layout.stdout",
-    expect   = "change_layout.reference",
-    main     = ":Change_layout",
+    expected = "change_layout.reference",
+    test_module = ":Change_layout",
     timeout  = "short"
 )
 
@@ -60,8 +60,8 @@ test_module(
 expect_test(
     name     = "Fftba_test",
     stdout   = "fftba.stdout",
-    expect   = "fftba.reference",
-    main     = ":Fftba",
+    expected = "fftba.reference",
+    test_module = ":Fftba",
     timeout  = "short"
 )
 
@@ -74,8 +74,8 @@ test_module(
 expect_test(
     name     = "Pr5115_test",
     stdout   = "pr5115.stdout",
-    expect   = "pr5115.reference",
-    main     = ":Pr5115",
+    expected = "pr5115.reference",
+    test_module = ":Pr5115",
     timeout  = "short"
 )
 
@@ -91,8 +91,8 @@ test_module(
 expect_test(
     name     = "Weak_bigarray_test",
     stdout   = "weak_bigarray.stdout",
-    expect   = "weak_bigarray.reference",
-    main     = ":Weak_bigarray",
+    expected = "weak_bigarray.reference",
+    test_module = ":Weak_bigarray",
     timeout  = "short"
 )
 

@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -16,7 +16,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "New_obj",
     struct = "new_obj.ml",
     opts = MODULE_OPTS,
@@ -24,7 +24,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Reachable_words",
     struct = "reachable_words.ml",
     opts = MODULE_OPTS,
@@ -32,7 +32,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Reachable_words_np",
     struct = "reachable_words_np.ml",
     opts = MODULE_OPTS,
@@ -40,7 +40,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "With_tag",
     struct = "with_tag.ml",
     opts = MODULE_OPTS,

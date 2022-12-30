@@ -1,7 +1,6 @@
 load("//test:rules.bzl",
      "test_archive",
      "test_executable",
-     "test_library",
      "test_module",
      "test_signature",
      "ocaml_test",
@@ -29,7 +28,7 @@ expect_test(
     name     = "Testarg_test",
     stdout   = "testarg.stdout",
     expected = "testarg.reference",
-    main     = ":Testarg",
+    test_module = ":Testarg",
     timeout  = "short"
 )
 
@@ -47,7 +46,7 @@ expect_test(
     name     = "Testerror_test",
     stdout   = "testerror.stdout",
     expected = "testerror.reference",
-    main     = ":Testerror",
+    test_module = ":Testerror",
     timeout  = "short"
 )
 

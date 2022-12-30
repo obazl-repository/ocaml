@@ -1,5 +1,5 @@
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -11,7 +11,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Wc",
     struct = "wc.ml",
     opts = MODULE_OPTS,

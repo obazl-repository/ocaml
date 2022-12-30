@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -18,7 +18,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "A",
     struct = "a.ml",
     opts = MODULE_OPTS,
@@ -26,7 +26,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "B",
     struct = "b.ml",
     opts = MODULE_OPTS,
@@ -34,7 +34,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "C",
     struct = "c.ml",
     opts = MODULE_OPTS,
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Main",
     struct = "main.ml",
     opts = MODULE_OPTS,
@@ -50,7 +50,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Main_ok",
     struct = "main_ok.ml",
     opts = MODULE_OPTS,
@@ -58,7 +58,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test",
     struct = "test.ml",
     opts = MODULE_OPTS,

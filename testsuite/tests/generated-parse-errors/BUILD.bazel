@@ -1,19 +1,17 @@
-## GENERATED FILE ##
-
-load("//bzl:rules.bzl",
-     "ocaml_module",
+load("//test:rules.bzl",
+     "test_module",
 )
 
-MODULE_OPTS = ["-nostdlib"]
+MODULE_OPTS = []
 
-ocaml_library(
+test_suite(
     name = "testsuite_tests_generated-parse-errors_lib",
-    modules  = [
+    tests  = [
         ":Errors",
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Errors",
     struct = "errors.ml",
     opts = MODULE_OPTS,

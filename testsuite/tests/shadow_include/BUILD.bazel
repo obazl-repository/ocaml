@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -16,7 +16,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Artificial",
     struct = "artificial.ml",
     opts = MODULE_OPTS,
@@ -24,7 +24,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Cannot_shadow_error",
     struct = "cannot_shadow_error.ml",
     opts = MODULE_OPTS,
@@ -32,7 +32,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ghosts",
     struct = "ghosts.ml",
     opts = MODULE_OPTS,
@@ -40,7 +40,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Shadow_all",
     struct = "shadow_all.ml",
     opts = MODULE_OPTS,

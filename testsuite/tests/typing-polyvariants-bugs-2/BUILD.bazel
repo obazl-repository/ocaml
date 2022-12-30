@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -13,13 +13,13 @@ test_suite(
     tests  = [
         ":Pr3918c",
     ],
-    signatures  = [
-        ":Pr3918a_cmi",
-        ":Pr3918b_cmi",
-    ],
+    # signatures  = [
+    #     ":Pr3918a_cmi",
+    #     ":Pr3918b_cmi",
+    # ],
 )
 
-ocaml_signature(
+test_signature(
     name = "Pr3918a_cmi",
     src  = "pr3918a.mli",
     opts = SIG_OPTS,
@@ -27,7 +27,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Pr3918b_cmi",
     src  = "pr3918b.mli",
     opts = SIG_OPTS,
@@ -35,7 +35,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr3918c",
     struct = "pr3918c.ml",
     opts = MODULE_OPTS,

@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -31,7 +31,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "A",
     struct = "a.ml",
     opts = MODULE_OPTS,
@@ -39,7 +39,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Api",
     struct = "api.ml",
     opts = MODULE_OPTS,
@@ -47,7 +47,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "B",
     struct = "b.ml",
     opts = MODULE_OPTS,
@@ -55,7 +55,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Bug",
     struct = "bug.ml",
     opts = MODULE_OPTS,
@@ -63,7 +63,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "C",
     struct = "c.ml",
     opts = MODULE_OPTS,
@@ -71,7 +71,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Main",
     struct = "main.ml",
     opts = MODULE_OPTS,
@@ -79,7 +79,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pack_client",
     struct = "pack_client.ml",
     opts = MODULE_OPTS,
@@ -87,7 +87,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Packed1",
     struct = "packed1.ml",
     opts = MODULE_OPTS,
@@ -95,7 +95,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Packed1_client",
     struct = "packed1_client.ml",
     opts = MODULE_OPTS,
@@ -103,7 +103,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Plugin",
     struct = "plugin.ml",
     sig    = "Plugin_cmi",
@@ -112,7 +112,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Plugin_cmi",
     src  = "plugin.mli",
     opts = SIG_OPTS,
@@ -120,7 +120,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Plugin2",
     struct = "plugin2.ml",
     opts = MODULE_OPTS,
@@ -128,7 +128,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Plugin4",
     struct = "plugin4.ml",
     opts = MODULE_OPTS,
@@ -136,7 +136,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Plugin_ext",
     struct = "plugin_ext.ml",
     opts = MODULE_OPTS,
@@ -144,7 +144,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Plugin_high_arity",
     struct = "plugin_high_arity.ml",
     opts = MODULE_OPTS,
@@ -152,7 +152,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Plugin_ref",
     struct = "plugin_ref.ml",
     opts = MODULE_OPTS,
@@ -160,7 +160,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Plugin_simple",
     struct = "plugin_simple.ml",
     opts = MODULE_OPTS,
@@ -168,7 +168,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Plugin_thread",
     struct = "plugin_thread.ml",
     opts = MODULE_OPTS,

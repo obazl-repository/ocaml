@@ -1,11 +1,10 @@
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
-ocaml_module(
+test_module(
     name   = "Exec",
     struct = "exec.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )

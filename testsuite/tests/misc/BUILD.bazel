@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -34,7 +34,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Bdd",
     struct = "bdd.ml",
     opts = MODULE_OPTS,
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Boyer",
     struct = "boyer.ml",
     opts = MODULE_OPTS,
@@ -50,7 +50,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ephe_infix",
     struct = "ephe_infix.ml",
     opts = MODULE_OPTS,
@@ -58,7 +58,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ephe_issue9391",
     struct = "ephe_issue9391.ml",
     opts = MODULE_OPTS,
@@ -66,7 +66,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ephetest",
     struct = "ephetest.ml",
     opts = MODULE_OPTS,
@@ -74,7 +74,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ephetest2",
     struct = "ephetest2.ml",
     opts = MODULE_OPTS,
@@ -82,7 +82,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ephetest3",
     struct = "ephetest3.ml",
     opts = MODULE_OPTS,
@@ -90,7 +90,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Exotic",
     struct = "exotic.ml",
     opts = MODULE_OPTS,
@@ -98,7 +98,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Fib",
     struct = "fib.ml",
     opts = MODULE_OPTS,
@@ -106,7 +106,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Finaliser",
     struct = "finaliser.ml",
     opts = MODULE_OPTS,
@@ -114,7 +114,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Gcwords",
     struct = "gcwords.ml",
     opts = MODULE_OPTS,
@@ -122,7 +122,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Gpr1370",
     struct = "gpr1370.ml",
     opts = MODULE_OPTS,
@@ -130,7 +130,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Hamming",
     struct = "hamming.ml",
     opts = MODULE_OPTS,
@@ -138,7 +138,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Nucleic",
     struct = "nucleic.ml",
     opts = MODULE_OPTS,
@@ -146,7 +146,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7168",
     struct = "pr7168.ml",
     opts = MODULE_OPTS,
@@ -154,7 +154,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Sieve",
     struct = "sieve.ml",
     opts = MODULE_OPTS,
@@ -162,7 +162,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Sorts",
     struct = "sorts.ml",
     opts = MODULE_OPTS,
@@ -170,7 +170,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Takc",
     struct = "takc.ml",
     opts = MODULE_OPTS,
@@ -178,7 +178,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Taku",
     struct = "taku.ml",
     opts = MODULE_OPTS,
@@ -186,7 +186,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Weaklifetime",
     struct = "weaklifetime.ml",
     opts = MODULE_OPTS,
@@ -194,7 +194,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Weaklifetime2",
     struct = "weaklifetime2.ml",
     opts = MODULE_OPTS,
@@ -202,7 +202,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Weaktest",
     struct = "weaktest.ml",
     opts = MODULE_OPTS,

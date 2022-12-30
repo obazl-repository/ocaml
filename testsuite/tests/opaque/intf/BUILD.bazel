@@ -1,21 +1,21 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_signature",
+     "test_signature",
 )
 
 SIG_OPTS = ["-nostdlib"]
 
 test_suite(
     name = "testsuite_tests_opaque_intf_lib",
-    signatures  = [
-        ":Opaque_impl_cmi",
-        ":Opaque_intf_cmi",
-        ":Regular_cmi",
-    ],
+    # signatures  = [
+    #     ":Opaque_impl_cmi",
+    #     ":Opaque_intf_cmi",
+    #     ":Regular_cmi",
+    # ],
 )
 
-ocaml_signature(
+test_signature(
     name = "Opaque_impl_cmi",
     src  = "opaque_impl.mli",
     opts = SIG_OPTS,
@@ -23,7 +23,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Opaque_intf_cmi",
     src  = "opaque_intf.mli",
     opts = SIG_OPTS,
@@ -31,7 +31,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Regular_cmi",
     src  = "regular.mli",
     opts = SIG_OPTS,

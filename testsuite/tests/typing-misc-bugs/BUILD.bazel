@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -16,7 +16,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Core_array_reduced_ok",
     struct = "core_array_reduced_ok.ml",
     opts = MODULE_OPTS,
@@ -24,7 +24,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Gadt_declaration_check",
     struct = "gadt_declaration_check.ml",
     opts = MODULE_OPTS,
@@ -32,7 +32,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6303_bad",
     struct = "pr6303_bad.ml",
     opts = MODULE_OPTS,
@@ -40,7 +40,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6946_bad",
     struct = "pr6946_bad.ml",
     opts = MODULE_OPTS,

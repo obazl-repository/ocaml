@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -17,7 +17,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Pervasives_leitmotiv",
     struct = "pervasives_leitmotiv.ml",
     opts = MODULE_OPTS,
@@ -25,7 +25,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr4791",
     struct = "pr4791.ml",
     opts = MODULE_OPTS,
@@ -33,7 +33,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6323",
     struct = "pr6323.ml",
     opts = MODULE_OPTS,
@@ -41,7 +41,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7402",
     struct = "pr7402.ml",
     opts = MODULE_OPTS,
@@ -49,7 +49,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7620_bad",
     struct = "pr7620_bad.ml",
     opts = MODULE_OPTS,

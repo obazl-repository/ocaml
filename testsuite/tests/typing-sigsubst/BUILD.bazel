@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -21,12 +21,12 @@ test_suite(
         ":Test_loc_type_subst",
         ":Test_locations",
     ],
-    signatures  = [
-        ":Mpr7852_cmi",
-    ],
+    # signatures  = [
+    #     ":Mpr7852_cmi",
+    # ],
 )
 
-ocaml_signature(
+test_signature(
     name = "Mpr7852_cmi",
     src  = "mpr7852.mli",
     opts = SIG_OPTS,
@@ -34,7 +34,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Sig_local_aliases",
     struct = "sig_local_aliases.ml",
     opts = MODULE_OPTS,
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Sig_local_aliases_syntax_errors",
     struct = "sig_local_aliases_syntax_errors.ml",
     opts = MODULE_OPTS,
@@ -50,7 +50,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Sigsubst",
     struct = "sigsubst.ml",
     opts = MODULE_OPTS,
@@ -58,7 +58,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test_functor",
     struct = "test_functor.ml",
     opts = MODULE_OPTS,
@@ -66,7 +66,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test_loc_modtype_type_eq",
     struct = "test_loc_modtype_type_eq.ml",
     opts = MODULE_OPTS,
@@ -74,7 +74,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test_loc_modtype_type_subst",
     struct = "test_loc_modtype_type_subst.ml",
     opts = MODULE_OPTS,
@@ -82,7 +82,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test_loc_type_eq",
     struct = "test_loc_type_eq.ml",
     opts = MODULE_OPTS,
@@ -90,7 +90,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test_loc_type_subst",
     struct = "test_loc_type_subst.ml",
     opts = MODULE_OPTS,
@@ -98,7 +98,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test_locations",
     struct = "test_locations.ml",
     opts = MODULE_OPTS,

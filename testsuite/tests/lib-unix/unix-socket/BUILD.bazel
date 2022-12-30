@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -15,7 +15,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Recvfrom",
     struct = "recvfrom.ml",
     opts = MODULE_OPTS,
@@ -23,7 +23,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Recvfrom_linux",
     struct = "recvfrom_linux.ml",
     opts = MODULE_OPTS,
@@ -31,7 +31,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Recvfrom_unix",
     struct = "recvfrom_unix.ml",
     opts = MODULE_OPTS,

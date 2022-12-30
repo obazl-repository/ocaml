@@ -1,5 +1,5 @@
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -28,7 +28,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Backtrace",
     struct = "backtrace.ml",
     opts = MODULE_OPTS,
@@ -36,7 +36,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Backtrace2",
     struct = "backtrace2.ml",
     opts = MODULE_OPTS,
@@ -44,7 +44,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Backtrace3",
     struct = "backtrace3.ml",
     opts = MODULE_OPTS,
@@ -52,7 +52,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Backtrace_deprecated",
     struct = "backtrace_deprecated.ml",
     opts = MODULE_OPTS,
@@ -60,7 +60,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Backtrace_or_exception",
     struct = "backtrace_or_exception.ml",
     opts = MODULE_OPTS,
@@ -68,7 +68,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Backtrace_slots",
     struct = "backtrace_slots.ml",
     opts = MODULE_OPTS,
@@ -76,7 +76,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Backtraces_and_finalizers",
     struct = "backtraces_and_finalizers.ml",
     opts = MODULE_OPTS,
@@ -84,7 +84,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Callstack",
     struct = "callstack.ml",
     opts = MODULE_OPTS,
@@ -92,7 +92,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Event_after_prim",
     struct = "event_after_prim.ml",
     opts = MODULE_OPTS,
@@ -100,7 +100,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Inline_test",
     struct = "inline_test.ml",
     opts = MODULE_OPTS,
@@ -108,7 +108,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Inline_traversal_test",
     struct = "inline_traversal_test.ml",
     opts = MODULE_OPTS,
@@ -116,7 +116,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Lazy",
     struct = "lazy.ml",
     opts = MODULE_OPTS,
@@ -124,7 +124,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Methods",
     struct = "methods.ml",
     opts = MODULE_OPTS,
@@ -132,7 +132,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Names",
     struct = "names.ml",
     opts = MODULE_OPTS,
@@ -140,7 +140,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr2195",
     struct = "pr2195.ml",
     opts = MODULE_OPTS,
@@ -148,7 +148,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6920_why_at",
     struct = "pr6920_why_at.ml",
     opts = MODULE_OPTS,
@@ -156,7 +156,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6920_why_swallow",
     struct = "pr6920_why_swallow.ml",
     opts = MODULE_OPTS,
@@ -164,7 +164,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Raw_backtrace",
     struct = "raw_backtrace.ml",
     opts = MODULE_OPTS,

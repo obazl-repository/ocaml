@@ -1,5 +1,5 @@
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -15,7 +15,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Float_compare",
     struct = "float_compare.ml",
     opts = MODULE_OPTS,
@@ -23,7 +23,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Float_literals",
     struct = "float_literals.ml",
     opts = MODULE_OPTS,
@@ -31,7 +31,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tfloat_hex",
     struct = "tfloat_hex.ml",
     opts = MODULE_OPTS,
@@ -39,7 +39,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tfloat_record",
     struct = "tfloat_record.ml",
     opts = MODULE_OPTS,
@@ -47,7 +47,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Zero_sized_float_arrays",
     struct = "zero_sized_float_arrays.ml",
     opts = MODULE_OPTS,

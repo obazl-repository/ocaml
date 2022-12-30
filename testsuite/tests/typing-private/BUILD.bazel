@@ -1,12 +1,12 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
 
-ocaml_module(
+test_module(
     name   = "Invalid_private_row",
     struct = "invalid_private_row.ml",
     opts = MODULE_OPTS,
@@ -14,7 +14,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Private",
     struct = "private.ml",
     opts = MODULE_OPTS,

@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -48,7 +48,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Test",
     struct = "Test.ml",
     opts = MODULE_OPTS,
@@ -56,7 +56,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Aliases",
     struct = "aliases.ml",
     opts = MODULE_OPTS,
@@ -64,7 +64,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Anonymous",
     struct = "anonymous.ml",
     opts = MODULE_OPTS,
@@ -72,7 +72,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Applicative_functor_type",
     struct = "applicative_functor_type.ml",
     opts = MODULE_OPTS,
@@ -80,7 +80,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Extension_constructors_errors_test",
     struct = "extension_constructors_errors_test.ml",
     opts = MODULE_OPTS,
@@ -88,7 +88,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Firstclass",
     struct = "firstclass.ml",
     opts = MODULE_OPTS,
@@ -96,7 +96,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Functors",
     struct = "functors.ml",
     opts = MODULE_OPTS,
@@ -104,7 +104,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Generative",
     struct = "generative.ml",
     opts = MODULE_OPTS,
@@ -112,7 +112,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Illegal_permutation",
     struct = "illegal_permutation.ml",
     opts = MODULE_OPTS,
@@ -120,7 +120,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Inclusion_errors",
     struct = "inclusion_errors.ml",
     opts = MODULE_OPTS,
@@ -128,7 +128,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Merge_constraint",
     struct = "merge_constraint.ml",
     opts = MODULE_OPTS,
@@ -136,7 +136,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Module_type_substitution",
     struct = "module_type_substitution.ml",
     opts = MODULE_OPTS,
@@ -144,7 +144,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Nondep",
     struct = "nondep.ml",
     opts = MODULE_OPTS,
@@ -152,7 +152,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Nondep_private_abbrev",
     struct = "nondep_private_abbrev.ml",
     opts = MODULE_OPTS,
@@ -160,7 +160,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Normalize_path",
     struct = "normalize_path.ml",
     opts = MODULE_OPTS,
@@ -168,7 +168,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr10298",
     struct = "pr10298.ml",
     opts = MODULE_OPTS,
@@ -176,7 +176,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr10399",
     struct = "pr10399.ml",
     opts = MODULE_OPTS,
@@ -184,7 +184,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr5911",
     struct = "pr5911.ml",
     opts = MODULE_OPTS,
@@ -192,7 +192,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6394",
     struct = "pr6394.ml",
     opts = MODULE_OPTS,
@@ -200,7 +200,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6633",
     struct = "pr6633.ml",
     opts = MODULE_OPTS,
@@ -208,7 +208,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7207",
     struct = "pr7207.ml",
     opts = MODULE_OPTS,
@@ -216,7 +216,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7348",
     struct = "pr7348.ml",
     opts = MODULE_OPTS,
@@ -224,7 +224,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7726",
     struct = "pr7726.ml",
     opts = MODULE_OPTS,
@@ -232,7 +232,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7787",
     struct = "pr7787.ml",
     opts = MODULE_OPTS,
@@ -240,7 +240,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7818",
     struct = "pr7818.ml",
     opts = MODULE_OPTS,
@@ -248,7 +248,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7851",
     struct = "pr7851.ml",
     opts = MODULE_OPTS,
@@ -256,7 +256,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr8810",
     struct = "pr8810.ml",
     opts = MODULE_OPTS,
@@ -264,7 +264,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr9384",
     struct = "pr9384.ml",
     opts = MODULE_OPTS,
@@ -272,7 +272,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr9695",
     struct = "pr9695.ml",
     opts = MODULE_OPTS,
@@ -280,7 +280,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Printing",
     struct = "printing.ml",
     opts = MODULE_OPTS,
@@ -288,7 +288,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Private",
     struct = "private.ml",
     opts = MODULE_OPTS,
@@ -296,7 +296,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Records_errors_test",
     struct = "records_errors_test.ml",
     opts = MODULE_OPTS,
@@ -304,7 +304,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Recursive",
     struct = "recursive.ml",
     opts = MODULE_OPTS,
@@ -312,7 +312,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unroll_private_abbrev",
     struct = "unroll_private_abbrev.ml",
     opts = MODULE_OPTS,
@@ -320,7 +320,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Variants_errors_test",
     struct = "variants_errors_test.ml",
     opts = MODULE_OPTS,
@@ -328,7 +328,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "With_ghosts",
     struct = "with_ghosts.ml",
     opts = MODULE_OPTS,

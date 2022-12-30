@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -15,12 +15,12 @@ test_suite(
         ":Stop_after_scheduling",
         ":Stop_after_typing_impl",
     ],
-    signatures  = [
-        ":Stop_after_parsing_intf_cmi",
-    ],
+    # signatures  = [
+    #     ":Stop_after_parsing_intf_cmi",
+    # ],
 )
 
-ocaml_module(
+test_module(
     name   = "Stop_after_parsing_impl",
     struct = "stop_after_parsing_impl.ml",
     opts = MODULE_OPTS,
@@ -28,7 +28,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Stop_after_parsing_intf_cmi",
     src  = "stop_after_parsing_intf.mli",
     opts = SIG_OPTS,
@@ -36,7 +36,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Stop_after_scheduling",
     struct = "stop_after_scheduling.ml",
     opts = MODULE_OPTS,
@@ -44,7 +44,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Stop_after_typing_impl",
     struct = "stop_after_typing_impl.ml",
     opts = MODULE_OPTS,

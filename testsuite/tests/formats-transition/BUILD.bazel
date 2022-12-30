@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -16,7 +16,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Deprecated_unsigned_printers",
     struct = "deprecated_unsigned_printers.ml",
     opts = MODULE_OPTS,
@@ -24,7 +24,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ignored_scan_counters",
     struct = "ignored_scan_counters.ml",
     opts = MODULE_OPTS,
@@ -32,7 +32,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Legacy_incompatible_flags",
     struct = "legacy_incompatible_flags.ml",
     opts = MODULE_OPTS,
@@ -40,7 +40,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Legacy_unfinished_modifiers",
     struct = "legacy_unfinished_modifiers.ml",
     opts = MODULE_OPTS,

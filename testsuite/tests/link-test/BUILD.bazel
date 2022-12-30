@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -21,7 +21,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Aliases",
     struct = "aliases.ml",
     opts = MODULE_OPTS,
@@ -29,7 +29,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Empty",
     struct = "empty.ml",
     opts = MODULE_OPTS,
@@ -37,7 +37,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "External",
     struct = "external.ml",
     sig    = "External_cmi",
@@ -46,7 +46,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "External_cmi",
     src  = "external.mli",
     opts = SIG_OPTS,
@@ -54,7 +54,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "External_for_pack",
     struct = "external_for_pack.ml",
     sig    = "External_for_pack_cmi",
@@ -63,7 +63,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "External_for_pack_cmi",
     src  = "external_for_pack.mli",
     opts = SIG_OPTS,
@@ -71,7 +71,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Submodule",
     struct = "submodule.ml",
     opts = MODULE_OPTS,
@@ -79,7 +79,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test",
     struct = "test.ml",
     opts = MODULE_OPTS,
@@ -87,7 +87,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Use_in_pack",
     struct = "use_in_pack.ml",
     opts = MODULE_OPTS,

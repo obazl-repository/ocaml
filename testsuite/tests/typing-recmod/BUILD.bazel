@@ -62,7 +62,7 @@ test_module(
 compile_fail_test(
     name   = "t01bad_test",
     struct = "t01bad.ml",
-    expect = "t01bad.compilers.reference",
+    expected = "t01bad.compilers.reference",
     deps   = [
 
     ],

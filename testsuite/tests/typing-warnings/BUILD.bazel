@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -35,7 +35,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Ambiguous_guarded_disjunction",
     struct = "ambiguous_guarded_disjunction.ml",
     opts = MODULE_OPTS,
@@ -43,7 +43,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Application",
     struct = "application.ml",
     opts = MODULE_OPTS,
@@ -51,7 +51,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Coercions",
     struct = "coercions.ml",
     opts = MODULE_OPTS,
@@ -59,7 +59,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Disable_warnings_classes",
     struct = "disable_warnings_classes.ml",
     opts = MODULE_OPTS,
@@ -67,7 +67,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Exhaustiveness",
     struct = "exhaustiveness.ml",
     opts = MODULE_OPTS,
@@ -75,7 +75,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Fragile_matching",
     struct = "fragile_matching.ml",
     opts = MODULE_OPTS,
@@ -83,7 +83,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Never_returns",
     struct = "never_returns.ml",
     opts = MODULE_OPTS,
@@ -91,7 +91,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Open_warnings",
     struct = "open_warnings.ml",
     opts = MODULE_OPTS,
@@ -99,7 +99,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr5892",
     struct = "pr5892.ml",
     opts = MODULE_OPTS,
@@ -107,7 +107,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6587",
     struct = "pr6587.ml",
     opts = MODULE_OPTS,
@@ -115,7 +115,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6872",
     struct = "pr6872.ml",
     opts = MODULE_OPTS,
@@ -123,7 +123,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7085",
     struct = "pr7085.ml",
     opts = MODULE_OPTS,
@@ -131,7 +131,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7115",
     struct = "pr7115.ml",
     opts = MODULE_OPTS,
@@ -139,7 +139,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7261",
     struct = "pr7261.ml",
     opts = MODULE_OPTS,
@@ -147,7 +147,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7297",
     struct = "pr7297.ml",
     opts = MODULE_OPTS,
@@ -155,7 +155,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7553",
     struct = "pr7553.ml",
     opts = MODULE_OPTS,
@@ -163,7 +163,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr9244",
     struct = "pr9244.ml",
     opts = MODULE_OPTS,
@@ -171,7 +171,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Records",
     struct = "records.ml",
     opts = MODULE_OPTS,
@@ -179,7 +179,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unused_functor_parameter",
     struct = "unused_functor_parameter.ml",
     opts = MODULE_OPTS,
@@ -187,7 +187,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unused_rec",
     struct = "unused_rec.ml",
     opts = MODULE_OPTS,
@@ -195,7 +195,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unused_recmodule",
     struct = "unused_recmodule.ml",
     opts = MODULE_OPTS,
@@ -203,7 +203,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unused_types",
     struct = "unused_types.ml",
     opts = MODULE_OPTS,
@@ -211,7 +211,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Warning16",
     struct = "warning16.ml",
     opts = MODULE_OPTS,

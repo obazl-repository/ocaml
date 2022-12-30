@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -41,12 +41,12 @@ test_suite(
         ":Test9_plugin",
         ":Test9_second_plugin",
     ],
-    signatures  = [
-        ":Test7_interface_only_cmi",
-    ],
+    # signatures  = [
+    #     ":Test7_interface_only_cmi",
+    # ],
 )
 
-ocaml_module(
+test_module(
     name   = "Test10_main",
     struct = "test10_main.ml",
     opts = MODULE_OPTS,
@@ -54,7 +54,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test10_plugin",
     struct = "test10_plugin.ml",
     opts = MODULE_OPTS,
@@ -62,7 +62,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test1_inited_second",
     struct = "test1_inited_second.ml",
     opts = MODULE_OPTS,
@@ -70,7 +70,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test1_main",
     struct = "test1_main.ml",
     opts = MODULE_OPTS,
@@ -78,7 +78,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test1_plugin",
     struct = "test1_plugin.ml",
     opts = MODULE_OPTS,
@@ -86,7 +86,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test2_inited_first",
     struct = "test2_inited_first.ml",
     opts = MODULE_OPTS,
@@ -94,7 +94,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test2_main",
     struct = "test2_main.ml",
     opts = MODULE_OPTS,
@@ -102,7 +102,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test2_plugin",
     struct = "test2_plugin.ml",
     opts = MODULE_OPTS,
@@ -110,7 +110,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test3_main",
     struct = "test3_main.ml",
     opts = MODULE_OPTS,
@@ -118,7 +118,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test3_plugin_a",
     struct = "test3_plugin_a.ml",
     opts = MODULE_OPTS,
@@ -126,7 +126,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test3_plugin_b",
     struct = "test3_plugin_b.ml",
     opts = MODULE_OPTS,
@@ -134,7 +134,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test4_main",
     struct = "test4_main.ml",
     opts = MODULE_OPTS,
@@ -142,7 +142,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test4_plugin_a",
     struct = "test4_plugin_a.ml",
     opts = MODULE_OPTS,
@@ -150,7 +150,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test4_plugin_b",
     struct = "test4_plugin_b.ml",
     opts = MODULE_OPTS,
@@ -158,7 +158,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test5_main",
     struct = "test5_main.ml",
     opts = MODULE_OPTS,
@@ -166,7 +166,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test5_plugin_a",
     struct = "test5_plugin_a.ml",
     opts = MODULE_OPTS,
@@ -174,7 +174,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test5_plugin_b",
     struct = "test5_plugin_b.ml",
     opts = MODULE_OPTS,
@@ -182,7 +182,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test5_second_plugin",
     struct = "test5_second_plugin.ml",
     opts = MODULE_OPTS,
@@ -190,7 +190,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test6_main",
     struct = "test6_main.ml",
     opts = MODULE_OPTS,
@@ -198,7 +198,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test6_plugin",
     struct = "test6_plugin.ml",
     opts = MODULE_OPTS,
@@ -206,7 +206,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test6_second_plugin",
     struct = "test6_second_plugin.ml",
     opts = MODULE_OPTS,
@@ -214,7 +214,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Test7_interface_only_cmi",
     src  = "test7_interface_only.mli",
     opts = SIG_OPTS,
@@ -222,7 +222,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test7_main",
     struct = "test7_main.ml",
     opts = MODULE_OPTS,
@@ -230,7 +230,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test7_plugin",
     struct = "test7_plugin.ml",
     opts = MODULE_OPTS,
@@ -238,7 +238,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test8_main",
     struct = "test8_main.ml",
     opts = MODULE_OPTS,
@@ -246,7 +246,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test8_plugin_a",
     struct = "test8_plugin_a.ml",
     opts = MODULE_OPTS,
@@ -254,7 +254,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test8_plugin_b",
     struct = "test8_plugin_b.ml",
     sig    = "Test8_plugin_b_cmi",
@@ -263,7 +263,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Test8_plugin_b_cmi",
     src  = "test8_plugin_b.mli",
     opts = SIG_OPTS,
@@ -271,7 +271,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test9_main",
     struct = "test9_main.ml",
     opts = MODULE_OPTS,
@@ -279,7 +279,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test9_plugin",
     struct = "test9_plugin.ml",
     opts = MODULE_OPTS,
@@ -287,7 +287,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test9_second_plugin",
     struct = "test9_second_plugin.ml",
     sig    = "Test9_second_plugin_cmi",
@@ -296,7 +296,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Test9_second_plugin_cmi",
     src  = "test9_second_plugin.mli",
     opts = SIG_OPTS,

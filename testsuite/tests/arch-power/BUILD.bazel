@@ -1,10 +1,10 @@
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
 
-ocaml_module(
+test_module(
     name   = "Exn_raise",
     struct = "exn_raise.ml",
     opts = MODULE_OPTS,

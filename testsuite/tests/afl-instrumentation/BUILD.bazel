@@ -1,10 +1,10 @@
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
 
-ocaml_module(
+test_module(
     name   = "Afltest",
     struct = "afltest.ml",
     opts = MODULE_OPTS,
@@ -12,7 +12,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Harness",
     struct = "harness.ml",
     opts = MODULE_OPTS,
@@ -20,7 +20,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test",
     struct = "test.ml",
     opts = MODULE_OPTS,

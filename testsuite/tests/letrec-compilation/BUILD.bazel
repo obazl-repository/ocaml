@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -31,7 +31,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Backreferences",
     struct = "backreferences.ml",
     opts = MODULE_OPTS,
@@ -39,7 +39,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Class_1",
     struct = "class_1.ml",
     opts = MODULE_OPTS,
@@ -47,7 +47,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Class_2",
     struct = "class_2.ml",
     opts = MODULE_OPTS,
@@ -55,7 +55,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Evaluation_order_1",
     struct = "evaluation_order_1.ml",
     opts = MODULE_OPTS,
@@ -63,7 +63,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Evaluation_order_2",
     struct = "evaluation_order_2.ml",
     opts = MODULE_OPTS,
@@ -71,7 +71,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Evaluation_order_3",
     struct = "evaluation_order_3.ml",
     opts = MODULE_OPTS,
@@ -79,7 +79,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Float_block_1",
     struct = "float_block_1.ml",
     opts = MODULE_OPTS,
@@ -87,7 +87,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Generic_array",
     struct = "generic_array.ml",
     opts = MODULE_OPTS,
@@ -95,7 +95,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Labels",
     struct = "labels.ml",
     opts = MODULE_OPTS,
@@ -103,7 +103,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Lazy_",
     struct = "lazy_.ml",
     opts = MODULE_OPTS,
@@ -111,7 +111,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Lists",
     struct = "lists.ml",
     opts = MODULE_OPTS,
@@ -119,7 +119,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Mixing_value_closures_1",
     struct = "mixing_value_closures_1.ml",
     opts = MODULE_OPTS,
@@ -127,7 +127,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Mixing_value_closures_2",
     struct = "mixing_value_closures_2.ml",
     opts = MODULE_OPTS,
@@ -135,7 +135,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Mutual_functions",
     struct = "mutual_functions.ml",
     opts = MODULE_OPTS,
@@ -143,7 +143,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Nested",
     struct = "nested.ml",
     opts = MODULE_OPTS,
@@ -151,7 +151,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr4989",
     struct = "pr4989.ml",
     opts = MODULE_OPTS,
@@ -159,7 +159,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr8681",
     struct = "pr8681.ml",
     opts = MODULE_OPTS,
@@ -167,7 +167,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Record_with",
     struct = "record_with.ml",
     opts = MODULE_OPTS,
@@ -175,7 +175,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ref",
     struct = "ref.ml",
     opts = MODULE_OPTS,

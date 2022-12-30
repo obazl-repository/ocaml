@@ -10,7 +10,7 @@ load("//test:rules.bzl",
      "lambda_expect_test"
 )
 
-test_library(
+test_suite(
     name = "testsuite_tests_basic-modules_lib",
     tests = [
         ":Anonymous",

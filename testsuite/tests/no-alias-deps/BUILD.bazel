@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -18,13 +18,13 @@ test_suite(
         ":Lib__2235",
         ":User_of_lib2235",
     ],
-    signatures  = [
-        ":C_cmi",
-        ":D_cmi",
-    ],
+    # signatures  = [
+    #     ":C_cmi",
+    #     ":D_cmi",
+    # ],
 )
 
-ocaml_module(
+test_module(
     name   = "A2235",
     struct = "a2235.ml",
     opts = MODULE_OPTS,
@@ -32,7 +32,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Aliases",
     struct = "aliases.ml",
     opts = MODULE_OPTS,
@@ -40,7 +40,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "C_cmi",
     src  = "c.mli",
     opts = SIG_OPTS,
@@ -48,7 +48,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "D_cmi",
     src  = "d.mli",
     opts = SIG_OPTS,
@@ -56,7 +56,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Gpr2235",
     struct = "gpr2235.ml",
     opts = MODULE_OPTS,
@@ -64,7 +64,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Lib2235",
     struct = "lib2235.ml",
     opts = MODULE_OPTS,
@@ -72,7 +72,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Lib__2235",
     struct = "lib__2235.ml",
     opts = MODULE_OPTS,
@@ -80,7 +80,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "User_of_lib2235",
     struct = "user_of_lib2235.ml",
     opts = MODULE_OPTS,

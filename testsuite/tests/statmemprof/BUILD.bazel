@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -26,7 +26,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Alloc_counts",
     struct = "alloc_counts.ml",
     opts = MODULE_OPTS,
@@ -34,7 +34,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Arrays_in_major",
     struct = "arrays_in_major.ml",
     opts = MODULE_OPTS,
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Arrays_in_minor",
     struct = "arrays_in_minor.ml",
     opts = MODULE_OPTS,
@@ -50,7 +50,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Blocking_in_callback",
     struct = "blocking_in_callback.ml",
     opts = MODULE_OPTS,
@@ -58,7 +58,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Callstacks",
     struct = "callstacks.ml",
     opts = MODULE_OPTS,
@@ -66,7 +66,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Comballoc",
     struct = "comballoc.ml",
     opts = MODULE_OPTS,
@@ -74,7 +74,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Custom",
     struct = "custom.ml",
     opts = MODULE_OPTS,
@@ -82,7 +82,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Exception_callback",
     struct = "exception_callback.ml",
     opts = MODULE_OPTS,
@@ -90,7 +90,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Exception_callback_minor",
     struct = "exception_callback_minor.ml",
     opts = MODULE_OPTS,
@@ -98,7 +98,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Intern",
     struct = "intern.ml",
     opts = MODULE_OPTS,
@@ -106,7 +106,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Lists_in_minor",
     struct = "lists_in_minor.ml",
     opts = MODULE_OPTS,
@@ -114,7 +114,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Minor_no_postpone",
     struct = "minor_no_postpone.ml",
     opts = MODULE_OPTS,
@@ -122,7 +122,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Moved_while_blocking",
     struct = "moved_while_blocking.ml",
     opts = MODULE_OPTS,
@@ -130,7 +130,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Thread_exit_in_callback",
     struct = "thread_exit_in_callback.ml",
     opts = MODULE_OPTS,

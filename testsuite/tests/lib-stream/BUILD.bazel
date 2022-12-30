@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -14,7 +14,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Count_concat_bug",
     struct = "count_concat_bug.ml",
     opts = MODULE_OPTS,
@@ -22,7 +22,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Mpr7769",
     struct = "mpr7769.ml",
     opts = MODULE_OPTS,

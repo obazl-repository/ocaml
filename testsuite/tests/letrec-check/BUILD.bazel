@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -26,7 +26,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Basic",
     struct = "basic.ml",
     opts = MODULE_OPTS,
@@ -34,7 +34,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Extension_constructor",
     struct = "extension_constructor.ml",
     opts = MODULE_OPTS,
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Flat_float_array",
     struct = "flat_float_array.ml",
     opts = MODULE_OPTS,
@@ -50,7 +50,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Float_unboxing",
     struct = "float_unboxing.ml",
     opts = MODULE_OPTS,
@@ -58,7 +58,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Labels",
     struct = "labels.ml",
     opts = MODULE_OPTS,
@@ -66,7 +66,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Lazy_",
     struct = "lazy_.ml",
     opts = MODULE_OPTS,
@@ -74,7 +74,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Modules",
     struct = "modules.ml",
     opts = MODULE_OPTS,
@@ -82,7 +82,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "No_flat_float_array",
     struct = "no_flat_float_array.ml",
     opts = MODULE_OPTS,
@@ -90,7 +90,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Objects",
     struct = "objects.ml",
     opts = MODULE_OPTS,
@@ -98,7 +98,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7215",
     struct = "pr7215.ml",
     opts = MODULE_OPTS,
@@ -106,7 +106,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7231",
     struct = "pr7231.ml",
     opts = MODULE_OPTS,
@@ -114,7 +114,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7706",
     struct = "pr7706.ml",
     opts = MODULE_OPTS,
@@ -122,7 +122,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Records",
     struct = "records.ml",
     opts = MODULE_OPTS,
@@ -130,7 +130,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unboxed",
     struct = "unboxed.ml",
     opts = MODULE_OPTS,

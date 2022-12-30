@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -17,7 +17,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Eintr",
     struct = "eintr.ml",
     opts = MODULE_OPTS,
@@ -25,7 +25,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Testfork",
     struct = "testfork.ml",
     opts = MODULE_OPTS,
@@ -33,7 +33,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Testpreempt",
     struct = "testpreempt.ml",
     opts = MODULE_OPTS,
@@ -41,7 +41,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Testyield",
     struct = "testyield.ml",
     opts = MODULE_OPTS,
@@ -49,7 +49,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Threadsigmask",
     struct = "threadsigmask.ml",
     opts = MODULE_OPTS,

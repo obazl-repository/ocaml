@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -18,7 +18,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Array_spec",
     struct = "array_spec.ml",
     opts = MODULE_OPTS,
@@ -26,7 +26,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Comparison_table",
     struct = "comparison_table.ml",
     opts = MODULE_OPTS,
@@ -34,7 +34,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Locs",
     struct = "locs.ml",
     opts = MODULE_OPTS,
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Module_coercion",
     struct = "module_coercion.ml",
     opts = MODULE_OPTS,
@@ -50,7 +50,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Ref_spec",
     struct = "ref_spec.ml",
     opts = MODULE_OPTS,
@@ -58,7 +58,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Sendcache",
     struct = "sendcache.ml",
     opts = MODULE_OPTS,

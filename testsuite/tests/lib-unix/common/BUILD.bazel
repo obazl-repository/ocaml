@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -30,7 +30,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Channel_of",
     struct = "channel_of.ml",
     opts = MODULE_OPTS,
@@ -38,7 +38,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Cloexec",
     struct = "cloexec.ml",
     opts = MODULE_OPTS,
@@ -46,7 +46,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Cmdline_prog",
     struct = "cmdline_prog.ml",
     opts = MODULE_OPTS,
@@ -54,7 +54,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Dup",
     struct = "dup.ml",
     opts = MODULE_OPTS,
@@ -62,7 +62,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Dup2",
     struct = "dup2.ml",
     opts = MODULE_OPTS,
@@ -70,7 +70,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Fdstatus_main",
     struct = "fdstatus_main.ml",
     opts = MODULE_OPTS,
@@ -78,7 +78,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Getaddrinfo",
     struct = "getaddrinfo.ml",
     opts = MODULE_OPTS,
@@ -86,7 +86,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pipe_eof",
     struct = "pipe_eof.ml",
     opts = MODULE_OPTS,
@@ -94,7 +94,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Process_pid",
     struct = "process_pid.ml",
     opts = MODULE_OPTS,
@@ -102,7 +102,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Redirections",
     struct = "redirections.ml",
     opts = MODULE_OPTS,
@@ -110,7 +110,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Reflector",
     struct = "reflector.ml",
     opts = MODULE_OPTS,
@@ -118,7 +118,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Rename",
     struct = "rename.ml",
     opts = MODULE_OPTS,
@@ -126,7 +126,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test_unix_cmdline",
     struct = "test_unix_cmdline.ml",
     opts = MODULE_OPTS,
@@ -134,7 +134,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Test_unixlabels",
     struct = "test_unixlabels.ml",
     opts = MODULE_OPTS,
@@ -142,7 +142,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Truncate",
     struct = "truncate.ml",
     opts = MODULE_OPTS,
@@ -150,7 +150,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Uexit",
     struct = "uexit.ml",
     opts = MODULE_OPTS,
@@ -158,7 +158,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Utimes",
     struct = "utimes.ml",
     opts = MODULE_OPTS,
@@ -166,7 +166,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Wait_nohang",
     struct = "wait_nohang.ml",
     opts = MODULE_OPTS,

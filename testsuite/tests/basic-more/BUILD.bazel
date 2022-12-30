@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -32,7 +32,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Bounds",
     struct = "bounds.ml",
     opts = MODULE_OPTS,
@@ -40,7 +40,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Div_by_zero",
     struct = "div_by_zero.ml",
     opts = MODULE_OPTS,
@@ -48,7 +48,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Function_in_ref",
     struct = "function_in_ref.ml",
     opts = MODULE_OPTS,
@@ -56,7 +56,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "If_in_if",
     struct = "if_in_if.ml",
     opts = MODULE_OPTS,
@@ -64,7 +64,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Morematch",
     struct = "morematch.ml",
     opts = MODULE_OPTS,
@@ -72,7 +72,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Opaque_prim",
     struct = "opaque_prim.ml",
     opts = MODULE_OPTS,
@@ -80,7 +80,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr10294",
     struct = "pr10294.ml",
     opts = MODULE_OPTS,
@@ -88,7 +88,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr10338",
     struct = "pr10338.ml",
     opts = MODULE_OPTS,
@@ -96,7 +96,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr1271",
     struct = "pr1271.ml",
     opts = MODULE_OPTS,
@@ -104,7 +104,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr2719",
     struct = "pr2719.ml",
     opts = MODULE_OPTS,
@@ -112,7 +112,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6216",
     struct = "pr6216.ml",
     opts = MODULE_OPTS,
@@ -120,7 +120,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7683",
     struct = "pr7683.ml",
     opts = MODULE_OPTS,
@@ -128,7 +128,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Record_evaluation_order",
     struct = "record_evaluation_order.ml",
     opts = MODULE_OPTS,
@@ -136,7 +136,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Robustmatch",
     struct = "robustmatch.ml",
     opts = MODULE_OPTS,
@@ -144,7 +144,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Sequential_and_or",
     struct = "sequential_and_or.ml",
     opts = MODULE_OPTS,
@@ -152,7 +152,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Structural_constants",
     struct = "structural_constants.ml",
     opts = MODULE_OPTS,
@@ -160,7 +160,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tbuffer",
     struct = "tbuffer.ml",
     opts = MODULE_OPTS,
@@ -168,7 +168,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Testrandom",
     struct = "testrandom.ml",
     opts = MODULE_OPTS,
@@ -176,7 +176,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Top_level_patterns",
     struct = "top_level_patterns.ml",
     opts = MODULE_OPTS,
@@ -184,7 +184,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tprintf",
     struct = "tprintf.ml",
     opts = MODULE_OPTS,

@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -18,7 +18,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Exhaustiveness_warnings",
     struct = "exhaustiveness_warnings.ml",
     opts = MODULE_OPTS,
@@ -26,7 +26,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "No_mixing_under_guard",
     struct = "no_mixing_under_guard.ml",
     opts = MODULE_OPTS,
@@ -34,7 +34,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "No_value_clauses",
     struct = "no_value_clauses.ml",
     opts = MODULE_OPTS,
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Placement",
     struct = "placement.ml",
     opts = MODULE_OPTS,
@@ -50,7 +50,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7083",
     struct = "pr7083.ml",
     opts = MODULE_OPTS,
@@ -58,7 +58,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Reachability",
     struct = "reachability.ml",
     opts = MODULE_OPTS,

@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -18,12 +18,12 @@ test_suite(
         ":Lib_impl",
         ":Main",
     ],
-    signatures  = [
-        ":Lib_cmi",
-    ],
+    # signatures  = [
+    #     ":Lib_cmi",
+    # ],
 )
 
-ocaml_module(
+test_module(
     name   = "A",
     struct = "A.ml",
     opts = MODULE_OPTS,
@@ -31,7 +31,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "B",
     struct = "B.ml",
     opts = MODULE_OPTS,
@@ -39,7 +39,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "C",
     struct = "C.ml",
     opts = MODULE_OPTS,
@@ -47,7 +47,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "D",
     struct = "D.ml",
     opts = MODULE_OPTS,
@@ -55,7 +55,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Lib_cmi",
     src  = "lib.mli",
     opts = SIG_OPTS,
@@ -63,7 +63,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Lib_impl",
     struct = "lib_impl.ml",
     opts = MODULE_OPTS,
@@ -71,7 +71,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Main",
     struct = "main.ml",
     opts = MODULE_OPTS,

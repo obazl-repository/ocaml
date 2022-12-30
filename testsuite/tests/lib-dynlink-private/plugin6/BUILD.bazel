@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -16,7 +16,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Partridge",
     struct = "partridge.ml",
     sig    = "Partridge_cmi",
@@ -25,7 +25,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Partridge_cmi",
     src  = "partridge.mli",
     opts = SIG_OPTS,
@@ -33,7 +33,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pheasant",
     struct = "pheasant.ml",
     sig    = "Pheasant_cmi",
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "Pheasant_cmi",
     src  = "pheasant.mli",
     opts = SIG_OPTS,

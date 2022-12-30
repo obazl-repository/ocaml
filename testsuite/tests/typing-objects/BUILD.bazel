@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -28,7 +28,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Exemples",
     struct = "Exemples.ml",
     opts = MODULE_OPTS,
@@ -36,7 +36,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tests",
     struct = "Tests.ml",
     opts = MODULE_OPTS,
@@ -44,7 +44,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Abstract_rows",
     struct = "abstract_rows.ml",
     opts = MODULE_OPTS,
@@ -52,7 +52,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Dummy",
     struct = "dummy.ml",
     opts = MODULE_OPTS,
@@ -60,7 +60,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Errors",
     struct = "errors.ml",
     opts = MODULE_OPTS,
@@ -68,7 +68,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Field_kind",
     struct = "field_kind.ml",
     opts = MODULE_OPTS,
@@ -76,7 +76,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Open_in_classes",
     struct = "open_in_classes.ml",
     opts = MODULE_OPTS,
@@ -84,7 +84,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr5545",
     struct = "pr5545.ml",
     opts = MODULE_OPTS,
@@ -92,7 +92,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr5619_bad",
     struct = "pr5619_bad.ml",
     opts = MODULE_OPTS,
@@ -100,7 +100,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr5858",
     struct = "pr5858.ml",
     opts = MODULE_OPTS,
@@ -108,7 +108,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6123_bad",
     struct = "pr6123_bad.ml",
     opts = MODULE_OPTS,
@@ -116,7 +116,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6383",
     struct = "pr6383.ml",
     opts = MODULE_OPTS,
@@ -124,7 +124,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6907_bad",
     struct = "pr6907_bad.ml",
     opts = MODULE_OPTS,
@@ -132,7 +132,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7711_ok",
     struct = "pr7711_ok.ml",
     opts = MODULE_OPTS,
@@ -140,7 +140,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Self_cannot_be_closed",
     struct = "self_cannot_be_closed.ml",
     opts = MODULE_OPTS,
@@ -148,7 +148,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Self_cannot_escape_pr7865",
     struct = "self_cannot_escape_pr7865.ml",
     opts = MODULE_OPTS,

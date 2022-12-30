@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -14,7 +14,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Float_subst_boxed_number",
     struct = "float_subst_boxed_number.ml",
     opts = MODULE_OPTS,
@@ -22,7 +22,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unbox_under_assign",
     struct = "unbox_under_assign.ml",
     opts = MODULE_OPTS,

@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -20,7 +20,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Allocation",
     struct = "allocation.ml",
     opts = MODULE_OPTS,
@@ -28,7 +28,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Exception_propagation",
     struct = "exception_propagation.ml",
     opts = MODULE_OPTS,
@@ -36,7 +36,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Identifier_sharing",
     struct = "identifier_sharing.ml",
     opts = MODULE_OPTS,
@@ -44,7 +44,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Match_failure",
     struct = "match_failure.ml",
     opts = MODULE_OPTS,
@@ -52,7 +52,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Nested_handlers",
     struct = "nested_handlers.ml",
     opts = MODULE_OPTS,
@@ -60,7 +60,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Raise_from_success_continuation",
     struct = "raise_from_success_continuation.ml",
     opts = MODULE_OPTS,
@@ -68,7 +68,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Streams",
     struct = "streams.ml",
     opts = MODULE_OPTS,
@@ -76,7 +76,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tail_calls",
     struct = "tail_calls.ml",
     opts = MODULE_OPTS,

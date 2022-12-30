@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -17,7 +17,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Pp_print_custom_break",
     struct = "pp_print_custom_break.ml",
     opts = MODULE_OPTS,
@@ -25,7 +25,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6824",
     struct = "pr6824.ml",
     opts = MODULE_OPTS,
@@ -33,7 +33,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Print_if_newline",
     struct = "print_if_newline.ml",
     opts = MODULE_OPTS,
@@ -41,7 +41,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Print_seq",
     struct = "print_seq.ml",
     opts = MODULE_OPTS,
@@ -49,7 +49,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Tformat",
     struct = "tformat.ml",
     opts = MODULE_OPTS,

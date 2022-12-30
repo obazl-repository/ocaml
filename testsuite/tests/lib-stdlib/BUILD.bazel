@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -13,7 +13,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Pervasives_deprecated",
     struct = "pervasives_deprecated.ml",
     opts = MODULE_OPTS,

@@ -1,7 +1,7 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
+     "test_module",
 )
 
 MODULE_OPTS = []
@@ -17,7 +17,7 @@ test_suite(
     ],
 )
 
-ocaml_module(
+test_module(
     name   = "Const_int_hint",
     struct = "const_int_hint.ml",
     opts = MODULE_OPTS,
@@ -25,7 +25,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Missing_rec_hint",
     struct = "missing_rec_hint.ml",
     opts = MODULE_OPTS,
@@ -33,7 +33,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Repeated_did_you_mean",
     struct = "repeated_did_you_mean.ml",
     opts = MODULE_OPTS,
@@ -41,7 +41,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Type_expected_explanation",
     struct = "type_expected_explanation.ml",
     opts = MODULE_OPTS,
@@ -49,7 +49,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Unit_fun_hints",
     struct = "unit_fun_hints.ml",
     opts = MODULE_OPTS,

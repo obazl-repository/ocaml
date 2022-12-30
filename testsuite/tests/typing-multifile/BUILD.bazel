@@ -1,8 +1,8 @@
 
 
 load("//test:rules.bzl",
-     "ocaml_module",
-     "ocaml_signature",
+     "test_module",
+     "test_signature",
 )
 
 MODULE_OPTS = []
@@ -21,12 +21,12 @@ test_suite(
         ":Pr7563",
         ":Pr9218",
     ],
-    signatures  = [
-        ":D_cmi",
-    ],
+    # signatures  = [
+    #     ":D_cmi",
+    # ],
 )
 
-ocaml_module(
+test_module(
     name   = "A",
     struct = "a.ml",
     opts = MODULE_OPTS,
@@ -34,7 +34,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "B",
     struct = "b.ml",
     opts = MODULE_OPTS,
@@ -42,7 +42,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "C",
     struct = "c.ml",
     opts = MODULE_OPTS,
@@ -50,7 +50,7 @@ ocaml_module(
     ]
 )
 
-ocaml_signature(
+test_signature(
     name = "D_cmi",
     src  = "d.mli",
     opts = SIG_OPTS,
@@ -58,7 +58,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "E",
     struct = "e.ml",
     opts = MODULE_OPTS,
@@ -66,7 +66,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "F",
     struct = "f.ml",
     opts = MODULE_OPTS,
@@ -74,7 +74,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr6372",
     struct = "pr6372.ml",
     opts = MODULE_OPTS,
@@ -82,7 +82,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7325",
     struct = "pr7325.ml",
     opts = MODULE_OPTS,
@@ -90,7 +90,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr7563",
     struct = "pr7563.ml",
     opts = MODULE_OPTS,
@@ -98,7 +98,7 @@ ocaml_module(
     ]
 )
 
-ocaml_module(
+test_module(
     name   = "Pr9218",
     struct = "pr9218.ml",
     opts = MODULE_OPTS,
