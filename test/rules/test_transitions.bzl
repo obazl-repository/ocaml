@@ -14,11 +14,16 @@ def _vv_test_in_transition_impl(settings, attr):
     config_executor = "vm"
     config_emitter  = "vm"
 
-    ## we only want to rebuild the compiler, not the bld tools
-    ## bin/test:ocamlc.byte is built by .baseline/bin:ocamlc.byte
-    compiler = "//test:ocamlc.byte"
-    ocamlrun = "@baseline//bin:ocamlrun"
-    runtime  = "@baseline//lib:libcamlrun.a"
+    if settings["//config/ocaml/compiler"]== "baseline":
+        compiler = "@baseline//bin:ocamlc.byte"
+        ocamlrun = "@baseline//bin:ocamlrun"
+        runtime  = "@baseline//lib:libcamlrun.a"
+    else:
+        compiler = "//test:ocamlc.byte"
+        ocamlrun = "//runtime:ocamlrun"
+        runtime  = "//runtime:camlrun"
+
+
     # mustach  = "@baseline//bin:mustach"
     # cvt_emit = "@baseline//bin:cvt_emit.byte"
 
@@ -44,7 +49,10 @@ def _vv_test_in_transition_impl(settings, attr):
 #########################################
 vv_test_in_transition = transition(
     implementation = _vv_test_in_transition_impl,
-    inputs = ["//config/build/protocol"],
+    inputs = [
+        "//config/build/protocol",
+        "//config/ocaml/compiler"
+    ],
     outputs = [
         "//config/build/protocol",
         "//config/target/executor",
@@ -71,14 +79,15 @@ def _vs_test_in_transition_impl(settings, attr):
     config_executor = "vm"
     config_emitter  = "sys"
 
-    compiler = "//test:ocamlopt.byte"
-    # runtime  = "//runtime:asmrun"
-    runtime  = "@baseline//lib:libasmrun.a"
-    ocamlrun = "@baseline//bin:ocamlrun"
-
-    # runtime  = "@baseline//lib:libcamlrun.a"
-    # mustach  = "@baseline//bin:mustach"
-    # cvt_emit = "@baseline//bin:cvt_emit.byte"
+    if settings["//config/ocaml/compiler"]== "baseline":
+        compiler = "@baseline//bin:ocamlopt.byte"
+        # runtime  = "//runtime:asmrun"
+        runtime  = "@baseline//lib:libasmrun.a"
+        ocamlrun = "@baseline//bin:ocamlrun"
+    else:
+        compiler = "//test:ocamlopt.byte"
+        runtime  = "//runtime:asmrun"
+        ocamlrun = "//runtime:ocamlrun"
 
     if debug:
         print("setting executor:  %s" % config_executor)

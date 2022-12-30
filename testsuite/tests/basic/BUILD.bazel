@@ -75,31 +75,27 @@ expect_test(
     expected = "arrays.reference",
 )
 
+test_module(
+    name   = "Arrays",
+    struct = "arrays.ml",
+    stdlib_deps   = [
+        # "//stdlib"
+        "//stdlib:Stdlib.Gc",
+    ]
+)
+
+############
 ## test_executable expands to <x>_test_executable and sh_binary
 ## targets (runners), where <x> = vv | vs | ss | sv indicates the
 ## compiler used to build the code; and sh_binary targets for vv, sv
-## generated names. The sh_binary targets (arrays.vv.byte.sh,
-## arrays.sv.byte.sh) may be used to run the vm executables from the
+## generated names. The sh_binary targets (foo.vv.byte.sh,
+## foo.sv.byte.sh) may be used to run the vm executables from the
 ## cmd line (using 'bazel run' only). Test rules depend on the
 ## executable targets but not the sh_binary ones.
 
 ## NB: the arrays test emits nothing to stdout, so we demonstrate the
 ## expansion below, for bigints.ml, which does write to stdout.
-# test_executable(
-#     name    = "arrays",
-#     main    = ":Arrays",
-# )
 
-test_module(
-    name   = "Arrays",
-    struct = "arrays.ml",
-    stdlib_deps   = select({
-        "//testsuite/tests:with-stdlib?":["//stdlib"],
-        "//conditions:default": ["//stdlib:Stdlib.Gc"]
-    })
-)
-
-############
 # expect_test(
 #     name    = "bigints_test",
 #     stdout  = "bigints.stdout",
@@ -122,16 +118,16 @@ test_module(
 test_suite(
     name = "Bigints_test",
     tests = [
-        ":bigints_vv_test",
-        ":bigints_vs_test",
-        ":bigints_ss_test",
-        ":bigints_sv_test",
+        ":Bigints_vv_test",
+        ":Bigints_vs_test",
+        ":Bigints_ss_test",
+        ":Bigints_sv_test",
     ]
 )
 
 expect_vv_test(
-    name    = "bigints_vv_test",
-    test_executable = ":__bigints.vv.byte",
+    name    = "Bigints_vv_test",
+    test_executable = ":Bigints.vv.byte",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
     timeout  = "short",
@@ -139,8 +135,8 @@ expect_vv_test(
 )
 
 expect_vs_test(
-    name    = "bigints_vs_test",
-    test_executable = ":bigints.vs.opt",
+    name    = "Bigints_vs_test",
+    test_executable = ":Bigints.vs.opt",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
     timeout  = "short",
@@ -148,8 +144,8 @@ expect_vs_test(
 )
 
 expect_ss_test(
-    name    = "bigints_ss_test",
-    test_executable = ":bigints.ss.opt",
+    name    = "Bigints_ss_test",
+    test_executable = ":Bigints.ss.opt",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
     timeout  = "short",
@@ -157,8 +153,8 @@ expect_ss_test(
 )
 
 expect_sv_test(
-    name    = "bigints_sv_test",
-    test_executable = ":__bigints.sv.byte",
+    name    = "Bigints_sv_test",
+    test_executable = ":Bigints.sv.byte",
     stdout  = "bigints.stdout",
     expected = "bigints.reference",
     timeout  = "short",
@@ -172,62 +168,60 @@ expect_sv_test(
 
 ## test_executable macro expansion:
 vv_test_executable(
-    ## note the leading '__' in the name; this is so that the
-    ## unadorned name can be used for the runnable (sh_binary) target
-    ## below.
-    name    = "__bigints.vv.byte",
+    name    = "Bigints.vv.byte",
     main    = ":Bigints",
 )
 ## to run the vv.byte executable:
 sh_binary(
-    name = "bigints.vv.byte",
+    name = "Bigints.vv.byte.sh",
     srcs = ["//test/rules:test_executable.sh"],
     env  = select({
         "//test:verbose?": {"VERBOSE": "true"},
         "//conditions:default": {"VERBOSE": "false"}
     }),
     args = ["$(rootpath //runtime:ocamlrun)",
-            "$(rootpath :__bigints.vv.byte)"],
+            "$(rootpath :Bigints.vv.byte)"],
     data = ["//runtime:ocamlrun",
-            ":__bigints.vv.byte"],
+            ":Bigints.vv.byte"],
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
 vs_test_executable(
-    name    = "bigints.vs.opt",
+    name    = "Bigints.vs.opt",
     main    = ":Bigints",
 )
 ss_test_executable(
-    name    = "bigints.ss.opt",
+    name    = "Bigints.ss.opt",
     main    = ":Bigints",
 )
 sv_test_executable(
-    name    = "__bigints.sv.byte",
+    name    = "Bigints.sv.byte",
     main    = ":Bigints",
 )
 ## to run the vv.byte executable:
 sh_binary(
-    name = "bigints.sv.byte",
+    name = "Bigints.sv.byte.sh",
     srcs = ["//test/rules:test_executable.sh"],
     env  = select({
         "//test:verbose?": {"VERBOSE": "true"},
         "//conditions:default": {"VERBOSE": "false"}
     }),
     args = ["$(rootpath //runtime:ocamlrun)",
-            "$(rootpath :__bigints.sv.byte)"],
+            "$(rootpath :Bigints.sv.byte)"],
     data = ["//runtime:ocamlrun",
-            ":__bigints.sv.byte"],
+            ":Bigints.sv.byte"],
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
 test_module(
     name   = "Bigints",
     struct = "bigints.ml",
-    open   = ["//stdlib:Stdlib"],
-    stdlib_deps   = select({
-        "//testsuite/tests:with-stdlib?":["//stdlib"],
-        "//conditions:default": ["//stdlib:Stdlib.Sys"]
-    })
+    stdlib_deps = ["//stdlib:Stdlib.Sys"]
+    # open   = ["//stdlib:Stdlib"],
+    # stdlib_deps   = select({
+    #     "//testsuite/tests:with-stdlib?":["//stdlib"],
+    #     "//conditions:default": ["//stdlib:Stdlib.Sys"]
+    # })
 )
 
 ############

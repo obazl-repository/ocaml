@@ -16,6 +16,7 @@ load(":BUILD_RULES.bzl",
      "stdlib_signature")
 
 load(":BUILD_STDLIB.bzl", "STDLIB_MANIFEST")
+load("//config:WARNINGS.bzl", "w")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -85,10 +86,7 @@ kernel_module(
     struct = "stdlib_ml",
     sig    = "Stdlib_cmi", # doesn't work with stdlib.mli
     # use_prims = True,
-    opts = [
-        "-nopervasives",
-        "-no-alias-deps",
-    ],
+    opts = ["-nopervasives", "-no-alias-deps"],
     warnings = [NO_CMI_FILE],
     stdlib_deps = [":CamlinternalFormatBasics",],
 )
@@ -109,10 +107,7 @@ alias(name = "Primitives_cmi", actual = ":Stdlib_cmi")
 kernel_signature(
     name = "Stdlib_cmi",
     src  = "stdlib.mli",
-    # opts = SIG_OPTS + [
-    #     "-nopervasives",
-    #     "-no-alias-deps",
-    # ],
+    opts = ["-nopervasives", "-no-alias-deps"],
     warnings = [NO_CMI_FILE],
     stdlib_deps   = [
         ":CamlinternalFormatBasics_cmi",
@@ -204,11 +199,10 @@ stdlib_internal_module(
     name   = "CamlinternalFormat",
     struct = "camlinternalFormat.ml",
     sig    = "CamlinternalFormat_cmi",
-    # sig    = select({
-    #     "//config:sig_src?"   : "camlinternalformat.mli",
-    #     "//conditions:default": "CamlinternalFormat_cmi"
-    # }),
-    warnings = ["fragile-match"],
+    warnings = select({
+        "//config/target/executor:vm_executor?": ["fragile-match"],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         ":CamlinternalFormatBasics",
         ":Stdlib.Buffer",
@@ -262,11 +256,12 @@ stdlib_internal_module(
         "//config:sig_src?": "camlinternalLazy.mli",
         "//conditions:default": "CamlinternalLazy_cmi"
     }),
-    opts = select({
-        # "//platform/target:sys?": ["-afl-inst-ratio", "0"],
+    opts   = select({
+        "//config/target/emitter:sys_emitter?": [
+            "-afl-inst-ratio", "0"
+        ],
         "//conditions:default": []
     }),
-    # open   = ["//stdlib:Stdlib"],
     stdlib_deps   = [
         ":Stdlib.Obj",
         ":Stdlib.Sys",
@@ -307,15 +302,13 @@ stdlib_internal_module(
     name   = "CamlinternalOO",
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
-    # opts = ["-open", "Stdlib"],
-    # + select({
-    #     # "//platform/target:vm?": [],
-    #     # "//platform/target:sys?": [
-    #     #     "-inline", "0",
-    #     #     "-afl-inst-ratio", "0"
-    #     # ],
-    #     "//conditions:default": []
-    # }),
+    opts   = select({
+        "//config/target/emitter:sys_emitter?": [
+            "-inline", "0",
+            "-afl-inst-ratio", "0"
+        ],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -473,11 +466,11 @@ stdlib_module(
     name   = "Stdlib.Buffer",
     struct = "buffer.ml",
     sig    = "Stdlib.Buffer_cmi",
-    opts = MODULE_OPTS,
-    # + select({
-    #     mode:native :-inline 3
-    #     mode:bc: ["-w" "+A"]
-    # }),
+    opts   = select({
+        "//config/target/emitter:sys_emitter?": ["-inline", "3"],
+        "//config/target/emitter:vm_emitter?": ["-w", "+A"],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         ":Stdlib.Uchar",
         ":Stdlib.Sys",
@@ -491,7 +484,10 @@ stdlib_module(
 stdlib_signature(
     name = "Stdlib.Buffer_cmi",
     src  = "buffer.mli",
-    opts = SIG_OPTS,
+    opts   = select({
+        "//config/target/executor:vm_executor?": ["-w", "+A"],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         ":Stdlib.Uchar_cmi",
         ":Stdlib.Seq_cmi",
@@ -757,8 +753,14 @@ stdlib_module(
     name   = "Stdlib.Format",
     struct = "format.ml",
     sig    = "Stdlib.Format_cmi",
-    opts = MODULE_OPTS,
-    warnings = ["fragile-match"],
+    opts = select({
+        "//config/target/executor:vm_executor?": [],
+        "//conditions:default": []
+    }),
+    warnings = select({
+        "//config/target/executor:vm_executor?": ["+A", "-fragile-match"],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         ":CamlinternalFormat",
         ":CamlinternalFormatBasics",
@@ -780,8 +782,14 @@ stdlib_module(
 stdlib_signature(
     name = "Stdlib.Format_cmi",
     src  = "format.mli",
-    opts = SIG_OPTS,
-    warnings = ["fragile-match"],
+    opts = select({
+        "//config/target/executor:vm_executor?": ["-w", "+A"],
+        "//conditions:default": []
+    }),
+    warnings = select({
+        "//config/target/executor:vm_executor?": ["fragile-match"],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         ":Stdlib_cmi",
         ":Stdlib.Buffer_cmi",
@@ -941,9 +949,6 @@ stdlib_module(
     struct = "lazy.ml",
     sig    = "Stdlib.Lazy_cmi",
     opts = MODULE_OPTS,
-    # + select({
-    #     mode:native : ["-afl-inst-ratio 0"]
-    # })
     stdlib_deps   = [
         ":Stdlib.Obj",
         ":CamlinternalLazy",
@@ -1140,7 +1145,13 @@ stdlib_module(
     name   = "Stdlib.Oo",
     struct = "oo.ml",
     sig    = "Stdlib.Oo_cmi",
-    opts = MODULE_OPTS,
+    opts = select({
+        "//config/target/executor:vm_executor?": [
+            # preserve structure sharing in Oo.copy (PR#9767)
+            "-no-principal"
+        ],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         ":CamlinternalOO",
     ],
@@ -1251,8 +1262,14 @@ stdlib_module(
     name   = "Stdlib.Printf",
     struct = "printf.ml",
     sig    = "Stdlib.Printf_cmi",
-    opts = MODULE_OPTS,
-    warnings = ["fragile-match"],
+    opts = select({
+        "//config/target/executor:vm_executor?": ["-w", "+A"],
+        "//conditions:default": []
+    }),
+    warnings = select({
+        "//config/target/executor:vm_executor?": ["fragile-match"],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         # ":CamlinternalFormatBasics",
         ":CamlinternalFormat",
@@ -1263,8 +1280,14 @@ stdlib_module(
 stdlib_signature(
     name = "Stdlib.Printf_cmi",
     src  = "printf.mli",
-    opts = SIG_OPTS,
-    warnings = ["fragile-match"],
+    opts = select({
+        "//config/target/executor:vm_executor?": ["-w", "+A"],
+        "//conditions:default": []
+    }),
+    warnings = select({
+        "//config/target/executor:vm_executor?": ["fragile-match"],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [":Stdlib.Buffer_cmi"]
 )
 
@@ -1340,11 +1363,15 @@ stdlib_module(
     name   = "Stdlib.Scanf",
     struct = "scanf.ml",
     sig    = "Stdlib.Scanf_cmi",
-    opts   = MODULE_OPTS,
-    warnings = ["fragile-match"],
-    # + select({
-    #     mode:native  ["-inline", 9]
-    # })
+    opts = select({
+        "//config/target/emitter:vm_emitter?": ["-w", "+A"],
+        "//config/target/emitter:sys_emitter?": ["-inline", "9"],
+        "//conditions:default": []
+    }),
+    warnings = select({
+        "//config/target/emitter:vm_emitter?": ["fragile-match"],
+        "//conditions:default": []
+    }),
     stdlib_deps   = [
         ":Stdlib",
         ":CamlinternalFormatBasics",

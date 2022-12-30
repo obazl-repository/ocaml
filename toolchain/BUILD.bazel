@@ -1,4 +1,4 @@
-label_setting(name="compiler",
+label_flag(name="compiler",
               build_setting_default = "//bin:ocamlc.byte",
               visibility = ["//visibility:public"])
 

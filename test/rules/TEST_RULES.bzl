@@ -28,8 +28,10 @@ def _t_ocamlc_byte_in_transition_impl(settings, attr):
     protocol = "test"
     config_executor = "vm"
     config_emitter  = "vm"
+
     compiler = "@baseline//bin:ocamlc.byte"
     runtime  = "@baseline//lib:libcamlrun.a"
+
     return {
         "//config/build/protocol" : protocol,
         "//config/target/executor": config_executor,

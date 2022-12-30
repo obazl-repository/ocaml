@@ -8,7 +8,7 @@ exports_files(glob(["**"]))
 
 package(default_visibility = ["//visibility:public"])
 
-load("//test/rules:BUILD_RULES.bzl",
+load("//test/rules:TEST_RULES.bzl",
      # "tocaml_compilers",
      "t_ocamlc_byte",
      "t_ocamlopt_byte",
@@ -87,11 +87,11 @@ sh_binary(
 
 ################################################################
 t_ocamlopt_byte(
-    name = "ocamlopt.byte",
-    prologue = OCAMLOPT_PROLOGUE,
-    main = OCAMLOPT_MAIN,
-    opts = OCAML_COMPILER_OPTS,
-    visibility             = ["//visibility:public"]
+    name       = "ocamlopt.byte",
+    prologue   = OCAMLOPT_PROLOGUE,
+    main       = OCAMLOPT_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
+    visibility = ["//visibility:public"]
 )
 
 sh_binary(
@@ -128,10 +128,11 @@ t_ocamlopt_opt(
 ################################################################
 ################
 t_ocamlc_opt(
-    name = "ocamlc.opt",
+    name       = "ocamlc.opt",
     prologue   = OCAMLC_PROLOGUE,
     main       = OCAMLC_MAIN,
     opts       = OCAML_COMPILER_OPTS,
-    visibility             = ["//visibility:public"]
+    visibility = ["//visibility:public"]
 )
 
+## TODO: flambda rules
