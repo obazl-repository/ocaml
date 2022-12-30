@@ -98,6 +98,11 @@ def progress_msg(workdir, ctx):
                 "ocamlopt_byte", "ocamloptx_byte",
                 "ocamlopt_opt", "ocamloptx_optx",
                 "ocamlc_opt", "ocamlc_optx",
+                "t_ocamlc_byte",
+                "t_ocamlopt_byte",
+                "t_ocamlopt_opt",
+                "t_ocamlc_opt",
+
                 "build_tool_vm", "build_tool_sys",
                 "ocaml_lex",
                 "ocaml_tool_r",

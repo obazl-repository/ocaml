@@ -450,7 +450,12 @@ def executable_impl(ctx, tc, exe_name,
                             "ocamlc_byte",
                             "ocamlopt_byte", "ocamloptx_byte",
                             "ocamlopt_opt", "ocamloptx_optx",
-                            "ocamlc_opt", "ocamlc_optx"]:
+                            "ocamlc_opt", "ocamlc_optx",
+                            "t_ocamlc_byte",
+                            "t_ocamlopt_byte",
+                            "t_ocamlopt_opt",
+                            "t_ocamlc_opt",
+                            ]:
         mnemonic = "LinkOcamlCompiler"
     elif ctx.attr._rule in ["ocamllex_byte", "ocamllex_opt"]:
         mnemonic = "LinkOCamlLex"
@@ -544,7 +549,12 @@ def executable_impl(ctx, tc, exe_name,
                           "ocamlc_byte",
                           "ocamlopt_byte", "ocamloptx_byte",
                           "ocamlopt_opt", "ocamloptx_optx",
-                          "ocamlc_opt", "ocamlc_optx"]:
+                          "ocamlc_opt", "ocamlc_optx",
+                          "t_ocamlc_byte",
+                          "t_ocamlopt_byte",
+                          "t_ocamlopt_opt",
+                          "t_ocamlc_opt",
+                          ]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
         exe_provider = OcamlExecutableMarker()
