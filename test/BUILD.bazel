@@ -8,6 +8,15 @@ exports_files(glob(["**"]))
 
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+
+load("//bzl/rules:BUILD.bzl",
+     "OCAMLC_PROLOGUE",
+     "OCAMLC_MAIN",
+     "OCAMLOPT_PROLOGUE",
+     "OCAMLOPT_MAIN",
+     "OCAML_COMPILER_OPTS")
+
 load("//test/rules:TEST_RULES.bzl",
      # "tocaml_compilers",
      "t_ocamlc_byte",
@@ -21,36 +30,6 @@ load("@bazel_skylib//rules:common_settings.bzl",
 bool_flag(name = "verbose", build_setting_default = False,
           visibility = ["//visibility:public"])
 config_setting(name = "verbose?", flag_values = {":verbose": "True"})
-
-OCAMLC_PROLOGUE = select({
-    "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-    "//conditions:default": []
-}) + [
-    "//compilerlibs:ocamlcommon",
-    "//bytecomp:ocamlbytecomp"
-]
-OCAMLC_MAIN = "//driver:Main"
-
-OCAMLOPT_PROLOGUE = select({
-    "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-    "//conditions:default": []
-}) + [
-    "//compilerlibs:ocamlcommon",
-    "//asmcomp:ocamloptcomp"
-]
-OCAMLOPT_MAIN = "//driver:Optmain"
-
-OCAML_COMPILER_OPTS = select({
-    # ocamlc.byte: ["-compat-32"]
-        "//conditions:default": []
-}) + select({
-    "//platform/target/os:linux?": [
-        "-cclib", "-lm",
-        "-cclib", "-ldl",
-        "-cclib", "-lpthread",
-    ],
-    "//conditions:default": []
-})
 
 ################################################################
 #t_ocamlc_byte(name = "ocamlc.byte") # as a macro
@@ -71,7 +50,7 @@ sh_binary(
     }),
     args = ["$(rootpath @ocamlcc//runtime:ocamlrun)",
             "$(rootpath :ocamlc.byte)",
-            "$(rlocationpath @ocamlcc//stdlib:stdlib)"],
+            "$(rlocationpaths @ocamlcc//stdlib:stdlib)"],
     data = [
         "@ocamlcc//runtime:ocamlrun",
         ":ocamlc.byte",
@@ -96,7 +75,7 @@ t_ocamlopt_byte(
 
 sh_binary(
     name = "ocamlopt.byte.sh",
-    srcs = ["ocamlcc.sh"],
+    srcs = ["@ocamlcc//bin:ocamlcc.sh"],
     env  = select({
         ":verbose?": {"VERBOSE": "true"},
         "//conditions:default": {"VERBOSE": "false"}
@@ -136,3 +115,59 @@ t_ocamlc_opt(
 )
 
 ## TODO: flambda rules
+
+################################################################
+################################################################
+## skylib
+build_test(
+    name = "smoke",
+    ## verify builds: compilers, tools, test rules
+    targets = [
+        # "//runtime:asmrun",
+        # "//runtime:camlrun",
+        # "//runtime:ocamlrun",
+
+        "//bin:ocamlc.opt",
+        "//bin:ocamlopt.opt",
+        "//bin:ocamlopt.byte",
+        "//bin:ocamlc.byte",
+
+        "//test:ocamlc.opt",
+        "//test:ocamlopt.opt",
+        "//test:ocamlopt.byte",
+        "//test:ocamlc.byte",
+
+        "//testsuite/tests/basic:Boxedints_test",
+
+        "//testsuite/tests/basic:Boxedints_vv_test",
+        "//testsuite/tests/basic:Boxedints_sv_test",
+        "//testsuite/tests/basic:Boxedints_ss_test",
+        "//testsuite/tests/basic:Boxedints_vs_test",
+
+        "//testsuite/tests/basic:Boxedints.vv.byte",
+        "//testsuite/tests/basic:Boxedints.sv.byte",
+        "//testsuite/tests/basic:Boxedints.ss.opt",
+        "//testsuite/tests/basic:Boxedints.vs.opt",
+
+        # "//lex:ocamllex",
+        # "//yacc:ocamlyacc",
+        # "//stdlib",
+
+
+        # ":Caml_tex",
+        # "//tools:cmpbyt",
+        # # ":dumpobj",   ## sys target only
+        # # ":Eqparsetree",
+        # "//tools:ocamlobjinfo",
+        # "//tools:ocamlcmt",
+        # "//tools:ocamlcp",
+        # "//tools:ocamldep",
+        # "//tools:ocamlmklib",
+        # "//tools:ocamlmktop",
+        # "//tools:ocamloptp",
+        # "//tools:ocamlprof",
+        # "//tools:primreq",
+        # "//tools:stripdebug",
+    ]
+)
+

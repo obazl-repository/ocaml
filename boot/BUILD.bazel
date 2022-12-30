@@ -1,22 +1,43 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//bzl:rules.bzl",
-     "boot_import_vm_executable",
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_setting")
+
+# load("//bzl:rules.bzl",
+#      "boot_import_vm_executable",
+#      "boot_ocamlc_byte",
+#      "boot_ocamlopt_byte",
+#      "boot_ocamlopt_opt",
+#      "boot_ocamlc_opt",
+#      "boot_ocaml_compilers",
+#      "ocaml_compilers")
+
+load("//bzl/rules:BUILD.bzl",
+     "OCAMLC_PROLOGUE",
+     "OCAMLC_MAIN",
+     "OCAMLOPT_PROLOGUE",
+     "OCAMLOPT_MAIN",
+     "OCAML_COMPILER_OPTS")
+
+load(":BOOT_RULES.bzl",
+     "boot_import_vm_executable", ## for boot/ocamllex
      "boot_ocamlc_byte",
      "boot_ocamlopt_byte",
      "boot_ocamlopt_opt",
-     "boot_ocamlc_opt",
-     "boot_ocaml_compilers",
-     "ocaml_compilers")
+     "boot_ocamlc_opt")
 
 load(":BUILD_RULES.bzl",
-     "ocamlc_boot",
+     "boot_ocamlc_import",
      "boot_coldstart",
      "boot_setup")
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
 exports_files(["ocamlc", "ocamllex"])
+
+bool_flag(name = "verbose", build_setting_default = False,
+          visibility = ["//visibility:public"])
+config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 
 ## Package //boot contains pre-compiled OCaml executables (ocamlc,
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
@@ -32,9 +53,15 @@ boot_coldstart(
     ],
     args = [
         # "$(rlocationpath //bin:ocamlc.opt)",
-        "$(rlocationpath //bin:ocamlopt.opt)",
-        "$(rlocationpath //bin:ocamlopt.byte)",
-        "$(rlocationpath //bin:ocamlc.byte)",
+        # "$(rlocationpath //bin:ocamlopt.opt)",
+        # "$(rlocationpath //bin:ocamlopt.byte)",
+        "$(rlocationpath //boot:ocamlc.byte)",
+
+        # flambda
+        # "$(rlocationpath //bin:ocamlc.optx)",
+        # "$(rlocationpath //bin:ocamlopt.optx)",
+        # "$(rlocationpath //bin:ocamloptx.optx)",
+        # "$(rlocationpath //bin:ocamloptx.byte)",
 
         # "$(rlocationpath @baseline//:ocamlc.byte)",
         # "$(rlocationpath //bin/baseline:ocamlc.byte)",
@@ -46,9 +73,14 @@ boot_coldstart(
     ],
     data = [
         # "//bin:ocamlc.opt",
-        "//bin:ocamlopt.opt",
-        "//bin:ocamlopt.byte",
+        # "//bin:ocamlopt.opt",
+        # "//bin:ocamlopt.byte",
         "//bin:ocamlc.byte",
+
+        # "//bin:ocamlc.optx",
+        # "//bin:ocamlopt.optx",
+        # "//bin:ocamloptx.optx",
+        # "//bin:ocamloptx.byte",
 
         # "@baseline//:ocamlc.byte",
         # "//bin/baseline:ocamlc.byte",
@@ -102,25 +134,77 @@ sh_binary(
 )
 
 ################################################################
-ocamlc_boot(
+boot_ocamlc_import(
     name = "ocamlc.boot",
-    tool = ":ocamlc",
+    # tool = ":ocamlc",
     # runtime = "//runtime:ocamlrun"
 )
 
-ocaml_compilers(
-    name = "ocamlcc",
+sh_binary(
+    name = "ocamlc.boot.sh",
+    srcs = ["ocamlc.boot.runner.sh"],
+    env  = {"VERBOSE": "true"},
+    args = [
+        # "$(rlocationpath //runtime:ocamlrun)",
+        "$(rlocationpath :ocamlc.boot)",
+    ],
+    data = [
+        ":ocamlc.boot",
+        # "//runtime:ocamlrun",
+        # "//stdlib",
+        # "//config/camlheaders",
+
+        # We cannot depend on Std_exit on pain of circularity.
+        # It depends on Stdlib, which is compiled by this tool.
+        # "//stdlib:Std_exit"
+    ],
+    deps = [
+         # for the runfiles lib used in ocamlc.sh:
+        "@bazel_tools//tools/bash/runfiles"
+    ]
+)
+
+################################################################
+# boot_ocaml_compilers(
+#     name = "ocamlcc",
+#     visibility = ["//visibility:public"]
+# )
+
+boot_ocamlc_byte(
+    name       = "ocamlc.byte",
+    prologue   = OCAMLC_PROLOGUE,
+    main       = OCAMLC_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
     visibility = ["//visibility:public"]
 )
 
-# boot_ocaml_compilers(
-#     name = "ocamlcc",
-#     visibility             = ["//visibility:public"]
-# )
+boot_ocamlopt_byte(
+    name       = "ocamlopt.byte",
+    prologue   = OCAMLOPT_PROLOGUE,
+    main       = OCAMLOPT_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
+    visibility = ["//visibility:public"]
+)
+
+boot_ocamlopt_opt(
+    name       = "ocamlopt.opt",
+    prologue   = OCAMLOPT_PROLOGUE,
+    main       = OCAMLOPT_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
+    visibility = ["//visibility:public"]
+)
+
+boot_ocamlc_opt(
+    name       = "ocamlc.opt",
+    prologue   = OCAMLC_PROLOGUE,
+    main       = OCAMLC_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
+    visibility = ["//visibility:public"]
+)
 
 sh_binary(
     name = "ocamlc.byte.sh",
-    srcs = ["ocamlc.byte.shell"],
+    srcs = ["ocamlc.byte.runner.sh"],
     env  = {"VERBOSE": "false"},
     data = [
         ":ocamlc.byte",
@@ -140,13 +224,21 @@ sh_binary(
 
 sh_binary(
     name = "ocamlopt.byte.sh",
-    srcs = ["ocamlopt.byte.shell"],
-    env  = {"VERBOSE": "false",
-            "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
-            "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    srcs = ["ocamlcc.boot.runner.sh"],
+    env  = select({
+        ":verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+            # "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+            # "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
+    args = [
+        # "$(rlocationpath //runtime:ocamlrun)",
+        "$(rlocationpath :ocamlopt.byte)",
+        "$(rlocationpath //stdlib:stdlib.cmxa)",
+    ],
     data = [
         ":ocamlopt.byte",
-        "//runtime:ocamlrun",
+        # "//runtime:ocamlrun",
         "//stdlib:stdlib.cmxa",
         "//config/camlheaders",
         "@bazel_tools//tools/cpp:current_cc_toolchain"
@@ -245,7 +337,7 @@ sh_binary(
 
 sh_binary(
     name = "ocamlc.sh",
-    srcs = ["ocamlc.byte.sh"],
+    srcs = ["ocamlc.byte.runner.sh"],
     data = [
         ":ocamlc",
         "//runtime:ocamlrun",

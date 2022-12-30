@@ -230,7 +230,7 @@ def tc_workdir(ctx):
     # if protocol == "test":
     #     cc = "_test/"
     if compiler.basename == "ocamlc.boot":
-        cc = "BS"
+        return "_BS/"
     elif compiler.basename == "ocamlc.byte":
         cc = "vv"
     elif compiler.basename == "ocamlopt.byte":
@@ -257,11 +257,13 @@ def tc_workdir(ctx):
     else:
         fail("Bad compiler name: %s" % compiler.basename)
 
-    if compiler.basename == "ocamlc.boot":
-        return "_BS/"
+    # if compiler.owner.workspace_name == "@baseline":
+
+    stem =  compiler.owner.workspace_name
+    if stem == "@baseline":
+        return "_" + stem + "_" + cc + "/"
     else:
-        return "_" + protocol + "_" + cc + "/"
-        # return paths.basename(compiler.dirname) + "_" + cc + "/"
+        return paths.basename(compiler.dirname) + "_" + cc + "/"
 
         # return paths.basename(compiler.dirname) + "_" + compiler.basename.replace(".", "_") + "/"
 

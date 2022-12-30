@@ -1,24 +1,28 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
+load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
+
 ################################################################
-def _ocamlc_boot_in_transition_impl(settings, attr):
-    debug = True
+## boot_ocamlc_import_in_transition: transition to const config, so
+## the dependent ocamlrun is only built once.
+def _boot_ocamlc_import_in_transition_impl(settings, attr):
+    debug = False
 
     if debug:
-        print("TRANSITION: ocamlc_boot_in_transition")
+        print("TRANSITION: boot_ocamlc_import_in_transition")
         print("protocol: %s" % settings["//config/build/protocol"])
         print("compiler: %s" % settings["//toolchain:compiler"])
 
     ## compiler should always be boot:ocamlc.boot
 
     return {
-        "//config/build/protocol": "preboot",
+        "//config/build/protocol": "preboot", # FIXME
         "//toolchain:compiler"   : "//boot:ocamlc"
     }
 
 ###################################
-ocamlc_boot_in_transition = transition(
-    implementation = _ocamlc_boot_in_transition_impl,
+boot_ocamlc_import_in_transition = transition(
+    implementation = _boot_ocamlc_import_in_transition_impl,
     inputs = [
         "//config/build/protocol",
         "//toolchain:compiler"
@@ -30,34 +34,42 @@ ocamlc_boot_in_transition = transition(
 )
 
 ################################################################
-def _ocamlc_boot_impl(ctx):
+def _boot_ocamlc_import_impl(ctx):
 
-    tool = ctx.actions.declare_file(ctx.label.name)
+    ocamlc = ctx.actions.declare_file(ctx.label.name)
 
-    ctx.actions.symlink(output = tool,
-                        target_file = ctx.file.tool)
+    ctx.actions.symlink(output = ocamlc,
+                        target_file = ctx.file._ocamlc)
 
     runfiles = ctx.runfiles(
-        # files = [ctx.file._stdlib]
+        files = [ctx.file._ocamlrun]
     )
 
     defaultInfo = DefaultInfo(
-        executable = tool,
+        executable = ocamlc,
         runfiles   = runfiles
     )
     return defaultInfo
 
 #####################
-ocamlc_boot = rule(
-    implementation = _ocamlc_boot_impl,
+boot_ocamlc_import = rule(
+    implementation = _boot_ocamlc_import_impl,
 
     doc = "Imports the precompiled ocamlc, uses it to build stdlib and adds to runfiles",
 
     attrs = dict(
-        tool = attr.label(
-            mandatory = True,
+        _ocamlc = attr.label(
             allow_single_file = True,
+            default = ":ocamlc"
         ),
+        _ocamlrun = attr.label(
+            allow_single_file = True,
+            default = "//runtime:ocamlrun",
+            executable = True,
+            # cfg = "exec"
+            cfg = reset_cc_config_transition
+        ),
+
         # stdlib is a runtime dep of the linker, so we need to build
         # it and add it runfiles.
         # _stdlib = attr.label(
@@ -82,18 +94,11 @@ ocamlc_boot = rule(
         #     default = ["//config/camlheaders"]
         # ),
 
-        # _ocamlrun = attr.label(
-        #     allow_single_file = True,
-        #     default = "//runtime:ocamlrun",
-        #     executable = True,
-        #     # cfg = "exec"
-        #     cfg = reset_cc_config_transition
-        # ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     ),
     # executable = True,
-    cfg = ocamlc_boot_in_transition
+    cfg = boot_ocamlc_import_in_transition
 )
 
 ################################################################

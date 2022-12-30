@@ -6,13 +6,13 @@ load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
 
 load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
-load("//bzl/rules:ocaml_boot_compiler.bzl",
-     _boot_import_vm_executable = "boot_import_vm_executable",
-     _boot_ocamlc_byte = "boot_ocamlc_byte",
-     _boot_ocamlopt_byte = "boot_ocamlopt_byte",
-     _boot_ocamlopt_opt = "boot_ocamlopt_opt",
-     _boot_ocamlc_opt = "boot_ocamlc_opt",
-     _boot_ocaml_compilers = "boot_ocaml_compilers")
+# load("//bzl/rules:ocaml_boot_compiler.bzl",
+#      _boot_import_vm_executable = "boot_import_vm_executable",
+#      _boot_ocamlc_byte = "boot_ocamlc_byte",
+#      _boot_ocamlopt_byte = "boot_ocamlopt_byte",
+#      _boot_ocamlopt_opt = "boot_ocamlopt_opt",
+#      _boot_ocamlc_opt = "boot_ocamlc_opt",
+#      _boot_ocaml_compilers = "boot_ocaml_compilers")
 
 load("//bzl/rules:ocaml_compiler.bzl",
      _ocaml_compiler_r = "ocaml_compiler_r",
@@ -92,12 +92,12 @@ bootstrap_repl   = _bootstrap_repl
 boot_signature   = _boot_signature
 compiler_signature   = _compiler_signature
 
-boot_import_vm_executable = _boot_import_vm_executable
-boot_ocamlc_byte          = _boot_ocamlc_byte
-boot_ocamlopt_byte        = _boot_ocamlopt_byte
-boot_ocamlopt_opt         = _boot_ocamlopt_opt
-boot_ocamlc_opt           = _boot_ocamlc_opt
-boot_ocaml_compilers      = _boot_ocaml_compilers
+# boot_import_vm_executable = _boot_import_vm_executable
+# boot_ocamlc_byte          = _boot_ocamlc_byte
+# boot_ocamlopt_byte        = _boot_ocamlopt_byte
+# boot_ocamlopt_opt         = _boot_ocamlopt_opt
+# boot_ocamlc_opt           = _boot_ocamlc_opt
+# boot_ocaml_compilers      = _boot_ocaml_compilers
 
 ocaml_compiler_r          = _ocaml_compiler_r
 ocamlc_byte               = _ocamlc_byte

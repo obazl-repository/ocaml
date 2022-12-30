@@ -1,0 +1,76 @@
+= Build Protocols
+:toc: auto
+:toclevels: 3
+
+== The Standard Protocol
+
+Package:  `//bin`
+
+Compiler targets in the `//bin` package are built directly from
+`/boot/ocamlc`. The boot build protocol does not bootstrap to reach a
+fixed point, on the assumption that `boot/camlc` and the sources are
+already there.
+
+CAUTION: The standard protocol is only appropriate for release
+commits, where the source code matches `boot/ocamlc`. This would be
+the case where the user just wants to build the compilers from a
+source release for use in a project.
+
+=== Standard build stacks
+
+* `//bin:ocamlc.byte`: `boot/ocamlc > ocamlc.byte`
+* `//bin:ocamlopt.byte`: `boot/ocamlc > ocamlopt.byte`
+* `//bin:ocamlopt.opt`: `boot/ocamlc > ocamlopt.byte > ocamlopt.opt`
+* `//bin:ocamlc.opt`: `boot/ocamlc > ocamlopt.byte > ocamlc.opt`
+
+
+== The Boot Protocol
+
+Package: none.  Used only by the `//boot:coldstart` target.
+
+The `//boot:coldstart` run target builds the compiles using
+ `boot/camlc`, just like the standard protocol, but it adds some
+ bootstrapping steps in order to bring the built compilers into
+ alignment with the baseline source code. It saves the built images to
+ `.baseline`, where they are used for compiler development.
+
+=== Boot build stacks
+
+* `boot/ocamlc > ocamlc.byte > ocamlc.byte`
+* `(boot/ocamlc > ocamlc.byte >) > ocamlopt.byte`
+* `(boot/ocamlc > ocamlc.byte >ocamlopt.byte) > ocamlopt.opt`
+* `(boot/ocamlc > ocamlc.byte >ocamlopt.byte > ocamlopt.opt) > ocamlc.opt`
+
+
+== The Dev Test Protocol
+
+Package:  `//test`
+
+The builds use the baseline compilers built by running
+`//boot:coldstart` to build new versions of the compilers,
+incorporating any changes in the source code, and then use the new
+versions to build the test cases.
+
+Targets in the testsuite depend on the `//test` compiles so they are
+built under the test protocol.
+
+== The Sys Test Protocol
+
+Once you've made and tested your changes using the baseline compilers,
+it's time to run a system test. This bootstraps all the compilers to a
+fixed point, starting from `boot/ocamlc` and then runs the entire
+testsuite.  [Not yet implemented]
+
+== The Reboot Protocol
+
+Once you've run the system test, so you're confident your shiny new
+compiler is copacetic, you run the reboot protocol. It bootstraps
+`ocamlc.byte` repeatedly until it reaches a fixed point and then
+copies it to the `boot` directory, replacing `boot/ocamlc`. [Not yet
+implemented]
+
+== The Deployment Protocol
+
+The protocol for building and packaging the compilers and tools for
+distribution is distinct from the protocols for building the
+compilers.  [Not yet implemented]

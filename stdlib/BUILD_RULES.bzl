@@ -1,8 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//boot:BUILD_RULES.bzl", "ocamlc_boot_in_transition")
-
 load("//bzl:providers.bzl", "BootInfo", "ModuleInfo", "OcamlArchiveProvider")
 
 load("//bzl/attrs:archive_attrs.bzl", "archive_attrs")
@@ -43,7 +41,6 @@ stdlib_archive = rule(
     ),
     # provides = [OcamlArchiveProvider, BootInfo],
     executable = False,
-    # cfg = ocamlc_boot_in_transition,
     toolchains = ["//toolchain/type:ocaml",
                   # ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]

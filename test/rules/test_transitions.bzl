@@ -2,7 +2,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 ################################################################
 def _vv_test_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
 
     if debug:
         print("vv_test_in_transition: %s" % attr.name)
@@ -67,7 +67,7 @@ vv_test_in_transition = transition(
 
 ################################################################
 def _vs_test_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
 
     if debug:
         print("vs_test_in_transition: %s" % attr.name)
@@ -110,7 +110,10 @@ def _vs_test_in_transition_impl(settings, attr):
 #########################################
 vs_test_in_transition = transition(
     implementation = _vs_test_in_transition_impl,
-    inputs = ["//config/build/protocol"],
+    inputs = [
+        "//config/ocaml/compiler",
+        "//config/build/protocol"
+    ],
     outputs = [
         "//config/build/protocol",
         "//config/target/executor",
@@ -126,7 +129,7 @@ vs_test_in_transition = transition(
 ################################################################
 def _ss_test_in_transition_impl(settings, attr):
 
-    debug = True
+    debug = False
 
     if debug:
         print("ss_test_in_transition: %s" % attr.name)
@@ -193,7 +196,7 @@ ss_test_in_transition = transition(
 ################################################################
 def _sv_test_in_transition_impl(settings, attr):
 
-    debug = True
+    debug = False
 
     if debug:
         print("sv_test_in_transition: %s" % attr.name)

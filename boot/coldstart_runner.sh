@@ -15,7 +15,7 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
 # --- end runfiles.bash initialization v2 ---
 
 # echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
-# echo "`cat ${RUNFILES_MANIFEST_FILE}`"
+echo "`cat ${RUNFILES_MANIFEST_FILE}`"
 
 for arg in "$@"
 do

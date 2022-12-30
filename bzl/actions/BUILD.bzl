@@ -93,22 +93,29 @@ def progress_msg(workdir, ctx):
     else:
         tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if rule in ["ocaml_compiler",
-                "ocamlc_byte",
-                "ocamlopt_byte", "ocamloptx_byte",
-                "ocamlopt_opt", "ocamloptx_optx",
-                "ocamlc_opt", "ocamlc_optx",
-                "t_ocamlc_byte",
-                "t_ocamlopt_byte",
-                "t_ocamlopt_opt",
-                "t_ocamlc_opt",
-
-                "build_tool_vm", "build_tool_sys",
+    if rule in ["build_tool_vm", "build_tool_sys",
                 "ocaml_lex",
                 "ocaml_tool_r",
                 "ocaml_tool_vm", "ocaml_tool_sys",
                 "test_executable"]:
-        action = "Linking"
+        action = "LinkingTool"
+
+    elif rule in ["ocamlc_byte", "ocamlopt_byte",
+                  "ocamlopt_opt", "ocamlc_opt"]:
+        action = "LinkingStdCompiler"
+
+    elif rule in ["ocamloptx_byte", "ocamloptx_optx",
+                  "ocamlc_optx", "ocamlopt.optx"]:
+        action = "LinkingFlambdaCompiler"
+
+    elif rule in ["boot_ocamlc_byte", "boot_ocamlopt_byte",
+                  "boot_ocamlopt_opt", "boot_ocamlc_opt"]:
+        action = "LinkingBootCompiler"
+
+    elif rule in ["t_ocamlc_byte", "t_ocamlopt_byte",
+                  "t_ocamlopt_opt", "t_ocamlc_opt"]:
+        action = "LinkingTestCompiler"
+
     elif rule in ["compiler_module", "build_module", "stdlib_module", "stdlib_internal_module", "kernel_module", "test_module", "tool_module", "ns_module", "boot_module"]:
         action = "Compiling"
     elif rule in ["compiler_signature", "stdlib_signature", "stdlib_internal_signature", "kernel_signature", "test_signature", "tool_signature", "ns_signature"]:

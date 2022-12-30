@@ -504,14 +504,18 @@ def executable_impl(ctx, tc, exe_name,
         mnemonic = "LinkBootstrapTest"
     elif ctx.attr._rule in ["ocaml_compiler",
                             "build_tool_vm", "build_tool_sys",
-                            "ocamlc_byte",
-                            "ocamlopt_byte", "ocamloptx_byte",
-                            "ocamlopt_opt", "ocamloptx_optx",
-                            "ocamlc_opt", "ocamlc_optx",
-                            "t_ocamlc_byte",
-                            "t_ocamlopt_byte",
-                            "t_ocamlopt_opt",
-                            "t_ocamlc_opt",
+
+                            "boot_ocamlc_byte", "boot_ocamlopt_byte",
+                            "boot_ocamlopt_opt", "boot_ocamlc_opt",
+
+                            "ocamlc_byte", "ocamlopt_byte",
+                            "ocamlopt_opt", "ocamlc_opt",
+
+                            "ocamloptx_optx", "ocamloptx_byte",
+                            "ocamlc_optx", "ocamlopt.optx",
+
+                            "t_ocamlc_byte", "t_ocamlopt_byte",
+                            "t_ocamlopt_opt", "t_ocamlc_opt",
                             ]:
         mnemonic = "LinkOcamlCompiler"
     elif ctx.attr._rule in ["ocamllex_byte", "ocamllex_opt"]:
@@ -603,14 +607,18 @@ def executable_impl(ctx, tc, exe_name,
     exe_provider = None
     if ctx.attr._rule in ["ocaml_compiler",
                           "build_tool_vm", "build_tool_sys",
-                          "ocamlc_byte",
-                          "ocamlopt_byte", "ocamloptx_byte",
-                          "ocamlopt_opt", "ocamloptx_optx",
-                          "ocamlc_opt", "ocamlc_optx",
-                          "t_ocamlc_byte",
-                          "t_ocamlopt_byte",
-                          "t_ocamlopt_opt",
-                          "t_ocamlc_opt",
+
+                          "boot_ocamlc_byte", "boot_ocamlopt_byte",
+                          "boot_ocamlopt_opt", "boot_ocamlc_opt",
+
+                          "ocamlc_byte", "ocamlopt_byte", "ocamloptx_byte",
+                          "ocamlopt_opt", "ocamlc_opt",
+
+                          "ocamloptx_optx", "ocamlc_optx",
+                          "ocamloptx_byte", "ocamlopt_optx",
+
+                          "t_ocamlc_byte", "t_ocamlopt_byte",
+                          "t_ocamlopt_opt", "t_ocamlc_opt",
                           ]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":
