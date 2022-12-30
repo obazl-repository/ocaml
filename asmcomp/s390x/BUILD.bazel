@@ -1,4 +1,4 @@
-load("//asmcomp:BUILD_RULES.bzl", "cvt_emit")
+load("//asmcomp:BUILD_RULES.bzl", "run_cvt_emit")
 
 exports_files([
     "arch.mli", "arch.ml",
@@ -6,7 +6,7 @@ exports_files([
     "reload.ml", "scheduling.ml", "selection.ml"
 ])
 
-cvt_emit(
+run_cvt_emit(
     name = "emit_ml",
     src  = "emit.mlp",
     out  = "emit.ml",
