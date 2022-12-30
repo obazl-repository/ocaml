@@ -17,11 +17,7 @@ def exec_common_attrs():
             doc          = "List of OCaml warning options. Will override configurable default options."
         ),
 
-        _libs_archived = attr.label( # boolean
-            default = "//config/ocaml/compiler/libs:archived"
-        ),
-
-        _archive = attr.label(
+        _compilerlibs_archived = attr.label( # boolean
             default = "//config/ocaml/compiler/libs:archived"
         ),
 
@@ -52,12 +48,12 @@ def exec_common_attrs():
         ## which means it is a runtime dep of the linker we're using
         ## to build this target, which we get from the toolchain. So
         ## it is _not_ a dependency of this target.
-        # stdlib = attr.label(
-        #     doc = "Stdlib archive", ## (not stdlib.cmx?a")
-        #     # default = "//stdlib:primitives", # archive, not resolver
-        #     # allow_single_file = True, # won't work with boot_library
-        #     # cfg = exe_deps_out_transition,
-        # ),
+        _stdlib = attr.label(
+            doc = "Stdlib archive", ## (not stdlib.cmx?a")
+            default = "//stdlib", # archive, not resolver
+            # allow_single_file = True, # won't work with boot_library
+            # cfg = exe_deps_out_transition,
+        ),
 
         ## ALL executables depend on std_exit (lowercase hardcoded in
         ## linker). We do not require the user to explicitly list it,

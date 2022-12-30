@@ -87,13 +87,17 @@ def executable_impl(ctx, tc, exe_name,
         if dep.label.name in ["Stdlib", "Primitives"]:
             open_stdlib = True
             stdlib_module_target = dep
-            break;
         elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
             open_stdlib = True
         elif dep.label.name == "stdlib": ## stdlib archive OR library
             open_stdlib = True
             stdlib_library_target = dep
-            break;
+            ##FIXME: make sure stdlib.cmx?a gets added to inputs and runfiles
+
+    ## if --//config/ocaml/compiler/libs:archived
+    ## then use ctx.attr._stdlib, which is the archive
+    ## better: distinguish between libs:archived and
+    ## --//config/ocaml/pervasives:enabled
 
     if ctx.attr.main:
         depsets = aggregate_deps(ctx, ctx.attr.main, depsets, manifest)
@@ -201,23 +205,38 @@ def executable_impl(ctx, tc, exe_name,
         cc_libdirs.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
 
     (_options, cancel_opts) = get_options(rule, ctx)
+    # print("_options: %s" % _options)
+    # print("cancel_opts: %s" % cancel_opts)
+    # if ctx.label.name == "Arrays.vv.byte":
+    #     fail()
 
     # if ext == ".cmx":
     #     args.add("-dstartup")
 
+    pervasives = False
     if "-pervasives" in _options:
         cancel_opts.append("-nopervasives")
         _options.remove("-pervasives")
+        pervasives = True
     # else:
     #     _options.append("-nopervasives")
 
+    ## if -nopervasives and libs:archived, then we need to put both
+    ## stdlib.cmx?a and std_exit.cm[x|a] on the cmd line. if not
+    ## libs:archived, its up to the compile target to list its
+    ## stdlib_deps, but std_exit must be added.
+
+    ## that is, std_exit must always be input to linker but only on
+    ## cmd line for -nopervasives. but stdlib only added to inputs
+    ## depset (and not to cmd line) if -pervasives.
+
+    ## if -pervasives, then neither goes on cmd line but both must be
+    ## added to inputs depset (and to runfiles for vm executors.)
     for opt in tc.linkopts:
         if opt not in cancel_opts:
             args.add(opt)
 
     args.add_all(_options)
-
-    # args.add("-nopervasives")
 
     for w in ctx.attr.warnings:
         args.add_all(["-w",
@@ -309,23 +328,27 @@ def executable_impl(ctx, tc, exe_name,
         includes.append(paths.dirname(stdlib))
         # cmd_args.append("-I")
         # cmd_args.append(paths.dirname(stdlib))
-    elif stdlib_library_target:
-        if ctx.attr._libs_archived[BuildSettingInfo].value:
-            stdlib = ctx.expand_location("$(rootpath //stdlib)",
-                                         targets=[stdlib_library_target])
-            includes.append(paths.dirname(stdlib))
-            # cmd_args.append("-I")
-            # cmd_args.append(paths.dirname(stdlib))
-        else:
-            stdlibstr = ctx.expand_location("$(rootpaths //stdlib)",
-                                         targets=[stdlib_library_target])
-            stdlibs = stdlibstr.split(" ")
-            includes.append(paths.dirname(stdlibs[0]))
-            # cmd_args.append("-I")
-            # cmd_args.append(paths.dirname(stdlibs[0]))
+    # elif stdlib_library_target:
+    #     if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+
+    ## NB: rootpath is for runfiles, not appropriate here. try $(location)?
+
+    #         stdlib = ctx.expand_location("$(rootpath //stdlib)",
+    #                                      targets=[stdlib_library_target])
+    #         includes.append(paths.dirname(stdlib))
+    #         # cmd_args.append("-I")
+    #         # cmd_args.append(paths.dirname(stdlib))
+    #     else:
+    #         stdlibstr = ctx.expand_location("$(rootpaths //stdlib)",
+    #                                      targets=[stdlib_library_target])
+    #         stdlibs = stdlibstr.split(" ")
+    #         includes.append(paths.dirname(stdlibs[0]))
+    #         # cmd_args.append("-I")
+    #         # cmd_args.append(paths.dirname(stdlibs[0]))
 
     args.add_all(includes, before_each="-I", uniquify=True)
 
+    ## FIXME: for ocamlcc we do not need this?
     if ctx.attr.cc_linkopts:
         for lopt in ctx.attr.cc_linkopts:
             if lopt == "verbose":
@@ -337,6 +360,7 @@ def executable_impl(ctx, tc, exe_name,
     for d in cc_libdirs:
         args.add_all(["-ccopt", "-L" + d])
 
+    ## FIXME: for ocamlcc we do not need this?
     if ctx.attr.cc_deps:
         for f in ctx.files.cc_deps:
             # args.add_all(["-ccopt", "-L" + f.path])
@@ -345,22 +369,47 @@ def executable_impl(ctx, tc, exe_name,
             runtime_files.append(f)
             includes.append(f.dirname)
 
+    ## FIXME: we should be able to just merge the cli_link_deps, with
+    ## no further ado.
+
     ## Choice: either use filtering_depset or cli_link_deps, not both
-    if ctx.attr._libs_archived[BuildSettingInfo].value:
+    ##FIXME: this logic is for building compilers only?
+    ## ordinary executables might not list stdib archive dep?
+
+    if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+        ## FIXME: this strategy works for archives, where we want to
+        ## archive only those modules explicitly listed in manifest.
+        ## but it does not executables.
         for dep in filtering_depset.to_list():
             if dep in manifest:
                 args.add(dep)
         # ## 'main' dep must come last on cmd line
         if ctx.file.main:
+            ##FIXME: what about main's deps? they should be in
+            ##filtering_depset; but they are not in manifest so they
+            ##are not added to cli.
             args.add(ctx.file.main)
     else:
         for dep in cli_link_deps_depset.to_list():
             args.add(dep)
 
+    ## this won't work since a direct module dep may depend on a
+    ## module that is in an archive that is also a dep (e.g.Optmain
+    ## and ocamloptcomp.cmxa)
+    # for dep in cli_link_deps_depset.to_list():
+    #     args.add(dep)
+    # args.add(ctx.file.main)
+
+
     if hasattr(ctx.attr, "epilogue"):
         args.add_all(ctx.files.epilogue)
 
-    args.add_all(ctx.files._std_exit)
+    ## only add this if -nopervasives
+    if not pervasives:
+        args.add_all(ctx.files._std_exit)
+    ## or, for compiling executables that are not compilers,
+    ## always add std_exit here?
+
 
     args.add("-o", out_exe)
 
@@ -436,6 +485,10 @@ def executable_impl(ctx, tc, exe_name,
         # + data_inputs
         # + [depset(action_inputs_ccdep_filelist)]
     )
+
+    if ctx.label.name == "ocamlopt.opt":
+        print("afiles: %s" % afiles_depset)
+        # fail()
 
     if ctx.attr._rule == "boot_executable":
         mnemonic = "LinkBootstrapExecutable"

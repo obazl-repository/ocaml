@@ -109,7 +109,7 @@ def _ocamlopt_byte_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if tc.flambda:
+    if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamloptx.byte"
     else:
         exe_name = "ocamlopt.byte"
@@ -144,7 +144,7 @@ def _ocamlopt_opt_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if tc.flambda:
+    if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamloptx.optx"
     else:
         exe_name = "ocamlopt.opt"
@@ -179,7 +179,7 @@ def _ocamlc_opt_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if tc.flambda:
+    if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamlc.optx"
     else:
         exe_name = "ocamlc.opt"
@@ -225,10 +225,10 @@ def _ocamloptx_byte_impl(ctx):
     if not ctx.label.name.endswith(".byte"):
         fail("Target name for rule ocamloptx_bytes must end in '.optx'")
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    if tc.flambda:
+    if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamloptx.byte"
     else:
-        fail("bad build setting: tc.flambda should be true: %s" % tc.flambda)
+        fail("bad build setting: tc.flambda should be true: %s" % tc.flambda[BuildSettingInfo].value)
     return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 ##############################
@@ -236,10 +236,10 @@ def _ocamloptx_optx_impl(ctx):
     if not ctx.label.name.endswith(".optx"):
         fail("Target name for rule ocamloptx_optx must end in '.optx'")
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    if tc.flambda:
+    if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamloptx.optx"
     else:
-        fail("bad build setting: tc.flambda should be true: %s" % tc.flambda)
+        fail("bad build setting: tc.flambda should be true: %s" % tc.flambda[BuildSettingInfo].value)
     return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 ##############################
@@ -247,10 +247,10 @@ def _ocamlopt_optx_impl(ctx):
     if not ctx.label.name.endswith(".optx"):
         fail("Target name for rule ocamlc_optx must end in '.optx'")
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    if tc.flambda:
+    if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamlopt.optx"
     else:
-        fail("bad build setting: tc.flambda should be true: %s" % tc.flambda)
+        fail("bad build setting: tc.flambda should be true: %s" % tc.flambda[BuildSettingInfo].value)
     return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 ##############################
@@ -258,10 +258,10 @@ def _ocamlc_optx_impl(ctx):
     if not ctx.label.name.endswith(".optx"):
         fail("Target name for rule ocamlc_optx must end in '.optx'")
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-    if tc.flambda:
+    if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamlc.optx"
     else:
-        fail("bad build setting: tc.flambda should be true: %s" % tc.flambda)
+        fail("bad build setting: tc.flambda should be true: %s" % tc.flambda[BuildSettingInfo].value)
     return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 ##############################
@@ -364,11 +364,10 @@ def ocaml_compilers(name,
 
     ocamlc_byte(
         name = "ocamlc.byte",
-        prologue = [
-            # "//stdlib:primitives",
-            # "//stdlib:Stdlib",
-            # "//stdlib:Stdlib.Arg",
-            "//stdlib",
+        prologue = select({
+            "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+            "//conditions:default": []
+        }) + [
             "@//compilerlibs:ocamlcommon",
             "@//bytecomp:ocamlbytecomp"
         ],
@@ -391,10 +390,13 @@ def ocaml_compilers(name,
     ocamlopt_byte(
         name = "ocamlopt.byte",
         # stdlib   = "//stdlib",
-    prologue = [
+        prologue = select({
+            "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+            "//conditions:default": []
+        }) + [
         "//compilerlibs:ocamlcommon",
         "//asmcomp:ocamloptcomp"
-    ],
+        ],
         main = "//driver:Optmain",
         opts = [ ] + select({
             # ocamlc.byte: ["-compat-32"]
@@ -413,8 +415,12 @@ def ocaml_compilers(name,
 
     ocamlopt_opt(
         name = "ocamlopt.opt",
-        # stdlib   = "//stdlib",
-        prologue = [
+        ## The Bazel rules cannot infer the ordering of archive file
+        ## deps, so the following order must be maintained:
+        prologue = select({
+            "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+            "//conditions:default": []
+        }) + [
             "//compilerlibs:ocamlcommon",
             "//asmcomp:ocamloptcomp"
         ],

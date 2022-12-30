@@ -833,7 +833,8 @@ build_tool_vm(
     #     "-verbose"
     # ],
     prologue = [
-        "//stdlib:Stdlib",
+        "//stdlib"
+        # "//stdlib:Stdlib",
         # "//stdlib:Primitives",
 
     #     "//stdlib:primitives",

@@ -270,7 +270,7 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
         cmd_args.append("-I")
         cmd_args.append(paths.dirname(stdlib))
     elif stdlib_library_target:
-        if ctx.attr._libs_archived[BuildSettingInfo].value:
+        if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
             stdlib = ctx.expand_location("$(rootpath //stdlib)",
                                          targets=[stdlib_library_target])
             cmd_args.append("-I")

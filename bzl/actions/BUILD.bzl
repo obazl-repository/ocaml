@@ -121,7 +121,7 @@ def progress_msg(workdir, ctx):
     elif rule in ["run_ocamllex"]:
         action = "Running ocamllex"
     elif rule == "compiler_library":
-        if ctx.attr.archive:
+        if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
             action = "Archiving compiler lib"
         else:
             action = "Packaging compiler lib"
@@ -161,10 +161,11 @@ def progress_msg(workdir, ctx):
         else:
             em = "ocamlc"
 
+    flambda = tc.flambda[BuildSettingInfo].value
     msg = "{m} {lbrack}{flambda}{c}{rbrack}: {ws}//{pkg}:{tgt} {action} {rule}".format(
         m   = cmode,
         lbrack = lbrack,
-        flambda = "!" if tc.flambda else "",
+        flambda = "!" if flambda else "",
         c   = tc.compiler[DefaultInfo].files_to_run.executable.basename,
         x   = x,
         em  = em,

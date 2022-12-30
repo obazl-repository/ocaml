@@ -38,11 +38,27 @@ def archive_impl(ctx):
     tgt_name = ctx.label.name
     if ctx.label.name.endswith(".cmxa"):
         tgt_name = ctx.label.name[:-5]
-        ext = ".cmxa"
-    elif tc.config_executor == "sys":
+    #     ext = ".cmxa"
+    # elif tc.config_executor == "sys":
+    #     ext = ".cmxa"
+    # else:
+    #     ext = ".cma"
+
+    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    if compiler.basename in [
+        "ocamlc.byte", "ocamlc.opt", "ocamlc.boot",
+        "ocamlc.optx",
+    ]:
+        # fail("XXXXXXXXXXXXXXXX %s" % ctx.label)
+        ext = ".cma"
+    elif compiler.basename in [
+        "ocamlopt.opt", "ocamlopt.byte",
+        "ocamloptx.optx", "ocamloptx.byte"
+    ]:
+        # fail("YYYYYYYYYYYYYYYY: %s" % ctx.label)
         ext = ".cmxa"
     else:
-        ext = ".cma"
+        fail("bad compiler basename: %s" % compiler.basename)
 
     ################################################################
     ################  OUTPUTS: out_archive  ################
@@ -236,10 +252,11 @@ def archive_impl(ctx):
         # manifest = manifest_depset
     )
 
+    ## now add archive to link_deps
     cli_link_deps_depset = depset(
         order = dsorder,
         direct = [out_archive],
-        transitive = [merge_depsets(depsets, "cli_link_deps")]
+        # transitive = [merge_depsets(depsets, "cli_link_deps")]
     )
 
     afiles_depset  = depset(
@@ -262,5 +279,8 @@ def archive_impl(ctx):
         bootProvider,
         ocamlArchiveProvider
     ]
+
+    print("boot provider:")
+    print(bootProvider)
 
     return providers

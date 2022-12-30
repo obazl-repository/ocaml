@@ -142,6 +142,7 @@ sv_test_executable = rule(
 ####  MACRO - generates two exec targets, vm and sys
 ################################################################
 def test_executable(name, main,
+                    opts = [],
                     **kwargs):
 
     if main.startswith(":"):
@@ -152,6 +153,8 @@ def test_executable(name, main,
     vv_test_executable(
         name    = main + ".vv.byte",
         main    = main,
+        opts    = opts,  ##  + ["-pervasives"],
+        # prologue = ["//stdlib"],
         **kwargs
     )
 

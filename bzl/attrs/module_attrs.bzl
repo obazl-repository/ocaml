@@ -67,14 +67,14 @@ def module_attrs():
             # providers = [[OcamlSignatureProvider]],
         ),
 
-        _libs_archived = attr.label( # boolean
+        _compilerlibs_archived = attr.label( # boolean
             default = "//config/ocaml/compiler/libs:archived"
         ),
 
         ################
         stdlib_deps = attr.label_list(
             doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
-            providers = [StdlibStructMarker]
+            providers = [[StdlibStructMarker],[]]
         ),
         sig_deps = attr.label_list(
             doc = "Sig deps",

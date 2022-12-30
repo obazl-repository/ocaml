@@ -24,7 +24,9 @@ load(":BUILD_STDLIB.bzl", "STDLIB_MANIFEST")
 ##############################
 def _stdlib_archive_impl(ctx):
 
-    if (ctx.attr.archive or ctx.attr._archive[BuildSettingInfo].value):
+    if ctx.attr.archive:
+        return archive_impl(ctx)
+    elif ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
         return archive_impl(ctx)
     else:
         return library_impl(ctx)

@@ -27,7 +27,7 @@ test_module_ = rule(
         _stdlib = attr.label(
             ## only added to depgraph if stdlib_primitives == True
             allow_single_file = True,
-            # default = "//stdlib:Stdlib"
+            default = "//stdlib:Stdlib"
         ),
         # _resolver = attr.label(
         #     doc = "The compiler always opens Stdlib, so everything depends on it.",

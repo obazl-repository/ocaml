@@ -223,15 +223,15 @@ bool_flag( name = "verbose", build_setting_default = False)
 
 ################################################################
 ##FIXME: what is the optimal way to select for flambda?
-bool_flag(
-    name = "flambda",
-    build_setting_default = False,
-    visibility = ["//visibility:public"]
-)
-config_setting(
-    name = "flambda?",
-    flag_values = {":flambda": "True"},
-)
+# bool_flag(
+#     name = "flambda",
+#     build_setting_default = False,
+#     visibility = ["//visibility:public"]
+# )
+# config_setting(
+#     name = "flambda?",
+#     flag_values = {":flambda": "True"},
+# )
 
 ################################################################
 config_setting(

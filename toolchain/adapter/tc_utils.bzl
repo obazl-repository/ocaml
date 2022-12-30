@@ -220,46 +220,49 @@ def tc_workdir(ctx):
 
     protocol = ctx.attr.protocol[BuildSettingInfo].value
 
-    if protocol == "test":
-        workdir = "_test"
-
     config_executor = ctx.attr.config_executor[BuildSettingInfo].value
     config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
     compiler = ctx.file.compiler
 
+    flambda = ctx.attr.flambda[BuildSettingInfo].value
+
+    # if protocol == "test":
+    #     cc = "_test/"
     if compiler.basename == "ocamlc.boot":
-        cc = "VV"
+        cc = "BS"
     elif compiler.basename == "ocamlc.byte":
         cc = "vv"
     elif compiler.basename == "ocamlopt.byte":
-        if ctx.attr.flambda:
-            cc = "vS"
+        if flambda:
+            cc = "vx"
         else:
             cc = "vs"
     elif compiler.basename == "ocamloptx.byte":
-        cc = "vS"
+        cc = "vx"
     elif compiler.basename == "ocamlopt.opt":
-        if ctx.attr.flambda:
-            cc = "SS"
+        if flambda:
+            cc = "xx"
         else:
             cc = "ss"
     elif compiler.basename == "ocamloptx.optx":
-        cc = "SS"
+        cc = "xx"
     elif compiler.basename == "ocamlc.opt":
-        if ctx.attr.flambda:
-            cc = "Sv"
+        if flambda:
+            cc = "xv"
         else:
             cc = "sv"
     elif compiler.basename == "ocamlc.optx":
-        cc = "Sv"
+        cc = "xv"
     else:
         fail("Bad compiler name: %s" % compiler.basename)
 
     if compiler.basename == "ocamlc.boot":
-        return "_VV/"
+        return "_BS/"
     else:
-        return paths.basename(compiler.dirname) + "_" + cc + "/"
+        return "_" + protocol + "_" + cc + "/"
+        # return paths.basename(compiler.dirname) + "_" + cc + "/"
+
         # return paths.basename(compiler.dirname) + "_" + compiler.basename.replace(".", "_") + "/"
 
     # if ctx.file.compiler.path == "bin:ocamlc.byte":
@@ -314,4 +317,4 @@ def tc_workdir(ctx):
 
     # # workdir = ctx.attr.name + "/"
 
-    return workdir
+    # return workdir

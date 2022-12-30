@@ -69,6 +69,10 @@ def signature_attrs():
         #     doc = "Experimental",
         # ),
 
+        _compilerlibs_archived = attr.label(
+            default = "//config/ocaml/compiler/libs:archived"
+        ),
+
         stdlib_deps = attr.label_list(
             doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
             providers = [StdlibSigMarker]

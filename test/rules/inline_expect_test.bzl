@@ -73,7 +73,7 @@ inline_expect_test = rule(
             # default = "//config/runtime" # label flag set by transition
         ),
 
-        _libs_archived = attr.label( # boolean
+        _compilerlibs_archived = attr.label( # boolean
             default = "//config/ocaml/compiler/libs:archived"
         ),
 

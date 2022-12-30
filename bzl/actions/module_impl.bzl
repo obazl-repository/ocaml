@@ -463,6 +463,7 @@ def module_impl(ctx, module_name):
 
     stdlib_depset =[]
 
+    # if --//config/ocaml/compiler/libs:archived
     # if hasattr(ctx.attr, "stdlib_primitives"): # test rules
     #     if ctx.attr.stdlib_primitives:
     #         if hasattr(ctx.attr, "_stdlib"):
@@ -613,7 +614,7 @@ def module_impl(ctx, module_name):
     #                                  targets=[stdlib_primitives_target])
     #     includes.append(paths.dirname(stdlib))
     elif stdlib_library_target:
-        if ctx.attr._libs_archived[BuildSettingInfo].value:
+        if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
             stdlib = ctx.expand_location("$(rootpath //stdlib)",
                                          targets=[stdlib_library_target])
             includes.append(paths.dirname(stdlib))

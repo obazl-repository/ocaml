@@ -12,7 +12,11 @@ def _compiler_library_impl(ctx):
     # print(" local arch: %s" % ctx.attr.archive)
     # print(" global arch %s" % ctx.attr._archive[BuildSettingInfo].value)
 
-    if (ctx.attr.archive or ctx.attr._archive[BuildSettingInfo].value):
+    # if (ctx.attr.archive or ctx.attr._compilerlibs_archived[BuildSettingInfo].value):
+    #     return archive_impl(ctx)
+    if ctx.attr.archive:
+        return archive_impl(ctx)
+    elif ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
         return archive_impl(ctx)
     else:
         return library_impl(ctx)
