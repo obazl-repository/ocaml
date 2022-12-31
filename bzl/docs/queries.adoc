@@ -1,4 +1,85 @@
 = queries
+:toc: auto
+:toclevels: 3
+
+== Overview
+
+Bazel boasts no fewer than three query facilities: query, aquery, and cquery.
+
+TIP: Bazel's querying facilities are very powerful and flexible, but
+they do have a learning curve. If you need to do more than minimal
+work with the buld, it will probably be worth your while to spend some
+time exploring queries. Otherwise, you should learn at a minimum how
+to use `aquery` to inspect build commands, and try some of the
+examples below to learn how to discover available build targets,
+inspect dependency graphs, etc.
+
+
+* link:https://bazel.build/query/guide[query] The "standard" query
+  facility applies to the results of Bazel's load phase, before
+  `select` functions and build options have been applied. For example,
+  standard queries can show you what dependency graphs look like
+  before any `select` functions have been evaluated.
+  ** link:https://bazel.build/query/language[Bazel query reference]
+* link:https://bazel.build/query/aquery[aquery] Action queries expose
+  detailed information about the actions associated with build
+  targets, including command lines.
+* link:https://bazel.build/query/cquery[cquery] Configurable queries are like ordinary queries, except that they are applied after dynamic configuration (code using the `select`function) has been completed. Unlike ordinary queries, cqueries show the effect of build options.
+
+TIP: For each query you can ask for several kinds of output: `build`
+displays build code; `label` displays the target label; `label_kind`
+displays the both the target label and rule name; etc. - see link:https://bazel.build/query/language#output-formats[Output formats] for more information.
+
+CAUTION: Don't forget to quote the query expressions.
+
+
+== Build commands and actions
+
+The `aquery` facility allows us to inspect fully expanded build
+commands without running them.  Just replace `build` with `aquery`:
+
+* Build the xref:terminology.adoc#standard[standard] `ocamlc.byte`
+  compiler:
++
+    $ bazel build bin:ocamlc.byte
++
+Bazel will construct a command line and run it; to inspect the command without running it:
++
+    $ bazel aquery bin:ocamlc.byte
+
+This will print detailed information about the build action of the
+`//bin:ocamlc.byte` target, of which the command line is just one
+element. In particular it will print the list of inputs and outputs of
+the action.
+
+IMPORTANT: Some build targets generate multiple build actions, so
+`aquery` may show you more than you expected. For example,
+`rules_ocamlcc` uses symlinks pretty extensively; symlink creation
+requires a Bazel build action
+link:https://bazel.build/rules/lib/actions#symlink[ctx.actions.symlink]
+(so that Bazel can track and cache), so `aquery` output will
+often include information about symlink actions. This can help you
+understand exactly how the build rules work. As an example, each rule
+does its work in a working directory, so it links source files into
+the working directory. Action queries on module compilation targets
+(e.g. `//stdlib:Stdlib.Buffer`, `//lambda:Simplif`, etc.) will show
+this symlink step. The same goes for signature compilation targets,
+(e.g. `//stdlib:Stdlib.Buffer_cmi`, `//lambda:Simplif_cmi`, etc.)
+
+NOTE: Reminder: all inputs for every action must be explicitly
+enumerated. That does not mean that they must be listed in the target
+expressions in `BUILD.bazel` files; rather it means that the
+implementation code of the rule must construct the list and pass it to
+Bazel. For example, to compile a `.ml` file, the compiler must be able
+to find the companion `.cmi` file. This is handled automatically by
+`rules_ocamlcc`; `.cmi` files are never listed in `BUILD.bazel` files.
+Running an action query on a module compile target (e.g.
+`//bytecomp:Bytegen`) will display the `.cmi` file passed to the
+compile action. The inputs list displayed by `aquery` will usually
+include the entire dependency graph of the target.
+
+
+== Rule queries
 
 
 * list all instances of a particular rule:
@@ -8,7 +89,14 @@
 For example, all uses of rule "mustache":
 +
     bazel query 'kind("mustache rule", //...)'
-
++
+All test rules (whose names terminate in "_test"):
++
+    bazel query 'kind(".*_test rule", //...)' --output=label_kind | sort'
++
+All genrules:
+    bazel query 'kind("genrule", //...)'
++
 * list all generated files (outputs of genrule, mustache rule):
 
   ** in a package:
@@ -21,15 +109,114 @@ For example, all uses of rule "mustache":
     bazel query 'kind("generated file", deps(//typing:ocamlcommon))' --noimplicit_deps
     bazel query 'kind("generated file", deps(//typing:Envaux))' --noimplicit_deps
 
-== reverse deps
 
-* show everything that depends (directly or indirectly) on `//runtime/caml:domain_state.h`:
+* List all rules used in package `//testsuite/tests/basic`:
 
-    bazel query "rdeps(//..., //runtime/caml:domain_state.h)"
+  bazel query 'kind(rule, testsuite/tests/basic:*)' --output label_kind | sort
 
-* to limit the depth add an int argument. E.g. to show only direct rdeps:
+== Configuration queries
 
-    bazel query "rdeps(//..., //runtime/caml:domain_state.h, 1)"
+Build configuration settings are exposed via command-line "flags". For
+example, `--//config/ocaml/link:verbose` globally enables verbose
+output for OCaml link actions (by passing `-verbose` on the command
+line); this is expressed using a `string_flag` rule in
+`config/ocaml/link/BUILD.bazel`.
+
+To view all flag rules:
+
+  bazel query 'kind(".*_flag rule", //...)' --output=label_kind | sort
+
+CAUTION: The term "flag" suggests booleans, but flags can also be
+string- or int-valued, or they may be list types. "Label flags" are a
+special case of flag whose value must be a Bazel label.
+
+The authoritative source of information about config flag types is of
+course the source code:
+
+     bazel query config/ocaml:xmo --output=build
+
+== Test queries
+
+Macro `expect_test` expands to targets using rules `expect_vv_test`,
+`expect_vs_test`, etc. (one per compiler):
+
+* List all the ocaml tool rules in `//tools`:
+
+     bazel query 'kind("ocaml_tool_*", tools:*)' --output label_kind
+
+* List all targets generated by macro `expect_test` in `//testsuite/tests/basic`:
+
+    bazel query 'attr(generator_function, expect_test, //testsuite/tests/basic/...)'
+
+* List all `expect_vv_test` targets:
+
+    bazel query 'kind("expect_vv_test", testsuite/tests/basic:*)' --output label_kind | sort
+
+* List all `test_suite` targets:
+
+  bazel query 'kind("test_suite", testsuite/tests/basic:*)' --output label_kind | sort
+
+* List the tests that `test_suite` target `//testsuite/tests/basic:Boxedints_test` expands to:
+
+    bazel query 'tests(//testsuite/tests/basic:Boxedints_test)'
+
+The `expect_test` macro contains a nested macro, `test_executable`.
+
+* List the targets that `test_executable` expands to:
+
+     bazel query 'kind("test_executable", testsuite/tests/basic:*)' --output label_kind | sort
+
+* List all the `test_module` targets:
+
+    bazel query 'kind("test_module", testsuite/tests/basic:*)' --output label_kind | sort
+
+* Show targets whose label contains "int" by filtering with a regex:
+
+    bazel query 'filter(".*int.*", kind(".*_test rule", //testsuite/tests/basic...))'
+
+== Inspecting BUILD.bazel source code
+
+* Show the code of a particular `expect_vv_test` target:
+
+    bazel query testsuite/tests/basic:Boxedints_vv_test --output=build
+
+* Show the code for the `test_executable` used by `//testsuite/tests/basic:Boxedints_vv_test`:
+
+    bazel query testsuite/tests/basic:Boxedints.vv.byte --output=build
+
+* Expand all macros in `testsuite/tests/basic/BUILD.bazel`:
+
+    bazel query testsuite/tests/basic/...  --output=build
+    or: bazel query 'testsuite/tests/basic/...:*'  --output=build
+
+* Expand the `expect_test` macro for target `testsuite/tests/basic:Boxedints_test`:
+
+    bazel query testsuite/tests/basic:Boxedints_test  --output=build
+
+* Expand the `test_executable` macro for target `testsuite/tests/basic:Boxedints.ss.opt`:
+
+    bazel query testsuite/tests/basic:Boxedints.ss.opt  --output=build
+
+== dependencies
+
+* What build files does a target depend on?
+
+    bazel query 'buildfiles(deps(//testsuite/tests/basic:Arrays))'
+
+* Why does `//testsuite/tests/basic:Arrays_test` depend on
+  `//stdlib:Stdlib.Array`?
+
+    bazel cquery 'somepath(testsuite/tests/basic:Arrays_test, stdlib:Stdlib.Array)'
+
+NOTE: The `cquery` command runs _after_ all `select` functions have been resolved.
+
+* Which targets depend on Stdlib.Gc
+
+     bazel cquery 'testsuite/tests/basic/... intersect allpaths(testsuite/tests/basic/..., stdlib:Stdlib.Gc)' | sort
+
+* Show length of dependency paths for a target:
+
+    bazel query 'deps(//testsuite/tests/basic:Arrays)' --output maxrank
 
 == dep paths
 
@@ -42,6 +229,17 @@ You can add something like ` | dot -Tsvg > /tmp/deps.svg` to view the graph.
 * show only "some" (arbitrary) path:
 
     bazel cquery "somepath(//lex:ocamllex, //runtime/caml:domain_state.h)" --output=graph --config=boot
+
+
+== reverse deps
+
+* show everything that depends (directly or indirectly) on `//runtime/caml:domain_state.h`:
+
+    bazel query "rdeps(//..., //runtime/caml:domain_state.h)"
+
+* to limit the depth add an int argument. E.g. to show only direct rdeps:
+
+    bazel query "rdeps(//..., //runtime/caml:domain_state.h, 1)"
 
 == providers
 

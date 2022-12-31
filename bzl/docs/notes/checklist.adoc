@@ -1,0 +1,68 @@
+= release checklist
+
+== build targets
+
+Skylib build_test:  //test:smoke
+
+
+== compilers
+
+* `//runtime` targets: `:asmrun`, `:camlrun`, `:ocamlrun`
+
+* `bazel build //boot:ocamlc.boot` - verify import, with ocamlrun runfile
+  ** `bazel run //boot:ocamlc.boot.sh -- -version`
+
+* `//bin` compilers
+
+  ** runners: `bazel run bin:ocaml.byte.sh -- -version` etc.
+
+* `//test` compilers
+
+* `//boot:coldstart`
+
+== tools
+
+* `//tools` targets
+
+== tests
+
+* `//testsuite/tests/basic:tests`
+
+* `//testsuite/tests/basic:Boxedints` - test_module build
+
+* `//testsuite/tests/basic:Boxedints_test` - test_suite
+
+* `//testsuite/tests/basic:Boxedints_vv_test` - expect_test
+* `//testsuite/tests/basic:Boxedints_sv_test` - expect_test
+* `//testsuite/tests/basic:Boxedints_ss_test` - expect_test
+* `//testsuite/tests/basic:Boxedints_vs_test` - expect_test
+
+* `//testsuite/tests/basic:Boxedints.vv.byte` - test_executable
+* `//testsuite/tests/basic:Boxedints.sv.byte` - test_executable
+* `//testsuite/tests/basic:Boxedints.ss.opt` - test_executable
+* `//testsuite/tests/basic:Boxedints.vs.opt` - test_executable
+
+
+== workflow
+
+Edit, compile, test
+
+*  edit compiler file (e.g.bytegen.ml), run test, verify test compiler rebuilt from baseline
+
+* same for stdlib file
+
+* same, with --//config/ocaml/compiler=baseline, verify baseline compiler is used and only stdlib is rebuilt
+
+
+== performance
+
+run some targets to gather basic metrics:
+
+* fresh builds of:
+
+  ** `//bin:ocamlc.byte`
+  ** `//test.ocamlc.byte`
+  ** `//boot:coldstart`
+  ** `//testsuite/tests/basic:tests`
+
+* edit/test simple edit, `//testsuite/tests/basic:Apply_vv_test` etc.

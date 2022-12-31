@@ -257,9 +257,10 @@ stdlib_internal_module(
         "//conditions:default": "CamlinternalLazy_cmi"
     }),
     opts   = select({
-        "//config/target/emitter:sys_emitter?": [
-            "-afl-inst-ratio", "0"
-        ],
+        ##FIXME: detect target .cmx or .cmo
+        # "//config/target/emitter:sys_emitter?": [
+        #     "-afl-inst-ratio", "0"
+        # ],
         "//conditions:default": []
     }),
     stdlib_deps   = [
@@ -303,10 +304,11 @@ stdlib_internal_module(
     struct = "camlinternalOO.ml",
     sig    = "CamlinternalOO_cmi",
     opts   = select({
-        "//config/target/emitter:sys_emitter?": [
-            "-inline", "0",
-            "-afl-inst-ratio", "0"
-        ],
+        ##FIXME: detect target .cmx or .cmo
+        # "//config/target/emitter:sys_emitter?": [
+        #     "-inline", "0",
+        #     "-afl-inst-ratio", "0"
+        # ],
         "//conditions:default": []
     }),
     stdlib_deps   = [
@@ -467,8 +469,9 @@ stdlib_module(
     struct = "buffer.ml",
     sig    = "Stdlib.Buffer_cmi",
     opts   = select({
-        "//config/target/emitter:sys_emitter?": ["-inline", "3"],
-        "//config/target/emitter:vm_emitter?": ["-w", "+A"],
+        ##FIXME: detect target .cmx or .cmo
+        # "//config/target/emitter:sys_emitter?": ["-inline", "3"],
+        # "//config/target/emitter:vm_emitter?": ["-w", "+A"],
         "//conditions:default": []
     }),
     stdlib_deps   = [
@@ -1364,8 +1367,9 @@ stdlib_module(
     struct = "scanf.ml",
     sig    = "Stdlib.Scanf_cmi",
     opts = select({
-        "//config/target/emitter:vm_emitter?": ["-w", "+A"],
-        "//config/target/emitter:sys_emitter?": ["-inline", "9"],
+        ##FIXME: detect target .cmx or .cmo
+        # "//config/target/emitter:vm_emitter?": ["-w", "+A"],
+        # "//config/target/emitter:sys_emitter?": ["-inline", "9"],
         "//conditions:default": []
     }),
     warnings = select({

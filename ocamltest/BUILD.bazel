@@ -7,7 +7,7 @@ load("//test:rules.bzl",
      "test_executable",
      "test_library")
 
-load("//lex:BUILD_RULES.bzl", "lex")
+load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
 MODULE_OPTS = ["-nopervasives"]
 SIG_OPTS    = ["-nopervasives"]
@@ -898,7 +898,7 @@ tool_module(
     ]
 )
 
-lex(
+run_ocamllex(
     name = "tsl_lexer_ml",
     src  = "tsl_lexer.mll",
     out  = "tsl_lexer.ml",

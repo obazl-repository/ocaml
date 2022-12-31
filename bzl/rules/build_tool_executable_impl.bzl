@@ -1,7 +1,10 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
+load("//bzl/actions:BUILD.bzl",
+     "progress_msg",
+     "rule_mnemonic",
+     "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo",
@@ -428,8 +431,10 @@ def executable_impl(ctx, tc, exe_name, workdir):
     # for dep in inputs_depset.to_list():
     #     print("XDEP: %s" % dep)
 
-    if ctx.attr._rule == "boot_executable":
-        mnemonic = "LinkBootstrapExecutable"
+    mnemonic = rule_mnemonic(ctx)
+
+    # if ctx.attr._rule == "boot_executable":
+    #     mnemonic = "LinkBootstrapExecutable"
     elif ctx.attr._rule == "test_executable":
         mnemonic = "LinkTestExecutable"
     elif ctx.attr._rule == "bootstrap_repl":
@@ -536,14 +541,14 @@ def executable_impl(ctx, tc, exe_name, workdir):
     elif ctx.attr._rule in ["build_tool_vm", "build_tool_sys",
                             "ocaml_tool"]:
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "boot_executable":
-        exe_provider = OcamlExecutableMarker()
+    # elif ctx.attr._rule == "boot_executable":
+    #     exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule in ["test_executable"]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "baseline_test":
-        exe_provider = OcamlTestMarker()
+    # elif ctx.attr._rule == "baseline_test":
+    #     exe_provider = OcamlTestMarker()
     elif ctx.attr._rule in ["ocaml_test", "expect_test"]:
         exe_provider = OcamlTestMarker()
     else:

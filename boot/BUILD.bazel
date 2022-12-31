@@ -12,7 +12,7 @@ load("@bazel_skylib//rules:common_settings.bzl",
 #      "boot_ocaml_compilers",
 #      "ocaml_compilers")
 
-load("//bzl/rules:BUILD.bzl",
+load("//bzl/rules:COMPILER.bzl",
      "OCAMLC_PROLOGUE",
      "OCAMLC_MAIN",
      "OCAMLOPT_PROLOGUE",

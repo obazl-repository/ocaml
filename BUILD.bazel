@@ -43,42 +43,9 @@ run_tool(
 
 run_tool(
     name = "primreq",
-    tool = "//tools:primreq",
+    tool = "//tools:primreq.opt",
     arg  = ":arg",
 )
 
 
-################################################################
-build_test(
-    name = "toolchain",
-    targets = [
-        ## boot stuff
-        "//runtime:camlrun",
-        "//runtime:asmrun",
-        "//lex:ocamllex",
-        "//yacc:ocamlyacc",
-        "//stdlib",
-
-        # "//boot/baseline:ocamlc.byte",
-        # "//boot/baseline:ocamlopt.byte",
-        # "//boot/baseline:ocamllex",
-        # "//boot/baseline:ocamlc.opt",
-        # "//boot/baseline:ocamlopt.opt",
-
-        # ":Caml_tex",
-        "//tools:cmpbyt",
-        # ":dumpobj",   ## sys target only
-        # ":Eqparsetree",
-        "//tools:ocamlobjinfo",
-        "//tools:ocamlcmt",
-        "//tools:ocamlcp",
-        "//tools:ocamldep",
-        "//tools:ocamlmklib",
-        "//tools:ocamlmktop",
-        "//tools:ocamloptp",
-        "//tools:ocamlprof",
-        "//tools:primreq",
-        "//tools:stripdebug",
-    ]
-)
 

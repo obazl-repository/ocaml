@@ -99,12 +99,6 @@ genrule(
     visibility = ["//:__pkg__"]
 )
 
-# baseline_test(
-#     name = "ocaml.test",
-#     main = ":ocaml",
-# )
-
-
 ################################################################
 ## dev/test, build all
 boot_library(

@@ -20,7 +20,7 @@ test_module(
     name   = "Lib",
     struct = "lib.ml",
     opts = MODULE_OPTS,
-    deps   = ["//stdlib:Stdlib"],
+    stdlib_deps   = ["//stdlib:Stdlib"],
     visibility = ["//testsuite/tests:__subpackages__"]
 )
 
@@ -29,7 +29,7 @@ test_module(
     struct = "testing.ml",
     sig    = "Testing_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Scanf",
     ]
@@ -39,6 +39,6 @@ test_signature(
     name = "Testing_cmi",
     src  = "testing.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib"]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 

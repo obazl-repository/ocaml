@@ -41,7 +41,7 @@ def _repl_test_impl(ctx):
     print("EXE %s" % exe)
 
     # _stdlib dirname won't work, we need the short path
-    stdlib_dir = paths.dirname(ctx.file._stdlib.short_path)
+    stdlib_dir = paths.dirname(ctx.files._stdlib[0].short_path)
     print("STDLIB path: %s" % stdlib_dir)
 
     lib_dir = paths.dirname(ctx.file._test_lib.short_path)
@@ -173,7 +173,7 @@ repl_test = rule(
         _stdlib = attr.label(
             doc = "Stdlib",
             default = "//stdlib", # archive, not resolver
-            allow_single_file = True, # won't work with boot_library
+            # allow_single_file = True, # won't work with boot_library
             cfg = "exec" ## to match _tool_lib and _repl
             # cfg = exe_deps_out_transition,
         ),

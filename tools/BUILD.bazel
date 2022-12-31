@@ -232,11 +232,12 @@ ocaml_tools(
 # primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
 ocaml_tools(
     name = "primreq",
-    main = ":Primreq",
     prologue = [
+        "//stdlib",
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
-    ]
+    ],
+    main = ":Primreq",
 )
 
 ################
@@ -646,9 +647,9 @@ compiler_module(
     warnings = [w.MISSING_MLI],
     deps   = [
         "//config:Config",
-        "//file_formats:Cmo_format_cmi",
         "//utils:Misc",
     ],
+    sig_deps = ["//file_formats:Cmo_format_cmi"],
     stdlib_deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.List",

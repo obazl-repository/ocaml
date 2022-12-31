@@ -65,21 +65,27 @@ Bazel label of the intended file, and they convert it to the
 appropriate filesystem path. They will also rebuild either the tool or
 the argument if the sources for either have changed:
 
-* `//:dumpobj`
-* `//:ocamlcmt`
-* `//:ocamlobjinfo`
-* `//:primreq`
+* `//tools:dumpobj.byte.sh`
+* `//tools:dumpobj.obj.sh`
+* `//tools:ocamlcmt.sh`
+* `//tools:ocamlobjinfo.byte.sh`
+* `//tools:ocamlobjinfo.obj.sh`
+* `//tools::primreq.sh`
 
 The leading `//` may be omitted. These targets take label arguments of the following form:
 
-    `--//:arg=<path to target`>
+    `--//tools:arg=<path to target`>
 
 Here `<path to target>` is a Bazel label, which the rules will convert
 to the correct filesystem path.
 
 For example, to inspect `Stdlib__Buffer.cmo` using `ocamlobjinfo`:
 
-    $ bazel run :ocamlobjinfo --//:arg=//stdlib:Stdlib.Buffer
+    $ bazel run tools:ocamlobjinfo --//tools:arg=//stdlib:Stdlib.Buffer
+
+As a convenience, aliases are defined in the root package:
+`//:ocamlobjinfo` is aliased to `tools:ocamlobjinfo`, etc. Saves a
+little typing.
 
 Show the primitives used by `Stdlib.Bool`:
 

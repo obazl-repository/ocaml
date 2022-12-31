@@ -1,0 +1,42 @@
+= performance
+
+Some informal measurements.
+
+
+
+
+
+
+== test protocol
+
+`//test:ocamlopt.opt`  (with unarchived libs)
+
+----
+$ bazel clean
+$ /usr/bin/time bazel build test:ocamlopt.opt
+...
+Target //test:ocamlopt.opt up-to-date:
+  bazel-bin/test/_test_ss/ocamlopt.opt
+INFO: Elapsed time: 27.719s, Critical Path: 20.39s
+INFO: 928 processes: 460 internal, 468 darwin-sandbox.
+INFO: Build completed successfully, 928 total actions
+       27.75 real         0.04 user         0.06 sys
+----
+again:
+INFO: Elapsed time: 25.985s, Critical Path: 21.81s
+       26.02 real         0.04 user         0.06 sys
+
+Same with archived compiler libs:
+
+----
+$ /usr/bin/time bazel build test:ocamlopt.opt --//config/ocaml/compiler/libs:archived
+Target //test:ocamlopt.opt up-to-date:
+  bazel-bin/test/_test_ss/ocamlopt.opt
+INFO: Elapsed time: 26.475s, Critical Path: 20.59s
+INFO: 931 processes: 460 internal, 471 darwin-sandbox.
+INFO: Build completed successfully, 931 total actions
+       26.50 real         0.04 user         0.06 sys
+----
+again:
+INFO: Elapsed time: 27.004s, Critical Path: 19.80s
+       27.03 real         0.04 user         0.06 sys

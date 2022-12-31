@@ -96,6 +96,7 @@ cc_library(
         "//bin:__pkg__",
         "//boot:__subpackages__",
         "//lib:__pkg__",
+        "//test:__pkg__",
         "//toolchain/adapter:__pkg__"
     ],
 )

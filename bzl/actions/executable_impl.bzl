@@ -3,7 +3,10 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-load(":BUILD.bzl", "progress_msg", "get_build_executor")
+load(":BUILD.bzl",
+     "progress_msg",
+     "rule_mnemonic",
+     "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo",
@@ -493,44 +496,7 @@ def executable_impl(ctx, tc, exe_name,
     # if ctx.label.name == "ocamlopt.opt":
     #     print("afiles: %s" % afiles_depset)
         # fail()
-
-    if ctx.attr._rule == "boot_executable":
-        mnemonic = "LinkBootstrapExecutable"
-    elif ctx.attr._rule == "test_executable":
-        mnemonic = "LinkTestExecutable"
-    elif ctx.attr._rule == "bootstrap_repl":
-        mnemonic = "LinkToplevel"
-    elif ctx.attr._rule == "baseline_test":
-        mnemonic = "LinkBootstrapTest"
-    elif ctx.attr._rule in ["ocaml_compiler",
-                            "build_tool_vm", "build_tool_sys",
-
-                            "boot_ocamlc_byte", "boot_ocamlopt_byte",
-                            "boot_ocamlopt_opt", "boot_ocamlc_opt",
-
-                            "ocamlc_byte", "ocamlopt_byte",
-                            "ocamlopt_opt", "ocamlc_opt",
-
-                            "ocamloptx_optx", "ocamloptx_byte",
-                            "ocamlc_optx", "ocamlopt.optx",
-
-                            "t_ocamlc_byte", "t_ocamlopt_byte",
-                            "t_ocamlopt_opt", "t_ocamlc_opt",
-                            ]:
-        mnemonic = "LinkOcamlCompiler"
-    elif ctx.attr._rule in ["ocamllex_byte", "ocamllex_opt"]:
-        mnemonic = "LinkOCamlLex"
-    elif ctx.attr._rule == "build_tool":
-        mnemonic = "LinkBuildTool"
-    # elif ctx.attr._rule == "baseline_compiler":
-    #     mnemonic = "LinkBaseline"
-    elif ctx.attr._rule in ["ocaml_tool_r",
-                            "ocaml_tool_vm", "ocaml_tool_sys"]:
-        mnemonic = "LinkOCamlTool"
-    elif ctx.attr._rule in ["ocaml_test", "expect_test"]:
-        mnemonic = "OcamlTest"
-    else:
-        fail("Unknown rule for executable: %s" % ctx.attr._rule)
+    mnemonic = rule_mnemonic(ctx)
 
     ################
     ctx.actions.run(
@@ -611,7 +577,7 @@ def executable_impl(ctx, tc, exe_name,
                           "boot_ocamlc_byte", "boot_ocamlopt_byte",
                           "boot_ocamlopt_opt", "boot_ocamlc_opt",
 
-                          "ocamlc_byte", "ocamlopt_byte", "ocamloptx_byte",
+                          "std_ocamlc_byte", "ocamlopt_byte",
                           "ocamlopt_opt", "ocamlc_opt",
 
                           "ocamloptx_optx", "ocamlc_optx",
@@ -627,15 +593,16 @@ def executable_impl(ctx, tc, exe_name,
                             "ocaml_tool_r",
                             "ocaml_tool_vm", "ocaml_tool_sys"]:
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "boot_executable":
-        exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule in ["test_executable"
-                            ]:
+    # elif ctx.attr._rule == "boot_executable":
+    #     exe_provider = OcamlExecutableMarker()
+    elif ctx.attr._rule in ["test_executable",
+                            "vv_test_executable",
+                            "ss_test_executable"]:
         exe_provider = TestExecutableMarker()
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()
-    elif ctx.attr._rule == "baseline_test":
-        exe_provider = OcamlTestMarker()
+    # elif ctx.attr._rule == "baseline_test":
+    #     exe_provider = OcamlTestMarker()
     elif ctx.attr._rule in ["ocaml_test", "expect_test"]:
         exe_provider = OcamlTestMarker()
     else:

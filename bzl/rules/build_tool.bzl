@@ -17,7 +17,7 @@ load("//bzl/transitions:tool_transitions.bzl",
 ##############################
 def _build_tool_vm_impl(ctx):
 
-    print("BUILD_TOOL_VM: %s" % ctx.label)
+    # print("BUILD_TOOL_VM: %s" % ctx.label)
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 

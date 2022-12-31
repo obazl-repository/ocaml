@@ -1,0 +1,49 @@
+= diagnostics
+
+== Progress messages
+
+Format: for C code: "Compiling <filename>" or "Linking <filename>". For OCaml code:
+
+    {m} {lbrack}{flambda}{compiler}{rbrack}{mnemonic}: {ws}//{pkg}:{tgt} {rule}
+
+where:
+
+* `{m}` = mode (fb=fastbuild, dbg, or opt)
+* brackets:
+  ** std protocol:  `<  >`
+  ** boot protocol:  `<<  >>`
+  ** test protocol:  `[  ]`
+  ** tool protocol:  `(  )`
+* `{flambda}` :  `!` if flambda is enabled, otherwise the null string
+* `{compiler}` - ocamlc.byte | ocamlopt.opt, etc.
+* `{mnemonic}` - depends on rule; e.g. `CompileModule`, `LinkStdCompiler`, etc.
+* `{ws}` - workspace name (usually blank)
+* `//{pkg}:{tgt}` - the Bazel label of the build targete
+* `{rule}` the name of the rule
+
+Example stdout fragments:
+
+----
+Compiling runtime/io.c [for tool]; 0s darwin-sandbox
+Compiling runtime/ints.original.c [for tool]; 0s darwin-sandbox
+Compiling runtime/domain.c [for tool]; 0s darwin-sandbox
+Compiling runtime/extern.c [for tool]; 0s darwin-sandbox
+Compiling runtime/interp.c [for tool]; 0s darwin-sandbox
+Compiling runtime/obj.c [for tool]; 0s darwin-sandbox
+fb <!ocamlc.boot>CompileSig: //utils:Build_path_prefix_map_cmi compiler_signature; 0s darwin-sandbox
+fb <!ocamlc.boot>CompileSig: //stdlib:Stdlib.Lexing_cmi stdlib_signature; 0s darwin-sandbox ...
+----
+
+
+----
+Compiling runtime/interp.c [for tool]; 1s darwin-sandbox
+fb <!ocamlc.boot>CompileSig: //stdlib:Stdlib.Format_cmi stdlib_signature; 0s darwin-sandbox
+fb <!ocamlc.boot>CompileModule: //stdlib:Stdlib.Int stdlib_module; 0s darwin-sandbox
+fb <!ocamlc.boot>CompileModule: //lambda:Runtimedef compiler_module; 0s darwin-sandbox
+fb <!ocamlc.boot>CompileModule: //utils:Domainstate compiler_module; 0s darwin-sandbox
+fb <!ocamlc.boot>CompileModule: //stdlib:Std_exit kernel_module; 0s darwin-sandbox
+fb <!ocamlc.boot>CompileModule: //stdlib:Stdlib.Int64 stdlib_module; 0s darwin-sandbox
+fb <!ocamlc.boot>CompileSig: //utils:Arg_helper_cmi compiler_signature; 0s darwin-sandbox ...
+----
+
+

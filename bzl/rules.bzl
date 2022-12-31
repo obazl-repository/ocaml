@@ -16,7 +16,7 @@ load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
 load("//bzl/rules:ocaml_compiler.bzl",
      _ocaml_compiler_r = "ocaml_compiler_r",
-     _ocamlc_byte = "ocamlc_byte",
+     # _ocamlc_byte = "ocamlc_byte",
      _ocamlopt_byte = "ocamlopt_byte",
      _ocamlopt_opt = "ocamlopt_opt",
      _ocamlc_opt = "ocamlc_opt",
@@ -100,7 +100,7 @@ compiler_signature   = _compiler_signature
 # boot_ocaml_compilers      = _boot_ocaml_compilers
 
 ocaml_compiler_r          = _ocaml_compiler_r
-ocamlc_byte               = _ocamlc_byte
+# ocamlc_byte               = _ocamlc_byte
 ocamlopt_byte             = _ocamlopt_byte
 ocamlopt_opt              = _ocamlopt_opt
 ocamlc_opt                = _ocamlc_opt

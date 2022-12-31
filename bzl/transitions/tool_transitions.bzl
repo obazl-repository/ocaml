@@ -1,7 +1,7 @@
 ################################################################
 ##########################################################
 def _build_tool_vm_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
 
     if debug:
         print("TRANSITION: build_tool_vm_in_transition")
@@ -105,7 +105,7 @@ build_tool_vm_in_transition = transition(
 
 ##########################################################
 def _build_tool_sys_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
     if debug: print("build_tool_sys_in_transition")
 
     config_executor = "sys"
@@ -148,7 +148,7 @@ build_tool_sys_in_transition = transition(
 # def _ocaml_tool_in_transition_impl(settings, attr, debug):
 
 #     print("ocaml_tool_in_transition")
-#     debug = True
+#     debug = False
 
 #     ## we use the CLI string flags in //config/...
 #     ## to set string settings in //toolchain/...

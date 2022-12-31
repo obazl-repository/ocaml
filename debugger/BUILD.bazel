@@ -4,18 +4,18 @@ load("//bzl:rules.bzl",
      "compiler_module",
      "tool_module",
      "tool_signature",
-     "ocaml_tool"
+     "ocaml_tools" # macro
 )
 load("//bzl/rules:ns_rules.bzl", "ns_module", "ns_signature")
 
-load("//lex:BUILD_RULES.bzl", "lex")
+load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
 
 MODULE_OPTS = []
 SIG_OPTS    = []
 
 
-ocaml_tool(
+ocaml_tools(
     name = "ocamldebug",
     prologue = [
         "//compilerlibs:ocamlcommon",
@@ -302,7 +302,7 @@ ns_module(
     ]
 )
 
-lex(
+run_ocamllex(
     name = "Ocamldebug.debugger_lexer_ml",
     src  = "debugger_lexer.mll",
     out  = "debugger_lexer.ml",

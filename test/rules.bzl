@@ -34,11 +34,6 @@ load("//test/rules:test_library.bzl", _test_library = "test_library")
 load("//test/rules:test_module.bzl",  _test_module  = "test_module")
 load("//test/rules:test_signature.bzl", _test_signature = "test_signature")
 
-# load("//test/rules:baseline_test.bzl",
-#      _baseline_test = "baseline_test")
-
-# baseline_test   = _baseline_test
-
 ocaml_test = _ocaml_test
 repl_test = _repl_test
 

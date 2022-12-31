@@ -33,7 +33,10 @@ bool_flag( name = "with_cmm_invariants", build_setting_default = False)
 config_setting(name = "with_cmm_invariants?",
                flag_values = {":with_cmm_invariants": "True"})
 
-bool_flag( name = "xmo", build_setting_default = False)
+bool_flag( name = "xmo",
+           # Toggle cross-module optimization. False inserts -opaque
+           # in compile commands.
+           build_setting_default = False)
 config_setting(name = "xmo?", flag_values = {":xmo": "True"})
 
 

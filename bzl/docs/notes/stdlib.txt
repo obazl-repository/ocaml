@@ -1,0 +1,9 @@
+## stdlib is not a dep of the compiler itself - it only
+## becomes one when the compiler needs to link, IF
+## -pervasives; if -nopervasives, then the compiler itself
+## never depends on it; it's only needed if the code being
+## compiled needs it.
+## that's if we're compiling with unarchived libs
+## if --//config/ocaml/compiler/libs:archived,
+## then the linker depends on stdlib.cmx?a
+"//stdlib",

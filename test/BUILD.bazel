@@ -10,7 +10,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
-load("//bzl/rules:BUILD.bzl",
+load("//bzl/rules:COMPILER.bzl",
      "OCAMLC_PROLOGUE",
      "OCAMLC_MAIN",
      "OCAMLOPT_PROLOGUE",

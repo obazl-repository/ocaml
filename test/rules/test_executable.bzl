@@ -41,7 +41,7 @@ vv_test_executable = rule(
         #     # cfg = reset_cc_config_transition ## only build once
         #     # default = "//config/runtime" # label flag set by transition
         # ),
-        _rule = attr.string( default = "test_executable" ),
+        _rule = attr.string( default = "vv_test_executable" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -97,7 +97,7 @@ ss_test_executable = rule(
         #     # cfg = reset_cc_config_transition ## only build once
         #     # default = "//config/runtime" # label flag set by transition
         # ),
-        _rule = attr.string( default = "test_executable" ),
+        _rule = attr.string( default = "ss_test_executable" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),

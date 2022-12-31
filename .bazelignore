@@ -1,3 +1,5 @@
+## workaround for bug when query //... is run
+bazel-ocaml-bazel
 manual
 ocamldoc
 stdlib/templates
