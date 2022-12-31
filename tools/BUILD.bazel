@@ -46,7 +46,10 @@ SIG_OPTS    = []
 ocaml_tools(
     name = "ocamldep",
     main = ":Ocamldep",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
@@ -57,7 +60,10 @@ ocaml_tools(
 # The OCaml profiling compilers: ocamlcp, ocamloptp, ocamlprof
 ocaml_tools(
     name = "ocamlprof",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -87,7 +93,10 @@ ocaml_tools(
 ocaml_tools(
     name = "ocamlcp",
     main = ":Ocamlcp",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -112,7 +121,10 @@ ocaml_tools(
 ocaml_tools(
     name = "ocamloptp",
     main = ":Ocamloptp",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -138,7 +150,10 @@ ocaml_tools(
 ocaml_tools(
     name = "ocamlmklib",
     main = ":Ocamlmklib",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -155,7 +170,10 @@ ocaml_tools(
 ocaml_tools(
     name = "ocamlmktop",
     main = ":Ocamlmktop",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//config:Config",
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
@@ -177,7 +195,10 @@ ocaml_tools(
 ocaml_tools(
     name = "ocamlcmt",
     main = ":Ocamlcmt",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
@@ -195,7 +216,10 @@ ocaml_tools(
 ocaml_tools(
     name = "dumpobj",
     main = ":Dumpobj",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         ":Opnames",
@@ -207,9 +231,10 @@ ocaml_tools(
 ocaml_tools(
     name = "ocamlobjinfo",
     main = ":Objinfo",
-    prologue = [
-        # "//stdlib",
-        # "//utils:Ccomp",
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
         "//middle_end:ocamlmiddleend",
@@ -232,8 +257,10 @@ ocaml_tools(
 # primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
 ocaml_tools(
     name = "primreq",
-    prologue = [
-        "//stdlib",
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ],
@@ -245,7 +272,10 @@ ocaml_tools(
 ocaml_tools(
     name = "stripdebug",
     main = ":Stripdebug",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
@@ -379,26 +409,26 @@ compiler_module(
     struct = "dumpobj.ml",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Sys",
-        "//bytecomp:Symtable",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        ":Opnames",
-        "//bytecomp:Opcodes",
-        "//stdlib:Stdlib.Obj",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//bytecomp:Instruct",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//config:Config",
-        # "//file_formats:Cmo_format_cmi",
         "//bytecomp:Bytesections",
-        # "//parsing:Asttypes_cmi",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Arg",
+        "//bytecomp:Instruct",
+        "//bytecomp:Opcodes",
+        "//bytecomp:Symtable",
+        "//config:Config",
+        "//parsing:Location",
+        "//typing:Ident",
+        ":Opnames",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ]
 )
 
 # eqparsetree.ml", line 66, characters 7-22:
@@ -704,7 +734,10 @@ compiler_module(
 ocaml_tools(
     name = "cmpbyt",
     main = ":Cmpbyt",
-    prologue = [
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
     ]
