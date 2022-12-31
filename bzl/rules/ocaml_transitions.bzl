@@ -419,25 +419,25 @@ def _ocaml_tool_sys_in_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
+    protocol = "boot"
+
     config_executor = "sys"
     config_emitter  = "sys"
 
-    if protocol == "std":
+    if protocol == "std":  ## default
         # protocol = "boot"
         compiler = "//bin:ocamlopt.opt"
         runtime  = "//runtime:asmrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
-    elif protocol == "boot":
-        compiler = "//bin:ocamlopt.opt"
-        runtime  = "//runtime:asmrun"
-        # cvt_emit = settings["//toolchain:cvt_emit"]
+    # elif protocol == "boot":
+    #     compiler = "//bin:ocamlopt.opt"
+    #     runtime  = "//runtime:asmrun"
+    #     # cvt_emit = settings["//toolchain:cvt_emit"]
 
-    # elif protocol == "dev":
-    #     compiler = "@baseline//bin:ocamlopt.opt"
-    #     # lexer    = "@baseline//bin:ocamllex.opt"
-    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
-    #     runtime  = "@baseline//lib:libasmrun.a"
+    elif protocol == "boot":
+        compiler = "@baseline//bin:ocamlopt.opt"
+        runtime  = "@baseline//lib:libasmrun.a"
 
     else:
         fail("Protocol not yet supported: %s" % protocol)
