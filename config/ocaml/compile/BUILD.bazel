@@ -11,6 +11,9 @@ bool_flag( name = "principal", build_setting_default = True)
 config_setting(name = "principal?", flag_values = {":principal": "True"})
 
 bool_flag(name = "verbose", build_setting_default = False,
+          tags = ["diagnostics", "verbosity"],
           visibility = ["//visibility:public"])
-config_setting(name = "verbose?", flag_values = {":verbose": "True"})
+config_setting(name = "verbose?",
+               tags = ["diagnostics", "verbosity"],
+               flag_values = {":verbose": "True"})
 

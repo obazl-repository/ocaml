@@ -114,6 +114,10 @@ All genrules:
 
   bazel query 'kind(rule, testsuite/tests/basic:*)' --output label_kind | sort
 
+Visibility:
+
+    bazel query 'visible(//some_other_package:rule, //a:all)`
+
 == Configuration queries
 
 Build configuration settings are exposed via command-line "flags". For
@@ -134,6 +138,16 @@ The authoritative source of information about config flag types is of
 course the source code:
 
      bazel query config/ocaml:xmo --output=build
+
+Config settings and flags are tagged.
+
+* Show all flags controlling verbosity:
+
+    bazel query 'attr(tags, 'verbosity', //...)'
+
+* To see the list of all tags, print the build code:
+
+    bazel query config/ocaml/cc/link:verbose --output=build
 
 == Test queries
 

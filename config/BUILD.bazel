@@ -219,7 +219,9 @@ config_setting(
 )
 
 ## FIXME: rename //config/ocaml:verbose
-bool_flag( name = "verbose", build_setting_default = False)
+bool_flag( name = "verbose",
+           tags = ["diagnostics", "verbosity"],
+           build_setting_default = False)
 
 ################################################################
 ##FIXME: what is the optimal way to select for flambda?

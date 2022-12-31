@@ -5,5 +5,8 @@ load("@bazel_skylib//rules:common_settings.bzl",
 ## == compile-time flag -dflambda-verbose
 
 bool_flag(name = "verbose", build_setting_default = False,
+          tags = ["diagnostics", "verbosity"],
           visibility=["//config:__pkg__", "//toolchain/adapter:__pkg__"])
-config_setting(name = "verbose?", flag_values = {":verbose": "True"})
+config_setting(name = "verbose?",
+               tags = ["diagnostics", "verbosity"],
+               flag_values = {":verbose": "True"})
