@@ -60,7 +60,7 @@ dev_toolchain_adapter(
         "//conditions:default": []
     }) + select({
         ## FIXME: only for native (sys) targets
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     linkopts    = STD_LOPTS,
@@ -84,7 +84,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     structopts  = select({
@@ -106,7 +106,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     structopts  = select({
@@ -128,7 +128,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     structopts  = select({
@@ -151,7 +151,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     structopts  = select({
@@ -173,7 +173,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     structopts  = select({
@@ -195,7 +195,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     structopts  = select({
@@ -217,7 +217,7 @@ ocaml_tc_adapter(
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     structopts  = select({
@@ -242,7 +242,7 @@ boot_toolchain_adapter(
         "//config/ocaml/compile:absname?" : ["-absname"],
         "//conditions:default": []
     }) + select({
-        "//config/ocaml:xmo?" : [],
+        "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
     structopts  = select({
