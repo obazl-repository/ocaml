@@ -440,12 +440,13 @@ def _ocaml_cc_config_impl(ctx):
     args.add_all(["-b", user_json.path])
     args.add_all(["-o", ctx.outputs.out])
 
-    clang_tc = ctx.attr._clang
+    # clang_tc = ctx.attr._clang
 
     ctx.actions.run(
         executable = ctx.file._merge_tool.path,
         arguments = [args],
-        inputs    = [ctx.file.json, user_json] + clang_tc.files.to_list(),
+        inputs    = [ctx.file.json, user_json],
+        ## + clang_tc.files.to_list(),
         outputs   = [ctx.outputs.out],
         tools = [ctx.file._merge_tool],
         mnemonic = "OCamlConfig",
@@ -504,12 +505,12 @@ ocaml_cc_config = rule(
         ## --enable-mmap-map-stack
         ## --with-afl
 
-        "_clang": attr.label( ##FIXME: not needed?
-            default = "@local_config_cc//:wrapped_clang",
-            allow_single_file = True,
-            executable = True,
-            cfg = "exec"
-        ),
+        # "_clang": attr.label( ##FIXME: not needed?
+        #     default = "@local_config_cc//:wrapped_clang",
+        #     allow_single_file = True,
+        #     executable = True,
+        #     cfg = "exec"
+        # ),
 
         "_xcode_sdkroot": attr.label(
             default = "@ocaml_xcode//env:sdkroot"

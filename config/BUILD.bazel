@@ -84,7 +84,8 @@ mustache(
     # stdlib = "//stdlib"
 )
 
-## runs merge_json:
+## runs merge_json to merge data from selected cc tc with initial json
+## file:
 ocaml_cc_config(
     name = "config_json",
     json = "config.initial.json",
