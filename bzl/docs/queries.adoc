@@ -114,11 +114,11 @@ All genrules:
 
   bazel query 'kind(rule, testsuite/tests/basic:*)' --output label_kind | sort
 
-Visibility:
+=== Visibility
 
     bazel query 'visible(//some_other_package:rule, //a:all)`
 
-== Configuration queries
+=== Config rules: flags and settings
 
 Build configuration settings are exposed via command-line "flags". For
 example, `--//config/ocaml/link:verbose` globally enables verbose
@@ -149,7 +149,7 @@ Config settings and flags are tagged.
 
     bazel query config/ocaml/cc/link:verbose --output=build
 
-== Test queries
+=== Test rules
 
 Macro `expect_test` expands to targets using rules `expect_vv_test`,
 `expect_vs_test`, etc. (one per compiler):
