@@ -1,0 +1,11 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "int_flag")
+
+## optimization (-g) level
+int_flag( name = "level",
+           tags = ["o11n"],
+           build_setting_default = 0)
+
+config_setting(name = "0?",
+               tags = ["o11n"],
+               flag_values = {":level": "0"})

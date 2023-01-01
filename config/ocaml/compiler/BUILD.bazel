@@ -1,0 +1,11 @@
+load("@bazel_skylib//rules:common_settings.bzl",
+     "string_flag")
+
+string_flag(
+    name = "compiler",
+    build_setting_default = "test",
+    values = ["test", "baseline"],
+    visibility = ["//visibility:public"]
+)
+config_setting(name = "baseline?", flag_values = {":test": "baseline"})
+
