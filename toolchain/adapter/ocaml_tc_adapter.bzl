@@ -58,7 +58,7 @@ def _ocaml_tc_adapter_impl(ctx):
         # lexer                  = ctx.attr.lexer,
         # cvt_emit               = ctx.file.cvt_emit,
 
-        runtime                = ctx.file.runtime,
+        runtime                = ctx.files.runtime,
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
         structopts             = ctx.attr.structopts,
@@ -106,9 +106,11 @@ ocaml_tc_adapter = rule(
 
         ## Virtual Machine
         "runtime": attr.label( # the lib, not ocamlrun
-            doc = "Batch interpreter. ocamlrun, usually",
+            doc = "libcamlrun.a or libasmrun.a",
             default = "//toolchain:runtime",
-            allow_single_file = True,
+            ## NB: building on linux with -c opt produces two outputs:
+            ## .a, .pic.a
+            # allow_single_file = True,
             executable = False,
             cfg = "exec"
             # cfg = reset_cc_config_transition

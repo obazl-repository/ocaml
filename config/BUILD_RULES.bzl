@@ -81,12 +81,14 @@ def cc_tc_config_map(ctx):
         config_map["arch"] = "amd64"
     else:
         config_map["arch"] = "unknown"
+
     if tc.cpu.startswith("darwin"):
         config_map["model"] = "default"
         config_map["system"] = "macosx"
     else:
         config_map["model"] = "default"
         config_map["system"] = "linux" ## FIXME
+
     config_map["ccomptype"] = "msvc" if tc.compiler == "msvc" else "cc"
     config_map["compiler"] = tc.compiler
     if tc.compiler == "msvc":
@@ -376,6 +378,9 @@ def _ocaml_cc_config_impl(ctx):
 
     json_map = {}
 
+    json_map["system"] = cc_config_map["system"]
+    json_map["model"] = cc_config_map["model"]
+
     json_map["c_compiler"] = cc_config_map["C_COMPILER"]
     json_map["ocamlc_cflags"] = " " + " ".join(cc_config_map["c_compile_cmd_line"])
 
@@ -387,6 +392,8 @@ def _ocaml_cc_config_impl(ctx):
     # arglist = cc_config_map["preprocess_assemble_cmd_line"]
     arglist.extend(ctx.attr.asmopts)
     if ctx.attr._asm_verbose[BuildSettingInfo].value: ## //config/ocaml/cc/asm:verbose
+
+        ## gcc -v: "Display the programs invoked by the compiler."
         arglist.append("-v")
     asmargs = " ".join(arglist)
 
@@ -409,6 +416,38 @@ def _ocaml_cc_config_impl(ctx):
             ctx.attr._xcode_sdkroot[BuildSettingInfo].value)
 
     json_map["asm"] = envsetup + assembler + " -c " + asmargs
+    # json_map["asm"] = assembler + " -c " + asmargs
+
+    linker  = cc_config_map["c_compiler_path"]
+    arglist = []
+    arglist.extend(cc_config_map["cpp_link_exe_cmd_line"])
+    arglist.extend(ctx.attr.linkopts)
+    if ctx.attr._link_verbose[BuildSettingInfo].value: ## //config/ocaml/cc/link:verbose
+        arglist.append("-v")
+    linkargs = " ".join(arglist)
+    # maczig:
+    # linkargs = " rc"
+
+    json_map["mkexe_cmd"] = envsetup + linker + " " + linkargs
+
+    if ctx.attr._flambda[BuildSettingInfo].value:
+        json_map["flambda"] =  True
+    if ctx.attr._with_flambda_invariants[BuildSettingInfo].value:
+        json_map["with_flambda_invariants"] =  True
+    if ctx.attr._with_cmm_invariants[BuildSettingInfo].value:
+        json_map["with_cmm_invariants"] =  True
+
+    ctx.actions.write(
+        output  = user_json,
+        content = json.encode(json_map)
+    )
+
+    ################################################################
+    args = ctx.actions.args()
+    args.add_all(["-a", ctx.file.json.path])
+    args.add_all(["-b", user_json.path])
+    args.add_all(["-o", ctx.outputs.out])
+
 
     linker  = cc_config_map["c_compiler_path"]
     arglist = []

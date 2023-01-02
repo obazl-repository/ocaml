@@ -183,12 +183,14 @@ def executable_impl(ctx, tc, exe_name,
 
         # print("tc.COMPILER: %s" % tc.compiler)
         # print("tc.RUNTIME: %s" % tc.runtime.path)
-        args.add(tc.runtime.path)
 
-        runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
+        ## FIXME: linux: pick .a or .pic.a???
+        args.add(tc.runtime[0].path)
+
+        runtime_files.extend(tc.runtime) # [0][DefaultInfo].files)
         ## NB: Asmlink looks for libasmrun.a in the std search
         ## space (-I dirs), not the link srch space (-L dirs)
-        includes.append(tc.runtime.dirname) #[0][DefaultInfo].files.to_list()[0].dirname)
+        includes.append(tc.runtime[0].dirname) #[0][DefaultInfo].files.to_list()[0].dirname)
         # cc_libdirs.append(f.dirname)
 
         ## do not add to CLI - asmcomp/asmlink adds it to the
