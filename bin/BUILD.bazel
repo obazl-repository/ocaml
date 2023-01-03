@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("//bzl:rules.bzl",
      "ocaml_compiler_r",
-     "ocaml_compilers")
+     "std_ocaml_compilers")
 
 load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag", "string_setting")
@@ -17,7 +17,7 @@ config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 ## ocaml_compilers is a macro; it expands to: ocamlc_byte,
 ## ocamlopt_byte ocamlopt_opt, ocamlc_opt
 
-ocaml_compilers(
+std_ocaml_compilers(
     name = "ocamlcc",
     visibility = ["//visibility:public"]
 )

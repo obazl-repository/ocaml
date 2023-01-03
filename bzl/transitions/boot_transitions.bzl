@@ -20,7 +20,7 @@ def tc_boot_in_transition_impl(settings, attr, debug):
     if settings["//config/build/protocol"] == "dev":
         compiler = "@baseline//bin:ocamlc.opt"
         # lexer    = "@baseline//bin:ocamllex.opt"
-        runtime  = "@baseline//lib:libasmrun.a"
+        runtime  = "@baseline//lib:asmrun"
         executor = settings["//config/target/executor"]
         emitter  = settings["//config/target/emitter"]
     else:

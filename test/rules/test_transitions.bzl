@@ -17,7 +17,7 @@ def _vv_test_in_transition_impl(settings, attr):
     if settings["//config/ocaml/compiler"]== "baseline":
         compiler = "@baseline//bin:ocamlc.byte"
         ocamlrun = "@baseline//bin:ocamlrun"
-        runtime  = "@baseline//lib:libcamlrun.a"
+        runtime  = "@baseline//lib:camlrun"
     else:
         compiler = "//test:ocamlc.byte"
         ocamlrun = "//runtime:ocamlrun"
@@ -82,7 +82,7 @@ def _vs_test_in_transition_impl(settings, attr):
     if settings["//config/ocaml/compiler"]== "baseline":
         compiler = "@baseline//bin:ocamlopt.byte"
         # runtime  = "//runtime:asmrun"
-        runtime  = "@baseline//lib:libasmrun.a"
+        runtime  = "@baseline//lib:asmrun"
         ocamlrun = "@baseline//bin:ocamlrun"
     else:
         compiler = "//test:ocamlopt.byte"
@@ -150,7 +150,7 @@ def _ss_test_in_transition_impl(settings, attr):
     compiler = "//test:ocamlopt.opt"
     ocamlrun = "@baseline//bin:ocamlrun"
     # ocamlrun = "//runtime:ocamlrun"
-    runtime  = "@baseline//lib:libasmrun.a"
+    runtime  = "@baseline//lib:asmrun"
     # mustach  = "@baseline//bin:mustach"
     # cvt_emit = "@baseline//bin:cvt_emit.byte"
     # else:
@@ -213,7 +213,7 @@ def _sv_test_in_transition_impl(settings, attr):
 
     compiler = "//test:ocamlc.opt"
     # ocamlrun = "//runtime:ocamlrun"
-    runtime  = "@baseline//lib:libcamlrun.a"
+    runtime  = "@baseline//lib:camlrun"
     # mustach  = "@baseline//bin:mustach"
     # cvt_emit = "@baseline//bin:cvt_emit.byte"
     # else:

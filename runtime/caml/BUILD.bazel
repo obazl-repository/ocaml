@@ -11,7 +11,7 @@ cc_mustache(
     visibility = [
         "//boot:__pkg__",
         "//runtime:__subpackages__",
-        "//otherlibs/unix:__pkg__",
+        "//otherlibs:__subpackages__",
         "//yacc:__pkg__"
     ]
 )
@@ -36,7 +36,7 @@ cc_mustache(
     visibility = [
         "//boot:__pkg__",
         "//lambda:__pkg__",
-        "//otherlibs/unix:__pkg__",
+        "//otherlibs:__subpackages__",
         "//runtime:__subpackages__"
     ]
 )
@@ -75,6 +75,7 @@ genrule(
     cmd  = "cp $(SRCS) $@", #FIXME: symlink?
     visibility = [
         "//boot:__pkg__",
+        "//otherlibs:__subpackages__",
         "//runtime:__pkg__",
         "//utils:__pkg__"
     ]

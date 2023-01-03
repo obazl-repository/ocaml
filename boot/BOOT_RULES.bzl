@@ -30,7 +30,6 @@ def _boot_ocamlc_byte_in_transition_impl(settings, attr):
     config_emitter  = "vm"
     compiler = "//bin:ocamlc.byte"
     runtime  = "//runtime:camlrun"
-
     return {
         "//config/build/protocol" : protocol,
         "//config/target/executor": config_executor,
@@ -48,14 +47,10 @@ boot_ocamlc_byte_in_transition = transition(
 
 ########
 def _boot_ocamlc_byte_impl(ctx):
-
     if not ctx.label.name.endswith(".byte"):
         fail("Target name for rule boot_ocamlc_byte must end in '.byte'")
-
     tc = ctx.toolchains["//toolchain/type:ocaml"]
-
     return executable_impl(ctx, tc, "ocamlc.byte", tc.workdir)
-
 #####################
 boot_ocamlc_byte = rule(
     implementation = _boot_ocamlc_byte_impl,
@@ -82,7 +77,6 @@ def _boot_ocamlopt_byte_in_transition_impl(settings, attr):
     config_emitter  = "sys"
     compiler = "//boot:ocamlc.byte"
     runtime  = "//runtime:asmrun"
-
     return {
         "//config/build/protocol" : protocol,
         "//config/target/executor": config_executor,
@@ -108,12 +102,10 @@ def _boot_ocamlopt_byte_impl(ctx):
     else:
         exe_name = "ocamlopt.byte"
     return executable_impl(ctx, tc, exe_name, tc.workdir)
-
 #####################
 boot_ocamlopt_byte = rule(
     implementation = _boot_ocamlopt_byte_impl,
     doc = "Builds a compiler",
-
     attrs = dict(
         executable_attrs(),
         _allowlist_function_transition = attr.label(
@@ -184,7 +176,7 @@ boot_ocamlopt_opt = rule(
 ################################################################
 ################################################################
 def _boot_ocamlc_opt_in_transition_impl(settings, attr):
-    protocol = "test"
+    protocol = "boot"
     config_executor = "sys"
     config_emitter  = "sys"
     compiler = "//boot:ocamlopt.opt"

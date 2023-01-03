@@ -156,7 +156,7 @@ def tc_runtime_out_transition_impl(settings, attr, debug):
         rt_target  = "camlrun"
 
     if protocol == "dev":
-        runtime = "@baseline//lib:libasmrun.a"
+        runtime = "@baseline//lib:asmrun"
         # runtime = "@baseline//lib:lib" + rt_target + ".a"
     else:
         runtime = "//runtime:" + rt_target

@@ -34,17 +34,14 @@ boot_ocamlc_import_in_transition = transition(
 )
 
 ################################################################
+################################################################
 def _boot_ocamlc_import_impl(ctx):
-
     ocamlc = ctx.actions.declare_file(ctx.label.name)
-
     ctx.actions.symlink(output = ocamlc,
                         target_file = ctx.file._ocamlc)
-
     runfiles = ctx.runfiles(
         files = [ctx.file._ocamlrun]
     )
-
     defaultInfo = DefaultInfo(
         executable = ocamlc,
         runfiles   = runfiles
@@ -54,9 +51,7 @@ def _boot_ocamlc_import_impl(ctx):
 #####################
 boot_ocamlc_import = rule(
     implementation = _boot_ocamlc_import_impl,
-
     doc = "Imports the precompiled ocamlc, uses it to build stdlib and adds to runfiles",
-
     attrs = dict(
         _ocamlc = attr.label(
             allow_single_file = True,
@@ -69,31 +64,6 @@ boot_ocamlc_import = rule(
             # cfg = "exec"
             cfg = reset_cc_config_transition
         ),
-
-        # stdlib is a runtime dep of the linker, so we need to build
-        # it and add it runfiles.
-        # _stdlib = attr.label(
-        #     doc = "Stdlib archive", ## (not stdlib.cmx?a")
-        #     default = "//stdlib", # archive, not resolver
-        #     allow_single_file = True, # won't work with boot_library
-        #     executable = False,
-        #     # cfg = "exec"
-        #     # cfg = ocamlc_boot_in_transition
-        # ),
-
-        # std_exit = attr.label(
-        #     doc = "Module linked last in every executable.",
-        #     default = "//stdlib:Std_exit",
-        #     allow_single_file = True,
-        #     # cfg = exe_deps_out_transition,
-        # ),
-
-        ## and ditto for camlheaders
-        # _camlheaders = attr.label_list(
-        #     allow_files = True,
-        #     default = ["//config/camlheaders"]
-        # ),
-
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     ),
@@ -102,18 +72,18 @@ boot_ocamlc_import = rule(
 )
 
 ################################################################
-def _coldstart_transition_impl(settings, attr):
+def _coldstart_in_transition_impl(settings, attr):
     debug = True
 
     if debug:
-        print("TRANSITION: coldstart_transition")
+        print("TRANSITION: coldstart_in_transition")
         print("protocol: %s" % settings["//config/build/protocol"])
         print("compiler: %s" % settings["//toolchain:compiler"])
         print("config_executor: %s" % settings["//config/target/executor"])
         print("config_emitter: %s" % settings["//config/target/emitter"])
         print("setting protocol to: boot")
 
-    # if settings["//config/target/executor"] == "boot":
+        # if settings["//config/target/executor"] == "boot":
     #     executor = "sys"
     #     emitter  = "vm"
     # else:
@@ -127,8 +97,8 @@ def _coldstart_transition_impl(settings, attr):
     }
 
 ###################################
-_coldstart_transition = transition(
-    implementation = _coldstart_transition_impl,
+_coldstart_in_transition = transition(
+    implementation = _coldstart_in_transition_impl,
     inputs = [
         "//config/build/protocol",
         "//config/target/executor",
@@ -234,7 +204,7 @@ boot_coldstart = rule(
         ),
 
     ),
-    cfg = _coldstart_transition,
+    cfg = _coldstart_in_transition,
     executable = True,
     # toolchains = ["//toolchain/type:ocaml"],
 )

@@ -30,7 +30,7 @@ def _t_ocamlc_byte_in_transition_impl(settings, attr):
     config_emitter  = "vm"
 
     compiler = "@baseline//bin:ocamlc.byte"
-    runtime  = "@baseline//lib:libcamlrun.a"
+    runtime  = "@baseline//lib:camlrun"
 
     return {
         "//config/build/protocol" : protocol,
@@ -84,7 +84,7 @@ def _t_ocamlopt_byte_in_transition_impl(settings, attr):
     config_executor = "sys"
     config_emitter  = "vm"
     compiler = "@baseline//bin:ocamlc.opt"
-    runtime  = "@baseline//lib:libasmrun.a"
+    runtime  = "@baseline//lib:asmrun"
     return {
         "//config/build/protocol" : protocol,
         "//config/target/executor": config_executor,
@@ -139,7 +139,7 @@ def _t_ocamlopt_opt_in_transition_impl(settings, attr):
     config_executor = "sys"
     config_emitter  = "sys"
     compiler = "@baseline//bin:ocamlopt.opt"
-    runtime  = "@baseline//lib:libasmrun.a"
+    runtime  = "@baseline//lib:asmrun"
     return {
         "//config/build/protocol" : protocol,
         "//config/target/executor": config_executor,
@@ -194,7 +194,7 @@ def _t_ocamlc_opt_in_transition_impl(settings, attr):
     config_executor = "sys"
     config_emitter  = "sys"
     compiler = "@baseline//bin:ocamlopt.opt"
-    runtime  = "@baseline//lib:libasmrun.a"
+    runtime  = "@baseline//lib:asmrun"
     return {
         "//config/build/protocol" : protocol,
         "//config/target/executor": config_executor,

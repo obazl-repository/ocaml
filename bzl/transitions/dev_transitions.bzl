@@ -73,10 +73,10 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
     if config_executor in ["boot", "baseline", "vm"]:
         ## vm emitter
         compiler = "@baseline//bin:ocamlc.opt"
-        runtime = "@baseline//lib:libasmrun.a"
+        runtime = "@baseline//lib:asmrun"
     else:
         compiler = "@baseline//bin:ocamlopt.opt"
-        runtime = "@baseline//lib:libasmrun.a"
+        runtime = "@baseline//lib:asmrun"
 
     if debug:
         print("setting compiler: %s" % compiler)

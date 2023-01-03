@@ -49,13 +49,20 @@ boot_coldstart(
     runner = "coldstart_runner.sh",
     runtimes = [
         # "//runtime:asmrun",
-        "//runtime:camlrun",
+        # "//runtime:camlrun",
     ],
     args = [
-        # "$(rlocationpath //bin:ocamlc.opt)",
-        # "$(rlocationpath //bin:ocamlopt.opt)",
-        # "$(rlocationpath //bin:ocamlopt.byte)",
+        "$(rlocationpath //runtime:asmrun)",
+        "$(rlocationpath //runtime:camlrun)",
+        "$(rlocationpath //runtime:ocamlrun)",
+        "$(rlocationpath //boot:ocamlc.opt)",
+        "$(rlocationpath //boot:ocamlopt.opt)", # 5
+
+        "$(rlocationpath //boot:ocamlopt.byte)",
         "$(rlocationpath //boot:ocamlc.byte)",
+        "$(rlocationpath //vendor/mustach)",
+        "$(rlocationpath //vendor/merge_json)",
+        "$(rlocationpaths //config/camlheaders)", # 10
 
         # flambda
         # "$(rlocationpath //bin:ocamlc.optx)",
@@ -72,26 +79,34 @@ boot_coldstart(
         # "$(rlocationpath //bin/baseline:ocamlopt.opt)",
     ],
     data = [
-        # "//bin:ocamlc.opt",
-        # "//bin:ocamlopt.opt",
-        # "//bin:ocamlopt.byte",
-        "//bin:ocamlc.byte",
+        "//runtime:asmrun",
+        "//runtime:camlrun",
+        "//runtime:ocamlrun",
+        "//boot:ocamlc.opt",
+        "//boot:ocamlopt.opt",  # 5
+
+        "//boot:ocamlopt.byte",
+        "//boot:ocamlc.byte",
+        "//vendor/mustach",
+        "//vendor/merge_json",
+        "//config/camlheaders", # 10
 
         # "//bin:ocamlc.optx",
         # "//bin:ocamlopt.optx",
         # "//bin:ocamloptx.optx",
         # "//bin:ocamloptx.byte",
 
+        # "//tools:dumpobj.opt",
+
         # "@baseline//:ocamlc.byte",
         # "//bin/baseline:ocamlc.byte",
         # "//bin/baseline:ocamlopt.byte",
         # "//bin/baseline:ocamlc.opt",
         # "//bin/baseline:ocamlopt.opt",
+
         # "//lex:ocamllex.byte",
         # "//lex:ocamllex.opt",
         # "//yacc:ocamlyacc",
-        # "//vendor/mustach",
-        # "//vendor/merge_json",
 
         ## the shell script could obtain the following from the preceding:
         # "//stdlib",

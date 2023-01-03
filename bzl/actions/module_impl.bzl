@@ -600,9 +600,10 @@ def module_impl(ctx, module_name):
     if sig_src:
         includes.append(sig_src.dirname)
 
-    # includes.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
+    # includes.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
     ## tc.runtime may contain two: .a, .pic.a
-    includes.append(tc.runtime[0].dirname)
+
+    includes.append(tc.runtime.dirname)
 
     if stdlib_module_target:
         includes.append(

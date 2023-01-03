@@ -23,7 +23,7 @@ do
     echo "rloc: $(rlocation $arg)"
 done
 
-exit 0
+# exit 0
 
 # echo "camlheader: $(rlocation ocamlcc/config/camlheaders/camlheader)"
 
@@ -50,11 +50,27 @@ echo "Installing WORKSPACE and BUILD files"
 # echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/lib/BUILD.bazel
 
 echo "Installing programs"
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-cp -vf $(rlocation $2) $BOOTDIR/bin/
+## runtimes
+cp -vf $(rlocation $1) $BOOTDIR/lib/
+cp -vf $(rlocation $2) $BOOTDIR/lib/
 cp -vf $(rlocation $3) $BOOTDIR/bin/
 
+# compilers
+cp -vf $(rlocation $4) $BOOTDIR/bin/
+cp -vf $(rlocation $5) $BOOTDIR/bin/
+cp -vf $(rlocation $6) $BOOTDIR/bin/
+cp -vf $(rlocation $7) $BOOTDIR/bin/
+
+# mustach, merge_json
+cp -vf $(rlocation $8) $BOOTDIR/bin/
+cp -vf $(rlocation $9) $BOOTDIR/bin/
+
+# camlheaders
+cp -vf $(rlocation ${10}) $BOOTDIR/lib/
+cp -vf $(rlocation ${11}) $BOOTDIR/lib/
+
 echo "Installing stdib"
+
 
 # cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
 # STDLIBDIR=`dirname $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte)`

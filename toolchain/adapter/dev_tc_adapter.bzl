@@ -37,7 +37,7 @@ def _dev_toolchain_adapter_impl(ctx):
 
         workdir                = tc_workdir(ctx),
 
-        runtime                = ctx.file.runtime, # camlrun, asmrun
+        runtime                = ctx.attr.runtime, # camlrun, asmrun
         ## vm
         ocamlrun               = ctx.file.ocamlrun,
         vmargs                 = ctx.attr.vmargs,
@@ -85,7 +85,8 @@ dev_toolchain_adapter = rule(
 
         "runtime": attr.label(
             doc = "runtime lib, either libcamlrun.a or libasmrun.a",
-            allow_single_file = True,
+            allow_files = True,
+            # allow_single_file = True,
             default = "//toolchain:runtime",
             executable = False,
             cfg = "exec"

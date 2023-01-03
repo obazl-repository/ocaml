@@ -26,6 +26,26 @@ def _ocaml_tc_adapter_impl(ctx):
     _config_executor = ctx.attr.config_executor[BuildSettingInfo].value
     _config_emitter  = ctx.attr.config_emitter[BuildSettingInfo].value
 
+    # print("runtime actions: %s" % ctx.attr.runtime)
+    # for a in dir(ctx.attr.runtime):
+    #     print("attr: %s" % a)
+    # for action in ctx.attr.runtime.actions:
+    #     print("Action: %s" % action.mnemonic)
+
+
+    ## FIXME: deal with PIC
+
+    linker_inputs = ctx.attr.runtime[CcInfo].linking_context.linker_inputs
+    for li in linker_inputs.to_list():
+        libs = li.libraries
+        for lib in libs:
+            if lib.static_library:
+                imported_runtime = lib.static_library
+                break
+            # for l in dir(lib):
+            #     print("runtime linker lib: {k}: {v}".format(
+            #         k=l, v=getattr(lib, l)))
+
     return [platform_common.ToolchainInfo(
         name                   = ctx.label.name,
         protocol               = ctx.attr.protocol,
@@ -58,7 +78,7 @@ def _ocaml_tc_adapter_impl(ctx):
         # lexer                  = ctx.attr.lexer,
         # cvt_emit               = ctx.file.cvt_emit,
 
-        runtime                = ctx.files.runtime,
+        runtime                = imported_runtime,  #  ctx.attr.runtime,
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
         structopts             = ctx.attr.structopts,
@@ -110,6 +130,7 @@ ocaml_tc_adapter = rule(
             default = "//toolchain:runtime",
             ## NB: building on linux with -c opt produces two outputs:
             ## .a, .pic.a
+            allow_files = True,
             # allow_single_file = True,
             executable = False,
             cfg = "exec"

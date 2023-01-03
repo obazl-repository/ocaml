@@ -486,11 +486,6 @@ compiler_module(
     deps   = [
         "//bytecomp:Bytesections",
         "//bytecomp:Symtable",
-        "//file_formats:Cmi_format_cmi",
-        "//file_formats:Cmo_format_cmi",
-        "//file_formats:Cmt_format_cmi",
-        "//file_formats:Cmx_format_cmi",
-        "//file_formats:Cmxs_format_cmi",
         "//middle_end/flambda:Export_info",
         "//middle_end:Compilation_unit",
         "//middle_end:Linkage_name",
@@ -499,6 +494,13 @@ compiler_module(
         "//typing:Ident",
         "//utils:Binutils",
         "//utils:Misc",
+    ],
+    sig_deps = [
+        "//file_formats:Cmi_format_cmi",
+        "//file_formats:Cmo_format_cmi",
+        "//file_formats:Cmt_format_cmi",
+        "//file_formats:Cmx_format_cmi",
+        "//file_formats:Cmxs_format_cmi",
     ],
     stdlib_deps = [
         "//stdlib:Stdlib.Arg",

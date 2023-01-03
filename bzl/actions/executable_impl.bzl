@@ -185,12 +185,12 @@ def executable_impl(ctx, tc, exe_name,
         # print("tc.RUNTIME: %s" % tc.runtime.path)
 
         ## FIXME: linux: pick .a or .pic.a???
-        args.add(tc.runtime[0].path)
+        args.add(tc.runtime.path)
 
-        runtime_files.extend(tc.runtime) # [0][DefaultInfo].files)
+        runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
         ## NB: Asmlink looks for libasmrun.a in the std search
         ## space (-I dirs), not the link srch space (-L dirs)
-        includes.append(tc.runtime[0].dirname) #[0][DefaultInfo].files.to_list()[0].dirname)
+        includes.append(tc.runtime.dirname) #[0][DefaultInfo].files.to_list()[0].dirname)
         # cc_libdirs.append(f.dirname)
 
         ## do not add to CLI - asmcomp/asmlink adds it to the
@@ -205,9 +205,10 @@ def executable_impl(ctx, tc, exe_name,
             # # will add -L<f.dirname> below
             # cc_libdirs.append(f.dirname)
         print("custom tc.RUNTIME: %s" % tc.runtime)
-        runtime_depsets.append(tc.runtime[0][DefaultInfo].files)
+        runtime_files.append(tc.runtime)
         # will add -L<f.dirname> below
-        cc_libdirs.append(tc.runtime[0][DefaultInfo].files.to_list()[0].dirname)
+        # cc_libdirs.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
+        cc_libdirs.append(tc.runtime.dirname)
 
     (_options, cancel_opts) = get_options(rule, ctx)
     # print("_options: %s" % _options)

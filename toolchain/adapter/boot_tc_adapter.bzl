@@ -173,7 +173,7 @@ def _boot_toolchain_adapter_impl(ctx):
 
         # cvt_emit               = ctx.file.cvt_emit,
 
-        runtime                = ctx.file.runtime,
+        runtime                = ctx.attr.runtime,
         copts                  = ctx.attr.copts,
         sigopts                = ctx.attr.sigopts,
         structopts             = ctx.attr.structopts,
@@ -208,8 +208,8 @@ boot_toolchain_adapter = rule(
         "runtime": attr.label( # the lib, not ocamlrun
             doc = "Batch interpreter. ocamlrun, usually",
             default = "//toolchain:runtime",
-            # default = "//runtime:camlrun",
-            allow_single_file = True,
+            allow_files = True,
+            # allow_single_file = True,
             executable = False,
             cfg = "exec"
             # cfg = reset_cc_config_transition

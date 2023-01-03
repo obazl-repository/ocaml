@@ -27,7 +27,7 @@ def _build_tool_vm_in_transition_impl(settings, attr):
     ocamlrun = "//runtime:ocamlrun"
 
     # compiler = "@baseline//bin:ocamlc.opt"
-    # runtime  = "@baseline//lib:libcamlrun.a"
+    # runtime  = "@baseline//lib:camlrun"
     # ocamlrun = "@baseline//bin:ocamlrun"
 
 
@@ -61,7 +61,7 @@ def _build_tool_vm_in_transition_impl(settings, attr):
     #     compiler = "@baseline//bin:ocamlc.opt"
     #     lexer    = "@baseline//bin:ocamllex.opt"
     #     cvt_emit = "@baseline//bin:cvt_emit.byte"
-    #     runtime  = "@baseline//lib:libasmrun.a"
+    #     runtime  = "@baseline//lib:asmrun"
     # else:
     #     fail("Protocol not yet supported: %s" % protocol)
 
@@ -115,7 +115,7 @@ def _build_tool_sys_in_transition_impl(settings, attr):
         compiler = "@baseline//bin:ocamlopt.opt"
         # lexer    = "@baseline//bin:ocamllex.opt"
         cvt_emit = "@baseline//bin:cvt_emit.byte"
-        runtime  = "@baseline//lib:libasmrun.a"
+        runtime  = "@baseline//lib:asmrun"
     else:
         compiler = "//bin:ocamlopt.opt"
         # lexer    = "//lex:ocamllex.opt"

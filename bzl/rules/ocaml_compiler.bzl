@@ -17,7 +17,7 @@ load(":ocaml_transitions.bzl",
 ################################################################
 ################################################################
 def _std_ocamlc_byte_in_transition_impl(settings, attr):
-    debug = False
+    debug = True
     if debug:
         print("TRANSITION: std_ocamlc_byte_in_transition: %s" % attr.name)
         print("tc name: %s" % attr.name)
@@ -67,7 +67,7 @@ def _std_ocamlc_byte_in_transition_impl(settings, attr):
 
     elif protocol == "test":
         compiler = "@baseline//bin:ocamlc.byte"
-        runtime  = "@baseline//lib:libasmrun.a"
+        runtime  = "@baseline//lib:asmrun"
         cvt_emit = "@baseline//bin:cvt_emit.byte"
 
     # elif protocol == "dev":
@@ -75,7 +75,7 @@ def _std_ocamlc_byte_in_transition_impl(settings, attr):
     #     config_executor = "sys"
     #     config_emitter  = "vm"
     #     compiler = "@baseline//bin:ocamlc.opt"
-    #     runtime  = "@baseline//lib:libasmrun.a"
+    #     runtime  = "@baseline//lib:asmrun"
     #     cvt_emit = "@baseline//bin:cvt_emit.byte"
 
     else:
@@ -463,7 +463,7 @@ ocamlopt_optx    = optx_rule("opt_optx")
 ################################################################
 ####  MACRO
 ################################################################
-def ocaml_compilers(name,
+def std_ocaml_compilers(name,
                     visibility = ["//visibility:public"],
                     **kwargs):
 

@@ -7,7 +7,7 @@ load("//bzl/rules/common:impl_common.bzl", "tmpdir")
 ###########################
 def _camlheaders_impl(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
+    # tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     # print("CAMLHEADERS tc.ocamlrun: %s" % tc.ocamlrun.path)
 
@@ -33,10 +33,11 @@ def _camlheaders_impl(ctx):
     return [DefaultInfo(files=depset([f, fur]))]
 
 ###################
+## FIXME: only works for /dev/null, need to support deployment build
 camlheaders = rule(
     implementation = _camlheaders_impl,
     doc = "Generates dummy camlheader file",
-    toolchains = ["//toolchain/type:ocaml"]
+    # toolchains = ["//toolchain/type:ocaml"]
 )
 
 ########################
