@@ -1,0 +1,17 @@
+# exports_files(glob(["**"]))
+
+cc_import(
+    name = "camlrun",
+    static_library = "libcamlrun.a"
+)
+
+cc_import(
+    name = "asmrun",
+    static_library = "libasmrun.a"
+)
+
+# cc_import(
+#     name = "camlrun.pic",
+#     static_library = "libcamlrun.pic.a"
+# )
+
