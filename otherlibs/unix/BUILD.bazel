@@ -28,6 +28,11 @@ compiler_module(
     sig    = "Unix_cmi",
     opts = MODULE_OPTS,
     deps   = [
+       ":unix", ## cc_library
+    ],
+    # cc_deps = [
+    # ]
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Bytes",
         "//stdlib:Stdlib.Callback",
@@ -39,11 +44,7 @@ compiler_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-
-       ":unix", ## cc_library
     ],
-    # cc_deps = [
-    # ]
     visibility = [
         "//debugger:__pkg__"
     ]
@@ -53,9 +54,10 @@ compiler_signature(
     name = "Unix_cmi",
     src  = "unix.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib.Bigarray"],
+    stdlib_deps = ["//stdlib:Stdlib.Bigarray_cmi"],
     visibility = [
-        "//debugger:__pkg__"
+        "//debugger:__pkg__",
+        "//otherlibs/systhreads:__pkg__"
     ]
 )
 
@@ -68,8 +70,8 @@ compiler_module(
         "-nolabels" # ignore labels in the cmi file
     ],
     deps   = [
-        ":Unix", ## (Otherlibs Unix Unix)
-    ]
+        ":Unix",
+    ],
 )
 
 compiler_signature(
@@ -77,9 +79,11 @@ compiler_signature(
     src  = "unixLabels.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib",
-        ":Unix",
-    ]
+        ":Unix_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.In_channel_cmi",
+    ],
 )
 
 # unixLabels.cmi: \

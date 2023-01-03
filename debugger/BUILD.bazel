@@ -25,7 +25,7 @@ ocaml_tools(
         "//toplevel:Topprinters",
         ":debugger_lib",
     ],
-    # cc_deps = ["//otherlibs/unix"],
+    cc_deps = ["//otherlibs/unix"],
     main = ":Ocamldebug.Ocamldebug_entry",
     opts = select({
         "//config/target/executor:boot_executor?": ["-custom"],
@@ -117,21 +117,23 @@ ns_module(
     sig    = ":Ocamldebug.Breakpoints_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Symbols",
-        ":Ocamldebug.Pos",
-        ":Ocamldebug.Parameters",
-        ":Ocamldebug.Exec",
-        ":Ocamldebug.Events",
-        ":Ocamldebug.Debugger_config",
-        ":Ocamldebug.Debugcom",
-        ":Ocamldebug.Checkpoints",
-        "//stdlib:Stdlib.Printf",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
         "//bytecomp:Instruct",
+        "//utils:Misc",
+        ":Ocamldebug.Checkpoints",
+        ":Ocamldebug.Debugcom",
+        ":Ocamldebug.Debugger_config",
+        ":Ocamldebug.Events",
+        ":Ocamldebug.Exec",
+        ":Ocamldebug.Parameters",
+        ":Ocamldebug.Pos",
+        ":Ocamldebug.Symbols",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Fun",
-    ]
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+    ],
 )
 
 ns_signature(
@@ -140,9 +142,12 @@ ns_signature(
     src  = "breakpoints.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Ocamldebug.Events_cmi",
         ":Ocamldebug.Debugcom_cmi",
-    ]
+        ":Ocamldebug.Events_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 ns_module(
@@ -155,8 +160,10 @@ ns_module(
         ":Ocamldebug.Primitives",
         ":Ocamldebug.Int64ops",
         ":Ocamldebug.Debugcom",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Option",
-    ]
+    ],
 )
 
 ns_signature(
@@ -167,7 +174,10 @@ ns_signature(
     deps   = [
         ":Ocamldebug.Primitives_cmi",
         ":Ocamldebug.Debugcom_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 ns_module(
@@ -180,16 +190,6 @@ ns_module(
         "//bytecomp:Instruct",
         "//parsing:Location",
         "//parsing:Longident",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Fun",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
         "//typing:Env",
         "//typing:Types",
         "//utils:Load_path",
@@ -219,7 +219,19 @@ ns_module(
         ":Ocamldebug.Symbols",
         ":Ocamldebug.Time_travel",
         ":Ocamldebug.Unix_tools",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Fun",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
 ns_signature(
@@ -227,7 +239,7 @@ ns_signature(
     ns     = ":Ocamldebug",
     src  = "command_line.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Lexing_cmi",
         "//stdlib:Stdlib.Format_cmi",
     ]
@@ -240,20 +252,22 @@ ns_module(
     sig    = ":Ocamldebug.Debugcom_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Int64ops",
-        ":Ocamldebug.Input_handling",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Obj",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int64",
         "//bytecomp:Instruct",
-        "//stdlib:Stdlib.Char",
+        "//utils:Misc",
+        ":Ocamldebug.Input_handling",
+        ":Ocamldebug.Int64ops",
+        ":Ocamldebug.Primitives",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
 ns_signature(
@@ -262,9 +276,12 @@ ns_signature(
     src  = "debugcom.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Ocamldebug.Primitives_cmi",
         "//bytecomp:Instruct_cmi",
-    ]
+        ":Ocamldebug.Primitives_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 ns_module(
@@ -275,17 +292,19 @@ ns_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Ocamldebug.Int64ops",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Hashtbl",
-    ]
+    ],
 )
 
 ns_signature(
     name = "Ocamldebug.Debugger_config_cmi",
     ns     = ":Ocamldebug",
     src  = "debugger_config.mli",
-    stdlib_primitives = True,
-    deps   = [
+    # stdlib_primitives = True,
+    stdlib_deps   = [
         "//stdlib:Stdlib.Hashtbl_cmi",
     ]
 )
@@ -296,7 +315,7 @@ ns_module(
     struct = "debugger_lexer.ml",
     sig    = ":Ocamldebug.Debugger_lexer_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Parsing",
     ]
@@ -314,9 +333,11 @@ ns_signature(
     src  = "debugger_lexer.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Lexing_cmi",
         ":Ocamldebug.Debugger_parser_cmi"
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing_cmi",
+    ],
 )
 
 ns_module(
@@ -328,8 +349,10 @@ ns_module(
     deps   = [
         ":Ocamldebug.Int64ops",
         ":Ocamldebug.Input_handling",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Parsing"
-    ]
+    ],
 )
 
 ns_signature(
@@ -339,8 +362,10 @@ ns_signature(
     stdlib_primitives = True,
     deps   = [
         ":Ocamldebug.Parser_aux_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Lexing_cmi"
-    ]
+    ],
 )
 
 genrule(
@@ -371,10 +396,6 @@ ns_module(
         "//bytecomp:Instruct",
         "//bytecomp:Symtable",
         "//parsing:Longident",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.String",
         "//typing:Btype",
         "//typing:Ctype",
         "//typing:Env",
@@ -388,10 +409,14 @@ ns_module(
         ":Ocamldebug.Events",
         ":Ocamldebug.Frames",
         ":Ocamldebug.Printval",
-        ## (Subst)
-
-        ":Ocamldebug.Parser_aux_cmi",
-    ]
+    ],
+        # ":Ocamldebug.Parser_aux_cmi",
+    stdlib_deps = [
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 ns_signature(
@@ -401,7 +426,6 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Longident_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//typing:Env_cmi",
         "//typing:Ident_cmi",
         "//typing:Path_cmi",
@@ -409,7 +433,10 @@ ns_signature(
         ":Ocamldebug.Debugcom_cmi",
         ":Ocamldebug.Events_cmi",
         ":Ocamldebug.Parser_aux_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 ns_module(
@@ -419,9 +446,12 @@ ns_module(
     sig    = ":Ocamldebug.Events_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//parsing:Location",
         "//bytecomp:Instruct",
-    ]
+        "//parsing:Location",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives",
+    ],
 )
 
 ns_signature(
@@ -430,9 +460,12 @@ ns_signature(
     src  = "events.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Lexing_cmi",
         "//bytecomp:Instruct_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+        "//stdlib:Stdlib.Lexing_cmi",
+    ],
 )
 
 ns_module(
@@ -441,7 +474,7 @@ ns_module(
     struct = "exec.ml",
     sig    = ":Ocamldebug.Exec_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Sys",
     ]
 )
@@ -460,13 +493,15 @@ ns_module(
     sig    = ":Ocamldebug.Frames_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Symbols",
-        ":Ocamldebug.Events",
-        ":Ocamldebug.Debugcom",
-        "//utils:Misc",
-        "//stdlib:Stdlib.Lexing",
         "//bytecomp:Instruct",
-    ]
+        "//utils:Misc",
+        ":Ocamldebug.Debugcom",
+        ":Ocamldebug.Events",
+        ":Ocamldebug.Symbols",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing",
+    ],
 )
 
 ns_signature(
@@ -476,7 +511,10 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Ocamldebug.Events_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 ns_module(
@@ -486,12 +524,14 @@ ns_module(
     sig    = ":Ocamldebug.History_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Int64ops",
-        ":Ocamldebug.Debugger_config",
         ":Ocamldebug.Checkpoints",
+        ":Ocamldebug.Debugger_config",
+        ":Ocamldebug.Int64ops",
+        ":Ocamldebug.Primitives",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
-    ]
+    ],
 )
 
 ns_signature(
@@ -508,12 +548,13 @@ ns_module(
     sig    = ":Ocamldebug.Input_handling_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Primitives",
         ":Ocamldebug.Parameters",
-        ## (Unix)
-        "//stdlib:Stdlib.List",
+        ":Ocamldebug.Primitives",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Fun",
-    ]
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 ns_signature(
@@ -523,7 +564,10 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Ocamldebug.Primitives_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 ns_module(
@@ -532,7 +576,7 @@ ns_module(
     struct = "int64ops.ml",
     sig    = ":Ocamldebug.Int64ops_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Int64",
     ]
 )
@@ -554,11 +598,6 @@ ns_module(
     deps   = [
         "//bytecomp:Symtable",
         "//parsing:Longident",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Obj",
-        "//stdlib:Stdlib.String",
         "//toplevel:Topprinters",
         "//typing:Ctype",
         "//typing:Env",
@@ -570,8 +609,14 @@ ns_module(
         "//utils:Misc",
         ":Ocamldebug.Parameters",
         ":Ocamldebug.Printval",
-        ## (Dynlink)
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 ns_signature(
@@ -581,9 +626,11 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         "//parsing:Longident_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//otherlibs/dynlink:Dynlink_cmi"
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+    ],
 )
 
 ns_module(
@@ -592,39 +639,39 @@ ns_module(
     struct = "main.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Unix_tools",
-        ":Ocamldebug.Time_travel",
-        ":Ocamldebug.Show_information",
-        ":Ocamldebug.Question",
-        ":Ocamldebug.Program_management",
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Parameters",
-        ":Ocamldebug.Loadprinter",
-        ":Ocamldebug.Input_handling",
-        ":Ocamldebug.Frames",
-        ":Ocamldebug.Exec",
-        ":Ocamldebug.Debugger_config",
-        ":Ocamldebug.Command_line",
-        ":Ocamldebug.Checkpoints",
-        ## (Unix)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//typing:Persistent_env",
-        "//utils:Misc",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
         "//config:Config",
         "//file_formats:Cmi_format",
+        "//typing:Persistent_env",
         "//utils:Clflags",
-        ## (Callback)
-        "//stdlib:Stdlib.Buffer",
-        "//stdlib:Stdlib.Array",
+        "//utils:Load_path",
+        "//utils:Misc",
+        ":Ocamldebug.Checkpoints",
+        ":Ocamldebug.Command_line",
+        ":Ocamldebug.Debugger_config",
+        ":Ocamldebug.Exec",
+        ":Ocamldebug.Frames",
+        ":Ocamldebug.Input_handling",
+        ":Ocamldebug.Loadprinter",
+        ":Ocamldebug.Parameters",
+        ":Ocamldebug.Primitives",
+        ":Ocamldebug.Program_management",
+        ":Ocamldebug.Question",
+        ":Ocamldebug.Show_information",
+        ":Ocamldebug.Time_travel",
+        ":Ocamldebug.Unix_tools",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
-    ]
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
 ns_module(
@@ -646,13 +693,15 @@ ns_module(
     opts = MODULE_OPTS,
     stdlib_primitives = True,
     deps   = [
-        ":Ocamldebug.Debugger_config",
-        "//utils:Load_path",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Envaux",
         "//config:Config",
-    ]
+        "//typing:Envaux",
+        "//utils:Load_path",
+        ":Ocamldebug.Debugger_config",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Hashtbl",
+    ],
 )
 
 ns_signature(
@@ -660,7 +709,10 @@ ns_signature(
     ns     = ":Ocamldebug",
     src  = "parameters.mli",
     opts = SIG_OPTS,
-    stdlib_primitives = True,
+    # stdlib_primitives = True,
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi"
+    ],
 )
 
 ns_signature(
@@ -669,8 +721,8 @@ ns_signature(
     src  = "parser_aux.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Ocamldebug.Debugcom_cmi",
         "//parsing:Longident_cmi",
+        ":Ocamldebug.Debugcom_cmi",
     ]
 )
 
@@ -709,12 +761,14 @@ ns_module(
     sig    = ":Ocamldebug.Pos_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Events",
-        "//stdlib:Stdlib.Printf",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Lexing",
         "//bytecomp:Instruct",
-    ]
+        "//parsing:Location",
+        ":Ocamldebug.Events",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Printf",
+  ],
 )
 
 ns_signature(
@@ -733,10 +787,9 @@ ns_module(
     struct = "primitives.ml",
     sig    = ":Ocamldebug.Primitives_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        ## (Unix)
-        "//stdlib:Stdlib.String",
+    stdlib_deps   = [
         "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -745,10 +798,13 @@ ns_signature(
     ns     = ":Ocamldebug",
     src  = "primitives.mli",
     opts = SIG_OPTS,
-    stdlib_primitives = True,
+    # stdlib_primitives = True,
     deps   = [
         "//otherlibs/unix:Unix_cmi"
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 ns_module(
@@ -759,20 +815,21 @@ ns_module(
     opts = MODULE_OPTS,
     deps   = [
         "//bytecomp:Symtable",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Obj",
         "//toplevel:Genprintval",
         "//typing:Env",
         "//typing:Oprint",
         "//typing:Printtyp",
         "//typing:Types",
         ":Ocamldebug.Debugcom",
-
-        "//typing:Outcometree_cmi",
-        ":Ocamldebug.Parser_aux_cmi",
-    ]
+    ],
+        # "//typing:Outcometree_cmi",
+        # ":Ocamldebug.Parser_aux_cmi",
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Obj",
+    ],
 )
 
 ns_signature(
@@ -781,14 +838,16 @@ ns_signature(
     src  = "printval.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Ocamldebug.Parser_aux_cmi",
-        ":Ocamldebug.Debugcom_cmi",
-        "//typing:Types_cmi",
-        "//typing:Path_cmi",
-        "//stdlib:Stdlib.Obj_cmi",
-        "//stdlib:Stdlib.Format_cmi",
         "//typing:Env_cmi",
-    ]
+        "//typing:Path_cmi",
+        "//typing:Types_cmi",
+        ":Ocamldebug.Debugcom_cmi",
+        ":Ocamldebug.Parser_aux_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Format_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
+    ],
 )
 
 ns_module(
@@ -798,19 +857,20 @@ ns_module(
     sig    = ":Ocamldebug.Program_loading_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Unix_tools",
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Parameters",
-        ":Ocamldebug.Input_handling",
         ":Ocamldebug.Debugger_config",
-        ## (Unix)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
+        ":Ocamldebug.Input_handling",
+        ":Ocamldebug.Parameters",
+        ":Ocamldebug.Primitives",
+        ":Ocamldebug.Unix_tools",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Buffer",
-    ]
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
 ns_signature(
@@ -820,7 +880,10 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Ocamldebug.Primitives_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 ns_module(
@@ -830,32 +893,35 @@ ns_module(
     sig    = ":Ocamldebug.Program_management_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Unix_tools",
-        ":Ocamldebug.Time_travel",
-        ":Ocamldebug.Symbols",
-        ":Ocamldebug.Question",
-        ":Ocamldebug.Program_loading",
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Parameters",
-        ":Ocamldebug.Int64ops",
-        ":Ocamldebug.Input_handling",
-        ":Ocamldebug.History",
-        ":Ocamldebug.Debugger_config",
-        ":Ocamldebug.Breakpoints",
         "//driver:Compmisc",
-        ## (Unix)
-        "//stdlib:Stdlib.Printf",
         "//utils:Load_path",
-        ## (Envaux)
+        ":Ocamldebug.Breakpoints",
+        ":Ocamldebug.Debugger_config",
+        ":Ocamldebug.History",
+        ":Ocamldebug.Input_handling",
+        ":Ocamldebug.Int64ops",
+        ":Ocamldebug.Parameters",
+        ":Ocamldebug.Primitives",
+        ":Ocamldebug.Program_loading",
+        ":Ocamldebug.Question",
+        ":Ocamldebug.Symbols",
+        ":Ocamldebug.Time_travel",
+        ":Ocamldebug.Unix_tools",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Bytes",
-    ]
+        "//stdlib:Stdlib.Printf",
+    ],
 )
 
 ns_signature(
     name = "Ocamldebug.Program_management_cmi",
     ns     = ":Ocamldebug",
     src  = "program_management.mli",
-    stdlib_primitives = True
+    # stdlib_primitives = True
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi"
+    ],
 )
 
 ns_module(
@@ -865,13 +931,15 @@ ns_module(
     sig    = ":Ocamldebug.Question_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Input_handling",
         ":Ocamldebug.Debugger_lexer",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Lexing",
+        ":Ocamldebug.Input_handling",
+        ":Ocamldebug.Primitives",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Fun",
-    ]
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 ns_signature(
@@ -888,23 +956,25 @@ ns_module(
     sig    = ":Ocamldebug.Show_information_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Symbols",
-        ":Ocamldebug.Source",
-        ":Ocamldebug.Show_source",
-        ":Ocamldebug.Printval",
-        ":Ocamldebug.Parameters",
-        ":Ocamldebug.Frames",
-        ":Ocamldebug.Events",
-        ":Ocamldebug.Debugcom",
-        ":Ocamldebug.Checkpoints",
-        ":Ocamldebug.Breakpoints",
-        "//stdlib:Stdlib.String",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
         "//bytecomp:Instruct",
+        "//utils:Misc",
+        ":Ocamldebug.Breakpoints",
+        ":Ocamldebug.Checkpoints",
+        ":Ocamldebug.Debugcom",
+        ":Ocamldebug.Events",
+        ":Ocamldebug.Frames",
+        ":Ocamldebug.Parameters",
+        ":Ocamldebug.Printval",
+        ":Ocamldebug.Show_source",
+        ":Ocamldebug.Source",
+        ":Ocamldebug.Symbols",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
-    ]
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 ns_signature(
@@ -914,8 +984,10 @@ ns_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Ocamldebug.Events_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format_cmi",
-    ]
+    ],
 )
 
 ns_module(
@@ -925,17 +997,19 @@ ns_module(
     sig    = ":Ocamldebug.Show_source_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Source",
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Parameters",
-        ":Ocamldebug.Events",
-        ":Ocamldebug.Debugger_config",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//parsing:Location",
-        "//stdlib:Stdlib.Lexing",
         "//bytecomp:Instruct",
-    ]
+        "//parsing:Location",
+        ":Ocamldebug.Debugger_config",
+        ":Ocamldebug.Events",
+        ":Ocamldebug.Parameters",
+        ":Ocamldebug.Primitives",
+        ":Ocamldebug.Source",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+    ],
 )
 
 ns_signature(
@@ -943,9 +1017,11 @@ ns_signature(
     ns     = ":Ocamldebug",
     src  = "show_source.mli",
     deps   = [
-        "//stdlib:Stdlib.Lexing_cmi",
         "//bytecomp:Instruct_cmi",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing_cmi",
+    ],
 )
 
 ns_module(
@@ -955,25 +1031,27 @@ ns_module(
     sig    = ":Ocamldebug.Source_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Debugger_config",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//utils:Misc",
         "//utils:Load_path",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Hashtbl",
+        "//utils:Misc",
+        ":Ocamldebug.Debugger_config",
+        ":Ocamldebug.Primitives",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Filename",
-    ]
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
 ns_signature(
     name = "Ocamldebug.Source_cmi",
     ns     = ":Ocamldebug",
     src  = "source.mli",
-    stdlib_primitives = True,
-    deps   = [
+    # stdlib_primitives = True,
+    stdlib_deps   = [
         "//stdlib:Stdlib.Lexing_cmi",
     ]
 )
@@ -988,17 +1066,19 @@ ns_module(
         "//bytecomp:Bytesections",
         "//bytecomp:Instruct",
         "//bytecomp:Symtable",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.List",
         "//utils:Misc",
         ":Ocamldebug.Checkpoints",
         ":Ocamldebug.Debugcom",
         ":Ocamldebug.Debugger_config",
         ":Ocamldebug.Events",
         ":Ocamldebug.Program_loading",
-    ]
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+    ],
 )
 
 ns_signature(
@@ -1007,10 +1087,13 @@ ns_signature(
     src  = "symbols.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Ocamldebug.Events_cmi",
-        ":Ocamldebug.Debugcom_cmi",
         "//bytecomp:Instruct_cmi",
-    ]
+        ":Ocamldebug.Debugcom_cmi",
+        ":Ocamldebug.Events_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi",
+    ],
 )
 
 ns_module(
@@ -1020,28 +1103,30 @@ ns_module(
     sig    = ":Ocamldebug.Time_travel_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Trap_barrier",
-        ":Ocamldebug.Symbols",
-        ":Ocamldebug.Question",
-        ":Ocamldebug.Program_loading",
-        ":Ocamldebug.Primitives",
-        ":Ocamldebug.Int64ops",
-        ":Ocamldebug.Input_handling",
-        ":Ocamldebug.Exec",
-        ":Ocamldebug.Events",
-        ":Ocamldebug.Debugger_config",
-        ":Ocamldebug.Debugcom",
-        ":Ocamldebug.Checkpoints",
-        ":Ocamldebug.Breakpoints",
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int64",
-        "//stdlib:Stdlib.Int",
         "//bytecomp:Instruct",
+        "//utils:Misc",
+        ":Ocamldebug.Breakpoints",
+        ":Ocamldebug.Checkpoints",
+        ":Ocamldebug.Debugcom",
+        ":Ocamldebug.Debugger_config",
+        ":Ocamldebug.Events",
+        ":Ocamldebug.Exec",
+        ":Ocamldebug.Input_handling",
+        ":Ocamldebug.Int64ops",
+        ":Ocamldebug.Primitives",
+        ":Ocamldebug.Program_loading",
+        ":Ocamldebug.Question",
+        ":Ocamldebug.Symbols",
+        ":Ocamldebug.Trap_barrier",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
-    ]
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Int64",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
 ns_signature(
@@ -1061,11 +1146,13 @@ ns_module(
     sig    = ":Ocamldebug.Trap_barrier_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Ocamldebug.Exec",
-        ":Ocamldebug.Debugcom",
         ":Ocamldebug.Checkpoints",
+        ":Ocamldebug.Debugcom",
+        ":Ocamldebug.Exec",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Fun",
-    ]
+    ],
 )
 
 ns_signature(
@@ -1084,13 +1171,15 @@ ns_module(
     opts = MODULE_OPTS,
     deps   = [
         "//otherlibs/unix:Unix",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
-        "//utils:Misc",
-    ]
+    ],
 )
 
 ns_signature(

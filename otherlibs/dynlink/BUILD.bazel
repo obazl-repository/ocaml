@@ -1,7 +1,8 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
+     # "boot_archive",
      # "boot_executable",
-     "boot_library",
+     # "boot_library",
+     "compiler_library",
      "compiler_module",
      # "bootstrap_ns",
      "compiler_signature",
@@ -45,7 +46,7 @@ SIG_OPTS    = []
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -g -c -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +A -bin-annot -strict-formats -I byte dynlink_types.mli
 
 
-boot_archive(
+compiler_library(
     name = "dynlink",
     manifest  = [
         ":Dynlink",             # selected, byte or native
@@ -99,6 +100,7 @@ compiler_module(
     ## makefiles it's the former(?), but since they're the same file
     ## in different namespaces we could also resolve against
     ## Dynlink_compilerlibs.
+    sig_deps = ["Dynlink_compilerlibs.Cmo_format_cmi"],
     deps   = [
         ":Dynlink_compilerlibs.Config",
         ":Dynlink_common",
@@ -107,12 +109,12 @@ compiler_module(
         # "//platform/constraints/ocaml/emitter:vm_emitter?": [
         "//config/target/executor:boot_executor?": [
         # "//toolchain/target/executor:vm_executor?": [
-            "//bytecomp:Dll",
-            "//bytecomp:Meta",
-            "//bytecomp:Opcodes",
-            "//bytecomp:Symtable",
-            "//file_formats:Cmo_format_cmi",
-            "//typing:Ident",
+            # "//bytecomp:Dll",
+            # "//bytecomp:Meta",
+            "Dynlink_compilerlibs.Opcodes",
+            "Dynlink_compilerlibs.Symtable",
+            # "//file_formats:Cmo_format_cmi",
+            # "//typing:Ident",
             "Dynlink_compilerlibs.Misc",
             ## (LongString)
         ],
@@ -122,7 +124,7 @@ compiler_module(
             "//bytecomp:Meta",
             "//bytecomp:Opcodes",
             "//bytecomp:Symtable",
-            "//file_formats:Cmo_format_cmi",
+            # "//file_formats:Cmo_format_cmi",
             "//typing:Ident",
             "Dynlink_compilerlibs.Misc",
             ## (LongString)
@@ -133,9 +135,10 @@ compiler_module(
             ":Dynlink_compilerlibs.Cmxs_format_cmi",
             # "//stdlib:Stdlib.Filename",
         ]
-    }) + select({
-        ":pack_dynlink":  [":compilerlibs_packed"],
-        "//conditions:default"   :  [":compilerlibs"],
+    # }) + select({
+    #     ":pack_dynlink":  [":compilerlibs_packed"],
+    #     "//conditions:default"   :  [":compilerlibs"],
+    # }),
     }),
     stdlib_deps   = [
         "//stdlib:Stdlib.Digest",
@@ -169,18 +172,11 @@ compiler_signature(
     name = "Dynlink_cmi",
     src  = "dynlink.mli",
     opts = SIG_OPTS,
-    deps   = [
-        "//stdlib:Stdlib.Obj",
-    ] + select({
+    deps   = select({
         # "//platform/constraints/ocaml/emitter:vm_emitter?": [
         "//config/target/executor:boot_executor?": [
         # "//toolchain/target/executor:vm_executor?": [
             "//file_formats:Cmo_format_cmi",
-            "//stdlib:Stdlib.Digest_cmi",
-            "//stdlib:Stdlib.Filename_cmi",
-            "//stdlib:Stdlib.List_cmi",
-            "//stdlib:Stdlib.Obj_cmi",
-            "//stdlib:Stdlib.Printexc_cmi",
             ":Dynlink_compilerlibs.Config_cmi",
             ":Dynlink_common_cmi",
             ":Dynlink_types_cmi",
@@ -188,11 +184,6 @@ compiler_signature(
         "//config/target/executor:vm_executor?": [
         # "//toolchain/target/executor:vm_executor?": [
             "//file_formats:Cmo_format_cmi",
-            "//stdlib:Stdlib.Digest_cmi",
-            "//stdlib:Stdlib.Filename_cmi",
-            "//stdlib:Stdlib.List_cmi",
-            "//stdlib:Stdlib.Obj_cmi",
-            "//stdlib:Stdlib.Printexc_cmi",
             ":Dynlink_compilerlibs.Config_cmi",
             ":Dynlink_common_cmi",
             ":Dynlink_types_cmi",
@@ -201,6 +192,31 @@ compiler_signature(
         "//config/target/executor:sys_executor?": [
         # "//toolchain/target/executor:sys_executor?": [
             ":Dynlink_compilerlibs.Cmxs_format_cmi",
+            # "//file_formats:Cmxs_format_cmi",
+        ]
+    }),
+    stdlib_deps = [
+        "//stdlib:Stdlib.Obj_cmi",
+    ] + select({
+        # "//platform/constraints/ocaml/emitter:vm_emitter?": [
+        "//config/target/executor:boot_executor?": [
+        # "//toolchain/target/executor:vm_executor?": [
+            "//stdlib:Stdlib.Digest_cmi",
+            "//stdlib:Stdlib.Filename_cmi",
+            "//stdlib:Stdlib.List_cmi",
+            "//stdlib:Stdlib.Printexc_cmi",
+        ],
+        "//config/target/executor:vm_executor?": [
+        # "//toolchain/target/executor:vm_executor?": [
+            "//stdlib:Stdlib.Digest_cmi",
+            "//stdlib:Stdlib.Filename_cmi",
+            "//stdlib:Stdlib.List_cmi",
+            "//stdlib:Stdlib.Printexc_cmi",
+        ],
+        # "//platform/constraints/ocaml/executor:sys_executor?": [
+        "//config/target/executor:sys_executor?": [
+        # "//toolchain/target/executor:sys_executor?": [
+            # ":Dynlink_compilerlibs.Cmxs_format_cmi",
             # "//file_formats:Cmxs_format_cmi",
         ]
     }),
@@ -214,7 +230,16 @@ compiler_module(
     sig    = "Dynlink_common_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        # "//stdlib:Stdlib.Digest",
+        ":Dynlink_platform_intf",
+        ":Dynlink_types",
+        ":Dynlink_compilerlibs.Misc"
+    # ] + select({
+    #     ":pack_dynlink"        :  [":compilerlibs_packed"],
+    #     "//conditions:default" :  [":compilerlibs"],
+    # }),
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Digest",
         # "//stdlib:Stdlib.Filename",
         # "//stdlib:Stdlib.Format",
         # "//stdlib:Stdlib.Lazy",
@@ -223,13 +248,7 @@ compiler_module(
         # "//stdlib:Stdlib.Printf",
         # "//stdlib:Stdlib.Set",
         # "//stdlib:Stdlib.Sys",
-        ":Dynlink_platform_intf",
-        ":Dynlink_types",
-        ":Dynlink_compilerlibs.Misc"
-    ] + select({
-        ":pack_dynlink"        :  [":compilerlibs_packed"],
-        "//conditions:default" :  [":compilerlibs"],
-    }),
+    ],
 )
 
 compiler_signature(
@@ -238,21 +257,41 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Dynlink_platform_intf_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Obj_cmi",
-    ]
+    ],
 )
 
 #################
 compiler_module(
     name   = "Dynlink_platform_intf",
     struct = "dynlink_platform_intf.ml",
+    sig = "Dynlink_platform_intf_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":Dynlink_types", ## (Otherlibs Dynlink Dynlink_types)
-        "//stdlib:Stdlib.Obj",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Digest",
         "//stdlib:Stdlib.Mutex",
-    ]
+        "//stdlib:Stdlib.Obj",
+    ],
+)
+
+compiler_signature(
+    name = "Dynlink_platform_intf_cmi",
+    src  = "dynlink_platform_intf.mli",
+    opts = SIG_OPTS,
+    deps   = [
+        ":Dynlink_types_cmi",
+    ],
+    stdlib_deps = [
+        # "//stdlib:Stdlib.Obj_cmi",
+        "//stdlib:Stdlib.Digest_cmi",
+        "//stdlib:Stdlib.Mutex_cmi",
+        "//stdlib:Stdlib.Obj_cmi",
+    ],
 )
 
 #################
@@ -261,10 +300,10 @@ compiler_module(
     struct = "dynlink_types.ml",
     sig    = "Dynlink_types_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        "//stdlib:Stdlib",
-        "//stdlib:Stdlib.Printf",
+    stdlib_deps   = [
+        # "//stdlib:Stdlib",
         "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
     ]
 )
 
@@ -292,18 +331,19 @@ compiler_signature(
 #     prologue = [":dynlink"]
 # )
 
-compiler_module(
-    name   = "Extract_crc",
-    struct = "extract_crc.ml",
-    sig    = "extract_crc.mli",  ##FIXME: use cmi
-    opts = MODULE_OPTS,
-    deps   = [
-        # makefile exposes this via '-I byte'
-    ] + select({
-        ":pack_dynlink":  [":compilerlibs_packed"],
-        "//conditions:default"   :  [":compilerlibs"],
-    }),
-)
+# compiler_module(
+#     name   = "Extract_crc",
+#     struct = "extract_crc.ml",
+#     sig    = "extract_crc.mli",  ##FIXME: use cmi
+#     opts = MODULE_OPTS,
+#     deps   = [
+#         # makefile exposes this via '-I byte'
+#     # ] + select({
+#     #     ":pack_dynlink":  [":compilerlibs_packed"],
+#     #     "//conditions:default"   :  [":compilerlibs"],
+#     # }),
+#     ]
+# )
 
 #########################################################
 ################  dynlink_compilerlibs  ################
@@ -311,7 +351,8 @@ compiler_module(
 ## since we're in pkg dynlink, "dynlink_compilerlibs" would be
 ## redundant. This gives us "//otherlibs/dynlink:compilerlibs"
 ## (private).
-boot_library(
+# boot_library(
+compiler_library(
     visibility = ["//visibility:private"],
     name       = "compilerlibs",
     ## cm_name not needed for std lib, it does not compile anything
@@ -1990,73 +2031,74 @@ ns_signature(
 
 ## Status: builds, but won't link into dynlink.cma
 
-boot_library(
-    name       = "compilerlibs_packed",
-    pack_ns    = "Dynlink_compilerlibs_packed",
-    visibility = ["//visibility:private"],
-    opts       = MODULE_OPTS,
-    # stdlib     = "//stdlib",
-    manifest   = [
-        "//bytecomp:Bytesections_cmi",
-        "//bytecomp:Bytesections",
-        "//bytecomp:Dll",
-        "//bytecomp:Dll_cmi",
-        "//bytecomp:Instruct",
-        "//bytecomp:Instruct_cmi",
-        "//bytecomp:Meta",
-        "//bytecomp:Meta_cmi",
-        "//bytecomp:Opcodes",
-        "//bytecomp:Symtable",
-        "//bytecomp:Symtable_cmi",
+# boot_library(
+# compiler_library(
+#     name       = "compilerlibs_packed",
+#     pack_ns    = "Dynlink_compilerlibs_packed",
+#     visibility = ["//visibility:private"],
+#     opts       = MODULE_OPTS,
+#     # stdlib     = "//stdlib",
+#     manifest   = [
+#         "//bytecomp:Bytesections_cmi",
+#         "//bytecomp:Bytesections",
+#         "//bytecomp:Dll",
+#         "//bytecomp:Dll_cmi",
+#         "//bytecomp:Instruct",
+#         "//bytecomp:Instruct_cmi",
+#         "//bytecomp:Meta",
+#         "//bytecomp:Meta_cmi",
+#         "//bytecomp:Opcodes",
+#         "//bytecomp:Symtable",
+#         "//bytecomp:Symtable_cmi",
 
-        "//file_formats:Cmi_format",
-        "//file_formats:Cmo_format_cmi",
-        "//file_formats:Cmxs_format_cmi",
+#         "//file_formats:Cmi_format",
+#         "//file_formats:Cmo_format_cmi",
+#         "//file_formats:Cmxs_format_cmi",
 
-        "//lambda:Debuginfo",
-        "//lambda:Lambda",
-        "//lambda:Runtimedef",
+#         "//lambda:Debuginfo",
+#         "//lambda:Lambda",
+#         "//lambda:Runtimedef",
 
-        "//parsing:Ast_helper",
-        "//parsing:Ast_mapper",
-        "//parsing:Asttypes_cmi",
-        "//parsing:Attr_helper",
-        "//parsing:Builtin_attributes",
-        "//parsing:Docstrings",
-        "//parsing:Location",
-        "//parsing:Longident",
-        "//parsing:Parsetree_cmi",
-        "//parsing:Syntaxerr",
+#         "//parsing:Ast_helper",
+#         "//parsing:Ast_mapper",
+#         "//parsing:Asttypes_cmi",
+#         "//parsing:Attr_helper",
+#         "//parsing:Builtin_attributes",
+#         "//parsing:Docstrings",
+#         "//parsing:Location",
+#         "//parsing:Longident",
+#         "//parsing:Parsetree_cmi",
+#         "//parsing:Syntaxerr",
 
-        "//typing:Btype",
-        "//typing:Datarepr",
-        "//typing:Env",
-        "//typing:Ident",
-        "//typing:Outcometree_cmi",
-        "//typing:Path",
-        "//typing:Persistent_env",
-        "//typing:Predef",
-        "//typing:Primitive",
-        "//typing:Shape",
-        "//typing:Subst",
-        "//typing:Type_immediacy",
-        "//typing:Types",
+#         "//typing:Btype",
+#         "//typing:Datarepr",
+#         "//typing:Env",
+#         "//typing:Ident",
+#         "//typing:Outcometree_cmi",
+#         "//typing:Path",
+#         "//typing:Persistent_env",
+#         "//typing:Predef",
+#         "//typing:Primitive",
+#         "//typing:Shape",
+#         "//typing:Subst",
+#         "//typing:Type_immediacy",
+#         "//typing:Types",
 
-        "//utils:Arg_helper",
-        "//utils:Binutils",
-        "//utils:Build_path_prefix_map",
-        "//utils:Clflags",
-        "//config:Config",
-        "//utils:Consistbl",
-        "//utils:Identifiable",
-        "//utils:Int_replace_polymorphic_compare",
-        "//utils:Lazy_backtrack",
-        "//utils:Load_path",
-        "//utils:Local_store",
-        "//utils:Misc",
-        "//utils:Numbers",
-        "//utils:Profile",
-        "//utils:Terminfo",
-        "//utils:Warnings",
-    ]
-)
+#         "//utils:Arg_helper",
+#         "//utils:Binutils",
+#         "//utils:Build_path_prefix_map",
+#         "//utils:Clflags",
+#         "//config:Config",
+#         "//utils:Consistbl",
+#         "//utils:Identifiable",
+#         "//utils:Int_replace_polymorphic_compare",
+#         "//utils:Lazy_backtrack",
+#         "//utils:Load_path",
+#         "//utils:Local_store",
+#         "//utils:Misc",
+#         "//utils:Numbers",
+#         "//utils:Profile",
+#         "//utils:Terminfo",
+#         "//utils:Warnings",
+#     ]
+# )

@@ -63,13 +63,13 @@ compiler_module(
     struct = "event.ml",
     sig    = "Event_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         # ":Mutex", ## (Otherlibs Systhreads Mutex)
         # ":Condition", ## (Otherlibs Systhreads Condition)
-        "//stdlib:Stdlib.Random",
-        "//stdlib:Stdlib.Queue",
-        "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Queue",
+        "//stdlib:Stdlib.Random",
     ]
 )
 
@@ -77,7 +77,7 @@ compiler_signature(
     name = "Event_cmi",
     src  = "event.mli",
     opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib"]
+    stdlib_deps   = ["//stdlib:Stdlib_cmi"]
 )
 
 # compiler_module(
@@ -119,22 +119,24 @@ compiler_signature(
 compiler_module(
     name   = "Thread",
     struct = "thread.ml",
-    sig    = "Thread_cmi",
+    # sig    = "Thread_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
+    sig_deps = ["//otherlibs/unix:Unix_cmi"],
+    stdlib_deps   = [
+        "//stdlib:Stdlib.Callback",
         "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Callback"
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
-compiler_signature(
-    name = "Thread_cmi",
-    src  = "thread.mli",
-    opts = SIG_OPTS,
-    deps   = ["//stdlib:Stdlib"]
-)
+# compiler_signature(
+#     name = "Thread_cmi",
+#     src  = "thread.mli",
+#     opts = SIG_OPTS,
+#     deps = ["//otherlibs/unix:Unix_cmi"],
+#     stdlib_deps   = ["//stdlib:Stdlib_cmi"]
+# )
 
 # compiler_module(
 #     name   = "ThreadUnix",
@@ -198,12 +200,18 @@ cc_library(
         "//platform:windows_x86_32?": ["st_win32.h"],
         "//conditions:default":      ["st_posix.h"]
     }),
-    copts = [
-        "-I", "$(GENDIR)/runtime/caml/cross-compile", ##HACK for xcompile
-        # "-I", "runtime"
-    ],
+    copts = ["-I", "runtime",
+             "-I", "runtime/caml",
+             "-I$(GENDIR)",
+             "-I$(GENDIR)/runtime",
+             "-I$(GENDIR)/runtime/caml",
+             ],
     linkopts = ["-lpthread"],
-    deps = ["//runtime/caml:hdrs"],
+    deps = [
+        "//runtime/caml:hdrs",
+        "//runtime/caml:domain_state_h",
+        "//runtime/caml:fail_h",
+    ],
     defines = [
         ## for now, just hardcode it
         # "TARGET_" + ARCH,
