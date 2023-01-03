@@ -149,6 +149,10 @@ def signature_impl(ctx, module_name):
 
     for dep in ctx.attr.deps:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
+
+    if hasattr(ctx.attr, "struct_deps"):
+        for dep in ctx.attr.struct_deps:
+            depsets = aggregate_deps(ctx, dep, depsets, manifest)
         # if len(ctx.attr.stdlib_deps) < 1:
         # if dep.label.package == "stdlib":
         #     if dep.label.name in ["Primitives", "Stdlib"]:

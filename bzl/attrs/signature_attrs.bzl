@@ -1,4 +1,6 @@
-load("//bzl:providers.bzl", "StdlibSigMarker", "CompilerSigMarker")
+load("//bzl:providers.bzl",
+     "CompilerMarker",
+     "StdlibSigMarker", "CompilerSigMarker")
 
 
 #######################
@@ -76,6 +78,11 @@ def signature_attrs():
         stdlib_deps = attr.label_list(
             doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
             providers = [StdlibSigMarker]
+        ),
+
+        struct_deps = attr.label_list(
+            doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
+            providers = [CompilerMarker] #FIXME: CompilerStructMarker
         ),
 
         deps = attr.label_list(

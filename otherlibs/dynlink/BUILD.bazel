@@ -255,8 +255,8 @@ compiler_signature(
     name = "Dynlink_common_cmi",
     src  = "dynlink_common.mli",
     opts = SIG_OPTS,
-    deps   = [
-        ":Dynlink_platform_intf_cmi",
+    struct_deps   = [
+        ":Dynlink_platform_intf",
     ],
     stdlib_deps = [
         "//stdlib:Stdlib.Obj_cmi",
@@ -267,7 +267,7 @@ compiler_signature(
 compiler_module(
     name   = "Dynlink_platform_intf",
     struct = "dynlink_platform_intf.ml",
-    sig = "Dynlink_platform_intf_cmi",
+    # sig = "Dynlink_platform_intf_cmi",
     opts = MODULE_OPTS,
     deps   = [
         ":Dynlink_types", ## (Otherlibs Dynlink Dynlink_types)
@@ -279,20 +279,21 @@ compiler_module(
     ],
 )
 
-compiler_signature(
-    name = "Dynlink_platform_intf_cmi",
-    src  = "dynlink_platform_intf.mli",
-    opts = SIG_OPTS,
-    deps   = [
-        ":Dynlink_types_cmi",
-    ],
-    stdlib_deps = [
-        # "//stdlib:Stdlib.Obj_cmi",
-        "//stdlib:Stdlib.Digest_cmi",
-        "//stdlib:Stdlib.Mutex_cmi",
-        "//stdlib:Stdlib.Obj_cmi",
-    ],
-)
+## WARNING: same file is used as both .ml and .mli!
+# compiler_signature(
+#     name = "Dynlink_platform_intf_cmi",
+#     src  = "dynlink_platform_intf.ml",
+#     opts = SIG_OPTS,
+#     deps   = [
+#         ":Dynlink_types_cmi",
+#     ],
+#     stdlib_deps = [
+#         # "//stdlib:Stdlib.Obj_cmi",
+#         "//stdlib:Stdlib.Digest_cmi",
+#         "//stdlib:Stdlib.Mutex_cmi",
+#         "//stdlib:Stdlib.Obj_cmi",
+#     ],
+# )
 
 #################
 compiler_module(
