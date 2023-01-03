@@ -80,8 +80,8 @@ run_ocamllex = rule(
             allow_single_file = True,
             default = "//toolchain:ocamlrun",
             executable = True,
-            cfg = "exec"
-            # cfg = reset_cc_config_transition
+            # cfg = "exec"
+            cfg = reset_cc_config_transition
         ),
         src = attr.label(
             doc = "A single .mll source file label",
@@ -101,9 +101,9 @@ run_ocamllex = rule(
 
         _protocol = attr.label(default = "//config/build/protocol"),
 
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
 
         _rule = attr.string( default = "run_ocamllex" )
     ),

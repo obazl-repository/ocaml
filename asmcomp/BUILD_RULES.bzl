@@ -79,13 +79,13 @@ run_cvt_emit = rule(
             allow_single_file = True,
             default = "//toolchain:ocamlrun",
             executable = True,
-            cfg = "exec"
-            # cfg = reset_cc_config_transition
+            # cfg = "exec"
+            cfg = reset_cc_config_transition
         ),
 
         "_protocol" : attr.label(default = "//config/build/protocol"),
-        # "_allowlist_function_transition": attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
 
     },
     # toolchains = ["//toolchain/type:boot",

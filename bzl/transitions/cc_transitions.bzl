@@ -22,7 +22,9 @@
 
 ## same config everytime, should mean only one build?
 def _reset_cc_config_transition_impl(settings, attr):
-    # print("reset_cc_config_transition: %s" % attr.name)
+    debug = True
+    if debug:
+        print("reset_cc_config_transition: %s" % attr.name)
 
     return {
         "//command_line_option:host_compilation_mode": "opt",
@@ -35,9 +37,9 @@ def _reset_cc_config_transition_impl(settings, attr):
         "//config/target/executor": "null",
         "//config/target/emitter" : "null",
 
-        # "//toolchain:compiler" : "//boot:ocamlc.boot",
+        "//toolchain:compiler" : "//boot:ocamlc.boot",
         "//toolchain:ocamlrun" : "//runtime:ocamlrun",
-        "//toolchain:runtime"  : "//runtime:asmrun",
+        # "//toolchain:runtime"  : "//runtime:asmrun",
         # "//toolchain:cvt_emit" : "//:BUILD.bazel",
     }
 
@@ -56,9 +58,8 @@ reset_cc_config_transition = transition(
         "//config/target/executor",
         "//config/target/emitter",
 
-        # "//toolchain:compiler",
-        "//toolchain:runtime",
+        "//toolchain:compiler",
         "//toolchain:ocamlrun",
-        # "//toolchain:cvt_emit"
+        # "//toolchain:runtime",
     ]
 )
