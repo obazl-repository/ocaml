@@ -24,7 +24,7 @@ TRANSITION_CONFIGS = [
 
 ################################################################
 ################################################################
-def _t_ocamlc_byte_in_transition_impl(settings, attr):
+def _test_ocamlc_byte_in_transition_impl(settings, attr):
     protocol = "test"
     config_executor = "vm"
     config_emitter  = "vm"
@@ -41,25 +41,25 @@ def _t_ocamlc_byte_in_transition_impl(settings, attr):
     }
 
 ####
-t_ocamlc_byte_in_transition = transition(
-    implementation = _t_ocamlc_byte_in_transition_impl,
+test_ocamlc_byte_in_transition = transition(
+    implementation = _test_ocamlc_byte_in_transition_impl,
     inputs  = TRANSITION_CONFIGS,
     outputs = TRANSITION_CONFIGS
 )
 
 ########
-def _t_ocamlc_byte_impl(ctx):
+def _test_ocamlc_byte_impl(ctx):
 
     if not ctx.label.name.endswith(".byte"):
-        fail("Target name for rule t_ocamlc_byte must end in '.byte'")
+        fail("Target name for rule test_ocamlc_byte must end in '.byte'")
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     return executable_impl(ctx, tc, "ocamlc.byte", tc.workdir)
 
 #####################
-t_ocamlc_byte = rule(
-    implementation = _t_ocamlc_byte_impl,
+test_ocamlc_byte = rule(
+    implementation = _test_ocamlc_byte_impl,
     doc = "Builds a compiler",
 
     attrs = dict(
@@ -67,9 +67,9 @@ t_ocamlc_byte = rule(
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-        _rule = attr.string( default = "t_ocamlc_byte" ),
+        _rule = attr.string( default = "test_ocamlc_byte" ),
     ),
-    cfg = t_ocamlc_byte_in_transition,
+    cfg = test_ocamlc_byte_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -79,7 +79,7 @@ t_ocamlc_byte = rule(
 
 ################################################################
 ################################################################
-def _t_ocamlopt_byte_in_transition_impl(settings, attr):
+def _test_ocamlopt_byte_in_transition_impl(settings, attr):
     protocol = "test"
     config_executor = "sys"
     config_emitter  = "vm"
@@ -94,16 +94,16 @@ def _t_ocamlopt_byte_in_transition_impl(settings, attr):
     }
 
 ####
-t_ocamlopt_byte_in_transition = transition(
-    implementation = _t_ocamlopt_byte_in_transition_impl,
+test_ocamlopt_byte_in_transition = transition(
+    implementation = _test_ocamlopt_byte_in_transition_impl,
     inputs  = TRANSITION_CONFIGS,
     outputs = TRANSITION_CONFIGS
 )
 
 ##############################
-def _t_ocamlopt_byte_impl(ctx):
+def _test_ocamlopt_byte_impl(ctx):
     if not ctx.label.name.endswith(".byte"):
-        fail("Target name for rule t_ocamlopt_byte must end in '.byte'")
+        fail("Target name for rule test_ocamlopt_byte must end in '.byte'")
     tc = ctx.toolchains["//toolchain/type:ocaml"]
     if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamloptx.byte"
@@ -113,8 +113,8 @@ def _t_ocamlopt_byte_impl(ctx):
 
 ################################################################
 #####################
-t_ocamlopt_byte = rule(
-    implementation = _t_ocamlopt_byte_impl,
+test_ocamlopt_byte = rule(
+    implementation = _test_ocamlopt_byte_impl,
     doc = "Builds a compiler",
 
     attrs = dict(
@@ -122,9 +122,9 @@ t_ocamlopt_byte = rule(
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-        _rule = attr.string( default = "t_ocamlopt_byte" ),
+        _rule = attr.string( default = "test_ocamlopt_byte" ),
     ),
-    cfg = t_ocamlopt_byte_in_transition,
+    cfg = test_ocamlopt_byte_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -134,7 +134,7 @@ t_ocamlopt_byte = rule(
 
 ################################################################
 ################################################################
-def _t_ocamlopt_opt_in_transition_impl(settings, attr):
+def _test_ocamlopt_opt_in_transition_impl(settings, attr):
     protocol = "test"
     config_executor = "sys"
     config_emitter  = "sys"
@@ -149,16 +149,16 @@ def _t_ocamlopt_opt_in_transition_impl(settings, attr):
     }
 
 ####
-t_ocamlopt_opt_in_transition = transition(
-    implementation = _t_ocamlopt_opt_in_transition_impl,
+test_ocamlopt_opt_in_transition = transition(
+    implementation = _test_ocamlopt_opt_in_transition_impl,
     inputs  = TRANSITION_CONFIGS,
     outputs = TRANSITION_CONFIGS
 )
 
 ##############################
-def _t_ocamlopt_opt_impl(ctx):
+def _test_ocamlopt_opt_impl(ctx):
     if not ctx.label.name.endswith(".opt"):
-        fail("Target name for rule t_ocamlopt_opt must end in '.opt'")
+        fail("Target name for rule test_ocamlopt_opt must end in '.opt'")
     tc = ctx.toolchains["//toolchain/type:ocaml"]
     if tc.flambda[BuildSettingInfo].value:
         exe_name = "ocamloptx.optx"
@@ -167,8 +167,8 @@ def _t_ocamlopt_opt_impl(ctx):
     return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 #####################
-t_ocamlopt_opt = rule(
-    implementation = _t_ocamlopt_opt_impl,
+test_ocamlopt_opt = rule(
+    implementation = _test_ocamlopt_opt_impl,
     doc = "Builds a compiler",
 
     attrs = dict(
@@ -176,9 +176,9 @@ t_ocamlopt_opt = rule(
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-        _rule = attr.string( default = "t_ocamlopt_opt" ),
+        _rule = attr.string( default = "test_ocamlopt_opt" ),
     ),
-    cfg = t_ocamlopt_opt_in_transition,
+    cfg = test_ocamlopt_opt_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -188,7 +188,7 @@ t_ocamlopt_opt = rule(
 
 ################################################################
 ################################################################
-def _t_ocamlc_opt_in_transition_impl(settings, attr):
+def _test_ocamlc_opt_in_transition_impl(settings, attr):
     protocol = "test"
     # we use ocamlopt.opt to build ocamlc.opt
     config_executor = "sys"
@@ -204,17 +204,17 @@ def _t_ocamlc_opt_in_transition_impl(settings, attr):
     }
 
 ####
-t_ocamlc_opt_in_transition = transition(
-    implementation = _t_ocamlc_opt_in_transition_impl,
+test_ocamlc_opt_in_transition = transition(
+    implementation = _test_ocamlc_opt_in_transition_impl,
     inputs  = TRANSITION_CONFIGS,
     outputs = TRANSITION_CONFIGS
 )
 
 ##############################
-def _t_ocamlc_opt_impl(ctx):
+def _test_ocamlc_opt_impl(ctx):
 
     if not ctx.label.name.endswith(".opt"):
-        fail("Target name for rule t_ocamlc_opt must end in '.opt'")
+        fail("Target name for rule test_ocamlc_opt must end in '.opt'")
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
@@ -226,8 +226,8 @@ def _t_ocamlc_opt_impl(ctx):
     return executable_impl(ctx, tc, exe_name, tc.workdir)
 
 #####################
-t_ocamlc_opt = rule(
-    implementation = _t_ocamlc_opt_impl,
+test_ocamlc_opt = rule(
+    implementation = _test_ocamlc_opt_impl,
     doc = "Builds a compiler",
 
     attrs = dict(
@@ -235,9 +235,9 @@ t_ocamlc_opt = rule(
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-        _rule = attr.string( default = "t_ocamlc_opt" ),
+        _rule = attr.string( default = "test_ocamlc_opt" ),
     ),
-    cfg = t_ocamlc_opt_in_transition,
+    cfg = test_ocamlc_opt_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -401,7 +401,7 @@ t_ocamlc_opt = rule(
 #                     visibility = ["//visibility:public"],
 #                     **kwargs):
 
-#     t_ocamlc_byte(
+#     test_ocamlc_byte(
 #         name = "ocamlc.byte",
 #         prologue = select({
 #             "//config/ocaml/compiler/libs:archived?": ["//stdlib"],

@@ -586,8 +586,8 @@ def executable_impl(ctx, tc, exe_name,
                           "ocamloptx_optx", "ocamlc_optx",
                           "ocamloptx_byte", "ocamlopt_optx",
 
-                          "t_ocamlc_byte", "t_ocamlopt_byte",
-                          "t_ocamlopt_opt", "t_ocamlc_opt",
+                          "test_ocamlc_byte", "test_ocamlopt_byte",
+                          "test_ocamlopt_opt", "test_ocamlc_opt",
                           ]:
         exe_provider = OcamlExecutableMarker()
     elif ctx.attr._rule == "baseline_compiler":

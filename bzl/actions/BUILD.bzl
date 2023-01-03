@@ -17,8 +17,8 @@ def rule_mnemonic(ctx):
                   "boot_ocamlopt_opt", "boot_ocamlc_opt"]:
         mnemonic = "LinkBootCompiler"
 
-    elif rule in ["t_ocamlc_byte", "t_ocamlopt_byte",
-                  "t_ocamlopt_opt", "t_ocamlc_opt"]:
+    elif rule in ["test_ocamlc_byte", "test_ocamlopt_byte",
+                  "test_ocamlopt_opt", "test_ocamlc_opt"]:
         mnemonic = "LinkTestCompiler"
 
     elif rule in ["build_tool_vm", "ocaml_tool_vm"]:
