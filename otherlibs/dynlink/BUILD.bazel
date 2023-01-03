@@ -411,11 +411,11 @@ compiler_library(
 ## resolver
 compiler_module(
     name   = "Dynlink_compilerlibs",
+    struct = "dynlink_compilerlibs.ml",
     opts = MODULE_OPTS + [
         "-no-alias-deps",
         "-w", "-49",
     ],
-    struct = "Dynlink_compilerlibs.ml",
     stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
