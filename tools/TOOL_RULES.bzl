@@ -119,7 +119,11 @@ def _ocaml_tool_vm_in_transition_impl(settings, attr):
     if protocol == "std":
         config_executor = "sys"
         config_emitter  = "vm"
-        compiler = "//boot:ocamlc.boot"
+        # WARNING: some tools (lintapidiff) need to link to c code,
+        # which is disallowed for the boot compiler. So we cannot build
+        # them directly from boot:ocamlc.boot.
+        # I.e. we can only do that for the compilers, not for tools.
+        compiler = "//boot:ocamlc.byte" ## fast enough
         ocamlrun = "//runtime:ocamlrun"
         runtime  = "//runtime:camlrun"
 
@@ -229,7 +233,7 @@ def _ocaml_tool_sys_in_transition_impl(settings, attr):
     if protocol == "std":  ## default
         config_executor = "sys"
         config_emitter  = "sys"
-        compiler = "//bin:ocamlopt.opt"
+        compiler = "//bin:ocamlopt.byte" # quickest std build
         runtime  = "//runtime:asmrun"
 
     elif protocol == "boot":

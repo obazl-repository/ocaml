@@ -70,7 +70,7 @@ cc_library(
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
     }) + select({
-        ":fastbuild?": [
+        "//config:macos_fastbuild?": [
             # Bazel adds -DDEBUG on macos; why?
             "-UDEBUG"
         ],

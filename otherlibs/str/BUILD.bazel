@@ -1,5 +1,6 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
+     # "boot_archive",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -7,18 +8,37 @@ load("//bzl:rules.bzl",
 MODULE_OPTS = []
 SIG_OPTS    = []
 
+## CAVEAT! on mac, bazel sets -DDEBUG for fastbuild but not opt and
+## this controls caml_failed_assert in runtime/caml/misc.h so if you
+## build otherlibs/[unix|str] and runtime:camlrun in different modes you may
+## see this:
+# Undefined symbols for architecture x86_64:
+#   "_caml_failed_assert", referenced from:
+#       _caml_run_command in librun_stubs.a(run_stubs.o)
+#       _caml_unix_accept in libunix.a(accept_unix.o)
+
+# or for otherlibs/str:
+# Undefined symbols for architecture x86_64:
+#   "_caml_failed_assert", referenced from:
+#       _re_replacement_text in libcamlstr.a(strstubs.o)
+
+## this can happen because we always build the runtimes with compile
+## mode opt.
+
+
 # LIBNAME=str
 # COBJS=strstubs.$(O)
 # CLIBNAME=camlstr
 # CAMLOBJS=str.cmo
 
-boot_archive(  ## mklib -o
+compiler_library(  ## mklib -o
     name = "str",
     opts = ["-linkall"],
     manifest = [
         ":Str",
     ],
-    cc_deps = {":camlstr" : "shared"}
+    # cc_deps = {":camlstr" : "shared"},
+    visibility = ["//tools:__pkg__"]
 )
 
 # ../../ocamlc.opt -nostdlib -I ../../stdlib -c -absname -w +a-4-9-41-42-44-45-48 -warn-error +A -bin-annot -g -safe-string -strict-sequence -strict-formats  str.ml
@@ -28,6 +48,7 @@ compiler_module(
     struct = "str.ml",
     sig    = "Str_cmi",
     opts = MODULE_OPTS,
+    deps = [":camlstr"],
     stdlib_deps   = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Buffer",
@@ -74,12 +95,22 @@ cc_library(
         "//runtime/caml:s.h",
         "//runtime/caml:signals.h",
     ],
-    copts = ["-I", "runtime",
-             "-I", "runtime/caml",
-             "-I$(GENDIR)",
-             "-I$(GENDIR)/runtime",
-             "-I$(GENDIR)/runtime/caml",
-             ],
+    copts = [
+        "-I", "runtime",
+        "-I", "runtime/caml",
+        "-I$(GENDIR)",
+        "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
+    ] + select({
+        # DO NOT FORGET THIS! Without it we get
+        # Undefined symbol "_caml_failed_assert",
+        # because libasmrun.a is always built with -c opt,
+        # which does NOT define -DDEBUG,
+        # and this file may be compiled with -c fastbuild, and
+        # Bazel adds -DDEBUG on macos under fastbuild (a bug)
+        "//config:macos_fastbuild?": ["-UDEBUG"],
+        "//conditions:default":  []
+    }),
     hdrs = ["//runtime/caml:domain_state.h"],
     deps= [
         # "//runtime/caml:hdrs",

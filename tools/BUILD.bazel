@@ -383,11 +383,87 @@ compiler_module(
 # lintapidiff.opt$(EXE): INCLUDES+= -I $(ROOTDIR)/otherlibs/str
 # lintapidiff.opt$(EXE): $(LINTAPIDIFF)
 # 	$(CAMLOPT_CMD) $(LINKFLAGS) -I $(ROOTDIR) -o $@ $(LINTAPIDIFF)
+################################################################
+ocaml_tools(
+    name = "lintapidiff",
+    prologue = select({
+        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
+        "//conditions:default": []
+    }) + [
+        "//compilerlibs:ocamlcommon",
+        "//bytecomp:ocamlbytecomp",
+        "//middle_end:ocamlmiddleend",
+        "//otherlibs/str"
+    ],
+    main = ":Lintapidiff",
+)
+
+compiler_module(
+    name   = "Lintapidiff",
+    struct = "lintapidiff.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        "//driver:Pparse",
+        "//otherlibs/str:Str",
+        "//parsing:Location",
+        "//parsing:Parse",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Printtyp",
+        "//utils:Misc",
+    ],
+    sig_deps = ["//parsing:Parsetree_cmi"],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Result",
+        "//stdlib:Stdlib.Scanf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ],
+)
 
 ################
 # checkstack tool
 # checkstack$(EXE): checkstack.$(O)
 # 	$(MKEXE) $(OUTPUTEXE)$@ $<
+OPTIMIZATION_FLAGS = select({
+    "//config/compilation_mode:dbg?": ["-O0", "-g3"], # -Wall -Werror
+    "//conditions:default": []
+})
+
+cc_binary(
+    name = "checkstack",
+    # linkstatic = True,
+    srcs = [
+        "checkstack.c"
+    ],
+    copts = [
+        # zig: warning: '-x c' after last input file has no effect [-Wunused-command-line-argument]
+        # "-x", "c",
+    ] + select({
+        "//platform/os:macos?": ["-std=c11"],
+        "//platform/os:linux?": [],
+        "//conditions:default":  ["-std=c11"]
+    }) + select({
+        "//config/compilation_mode:fastbuild?": ["-UDEBUG"], # macos/bazel
+        "//conditions:default":  []
+    }) + select({
+        # mac zig: ["-Wno-deprecated-non-prototype"],
+        "//conditions:default":  []
+    # }) + select({
+    #     ":INSTR_TRACE?": ["-DINSTR_TRACE"],
+    #     "//conditions:default":  []
+    }) + OPTIMIZATION_FLAGS,
+    linkopts = select({
+        "//platform/target/os:linux?": ["-lm", "-ldl", "-lpthread"],
+        "//conditions:default": []
+    }),
+    visibility = ["//visibility:public"],
+)
 
 ################
 #Scan latex files, and run ocaml code examples
@@ -512,246 +588,6 @@ compiler_module(
 #     ],
 # # )
 
-# lintapidiff.ml", line 41, characters 15-29:
-# 41 | module IdMap = Misc.StringMap
-#                     ^^^^^^^^^^^^^^
-# Error: Unbound module Misc.StringMap
-# compiler_module(
-#     name   = "Lintapidiff.opt",
-#     mode   = "native",
-#     struct = "lintapidiff.ml",
-#     opts = MODULE_OPTS,
-#     deps   = [
-#         "//driver:Pparse",
-#         "//otherlibs/str:Str",
-#         "//parsing:Location",
-#         "//parsing:Parse",
-#         "//parsing:Parsetree_cmi",
-#         "//stdlib:Stdlib.Array",
-#         "//stdlib:Stdlib.Filename",
-#         "//stdlib:Stdlib.Format",
-#         "//stdlib:Stdlib.List",
-#         "//stdlib:Stdlib.Printf",
-#         "//stdlib:Stdlib.Scanf",
-#         "//stdlib:Stdlib.String",
-#         "//stdlib:Stdlib.Sys",
-#         "//typing:Ident",
-#         "//typing:Path",
-#         "//typing:Printtyp",
-#         "//utils:Misc",
-#     ],
-# # )
-
-compiler_module(
-    name   = "Objinfo",
-    struct = "objinfo.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//bytecomp:Bytesections",
-        "//bytecomp:Symtable",
-        "//middle_end/flambda:Export_info",
-        "//middle_end:Compilation_unit",
-        "//middle_end:Linkage_name",
-        "//middle_end:Printclambda",
-        "//middle_end:Symbol",
-        "//typing:Ident",
-        "//utils:Binutils",
-        "//utils:Misc",
-    ],
-    sig_deps = [
-        "//file_formats:Cmi_format_cmi",
-        "//file_formats:Cmo_format_cmi",
-        "//file_formats:Cmt_format_cmi",
-        "//file_formats:Cmx_format_cmi",
-        "//file_formats:Cmxs_format_cmi",
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
-    ]
-)
-
-compiler_module(
-    name   = "Ocamlcmt",
-    struct = "ocamlcmt.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//driver:Compmisc",
-        "//file_formats:Cmt_format",
-        "//parsing:Location",
-        "//parsing:Pprintast",
-        "//typing:Cmt2annot",
-        "//typing:Envaux",
-        "//typing:Stypes",
-        "//typing:Untypeast",
-        "//utils:Clflags",
-        "//utils:Load_path",
-        # "//typing:Annot_cmi",
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Digest",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
-    ]
-)
-
-compiler_module(
-    name   = "Ocamlcp",
-    struct = "ocamlcp.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//driver:Compenv",
-        "//driver:Main_args",
-        ":Ocamlcp_common"
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
-    ]
-)
-
-compiler_module(
-    name   = "Ocamlcp_common",
-    struct = "ocamlcp_common.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//driver:Main_args",
-    ],
-)
-
-compiler_module(
-    name   = "Ocamlmklib",
-    struct = "ocamlmklib.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//config:Config",
-        "//utils:Misc",
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Stack",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
-    ]
-)
-
-compiler_module(
-    name   = "Ocamlmktop",
-    struct = "ocamlmktop.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//config:Config",
-        "//utils:Ccomp",
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Sys",
-    ]
-)
-
-compiler_module(
-    name   = "Ocamloptp",
-    struct = "ocamloptp.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//driver:Compenv",
-        "//driver:Main_args",
-        ":Ocamlcp_common"
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
-    ]
-)
-
-compiler_module(
-    name   = "Primreq",
-    struct = "primreq.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//config:Config",
-        "//utils:Misc",
-    ],
-    sig_deps = ["//file_formats:Cmo_format_cmi"],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.List",
-    ]
-)
-
-compiler_module(
-    name   = "Profiling",
-    struct = "profiling.ml",
-    sig    = "Profiling_cmi",
-    opts = MODULE_OPTS,
-    stdlib_deps   = [
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Sys",
-    ],
-)
-
-compiler_signature(
-    name = "Profiling_cmi",
-    src  = "profiling.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ],
-)
-
-# ../boot/ocamlrun ../boot/ocamlc
-compiler_module(
-    name   = "Stripdebug",
-    struct = "stripdebug.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//bytecomp:Bytesections",
-        "//utils:Misc",
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Sys",
-    ]
-)
 
 ################
 # Compare two bytecode executables

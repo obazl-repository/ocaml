@@ -25,12 +25,19 @@ load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
      "merge_depsets")
 
+load("//bzl/rules/common:impl_ccdeps.bzl",
+     "extract_cclibs",
+     "dump_CcInfo", "ccinfo_to_string")
+
+load("//bzl:functions.bzl", "filestem")
+
 #########################
 def executable_impl(ctx, tc, exe_name,
                     workdir ##FIXME: remove
                     ):
 
     debug = False
+    debug_ccdeps = True
 
     if debug:
         print("EXECUTABLE TARGET: {kind}: {tgt}".format(
@@ -138,6 +145,11 @@ def executable_impl(ctx, tc, exe_name,
         transitive = [merge_depsets(depsets, "archived_cmx")]
     )
 
+    ccInfo_provider = cc_common.merge_cc_infos(
+        cc_infos = depsets.ccinfos
+            # cc_infos = cc_deps_primary + cc_deps_secondary
+    )
+
     paths_depset  = depset(
         order = dsorder,
         transitive = [merge_depsets(depsets, "paths")]
@@ -162,11 +174,14 @@ def executable_impl(ctx, tc, exe_name,
     cc_libdirs    = []
 
     runtime_path = None
+
+    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    stem = filestem(compiler)
+
     # if tc.config_executor == "sys":  ## target_executor
-    if tc.compiler[DefaultInfo].files_to_run.executable.basename in [
-        "ocamlopt.opt", "ocamlopt.byte",
-        "ocamloptx.optx", "ocamloptx.byte"
-    ]:
+    # if compiler.basename in ["ocamlopt.opt", "ocamlopt.byte",
+    #                          "ocamloptx.optx", "ocamloptx.byte"]:
+    if stem in ["ocamlc", "ocamlcp"]:
 
         ## if target_executor(tc) == "sys"
 
@@ -186,8 +201,10 @@ def executable_impl(ctx, tc, exe_name,
         # print("tc.RUNTIME: %s" % tc.runtime.path)
 
         ## FIXME: linux: pick .a or .pic.a???
-        runtime_path = tc.runtime.path
 
+        # make sure -lcamlrun can be resolved
+
+        runtime_path = tc.runtime.path
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
         ## NB: Asmlink looks for libasmrun.a in the std search
         ## space (-I dirs), not the link srch space (-L dirs)
@@ -211,6 +228,9 @@ def executable_impl(ctx, tc, exe_name,
         # will add -L<f.dirname> below
         # cc_libdirs.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
         cc_libdirs.append(tc.runtime.dirname)
+    else:
+        runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
+        runtime_path = tc.runtime.path
 
     (_options, cancel_opts) = get_options(rule, ctx)
     # print("_options: %s" % _options)
@@ -315,8 +335,6 @@ def executable_impl(ctx, tc, exe_name,
         transitive = [cli_link_deps_depset]
     )
 
-    compiler = tc.compiler[DefaultInfo].files_to_run.executable
-
     # if tc.config_executor in ["boot", "baseline", "vm"]:
     if compiler.basename in [
         "ocamlc.boot",
@@ -368,7 +386,6 @@ def executable_impl(ctx, tc, exe_name,
     for d in cc_libdirs:
         args.add_all(["-ccopt", "-L" + d])
 
-    ## FIXME: for ocamlcc we do not need this?
     if ctx.attr.cc_deps:
         for f in ctx.files.cc_deps:
             # args.add_all(["-ccopt", "-L" + f.path])
@@ -420,8 +437,57 @@ def executable_impl(ctx, tc, exe_name,
     if not pervasives:
         args.add_all(ctx.files._std_exit)
 
-    if runtime_path:
-        args.add(runtime_path)
+    if debug_ccdeps:
+        dump_CcInfo(ctx, ccInfo_provider)
+        print("x: %s" % ccinfo_to_string(ctx, ccInfo_provider))
+        print("Module provides: %s" % ccInfo_provider)
+    ## to construct cmd line we need to extract the cc files from
+    ## merged CcInfo provider:
+    [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
+    if debug_ccdeps:
+        print("static_cc_deps:  %s" % static_cc_deps)
+        print("dynamic_cc_deps: %s" % dynamic_cc_deps)
+
+    # from rules_ocaml:
+    cclib_linkpaths = []
+    ## FIXME: find a better way to determine target executor:
+    if stem in ["ocamlc", "ocamlcp"]:
+        if len(static_cc_deps) > 0:
+            args.add("-custom")
+            sincludes = []
+            for dep in static_cc_deps:
+                bn = dep.basename[3:] # drop initial 'lib'
+                bn = bn[:-2]  # drop final '.a'
+                args.add("-cclib", "-l" + bn)
+                # includes.append(dep.dirname)
+                sincludes.append("-L" + dep.dirname)
+            args.add_all(sincludes, before_each="-ccopt", uniquify=True)
+
+    # if target == "vm":
+    #     if ctx.attr.vm_runtime[OcamlVmRuntimeProvider].kind == "dynamic":
+    #         for cclib in dynamic_cc_deps:
+    #             print("dynamic ccdep...")
+    #     elif ctx.attr.vm_runtime[OcamlVmRuntimeProvider].kind == "static":
+    #         ...
+    # elif target == "sys"
+    #     vmlibs = [] ## we never need vmlibs for native code
+    #     ## this accomodates ml libs with cc deps
+    #     ## e.g. 'base' depends on libbase_stubs.a
+    #     for cclib in static_cc_deps:
+    #         # print("STATIC DEP: %s" % dep)
+    #         cclib_linkpaths.append("-L" + cclib.dirname)
+
+    ## works for tools:linkapidiff, but not in general?
+    ## need we use --ccopt, --cclib?
+    else:
+        if runtime_path:
+            args.add(runtime_path)
+
+        for cclib in static_cc_deps:
+            args.add(cclib.path)
+
+    #     cclib_linkpaths.append("-L" + cclib.dirname)
+    # args.add_all(cclib_linkpaths, before_each="-ccopt", uniquify=True)
 
     args.add("-o", out_exe)
 
@@ -474,6 +540,8 @@ def executable_impl(ctx, tc, exe_name,
         + [std_exit_files]
         + [depset(
              [tc.executable]
+        + static_cc_deps
+        + dynamic_cc_deps
             + ctx.files.prologue  #
             + ctx.files.epilogue
             # + ctx.files.stdlib

@@ -14,6 +14,7 @@ load("//bzl:providers.bzl",
 load("//bzl:functions.bzl", "get_module_name") #, "get_workdir")
 load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
+load("//bzl/rules/common:impl_ccdeps.bzl", "dump_CcInfo", "ccinfo_to_string")
 load("//bzl/rules/common:options.bzl", "get_options")
 
 ##############################################
@@ -37,6 +38,7 @@ def module_impl(ctx, module_name):
 
     debug = False
     debug_bootstrap = False
+    debug_ccdeps = False
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
@@ -431,6 +433,11 @@ def module_impl(ctx, module_name):
         transitive = [merge_depsets(depsets, "archived_cmx")]
     )
 
+    ccInfo_provider = cc_common.merge_cc_infos(
+        cc_infos = depsets.ccinfos
+            # cc_infos = cc_deps_primary + cc_deps_secondary
+    )
+
     paths_depset  = depset(
         order = dsorder,
         direct = [out_cm_.dirname],
@@ -741,6 +748,13 @@ def module_impl(ctx, module_name):
         paths    = paths_depset,
     )
     providers.append(bootProvider)
+
+    providers.append(ccInfo_provider)
+
+    if debug_ccdeps:
+        dump_CcInfo(ctx, ccInfo_provider)
+        print("x: %s" % ccinfo_to_string(ctx, ccInfo_provider))
+        print("Module provides: %s" % ccInfo_provider)
 
     if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):

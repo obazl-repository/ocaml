@@ -20,6 +20,10 @@ load("//bzl:providers.bzl",
 
 WARNING_FLAGS = "@1..3@5..28@30..39@43@46..47@49..57@61..62-40"
 
+def filestem(File):
+    ext = File.extension
+    return File.basename[:-(len(ext) + 1)]
+
 ###################################
 def submodule_from_label_string(s):
     """Derive module name from label string."""

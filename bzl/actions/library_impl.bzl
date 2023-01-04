@@ -12,6 +12,8 @@ load("//bzl/rules/common:DEPS.bzl",
      "aggregate_deps",
      "merge_depsets")
 
+load("//bzl/rules/common:impl_ccdeps.bzl", "dump_CcInfo", "ccinfo_to_string")
+
 ## Library targets do not produce anything, they just merge their deps
 ## and pass them on.
 
@@ -19,6 +21,8 @@ load("//bzl/rules/common:DEPS.bzl",
 def library_impl(ctx):
 
     debug = False
+    debug_ccdeps = False
+
     # print("**** NS_LIB {} ****************".format(ctx.label))
 
     # tc = ctx.exec_groups["boot"].toolchains["//toolchain/type:ocaml"]
@@ -36,6 +40,10 @@ def library_impl(ctx):
 
     for dep in ctx.attr.manifest:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
+
+    if hasattr(ctx.attr, "cc_deps"):
+        for dep in ctx.attr.cc_deps:
+            depsets = aggregate_deps(ctx, dep, depsets, manifest)
 
     ################################
     ## merge BootInfo deps
@@ -65,6 +73,11 @@ def library_impl(ctx):
     archived_cmx_depset = depset(
         order=dsorder,
         transitive = [merge_depsets(depsets, "archived_cmx")]
+    )
+
+    ccInfo_provider = cc_common.merge_cc_infos(
+        cc_infos = depsets.ccinfos
+            # cc_infos = cc_deps_primary + cc_deps_secondary
     )
 
     paths_depset  = depset(
@@ -118,10 +131,16 @@ def library_impl(ctx):
         paths    = paths_depset,
     )
 
+    if debug_ccdeps:
+        dump_CcInfo(ctx, ccInfo_provider)
+        print("x: %s" % ccinfo_to_string(ctx, ccInfo_provider))
+        print("Module provides: %s" % ccInfo_provider)
+
     providers = [
         defaultInfo,
         # outputGroupInfo,
         bootProvider,
+        ccInfo_provider,
         OcamlLibraryMarker(marker = "OcamlLibraryMarker")
     ]
 
