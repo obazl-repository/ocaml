@@ -19,10 +19,10 @@ load("//bzl/rules:COMPILER.bzl",
 
 load("//test/rules:TEST_RULES.bzl",
      # "tocaml_compilers",
-     "t_ocamlc_byte",
-     "t_ocamlopt_byte",
-     "t_ocamlopt_opt",
-     "t_ocamlc_opt")
+     "test_ocamlc_byte",
+     "test_ocamlopt_byte",
+     "test_ocamlopt_opt",
+     "test_ocamlc_opt")
 
 load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag", "string_setting")
@@ -32,8 +32,8 @@ bool_flag(name = "verbose", build_setting_default = False,
 config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 
 ################################################################
-#t_ocamlc_byte(name = "ocamlc.byte") # as a macro
-t_ocamlc_byte(
+#test_ocamlc_byte(name = "ocamlc.byte") # as a macro
+test_ocamlc_byte(
     name       = "ocamlc.byte",
     prologue   = OCAMLC_PROLOGUE,
     main       = OCAMLC_MAIN,
@@ -65,7 +65,7 @@ sh_binary(
 )
 
 ################################################################
-t_ocamlopt_byte(
+test_ocamlopt_byte(
     name       = "ocamlopt.byte",
     prologue   = OCAMLOPT_PROLOGUE,
     main       = OCAMLOPT_MAIN,
@@ -96,7 +96,7 @@ sh_binary(
 
 ################################################################
 ################
-t_ocamlopt_opt(
+test_ocamlopt_opt(
     name       = "ocamlopt.opt",
     prologue   = OCAMLOPT_PROLOGUE,
     main       = OCAMLOPT_MAIN,
@@ -106,7 +106,7 @@ t_ocamlopt_opt(
 
 ################################################################
 ################
-t_ocamlc_opt(
+test_ocamlc_opt(
     name       = "ocamlc.opt",
     prologue   = OCAMLC_PROLOGUE,
     main       = OCAMLC_MAIN,
