@@ -115,9 +115,11 @@ def _run_ocamldep_impl(ctx):
 
     runner = ctx.actions.declare_file(ctx.attr.name + ".runner")
 
-    for inc in ctx.attr.includes:
-        print("INC: %s" % inc)
-
+    ## NB: Bazel sets env var BUILD_WORKSPACE_DIRECTORY when you
+    ## `bazel run`; this is needed since the execution (launch) dir is
+    ## somewhere in Bazel's private area (run with --//tools:verbose
+    ## to see this). So this gets us the src directories relative to
+    ## the project root:
     includes = " ".join([
         "-I", "${BUILD_WORKSPACE_DIRECTORY}/stdlib",
         "-I", "${BUILD_WORKSPACE_DIRECTORY}/utils",
@@ -136,7 +138,7 @@ def _run_ocamldep_impl(ctx):
     ])
 
     if ctx.attr._verbose[BuildSettingInfo].value:
-        verbose = "set -x"
+        verbose = "echo PWD: $PWD; set -x;"
     else:
         verbose = ""
 
@@ -183,13 +185,6 @@ run_ocamldep = rule(
     attrs = dict(
         tool = attr.label(
             allow_single_file = True,
-        ),
-        includes = attr.string_list(
-            default = [
-                "asmcomp",
-                "bytecomp",
-                "stdlib"
-            ]
         ),
         arg = attr.label(
             # mandatory = True,
