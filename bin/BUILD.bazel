@@ -1,11 +1,33 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//bzl:rules.bzl",
-     "ocaml_compiler_r",
-     "std_ocaml_compilers")
-
 load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag", "string_setting")
+
+load("//bzl:rules.bzl",
+     "ocaml_compiler_r",
+     "compiler_module",
+     "std_ocaml_compilers", # macro
+     "std_ocamlc_byte",
+     "std_ocamlopt_byte",
+     "std_ocamlopt_opt",
+     "std_ocamlc_opt"
+     )
+
+load("//bzl/rules:COMPILER.bzl",
+     "OCAMLCP_PROLOGUE",
+     "OCAMLCP_MAIN",
+     "OCAMLOPTP_PROLOGUE",
+     "OCAMLOPTP_MAIN",
+     "OCAML_COMPILER_OPTS")
+
+
+load("//tools:TOOL_RULES.bzl",
+     "ocaml_tools",  ## macro
+     "tool_module",
+     "tool_signature"
+     )
+
+load("//config:WARNINGS.bzl", "w")
 
 exports_files(["ocamlcc.sh"])
 
@@ -117,7 +139,36 @@ sh_binary(
     ]
 )
 
+################################################################
+################################################################
+## Profiling compilers ocamlcp.byte, ocamlcp.opt, ocamloptp.byte, ocamloptp.opt
 
+std_ocamlc_byte(
+    name = "ocamlcp.byte",
+    prologue = OCAMLCP_PROLOGUE,
+    main = OCAMLCP_MAIN
+)
+
+std_ocamlc_opt(
+    name = "ocamlcp.opt",
+    prologue = OCAMLCP_PROLOGUE,
+    main = OCAMLCP_MAIN
+)
+
+# profiling compiler ocamloptp.byte, ocamloptp.opt
+std_ocamlopt_byte(
+    name = "ocamloptp.byte",
+    prologue = OCAMLOPTP_PROLOGUE,
+    main = OCAMLOPTP_MAIN
+)
+
+std_ocamlopt_opt(
+    name = "ocamloptp.opt",
+    prologue = OCAMLOPTP_PROLOGUE,
+    main = OCAMLOPTP_MAIN
+)
+
+################################################################
 ################################################################
 ## recursive builds. abandoned. they work, but at the cost of
 ## duplicated builds of some of the code.

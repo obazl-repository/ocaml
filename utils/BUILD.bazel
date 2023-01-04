@@ -163,6 +163,7 @@ compiler_module(
         "//stdlib:Stdlib.String",
     ],
     visibility = [
+        "//bin:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__"
     ]
@@ -230,6 +231,7 @@ compiler_module(
         "//stdlib:Stdlib.String",
     ],
     visibility = [
+        "//bin:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
@@ -266,6 +268,7 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//bin:__pkg__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
         "//otherlibs/dynlink:__pkg__",
@@ -303,6 +306,7 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__subpackages__",
+        "//bin:__subpackages__",
         "//bytecomp:__subpackages__",
         "//debugger:__pkg__",
         "//driver:__subpackages__",
@@ -643,6 +647,7 @@ compiler_module(
         "//stdlib:Stdlib.Set",
     ],
     visibility = [
+        "//bin:__pkg__",
         "//middle_end:__subpackages__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -739,6 +744,7 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//bin:__pkg__",
         "//bytecomp:__pkg__",
         "//debugger:__pkg__",
         "//driver:__pkg__",
@@ -773,6 +779,7 @@ compiler_module(
         "//stdlib:Stdlib.List",
     ],
     visibility = [
+        "//bin:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
         "//typing:__pkg__"
@@ -821,6 +828,7 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__subpackages__",
+        "//bin:__subpackages__",
         "//bytecomp:__pkg__",
         "//driver:__pkg__",
         "//debugger:__pkg__",
@@ -884,6 +892,7 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//bin:__pkg__",
         "//middle_end:__subpackages__",
         "//otherlibs/dynlink:__pkg__",
         "//tools:__pkg__",
@@ -931,6 +940,7 @@ compiler_module(
     ],
     visibility = [
         "//asmcomp:__pkg__",
+        "//bin:__pkg__",
         "//driver:__pkg__",
         "//middle_end/flambda:__pkg__",
         "//otherlibs/dynlink:__pkg__",
@@ -1024,6 +1034,7 @@ compiler_module(
         "//stdlib:Stdlib.Sys",
     ],
     visibility = [
+        "//bin:__pkg__",
         "//otherlibs/dynlink:__pkg__",
         "//parsing:__pkg__",
         "//tools:__pkg__",
@@ -1060,6 +1071,7 @@ compiler_module(
     ],
     visibility = [
         "//bytecomp:__pkg__",
+        "//bin:__pkg__",
         "//driver:__pkg__",
         "//lambda:__pkg__",
         "//parsing:__pkg__",

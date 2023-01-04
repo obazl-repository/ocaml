@@ -3,11 +3,18 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
+load("//bzl/rules:COMPILER.bzl",
+     "OCAMLC_PROLOGUE",
+     "OCAMLC_MAIN",
+     "OCAMLOPT_PROLOGUE",
+     "OCAMLOPT_MAIN",
+     "OCAML_COMPILER_OPTS")
+
 load(":ocaml_transitions.bzl",
      # "ocamlc_byte_in_transition",
-     "ocamlopt_byte_in_transition",
-     "ocamlopt_opt_in_transition",
-     "ocamlc_opt_in_transition",
+     "std_ocamlopt_byte_in_transition",
+     "std_ocamlopt_opt_in_transition",
+     "std_ocamlc_opt_in_transition",
      ## flambda:
      "ocamloptx_byte_in_transition",
      "ocamloptx_optx_in_transition",
@@ -66,9 +73,9 @@ def _std_ocamlc_byte_in_transition_impl(settings, attr):
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
     elif protocol == "test":
-        compiler = "@baseline//bin:ocamlc.byte"
-        runtime  = "@baseline//lib:asmrun"
-        cvt_emit = "@baseline//bin:cvt_emit.byte"
+        compiler = "@baseline//bin:ocamlc.opt"
+        runtime  = "@baseline//lib:camlrun"
+        # cvt_emit = "@baseline//bin:cvt_emit.byte"
 
     # elif protocol == "dev":
     #     ## use coldstart ocamlc.opt to build ocamlc.byte
@@ -98,7 +105,7 @@ def _std_ocamlc_byte_in_transition_impl(settings, attr):
         # "//toolchain:cvt_emit"  : cvt_emit
     }
 
-################################################################
+############################################
 _std_ocamlc_byte_in_transition = transition(
     implementation = _std_ocamlc_byte_in_transition_impl,
     inputs = [
@@ -119,63 +126,6 @@ _std_ocamlc_byte_in_transition = transition(
     ]
 )
 
-################################################################
-##############################
-def _ocaml_compiler_r_impl(ctx):
-
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
-
-    workdir = tc.workdir
-
-    executor = tc.config_executor
-    emitter  = tc.config_emitter
-
-    if executor == "boot":
-        exe_name = "ocamlc.byte"
-    elif executor == "baseline":
-        exe_name = "ocamlc.baseline"
-    elif executor == "vm":
-        if emitter == "vm":
-            exe_name = "ocamlc.byte"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.byte"
-        else:
-            fail("unknown emitter: %s" % emitter)
-    elif executor in ["sys"]:
-        if emitter in ["boot", "vm"]:
-            exe_name = "ocamlc.opt"
-        elif emitter == "sys":
-            exe_name = "ocamlopt.opt"
-        else:
-            fail("sys unknown emitter: %s" % emitter)
-    elif executor == "unspecified":
-        fail("unspecified executor: %s" % executor)
-    else:
-        fail("unknown executor: %s" % executor)
-
-    return executable_impl(ctx, tc, exe_name, workdir)
-
-#####################
-ocaml_compiler_r = rule(
-    implementation = _ocaml_compiler_r_impl,
-    doc = "Builds a compiler",
-
-    attrs = dict(
-        executable_attrs(),
-
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
-
-        _rule = attr.string( default = "ocaml_compiler" ),
-    ),
-    executable = True,
-    fragments = ["cpp"],
-    toolchains = ["//toolchain/type:ocaml",
-                  ## //toolchain/type:profile,",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
-)
-
 ##############################
 def _std_ocamlc_byte_impl(ctx):
 
@@ -184,7 +134,7 @@ def _std_ocamlc_byte_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    return executable_impl(ctx, tc, "ocamlc.byte", tc.workdir)
+    return executable_impl(ctx, tc, ctx.label.name, tc.workdir)
 
 #####################
 std_ocamlc_byte = rule(
@@ -206,24 +156,25 @@ std_ocamlc_byte = rule(
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
+################################################################
 ##############################
-def _ocamlopt_byte_impl(ctx):
+def _std_ocamlopt_byte_impl(ctx):
 
     if not ctx.label.name.endswith(".byte"):
-        fail("Target name for rule ocamlopt_byte must end in '.byte'")
+        fail("Target name for rule std_ocamlopt_byte must end in '.byte'")
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if tc.flambda[BuildSettingInfo].value:
-        exe_name = "ocamloptx.byte"
-    else:
-        exe_name = "ocamlopt.byte"
+    # if tc.flambda[BuildSettingInfo].value:
+    #     exe_name = "ocamloptx.byte"
+    # else:
+    #     exe_name = "ocamlopt.byte"
 
-    return executable_impl(ctx, tc, exe_name, tc.workdir)
+    return executable_impl(ctx, tc, ctx.label.name, tc.workdir)
 
 #####################
-ocamlopt_byte = rule(
-    implementation = _ocamlopt_byte_impl,
+std_ocamlopt_byte = rule(
+    implementation = _std_ocamlopt_byte_impl,
     doc = "Builds a compiler",
 
     attrs = dict(
@@ -231,9 +182,9 @@ ocamlopt_byte = rule(
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-        _rule = attr.string( default = "ocamlopt_byte" ),
+        _rule = attr.string( default = "std_ocamlopt_byte" ),
     ),
-    cfg = ocamlopt_byte_in_transition,
+    cfg = std_ocamlopt_byte_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -241,24 +192,25 @@ ocamlopt_byte = rule(
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
+################################################################
 ##############################
-def _ocamlopt_opt_impl(ctx):
+def _std_ocamlopt_opt_impl(ctx):
 
     if not ctx.label.name.endswith(".opt"):
-        fail("Target name for rule ocamlopt_opt must end in '.opt'")
+        fail("Target name for rule std_ocamlopt_opt must end in '.opt'")
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if tc.flambda[BuildSettingInfo].value:
-        exe_name = "ocamloptx.optx"
-    else:
-        exe_name = "ocamlopt.opt"
+    # if tc.flambda[BuildSettingInfo].value:
+    #     exe_name = "ocamloptx.optx"
+    # else:
+    #     exe_name = "ocamlopt.opt"
 
-    return executable_impl(ctx, tc, exe_name, tc.workdir)
+    return executable_impl(ctx, tc, ctx.label.name, tc.workdir)
 
 #####################
-ocamlopt_opt = rule(
-    implementation = _ocamlopt_opt_impl,
+std_ocamlopt_opt = rule(
+    implementation = _std_ocamlopt_opt_impl,
     doc = "Builds a compiler",
 
     attrs = dict(
@@ -266,9 +218,9 @@ ocamlopt_opt = rule(
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-        _rule = attr.string( default = "ocamlopt_opt" ),
+        _rule = attr.string( default = "std_ocamlopt_opt" ),
     ),
-    cfg = ocamlopt_opt_in_transition,
+    cfg = std_ocamlopt_opt_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -276,24 +228,25 @@ ocamlopt_opt = rule(
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
+################################################################
 ##############################
-def _ocamlc_opt_impl(ctx):
+def _std_ocamlc_opt_impl(ctx):
 
     if not ctx.label.name.endswith(".opt"):
-        fail("Target name for rule ocamlc_opt must end in '.opt'")
+        fail("Target name for rule std_ocamlc_opt must end in '.opt'")
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if tc.flambda[BuildSettingInfo].value:
-        exe_name = "ocamlc.optx"
-    else:
-        exe_name = "ocamlc.opt"
+    # if tc.flambda[BuildSettingInfo].value:
+    #     exe_name = "ocamlc.optx"
+    # else:
+    #     exe_name = "ocamlc.opt"
 
-    return executable_impl(ctx, tc, exe_name, tc.workdir)
+    return executable_impl(ctx, tc, ctx.label.name, tc.workdir)
 
 #####################
-ocamlc_opt = rule(
-    implementation = _ocamlc_opt_impl,
+std_ocamlc_opt = rule(
+    implementation = _std_ocamlc_opt_impl,
     doc = "Builds a compiler",
 
     attrs = dict(
@@ -301,9 +254,9 @@ ocamlc_opt = rule(
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-        _rule = attr.string( default = "ocamlc_opt" ),
+        _rule = attr.string( default = "std_ocamlc_opt" ),
     ),
-    cfg = ocamlc_opt_in_transition,
+    cfg = std_ocamlc_opt_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -467,153 +420,66 @@ def std_ocaml_compilers(name,
                     visibility = ["//visibility:public"],
                     **kwargs):
 
+    ## Standard Big Four
     std_ocamlc_byte(
         name = "ocamlc.byte",
-        prologue = select({
-            "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-            "//conditions:default": []
-        }) + [
-            "@//compilerlibs:ocamlcommon",
-            "@//bytecomp:ocamlbytecomp"
-        ],
-        main = "@//driver:Main",
-        opts = [ ] + select({
-            # ocamlc.byte: ["-compat-32"]
-        "//conditions:default": []
-        }) + [
-        ] + select({
-            "@//platform/target/os:linux?": [
-                "-cclib", "-lm",
-                "-cclib", "-ldl",
-                "-cclib", "-lpthread",
-            ],
-            "//conditions:default": []
-        }),
+        prologue   = OCAMLC_PROLOGUE,
+        main       = OCAMLC_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
         visibility             = ["//visibility:public"]
     )
 
-    ocamlopt_byte(
+    std_ocamlopt_byte(
         name = "ocamlopt.byte",
-        # stdlib   = "//stdlib",
-        prologue = select({
-            "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-            "//conditions:default": []
-        }) + [
-        "//compilerlibs:ocamlcommon",
-        "//asmcomp:ocamloptcomp"
-        ],
-        main = "//driver:Optmain",
-        opts = [ ] + select({
-            # ocamlc.byte: ["-compat-32"]
-        "//conditions:default": []
-        }) + [
-        ] + select({
-            "//platform/target/os:linux?": [
-                "-cclib", "-lm",
-                "-cclib", "-ldl",
-                "-cclib", "-lpthread",
-            ],
-            "//conditions:default": []
-        }),
+        prologue   = OCAMLOPT_PROLOGUE,
+        main       = OCAMLOPT_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
         visibility             = ["//visibility:public"]
     )
 
-    ocamlopt_opt(
+    std_ocamlopt_opt(
         name = "ocamlopt.opt",
-        ## The Bazel rules cannot infer the ordering of archive file
-        ## deps, so the following order must be maintained:
-        prologue = select({
-            "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-            "//conditions:default": []
-        }) + [
-            "//compilerlibs:ocamlcommon",
-            "//asmcomp:ocamloptcomp"
-        ],
-        main = "//driver:Optmain",
-        opts = [ ] + select({
-            "//platform/target/os:linux?": [
-                "-cclib", "-lm",
-                "-cclib", "-ldl",
-                "-cclib", "-lpthread",
-            ],
-            "//conditions:default": []
-        }),
+        prologue   = OCAMLOPT_PROLOGUE,
+        main       = OCAMLOPT_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
         visibility             = ["//visibility:public"]
     )
 
-    ocamlc_opt(
+    std_ocamlc_opt(
         name = "ocamlc.opt",
-        # stdlib   = "//stdlib",
-        prologue = [
-            "//compilerlibs:ocamlcommon",
-            "//bytecomp:ocamlbytecomp"
-        ],
-        main = "//driver:Main",
-        opts = [ ] + select({
-            "//platform/target/os:linux?": [
-                "-cclib", "-lm",
-                "-cclib", "-ldl",
-                "-cclib", "-lpthread",
-            ],
-            "//conditions:default": []
-        }),
+        prologue   = OCAMLC_PROLOGUE,
+        main       = OCAMLC_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
         visibility             = ["//visibility:public"]
     )
 
     ################################################################
-    ## flambda variants
+    ## Profiling variants
+
+    ################################################################
+    ## Flambda variants
 
     ocamloptx_byte(
         name = "ocamloptx.byte",
-        prologue = [
-            "//compilerlibs:ocamlcommon",
-            "//asmcomp:ocamloptcomp"
-        ],
-        main = "//driver:Optmain",
-        opts = [ ] + select({
-            "//platform/target/os:linux?": [
-                "-cclib", "-lm",
-                "-cclib", "-ldl",
-                "-cclib", "-lpthread",
-            ],
-            "//conditions:default": []
-        }),
-        visibility             = ["//visibility:public"]
+        prologue   = OCAMLOPT_PROLOGUE,
+        main       = OCAMLOPT_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
+        visibility = ["//visibility:public"]
     )
 
     ocamloptx_optx(
         name = "ocamloptx.optx",
-        prologue = [
-            "//compilerlibs:ocamlcommon",
-            "//asmcomp:ocamloptcomp"
-        ],
-        main = "//driver:Optmain",
-        opts = [ ] + select({
-            "//platform/target/os:linux?": [
-                "-cclib", "-lm",
-                "-cclib", "-ldl",
-                "-cclib", "-lpthread",
-            ],
-            "//conditions:default": []
-        }),
-        visibility             = ["//visibility:public"]
+        prologue   = OCAMLOPT_PROLOGUE,
+        main       = OCAMLOPT_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
+        visibility = ["//visibility:public"]
     )
 
     ocamlc_optx(
         name = "ocamlc.optx",
-        prologue = [
-            "//compilerlibs:ocamlcommon",
-            "//bytecomp:ocamlbytecomp"
-        ],
-        main = "//driver:Main",
-        opts = [ ] + select({
-            "//platform/target/os:linux?": [
-                "-cclib", "-lm",
-                "-cclib", "-ldl",
-                "-cclib", "-lpthread",
-            ],
-            "//conditions:default": []
-        }),
+        prologue   = OCAMLC_PROLOGUE,
+        main       = OCAMLC_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
         visibility             = ["//visibility:public"]
     )
 
@@ -623,18 +489,67 @@ def std_ocaml_compilers(name,
     ## (ocamlc.optx is already an optimized non-optimizing compiler)
     ocamlopt_optx(
         name = "ocamlopt.optx",
-        prologue = [
-            "//compilerlibs:ocamlcommon",
-            "//asmcomp:ocamloptcomp"
-        ],
-        main = "//driver:Optmain",
-        opts = [ ] + select({
-            "//platform/target/os:linux?": [
-                "-cclib", "-lm",
-                "-cclib", "-ldl",
-                "-cclib", "-lpthread",
-            ],
-            "//conditions:default": []
-        }),
+        prologue   = OCAMLOPT_PROLOGUE,
+        main       = OCAMLOPT_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
         visibility             = ["//visibility:public"]
     )
+
+################################################################
+################################################################
+## recursive rule - obsolete
+##############################
+def _ocaml_compiler_r_impl(ctx):
+
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
+
+    workdir = tc.workdir
+
+    executor = tc.config_executor
+    emitter  = tc.config_emitter
+
+    if executor == "boot":
+        exe_name = "ocamlc.byte"
+    elif executor == "baseline":
+        exe_name = "ocamlc.baseline"
+    elif executor == "vm":
+        if emitter == "vm":
+            exe_name = "ocamlc.byte"
+        elif emitter == "sys":
+            exe_name = "ocamlopt.byte"
+        else:
+            fail("unknown emitter: %s" % emitter)
+    elif executor in ["sys"]:
+        if emitter in ["boot", "vm"]:
+            exe_name = "ocamlc.opt"
+        elif emitter == "sys":
+            exe_name = "ocamlopt.opt"
+        else:
+            fail("sys unknown emitter: %s" % emitter)
+    elif executor == "unspecified":
+        fail("unspecified executor: %s" % executor)
+    else:
+        fail("unknown executor: %s" % executor)
+
+    return executable_impl(ctx, tc, exe_name, workdir)
+
+#####################
+ocaml_compiler_r = rule(
+    implementation = _ocaml_compiler_r_impl,
+    doc = "Builds a compiler",
+
+    attrs = dict(
+        executable_attrs(),
+
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
+
+        _rule = attr.string( default = "ocaml_compiler" ),
+    ),
+    executable = True,
+    fragments = ["cpp"],
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)

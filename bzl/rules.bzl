@@ -16,10 +16,10 @@ load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
 load("//bzl/rules:ocaml_compiler.bzl",
      _ocaml_compiler_r = "ocaml_compiler_r",
-     # _ocamlc_byte = "ocamlc_byte",
-     _ocamlopt_byte = "ocamlopt_byte",
-     _ocamlopt_opt = "ocamlopt_opt",
-     _ocamlc_opt = "ocamlc_opt",
+     _std_ocamlc_byte = "std_ocamlc_byte",
+     _std_ocamlopt_byte = "std_ocamlopt_byte",
+     _std_ocamlopt_opt = "std_ocamlopt_opt",
+     _std_ocamlc_opt = "std_ocamlc_opt",
      _std_ocaml_compilers = "std_ocaml_compilers")
 
 load("//bzl/rules:build_tool.bzl",
@@ -94,10 +94,10 @@ compiler_signature   = _compiler_signature
 # boot_ocaml_compilers      = _boot_ocaml_compilers
 
 ocaml_compiler_r          = _ocaml_compiler_r
-# ocamlc_byte               = _ocamlc_byte
-ocamlopt_byte             = _ocamlopt_byte
-ocamlopt_opt              = _ocamlopt_opt
-ocamlc_opt                = _ocamlc_opt
+std_ocamlc_byte               = _std_ocamlc_byte
+std_ocamlopt_byte             = _std_ocamlopt_byte
+std_ocamlopt_opt              = _std_ocamlopt_opt
+std_ocamlc_opt                = _std_ocamlc_opt
 std_ocaml_compilers           = _std_ocaml_compilers
 # ocaml_tool_r              = _ocaml_tool_r
 # ocaml_tools               = _ocaml_tools

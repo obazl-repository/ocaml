@@ -5,8 +5,8 @@ def rule_mnemonic(ctx):
     rule = ctx.attr._rule
     mnemonic = None
 
-    if rule in ["std_ocamlc_byte", "ocamlopt_byte",
-                  "ocamlopt_opt", "ocamlc_opt"]:
+    if rule in ["std_ocamlc_byte", "std_ocamlopt_byte",
+                  "std_ocamlopt_opt", "std_ocamlc_opt"]:
         mnemonic = "LinkStdCompiler"
 
     elif rule in ["ocamloptx_byte", "ocamloptx_optx",

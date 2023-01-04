@@ -354,10 +354,10 @@ ocaml_in_transition = transition(
 )
 
 ##########################################################
-def _ocamlopt_byte_in_transition_impl(settings, attr):
+def _std_ocamlopt_byte_in_transition_impl(settings, attr):
     debug = False
     if debug:
-        print("TRANSITION: ocamlopt_byte_in_transition: %s" % attr.name)
+        print("TRANSITION: std_ocamlopt_byte_in_transition: %s" % attr.name)
 
     protocol = settings["//config/build/protocol"]
 
@@ -436,8 +436,8 @@ def _ocamlopt_byte_in_transition_impl(settings, attr):
     }
 
 ################################################################
-ocamlopt_byte_in_transition = transition(
-    implementation = _ocamlopt_byte_in_transition_impl,
+std_ocamlopt_byte_in_transition = transition(
+    implementation = _std_ocamlopt_byte_in_transition_impl,
     inputs = [
         "//config/build/protocol",
         "//config/target/executor",
@@ -457,9 +457,9 @@ ocamlopt_byte_in_transition = transition(
 )
 
 ##########################################################
-def _ocamlopt_opt_in_transition_impl(settings, attr):
+def _std_ocamlopt_opt_in_transition_impl(settings, attr):
     debug = False
-    if debug: print("ocamlopt_opt_in_transition: %s" % attr.name)
+    if debug: print("std_ocamlopt_opt_in_transition: %s" % attr.name)
 
     protocol = settings["//config/build/protocol"]
 
@@ -519,8 +519,8 @@ def _ocamlopt_opt_in_transition_impl(settings, attr):
     }
 
 ################################################################
-ocamlopt_opt_in_transition = transition(
-    implementation = _ocamlopt_opt_in_transition_impl,
+std_ocamlopt_opt_in_transition = transition(
+    implementation = _std_ocamlopt_opt_in_transition_impl,
     inputs = [
         "//config/build/protocol",
         "//config/target/executor",
@@ -541,9 +541,9 @@ ocamlopt_opt_in_transition = transition(
 )
 
 ##########################################################
-def _ocamlc_opt_in_transition_impl(settings, attr):
+def _std_ocamlc_opt_in_transition_impl(settings, attr):
     debug = False
-    if debug: print("ocamlc_opt_in_transition: %s" % attr.name)
+    if debug: print("std_ocamlc_opt_in_transition: %s" % attr.name)
 
     protocol = settings["//config/build/protocol"]
 
@@ -593,8 +593,8 @@ def _ocamlc_opt_in_transition_impl(settings, attr):
     }
 
 ################################################################
-ocamlc_opt_in_transition = transition(
-    implementation = _ocamlc_opt_in_transition_impl,
+std_ocamlc_opt_in_transition = transition(
+    implementation = _std_ocamlc_opt_in_transition_impl,
     inputs = [
         "//config/build/protocol",
         "//config/target/executor",

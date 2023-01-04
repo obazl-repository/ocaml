@@ -231,23 +231,23 @@ def tc_workdir(ctx):
     #     cc = "_test/"
     if compiler.basename == "ocamlc.boot":
         return "_BS/"
-    elif compiler.basename == "ocamlc.byte":
+    elif compiler.basename in ["ocamlc.byte", "ocamlcp.byte"]:
         cc = "vv"
-    elif compiler.basename == "ocamlopt.byte":
+    elif compiler.basename in ["ocamlopt.byte", "ocamloptp.byte"]:
         if flambda:
             cc = "vx"
         else:
             cc = "vs"
-    elif compiler.basename == "ocamloptx.byte":
+    elif compiler.basename in ["ocamloptx.byte"]:
         cc = "vx"
-    elif compiler.basename == "ocamlopt.opt":
+    elif compiler.basename in ["ocamlopt.opt", "ocamloptp.opt"]:
         if flambda:
             cc = "xx"
         else:
             cc = "ss"
     elif compiler.basename == "ocamloptx.optx":
         cc = "xx"
-    elif compiler.basename == "ocamlc.opt":
+    elif compiler.basename in ["ocamlc.opt", "ocamlcp.opt"]:
         if flambda:
             cc = "xv"
         else:

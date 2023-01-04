@@ -161,6 +161,7 @@ def executable_impl(ctx, tc, exe_name,
     runtime_depsets = []
     cc_libdirs    = []
 
+    runtime_path = None
     # if tc.config_executor == "sys":  ## target_executor
     if tc.compiler[DefaultInfo].files_to_run.executable.basename in [
         "ocamlopt.opt", "ocamlopt.byte",
@@ -185,7 +186,7 @@ def executable_impl(ctx, tc, exe_name,
         # print("tc.RUNTIME: %s" % tc.runtime.path)
 
         ## FIXME: linux: pick .a or .pic.a???
-        args.add(tc.runtime.path)
+        runtime_path = tc.runtime.path
 
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
         ## NB: Asmlink looks for libasmrun.a in the std search
@@ -206,6 +207,7 @@ def executable_impl(ctx, tc, exe_name,
             # cc_libdirs.append(f.dirname)
         print("custom tc.RUNTIME: %s" % tc.runtime)
         runtime_files.append(tc.runtime)
+        ## add tc.runtime.path to args?
         # will add -L<f.dirname> below
         # cc_libdirs.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
         cc_libdirs.append(tc.runtime.dirname)
@@ -417,9 +419,9 @@ def executable_impl(ctx, tc, exe_name,
     ## only add this if -nopervasives
     if not pervasives:
         args.add_all(ctx.files._std_exit)
-    ## or, for compiling executables that are not compilers,
-    ## always add std_exit here?
 
+    if runtime_path:
+        args.add(runtime_path)
 
     args.add("-o", out_exe)
 
@@ -580,8 +582,8 @@ def executable_impl(ctx, tc, exe_name,
                           "boot_ocamlc_byte", "boot_ocamlopt_byte",
                           "boot_ocamlopt_opt", "boot_ocamlc_opt",
 
-                          "std_ocamlc_byte", "ocamlopt_byte",
-                          "ocamlopt_opt", "ocamlc_opt",
+                          "std_ocamlc_byte", "std_ocamlopt_byte",
+                          "std_ocamlopt_opt", "std_ocamlc_opt",
 
                           "ocamloptx_optx", "ocamlc_optx",
                           "ocamloptx_byte", "ocamlopt_optx",
