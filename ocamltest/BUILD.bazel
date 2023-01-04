@@ -1,4 +1,4 @@
-load("//bzl:rules.bzl",
+load("//tools:TOOL_RULES.bzl",
      "tool_module",
      "tool_signature")
 

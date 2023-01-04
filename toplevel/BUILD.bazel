@@ -7,8 +7,10 @@ load("//bzl:rules.bzl",
      "compiler_library",
      "compiler_module",
      "compiler_signature",
-     "ocaml_tool_vm",
 )
+
+load("//tools:TOOL_RULES.bzl",
+     "ocaml_tool_vm")
 
 load("//stdlib:BUILD_STDLIB.bzl", "STDLIB_MODULE_NAMES")
 

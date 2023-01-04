@@ -1,8 +1,8 @@
 load("//bzl/rules:run_tool.bzl", _run_tool = "run_tool")
 load("//bzl/rules:run_repl.bzl", _run_repl = "run_repl")
 
-load("//bzl/rules:tool_module.bzl",  _tool_module  = "tool_module")
-load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
+# load("//bzl/rules:tool_module.bzl",  _tool_module  = "tool_module")
+# load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
 
 load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
 
@@ -26,12 +26,6 @@ load("//bzl/rules:build_tool.bzl",
      _build_tool_vm = "build_tool_vm",
      _build_tool    = "build_tool")
 
-load("//bzl/rules:ocaml_tool.bzl",
-     _ocaml_tool_r = "ocaml_tool_r",
-     _ocaml_tools = "ocaml_tools",
-     _ocaml_tool_vm = "ocaml_tool_vm",
-     _ocaml_tool_sys = "ocaml_tool_sys",
-     )
 load("//bzl/rules:build_module.bzl", _build_module = "build_module")
 
 # load("//bzl/rules:boot_config.bzl",
@@ -105,15 +99,15 @@ ocamlopt_byte             = _ocamlopt_byte
 ocamlopt_opt              = _ocamlopt_opt
 ocamlc_opt                = _ocamlc_opt
 std_ocaml_compilers           = _std_ocaml_compilers
-ocaml_tool_r              = _ocaml_tool_r
-ocaml_tools               = _ocaml_tools
-ocaml_tool_vm             = _ocaml_tool_vm
-ocaml_tool_sys            = _ocaml_tool_sys
+# ocaml_tool_r              = _ocaml_tool_r
+# ocaml_tools               = _ocaml_tools
+# ocaml_tool_vm             = _ocaml_tool_vm
+# ocaml_tool_sys            = _ocaml_tool_sys
 
 # ocamlc_runtime    = _ocamlc_runtime
 # ocamlc_fixpoint    = _ocamlc_fixpoint
 
 run_repl = _run_repl
 run_tool = _run_tool
-tool_module  = _tool_module
-tool_signature = _tool_signature
+# tool_module  = _tool_module
+# tool_signature = _tool_signature

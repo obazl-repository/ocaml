@@ -1,11 +1,15 @@
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
+
 load("//bzl:rules.bzl",
      "boot_library",
      "compiler_module",
-     "tool_module",
-     "tool_signature",
-     "ocaml_tools" # macro
 )
+
+load("//tools:TOOL_RULES.bzl",
+     "ocaml_tools",  ## macro
+     "tool_module",
+     "tool_signature")
+
 load("//bzl/rules:ns_rules.bzl", "ns_module", "ns_signature")
 
 load("//lex:BUILD_RULES.bzl", "run_ocamllex")
@@ -32,25 +36,33 @@ ocaml_tools(
         "//config/target/executor:vm_executor?": ["-custom"],
         "//conditions:default": [],
     }) + [
-        "-linkall", "-g",
+        "-linkall",
+        # "-g",
         # "-no-alias-deps",
-        "-verbose"
-    ],
-    cc_linkopts = select({
-        "@platforms//os:macos": [ ## FIXME: default tc, not zig
-            # "-Wl,-v", # prints config, search paths
-            # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
-            # "-t", # -Wl-v plus logs each file the linker loads.
-            # "-why_load" # Log why each object file in a static library
-            #             # is loaded. That is, what symbol was needed.
-            ## zig linker opts
-            # "-v",
-            ],
-        "@platforms//os:linux": [
-            # "-Wl,--verbose"
-            ##FIXME: depends on linker used (bfd, gold, etc.)
-        ]
+        # "-verbose"
+    ] + select({
+        "//platform/target/os:linux?": [
+            "-cclib", "-lm",
+            "-cclib", "-ldl",
+            "-cclib", "-lpthread",
+        ],
+        "//conditions:default": []
     }),
+    # cc_linkopts = select({
+    #     "@platforms//os:macos": [ ## FIXME: default tc, not zig
+    #         # "-Wl,-v", # prints config, search paths
+    #         # "-Wl,-print_statistics", # -Wl,-v plus timings, mem, etc.
+    #         # "-t", # -Wl-v plus logs each file the linker loads.
+    #         # "-why_load" # Log why each object file in a static library
+    #         #             # is loaded. That is, what symbol was needed.
+    #         ## zig linker opts
+    #         # "-v",
+    #         ],
+    #     "@platforms//os:linux": [
+    #         # "-Wl,--verbose"
+    #         ##FIXME: depends on linker used (bfd, gold, etc.)
+    #     ]
+    # }),
 )
 
 ## resolver

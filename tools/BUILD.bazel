@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_setting")
 load("//bzl:rules.bzl",
      # "boot_executable",
      "boot_library",
@@ -8,8 +10,17 @@ load("//bzl:rules.bzl",
      # "build_tool",
      "compiler_module",
      "compiler_signature",
-     "ocaml_tools"  ## macro
 )
+load(":TOOL_RULES.bzl",
+     "ocaml_tools",  ## macro
+     "tool_module",
+     "tool_signature"
+)
+
+load(":TOOL_RUNNERS.bzl",
+     "run_ocamldep"
+)
+
 # load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
 exports_files([
@@ -17,6 +28,14 @@ exports_files([
 ])
 
 load("//config:WARNINGS.bzl", "w")
+
+## for the sh_binary targets:
+label_flag(name = "arg", build_setting_default = "BUILD.bazel")
+
+bool_flag(name = "verbose", build_setting_default = False,
+          visibility = ["//visibility:public"])
+
+config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 
 MODULE_OPTS = []
 SIG_OPTS    = []
@@ -45,14 +64,33 @@ SIG_OPTS    = []
 
 ocaml_tools(
     name = "ocamldep",
-    main = ":Ocamldep",
     prologue = select({
         "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
         "//conditions:default": []
     }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
-    ]
+    ],
+    main = ":Ocamldep",
+)
+
+tool_module(
+    name   = "Ocamldep",
+    struct = "ocamldep.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//driver:Makedepend"
+    ],
+)
+
+run_ocamldep(
+    name = "ocamldep.byte.sh",
+    tool = ":ocamldep.byte"
+)
+run_ocamldep(
+    name = "ocamldep.opt.sh",
+    tool = ":ocamldep.opt"
 )
 
 ################################################################
@@ -90,6 +128,34 @@ ocaml_tools(
     # toolchains = ["//toolchain/profile/ocaml"]
 )
 
+tool_module(
+    name   = "Ocamlprof",
+    struct = "ocamlprof.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//parsing:Location",
+        "//parsing:Parse",
+        "//utils:Warnings",
+    ],
+    # "//parsing:Parsetree_cmi",
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ]
+)
+
+################################################################
 ocaml_tools(
     name = "ocamlcp",
     main = ":Ocamlcp",
@@ -228,6 +294,8 @@ ocaml_tools(
 
 ################################################################
 ## ocamlobjinfo - Display info on compiled files
+alias(name = "inspector.byte", actual = ":ocamlobjinfo.byte")
+alias(name = "inspector.opt", actual = ":ocamlobjinfo.opt")
 ocaml_tools(
     name = "ocamlobjinfo",
     main = ":Objinfo",
@@ -241,11 +309,7 @@ ocaml_tools(
     ],
     opts = [
         "-linkall",
-        "-nostdlib",
-        "-I", "bazel-out/darwin-fastbuild/bin/utils/_vmvm1",
-        "-I", "bazel-out/darwin-fastbuild/bin/driver/_vmvm1"
     ],
-    # warnings = [w.MODULE_LINKED_TWICE]
 )
 
 ################################################################
@@ -577,16 +641,6 @@ compiler_module(
 )
 
 compiler_module(
-    name   = "Ocamldep",
-    struct = "ocamldep.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//driver:Makedepend"
-    ],
-)
-
-compiler_module(
     name   = "Ocamlmklib",
     struct = "ocamlmklib.ml",
     opts = MODULE_OPTS,
@@ -639,33 +693,6 @@ compiler_module(
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
-    ]
-)
-
-compiler_module(
-    name   = "Ocamlprof",
-    struct = "ocamlprof.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//parsing:Location",
-        "//parsing:Parse",
-        "//utils:Warnings",
-    ],
-    # "//parsing:Parsetree_cmi",
-    stdlib_deps = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Option",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
