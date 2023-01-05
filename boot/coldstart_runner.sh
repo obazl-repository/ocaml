@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "ARGS: $@"
+# echo "ARGS: $@"
 
 # --- begin runfiles.bash initialization v2 ---
 # Copy-pasted from the Bazel Bash runfiles library v2.
@@ -15,13 +15,7 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
 # --- end runfiles.bash initialization v2 ---
 
 # echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
-echo "`cat ${RUNFILES_MANIFEST_FILE}`"
-
-for arg in "$@"
-do
-    echo "ARG: $arg"
-    echo "rloc: $(rlocation $arg)"
-done
+# echo "`cat ${RUNFILES_MANIFEST_FILE}`"
 
 # exit 0
 
@@ -50,63 +44,31 @@ echo "Installing WORKSPACE and BUILD files"
 # echo "exports_files(glob([\"**\"]))"  > $BOOTDIR/lib/BUILD.bazel
 
 echo "Installing programs"
-## runtimes
-cp -vf $(rlocation $1) $BOOTDIR/lib/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/lib/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/lib/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
 
-# compilers
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
+for arg in "$@"
+do
+    if [ $(basename $arg) == "runfiles.bash" ]
+    then
+        : # nop
+    elif [ $(basename $arg) == "camlheader" ]
+    then
+        cp -vf $(rlocation $arg) $BOOTDIR/lib/
+    elif  [ $(basename $arg) == "camlheader_ur" ]
+    then
+        cp -vf $(rlocation $arg) $BOOTDIR/lib/
+    elif  [ $(basename $arg) == "libasmrun.a" ]
+    then
+        cp -vf $(rlocation $arg) $BOOTDIR/lib/
+    elif  [ $(basename $arg) == "libcamlrun.a" ]
+    then
+        cp -vf $(rlocation $arg) $BOOTDIR/lib/
+    else
+        cp -vf $(rlocation $arg) $BOOTDIR/bin/
+    fi
+    # echo "rloc: $(rlocation $arg)"
+done
 
-# mustach, merge_json
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/bin/
-shift
-
-# camlheaders
-cp -vf $(rlocation $1) $BOOTDIR/lib/
-shift
-cp -vf $(rlocation $1) $BOOTDIR/lib/
-shift
-
-# ocamldep
-cp -vf $(rlocation ocamlcc/tools/_vm/ocamldep.byte) $BOOTDIR/bin/
-cp -vf $(rlocation  ocamlcc/tools/_sys/ocamldep.opt) $BOOTDIR/bin/
-
-# ocamlprof
-cp -vf $(rlocation ocamlcc/tools/_vm/ocamlprof.byte) $BOOTDIR/bin/
-cp -vf $(rlocation  ocamlcc/tools/_sys/ocamlprof.opt) $BOOTDIR/bin/
-
-# ocamlobjinfo
-cp -vf $(rlocation ocamlcc/tools/_vm/ocamlobjinfo.byte) $BOOTDIR/bin/
-cp -vf $(rlocation  ocamlcc/tools/_sys/ocamlobjinfo.opt) $BOOTDIR/bin/
-
-# primreq
-cp -vf $(rlocation ocamlcc/tools/_vm/primreq.byte) $BOOTDIR/bin/
-cp -vf $(rlocation  ocamlcc/tools/_sys/primreq.opt) $BOOTDIR/bin/
-
-
-echo "Installing stdib"
-
+# echo "Installing stdib"
 
 # cp -vf $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte) $BOOTDIR/bin/
 # STDLIBDIR=`dirname $(rlocation ocamlcc/bin/_ocamlc.byte/ocamlc.byte)`
@@ -119,9 +81,9 @@ echo "Installing stdib"
 # # ocamlcc/boot/_ocamlopt.byte/ocamlopt.byte
 # cp -vf $(rlocation ocamlcc/boot/_ocamlopt.opt/ocamlopt.opt) $BOOTDIR/bin/
 
-STDLIBDIR=`dirname $(rlocation $4)`
-STDLIBDIR="`dirname $STDLIBDIR`"
-STDLIBDIR="`dirname $STDLIBDIR`"
+# STDLIBDIR=`dirname $(rlocation $4)`
+# STDLIBDIR="`dirname $STDLIBDIR`"
+# STDLIBDIR="`dirname $STDLIBDIR`"
 
 # cp -vf $STDLIBDIR/stdlib/_ocamlopt.opt/* $BOOTDIR/lib
 
@@ -146,12 +108,9 @@ echo "Setting permissions"
 
 chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
 chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
-
-# chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/ocamlrun
-# chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/mustach
-chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*.opt
 chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
-# chmod -vf ugo=+r-xw $BOOTDIR/lib/*.a
+
+chmod -vf ugo=+r-xw $BOOTDIR/lib/*
 
 echo "Coldstart completed."
 

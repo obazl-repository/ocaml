@@ -55,6 +55,7 @@ COLDSTART_DEPS = [
     "//boot:ocamlopt.opt",
     "//boot:ocamlopt.byte",
     "//boot:ocamlc.byte",
+
     "//bin:ocamlcp.byte",
     "//bin:ocamlcp.opt",  # 10
     "//bin:ocamloptp.opt",
@@ -73,14 +74,15 @@ COLDSTART_DEPS = [
     "//tools:primreq.byte",
     "//tools:primreq.opt",
 
-        # "//bin:ocamlc.optx",
+    ## obsolete:
+    # "//bin:ocamlc.optx",
     # "//bin:ocamlopt.optx",
     # "//bin:ocamloptx.optx",
     # "//bin:ocamloptx.byte",
 
-        # "//tools:dumpobj.opt",
+    # "//tools:dumpobj.opt",
 
-        # "@baseline//:ocamlc.byte",
+    # "@baseline//:ocamlc.byte",
     # "//bin/baseline:ocamlc.byte",
     # "//bin/baseline:ocamlopt.byte",
     # "//bin/baseline:ocamlc.opt",
