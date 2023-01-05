@@ -3,6 +3,8 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
+load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
+
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
 
@@ -186,7 +188,7 @@ def test_executable(name, main,
     vs_test_executable(
         name    = main + ".vs.opt",
         main    = main,
-        opts    = opts,
+        opts    = opts + OCAML_COMPILER_OPTS,
         tags    = ["test_exe"],
         **kwargs
     )
@@ -194,7 +196,7 @@ def test_executable(name, main,
     ss_test_executable(
         name    = main + ".ss.opt",
         main    = main,
-        opts    = opts,
+        opts    = opts + OCAML_COMPILER_OPTS,
         tags = ["test_exe"],
         **kwargs
     )
