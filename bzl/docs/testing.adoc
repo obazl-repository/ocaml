@@ -2,7 +2,6 @@
 :toc: auto
 :toclevels: 3
 
-link:
 == quickstart
 
 === running tests
@@ -298,3 +297,19 @@ test_suite(
     ]
 )
 ---
+
+
+== Misc
+
+WARNING: You may see some error messages like the following when
+running tests:
++
+----
+Could not create "/home/<uid>/.cache/bazel/_bazel_<uid>/f4012e66d98647d4c49d9c650a5ae78c/sandbox/linux-sandbox/10917/execroot/ocamlcc/bazel-out/k8-fastbuild-ST-462396b1cbfe/testlogs/testsuite/tests/basic/Eval_order_2_vv_test/test.outputs/outputs.zip": zip not found or failed
+----
+
+This message is harmless and can be ignored. It has to do with files
+the test may have written to TEST_UNDECLARED_OUTPUTS_DIR, which is
+documented at link:https://bazel.build/reference/test-encyclopedia#initial-conditions[Test Encyclopedia#Initial conditions].
+
+See also link:https://github.com/bazelbuild/bazel/issues/8336[test-setup.sh: outputs.zip creation may fail silently #8336]

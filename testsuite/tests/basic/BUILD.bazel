@@ -289,10 +289,7 @@ expect_test(
 
 test_module(
     name   = "Constprop",
-    struct = "constprop.ml.c",
-    opts   = ["-pp", "cpp"], ## does not work on linux: cc1 not found
-    # pp     = ["cpp"], # need a file dep here
-    open   = ["//stdlib:Stdlib"],
+    struct = "constprop.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [

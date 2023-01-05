@@ -1,4 +1,8 @@
-= optimization config
+= optimization
+
+
+== C optimizations
+
 
 link:https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc[Recommended compiler and linker flags for GCC]
 
@@ -7,3 +11,33 @@ link:https://www.incredibuild.com/blog/compiling-with-clang-optimization-flags[C
 
 
 link:https://stackoverflow.com/questions/15548023/clang-optimization-levels[stack overflow], info on clang optimizations
+
+
+== lto
+
+Link-Time Optimization
+
+link:https://blog.llvm.org/2016/06/thinlto-scalable-and-incremental-lto.html[ThinLTO: Scalable and Incremental LTO] (blog article, 2016)
+
+== pgo
+
+Profile-Guided Optimization
+
+"PGO (Profile-Guided Optimization) allows your compiler to better
+optimize code for how it actually runs. Users report that applying
+this to Clang and LLVM can decrease overall compile time by 20%."
+
+src:  link:https://www.llvm.org/docs/HowToBuildWithPGO.html[How To Build Clang and LLVM with Profile-Guided Optimizations]
+
+
+
+== llvm propeller
+
+`rules_cc` includes a `propeller_optimize` rule.
+
+See link:https://lists.llvm.org/pipermail/llvm-dev/2019-September/135393.html[ [RFC] Propeller: A frame work for Post Link Optimizations] (announcement email, Sept 2019)
+
+
+link:https://lists.llvm.org/pipermail/llvm-dev/2019-October/135980.html[thread (2019)]
+
+link:https://www.infoq.com/news/2020/03/google-propeller-llvm-optmizer/[Google Propeller Squeezes Extra Performance from Large-Scale LLVM Binaries] (Mar 2020 article)

@@ -1,6 +1,14 @@
 = workflows
 
 
+If you get an error like this:
+
+----
+ERROR: /home/<uid>/ocamlcc/toolchain/BUILD.bazel:1:11: every rule of type label_flag implicitly depends upon the target '@baseline//bin:ocamlc.opt', but this target could not be found because of: no such target '@baseline//bin:ocamlc.opt': target 'ocamlc.opt' not declared in package 'bin' defined by /home/<uid>/.cache/bazel/_bazel_<uid>/f4012e66d98647d4c49d9c650a5ae78c/external/baseline/bin/BUILD.bazel (Tip: use `query "@baseline//bin:*"` to see all the targets in that package)
+----
+
+then you need to run `$ bazel run boot:checkpoint`
+
 == Compiler development
 
 
