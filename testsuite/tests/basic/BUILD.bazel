@@ -145,6 +145,7 @@ expect_vs_test(
     expected = "bigints.reference",
     timeout  = "short",
     tags     = ["vs"],
+    opts  = OCAML_COMPILER_OPTS
 )
 
 expect_ss_test(
@@ -154,6 +155,7 @@ expect_ss_test(
     expected = "bigints.reference",
     timeout  = "short",
     tags     = ["ss", "vvss"],
+    opts  = OCAML_COMPILER_OPTS
 )
 
 expect_sv_test(
@@ -163,6 +165,7 @@ expect_sv_test(
     expected = "bigints.reference",
     timeout  = "short",
     tags     = ["sv"],
+    opts  = OCAML_COMPILER_OPTS
 )
 
 # test_executable(
