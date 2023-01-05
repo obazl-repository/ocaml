@@ -45,6 +45,62 @@ config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 alias(name = "bootstrap", actual = ":checkpoint")
 alias(name = "coldstart", actual = ":checkpoint")
 
+COLDSTART_DEPS = [
+    "//config/camlheaders",
+    "//runtime:asmrun",
+    "//runtime:camlrun",
+    "//runtime:ocamlrun",
+
+    "//boot:ocamlc.opt",  #5
+    "//boot:ocamlopt.opt",
+    "//boot:ocamlopt.byte",
+    "//boot:ocamlc.byte",
+    "//bin:ocamlcp.byte",
+    "//bin:ocamlcp.opt",  # 10
+    "//bin:ocamloptp.opt",
+    "//bin:ocamloptp.byte",
+
+    "//vendor/mustach",
+    "//vendor/merge_json",
+
+    "//tools:ocamldep.byte",  #15
+    "//tools:ocamldep.opt",
+    "//tools:ocamlprof.byte",
+    "//tools:ocamlprof.opt",
+    "//tools:ocamlobjinfo.byte",
+    "//tools:ocamlobjinfo.opt",   # 20
+
+    "//tools:primreq.byte",
+    "//tools:primreq.opt",
+
+        # "//bin:ocamlc.optx",
+    # "//bin:ocamlopt.optx",
+    # "//bin:ocamloptx.optx",
+    # "//bin:ocamloptx.byte",
+
+        # "//tools:dumpobj.opt",
+
+        # "@baseline//:ocamlc.byte",
+    # "//bin/baseline:ocamlc.byte",
+    # "//bin/baseline:ocamlopt.byte",
+    # "//bin/baseline:ocamlc.opt",
+    # "//bin/baseline:ocamlopt.opt",
+
+        # "//lex:ocamllex.byte",
+    # "//lex:ocamllex.opt",
+    # "//yacc:ocamlyacc",
+
+        ## the shell script could obtain the following from the preceding:
+    # "//stdlib",
+    # "//stdlib:Std_exit",
+
+        # "//asmcomp:cvt_emit.byte",
+
+        # "//asmcomp:cvt_emit.byte",
+
+        "@bazel_tools//tools/bash/runfiles",
+]
+
 boot_coldstart(
     name = "checkpoint",
     runner = "coldstart_runner.sh",
@@ -52,100 +108,8 @@ boot_coldstart(
         # "//runtime:asmrun",
         # "//runtime:camlrun",
     ],
-    args = [
-        "$(rlocationpath //runtime:asmrun)",
-        "$(rlocationpath //runtime:camlrun)",
-        "$(rlocationpath //runtime:ocamlrun)",
-        "$(rlocationpath //boot:ocamlc.opt)",
-        "$(rlocationpath //boot:ocamlopt.opt)", # 5
-
-        "$(rlocationpath //boot:ocamlopt.byte)",
-        "$(rlocationpath //boot:ocamlc.byte)",
-        "$(rlocationpath //vendor/mustach)",
-        "$(rlocationpath //vendor/merge_json)",
-        "$(rlocationpaths //config/camlheaders)", # 10
-
-        "$(rlocationpaths //tools:ocamldep.byte)",
-        "$(rlocationpaths //tools:ocamldep.opt)",
-
-        "$(rlocationpaths //tools:ocamlprof.byte)",
-        "$(rlocationpaths //tools:ocamlprof.opt)",
-
-        "$(rlocationpaths //tools:ocamlobjinfo.byte)",
-        "$(rlocationpaths //tools:ocamlobjinfo.opt)",
-
-        "$(rlocationpaths //tools:primreq.byte)",
-        "$(rlocationpaths //tools:primreq.opt)",
-
-        # flambda
-        # "$(rlocationpath //bin:ocamlc.optx)",
-        # "$(rlocationpath //bin:ocamlopt.optx)",
-        # "$(rlocationpath //bin:ocamloptx.optx)",
-        # "$(rlocationpath //bin:ocamloptx.byte)",
-
-        # "$(rlocationpath @baseline//:ocamlc.byte)",
-        # "$(rlocationpath //bin/baseline:ocamlc.byte)",
-        # "$(rlocationpath //bin/baseline:ocamlc.byte)",
-        # "$(rlocationpath //bin/baseline:ocamlc.byte)",
-        # "$(rlocationpath //bin/baseline:ocamlopt.byte)",
-        # "$(rlocationpath //bin/baseline:ocamlc.opt)",
-        # "$(rlocationpath //bin/baseline:ocamlopt.opt)",
-    ],
-    data = [
-        "//config/camlheaders",
-        "//runtime:asmrun",
-        "//runtime:camlrun",
-        "//runtime:ocamlrun",
-
-        "//boot:ocamlc.opt",  #5
-        "//boot:ocamlopt.opt",
-        "//boot:ocamlopt.byte",
-        "//boot:ocamlc.byte",
-        "//bin:ocamlcp.byte",
-        "//bin:ocamlcp.opt",  # 10
-        "//bin:ocamloptp.opt",
-        "//bin:ocamloptp.byte",
-
-        "//vendor/mustach",
-        "//vendor/merge_json",
-
-        "//tools:ocamldep.byte",  #15
-        "//tools:ocamldep.opt",
-        "//tools:ocamlprof.byte",
-        "//tools:ocamlprof.opt",
-        "//tools:ocamlobjinfo.byte",
-        "//tools:ocamlobjinfo.opt",   # 20
-
-        "//tools:primreq.byte",
-        "//tools:primreq.opt",
-
-        # "//bin:ocamlc.optx",
-        # "//bin:ocamlopt.optx",
-        # "//bin:ocamloptx.optx",
-        # "//bin:ocamloptx.byte",
-
-        # "//tools:dumpobj.opt",
-
-        # "@baseline//:ocamlc.byte",
-        # "//bin/baseline:ocamlc.byte",
-        # "//bin/baseline:ocamlopt.byte",
-        # "//bin/baseline:ocamlc.opt",
-        # "//bin/baseline:ocamlopt.opt",
-
-        # "//lex:ocamllex.byte",
-        # "//lex:ocamllex.opt",
-        # "//yacc:ocamlyacc",
-
-        ## the shell script could obtain the following from the preceding:
-        # "//stdlib",
-        # "//stdlib:Std_exit",
-
-        # "//asmcomp:cvt_emit.byte",
-
-        # "//asmcomp:cvt_emit.byte",
-
-        "@bazel_tools//tools/bash/runfiles",
-    ],
+    data = COLDSTART_DEPS,
+    args = ["$(rlocationpaths {})".format(dep) for dep in COLDSTART_DEPS]
 )
 
 boot_setup(
