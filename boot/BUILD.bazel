@@ -88,19 +88,19 @@ COLDSTART_DEPS = [
     # "//bin/baseline:ocamlc.opt",
     # "//bin/baseline:ocamlopt.opt",
 
-        # "//lex:ocamllex.byte",
+    # "//lex:ocamllex.byte",
     # "//lex:ocamllex.opt",
     # "//yacc:ocamlyacc",
 
-        ## the shell script could obtain the following from the preceding:
+    ## the shell script could obtain the following from the preceding:
     # "//stdlib",
     # "//stdlib:Std_exit",
 
-        # "//asmcomp:cvt_emit.byte",
+    # "//asmcomp:cvt_emit.byte",
 
-        # "//asmcomp:cvt_emit.byte",
+    # "//asmcomp:cvt_emit.byte",
 
-        "@bazel_tools//tools/bash/runfiles",
+    "@bazel_tools//tools/bash/runfiles",
 ]
 
 boot_coldstart(

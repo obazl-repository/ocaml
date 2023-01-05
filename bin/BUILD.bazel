@@ -149,22 +149,28 @@ std_ocamlc_byte(
 )
 
 std_ocamlc_opt(
-    name = "ocamlcp.opt",
-    prologue = OCAMLCP_PROLOGUE,
-    main = OCAMLCP_MAIN
+    name       = "ocamlcp.opt",
+    prologue   = OCAMLCP_PROLOGUE,
+    main       = OCAMLCP_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
+    visibility = ["//visibility:public"]
 )
 
 # profiling compiler ocamloptp.byte, ocamloptp.opt
 std_ocamlopt_byte(
-    name = "ocamloptp.byte",
-    prologue = OCAMLOPTP_PROLOGUE,
-    main = OCAMLOPTP_MAIN
+    name       = "ocamloptp.byte",
+    prologue   = OCAMLOPTP_PROLOGUE,
+    main       = OCAMLOPTP_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
+    visibility = ["//visibility:public"]
 )
 
 std_ocamlopt_opt(
-    name = "ocamloptp.opt",
-    prologue = OCAMLOPTP_PROLOGUE,
-    main = OCAMLOPTP_MAIN
+    name       = "ocamloptp.opt",
+    prologue   = OCAMLOPTP_PROLOGUE,
+    main       = OCAMLOPTP_MAIN,
+    opts       = OCAML_COMPILER_OPTS,
+    visibility = ["//visibility:public"]
 )
 
 ################################################################

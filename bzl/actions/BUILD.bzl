@@ -185,7 +185,10 @@ def progress_msg(workdir, ctx):
     elif protocol == "test":
         lbrack = "["
         rbrack = "]"
-    elif protocol in ["fb", "tool"]:
+    elif protocol in ["fb"]:
+        lbrack = "[["
+        rbrack = "]]"
+    elif protocol in ["tool"]: # ie build_tool
         lbrack = "("
         rbrack = ")"
     else:
