@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
+
 load("//test:rules.bzl",
      "test_archive",
      "test_executable",
@@ -685,6 +687,7 @@ expect_test(
     stdout  = "pr7657.stdout",
     expected = "pr7657.reference",
     test_module    = ":Pr7657",
+    opts  = OCAML_COMPILER_OPTS
 )
 
 test_module(

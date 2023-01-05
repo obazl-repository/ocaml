@@ -154,8 +154,7 @@ def test_executable(name, main,
     vv_test_executable(
         name    = main + ".vv.byte",
         main    = main,
-        opts    = opts,  ##  + ["-pervasives"],
-        # prologue = ["//stdlib"],
+        opts    = opts,
         tags = ["test_exe"],
         **kwargs
     )
@@ -187,6 +186,7 @@ def test_executable(name, main,
     vs_test_executable(
         name    = main + ".vs.opt",
         main    = main,
+        opts    = opts,
         tags    = ["test_exe"],
         **kwargs
     )
@@ -194,6 +194,7 @@ def test_executable(name, main,
     ss_test_executable(
         name    = main + ".ss.opt",
         main    = main,
+        opts    = opts,
         tags = ["test_exe"],
         **kwargs
     )
@@ -201,6 +202,7 @@ def test_executable(name, main,
     sv_test_executable(
         name    = main + ".sv.byte",
         main    = main,
+        opts    = opts,
         tags    = ["test_exe"],
         **kwargs
     )

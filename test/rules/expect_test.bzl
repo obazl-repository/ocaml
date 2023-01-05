@@ -226,7 +226,8 @@ def expect_test(name,
 
     test_executable(
         name    = executable,
-        main    = executable
+        main    = executable,
+        **kwargs
     )
 
     native.test_suite(
