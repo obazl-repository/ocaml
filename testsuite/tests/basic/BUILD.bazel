@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
+load("//bzl:rules.bzl", "cc_preprocess")
 
 load("//test:rules.bzl",
      "test_archive",
@@ -280,16 +281,17 @@ test_module( # not a test, used by unit_naming_test
 
 ############
 expect_test(
-    name    = "constprop_test",
-    test_module    = ":Constprop",
-    stdout  = "constprop.stdout",
-    expected = "constprop.ml.reference",
+    name        = "constprop_test",
+    test_module = ":Constprop",
+    stdout      = "constprop.stdout",
+    expected    = "constprop.ml.reference",
 )
 
 test_module(
     name   = "Constprop",
     struct = "constprop.ml.c",
-    opts   = ["-pp", "cpp"],
+    opts   = ["-pp", "cpp"], ## does not work on linux: cc1 not found
+    # pp     = ["cpp"], # need a file dep here
     open   = ["//stdlib:Stdlib"],
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
@@ -299,6 +301,27 @@ test_module(
             "//stdlib:Stdlib.Printf",
         ]
     })
+)
+
+cc_preprocess(
+    name = "constprop.pp",
+    src  = "constprop.ml.c",
+    out  = "constprop.ml"
+    # deps = [
+    #     "//runtime/caml:hdrs"
+    # ],
+    # copts = [
+    #     "-Iruntime", # caml/m.h
+    #     "-I$(GENDIR)/runtime/caml",
+    # ] + select({
+    # }),
+    # defines = RUNTIME_DEFINES + [
+    #     "NATIVE_CODE",
+    #     "TARGET_$(ARCH)",
+    #     "MODEL_$(MODEL)",
+    #     "SYS_$(SYSTEM)"
+    # ],
+    # toolchains = ["//profile/system/local"],
 )
 
 ################################################################

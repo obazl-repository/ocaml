@@ -111,7 +111,7 @@ tool_module = rule( # same as compiler_module(?)
 ################################################################
 ##########################################################
 def _ocaml_tool_vm_in_transition_impl(settings, attr):
-    debug = True
+    debug = False
     if debug: print("ocaml_tool_vm_in_transition")
 
     protocol = settings["//config/build/protocol"]
@@ -174,7 +174,7 @@ ocaml_tool_vm_in_transition = transition(
 ##############################
 def _ocaml_tool_vm_impl(ctx):
 
-    debug = True
+    debug = False
     if debug:
         print("ocaml_tool_vm: %s" % ctx.label)
 
@@ -182,7 +182,7 @@ def _ocaml_tool_vm_impl(ctx):
 
     workdir = tc.workdir
 
-    print("OCAML TOOL.BYTE emitter: %s" % tc.config_emitter)
+    # print("OCAML TOOL.BYTE emitter: %s" % tc.config_emitter)
 
     # if tc.config_emitter == "sys":
     #     # ext = ".opt"

@@ -5,6 +5,7 @@ load("//bzl/rules:run_repl.bzl", _run_repl = "run_repl")
 # load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
 
 load("//bzl/rules:cc_assemble.bzl", _cc_assemble = "cc_assemble")
+load("//bzl/rules:cc_preprocess.bzl", _cc_preprocess = "cc_preprocess")
 
 # load("//bzl/rules:ocaml_boot_compiler.bzl",
 #      _boot_import_vm_executable = "boot_import_vm_executable",
@@ -60,6 +61,7 @@ load("//bzl/rules:bootstrap_repl.bzl", _bootstrap_repl = "bootstrap_repl")
 
 # mustache    = _mustache
 cc_assemble = _cc_assemble
+cc_preprocess = _cc_preprocess
 build_module      = _build_module
 ocaml_module      = _build_module ### TEMPORARY until //testsuite cleanup
 
