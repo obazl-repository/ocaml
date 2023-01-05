@@ -178,6 +178,15 @@ def executable_impl(ctx, tc, exe_name,
     compiler = tc.compiler[DefaultInfo].files_to_run.executable
     stem = filestem(compiler)
 
+    ## If the target executor is vm, and we have a c lib we need to
+    ## link, then we have to decide which kind of vmruntime to emit:
+    ## static (vm runtime extended by static c libs) or dynamic (pure
+    ## vm runtime that dynamically loads clibs).
+
+    ## Currently only static is supported (i.e. -custom flag is inserted).
+    ## See https://v2.ocaml.org/manual/intfc.html#ss:staticlink-c-code
+    ## and https://v2.ocaml.org/manual/intfc.html#ss:dynlink-c-code
+
     # if tc.config_executor == "sys":  ## target_executor
     # if compiler.basename in ["ocamlopt.opt", "ocamlopt.byte",
     #                          "ocamloptx.optx", "ocamloptx.byte"]:

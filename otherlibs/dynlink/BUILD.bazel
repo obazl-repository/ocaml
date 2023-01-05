@@ -27,6 +27,7 @@ SIG_OPTS    = []
 # dynlink.cma: $(OBJS)
 # 	$(OCAMLC) $(COMPFLAGS) -ccopt "$(NATDYNLINKOPTS)" -a -I byte -o $@ $^
 # %.cmi: %.mli
+
 # 	$(OCAMLC) -c $(COMPFLAGS) $<
 # %.cmo: %.ml
 # 	$(OCAMLC) -c $(COMPFLAGS) $<
@@ -95,11 +96,6 @@ compiler_module(
     }),
     sig    = "Dynlink_cmi",
     opts = MODULE_OPTS,
-    ## NB: ambiguity. should e.g. Symtable be resolved to
-    ## //bytecomp:Symtable or Dynlink_compilerlibs.Symtable? For the
-    ## makefiles it's the former(?), but since they're the same file
-    ## in different namespaces we could also resolve against
-    ## Dynlink_compilerlibs.
     sig_deps = ["Dynlink_compilerlibs.Cmo_format_cmi"],
     deps   = [
         ":Dynlink_compilerlibs.Config",

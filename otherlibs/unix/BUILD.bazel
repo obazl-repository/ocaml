@@ -164,7 +164,7 @@ cc_library(
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime",
         "-I$(GENDIR)/runtime/caml",
-        # "$(FILE_OFFSET_BITS)"
+        # "$(FILE_OFFSET_BITS)" ## FIXME
     ],
     defines = ["CAML_BUILDING_UNIX"],
     linkopts = ["-lm"],

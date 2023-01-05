@@ -196,14 +196,17 @@ sh_binary(
 vs_test_executable(
     name    = "Bigints.vs.opt",
     main    = ":Bigints",
+    opts  = OCAML_COMPILER_OPTS
 )
 ss_test_executable(
     name    = "Bigints.ss.opt",
     main    = ":Bigints",
+    opts  = OCAML_COMPILER_OPTS
 )
 sv_test_executable(
     name    = "Bigints.sv.byte",
     main    = ":Bigints",
+    opts  = OCAML_COMPILER_OPTS
 )
 ## to run the vv.byte executable:
 sh_binary(
