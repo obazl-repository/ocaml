@@ -28,7 +28,7 @@ source release for use in a project.
 
 Package: none.  Used only by the `//boot:coldstart` target.
 
-The `//boot:coldstart` run target builds the compiles using
+The `//boot:coldstart` run target builds the compilers using
  `boot/camlc`, just like the standard protocol, but it adds some
  bootstrapping steps in order to bring the built compilers into
  alignment with the baseline source code. It saves the built images to
@@ -36,10 +36,21 @@ The `//boot:coldstart` run target builds the compiles using
 
 === Boot build stacks
 
-* `boot/ocamlc > ocamlc.byte > ocamlc.byte`
-* `(boot/ocamlc > ocamlc.byte >) > ocamlopt.byte`
-* `(boot/ocamlc > ocamlc.byte >ocamlopt.byte) > ocamlopt.opt`
-* `(boot/ocamlc > ocamlc.byte >ocamlopt.byte > ocamlopt.opt) > ocamlc.opt`
+[cols="1,2"]
+|===
+| Installed | Build provenance
+| `@baseline//bin:ocamlc.byte` | `(boot/ocamlc > ocamlc.byte) > ocamlc.byte`
+| `@baseline//bin:ocamlopt.byte` | `(boot/ocamlc > ocamlc.byte) > ocamlopt.byte`
+| `@baseline//bin:ocamlopt.opt` | `(boot/ocamlc > ocamlc.byte > ocamlopt.byte) > ocamlopt.opt`
+| `@baseline//bin:ocamlc.opt` | `(boot/ocamlc > ocamlc.byte >ocamlopt.byte > ocamlopt.opt) > ocamlc.opt`
+|===
+
+== The Fastbuild Protocol
+
+For use with tools only.  Builds the tool directly using the baseline compilers. For example:
+
+    bazel run tools:ocamldep.byte --//config/build/protocol=fb  - uses @baseline//bin:ocamlc.opt
+    bazel run tools:ocamldep.opt  --//config/build/protocol=fb  - uses @baseline//bin:ocamlopt.opt
 
 
 == The Dev Test Protocol
@@ -51,8 +62,18 @@ The builds use the baseline compilers built by running
 incorporating any changes in the source code, and then use the new
 versions to build the test cases.
 
-Targets in the testsuite depend on the `//test` compiles so they are
-built under the test protocol.
+[cols="1,2"]
+|===
+| build target | compiler used
+| `//test:ocamlc.byte` | `@baseline//bin/ocamlc.opt`
+| `//test:ocamlopt.byte` | `@baseline//bin/ocamlc.opt`
+| `//test:ocamlopt.opt` | `@baseline//bin/ocamlopt.opt`
+| `//test:ocamlc.opt` | `@baseline//bin/ocamlopt.opt`
+|===
+
+Targets in the testsuite depend on the `//test` compilers so they are
+built under the test protocol.  See article link:testing.adoc[testing] for more information.
+
 
 == The Sys Test Protocol
 

@@ -2,6 +2,10 @@
 :toc: auto
 :toclevels: 3
 
+
+NOTE: each tool has two build targets, *.byte and *.opt. An alias for
+the *.opt version is defined for each; e.g. `:ocamldep` is aliased to `:ocamldep.opt`.
+
 == build targets
 
 NB: the leading `//` may be omitted in build commands, e.g. `$ bazel
@@ -11,11 +15,12 @@ build tools:ocamldep` is equivalent to [.nowrap]`$ bazel build //tools:ocamldep`
 
 * `//tools:cmpbyt` - compare two bytecode executables
 
-Logging:
+Inspection:
 
 * `//tools:ocamlcmt` - dump `.cmt`, `.cmti` files
 * `//tools:ocamldumpobj` - dissasembler for executable and .cmo object files
 * `//tools:ocamlobjinfo` - dump `.cmo`, `.cmx`, `.cma`, `.cmxa` files
+  ** alias:  :lso  (ls object)
 * `//tools:primreq` - determine the set of C primitives used by `.cmo`, `.cma` files
 
 Build tools:
@@ -28,10 +33,10 @@ These two  are not needed with Bazel:
 * `//tools:ocamlmktop` -  builds OCaml toplevels that contain user code preloaded at start-up.  link:https://v2.ocaml.org/manual/toplevel.html#s%3Acustom-toplevel[Building custom toplevel systems: ocamlmktop
 ]
 
-The OCaml profiling compilers:
+The OCaml profiling compilers are in the `//bin` package:
 
-* `//tools:ocamlcp`
-* `//tools:ocamloptp`
+* `//bin:ocamlcp.byte`, `//bin:ocamlcp.opt`
+* `//bin:ocamloptp.byte`, `//bin:ocamloptp.opt`
 
 link:https://v2.ocaml.org/manual/profil.html[Profiling]:
 
@@ -39,6 +44,9 @@ link:https://v2.ocaml.org/manual/profil.html[Profiling]:
 
 
 == running tools under bazel
+
+Special support for:  ocamldep, ocamlobjinfo, dumpobj, primreq.
+
 
 To run a tool directly on the command line, you must first build it
 and then construct a command line. This requires that you figure out

@@ -6,42 +6,46 @@ See the link:https://github.com/ocaml/ocaml[upstream repository] for the origina
 
 Latest doc changes: 11/30/2022
 
-== News (12/01/2022)
+== News (01/03/2023)
 
-* New name: `ocamlcc` - the OCaml Compiler Collection. Analogous to
-  `GCC`, the GNU Compiler Collection. Not only do we have multiple
-  compilers - `ocamlc.byte`, `ocamlopt.byte`, etc., the compilers
-  themselves may serve to drive a C toolchain, to compile, assemble,
-  and link C code.
+Compiler build targets::
+Previous versions defined a single parameterized build target for
+  the compilers: `//bin:ocamlcc --config=ocamlc.byte`. This proved to
+  be error-prone and difficult to debug, so it has been replaced with
+  specialized targets, e.g. `//bin:ocamlc.byte`,
+  `//bin:ocamlopt.byte`, etc.
 
-* Platforms and toolchains have been revised to support recursive (staged) builds.
+Build protocols & stacks::
+Compiler build targets are implemented by (possibly recursive)
+  "build stacks", whose structure depends on the
+  link:build_protocols.adoc[build protocol] in effect. For example,
+  under the 'boot' protocol:
++
+    boot/ocamlc > ocamlc.byte > ocamlc.byte
+    boot/ocamlc > ocamlopt.byte > ocamlopt.opt
++
+Definition of build stacks is relatively easy.
 
-* Recursive builds. Well, at least quasi-recursive. There is only one
-  target for building a compiler, `bin:ocamlcc`; to build the
-  compiler, this target needs a compiler, which it gets from a
-  toolchain, which depends on `bin:ocamlc`, which needs a
-  compiler, ... recursively, until we get to the base case, the
-  precompiled `boot/ocamlc` compiler. So the boot compiler
-  (`boot/ocamlc`) builds the stage 1 compiler which builds the stage 2
-  compiler which builds the stage 3 compiler. See
-  link:bzl/docs/staged_builds.adoc[Staged builds].
+Archiveless builds:: By default the libraries used in the
+(development) builds (i.e. stdlib, ocamlcommon, etc.) are not packaged
+into archive files. See link:bzl/docs/libraries.adoc[libraries &
+archives] for more information.
 
-* Revised configuration logic. The goal is to eliminate dependency on
-  autotools (`./configure`). This is very much a Work-In-Progress; the
-  code is in link:config[//config]. For more info see
-  link:bzl/docs/notes/autoconf.adoc[notes/autoconf].
+Fine-grained dependencies:: All depenencies are expressed as module
+(or signature) dependencies, rather than archive dependencies. For
+example, `asmcomp:Asmgen` depends on three `Stdlib` submodules
+directly, so they (but not the `stdlib.cmx?a` archive) are listed as
+dependencies.
 
-* Use the link command from the Bazel CC toolchain. OBazl now uses
-  information from the cc toolchain selected (and configured) by Bazel
-  to set the command string used by OCaml to run the C linker
-  (`Config.mkexe`). For more info see
-  link:bzl/docs/ocaml_cc_config.adoc[ocaml_cc_config] and
-  link:bzl/docs/notes/linking.adoc[notes/linking]. [TODO: same thing
-  for the assemble command `Config.asm`]
+Improved CC Toolchain Integration:: The OCaml compilers are configured
+at build-time (not `.configure`-time) with assemble, C compile, and C
+link commands derived from the selected Bazel toolchain. See
+link:bzl/docs/ocaml_cc_config.adoc[ocamlcc config] for more info.
 
-* Revised link:bzl/docs/preprocessing.adoc[preprocessing]. OBazl eliminates shell scripts and tools,
-  instead using a template engine written in portable C to generate
-  code.
+Testing support:: Support for running the tests in `testsuite/tests`.
+The tests are completely under the control of Bazel: `ocamltest`,
+being unecessary, is not used. [NB: only of a subset of the tests have
+been converted.]  See link:bzl/docs/testing.adoc[testing].
 
 == Quickstart
 
@@ -51,12 +55,35 @@ Latest doc changes: 11/30/2022
 
 3. `cd` into the root directory of the cloned repo and run configure: `$ ./configure`
 
-4. Build the Big Four compiler variants:
+4. Build some compilers:
 
-  a. `$ bazel build bin:ocamlcc --config=ocamlc.byte`
-  b. `$ bazel build bin:ocamlcc --config=ocamlopt.byte`
-  c. `$ bazel build bin:ocamlcc --config=ocamlc.opt`
-  d. `$ bazel build bin:ocamlcc --config=ocamlopt.opt`
+  $ bazel build bin:ocamlc.byte
+  $ bazel build bin:ocamlopt.opt
+
+5. Build some tools:
+
+  $ bazel build tools:ocamldep.byte
+  $ bazel build tools:ocamlobjinfo.opt
+
+5. Run some of the queries demonstrated in
+link:bzl/docs/queries.adoc[queries] to see what build targets are
+available.
+
+6. Build and store the baseline compilers (built using `boot/ocamlc`
+and the current source code state), so they can be used to rebuild the
+compilers after source code changes:
+
+    $ bazel run boot:coldstart
+
+7. After running coldstart, edit some code and run some tests:
+
+    $ bazel test testsuite/tests/basic:Boxedints_test   ## four tests, one for each compiler
+    $ bazel test testsuite/tests/basic:Boxedints_vv_test   ## just the ocamlc.byte test
+    $ bazel test testsuite/tests/basic:tests --test_tag_filters=vv ## all ocamlc.byte tests in pkg
++
+Bazel has very strong test magic; see link:bzl/docs/testing.adoc[testing] for details.
+
+8.  Take a look at the docs.  Start with link:bzl/docs/terminology[symbols & terminology]
 
 To build debug or instrumented variants add `--//runtime:DEBUG`,
 `--//runtime:CAML_INSTR`. See link:bzl/docs/debugging.adoc[debugging]
@@ -68,12 +95,13 @@ cross-compiling has not yet been updated to use the new toolchain/platform disci
 
 == Overview
 
-OBazl is a Bazel Language Support Pack for OCaml. This fork of the
-OCaml compiler toolset repository contains a Proof-of-Concept build
-program written in OBazl. As a Proof-of-Concept whose primary purpose
-is to demonsrate the capabilities of OBazl, it only builds a subset of
-the targets supported by the Makefile-based production build program,
-and it does not support the full range of configuration options.
+`rules_ocamlcc` is a Bazel Language Support Pack for OCaml. This fork
+of the OCaml compiler toolset repository contains a Proof-of-Concept
+build program written in Bazel. As a Proof-of-Concept whose primary
+purpose is to demonsrate the capabilities of Bazel, it only builds a
+subset of the targets supported by the Makefile-based production build
+program, and it does not support the full range of configuration
+options.
 
 It can build (bootstrap):
 
@@ -82,7 +110,7 @@ It can build (bootstrap):
 
 These targets can be built on Macos and Linux.
 
-The OBazl ruleset used is a stripped-down, minimal version of the
+The `rules_ocamlcc`  ruleset used is a stripped-down, minimal version of the
 standard ruleset called the `bootstrap` ruleset. It includes only the
 functionality required to build the compiler. This means it contains
 no direct support for PPX processing or for generalized namespaces

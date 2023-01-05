@@ -1,4 +1,6 @@
 = debugging
+:toc: auto
+:toclevels: 3
 
 Debugging is a little bit complicated because the term is overloaded and ambiguous:
 

@@ -1,4 +1,6 @@
 = cross-compilation
+:toc: auto
+:toclevels: 3
 
 WARNING: cross-compilation will only work for C code (runtimes,
 ocamlyacc) at the moment.

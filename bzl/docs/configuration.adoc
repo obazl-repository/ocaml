@@ -1,4 +1,6 @@
 = configuration
+:toc: auto
+:toclevels: 3
 
 Two broad classes:
 

@@ -6,3 +6,22 @@
 
 Rule `cc_assembler` uses the effective CC toolchain to run action
 PREPROCESS_ASSEMBLE_ACTION_NAME.
+
+link:https://stackoverflow.com/questions/15284947/understanding-gcc-s-output/15285058#15285058[understanding gcc -S output]
+
+CFI::
+Call Frame Information
+
+CFA::
+Canonical Frame Address
+
+
+== cfi
+
+link:https://www.imperialviolet.org/2017/01/18/cfi.html[cfi directives in assembly files] (2017 blog article)
+
+link:https://sourceware.org/binutils/docs/as/CFI-directives.html[cfi directives]
+
+link:https://stackoverflow.com/questions/2529185/what-are-cfi-directives-in-gnu-assembler-gas-used-for[cfi gnu gas] old blog post
+
+

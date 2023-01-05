@@ -1,0 +1,18 @@
+= dev tools
+
+== shell stuff
+
+link:https://www.shellcheck.net/[shellcheck]
+
+== tmux
+
+link:https://www.seanh.cc/2020/12/28/binding-keys-in-tmux/[binding keys in tmux]
+
+link:https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/[quick & easy guide]
+
+link:https://www.freecodecamp.org/news/tmux-in-practice-scrollback-buffer-47d5ffa71c93/[tmux in practice: scrollback buffer]
+
+Some common choices for rebinding prefix key from the default C-b:
+
+* `C-\`
+* `C-`'  (backtick)

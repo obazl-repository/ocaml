@@ -2,7 +2,7 @@
 :toc: auto
 :toclevels: 3
 
-
+link:
 == quickstart
 
 === running tests
@@ -39,28 +39,52 @@ module names; they always have suffix `_test`. For example, from
 
   ** `$ bazel test testsuite/tests/basic:Arrays_test --test_tag_filters=vv,ss`
 
-=== building and linking test executables
+=== building, linking, and running test executables
+
+Bazel test rules (like our `expect_test`, `ocaml_test` etc.) must emit
+an executable, which the Bazel test machinery will then run. The
+`rules_ocamlcc` test rules emit shell script executables that run test
+OCaml executables, rather than linking and emitting OCaml executables.
+Linking the test executables is the responsibility of a separate
+family of rules, `test_executable . So test cases have the following
+dependency structure:
+
+----
+compile test module -> link test executable -> run test executable
+----
+
+This makes it possible to develop test cases outside of the test
+framework. Specically, you can run your test executable as an ordinary
+executble, in order to develop its stdout, before running it under the
+control of the testing apparatu[qs.
 
 The `arrays.ml` test emits nothing to stdout, so for the following we
 will use `boxedints.ml` instead, which does.
 
-* Compile `testsuite/tests/basic:boxedints.ml`
+* Compile test_module `testsuite/tests/basic:boxedints.ml`
 
   ** `$ bazel build testsuite/tests/basic:Boxedints`
 
 * Link the test executables for `testsuite/tests/basic:boxedints.ml` without running them:
 
-  ** `$ bazel build testsuite/tests/basic:__Boxedints.vv.byte`   [NB: leading underscores]
+  ** `$ bazel build testsuite/tests/basic:Boxedints.vv.byte`
   ** `$ bazel build testsuite/tests/basic:Boxedints.vs.opt`
   ** `$ bazel build testsuite/tests/basic:Boxedints.ss.opt`
-  ** `$ bazel build testsuite/tests/basic:__Boxedints.sv.byte`
+  ** `$ bazel build testsuite/tests/basic:Boxedints.sv.byte`
 
-* Run the test executables directly (not using the test runner), to examine stdout:
-  ** `$ bazel run testsuite/tests/basic:Boxedints.vv.byte`
+* Run the test executables directly (not using `bazel test`), to examine stdout:
+  ** `$ bazel run testsuite/tests/basic:Boxedints.vv.byte.sh`
   ** `$ bazel run testsuite/tests/basic:Boxedints.vs.opt`
   ** `$ bazel run testsuite/tests/basic:Boxedints.ss.opt`
-  ** `$ bazel run testsuite/tests/basic:Boxedints.sv.byte`
+  ** `$ bazel run testsuite/tests/basic:Boxedints.sv.byte.sh`
 
+NOTE: For example, `$ bazel run
+testsuite/tests/basic:Boxedints.sv.byte.sh` will use the baseline
+`ocamlc.opt` compiler (`sv` == **s**ys->**v**m) to compile
+`testsuite/tests/basic/boxedints.ml` as a bytecode executable, and
+then run it. The `ocamlc.opt` compiler will be incrementally rebuilt
+if any of its sources have changed, or if its configuration settings
+have changed.
 
 
 == Default configuration

@@ -1,4 +1,6 @@
 = symbols & terminology
+:toc: auto
+:toclevels: 3
 
 
 == terminology

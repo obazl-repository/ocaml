@@ -1,8 +1,39 @@
 = diagnostics
+:toc: auto
+:toclevels: 3
+
+
+== Verbosity
+
+=== Bazel verbosity
+
+* `--subcommands` - False, True, or pretty_print
+* `--verbose_failures`
+
+
+== OCaml verbosity
+
+* `//config/ocaml/asm:verbose`
+* `//config/ocaml/compile:verbose`
+* `//config/ocaml/link:verbose`
+
+=== CC verbosity
+
+* `//config/ocaml/cc/asm:verbose`
+* `//config/ocaml/cc/compile:verbose`
+* `//config/ocaml/cc/link:verbose`
+
 
 == Progress messages
 
-Format: for C code: "Compiling <filename>" or "Linking <filename>". For OCaml code:
+Bazel prints "progress messages" as the build proceeds. These are
+separate from subcommand verbosity controlled by the `--subcommands`
+command line option. Progress messages for `rules_ocamlcc` actions
+have the following formats:
+
+* for C code: "Compiling <filename>" or "Linking <filename>" (messages
+  from `cc_library` and `cc_binary` targets)
+* for OCaml code:
 
     {m} {lbrack}{flambda}{compiler}{rbrack}{mnemonic}: {ws}//{pkg}:{tgt} {rule}
 
@@ -15,13 +46,19 @@ where:
   ** test protocol:  `[  ]`
   ** tool protocol:  `(  )`
 * `{flambda}` :  `!` if flambda is enabled, otherwise the null string
-* `{compiler}` - ocamlc.byte | ocamlopt.opt, etc.
+* `{compiler}` - ocamlc.byte | ocamlopt.opt, etc. This is the compiler being _used_ by the build action, not the one being produced.
 * `{mnemonic}` - depends on rule; e.g. `CompileModule`, `LinkStdCompiler`, etc.
 * `{ws}` - workspace name (usually blank)
 * `//{pkg}:{tgt}` - the Bazel label of the build targete
 * `{rule}` the name of the rule
 
-Example stdout fragments:
+Some messages will include `[for tool]`. This means that the target is
+being built in order to serve as a tool used in the build process;
+usually this means a tool that does some preprocessing. For example,
+the `mustach` template engine is always built as a tool, since it is
+used to generate source files to be compiled.
+
+Example messages excerpted from the stdout of a compiler build:
 
 ----
 Compiling runtime/io.c [for tool]; 0s darwin-sandbox
@@ -46,4 +83,6 @@ fb <!ocamlc.boot>CompileModule: //stdlib:Stdlib.Int64 stdlib_module; 0s darwin-s
 fb <!ocamlc.boot>CompileSig: //utils:Arg_helper_cmi compiler_signature; 0s darwin-sandbox ...
 ----
 
-
+----
+fb <ocamlopt.byte>LinkStdCompiler: //bin:ocamlc.opt ocamlc_opt; 0s linux-sandbox
+----

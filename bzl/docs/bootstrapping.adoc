@@ -1,4 +1,6 @@
 = bootstrapping the compilers
+:toc: auto
+:toclevels: 3
 
 The OCaml compiler collection may be defined inductively in a form
 that is homomorphic (or at least analogous) to the inductive
