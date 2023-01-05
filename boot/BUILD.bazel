@@ -74,6 +74,9 @@ COLDSTART_DEPS = [
     "//tools:primreq.byte",
     "//tools:primreq.opt",
 
+    "//debugger:ocamldebug.byte",
+    "//debugger:ocamldebug.opt",
+
     ## obsolete:
     # "//bin:ocamlc.optx",
     # "//bin:ocamlopt.optx",

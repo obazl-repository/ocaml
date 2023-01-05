@@ -117,7 +117,7 @@ def _ocaml_tool_vm_in_transition_impl(settings, attr):
     protocol = settings["//config/build/protocol"]
 
     if protocol in ["std", "boot"]: # default/checkpoint
-        config_executor = "sys"
+        config_executor = "vm"
         config_emitter  = "vm"
         # WARNING: some tools (lintapidiff) need to link to c code,
         # which is disallowed for the boot compiler. So we cannot build

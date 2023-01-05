@@ -120,10 +120,12 @@ compiler_module(
         ],
         "//config/target/executor:vm_executor?": [
         # "//toolchain/target/executor:vm_executor?": [
-            "//bytecomp:Dll",
-            "//bytecomp:Meta",
-            "//bytecomp:Opcodes",
-            "//bytecomp:Symtable",
+            # "//bytecomp:Dll",
+            # "//bytecomp:Meta",
+            # "//bytecomp:Opcodes",
+            "Dynlink_compilerlibs.Opcodes",
+            # "//bytecomp:Symtable",
+            "Dynlink_compilerlibs.Symtable",
             # "//file_formats:Cmo_format_cmi",
             "//typing:Ident",
             "Dynlink_compilerlibs.Misc",
