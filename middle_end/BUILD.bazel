@@ -1,6 +1,6 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
      "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -8,7 +8,7 @@ load("//bzl:rules.bzl",
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-boot_library(
+compiler_library(
     name = "middle_end",
     manifest  = [
         ":Backend_var",
@@ -32,8 +32,6 @@ boot_library(
 ## defined in compilerlibs/Makefile.compilerlibs
 ## //asmcomp:ocamloptcomp (archive) needs it as a lib, not an archive
 ## //tools:ocamlobjinfo (executable)
-## TODO: select archive=True or False
-# boot_archive(
 boot_library(
     name = "ocamlmiddleend",
     manifest  = [

@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag", "string_setting")
+
 load("//bzl:rules.bzl",
      # "boot_executable",
      "boot_library",
@@ -17,6 +18,9 @@ load(":TOOL_RULES.bzl",
      "tool_signature"
 )
 
+load("//bzl/rules:COMPILER.bzl",
+     "OCAMLC_PROLOGUE")
+
 load(":TOOL_RUNNERS.bzl",
      "run_ocamldep"
 )
@@ -30,7 +34,7 @@ exports_files([
 load("//config:WARNINGS.bzl", "w")
 
 ## for the sh_binary targets:
-label_flag(name = "arg", build_setting_default = "BUILD.bazel")
+# label_flag(name = "arg", build_setting_default = "BUILD.bazel")
 
 bool_flag(name = "verbose", build_setting_default = False,
           visibility = ["//visibility:public"])
@@ -40,7 +44,6 @@ config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-## first the executables. modules and sigs below.
 # programs_byte := \
 #   ocamldep ocamlprof ocamlcp ocamloptp ocamlmklib  \
 #   ocamlmktop ocamlcmt dumpobj ocamlobjinfo \
@@ -53,7 +56,8 @@ SIG_OPTS    = []
 ## use by compiler engineers; the latter are utilities designed for users.
 
 ################################################################
-# The dependency generator
+# ocamldep, the dependency generator
+
 # OCAMLDEP = \
 #   $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 #   $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
@@ -62,7 +66,18 @@ SIG_OPTS    = []
 # ocamldep$(EXE): $(OCAMLDEP)
 # ocamldep.opt$(EXE): $(call byte2native, $(OCAMLDEP))
 
-ocaml_tools(
+alias(name = "ocamldep.sh", actual = ":ocamldep.opt.sh")
+run_ocamldep(
+    name = "ocamldep.byte.sh",
+    tool = ":ocamldep.byte"
+)
+run_ocamldep(
+    name = "ocamldep.opt.sh",
+    tool = ":ocamldep.opt"
+)
+
+alias(name = "ocamldep", actual = ":ocamldep.opt")
+ocaml_tools( # expands to targets ocamldep.byte, ocamldep.opt
     name = "ocamldep",
     prologue = select({
         "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
@@ -84,19 +99,77 @@ tool_module(
     ],
 )
 
-run_ocamldep(
-    name = "ocamldep.byte.sh",
-    tool = ":ocamldep.byte"
-)
-run_ocamldep(
-    name = "ocamldep.opt.sh",
-    tool = ":ocamldep.opt"
-)
-
 ################################################################
 # Profiling: https://ocaml.org/manual/profil.html
 # The OCaml profiling compilers: ocamlcp, ocamloptp, ocamlprof
-ocaml_tools(
+
+# Before profiling an execution, the program must be compiled in
+# profiling mode, using the ocamlcp front-end to the ocamlc compiler
+# (see chapter 11) or the ocamloptp front-end to the ocamlopt
+# compiler.
+
+## Profiling modules built here; executable targets in //bin
+compiler_module(
+    name   = "Ocamlcp",
+    struct = "ocamlcp.ml",
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//driver:Compenv",
+        "//driver:Main_args",
+        ":Ocamlcp_common"
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ]
+)
+
+compiler_module(
+    name   = "Ocamloptp",
+    struct = "ocamloptp.ml",
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//driver:Compenv",
+        "//driver:Main_args",
+        ":Ocamlcp_common"
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ]
+)
+
+compiler_module(
+    name   = "Ocamlcp_common",
+    struct = "ocamlcp_common.ml",
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//driver:Main_args",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives"
+    ],
+)
+
+####################
+# The ocamlprof command produces a source listing of the program
+# modules where execution counts have been inserted as comments. For
+# instance,
+#        ocamlprof foo.ml
+# prints the source code for the foo module, with comments indicating
+# how many times the functions in this module have been called.
+
+##TODO: run_ocamlprof
+alias(name = "ocamlprof", actual = ":ocamlprof.opt")
+ocaml_tools( # expands to tgts ocamlprof.byte, ocamlprof.opt
     name = "ocamlprof",
     prologue = select({
         "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
@@ -155,65 +228,31 @@ tool_module(
     ]
 )
 
-################################################################
-ocaml_tools(
-    name = "ocamlcp",
-    main = ":Ocamlcp",
-    prologue = select({
-        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-        "//conditions:default": []
-    }) + [
-        "//config:Config",
-        "//utils:Build_path_prefix_map",
-        "//utils:Misc",
-        "//utils:Profile",
-        "//utils:Warnings",
-        "//utils:Identifiable",
-        "//utils:Numbers",
-        "//utils:Arg_helper",
-        "//utils:Clflags",
-        "//utils:Local_store",
-        "//utils:Terminfo",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//utils:Ccomp",
-        "//driver:Compenv",
-        "//driver:Main_args",
-        ":Ocamlcp_common"
-    ]
+compiler_module(
+    name   = "Profiling",
+    struct = "profiling.ml",
+    sig    = "Profiling_cmi",
+    opts = MODULE_OPTS,
+    stdlib_deps   = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Sys",
+    ],
 )
 
-# profiling compiler
-ocaml_tools(
-    name = "ocamloptp",
-    main = ":Ocamloptp",
-    prologue = select({
-        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-        "//conditions:default": []
-    }) + [
-        "//config:Config",
-        "//utils:Build_path_prefix_map",
-        "//utils:Misc",
-        "//utils:Profile",
-        "//utils:Warnings",
-        "//utils:Identifiable",
-        "//utils:Numbers",
-        "//utils:Arg_helper",
-        "//utils:Clflags",
-        "//utils:Local_store",
-        "//utils:Terminfo",
-        "//parsing:Location",
-        "//utils:Load_path",
-        "//utils:Ccomp",
-        "//driver:Compenv",
-        "//driver:Main_args",
-        ":Ocamlcp_common"
-    ]
+compiler_signature(
+    name = "Profiling_cmi",
+    src  = "profiling.mli",
+    opts = SIG_OPTS,
+    deps   = [
+    ],
 )
 
 ################################################################
 # To help building mixed-mode libraries (OCaml + C)
-ocaml_tools(
+# NB: not needed with Bazel
+alias(name = "ocamlmklib", actual = ":ocamlmklib.opt")
+ocaml_tools( # expands to tgts ocamlmklib.byte, ocamlmklib.opt
     name = "ocamlmklib",
     main = ":Ocamlmklib",
     prologue = select({
@@ -226,6 +265,28 @@ ocaml_tools(
     ]
 )
 
+compiler_module(
+    name   = "Ocamlmklib",
+    struct = "ocamlmklib.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//config:Config",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Stack",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ]
+)
+
 ################################################################
 # To make custom toplevels
 # OCAMLMKTOP=config.cmo build_path_prefix_map.cmo misc.cmo \
@@ -233,6 +294,7 @@ ocaml_tools(
 #        local_store.cmo load_path.cmo profile.cmo ccomp.cmo ocamlmktop.cmo
 # ocamlmktop$(EXE): $(OCAMLMKTOP)
 # ocamlmktop.opt$(EXE): $(call byte2native, $(OCAMLMKTOP))
+alias(name = "ocamlmktop", actual = ":ocamlmktop.opt")
 ocaml_tools(
     name = "ocamlmktop",
     main = ":Ocamlmktop",
@@ -254,24 +316,67 @@ ocaml_tools(
     ]
 )
 
+compiler_module(
+    name   = "Ocamlmktop",
+    struct = "ocamlmktop.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//config:Config",
+        "//utils:Ccomp",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Sys",
+    ]
+)
+
 ## cvt_emit build targets moved to //asmcomp
 
 ################################################################
-# Reading cmt files
-ocaml_tools(
+# ocamlcmt:  reading cmt files
+alias(name = "ocamlcmt", actual = ":ocamlcmt.opt")
+ocaml_tools( # expands to ocamlcmt.byte, ocamlcmt.opt
     name = "ocamlcmt",
+    prologue = OCAMLC_PROLOGUE,
     main = ":Ocamlcmt",
-    prologue = select({
-        "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-        "//conditions:default": []
-    }) + [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
+)
+
+compiler_module(
+    name   = "Ocamlcmt",
+    struct = "ocamlcmt.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//driver:Compmisc",
+        "//file_formats:Cmt_format",
+        "//parsing:Location",
+        "//parsing:Pprintast",
+        "//typing:Cmt2annot",
+        "//typing:Envaux",
+        "//typing:Stypes",
+        "//typing:Untypeast",
+        "//utils:Clflags",
+        "//utils:Load_path",
+        # "//typing:Annot_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
 ################################################################
-# The bytecode disassembler
+# dumpobj: the bytecode disassembler
 # DUMPOBJ= \
 #           $(ROOTDIR)/compilerlibs/ocamlcommon.cma \
 #           $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \
@@ -279,26 +384,56 @@ ocaml_tools(
 # dumpobj$(EXE): $(DUMPOBJ)
 # dumpobj.opt$(EXE): $(call byte2native, $(DUMPOBJ))
 
+alias(name = "dumpobj", actual = ":dumpobj.opt")
 ocaml_tools(
     name = "dumpobj",
-    main = ":Dumpobj",
     prologue = select({
         "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
         "//conditions:default": []
     }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
-        ":Opnames",
+        "//bytecomp:Opnames",
     ],
+    main = ":Dumpobj",
+)
+
+compiler_module(
+    name   = "Dumpobj",
+    # target_compatible_with = ["//platform/target:sys?"],
+    struct = "dumpobj.ml",
+    opts = MODULE_OPTS,
+    deps   = [
+        "//bytecomp:Bytesections",
+        "//bytecomp:Instruct",
+        "//bytecomp:Opcodes",
+        "//bytecomp:Opnames",
+        "//bytecomp:Symtable",
+        "//config:Config",
+        "//parsing:Location",
+        "//typing:Ident",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Obj",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ]
 )
 
 ################################################################
 ## ocamlobjinfo - Display info on compiled files
-alias(name = "inspector.byte", actual = ":ocamlobjinfo.byte")
-alias(name = "inspector.opt", actual = ":ocamlobjinfo.opt")
+alias(name = "lso.byte", actual = ":ocamlobjinfo.byte")
+alias(name = "lso.opt", actual = ":ocamlobjinfo.opt")
+alias(name = "lso", actual = ":ocamlobjinfo.opt")
+alias(name = "ocamlobjinfo", actual = ":ocamlobjinfo.opt")
 ocaml_tools(
     name = "ocamlobjinfo",
-    main = ":Objinfo",
     prologue = select({
         "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
         "//conditions:default": []
@@ -310,6 +445,44 @@ ocaml_tools(
     opts = [
         "-linkall",
     ],
+    main = ":Objinfo",
+)
+
+compiler_module(
+    name   = "Objinfo",
+    struct = "objinfo.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//bytecomp:Bytesections",
+        "//bytecomp:Symtable",
+        "//middle_end/flambda:Export_info",
+        "//middle_end:Compilation_unit",
+        "//middle_end:Linkage_name",
+        "//middle_end:Printclambda",
+        "//middle_end:Symbol",
+        "//typing:Ident",
+        "//utils:Binutils",
+        "//utils:Misc",
+    ],
+    sig_deps = [
+        "//file_formats:Cmi_format_cmi",
+        "//file_formats:Cmo_format_cmi",
+        "//file_formats:Cmt_format_cmi",
+        "//file_formats:Cmx_format_cmi",
+        "//file_formats:Cmxs_format_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Digest",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
+    ]
 )
 
 ################################################################
@@ -319,6 +492,7 @@ ocaml_tools(
 #         primreq.cmo
 # primreq$(EXE): $(PRIMREQ)
 # primreq.opt$(EXE): $(call byte2native, $(PRIMREQ))
+alias(name = "primreq", actual = ":primreq.opt")
 ocaml_tools(
     name = "primreq",
     prologue = select({
@@ -329,6 +503,22 @@ ocaml_tools(
         "//bytecomp:ocamlbytecomp",
     ],
     main = ":Primreq",
+)
+
+compiler_module(
+    name   = "Primreq",
+    struct = "primreq.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//config:Config",
+        "//utils:Misc",
+    ],
+    sig_deps = ["//file_formats:Cmo_format_cmi"],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.List",
+    ]
 )
 
 ################
@@ -345,33 +535,23 @@ ocaml_tools(
     ]
 )
 
-################
-## FIXME: move to //bytecomp
-# make_opcodes, opnames.ml
-# OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
-# NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
-# opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
-# 	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
+# ../boot/ocamlrun ../boot/ocamlc
 compiler_module(
-    name = "Opnames",
-    struct = "//bytecomp:opnames_ml",
+    name   = "Stripdebug",
+    struct = "stripdebug.ml",
     opts = MODULE_OPTS,
     warnings = [w.MISSING_MLI],
-    stdlib_deps = ["//stdlib:Stdlib"]
+    deps   = [
+        "//bytecomp:Bytesections",
+        "//utils:Misc",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
+    ]
 )
-
-## moved to bytecode:opnames_ml
-# genrule(
-#     name = "gen_opnames",
-#     outs = ["opnames.ml"],
-#     srcs = ["//runtime/caml:instruct.h", ":make_opcodes"],
-#     tools = ["//boot/baseline:ocamlrun"],
-#     cmd   = " ".join([
-#         "$(execpath //boot/baseline:ocamlrun) $(location :make_opcodes)",
-#         "-opnames < $(location //runtime/caml:instruct.h)",
-#         "> $@"
-#     ])
-# )
 
 ################################################################
 # LINTAPIDIFF=$(ROOTDIR)/compilerlibs/ocamlcommon.cmxa \
@@ -489,10 +669,6 @@ cc_binary(
 # opt.opt: $(caml_tex)
 # endif
 
-
-##########################################################
-################  ocaml modules and sigs  ################
-## TODO: get the unix stuff set up
 # compiler_module(
 #     name   = "Caml_tex",
 #     struct = "caml_tex.ml",
@@ -528,49 +704,7 @@ cc_binary(
 #     ],
 # )
 
-compiler_module(
-    name   = "Cmpbyt",
-    struct = "cmpbyt.ml",
-    opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
-    deps   = [
-        "//bytecomp:Bytesections",
-        "//stdlib:Stdlib.Array",
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
-    ]
-)
-
-compiler_module(
-    name   = "Dumpobj",
-    # target_compatible_with = ["//platform/target:sys?"],
-    struct = "dumpobj.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-        "//bytecomp:Bytesections",
-        "//bytecomp:Instruct",
-        "//bytecomp:Opcodes",
-        "//bytecomp:Symtable",
-        "//config:Config",
-        "//parsing:Location",
-        "//typing:Ident",
-        ":Opnames",
-    ],
-    stdlib_deps = [
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Array",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Obj",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Sys",
-    ]
-)
-
+################################################################
 # eqparsetree.ml", line 66, characters 7-22:
 # 66 |     | (Const_string a0, Const_string b0) -> eq_string (a0, b0)
 #             ^^^^^^^^^^^^^^^
@@ -605,6 +739,21 @@ ocaml_tools(
     }) + [
         "//compilerlibs:ocamlcommon",
         "//bytecomp:ocamlbytecomp",
+    ]
+)
+
+compiler_module(
+    name   = "Cmpbyt",
+    struct = "cmpbyt.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    deps   = [
+        "//bytecomp:Bytesections",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 

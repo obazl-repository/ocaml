@@ -9,9 +9,13 @@ load("@bazel_skylib//rules:common_settings.bzl",
 string_flag( # for testing
     name = "protocol",
     build_setting_default = "std",
-    values = ["std", "boot", ## "baseline",
+    values = ["std",
+              "boot", ## used by coldstart to build baseline
               "tool", # used for build_tool rules, e.g. cvt_emit
-              "dev", "test", "release", "unspecified", "null"],
+              "fb", # fastbuild using baseline compilers (for tools only?)
+              "test", # == dev
+              "release", "deploy", # etc.
+              "unspecified", "null"],
     visibility = ["//visibility:public"]
 )
 
@@ -20,6 +24,9 @@ config_setting(name = "std?",
 
 config_setting(name = "boot?",
                flag_values = {":protocol": "boot"})
+
+config_setting(name = "fb?",
+               flag_values = {":protocol": "fb"})
 
 # config_setting(name = "baseline?",
 #                flag_values = {":protocol": "baseline"})

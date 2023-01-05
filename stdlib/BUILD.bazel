@@ -475,12 +475,10 @@ stdlib_module(
         "//conditions:default": []
     }),
     stdlib_deps   = [
-        ":Stdlib.Uchar",
-        ":Stdlib.Sys",
-        ":Stdlib.String",
-        ":Stdlib.Seq",
-        ":Stdlib.Char",
         ":Stdlib.Bytes",
+        ":Stdlib.Seq",
+        ":Stdlib.String",
+        ":Stdlib.Sys",
     ],
 )
 

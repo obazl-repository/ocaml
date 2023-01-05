@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 ##############################################
-def _tc_target_transitions(settings, attr, debug):
+def tc_target_transitions(settings, attr, debug):
     debug = True
     if debug: print("tc_target_transitions")
 
@@ -65,7 +65,7 @@ def _tc_target_transitions(settings, attr, debug):
 #     debug = True
 #     if debug: print("tc_lexer_out_transition")
 
-#     config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
+#     config_executor, config_emitter = tc_target_transitions(settings, attr, debug)
 
 #     # compiler = settings["//toolchain:compiler"]
 #     # lexer = settings["//toolchain:lexer"]
@@ -113,66 +113,6 @@ def _tc_target_transitions(settings, attr, debug):
 #         "//toolchain:runtime" : settings["//toolchain:runtime"],
 #         "//toolchain:cvt_emit" : settings["//toolchain:cvt_emit"]
 #     }
-
-##############################################
-def tc_runtime_out_transition_impl(settings, attr, debug):
-
-    protocol = settings["//config/build/protocol"]
-
-    debug = True
-    if debug: print("tc_runtime_out_transition")
-
-    fail("TCR")
-
-    if protocol == "boot":
-        return {}
-
-    config_executor, config_emitter = _tc_target_transitions(settings, attr, debug)
-
-    if debug:
-        print("//toolchain:runtime: %s" % settings["//toolchain:runtime"])
-
-    if config_executor == "boot":
-        print("rttxn CC TRANSITION")
-        return {}
-    elif (config_executor == "boot"): #and config_emitter == "boot"):
-        print("rttxn BOOT TRANSITION")
-        rt_target  = "camlrun"
-    elif (config_executor == "baseline"):
-        print("rttxn BASELINE TRANSITION")
-        rt_target  = "camlrun"
-    elif (config_executor == "vm" and config_emitter == "vm"):
-        print("rttxn VM-VM TRANSITION")
-        rt_target  = "camlrun"
-
-    elif (config_executor == "vm" and config_emitter == "sys"):
-        print("rttxn VM-SYS TRANSITION")
-        rt_target  = "asmrun"
-    elif (config_executor == "sys" and config_emitter == "sys"):
-        print("rttxn SYS-SYS TRANSITION")
-        rt_target  = "asmrun"
-    elif (config_executor == "sys" and config_emitter == "vm"):
-        print("rttxn SYS-VM TRANSITION")
-        rt_target  = "camlrun"
-
-    if protocol == "dev":
-        runtime = "@baseline//lib:asmrun"
-        # runtime = "@baseline//lib:lib" + rt_target + ".a"
-    else:
-        runtime = "//runtime:" + rt_target
-
-    if debug:
-        print("setting //config/target/executor: %s" % config_executor)
-        print("setting //config/target/emitter: %s" % config_emitter)
-        print("setting //toolchain:runtime %s" % runtime)
-
-    return {
-        "//config/target/executor": config_executor,
-        "//config/target/emitter" : config_emitter,
-        "//toolchain:compiler"    : settings["//toolchain:compiler"],
-        # "//toolchain:lexer"       : settings["//toolchain:lexer"],
-        "//toolchain:runtime"     : runtime
-    }
 
 ##############################################
 def tc_mustache_transition_impl(settings, attr, debug):

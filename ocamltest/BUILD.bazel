@@ -22,12 +22,16 @@ SIG_OPTS    = ["-nopervasives"]
 
 ## CAVEAT! on mac, bazel sets -DDEBUG for fastbuild but not opt and
 ## this controls caml_failed_assert in runtime/caml/misc.h so if you
-## build otherlibs/unix and runtime:camlrun in different modes you may
+## build otherlibs/[unix|str] and runtime:camlrun in different modes you may
 ## see this:
 # Undefined symbols for architecture x86_64:
 #   "_caml_failed_assert", referenced from:
 #       _caml_run_command in librun_stubs.a(run_stubs.o)
 #       _caml_unix_accept in libunix.a(accept_unix.o)
+# or for otherlibs/str:
+# Undefined symbols for architecture x86_64:
+#   "_caml_failed_assert", referenced from:
+#       _re_replacement_text in libcamlstr.a(strstubs.o)
 
 ## this can happen because we always build the runtimes with compile
 ## mode opt.

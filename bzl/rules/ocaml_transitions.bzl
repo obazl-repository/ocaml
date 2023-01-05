@@ -131,8 +131,8 @@ def _ocaml_tc_compiler_out_transition_impl(settings, attr):
         # print("identity txn ")
         return {}
 
-    # if protocol == "baseline":
-    #     return {}
+    if protocol == "fb":
+        return {}
 
     if protocol == "test":
         # print("identity txn ")
@@ -378,17 +378,12 @@ def _std_ocamlopt_byte_in_transition_impl(settings, attr):
         runtime  = "//runtime:camlrun"
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
-    # elif protocol == "boot":  ## coldstart
-    #     # bootstrap:
-    #     # boot:ocaml.boot > bin:ocamlc.byte(std)
-    #     # > bin:ocamlc.byte(boot) > bin:ocamlopt.byte
-    #     # protocol = "boot"
-    #     # config settings used by tc selector
-    #     config_executor = "vm"
-    #     config_emitter  = "sys"
-    #     compiler = "//bin:ocamlc.byte"
-    #     runtime  = "//runtime:camlrun"
-    #     # cvt_emit = settings["//toolchain:cvt_emit"]
+    elif protocol == "boot":  ## coldstart
+        config_executor = "vm"
+        config_emitter  = "sys"
+        compiler = "//bin:ocamlc.byte"
+        runtime  = "//runtime:camlrun"
+        # cvt_emit = settings["//toolchain:cvt_emit"]
 
     elif protocol == "tool":
         # during coldstart: use ocamlc.boot

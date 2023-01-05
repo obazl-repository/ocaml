@@ -1,5 +1,4 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 ################################################################

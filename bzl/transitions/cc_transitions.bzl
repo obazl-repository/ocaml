@@ -22,7 +22,7 @@
 
 ## same config everytime, should mean only one build?
 def _reset_cc_config_transition_impl(settings, attr):
-    debug = True
+    debug = False
     if debug:
         print("reset_cc_config_transition: %s" % attr.name)
 

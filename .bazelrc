@@ -1,6 +1,7 @@
 ## in dev mode, just pass //config/target/executor=<> to set output
 build --flag_alias=tgt=//config/target/executor
 build --flag_alias=stdlib=//testsuite/tests:with-stdlib
+build --flag_alias=larch=//config/ocaml/compiler/libs:archived
 
 build --nokeep_going
 

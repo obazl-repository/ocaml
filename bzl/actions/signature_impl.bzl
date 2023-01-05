@@ -51,6 +51,7 @@ def signature_impl(ctx, module_name):
     includes   = []
 
     sig_src = ctx.file.src
+    # sig_ext = ctx.file.src.extension
     if debug:
         print("sig_src: %s" % sig_src)
 
@@ -99,7 +100,8 @@ def signature_impl(ctx, module_name):
         ctx.actions.symlink(output = mlifile,
                             target_file = sig_src)
         if debug:
-            print("mlifile %s" % mlifile)
+            print("symlinked {src} => {dst}".format(
+                src = sig_src.path, dst = mlifile.path))
 
     direct_inputs = [mlifile]
 

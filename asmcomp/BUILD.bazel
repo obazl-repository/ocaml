@@ -88,6 +88,18 @@ boot_archive(
     visibility = ["//testsuite:__pkg__"],
 )
 
+compiler_library(
+    name    = "ocamloptcomp",
+    visibility = [
+        "//visibility:public",
+        # "//testsuite:__pkg__",
+    ],
+    manifest = [
+        "//middle_end:ocamlmiddleend",
+        ":optcomp",
+    ],
+)
+
 boot_library(
     name = "optcomp",
     visibility = [
@@ -101,7 +113,6 @@ boot_library(
         ":Asmlink",
         ":Asmpackager",
         ":Branch_relaxation",
-        # ":Branch_relaxation_intf_cmi",
         ":Cmm",
         ":Cmm_helpers",
         ":Cmm_invariants",
@@ -131,6 +142,8 @@ boot_library(
         ":Spill",
         ":Split",
         ":Strmatch",
+
+        # ":Branch_relaxation_intf_cmi",
 
         "//file_formats:Linear_format",
         "//driver:Opterrors",
@@ -1897,16 +1910,3 @@ compiler_signature(
 # compilerlibs/ocamloptcomp.cma: $(OPTCOMP_CMI) $(OPTCOMP)
 # 	$(CAMLC) -a -o $@ $(OPTCOMP)
 
-# boot_library(
-#boot_archive(
-compiler_library(
-    name    = "ocamloptcomp",
-    visibility = [
-        "//visibility:public",
-        # "//testsuite:__pkg__",
-    ],
-    manifest = [
-        "optcomp",
-        "//middle_end:ocamlmiddleend" # ocamloptcomp",
-    ],
-)

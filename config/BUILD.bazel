@@ -35,7 +35,7 @@ compiler_module(
     name   = "Config",
     struct = "config.ml",
     sig    = "Config_cmi",
-    open   = ["//stdlib:Stdlib"],
+    # open   = ["//stdlib:Stdlib"],
     stdlib_deps   = [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Option", # if not bootstrapping?

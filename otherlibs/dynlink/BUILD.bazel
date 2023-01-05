@@ -132,7 +132,7 @@ compiler_module(
         # "//platform/constraints/ocaml/emitter:sys_emitter?": [
         "//config/target/executor:sys_executor?": [
         # "//toolchain/target/executor:sys_executor?": [
-            ":Dynlink_compilerlibs.Cmxs_format_cmi",
+            # ":Dynlink_compilerlibs.Cmxs_format_cmi",
             # "//stdlib:Stdlib.Filename",
         ]
     # }) + select({

@@ -13,18 +13,13 @@ def _compiler_module(ctx):
     return module_impl(ctx, module_name)
 
 ####################
-compiler_module = rule(
+compiler_module = rule( # same as tool_module(?)
     implementation = _compiler_module,
-    doc = "Compiles a module with the bootstrap compiler.",
+    doc = "Compiles a module needed by compilers.",
     attrs = dict(
         module_attrs(),
-        # stdlib only a runtime linker dep
-        # _stdlib_resolver = attr.label(
-        #     default = "//stdlib:Stdlib"
-        # ),
         _rule = attr.string( default = "compiler_module" ),
     ),
-    # cfg = compile_mode_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
     fragments = ["platform", "cpp"],

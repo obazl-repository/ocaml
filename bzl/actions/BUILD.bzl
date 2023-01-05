@@ -185,7 +185,7 @@ def progress_msg(workdir, ctx):
     elif protocol == "test":
         lbrack = "["
         rbrack = "]"
-    elif protocol == "tool":
+    elif protocol in ["fb", "tool"]:
         lbrack = "("
         rbrack = ")"
     else:

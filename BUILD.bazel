@@ -6,7 +6,9 @@ load("//bzl:rules.bzl", "run_tool", "run_repl")
 
 exports_files(["Makefile.config", "VERSION", "BUILD.bazel"])
 
-label_flag(name = "arg", build_setting_default = "BUILD.bazel")
+label_flag(name = "arg",
+           build_setting_default = "BUILD.bazel",
+           visibility = ["//visibility:public"])
 
 bool_flag(
     name = "verbose",

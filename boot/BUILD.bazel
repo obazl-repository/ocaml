@@ -42,10 +42,11 @@ config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 ## Package //boot contains pre-compiled OCaml executables (ocamlc,
 ## ocamllex) and aliases to native C executables (ocamlrun, ocamlyacc).
 
-alias(name = "bootstrap", actual = ":coldstart")
+alias(name = "bootstrap", actual = ":checkpoint")
+alias(name = "coldstart", actual = ":checkpoint")
 
 boot_coldstart(
-    name = "coldstart",
+    name = "checkpoint",
     runner = "coldstart_runner.sh",
     runtimes = [
         # "//runtime:asmrun",
@@ -64,6 +65,18 @@ boot_coldstart(
         "$(rlocationpath //vendor/merge_json)",
         "$(rlocationpaths //config/camlheaders)", # 10
 
+        "$(rlocationpaths //tools:ocamldep.byte)",
+        "$(rlocationpaths //tools:ocamldep.opt)",
+
+        "$(rlocationpaths //tools:ocamlprof.byte)",
+        "$(rlocationpaths //tools:ocamlprof.opt)",
+
+        "$(rlocationpaths //tools:ocamlobjinfo.byte)",
+        "$(rlocationpaths //tools:ocamlobjinfo.opt)",
+
+        "$(rlocationpaths //tools:primreq.byte)",
+        "$(rlocationpaths //tools:primreq.opt)",
+
         # flambda
         # "$(rlocationpath //bin:ocamlc.optx)",
         # "$(rlocationpath //bin:ocamlopt.optx)",
@@ -79,17 +92,32 @@ boot_coldstart(
         # "$(rlocationpath //bin/baseline:ocamlopt.opt)",
     ],
     data = [
+        "//config/camlheaders",
         "//runtime:asmrun",
         "//runtime:camlrun",
         "//runtime:ocamlrun",
-        "//boot:ocamlc.opt",
-        "//boot:ocamlopt.opt",  # 5
 
+        "//boot:ocamlc.opt",  #5
+        "//boot:ocamlopt.opt",
         "//boot:ocamlopt.byte",
         "//boot:ocamlc.byte",
+        "//bin:ocamlcp.byte",
+        "//bin:ocamlcp.opt",  # 10
+        "//bin:ocamloptp.opt",
+        "//bin:ocamloptp.byte",
+
         "//vendor/mustach",
         "//vendor/merge_json",
-        "//config/camlheaders", # 10
+
+        "//tools:ocamldep.byte",  #15
+        "//tools:ocamldep.opt",
+        "//tools:ocamlprof.byte",
+        "//tools:ocamlprof.opt",
+        "//tools:ocamlobjinfo.byte",
+        "//tools:ocamlobjinfo.opt",   # 20
+
+        "//tools:primreq.byte",
+        "//tools:primreq.opt",
 
         # "//bin:ocamlc.optx",
         # "//bin:ocamlopt.optx",

@@ -116,7 +116,7 @@ def _ocaml_tool_vm_in_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
-    if protocol == "std":
+    if protocol in ["std", "boot"]: # default/checkpoint
         config_executor = "sys"
         config_emitter  = "vm"
         # WARNING: some tools (lintapidiff) need to link to c code,
@@ -127,26 +127,24 @@ def _ocaml_tool_vm_in_transition_impl(settings, attr):
         ocamlrun = "//runtime:ocamlrun"
         runtime  = "//runtime:camlrun"
 
-    elif protocol == "boot":
+    elif protocol == "fb":  ## fastbuild, w/o compiler rebuild
         config_executor = "sys"
         config_emitter  = "vm"
-        compiler = "//boot:ocamlc.byte"
-        ocamlrun = "//runtime:ocamlrun"
-        runtime  = "//runtime:camlrun"
+        compiler = "@baseline//bin:ocamlc.opt"
+        runtime  = "@baseline//lib:camlrun"
+        ocamlrun = "@baseline//lib:ocamlrun"
 
-    # elif protocol == "baseline":
-    #     config_executor = "sys"
-    #     config_emitter  = "vm"
-    #     compiler = "@baseline//bin:ocamlc.opt"
-    #     ocamlrun = "@baseline//lib:ocamlrun"
-    #     runtime  = "@baseline//lib:camlrun"
-
-    elif protocol == "test":
+    elif protocol == "test":  ## with compiler rebuild
         config_executor = "sys"
         config_emitter  = "vm"
         compiler = "//test:ocamlc.opt"
         ocamlrun = "@baseline//bin:ocamlrun"
         runtime  = "@baseline//lib:camlrun"
+
+    else:
+        fail("Build protocol '{p}' not supported by this target.".format(p=protocol))
+        fail("FAIL goddamit!!!")
+        return { "foo": None }
 
     return {
         "//config/target/executor": config_executor,
@@ -230,17 +228,23 @@ def _ocaml_tool_sys_in_transition_impl(settings, attr):
 
     protocol = settings["//config/build/protocol"]
 
-    if protocol == "std":  ## default
+    if protocol in ["std", "boot"]:  ## default/checkpoint
         config_executor = "sys"
         config_emitter  = "sys"
         compiler = "//bin:ocamlopt.byte" # quickest std build
         runtime  = "//runtime:asmrun"
 
-    elif protocol == "boot":
+    elif protocol == "fb": # 'tool' is for build_tools
         config_executor = "sys"
         config_emitter  = "sys"
         compiler = "@baseline//bin:ocamlopt.opt"
         runtime  = "@baseline//lib:asmrun"
+
+    elif protocol == "test":
+        config_executor = "sys"
+        config_emitter  = "sys"
+        compiler = "//test:ocamlopt.opt"
+        runtime  = "//runtime:asmrun"
 
     else:
         fail("Protocol not yet supported: %s" % protocol)

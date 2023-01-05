@@ -52,22 +52,58 @@ echo "Installing WORKSPACE and BUILD files"
 echo "Installing programs"
 ## runtimes
 cp -vf $(rlocation $1) $BOOTDIR/lib/
-cp -vf $(rlocation $2) $BOOTDIR/lib/
-cp -vf $(rlocation $3) $BOOTDIR/bin/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/lib/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/lib/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
 
 # compilers
-cp -vf $(rlocation $4) $BOOTDIR/bin/
-cp -vf $(rlocation $5) $BOOTDIR/bin/
-cp -vf $(rlocation $6) $BOOTDIR/bin/
-cp -vf $(rlocation $7) $BOOTDIR/bin/
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
 
 # mustach, merge_json
-cp -vf $(rlocation $8) $BOOTDIR/bin/
-cp -vf $(rlocation $9) $BOOTDIR/bin/
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/bin/
+shift
 
 # camlheaders
-cp -vf $(rlocation ${10}) $BOOTDIR/lib/
-cp -vf $(rlocation ${11}) $BOOTDIR/lib/
+cp -vf $(rlocation $1) $BOOTDIR/lib/
+shift
+cp -vf $(rlocation $1) $BOOTDIR/lib/
+shift
+
+# ocamldep
+cp -vf $(rlocation ocamlcc/tools/_vm/ocamldep.byte) $BOOTDIR/bin/
+cp -vf $(rlocation  ocamlcc/tools/_sys/ocamldep.opt) $BOOTDIR/bin/
+
+# ocamlprof
+cp -vf $(rlocation ocamlcc/tools/_vm/ocamlprof.byte) $BOOTDIR/bin/
+cp -vf $(rlocation  ocamlcc/tools/_sys/ocamlprof.opt) $BOOTDIR/bin/
+
+# ocamlobjinfo
+cp -vf $(rlocation ocamlcc/tools/_vm/ocamlobjinfo.byte) $BOOTDIR/bin/
+cp -vf $(rlocation  ocamlcc/tools/_sys/ocamlobjinfo.opt) $BOOTDIR/bin/
+
+# primreq
+cp -vf $(rlocation ocamlcc/tools/_vm/primreq.byte) $BOOTDIR/bin/
+cp -vf $(rlocation  ocamlcc/tools/_sys/primreq.opt) $BOOTDIR/bin/
+
 
 echo "Installing stdib"
 
@@ -108,13 +144,13 @@ STDLIBDIR="`dirname $STDLIBDIR`"
 
 echo "Setting permissions"
 
-# chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
-# chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
+chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*
+chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.bazel
 
 # chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/ocamlrun
 # chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/mustach
-# chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*.opt
-# chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
+chmod -vf ug=+rx-w,o=-rwx $BOOTDIR/bin/*.opt
+chmod -vf ug=+r-xw,o=-rwx $BOOTDIR/bin/*.byte
 # chmod -vf ugo=+r-xw $BOOTDIR/lib/*.a
 
 echo "Coldstart completed."

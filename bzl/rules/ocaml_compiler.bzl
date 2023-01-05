@@ -55,13 +55,13 @@ def _std_ocamlc_byte_in_transition_impl(settings, attr):
     #     # goal: build _boot/ocamlc.byte from boot/ocamlc.boot
     #     # then _boot_ocamlc_byte/ocamlc.byte from _boot/ocamlc.byte
     #     protocol = "std"
-    #     # config_executor = "vm"
-    #     # config_emitter  = "vm"
+    #     config_executor = "vm"
+    #     config_emitter  = "vm"
     #     compiler = "//bin:ocamlc.byte"
     #     runtime  = "//runtime:camlrun"
     #     # cvt_emit = settings["//toolchain:cvt_emit"]
 
-    elif protocol == "tool":
+    elif protocol in ["boot", "tool"]:
         # during coldstart: use ocamlc.boot
         # after coldstart: use .bazeline/bin/ocamlc.opt
         protocol = "std"

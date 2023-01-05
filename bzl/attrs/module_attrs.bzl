@@ -36,10 +36,11 @@ def module_attrs():
             doc = "Undocumented flag, heavily used in bootstrapping",
             default = "//runtime:use_prims"
         ),
-        _primitives = attr.label( ## file
-            allow_single_file = True,
-            default = "//runtime:primitives_dat"
-        ),
+
+        # _primitives = attr.label( ## file
+        #     allow_single_file = True,
+        #     default = "//runtime:primitives_dat"
+        # ),
 
         ns = attr.label(
             doc = "Bottom-up namespacing",

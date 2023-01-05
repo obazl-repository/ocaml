@@ -37,7 +37,7 @@ def executable_impl(ctx, tc, exe_name,
                     ):
 
     debug = False
-    debug_ccdeps = True
+    debug_ccdeps = False
 
     if debug:
         print("EXECUTABLE TARGET: {kind}: {tgt}".format(

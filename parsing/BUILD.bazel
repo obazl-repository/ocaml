@@ -660,17 +660,18 @@ compiler_module(
 # 	@-tools/check-parser-uptodate-or-warn.sh
 # 	sed "s/MenhirLib/CamlinternalMenhirLib/g" $< > $@
 
+## WARNING: check-parser-update-or-warn is unecessary under Bazel
 genrule(
     name = "parser_ml",
     outs  = ["parser.ml"],
     srcs  = [
         "//:VERSION",
         "//boot/menhir:parser.ml",
-        "//tools:check-parser-uptodate-or-warn.sh",
+        # "//tools:check-parser-uptodate-or-warn.sh",
         "parser.mly"
     ],
     cmd  = "\n".join([
-        "$(location //tools:check-parser-uptodate-or-warn.sh) \\ ",
+        # "$(location //tools:check-parser-uptodate-or-warn.sh) \\ ",
 	    "sed \"s/MenhirLib/CamlinternalMenhirLib/g\" " +
         "$(location //boot/menhir:parser.ml) > $@"
     ])

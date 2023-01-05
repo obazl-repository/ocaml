@@ -189,7 +189,7 @@ run_ocamldep = rule(
         arg = attr.label(
             # mandatory = True,
             allow_single_file = True,
-            default = "//tools:arg"
+            default = "//:arg"
         ),
         _verbose = attr.label(
             default = "//tools:verbose"

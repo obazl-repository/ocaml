@@ -702,3 +702,30 @@ compiler_signature(
     ]
 )
 
+################################################################
+################
+# make_opcodes, opnames.ml
+# OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
+# NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
+# opnames.ml: $(ROOTDIR)/runtime/caml/instruct.h $(make_opcodes)
+# 	$(NEW_OCAMLRUN) $(make_opcodes) -opnames < $< > $@
+compiler_module(
+    name = "Opnames",
+    struct = ":opnames.ml",
+    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI],
+    stdlib_deps = ["//stdlib:Stdlib"]
+)
+
+## moved to bytecode:opnames_ml
+# genrule(
+#     name = "gen_opnames",
+#     outs = ["opnames.ml"],
+#     srcs = ["//runtime/caml:instruct.h", ":make_opcodes"],
+#     tools = ["//boot/baseline:ocamlrun"],
+#     cmd   = " ".join([
+#         "$(execpath //boot/baseline:ocamlrun) $(location :make_opcodes)",
+#         "-opnames < $(location //runtime/caml:instruct.h)",
+#         "> $@"
+#     ])
+# )

@@ -81,7 +81,7 @@ def _run_tool_impl(ctx):
 #######################
 run_tool = rule(
     implementation = _run_tool_impl,
-    doc = "Compile and test an OCaml program.",
+    doc = "Run an ocaml tool.",
     attrs = dict(
         tool = attr.label(
             allow_single_file = True,
