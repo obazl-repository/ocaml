@@ -94,12 +94,15 @@ def aggregate_deps(ctx,
         ## if target == vm, and vmruntime = dynamic, then cc_binary
         ## targets producing shared libs will deliver the shared lib
         ## in DefaultInfo, but not in CcInfo. E.g. jsoo
-        ## lib/runtime:jsoo_runtime builds a cc_bindary
+        ## lib/runtime:jsoo_runtime builds a cc_binary
         ## dlljsoo_runtime_stubs.so or a cc_library
         ## libjsoo_runtime.stubs.a, depending on build context.
 
         ## to handle this anomlous case we need to detect it and then
         ## construct a CcInfo provider containing the shared lib.
+        ## Since the target also contains a CcInfo, we need to add it
+        ## to the list also, so they will be merged.
+        depsets.ccinfos.append(target[CcInfo])
 
         # (libname, filtered_ccinfo) = filter_ccinfo(dep)
         # if debug_cc:
@@ -119,10 +122,6 @@ def aggregate_deps(ctx,
         #     # dump_CcInfo(ctx, dep[CcInfo])
 
         ccInfo = normalize_ccinfo(ctx, target)
-        # if ctx.label.name == "jsoo_runtime":
-        #     dump_CcInfo(ctx, ccInfo)
-        #     fail("asdf")
-
         depsets.ccinfos.append(ccInfo)
 
     return depsets

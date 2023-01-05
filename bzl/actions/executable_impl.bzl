@@ -183,7 +183,14 @@ def executable_impl(ctx, tc, exe_name,
     ## static (vm runtime extended by static c libs) or dynamic (pure
     ## vm runtime that dynamically loads clibs).
 
-    ## Currently only static is supported (i.e. -custom flag is inserted).
+    ## Currently (on mac) only static is supported (i.e. -custom flag
+    ## is inserted), because cc_library only produces .a libs. To add
+    ## dynamic support, we need to add cc_binary targets to produce
+    ## .so libs, and select the one we want.
+
+    ## On linux, cc_library produces both libfoo.a and libfoo.so (and
+    ## maybe libfoo.pic.a?), so we need a method to decide which to use.
+
     ## See https://v2.ocaml.org/manual/intfc.html#ss:staticlink-c-code
     ## and https://v2.ocaml.org/manual/intfc.html#ss:dynlink-c-code
 
@@ -237,7 +244,7 @@ def executable_impl(ctx, tc, exe_name,
         # will add -L<f.dirname> below
         # cc_libdirs.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
         cc_libdirs.append(tc.runtime.dirname)
-    else:
+    else:  # stem != ocamlc
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
         runtime_path = tc.runtime.path
 
@@ -331,7 +338,7 @@ def executable_impl(ctx, tc, exe_name,
     #     # includes.append(f.dirname)
     #     camlheader_deps.append(f)
 
-    ## To get cli args in right order, we need then merged depset of
+    ## To get cli args in right order, we need the merged depset of
     ## all deps. Then we use the manifest to filter.
 
     manifest = ctx.files.prologue
@@ -395,7 +402,7 @@ def executable_impl(ctx, tc, exe_name,
     for d in cc_libdirs:
         args.add_all(["-ccopt", "-L" + d])
 
-    if ctx.attr.cc_deps:
+    if ctx.attr.cc_deps:        # FIXME: obsolete?
         for f in ctx.files.cc_deps:
             # args.add_all(["-ccopt", "-L" + f.path])
             # args.add_all(["-ccopt", f.basename])
@@ -442,10 +449,14 @@ def executable_impl(ctx, tc, exe_name,
     if hasattr(ctx.attr, "epilogue"):
         args.add_all(ctx.files.epilogue)
 
-    ## only add this if -nopervasives
+    # if -nopervasives, then std_exit must be explicit on the cmd line
+    # if -pervasives, it only needs to be in the inputs depset
     if not pervasives:
         args.add_all(ctx.files._std_exit)
 
+    ################################################################
+    ## cc deps other than runtimes (e.g. libcamlstr, libunix, etc.)
+    ################################################################
     if debug_ccdeps:
         dump_CcInfo(ctx, ccInfo_provider)
         print("x: %s" % ccinfo_to_string(ctx, ccInfo_provider))

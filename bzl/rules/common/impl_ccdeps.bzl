@@ -651,8 +651,10 @@ def cc_shared_lib_to_ccinfo(ctx, ccinfo, ccfile):
 
 
 ################################################################
-## target may contain shared libs in DefaultInfo, as we as a CcInfo
-## provider.  Merge them.
+## target contains CcInfo provider. If it is a cc_library target, it
+## may contain shared libs in DefaultInfo (happens on linux, not mac?)
+## but *not* list those libs in its CcInfo provider. So we need to
+## manually merge them.
 def normalize_ccinfo(ctx, target):
 
     debug = False
@@ -676,7 +678,9 @@ def normalize_ccinfo(ctx, target):
     ## Create a new CcInfo containing just the ccfiles
 
     ## FIXME: here we've assumed that the CcInfo is empty if
-    ## DefaultInfo contains a shared lib.
+    ## DefaultInfo contains a shared lib. If it is not? We need to
+    ## create a new CcInfo containing the cc libs in DefaultInfo, and
+    ## merge it with the CcInfo already in the target.
 
     cc_toolchain = find_cpp_toolchain(ctx)
     # cc_toolchain = ctx.toolchains["@bazel_tools//tools/cpp:toolchain_type"]
@@ -713,5 +717,7 @@ def normalize_ccinfo(ctx, target):
         compilation_context = cc_common.create_compilation_context(),
         linking_context = linking_ctx
     )
+
+    ## now merge this new CcInfo with target[CcInfo]
 
     return cc_info

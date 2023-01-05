@@ -1,5 +1,6 @@
 load("//bzl:rules.bzl",
      "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -7,7 +8,7 @@ load("//bzl:rules.bzl",
 MODULE_OPTS = ["-nostdlib"]
 SIG_OPTS = ["-nostdlib"]
 
-boot_library(
+compiler_library(
     name = "unix_lib",
     manifest  = [
         ":Unix",
@@ -147,8 +148,12 @@ filegroup(
 # -D_FILE_OFFSET_BITS=64  -DCAML_BUILDING_UNIX
 # -o chown.o chown.c
 
+## WARNING: on macos, this produces libunix.a; on linux: libunix.a,
+## libunix.so
 cc_library(
     name = "unix",
+    linkstatic = True, # for now
+    # features = ["-pic"],  ## no effect?
     srcs = [
         "common_c_sources",
         "unix_sources"
