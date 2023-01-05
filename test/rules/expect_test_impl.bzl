@@ -18,7 +18,7 @@ load("//bzl/transitions:dev_transitions.bzl",
 ##############################
 def expect_test_impl(ctx):
 
-    debug = True
+    debug = False
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 

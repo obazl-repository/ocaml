@@ -51,7 +51,9 @@ expect_vv_test = rule(
         ),
 
         _runtime = attr.label(
-            allow_single_file = True,
+            #WARNING: cc_import may not produce a single file, even if
+            # it impports a single file.
+            # allow_single_file = True,
             default = "//toolchain:runtime",
             executable = False,
             # cfg = reset_cc_config_transition ## only build once
@@ -93,7 +95,7 @@ expect_vs_test = rule(
         ),
 
         _runtime = attr.label(
-            allow_single_file = True,
+            # allow_single_file = True,
             default = "//toolchain:runtime",
             executable = False,
             # cfg = reset_cc_config_transition ## only build once
@@ -135,7 +137,7 @@ expect_ss_test = rule(
         ),
 
         _runtime = attr.label(
-            allow_single_file = True,
+            ## allow_single_file = True,
             default = "//toolchain:runtime",
             executable = False,
             # cfg = reset_cc_config_transition ## only build once
@@ -178,7 +180,7 @@ expect_sv_test = rule(
         ),
 
         _runtime = attr.label(
-            allow_single_file = True,
+            # allow_single_file = True,
             default = "//toolchain:runtime",
             executable = False,
             # cfg = reset_cc_config_transition ## only build once

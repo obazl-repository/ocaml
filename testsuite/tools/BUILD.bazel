@@ -1,4 +1,5 @@
-load("//bzl:rules.bzl", "ocaml_tool_vm")
+load("//tools:TOOL_RULES.bzl", "ocaml_tool_vm")
+
 load("//test:rules.bzl",
      "test_archive",
      "test_executable",
