@@ -422,36 +422,38 @@ def std_ocaml_compilers(name,
 
     ## Standard Big Four
     std_ocamlc_byte(
-        name = "ocamlc.byte",
+        name       = "ocamlc.byte",
         prologue   = OCAMLC_PROLOGUE,
         main       = OCAMLC_MAIN,
         opts       = OCAML_COMPILER_OPTS,
-        visibility             = ["//visibility:public"]
+        visibility = ["//visibility:public"]
     )
 
     std_ocamlopt_byte(
-        name = "ocamlopt.byte",
+        name       = "ocamlopt.byte",
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
-        visibility             = ["//visibility:public"]
+        visibility = ["//visibility:public"]
     )
 
     std_ocamlopt_opt(
-        name = "ocamlopt.opt",
+        name       = "ocamlopt.opt",
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
-        visibility             = ["//visibility:public"]
+        visibility = ["//visibility:public"]
     )
 
     std_ocamlc_opt(
-        name = "ocamlc.opt",
+        name       = "ocamlc.opt",
         prologue   = OCAMLC_PROLOGUE,
         main       = OCAMLC_MAIN,
         opts       = OCAML_COMPILER_OPTS,
-        visibility             = ["//visibility:public"]
+        visibility = ["//visibility:public"]
     )
+
+    ##FIXME: put profiling variants here? (ocamlcp.byte etc.)
 
     ################################################################
     ## Profiling variants
@@ -460,7 +462,7 @@ def std_ocaml_compilers(name,
     ## Flambda variants
 
     ocamloptx_byte(
-        name = "ocamloptx.byte",
+        name       = "ocamloptx.byte",
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
@@ -468,7 +470,7 @@ def std_ocaml_compilers(name,
     )
 
     ocamloptx_optx(
-        name = "ocamloptx.optx",
+        name       = "ocamloptx.optx",
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
@@ -476,11 +478,11 @@ def std_ocaml_compilers(name,
     )
 
     ocamlc_optx(
-        name = "ocamlc.optx",
+        name       = "ocamlc.optx",
         prologue   = OCAMLC_PROLOGUE,
         main       = OCAMLC_MAIN,
         opts       = OCAML_COMPILER_OPTS,
-        visibility             = ["//visibility:public"]
+        visibility = ["//visibility:public"]
     )
 
     ## TODO:
@@ -488,11 +490,11 @@ def std_ocaml_compilers(name,
     ## built by ocamloptx.optx, but built w/o flambda
     ## (ocamlc.optx is already an optimized non-optimizing compiler)
     ocamlopt_optx(
-        name = "ocamlopt.optx",
+        name       = "ocamlopt.optx",
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
-        visibility             = ["//visibility:public"]
+        visibility = ["//visibility:public"]
     )
 
 ################################################################
