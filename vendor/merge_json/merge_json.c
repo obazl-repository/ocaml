@@ -44,18 +44,25 @@ cJSON *read_json(char *json_file) {
 #endif
     }
     fseek (stream, 0, SEEK_END);
-    uint64_t filea_sz = ftell (stream);
+    long filea_sz = ftell (stream);
     fseek (stream, 0, SEEK_SET);
     char * buffer = malloc (filea_sz);
+    size_t readed;
     if (buffer) {
-        fread(buffer, 1, filea_sz, stream);
+        readed = fread(buffer, 1, (size_t)filea_sz, stream);
     } else {
         printf("HUH?\n");
         fclose(stream);
         return NULL;
     }
+    if (readed != filea_sz) {
+        fprintf(stderr, "fread readed ct != nitems\n");
+        free(buffer);
+        fclose(stream);
+        exit(EXIT_FAILURE);     /* FIXME: exit gracefully */
+    }
 #ifdef DEBUG
-    printf("readed: %llu\n", filea_sz);
+    printf("readed: %ld (nitems: %ld)\n", readed, filea_sz);
 #endif
 
     cJSON *json = cJSON_Parse((char*)buffer);
