@@ -71,11 +71,12 @@ boot_ocamlc_import = rule(
 )
 
 ################################################################
-def _coldstart_in_transition_impl(settings, attr):
-    debug = True
+################################################################
+def _checkpoint_in_transition_impl(settings, attr):
+    debug = False
 
     if debug:
-        print("TRANSITION: coldstart_in_transition")
+        print("TRANSITION: checkpoint_in_transition")
         print("protocol: %s" % settings["//config/build/protocol"])
         print("compiler: %s" % settings["//toolchain:compiler"])
         print("config_executor: %s" % settings["//config/target/executor"])
@@ -96,8 +97,8 @@ def _coldstart_in_transition_impl(settings, attr):
     }
 
 ###################################
-_coldstart_in_transition = transition(
-    implementation = _coldstart_in_transition_impl,
+_checkpoint_in_transition = transition(
+    implementation = _checkpoint_in_transition_impl,
     inputs = [
         "//config/build/protocol",
         "//config/target/executor",
@@ -112,16 +113,16 @@ _coldstart_in_transition = transition(
 )
 
 ########################
-def _boot_coldstart_impl(ctx):
+def _boot_checkpoint_impl(ctx):
 
-    runner = ctx.actions.declare_file("coldstart.sh")
+    runner = ctx.actions.declare_file("checkpoint.sh")
     ctx.actions.symlink(output = runner,
                         target_file = ctx.file.runner)
 
     rfs = []
 
     ## we need to pass //config/target/executor, //config/target/emitter
-    ## as args to coldstart.sh. We cannot set the 'args' attr here,
+    ## as args to checkpoint.sh. We cannot set the 'args' attr here,
     ## so we write them to files and pass them in runfiles.
     ## the shell script reads them to discover what is being built
     ## and needs to be copied to .baseline/bin.
@@ -163,8 +164,8 @@ def _boot_coldstart_impl(ctx):
     return defaultInfo
 
 #####################
-boot_coldstart = rule(
-    implementation = _boot_coldstart_impl,
+boot_checkpoint = rule(
+    implementation = _boot_checkpoint_impl,
 
     doc = "Builds boot toolchain and installs in .bootstrap/",
 
@@ -173,7 +174,7 @@ boot_coldstart = rule(
             allow_single_file = True,
             executable = True,
             cfg = "exec",
-            default = "//boot:coldstart.sh",
+            default = "//boot:checkpoint.sh",
         ),
         compilers = attr.label_list(
             allow_files = True
@@ -203,64 +204,64 @@ boot_coldstart = rule(
         ),
 
     ),
-    cfg = _coldstart_in_transition,
+    cfg = _checkpoint_in_transition,
     executable = True,
     # toolchains = ["//toolchain/type:ocaml"],
 )
 
 ###############################
-# def boot_coldstart(**kwargs):
+# def boot_checkpoint(**kwargs):
 #   if "args" not in kwargs:
 #       kwargs["args"] = ["a", "b", "c"]
-#   _boot_coldstart(**kwargs)
+#   _boot_checkpoint(**kwargs)
 
 ################################################################
 
-def _boot_setup_impl(ctx):
+# def _boot_setup_impl(ctx):
 
-    runner = ctx.actions.declare_file("setup.sh")
-    ctx.actions.symlink(output = runner,
-                        target_file = ctx.file.runner)
+#     runner = ctx.actions.declare_file("setup.sh")
+#     ctx.actions.symlink(output = runner,
+#                         target_file = ctx.file.runner)
 
-    rfs = []
+#     rfs = []
 
-    for d in ctx.attr.data:
-        # print("DATUM: %s" % d)
-        rfs.append(d.files)
-        rfs.append(d[DefaultInfo].default_runfiles.files)
+#     for d in ctx.attr.data:
+#         # print("DATUM: %s" % d)
+#         rfs.append(d.files)
+#         rfs.append(d[DefaultInfo].default_runfiles.files)
 
-    # for f in ctx.files.runtimes:
-    #     # print("RUNTIME: %s" % d)
-    #     rfs.append(f)
+#     # for f in ctx.files.runtimes:
+#     #     # print("RUNTIME: %s" % d)
+#     #     rfs.append(f)
 
-    runfiles = ctx.runfiles(
-        # files = ctx.files.runtimes,
-        transitive_files = depset(transitive=rfs)
-    )
+#     runfiles = ctx.runfiles(
+#         # files = ctx.files.runtimes,
+#         transitive_files = depset(transitive=rfs)
+#     )
 
-    defaultInfo = DefaultInfo(
-        executable = runner,
-        runfiles   = runfiles
-    )
+#     defaultInfo = DefaultInfo(
+#         executable = runner,
+#         runfiles   = runfiles
+#     )
 
-    return defaultInfo
+#     return defaultInfo
 
-#####################
-boot_setup = rule(
-    implementation = _boot_setup_impl,
+# #####################
+# boot_setup = rule(
+#     implementation = _boot_setup_impl,
 
-    doc = "Prebuilds CC tools",
+#     doc = "Prebuilds CC tools",
 
-    attrs = dict(
-        runner = attr.label(
-            allow_single_file = True,
-            executable = True,
-            cfg = "exec",
-            default = "//boot:coldstart.sh",
-        ),
-        data = attr.label_list(
-            allow_files = True
-        ),
-    ),
-    executable = True,
-)
+#     attrs = dict(
+#         runner = attr.label(
+#             allow_single_file = True,
+#             executable = True,
+#             cfg = "exec",
+#             default = "//boot:checkpoint.sh",
+#         ),
+#         data = attr.label_list(
+#             allow_files = True
+#         ),
+#     ),
+#     executable = True,
+# )

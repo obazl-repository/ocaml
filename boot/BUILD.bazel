@@ -28,8 +28,7 @@ load(":BOOT_RULES.bzl",
 
 load(":BUILD_RULES.bzl",
      "boot_ocamlc_import",
-     "boot_coldstart",
-     "boot_setup")
+     "boot_checkpoint")
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
@@ -45,7 +44,7 @@ config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 alias(name = "bootstrap", actual = ":checkpoint")
 alias(name = "coldstart", actual = ":checkpoint")
 
-COLDSTART_DEPS = [
+CHECKPOINT_DEPS = [
     "//config/camlheaders",
     "//runtime:asmrun",
     "//runtime:camlrun",
@@ -106,38 +105,38 @@ COLDSTART_DEPS = [
     "@bazel_tools//tools/bash/runfiles",
 ]
 
-boot_coldstart(
+boot_checkpoint(
     name = "checkpoint",
-    runner = "coldstart_runner.sh",
+    runner = "checkpoint_runner.sh",
     runtimes = [
         # "//runtime:asmrun",
         # "//runtime:camlrun",
     ],
-    data = COLDSTART_DEPS,
-    args = ["$(rlocationpaths {})".format(dep) for dep in COLDSTART_DEPS]
+    data = CHECKPOINT_DEPS,
+    args = ["$(rlocationpaths {})".format(dep) for dep in CHECKPOINT_DEPS]
 )
 
-boot_setup(
-    name = "preproc",
-    runner = "preproc_runner.sh",
-    data = [
-        "@bazel_tools//tools/bash/runfiles",
-        # generated code - cache it so it only gets generated once
-        "//runtime:ints.c",
-        "//runtime:primitives.dat",
-        "//runtime:primitives.h",
-        "//runtime:prims.c",
-        "//runtime/caml:domain_state.h",
-        "//runtime/caml:instruct.h",
-        "//runtime/caml:fail.h",
-        "//runtime/caml:jumptbl.h",
-        "//runtime/caml:opnames.h",
-        "//runtime/caml:s.h",
-        "//stdlib:stdlib.mli",
-        "//stdlib:stdlib.ml",
-        "//vendor/mustach",
-    ],
-)
+# boot_setup(
+#     name = "preproc",
+#     runner = "preproc_runner.sh",
+#     data = [
+#         "@bazel_tools//tools/bash/runfiles",
+#         # generated code - cache it so it only gets generated once
+#         "//runtime:ints.c",
+#         "//runtime:primitives.dat",
+#         "//runtime:primitives.h",
+#         "//runtime:prims.c",
+#         "//runtime/caml:domain_state.h",
+#         "//runtime/caml:instruct.h",
+#         "//runtime/caml:fail.h",
+#         "//runtime/caml:jumptbl.h",
+#         "//runtime/caml:opnames.h",
+#         "//runtime/caml:s.h",
+#         "//stdlib:stdlib.mli",
+#         "//stdlib:stdlib.ml",
+#         "//vendor/mustach",
+#     ],
+# )
 
 
 sh_binary(
