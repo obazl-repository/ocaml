@@ -1,0 +1,99 @@
+= build verification
+
+Purposes:
+
+* Verify that the actual build matches the designed build
+  ** In particular, verify the
+     xref:build_protocols.adoc#_boot_build_stacks[build stacks]. For
+     example, for `//bin:ocamlc.byte` it should be `boot/ocamlc >
+     ocamlc.byte`, but for `//boot/ocamlc.byte` it should be
+     `boot/ocamlc > ocamlc.byte > ocamlc.byte`.
+* Verify that builds are truly incremental: nothing is built unnecessarily.
+
+== Method 1:  stdout/stderr
+
+The brute-force method is to log the build and inspect the output.
+Build actions are tagged with "mnemonics", so you can search for those
+(see the rule sources for the mnemonics.)
+
+* Get and save the location of the command log. One simple method:
++
+----
+    $ alias bzlog="less -R $(bazel info command_log)"
+----
++
+Note that the `bazel info` command output is logged, which is why we
+need to save the location of the log file. Running `$(bazel info
+command_log)` again after a build would overwrite the log from the
+build.
+
+* Build with `--subcommands=pretty_print` or `--subcommands=True`
++
+Building without verbose output may display progress messages but they
+may be repeated and it is hard to pick out the specific targets of
+interest.
+
+* After building, inspect the command log (`bzlog`).
+
+You can check to see which compiler was used to build any compiler target using `aquery`:
+
+    bazel aquery boot:ocamlopt.byte
+
+This should show that `ocamlopt.byte` was built using something like:
+
+    bazel-out/<confighash seg>/bin/boot/_BS_vv/ocamlc.byte
+
+=== Incremental rebuilds
+
+Using the above method you can verify that test cases are indeed
+rebuilt incrementally after source code changes. For example, module
+`testsuite/tests/basic/sets.ml` depends directly on `Stdlib.Set` and
+`Stdlib.Printf`, both of which depend in turn on other `Stdlib`
+submodules. You can use a query to print the complete dependency
+graph:
+
+     bazel query 'deps(testsuite/tests/basic/Sets)' --output=graph
+
+Doing the same for `stdlib:Stdlib.Set` shows that it depends on
+`stdlib:Stdlib.Seq`, which depends on `stdlib:Stdlib.Atomic`. So if we
+make a change to the last, and we rerun the `basic:Sets` test, only
+those `Stdlib` submodules should be recompiled (after the compiler
+itself is rebuilt).
+
+So make an edit to stdlib/sets.ml and rerun the test:
+
+    bazel test testsuite/tests/basic:Sets_vv_test --config=show
+
+In the build command log after rerunning the test, search for `Link`;
+this should match two "mnemonics": `LinkTestCompiler` and
+`LinkVvTestExecutable`. The first is attached to the action that links
+the `ocamlc.byte` compiler, which is rebuilt because it depends on
+`Stdlib`, which changed. You can confirm that it was built using the
+baseline compiler. The second is attached to the test case executable
+itself; you can verify that it was linked using the just-built
+`ocamlc.byte`. Between those two entries, you can verify that only the
+modules needed to build Sets are indeed rebuilt. Try changing some
+dependency other that `Stdlib.Atomic`, and verify that the rebuild
+changes.
+
+WARNING: Currently all deps in `Stdlib` get rebuilt after the compiler
+is rebuilt. This makes sense since they all depend on the compiler,
+which changes. [An enhancement: do not rebuild the compiler if only the
+stdlib changes.]
+
+== Method 2: BEP
+
+BEP:: Build Event Protocol.  "[A] set of protocol buffer messages with
+some semantics defined on top of it. It includes information about
+build and test results, build progress, the build configuration and
+much more. The BEP is intended to be consumed programmatically and
+makes parsing Bazel’s command line output a thing of the past."
+
+Not currently supported but very promising.
+
+Documentation:
+
+* link:https://bazel.build/remote/bep[Build Event Protocol]
+* link:https://bazel.build/remote/bep-glossary#buildstarted[BEP Glossary]
+
+* link:https://github.com/bazelbuild/bazel/blob/master/src/main/java/com/google/devtools/build/lib/buildeventstream/proto/build_event_stream.proto[build_event_stream.proto]
