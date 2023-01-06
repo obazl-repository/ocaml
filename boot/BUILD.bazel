@@ -20,15 +20,17 @@ load("//bzl/rules:COMPILER.bzl",
      "OCAML_COMPILER_OPTS")
 
 load(":BOOT_RULES.bzl",
-     "boot_import_vm_executable", ## for boot/ocamllex
      "boot_ocamlc_byte",
      "boot_ocamlopt_byte",
      "boot_ocamlopt_opt",
      "boot_ocamlc_opt")
 
-load(":BUILD_RULES.bzl",
-     "boot_ocamlc_import",
+load(":BUILD_CHECKPOINT.bzl",
      "boot_checkpoint")
+
+load(":BUILD_IMPORTS.bzl",
+     "boot_import_vm_executable", ## for boot/ocamllex
+     "boot_ocamlc_import")
 
 # load("//bzl/rules/macros:stdlib.bzl", "stdlib")
 
@@ -45,68 +47,47 @@ alias(name = "bootstrap", actual = ":checkpoint")
 alias(name = "coldstart", actual = ":checkpoint")
 
 CHECKPOINT_DEPS = [
+    "//lex:ocamllex.byte",
+    "//lex:ocamllex.opt",
+    "//yacc:ocamlyacc",
     "//config/camlheaders",
-    "//runtime:asmrun",
+    "//runtime:asmrun",         # 5
     "//runtime:camlrun",
     "//runtime:ocamlrun",
-
-    "//boot:ocamlc.opt",  #5
+    "//boot:ocamlc.opt",
     "//boot:ocamlopt.opt",
-    "//boot:ocamlopt.byte",
+    "//boot:ocamlopt.byte",     # 10
     "//boot:ocamlc.byte",
-
+    # ## FIXME: should we use boot protocol for these?
     "//bin:ocamlcp.byte",
-    "//bin:ocamlcp.opt",  # 10
+    "//bin:ocamlcp.opt",
     "//bin:ocamloptp.opt",
-    "//bin:ocamloptp.byte",
-
+    "//bin:ocamloptp.byte",     # 15
+    # ## FIXME: should we use boot protocol for these?
     "//bin:ocamloptx.byte",
     "//bin:ocamloptx.opt",
     "//bin:ocamlc.optx",
     "//bin:ocamlopt.optx",
-    "//bin:ocamloptx.optx",
-
+    "//bin:ocamloptx.optx",     # 20
     "//vendor/mustach",
     "//vendor/merge_json",
-
-    "//tools:ocamldep.byte",  #15
+    "//tools:ocamldep.byte",
     "//tools:ocamldep.opt",
-    "//tools:ocamlprof.byte",
+    "//tools:ocamlprof.byte",   # 25
     "//tools:ocamlprof.opt",
     "//tools:ocamlobjinfo.byte",
-    "//tools:ocamlobjinfo.opt",   # 20
-
+    "//tools:ocamlobjinfo.opt",
+    "//tools:dumpobj.byte",
+    "//tools:dumpobj.opt",      # 30
     "//tools:primreq.byte",
     "//tools:primreq.opt",
-
     "//debugger:ocamldebug.byte",
     "//debugger:ocamldebug.opt",
 
-    ## obsolete:
-    # "//bin:ocamlc.optx",
-    # "//bin:ocamlopt.optx",
-    # "//bin:ocamloptx.optx",
-    # "//bin:ocamloptx.byte",
+    ## TODO: ocamldoc etc.
 
-    # "//tools:dumpobj.opt",
-
-    # "@baseline//:ocamlc.byte",
-    # "//bin/baseline:ocamlc.byte",
-    # "//bin/baseline:ocamlopt.byte",
-    # "//bin/baseline:ocamlc.opt",
-    # "//bin/baseline:ocamlopt.opt",
-
-    # "//lex:ocamllex.byte",
-    # "//lex:ocamllex.opt",
-    # "//yacc:ocamlyacc",
-
-    ## the shell script could obtain the following from the preceding:
-    # "//stdlib",
-    # "//stdlib:Std_exit",
-
-    # "//asmcomp:cvt_emit.byte",
-
-    # "//asmcomp:cvt_emit.byte",
+    # stdlib??
+    # "//asmcomp:cvt_emit.byte",  ## ??
 
     "@bazel_tools//tools/bash/runfiles",
 ]
@@ -151,11 +132,9 @@ sh_binary(
 )
 
 ################################################################
-boot_ocamlc_import(
-    name = "ocamlc.boot",
-    # tool = ":ocamlc",
-    # runtime = "//runtime:ocamlrun"
-)
+## boot/ocamlc import (specialized rule)
+################################################################
+boot_ocamlc_import(name = "ocamlc.boot")
 
 sh_binary(
     name = "ocamlc.boot.sh",
@@ -182,8 +161,8 @@ sh_binary(
 )
 
 ################################################################
-# boot_ocaml_compilers(
-#     name = "ocamlcc",
+# boot_compilers(
+#     name = "boot_ocamlcc",
 #     visibility = ["//visibility:public"]
 # )
 
@@ -378,8 +357,8 @@ boot_import_vm_executable(
 )
 
 sh_binary(
-    name = "ocamllex.sh",
-    srcs = ["ocamllex.byte.sh"],
+    name = "ocamllex.byte.sh",
+    srcs = ["ocamllex.byte.runner.sh"],
     data = [
         ":ocamllex.byte",
         "//runtime:ocamlrun"

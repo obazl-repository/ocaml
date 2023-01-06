@@ -45,7 +45,12 @@ echo "Installing WORKSPACE and BUILD files"
 
 echo "Installing programs"
 
-VERBOSE=
+if [ -z ${VERBOSE+x} ]
+then
+    VERBOSE=
+else
+    VERBOSE="-v"
+fi
 
 for arg in "$@"
 do
