@@ -6,21 +6,15 @@ load("@bazel_skylib//rules:common_settings.bzl",
 load("//bzl:rules.bzl",
      "ocaml_compiler_r",
      "compiler_module",
-     "std_ocaml_compilers", # macro
-     "flambda_ocaml_compilers", # macro
+     "std_compilers", # macro
+     "profiling_compilers", # macro
+     "flambda_compilers", # macro
      ## for profiling compilers:
      "std_ocamlc_byte",
      "std_ocamlopt_byte",
      "std_ocamlopt_opt",
      "std_ocamlc_opt"
      )
-
-load("//bzl/rules:COMPILER.bzl",
-     "OCAMLCP_PROLOGUE",
-     "OCAMLCP_MAIN",
-     "OCAMLOPTP_PROLOGUE",
-     "OCAMLOPTP_MAIN",
-     "OCAML_COMPILER_OPTS")
 
 load("//tools:TOOL_RULES.bzl",
      "ocaml_tools",  ## macro
@@ -37,24 +31,24 @@ bool_flag(name = "verbose", build_setting_default = False,
 config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 
 ################################################################
-## ocaml_compilers is a macro; it expands to: ocamlc_byte,
-## ocamlopt_byte ocamlopt_opt, ocamlc_opt
-
-std_ocaml_compilers(
+std_compilers(                  # macro
     name = "std_ocamlcc",
     visibility = ["//visibility:public"]
 )
 
-flambda_ocaml_compilers(
+profiling_compilers(              # macro
+    name = "profiling_ocamlcc",
+    visibility = ["//visibility:public"]
+)
+
+flambda_compilers(              # macro
     name = "flambda_ocamlcc",
     visibility = ["//visibility:public"]
 )
 
-## to run the compilers directly from the cmd line:
-
-# xcodebuild -sdk -version
-# xcrun --sdk macosx --show-sdk-path
-
+################################################################
+## runners, for vm executables
+################################################################
 sh_binary(
     name = "ocamlc.byte.sh",
     srcs = ["ocamlcc.sh"],
@@ -144,41 +138,6 @@ sh_binary(
          # for the runfiles lib used in ocamlc.sh:
         "@bazel_tools//tools/bash/runfiles"
     ]
-)
-
-################################################################
-################################################################
-## Profiling compilers ocamlcp.byte, ocamlcp.opt, ocamloptp.byte, ocamloptp.opt
-
-std_ocamlc_byte(
-    name = "ocamlcp.byte",
-    prologue = OCAMLCP_PROLOGUE,
-    main = OCAMLCP_MAIN
-)
-
-std_ocamlc_opt(
-    name       = "ocamlcp.opt",
-    prologue   = OCAMLCP_PROLOGUE,
-    main       = OCAMLCP_MAIN,
-    opts       = OCAML_COMPILER_OPTS,
-    visibility = ["//visibility:public"]
-)
-
-# profiling compiler ocamloptp.byte, ocamloptp.opt
-std_ocamlopt_byte(
-    name       = "ocamloptp.byte",
-    prologue   = OCAMLOPTP_PROLOGUE,
-    main       = OCAMLOPTP_MAIN,
-    opts       = OCAML_COMPILER_OPTS,
-    visibility = ["//visibility:public"]
-)
-
-std_ocamlopt_opt(
-    name       = "ocamloptp.opt",
-    prologue   = OCAMLOPTP_PROLOGUE,
-    main       = OCAMLOPTP_MAIN,
-    opts       = OCAML_COMPILER_OPTS,
-    visibility = ["//visibility:public"]
 )
 
 ################################################################

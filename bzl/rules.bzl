@@ -15,16 +15,18 @@ load("//bzl/rules:cc_preprocess.bzl", _cc_preprocess = "cc_preprocess")
 #      _boot_ocamlc_opt = "boot_ocamlc_opt",
 #      _boot_ocaml_compilers = "boot_ocaml_compilers")
 
-load("//bzl/rules:ocaml_compiler.bzl",
+load("//bzl/rules:ocaml_compilers.bzl",
      _ocaml_compiler_r = "ocaml_compiler_r",
      _std_ocamlc_byte = "std_ocamlc_byte",
      _std_ocamlopt_byte = "std_ocamlopt_byte",
      _std_ocamlopt_opt = "std_ocamlopt_opt",
      _std_ocamlc_opt = "std_ocamlc_opt",
-     _std_ocaml_compilers = "std_ocaml_compilers")
+     # macros:
+     _std_compilers = "std_compilers",
+     _profiling_compilers = "profiling_compilers")
 
 load("//bzl/rules:flambda_compilers.bzl",
-     _flambda_ocaml_compilers = "flambda_ocaml_compilers")
+     _flambda_compilers = "flambda_compilers")
 
 load("//bzl/rules:build_tool.bzl",
      _build_tool_vm = "build_tool_vm",
@@ -99,12 +101,13 @@ compiler_signature   = _compiler_signature
 # boot_ocaml_compilers      = _boot_ocaml_compilers
 
 ocaml_compiler_r          = _ocaml_compiler_r
-std_ocamlc_byte               = _std_ocamlc_byte
-std_ocamlopt_byte             = _std_ocamlopt_byte
-std_ocamlopt_opt              = _std_ocamlopt_opt
-std_ocamlc_opt                = _std_ocamlc_opt
-std_ocaml_compilers           = _std_ocaml_compilers
-flambda_ocaml_compilers       = _flambda_ocaml_compilers
+std_ocamlc_byte           = _std_ocamlc_byte
+std_ocamlopt_byte         = _std_ocamlopt_byte
+std_ocamlopt_opt          = _std_ocamlopt_opt
+std_ocamlc_opt            = _std_ocamlc_opt
+std_compilers             = _std_compilers
+profiling_compilers       = _profiling_compilers
+flambda_compilers         = _flambda_compilers
 
 # ocaml_tool_r              = _ocaml_tool_r
 # ocaml_tools               = _ocaml_tools

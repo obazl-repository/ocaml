@@ -137,7 +137,7 @@ ocamloptx_optx = optx_rule("optx_optx")
 ####  ocamlc.optx, ocamlopt.optx,
 ####  ocamloptx.optx
 ################################################################
-def flambda_ocaml_compilers(name,
+def flambda_compilers(name,
                             visibility = ["//visibility:public"],
                             **kwargs):
 

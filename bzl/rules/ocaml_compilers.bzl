@@ -4,10 +4,17 @@ load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 load("//bzl/rules:COMPILER.bzl",
+     ## std compilers:
      "OCAMLC_PROLOGUE",
      "OCAMLC_MAIN",
      "OCAMLOPT_PROLOGUE",
      "OCAMLOPT_MAIN",
+     ## profiling compilers:
+     "OCAMLCP_PROLOGUE",
+     "OCAMLCP_MAIN",
+     "OCAMLOPTP_PROLOGUE",
+     "OCAMLOPTP_MAIN",
+     ## both:
      "OCAML_COMPILER_OPTS")
 
 load(":ocaml_transitions.bzl",
@@ -260,9 +267,11 @@ std_ocamlc_opt = rule(
 )
 
 ################################################################
-####  MACRO
+####  MACRO: standard compilers
+####  ocamlc.byte, ocamlopt.byte,
+####  ocamlopt.opt, ocamlc.opt
 ################################################################
-def std_ocaml_compilers(name,
+def std_compilers(name,
                     visibility = ["//visibility:public"],
                     **kwargs):
 
@@ -299,10 +308,45 @@ def std_ocaml_compilers(name,
         visibility = ["//visibility:public"]
     )
 
-    ##FIXME: put profiling variants here? (ocamlcp.byte etc.)
+################################################################
+####  MACRO: profiling compilers
+####  ocamlcp.byte, ocamloptp.byte,
+####  ocamloptp.opt, ocamlcp.opt
+####  same as std compilers, except for prologue and main
+################################################################
+def profiling_compilers(name,
+                    visibility = ["//visibility:public"],
+                    **kwargs):
 
-    ################################################################
-    ## Profiling variants
+    std_ocamlc_byte(
+        name = "ocamlcp.byte",
+        prologue = OCAMLCP_PROLOGUE,
+        main = OCAMLCP_MAIN
+    )
+
+    std_ocamlc_opt(
+        name       = "ocamlcp.opt",
+        prologue   = OCAMLCP_PROLOGUE,
+        main       = OCAMLCP_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
+        visibility = ["//visibility:public"]
+    )
+
+    std_ocamlopt_byte(
+        name       = "ocamloptp.byte",
+        prologue   = OCAMLOPTP_PROLOGUE,
+        main       = OCAMLOPTP_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
+        visibility = ["//visibility:public"]
+    )
+
+    std_ocamlopt_opt(
+        name       = "ocamloptp.opt",
+        prologue   = OCAMLOPTP_PROLOGUE,
+        main       = OCAMLOPTP_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
+        visibility = ["//visibility:public"]
+    )
 
 ################################################################
 ################################################################
