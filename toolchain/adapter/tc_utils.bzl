@@ -242,9 +242,11 @@ def tc_workdir(ctx):
         cc = "vx"
     elif compiler.basename in ["ocamlopt.opt", "ocamloptp.opt"]:
         if flambda:
-            cc = "xx"
+            cc = "sx"
         else:
             cc = "ss"
+    elif compiler.basename == "ocamloptx.opt":
+        cc = "sx"
     elif compiler.basename == "ocamloptx.optx":
         cc = "xx"
     elif compiler.basename in ["ocamlc.opt", "ocamlcp.opt"]:

@@ -23,6 +23,9 @@ load("//bzl/rules:ocaml_compiler.bzl",
      _std_ocamlc_opt = "std_ocamlc_opt",
      _std_ocaml_compilers = "std_ocaml_compilers")
 
+load("//bzl/rules:flambda_compilers.bzl",
+     _flambda_ocaml_compilers = "flambda_ocaml_compilers")
+
 load("//bzl/rules:build_tool.bzl",
      _build_tool_vm = "build_tool_vm",
      _build_tool    = "build_tool")
@@ -101,6 +104,8 @@ std_ocamlopt_byte             = _std_ocamlopt_byte
 std_ocamlopt_opt              = _std_ocamlopt_opt
 std_ocamlc_opt                = _std_ocamlc_opt
 std_ocaml_compilers           = _std_ocaml_compilers
+flambda_ocaml_compilers       = _flambda_ocaml_compilers
+
 # ocaml_tool_r              = _ocaml_tool_r
 # ocaml_tools               = _ocaml_tools
 # ocaml_tool_vm             = _ocaml_tool_vm

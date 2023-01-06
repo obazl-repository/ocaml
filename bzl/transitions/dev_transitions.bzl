@@ -10,7 +10,7 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
     ## so we should see this twice per config
 
     debug = True
-    fail("DDDDEV")
+    # fail("DDDDEV")
 
     protocol = settings["//config/build/protocol"]
 

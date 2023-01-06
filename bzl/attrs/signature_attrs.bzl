@@ -1,6 +1,6 @@
 load("//bzl:providers.bzl",
-     "CompilerMarker",
-     "StdlibSigMarker", "CompilerSigMarker")
+     "StdStructMarker",
+     "StdlibSigMarker", "StdSigMarker")
 
 
 #######################
@@ -82,14 +82,14 @@ def signature_attrs():
 
         struct_deps = attr.label_list(
             doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
-            providers = [CompilerMarker] #FIXME: CompilerStructMarker
+            providers = [StdStructMarker] #FIXME: CompilerStructMarker
         ),
 
         deps = attr.label_list(
             doc = "List of OCaml dependencies. Use this for compiling a .mli source file with deps. See [Dependencies](#deps) for details.",
             # cfg = compile_mode_out_transition,
             providers = [
-                [CompilerSigMarker],
+                [StdSigMarker],
                 # BootInfo,  ## bug
 
                 # [OcamlArchiveProvider],

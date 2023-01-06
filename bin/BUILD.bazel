@@ -7,6 +7,8 @@ load("//bzl:rules.bzl",
      "ocaml_compiler_r",
      "compiler_module",
      "std_ocaml_compilers", # macro
+     "flambda_ocaml_compilers", # macro
+     ## for profiling compilers:
      "std_ocamlc_byte",
      "std_ocamlopt_byte",
      "std_ocamlopt_opt",
@@ -39,7 +41,12 @@ config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 ## ocamlopt_byte ocamlopt_opt, ocamlc_opt
 
 std_ocaml_compilers(
-    name = "ocamlcc",
+    name = "std_ocamlcc",
+    visibility = ["//visibility:public"]
+)
+
+flambda_ocaml_compilers(
+    name = "flambda_ocamlcc",
     visibility = ["//visibility:public"]
 )
 
@@ -96,6 +103,7 @@ sh_binary(
     toolchains = ["@bazel_tools//tools/cpp:current_cc_toolchain"]
 )
 
+## why do we need opt.sh?
 sh_binary(
     name = "ocamlopt.opt.sh",
     srcs = ["ocamlcc.sh"],

@@ -60,6 +60,12 @@ CHECKPOINT_DEPS = [
     "//bin:ocamloptp.opt",
     "//bin:ocamloptp.byte",
 
+    "//bin:ocamloptx.byte",
+    "//bin:ocamloptx.opt",
+    "//bin:ocamlc.optx",
+    "//bin:ocamlopt.optx",
+    "//bin:ocamloptx.optx",
+
     "//vendor/mustach",
     "//vendor/merge_json",
 

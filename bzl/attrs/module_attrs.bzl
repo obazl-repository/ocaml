@@ -3,8 +3,8 @@ load("//bzl:providers.bzl",
      "OcamlLibraryMarker",
      "OcamlSignatureProvider",
      "ModuleInfo",
-     "CompilerMarker",
-     "CompilerSigMarker",
+     "StdStructMarker",
+     "StdSigMarker",
      "StdlibStructMarker")
 
 ###################
@@ -79,7 +79,7 @@ def module_attrs():
         ),
         sig_deps = attr.label_list(
             doc = "Sig deps",
-            providers = [CompilerSigMarker]
+            providers = [StdSigMarker]
         ),
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
@@ -87,8 +87,9 @@ def module_attrs():
                 # [OcamlArchiveProvider],
                 # [OcamlLibraryMarker],
                 # [OcamlSignatureProvider],
-                [CompilerMarker, ModuleInfo],
-                [CcInfo]
+                # [StdStructMarker, ModuleInfo],
+                # [CcInfo]
+                [StdStructMarker, ModuleInfo],
             ],
             # transition undoes changes that may have been made by ns_lib
             # cfg = compile_deps_out_transition,
@@ -112,13 +113,16 @@ def module_attrs():
         ),
 
         ################
-        cc_deps = attr.label_keyed_string_dict(
-            doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
-            """,
+        cc_deps = attr.label_list(
+            providers = [CcInfo],
+        ),
+        # cc_deps = attr.label_keyed_string_dict(
+            # doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
+            # """,
             # providers = since this is a dictionary depset, no providers
             ## but the keys must have CcInfo providers, check at build time
             # cfg = ocaml_module_cc_deps_out_transition
-        ),
+        # ),
 
         _verbose = attr.label(default = "//config/ocaml/compile:verbose"),
 

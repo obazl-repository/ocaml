@@ -7,7 +7,7 @@ load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo", "DumpInfo", "ModuleInfo", "NsResolverInfo",
-     "CompilerMarker",
+     "StdStructMarker",
      "StdlibStructMarker",
      "new_deps_aggregator", "OcamlSignatureProvider")
 
@@ -78,8 +78,11 @@ def module_impl(ctx, module_name):
     ]:
         ext = ".cmo"
     elif compiler.basename in [
-        "ocamlopt.opt", "ocamlopt.byte",
-        "ocamloptx.optx", "ocamloptx.byte"
+        "ocamlopt.byte",
+        "ocamlopt.opt",
+        "ocamloptx.byte",
+        "ocamloptx.opt",
+        "ocamloptx.optx",
     ]:
         ext = ".cmx"
     else:
@@ -335,6 +338,9 @@ def module_impl(ctx, module_name):
         #     elif dep.label.name == "stdlib": ## stdlib archive OR library
         #         open_stdlib = True
         #         stdlib_library_target = dep
+
+    for dep in ctx.attr.cc_deps:
+        depsets = aggregate_deps(ctx, dep, depsets, manifest)
 
     if hasattr(ctx.attr, "sig_deps"):
         for dep in ctx.attr.sig_deps:
@@ -720,7 +726,7 @@ def module_impl(ctx, module_name):
         "ns_module",
         "test_module"
     ]:
-        providers.append(CompilerMarker())
+        providers.append(StdStructMarker())
 
     providers.append(moduleInfo)
 
