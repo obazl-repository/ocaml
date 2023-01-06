@@ -159,7 +159,6 @@ ocaml_tool_vm(
 
 ocaml_tool_sys(
     name       = "ocamllex.opt",
-    opts = ["-verbose"],
     prologue   = [":lex"],
     main       = ":Main",
     opts      = OCAML_COMPILER_OPTS,
