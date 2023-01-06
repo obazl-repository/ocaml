@@ -62,18 +62,20 @@ ocaml_module(
     struct = "odoc.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
-        ":Odoc_config", ## (Ocamldoc Odoc_config)
-        ":Odoc_args", ## (Ocamldoc Odoc_args)
         ":Odoc_analyse", ## (Ocamldoc Odoc_analyse)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
+        ":Odoc_args", ## (Ocamldoc Odoc_args)
+        ":Odoc_config", ## (Ocamldoc Odoc_config)
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ## (Dynlink)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
@@ -83,37 +85,39 @@ ocaml_module(
     sig    = "Odoc_analyse_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_text", ## (Ocamldoc Odoc_text)
-        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_dep", ## (Ocamldoc Odoc_dep)
-        ":Odoc_cross", ## (Ocamldoc Odoc_cross)
-        ":Odoc_comments", ## (Ocamldoc Odoc_comments)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ":Odoc_ast", ## (Ocamldoc Odoc_ast)
-        "//utils:Warnings",
-        "//typing:Types",
-        "//typing:Typemod",
-        "//typing:Typedtree",
-        "//parsing:Syntaxerr",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printexc",
-        "//driver:Pparse",
-        "//parsing:Parse",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//parsing:Lexer",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Env",
         "//config:Config",
         "//driver:Compmisc",
+        "//driver:Pparse",
+        "//parsing:Lexer",
+        "//parsing:Location",
+        "//parsing:Parse",
+        "//parsing:Syntaxerr",
+        "//typing:Env",
+        "//typing:Typedtree",
+        "//typing:Typemod",
+        "//typing:Types",
         "//utils:Clflags",
+        "//utils:Warnings",
+        ":Odoc_ast", ## (Ocamldoc Odoc_ast)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_comments", ## (Ocamldoc Odoc_comments)
+        ":Odoc_cross", ## (Ocamldoc Odoc_cross)
+        ":Odoc_dep", ## (Ocamldoc Odoc_dep)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
+        ":Odoc_text", ## (Ocamldoc Odoc_text)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -122,8 +126,8 @@ ocaml_signature(
     src  = "odoc_analyse.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
         ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
     ]
 )
 
@@ -133,25 +137,27 @@ ocaml_module(
     sig    = "Odoc_args_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_man", ## (Ocamldoc Odoc_man)
-        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
-        ":Odoc_html", ## (Ocamldoc Odoc_html)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
-        ":Odoc_dot", ## (Ocamldoc Odoc_dot)
-        ":Odoc_config", ## (Ocamldoc Odoc_config)
-        "//stdlib:Stdlib.String",
-        "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
-        "//driver:Main_args",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
         "//config:Config",
         "//driver:Compenv",
+        "//driver:Main_args",
+        "//otherlibs/str:Str",
+        ":Odoc_config", ## (Ocamldoc Odoc_config)
+        ":Odoc_dot", ## (Ocamldoc Odoc_dot)
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_html", ## (Ocamldoc Odoc_html)
+        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
+        ":Odoc_man", ## (Ocamldoc Odoc_man)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -161,6 +167,8 @@ ocaml_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+    ]
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
     ]
 )
@@ -171,35 +179,37 @@ ocaml_module(
     sig    = "Odoc_ast_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
-        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_env", ## (Ocamldoc Odoc_env)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
-        "//typing:Types",
-        "//typing:Typedtree",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        "//typing:Predef",
-        "//typing:Path",
-        "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Option",
-        ## (Name)
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Btype",
         "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        "//typing:Btype",
+        "//typing:Ident",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Typedtree",
+        "//typing:Types",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_env", ## (Ocamldoc Odoc_env)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ## (Name)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -208,12 +218,14 @@ ocaml_signature(
     src  = "odoc_ast.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        "//typing:Types",
-        "//typing:Typedtree",
         "//parsing:Parsetree_cmi",
+        "//typing:Typedtree",
+        "//typing:Types",
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_sig", ## (Ocamldoc Odoc_sig)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Hashtbl",
     ]
 )
@@ -223,11 +235,13 @@ ocaml_module(
     struct = "odoc_class.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
         "//typing:Types",
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
     ]
 )
@@ -238,22 +252,21 @@ ocaml_module(
     sig    = "Odoc_comments_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_text", ## (Ocamldoc Odoc_text)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_cross", ## (Ocamldoc Odoc_cross)
-        ":Odoc_comments_global", ## (Ocamldoc Odoc_comments_global)
-        "//stdlib:Stdlib.String",
         "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
-        ## (Odoc_see_lexer)
-        ## (Odoc_parser)
-        ## (Odoc_lexer)
-        "//stdlib:Stdlib.List",
+        ":Odoc_comments_global", ## (Ocamldoc Odoc_comments_global)
+        ":Odoc_cross", ## (Ocamldoc Odoc_cross)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_text", ## (Ocamldoc Odoc_text)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -262,8 +275,8 @@ ocaml_signature(
     src  = "odoc_comments.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
     ]
 )
 
@@ -272,16 +285,12 @@ ocaml_module(
     struct = "odoc_comments_global.ml",
     sig    = "Odoc_comments_global_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
 ocaml_signature(
     name = "Odoc_comments_global_cmi",
     src  = "odoc_comments_global.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ]
 )
 
 ocaml_module(
@@ -290,8 +299,10 @@ ocaml_module(
     sig    = "Odoc_config_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Filename",
         "//config:Config",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
     ]
 )
 
@@ -299,16 +310,12 @@ ocaml_signature(
     name = "Odoc_config_cmi",
     src  = "odoc_config.mli",
     opts = SIG_OPTS,
-    deps   = [
-    ]
 )
 
 ocaml_module(
     name   = "Odoc_control",
     struct = "odoc_control.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
 ocaml_module(
@@ -317,27 +324,29 @@ ocaml_module(
     sig    = "Odoc_cross_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_search", ## (Ocamldoc Odoc_search)
-        ":Odoc_scan", ## (Ocamldoc Odoc_scan)
-        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
         "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Printf",
         "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_scan", ## (Ocamldoc Odoc_scan)
+        ":Odoc_search", ## (Ocamldoc Odoc_search)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
     ]
 )
 
@@ -346,8 +355,8 @@ ocaml_signature(
     src  = "odoc_cross.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
     ]
 )
 
@@ -358,12 +367,14 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Odoc_info", ## (Ocamldoc Odoc_info)
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Buffer",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
     ]
 )
 
@@ -381,14 +392,15 @@ ocaml_module(
     struct = "odoc_dep.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_print", ## (Ocamldoc Odoc_print)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
         "//otherlibs/str:Str",
         "//parsing:Parsetree_cmi",
         "//utils:Misc",
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_print", ## (Ocamldoc Odoc_print)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
-        ## (Depend)
     ]
 )
 
@@ -397,11 +409,13 @@ ocaml_module(
     struct = "odoc_dot.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         ":Odoc_info", ## (Ocamldoc Odoc_info)
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -411,13 +425,15 @@ ocaml_module(
     sig    = "Odoc_env_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        "//typing:Types",
-        "//typing:Printtyp",
-        "//typing:Predef",
-        "//typing:Path",
-        "//stdlib:Stdlib.List",
         "//typing:Btype",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Printtyp",
+        "//typing:Types",
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -426,8 +442,8 @@ ocaml_signature(
     src  = "odoc_env.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
         "//typing:Types",
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
     ]
 )
 
@@ -436,10 +452,10 @@ ocaml_module(
     struct = "odoc_exception.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
         "//typing:Types",
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
     ]
 )
 
@@ -448,11 +464,11 @@ ocaml_module(
     struct = "odoc_extension.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        "//typing:Types",
         "//parsing:Asttypes_cmi",
+        "//typing:Types",
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
     ]
 )
 
@@ -462,12 +478,12 @@ ocaml_module(
     sig    = "Odoc_gen_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_man", ## (Ocamldoc Odoc_man)
-        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
-        ":Odoc_html", ## (Ocamldoc Odoc_html)
         ":Odoc_dot", ## (Ocamldoc Odoc_dot)
+        ":Odoc_html", ## (Ocamldoc Odoc_html)
+        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
+        ":Odoc_man", ## (Ocamldoc Odoc_man)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
     ]
 )
 
@@ -476,13 +492,13 @@ ocaml_signature(
     src  = "odoc_gen.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_man", ## (Ocamldoc Odoc_man)
-        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
-        ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ":Odoc_html", ## (Ocamldoc Odoc_html)
         ":Odoc_dot", ## (Ocamldoc Odoc_dot)
+        ":Odoc_html", ## (Ocamldoc Odoc_html)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_latex", ## (Ocamldoc Odoc_latex)
+        ":Odoc_man", ## (Ocamldoc Odoc_man)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_texi", ## (Ocamldoc Odoc_texi)
     ]
 )
 
@@ -492,11 +508,13 @@ ocaml_module(
     sig    = "Odoc_global_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_config", ## (Ocamldoc Odoc_config)
-        "//stdlib:Stdlib.Filename",
         "//utils:Clflags",
+        ":Odoc_config", ## (Ocamldoc Odoc_config)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ]
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
     ]
 )
 
@@ -514,22 +532,23 @@ ocaml_module(
     struct = "odoc_html.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_text", ## (Ocamldoc Odoc_text)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_dag2html", ## (Ocamldoc Odoc_dag2html)
-        "//stdlib:Stdlib.Sys",
         "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
-        ## (Odoc_ocamlhtml)
-        "//utils:Misc",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Buffer",
         "//parsing:Asttypes_cmi",
+        "//utils:Misc",
+        ":Odoc_dag2html", ## (Ocamldoc Odoc_dag2html)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_text", ## (Ocamldoc Odoc_text)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
@@ -539,32 +558,34 @@ ocaml_module(
     sig    = "Odoc_info_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_text", ## (Ocamldoc Odoc_text)
-        ":Odoc_str", ## (Ocamldoc Odoc_str)
-        ":Odoc_search", ## (Ocamldoc Odoc_search)
-        ":Odoc_scan", ## (Ocamldoc Odoc_scan)
-        ":Odoc_print", ## (Ocamldoc Odoc_print)
-        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_dep", ## (Ocamldoc Odoc_dep)
-        ":Odoc_config", ## (Ocamldoc Odoc_config)
-        ":Odoc_comments", ## (Ocamldoc Odoc_comments)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
-        ":Odoc_analyse", ## (Ocamldoc Odoc_analyse)
-        "//stdlib:Stdlib.String",
-        "//typing:Printtyp",
-        "//stdlib:Stdlib.Printf",
         "//parsing:Location",
-        "//stdlib:Stdlib.List",
+        "//typing:Printtyp",
+        ":Odoc_analyse", ## (Ocamldoc Odoc_analyse)
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_comments", ## (Ocamldoc Odoc_comments)
+        ":Odoc_config", ## (Ocamldoc Odoc_config)
+        ":Odoc_dep", ## (Ocamldoc Odoc_dep)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_print", ## (Ocamldoc Odoc_print)
+        ":Odoc_scan", ## (Ocamldoc Odoc_scan)
+        ":Odoc_search", ## (Ocamldoc Odoc_search)
+        ":Odoc_str", ## (Ocamldoc Odoc_str)
+        ":Odoc_text", ## (Ocamldoc Odoc_text)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -573,20 +594,20 @@ ocaml_signature(
     src  = "odoc_info.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_search", ## (Ocamldoc Odoc_search)
-        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
-        "//typing:Types",
         "//otherlibs/str:Str",
-        "//parsing:Location",
         "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//typing:Types",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_search", ## (Ocamldoc Odoc_search)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
     ]
 )
 
@@ -594,8 +615,6 @@ ocaml_module(
     name   = "Odoc_inherit",
     struct = "odoc_inherit.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
 ocaml_module(
@@ -603,19 +622,21 @@ ocaml_module(
     struct = "odoc_latex.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_to_text", ## (Ocamldoc Odoc_to_text)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_latex_style", ## (Ocamldoc Odoc_latex_style)
-        ":Odoc_info", ## (Ocamldoc Odoc_info)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
         "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Buffer",
         "//parsing:Asttypes_cmi",
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_latex_style", ## (Ocamldoc Odoc_latex_style)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_to_text", ## (Ocamldoc Odoc_to_text)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
@@ -623,8 +644,6 @@ ocaml_module(
     name   = "Odoc_latex_style",
     struct = "odoc_latex_style.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
 ocaml_module(
@@ -632,19 +651,21 @@ ocaml_module(
     struct = "odoc_man.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_str", ## (Ocamldoc Odoc_str)
-        ":Odoc_print", ## (Ocamldoc Odoc_print)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_info", ## (Ocamldoc Odoc_info)
-        "//stdlib:Stdlib.String",
         "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Option",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Buffer",
         "//parsing:Asttypes_cmi",
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_print", ## (Ocamldoc Odoc_print)
+        ":Odoc_str", ## (Ocamldoc Odoc_str)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -654,17 +675,19 @@ ocaml_module(
     sig    = "Odoc_merge_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
         "//otherlibs/str:Str",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_module", ## (Ocamldoc Odoc_module),
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
     ]
 )
@@ -674,8 +697,8 @@ ocaml_signature(
     src  = "odoc_merge.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
         ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
     ]
 )
 
@@ -684,14 +707,16 @@ ocaml_module(
     struct = "odoc_messages.ml",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
         "//config:Config",
+        "//otherlibs/str:Str",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
@@ -701,24 +726,24 @@ ocaml_module(
     sig    = "Odoc_misc_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ## (Unix)
-        "//typing:Types",
-        ## (Transient_expr)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Printf",
-        "//typing:Predef",
-        "//typing:Path",
         "//parsing:Longident",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Char",
-        "//stdlib:Stdlib.Bytes",
-        "//stdlib:Stdlib.Buffer",
         "//typing:Btype",
+        "//typing:Path",
+        "//typing:Predef",
+        "//typing:Types",
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.String",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
@@ -727,10 +752,10 @@ ocaml_signature(
     src  = "odoc_misc.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        "//typing:Types",
-        "//parsing:Longident",
         "//parsing:Asttypes_cmi",
+        "//parsing:Longident",
+        "//typing:Types",
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
     ]
 )
 
@@ -739,15 +764,17 @@ ocaml_module(
     struct = "odoc_module.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
         "//typing:Types",
         "//utils:Misc",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
     ]
 )
@@ -758,15 +785,17 @@ ocaml_module(
     sig    = "Odoc_name_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        "//stdlib:Stdlib.String",
         "//otherlibs/str:Str",
-        "//typing:Path",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
         "//typing:Ident",
-        "//stdlib:Stdlib.Buffer",
+        "//typing:Path",
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -775,10 +804,12 @@ ocaml_signature(
     src  = "odoc_name.mli",
     opts = SIG_OPTS,
     deps   = [
-        "//typing:Path",
-        "//stdlib:Stdlib.Map",
         "//parsing:Longident",
         "//typing:Ident",
+        "//typing:Path",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Map",
     ]
 )
 
@@ -787,10 +818,12 @@ ocaml_module(
     struct = "odoc_parameter.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
         "//typing:Types",
-        "//stdlib:Stdlib.String",
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -800,14 +833,13 @@ ocaml_module(
     sig    = "Odoc_print_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ## (Vars)
-        "//typing:Types",
-        ## (Transient_expr)
-        "//typing:Printtyp",
-        ## (Meths)
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Buffer",
         "//typing:Btype",
+        "//typing:Printtyp",
+        "//typing:Types",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Format",
     ]
 )
 
@@ -825,13 +857,15 @@ ocaml_module(
     struct = "odoc_scan.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
         ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
     ]
 )
@@ -842,17 +876,19 @@ ocaml_module(
     sig    = "Odoc_search_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
         "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
     ]
 )
 
@@ -861,14 +897,14 @@ ocaml_signature(
     src  = "odoc_search.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
         "//otherlibs/str:Str",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
     ]
 )
 
@@ -878,35 +914,37 @@ ocaml_module(
     sig    = "Odoc_sig_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
-        ":Odoc_global", ## (Ocamldoc Odoc_global)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_env", ## (Ocamldoc Odoc_env)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
-        "//typing:Types",
-        "//typing:Typedtree",
-        "//stdlib:Stdlib.String",
-        "//parsing:Parsetree_cmi",
-        "//stdlib:Stdlib.Option",
-        ## (Name)
-        "//parsing:Longident",
-        "//parsing:Location",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//typing:Ident",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Filename",
-        "//typing:Ctype",
-        "//typing:Btype",
         "//parsing:Asttypes_cmi",
+        "//parsing:Location",
+        "//parsing:Longident",
+        "//parsing:Parsetree_cmi",
+        "//typing:Btype",
+        "//typing:Ctype",
+        "//typing:Ident",
+        "//typing:Typedtree",
+        "//typing:Types",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_env", ## (Ocamldoc Odoc_env)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_global", ## (Ocamldoc Odoc_global)
+        ":Odoc_merge", ## (Ocamldoc Odoc_merge)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+        ## (Name)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Option",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -915,16 +953,18 @@ ocaml_signature(
     src  = "odoc_sig.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_env", ## (Ocamldoc Odoc_env)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
-        "//typing:Types",
-        "//typing:Typedtree",
-        "//parsing:Parsetree_cmi",
         "//parsing:Location",
+        "//parsing:Parsetree_cmi",
+        "//typing:Typedtree",
+        "//typing:Types",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_env", ## (Ocamldoc Odoc_env)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Hashtbl",
     ]
 )
@@ -935,23 +975,25 @@ ocaml_module(
     sig    = "Odoc_str_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_print", ## (Ocamldoc Odoc_print)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
-        "//typing:Types",
-        "//stdlib:Stdlib.String",
-        "//typing:Printtyp",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Format",
-        "//stdlib:Stdlib.Buffer",
         "//parsing:Asttypes_cmi",
+        "//typing:Printtyp",
+        "//typing:Types",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_print", ## (Ocamldoc Odoc_print)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -960,12 +1002,12 @@ ocaml_signature(
     src  = "odoc_str.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Odoc_value", ## (Ocamldoc Odoc_value)
-        ":Odoc_type", ## (Ocamldoc Odoc_type)
-        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
-        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
-        ":Odoc_class", ## (Ocamldoc Odoc_class)
         "//typing:Types",
+        ":Odoc_class", ## (Ocamldoc Odoc_class)
+        ":Odoc_exception", ## (Ocamldoc Odoc_exception)
+        ":Odoc_extension", ## (Ocamldoc Odoc_extension)
+        ":Odoc_type", ## (Ocamldoc Odoc_type)
+        ":Odoc_value", ## (Ocamldoc Odoc_value)
     ]
 )
 
@@ -974,12 +1016,14 @@ ocaml_module(
     struct = "odoc_test.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_info", ## (Ocamldoc Odoc_info)
-        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
         ":Odoc_args", ## (Ocamldoc Odoc_args)
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.List",
+        ":Odoc_gen", ## (Ocamldoc Odoc_gen)
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printexc",
     ]
 )
 
@@ -988,18 +1032,20 @@ ocaml_module(
     struct = "odoc_texi.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_to_text", ## (Ocamldoc Odoc_to_text)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_info", ## (Ocamldoc Odoc_info)
-        "//typing:Types",
-        "//stdlib:Stdlib.String",
         "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Bytes",
         "//parsing:Asttypes_cmi",
+        "//typing:Types",
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_to_text", ## (Ocamldoc Odoc_to_text)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -1010,13 +1056,13 @@ ocaml_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Odoc_types", ## (Ocamldoc Odoc_types)
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Printf",
-        ## (Odoc_text_parser)
-        ## (Odoc_text_lexer)
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Buffer",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -1034,15 +1080,17 @@ ocaml_module(
     struct = "odoc_to_text.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_str", ## (Ocamldoc Odoc_str)
-        ":Odoc_module", ## (Ocamldoc Odoc_module)
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
-        ":Odoc_info", ## (Ocamldoc Odoc_info)
-        "//stdlib:Stdlib.String",
         "//otherlibs/str:Str",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
+        ":Odoc_info", ## (Ocamldoc Odoc_info)
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
+        ":Odoc_module", ## (Ocamldoc Odoc_module)
+        ":Odoc_str", ## (Ocamldoc Odoc_str)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Format",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -1051,10 +1099,10 @@ ocaml_module(
     struct = "odoc_type.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        "//typing:Types",
         "//parsing:Asttypes_cmi",
+        "//typing:Types",
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
     ]
 )
 
@@ -1064,8 +1112,8 @@ ocaml_module(
     sig    = "Odoc_types_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
         "//parsing:Location",
+        ":Odoc_messages", ## (Ocamldoc Odoc_messages)
     ]
 )
 
@@ -1083,14 +1131,16 @@ ocaml_module(
     struct = "odoc_value.ml",
     opts = MODULE_OPTS,
     deps   = [
-        ":Odoc_types", ## (Ocamldoc Odoc_types)
-        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
-        ":Odoc_name", ## (Ocamldoc Odoc_name)
-        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
-        "//typing:Types",
-        "//typing:Printtyp",
-        "//stdlib:Stdlib.List",
         "//parsing:Asttypes_cmi",
+        "//typing:Printtyp",
+        "//typing:Types",
+        ":Odoc_misc", ## (Ocamldoc Odoc_misc)
+        ":Odoc_name", ## (Ocamldoc Odoc_name)
+        ":Odoc_parameter", ## (Ocamldoc Odoc_parameter)
+        ":Odoc_types", ## (Ocamldoc Odoc_types)
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
     ]
 )
 
