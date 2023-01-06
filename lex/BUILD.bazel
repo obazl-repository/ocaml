@@ -3,10 +3,12 @@ load("//bzl:rules.bzl",
      # "boot_executable",
      "compiler_module",
      "compiler_signature",
-     "boot_library",
-     "ocaml_tool_r",
+     "boot_library")
+
+load("//tools:TOOL_RULES.bzl",
      "ocaml_tool_vm",
-     "ocaml_tool_sys")
+     "ocaml_tool_sys",
+     "ocaml_tool_r")
 
 # load("//bzl/rules:ocaml_tool.bzl",
 #      "ocaml_tool_vm", "ocaml_tool_sys")
@@ -198,13 +200,15 @@ compiler_module(
     sig    = "Common_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Syntax", ## (Lex Syntax)
         ":Lexgen", ## (Lex Lexgen)
-        "//stdlib:Stdlib.Sys",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
+        ":Syntax", ## (Lex Syntax)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Bytes",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ]
 )
 
@@ -215,6 +219,9 @@ compiler_signature(
     deps   = [
         ":Syntax_cmi",
         ":Lexgen_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi"
     ]
 )
 
@@ -226,9 +233,11 @@ compiler_module(
     deps   = [
         ":Lexgen", ## (Lex Lexgen)
         ":Table", ## (Lex Table)
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -237,8 +246,8 @@ compiler_signature(
     src  = "compact.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax_cmi",
         ":Lexgen_cmi",
+        ":Syntax_cmi",
     ]
 )
 
@@ -247,10 +256,10 @@ compiler_module(
     struct = "cset.ml",
     sig    = "Cset_cmi",
     opts = MODULE_OPTS,
-    deps   = [
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Int",
+    stdlib_deps   = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.List",
     ]
 )
 
@@ -258,7 +267,7 @@ compiler_signature(
     name = "Cset_cmi",
     src  = "cset.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi",
     ]
 )
@@ -270,6 +279,9 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Parser"
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives"
     ],
     visibility = ["//file_formats:__pkg__"]
 )
@@ -286,6 +298,9 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Parser_cmi"
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Lexing_cmi"
     ]
 )
 
@@ -295,19 +310,21 @@ compiler_module(
     sig    = "Lexgen_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Table", ## (Lex Table)
-        ":Syntax", ## (Lex Syntax)
         ":Cset", ## (Lex Cset)
-        "//stdlib:Stdlib.String",
-        "//stdlib:Stdlib.Stack",
-        "//stdlib:Stdlib.Set",
-        "//stdlib:Stdlib.Map",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Int",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Bool",
+        ":Syntax", ## (Lex Syntax)
+        ":Table", ## (Lex Table)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Bool",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Int",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set",
+        "//stdlib:Stdlib.Stack",
+        "//stdlib:Stdlib.String",
     ]
 )
 
@@ -326,13 +343,6 @@ compiler_module(
     sig    = "Main_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//stdlib:Stdlib",
-        "//stdlib:Stdlib.Arg",
-        "//stdlib:Stdlib.Filename",
-        "//stdlib:Stdlib.Lexing",
-        "//stdlib:Stdlib.Printexc",
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.Sys",
         ":Common",
         ":Compact",
         ":Cset",
@@ -342,6 +352,15 @@ compiler_module(
         ":Outputbis",
         ":Parser",
         ":Syntax",
+    ],
+    stdlib_deps = [
+        "//stdlib:Stdlib",
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Filename",
+        "//stdlib:Stdlib.Lexing",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Sys",
     ],
     visibility = [
         "//boot:__subpackages__",
@@ -354,7 +373,7 @@ compiler_signature(
     name = "Main_cmi",
     src  = "main.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi",
     ]
 )
@@ -365,14 +384,16 @@ compiler_module(
     sig    = "Output_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Syntax", ## (Lex Syntax)
-        ":Lexgen", ## (Lex Lexgen)
-        ":Compact", ## (Lex Compact)
         ":Common", ## (Lex Common)
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Char",
+        ":Compact", ## (Lex Compact)
+        ":Lexgen", ## (Lex Lexgen)
+        ":Syntax", ## (Lex Syntax)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
     ]
 )
 
@@ -381,10 +402,13 @@ compiler_signature(
     src  = "output.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax_cmi",
-        ":Lexgen_cmi",
-        ":Compact_cmi",
         ":Common_cmi",
+        ":Compact_cmi",
+        ":Lexgen_cmi",
+        ":Syntax_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi"
     ]
 )
 
@@ -394,14 +418,16 @@ compiler_module(
     sig    = "Outputbis_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Syntax", ## (Lex Syntax)
-        ":Lexgen", ## (Lex Lexgen)
         ":Common", ## (Lex Common)
-        "//stdlib:Stdlib.Printf",
-        "//stdlib:Stdlib.List",
-        "//stdlib:Stdlib.Hashtbl",
-        "//stdlib:Stdlib.Char",
+        ":Lexgen", ## (Lex Lexgen)
+        ":Syntax", ## (Lex Syntax)
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Char",
+        "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
     ]
 )
 
@@ -410,9 +436,12 @@ compiler_signature(
     src  = "outputbis.mli",
     opts = SIG_OPTS,
     deps   = [
-        ":Syntax_cmi",
-        ":Lexgen_cmi",
         ":Common_cmi",
+        ":Lexgen_cmi",
+        ":Syntax_cmi",
+    ],
+    stdlib_deps = [
+        "//stdlib:Primitives_cmi"
     ]
 )
 
@@ -423,8 +452,10 @@ compiler_module(
     opts = MODULE_OPTS,
     deps   = [
         ":Syntax",
-        "//stdlib:Stdlib.Lexing",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Hashtbl",
+        "//stdlib:Stdlib.Lexing",
         "//stdlib:Stdlib.Parsing",
         "//stdlib:Stdlib.Printf",
     ]
@@ -436,6 +467,8 @@ compiler_signature(
     opts = SIG_OPTS,
     deps   = [
         ":Syntax_cmi",
+    ],
+    stdlib_deps = [
         "//stdlib:Stdlib.Lexing_cmi",
     ]
 )
@@ -471,7 +504,7 @@ compiler_module(
     sig    = "Syntax_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        ":Cset", ## (Lex Cset)
+        ":Cset",
     ]
 )
 
@@ -489,7 +522,7 @@ compiler_module(
     struct = "table.ml",
     sig    = "Table_cmi",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Array",
     ]
 )
@@ -498,7 +531,7 @@ compiler_signature(
     name = "Table_cmi",
     src  = "table.mli",
     opts = SIG_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib_cmi",
     ]
 )
