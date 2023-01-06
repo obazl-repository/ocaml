@@ -8,7 +8,7 @@ Latest doc changes: 01/06/2023
 
 == News (01/06/2023)
 
-This version includes many major changes.  See <<_overview>> for details.
+This version includes many major changes.  See <<overview>> for details.
 
 == Quickstart
 
