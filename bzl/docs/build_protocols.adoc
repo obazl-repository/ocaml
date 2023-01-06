@@ -3,12 +3,27 @@
 :toclevels: 3
 
 
-== Overview
+== Overview: build protocols and stacks
 
-=== Build Protocols
+A _build protocol_ is not much more than a dependency structure. The
+compiler build rules are quasi-recursive: each depends on a toolchain
+that references (and thus depends on) a compiler. That compiler target
+in turn depends on a toolchain, which depends on a compile, and so on;
+the chain bottoms out at the precompiled `boot/ocamlc` compiler.
 
-=== Build Stacks
+Compiler dependencies are controlled by a configuration setting,
+`//config/build/protocol`, and _transition functions_ that may change
+the protocol. The result is each compiler is the end result of a _build stack_; for
+example, the minimal build stack required to build `ocamlc.opt` is:
 
+    boot/ocamlc > ocamlopt.byte > ocamlc.opt
+
+Each build protocol configures the build stack in a different way. For
+example, the `boot` protocol inserts "bootstrapping" (i.e.
+self-compiling) steps, in order to bring the compilers into alignment
+with the baseline source code. It uses the following build stack to produce `ocamlc.byte`:
+
+    boot/ocamlc > ocamlc.byte > ocamlc.byte
 
 
 == The Standard Protocol
@@ -16,9 +31,9 @@
 Package:  `//bin`
 
 Compiler targets in the `//bin` package are built directly from
-`/boot/ocamlc`. The boot build protocol does not bootstrap to reach a
-fixed point, on the assumption that `boot/camlc` and the sources are
-already there.
+`/boot/ocamlc`. The standard protocol does not bootstrap to
+reach a fixed point, on the assumption that `boot/camlc` and the
+sources are already there.
 
 CAUTION: The standard protocol is only appropriate for release
 commits, where the source code matches `boot/ocamlc`. This would be
@@ -35,72 +50,89 @@ source release for use in a project.
 
 == The Boot Protocol
 
-Package: none.  Used only by the `//boot:coldstart` target.
+Package: `//boot`. Not intended for direct use; used only by the
+`//boot:checkpoint` target.
 
-The `//boot:coldstart` run target builds the compilers using
+The `//boot:checkpoint` run target builds the compilers using
  `boot/camlc`, just like the standard protocol, but it adds some
  bootstrapping steps in order to bring the built compilers into
- alignment with the baseline source code. It saves the built images to
- `.baseline`, where they are used for compiler development.
+ alignment with the baseline source code. It copies the built images
+ to `.baseline` and exposes them in workspace `@baseline`. They are
+ used for compiler development.
 
 === Boot build stacks
 
 [cols="1,2"]
 |===
-| Installed | Build provenance
+| Installed | Build stack
 | `@baseline//bin:ocamlc.byte` | `(boot/ocamlc > ocamlc.byte) > ocamlc.byte`
 | `@baseline//bin:ocamlopt.byte` | `(boot/ocamlc > ocamlc.byte) > ocamlopt.byte`
 | `@baseline//bin:ocamlopt.opt` | `(boot/ocamlc > ocamlc.byte > ocamlopt.byte) > ocamlopt.opt`
 | `@baseline//bin:ocamlc.opt` | `(boot/ocamlc > ocamlc.byte >ocamlopt.byte > ocamlopt.opt) > ocamlc.opt`
 |===
 
-== The Fastbuild Protocol
-
-For use with tools only.  Builds the tool directly using the baseline compilers. For example:
-
-    bazel run tools:ocamldep.byte --//config/build/protocol=fb  - uses @baseline//bin:ocamlc.opt
-    bazel run tools:ocamldep.opt  --//config/build/protocol=fb  - uses @baseline//bin:ocamlopt.opt
+The same protocol is used to build the profiliing compilers
+(`@baseline//bin:ocamlcp.byte`, etc.) and the flambda compilers
+(`@baseline//ocamlc.optx`, etc.)
 
 
-== The Dev Test Protocol
+== The Test Protocol (for development)
 
 Package:  `//test`
 
-The builds use the baseline compilers built by running
-`//boot:coldstart` to build new versions of the compilers,
-incorporating any changes in the source code, and then use the new
-versions to build the test cases.
+These builds use the baseline compilers built by running
+`//boot:checkpoint` to build new versions of the compilers,
+incorporating any changes in the source code. This is just an
+optimization; it uses the fastest compilers and avoids the lengthier
+build stacks that would be required by the `std` protocol.
 
 [cols="1,2"]
 |===
-| build target | compiler used
-| `//test:ocamlc.byte` | `@baseline//bin/ocamlc.opt`
-| `//test:ocamlopt.byte` | `@baseline//bin/ocamlc.opt`
-| `//test:ocamlopt.opt` | `@baseline//bin/ocamlopt.opt`
-| `//test:ocamlc.opt` | `@baseline//bin/ocamlopt.opt`
+| *target* | *build stack*
+| `//test:ocamlc.byte` | `@baseline//bin/ocamlc.opt > ocamlc.byte`
+| `//test:ocamlopt.byte` | `@baseline//bin/ocamlc.opt > ocamlopt.byte`
+| `//test:ocamlopt.opt` | `@baseline//bin/ocamlopt.opt > ocamlopt.opt`
+| `//test:ocamlc.opt` | `@baseline//bin/ocamlopt.opt > ocamlc.opt`
 |===
 
 Targets in the testsuite depend on the `//test` compilers so they are
 built under the test protocol.  See article link:testing.adoc[testing] for more information.
 
 
+== The Fastbuild Protocol
+
+By default, targets in `//tools` are built under the standard
+protocol; this allows them to be built even if `bazel run
+boot:checkpoint` as not been run. If it has been run, the tools can be
+built under the _fastbuild_ protocol, using the baseline compilers.
+For example:
+
+    bazel run tools:ocamldep.byte --//config/build/protocol=fb
+    bazel run tools:ocamldep.opt  --//config/build/protocol=fb
+
 == The Sys Test Protocol
+
+CAUTION: Not yet implemented
 
 Once you've made and tested your changes using the baseline compilers,
 it's time to run a system test. This bootstraps all the compilers to a
 fixed point, starting from `boot/ocamlc` and then runs the entire
-testsuite.  [Not yet implemented]
+testsuite.
 
 == The Reboot Protocol
+
+CAUTION: Not yet implemented
 
 Once you've run the system test, so you're confident your shiny new
 compiler is copacetic, you run the reboot protocol. It bootstraps
 `ocamlc.byte` repeatedly until it reaches a fixed point and then
-copies it to the `boot` directory, replacing `boot/ocamlc`. [Not yet
+copies it to the `boot` directory, replacing `boot/ocamlc`.
 implemented]
 
 == The Deployment Protocol
 
+CAUTION: Not yet implemented
+
 The protocol for building and packaging the compilers and tools for
 distribution is distinct from the protocols for building the
-compilers.  [Not yet implemented]
+compilers.

@@ -1,5 +1,10 @@
 = configuration under Bazel
 
+CAUTION: These are notes on the legacy system. After having spent
+substantial time and effort trying to translate the makefile code into
+Bazel code, I threw in the towel and started from scratch, using build
+logs as the main guide and the makefiles as an additional guide.
+
 == legacy makefiles
 
 === compiler vars
@@ -51,8 +56,8 @@ Under Bazel compilers are built in `compilers/stage`, `compilers/stage2`.
 
 Makefile.common:
 
-# we use OCAMLRUN to designate [boot/ocamlrun] and keep NEW_OCAMLRUN to refer
-# to runtime/ocamlrun, because it's less frequently used.
+we use OCAMLRUN to designate [boot/ocamlrun] and keep NEW_OCAMLRUN to refer
+to runtime/ocamlrun, because it's less frequently used.
 OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun$(EXE)
 NEW_OCAMLRUN ?= $(ROOTDIR)/runtime/ocamlrun$(EXE)
 

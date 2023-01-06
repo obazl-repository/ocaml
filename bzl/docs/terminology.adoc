@@ -89,7 +89,7 @@ A tc selector ...
 Toolset::
 A toolset is a collection of tools.
 
-== compiler names
+== compiler structure
 
 The compilers are composed of:
 

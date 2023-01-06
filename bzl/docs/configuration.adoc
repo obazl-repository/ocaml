@@ -1,16 +1,38 @@
-= configuration
+= Configuration
 :toc: auto
 :toclevels: 3
 
+
+[IMPORTANT]
+====
+The general idea is something like the following
+
+* Partition configuration settings into categories: system config,
+(compiler) build config (e.g. `flat_float_array`,
+`with_cmm_invariants`), deployment config (install directories,
+mostly), etc. See link:notes/config/census.adoc[config census].
+
+* Put all the config rules and logic in one place: `//config`
+
+* Generate `config.ml` from a mustache template file and a json data file
+
+* Before generating `config.ml`, use a Bazel rule to update the json
+  data file with data derived from the selected CC toolchain
+====
+
+
+Configuration is a Work-In-Progress. The following notes may
+help, but see also link:notes/config[]
+
 Two broad classes:
 
-* fixed - forced by platform and toolchain
+* fixed - forced by platform (e.g. endianness, word size)
 * preferential - user's choice
 
 Several sub-classes:
 
 * system config (fixed)
-* toolchain config (fixed)
+* toolchain config (fixed once toolchain is selected)
 * build config (preferential - how the user wants the compilers to be configured)
 * deployment config (preferential) - how the user wants stuff installed
 
@@ -28,7 +50,7 @@ The `./configure` script emits several classes of config data: toolchain and sys
 
 * installation config: e.g. the standard PREFIX, EXEC_PREFIX, etc. specified by the user via `./configure` arguments and/or environment vars.
 
-OBazl partitions the output of `./configure` accordingly:
+The Bazel code partitions the output of `./configure` accordingly:
 
 WARNING: outdated. Most of the config stuff is now in link:/config[//config]
 
@@ -83,6 +105,12 @@ since the *64 functions are identical to the normal functions."
 link:https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html[Feature test macros]
 
 ==== -use-prims
+
+WARNING: This option is disabled in the current code. The legacy
+makefiles use it almost everywhere, but it is only needed in specific
+places under special circumstances (i.e. you are making changes to the
+C primitives). So I've just omitted it until I can work out the proper
+way to support it. (The code to make it work is there, just disabled).
 
 ==== function_sections
 
@@ -152,4 +180,25 @@ the compiler supports, i.e.those that configure a built compiler's
 operations. To continue the example, we can build the compiler with
 (or without) `-ffunction-sections`; users of the built compiler can
 tell it to emit code with or without `-ffunction-sections`.
+
+
+
+Configuration involves:
+
+* Auto-detected feature options set by `./configure` by interrogating
+  the system. This usually results in setting `#define` macros or `-D`
+  build flags in source files or headers; e.g.
++
+    #define HAS_MACH_ABSOLUTE_TIME 1      #  in runtime/caml/s.h
+    let ocamlc_cppflags = "-D_FILE_OFFSET_BITS=64 "  # in utils/config_ml.generated
++
+* User-controllable configuration options exposed by `./configure`, e.g.
++
+    --disable-debug-runtime
++
+* User-controllable build options - arguments or env variables passed
+  to `make`; e.g. `CC`, `CFLAGS`, etc. Many such make/compiler/linker
+  variables are set to default values by `./configure`.
+
+The OBazl rules always set such configuration items to default values.
 
