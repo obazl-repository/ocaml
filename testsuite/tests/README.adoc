@@ -1,5 +1,6 @@
 = Bazel tests
 
+See link:/bzl/docs/testing.adoc[bzl/docs/testing.adoc].
 
 == overview
 

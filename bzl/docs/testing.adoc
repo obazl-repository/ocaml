@@ -4,6 +4,9 @@
 
 == quickstart
 
+TIP: By default the test runner will halt at the first error. Pass
+`--keep_going` to keep going.
+
 === running tests
 
 Test target names are constructed from filename stems normalized to
@@ -11,6 +14,13 @@ module names; they always have suffix `_test`. For example, from
 `arrays.ml` we get `Arrays_test` (suite of all tests for that file),
 `Arrays_vv_test`, `Arrays_vs_test`, `Arrays_ss_test`,
 `Arrays_sv_test`.
+
+* Run all tests currently implemented:
+
+  ** `$ bazel test testsuite/tests`
+
+WARNING: This may take a while. Each test is run once per compiler, so
+this target builds all the compilers, builds all the tests, and runs all the tests.
 
 * Run all the tests for `testsuite/tests/basic`:
 

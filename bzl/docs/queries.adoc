@@ -166,9 +166,13 @@ Macro `expect_test` expands to targets using rules `expect_vv_test`,
 
     bazel query 'kind("expect_vv_test", testsuite/tests/basic:*)' --output label_kind | sort
 
-* List all `test_suite` targets:
+* List all `test_suite` targets in package `testsuite/tests/basic`:
 
   bazel query 'kind("test_suite", testsuite/tests/basic:*)' --output label_kind | sort
+
+* List all `test_suite` targets in package `testsuite/tests` and all subpackages:
+
+  bazel query 'kind("test_suite", testsuite/tests/...:*)' --output label_kind | sort
 
 * List the tests that `test_suite` target `//testsuite/tests/basic:Boxedints_test` expands to:
 
