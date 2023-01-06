@@ -13,15 +13,20 @@ MODULE_OPTS = []
 test_suite(
     name = "tests",
     tests  = [
-        ":Test_rest_all",
-        ":testarg_expect_test",
-        ":testerror_expect_test",
+        ":Test_rest_all_test",
+        ":Testarg_test",
+        ":Testerror_test",
     ],
 )
 
 inline_expect_test(
     name   = "Test_rest_all_test",
     src = "test_rest_all.ml",
+    deps = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib",
+    ],
+    timeout = "short"
 )
 
 expect_test(
@@ -36,7 +41,7 @@ test_module(
     name   = "Testarg",
     struct = "testarg.ml",
     opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Printf"
     ]
@@ -54,8 +59,9 @@ test_module(
     name   = "Testerror",
     struct = "testerror.ml",
     opts = MODULE_OPTS,
-    deps   = [
-        "//stdlib"
+    stdlib_deps   = [
+        "//stdlib:Stdlib.Arg",
+        "//stdlib:Stdlib.Array"
     ]
 )
 

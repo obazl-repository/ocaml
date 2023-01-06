@@ -1,4 +1,4 @@
-Bazel conversion status
+Bazel conversion status (a little outdated)
 
 O  afl-instrumentation
 O  arch-power
@@ -12,8 +12,8 @@ X      arrays.ml
 X      bigints.ml
 X      boxedints.ml
 O      camlCase.ml
-O      constprop.ml.c
-O      constprop.ml.reference
+X      constprop.ml.c
+X      constprop.ml.reference
 X      divint.ml
 X      equality.ml
 X      eval_order_1.ml

@@ -31,7 +31,7 @@ expect_test(
 test_module(
     name   = "Bigarrays",
     struct = "bigarrays.ml",
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Bigarray",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.Gc",
@@ -51,7 +51,7 @@ expect_test(
 test_module(
     name   = "Change_layout",
     struct = "change_layout.ml",
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Bigarray",
         "//stdlib:Stdlib.Format",
     ]
@@ -68,7 +68,7 @@ expect_test(
 test_module(
     name   = "Fftba",
     struct = "fftba.ml",
-    deps   = ["//stdlib:Stdlib.Bigarray"]
+    stdlib_deps   = ["//stdlib:Stdlib.Bigarray"]
 )
 
 expect_test(
@@ -82,7 +82,7 @@ expect_test(
 test_module(
     name   = "Pr5115",
     struct = "pr5115.ml",
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Bigarray",
         "//stdlib:Stdlib.Printf"
     ]
@@ -99,7 +99,7 @@ expect_test(
 test_module(
     name   = "Weak_bigarray",
     struct = "weak_bigarray.ml",
-    deps   = [
+    stdlib_deps   = [
         "//stdlib:Stdlib.Bigarray",
         "//stdlib:Stdlib.Gc",
         "//stdlib:Stdlib.Weak"

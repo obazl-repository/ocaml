@@ -11,16 +11,12 @@ load("//test:rules.bzl",
 )
 
 test_suite(
-    name = "testsuite_tests_basic-modules_lib",
+    name = "tests",
     tests = [
-        ":Anonymous",
-        ":Main",
-        ":Offset",
-        ":Pr4008",
-        ":Pr6726",
-        ":Pr7427",
+        ":anonymous_test",
+        ":Main_expect_test",
+        ":Recursive_module_init_expect_test",
         ":Recursive_module_evaluation_errors",
-        ":Recursive_module_init",
     ],
 )
 
@@ -141,6 +137,12 @@ test_module(
 inline_expect_test(
     name = "Recursive_module_evaluation_errors",
     src  = "recursive_module_evaluation_errors.ml",
+    deps = [
+        ## FIXME: deps ordering not working, these must be listed in
+        ## this order. This should happen automatically.
+        "//stdlib:CamlinternalMod",
+        "//stdlib:Stdlib",
+    ],
     timeout = "short",
     tags = ["inline_expect"]
 )

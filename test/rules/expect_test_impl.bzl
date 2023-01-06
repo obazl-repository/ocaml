@@ -119,9 +119,10 @@ def expect_test_impl(ctx):
 
         "if [ $? -eq 0 ]",
         "then",
-        "    echo PASS",
+        # "    echo PASS",
+        "    :",
         "else",
-        "    echo FAIL",
+        # "    echo FAIL",
         "    exit 1",
         "fi",
 

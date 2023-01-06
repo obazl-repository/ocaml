@@ -142,7 +142,9 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
     cmd_args.append(tc.ocamlrun.short_path)
 
     executable = ctx.file._tool
-    print("EXPECT executable: %s" % ctx.attr._tool)
+    if debug:
+        print("EXPECT executable: %s" % ctx.attr._tool)
+
     cmd_args.append(executable.short_path)
 
     ## inline-expect arg -repo-root - meaning?
@@ -415,8 +417,9 @@ def inline_expect_impl(ctx, tc, exe_name, workdir):
         # + [depset(action_inputs_ccdep_filelist)]
     )
 
-    print("EXPECT runfiles tool: %s" % ctx.attr._runfiles_tool[DefaultInfo].files)
-    print("EXPECT runfiles file: %s" % ctx.files._runfiles_tool)
+    if debug:
+        print("EXPECT runfiles tool: %s" % ctx.attr._runfiles_tool[DefaultInfo].files)
+        print("EXPECT runfiles file: %s" % ctx.files._runfiles_tool)
 
     # if ctx.attr.strip_data_prefixes:
     #   myrunfiles = ctx.runfiles(

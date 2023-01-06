@@ -3,3 +3,13 @@ load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 bool_flag( name = "with-stdlib", build_setting_default = False)
 config_setting(name = "with-stdlib?",
                flag_values = {":with-stdlib": "True"})
+
+test_suite(
+    name = "tests",
+    tests = [
+        "//testsuite/tests/basic:tests",
+        "//testsuite/tests/basic-modules:tests",
+        "//testsuite/tests/lib-arg:tests",
+        "//testsuite/tests/lib-bigarray:tests"
+    ],
+)

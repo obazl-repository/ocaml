@@ -29,7 +29,7 @@ ocaml_test = rule(
     attrs = dict(
         executable_attrs(),
         _runtime = attr.label(
-            allow_single_file = True,
+            # allow_single_file = True,
             default = "//toolchain:runtime",
             executable = False,
             # cfg = reset_cc_config_transition ## only build once
