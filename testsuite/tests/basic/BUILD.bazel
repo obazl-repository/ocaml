@@ -304,21 +304,6 @@ cc_preprocess(
     name = "constprop.pp",
     src  = "constprop.ml.c",
     out  = "constprop.ml"
-    # deps = [
-    #     "//runtime/caml:hdrs"
-    # ],
-    # copts = [
-    #     "-Iruntime", # caml/m.h
-    #     "-I$(GENDIR)/runtime/caml",
-    # ] + select({
-    # }),
-    # defines = RUNTIME_DEFINES + [
-    #     "NATIVE_CODE",
-    #     "TARGET_$(ARCH)",
-    #     "MODEL_$(MODEL)",
-    #     "SYS_$(SYSTEM)"
-    # ],
-    # toolchains = ["//profile/system/local"],
 )
 
 ################################################################
