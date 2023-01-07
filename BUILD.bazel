@@ -37,30 +37,30 @@ run_tool(
 
 run_ocamlcmt(
     name = "cmt",
-    tool = "@baseline//bin:ocamlcmt.opt",
+    tool = "@dev//bin:ocamlcmt.opt",
     arg  = ":arg",
 )
 
 run_ocamldep(
     name = "deps",
-    tool = "@baseline//bin:ocamldep.opt",
+    tool = "@dev//bin:ocamldep.opt",
     # tool = ":ocamldep.opt"
 )
 
 # run_tool(
 #     name = "deps",
-#     tool = "@baseline//bin:ocamldep.opt",
+#     tool = "@dev//bin:ocamldep.opt",
 #     arg  = ":arg",
 # )
 
 run_tool(
     name = "lso",
-    tool = "@baseline//bin:ocamlobjinfo.opt",
+    tool = "@dev//bin:ocamlobjinfo.opt",
     arg  = ":arg",
 )
 run_tool(
     name = "ocamlobjinfo",
-    tool = "@baseline//bin:ocamlobjinfo.opt",
+    tool = "@dev//bin:ocamlobjinfo.opt",
     # tool = "//tools:ocamlobjinfo",
     arg  = ":arg",
 )

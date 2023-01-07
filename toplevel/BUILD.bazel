@@ -87,9 +87,9 @@ genrule(
     outs = ["ocaml"],
     executable = True,
     srcs = [":ocaml.tmp", ":expunge"],
-    tools = ["@baseline//bin:ocamlrun"],
+    tools = ["@dev//bin:ocamlrun"],
     cmd  = " ".join([
-        "$(execpath @baseline//bin:ocamlrun)",
+        "$(execpath @dev//bin:ocamlrun)",
         "$(location :expunge)",
         "$(location :ocaml.tmp)",
         "$(location ocaml)",

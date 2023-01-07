@@ -399,16 +399,16 @@ def _std_ocamlopt_byte_in_transition_impl(settings, attr):
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
     elif protocol == "test":
-        compiler = "@baseline//bin:ocamlc.byte"
-        runtime  = "@baseline//lib:asmrun"
-        cvt_emit = "@baseline//bin:cvt_emit.byte"
+        compiler = "@dev//bin:ocamlc.byte"
+        runtime  = "@dev//lib:asmrun"
+        cvt_emit = "@dev//bin:cvt_emit.byte"
 
     # elif protocol == "dev":
     #     # use ocamlc.opt to build ocamlopt.byte
-    #     compiler = "@baseline//bin:ocamlc.opt"
-    #     # lexer    = "@baseline//bin:ocamllex.opt"
-    #     runtime  = "@baseline//lib:asmrun"
-    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
+    #     compiler = "@dev//bin:ocamlc.opt"
+    #     # lexer    = "@dev//bin:ocamllex.opt"
+    #     runtime  = "@dev//lib:asmrun"
+    #     cvt_emit = "@dev//bin:cvt_emit.byte"
 
     else:
         fail("Protocol not supported for this target: %s" % protocol)
@@ -491,17 +491,17 @@ def _std_ocamlopt_opt_in_transition_impl(settings, attr):
     elif protocol == "test":
         config_executor = "vm"
         config_emitter  = "sys"
-        compiler = "@baseline//bin:ocamlopt.opt"
-        runtime  = "@baseline//lib:asmrun"  ##FIXME ???
-        # cvt_emit = "@baseline//bin:cvt_emit.byte"
+        compiler = "@dev//bin:ocamlopt.opt"
+        runtime  = "@dev//lib:asmrun"  ##FIXME ???
+        # cvt_emit = "@dev//bin:cvt_emit.byte"
 
     # elif protocol == "dev":
     #     print("sys/sys DEVTXN")
     #     # we're targeting ocamlopt.opt, so we use same
-    #     compiler = "@baseline//bin:ocamlopt.opt"
-    #     # lexer    = "@baseline//bin:ocamllex.opt"
-    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
-    #     runtime  = "@baseline//lib:asmrun"
+    #     compiler = "@dev//bin:ocamlopt.opt"
+    #     # lexer    = "@dev//bin:ocamllex.opt"
+    #     cvt_emit = "@dev//bin:cvt_emit.byte"
+    #     runtime  = "@dev//lib:asmrun"
 
     else:
         fail("Protocol not supported for this target: %s" % protocol)
@@ -570,16 +570,16 @@ def _std_ocamlc_opt_in_transition_impl(settings, attr):
     elif protocol == "test":
         config_executor = "sys"
         config_emitter  = "sys"
-        compiler = "@baseline//bin:ocamlopt.opt"
-        runtime  = "@baseline//lib:asmrun"  ##FIXME ???
-        # cvt_emit = "@baseline//bin:cvt_emit.byte"
+        compiler = "@dev//bin:ocamlopt.opt"
+        runtime  = "@dev//lib:asmrun"  ##FIXME ???
+        # cvt_emit = "@dev//bin:cvt_emit.byte"
 
     # elif protocol == "dev":
     #     # we're targeting ocamlc.opt, so we use ocamlopt.opt
-    #     compiler = "@baseline//bin:ocamlopt.opt"
-    #     # lexer    = "@baseline//bin:ocamllex.opt"
-    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
-    #     runtime  = "@baseline//lib:asmrun"
+    #     compiler = "@dev//bin:ocamlopt.opt"
+    #     # lexer    = "@dev//bin:ocamllex.opt"
+    #     cvt_emit = "@dev//bin:cvt_emit.byte"
+    #     runtime  = "@dev//lib:asmrun"
 
     else:
         fail("Protocol not supported for this target: %s" % protocol)

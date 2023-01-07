@@ -47,8 +47,8 @@ def _tc_runtime_out_transition_impl(settings, attr, debug):
         rt_target  = "camlrun"
 
     if protocol == "dev":
-        runtime = "@baseline//lib:asmrun"
-        # runtime = "@baseline//lib:lib" + rt_target + ".a"
+        runtime = "@dev//lib:asmrun"
+        # runtime = "@dev//lib:lib" + rt_target + ".a"
     else:
         runtime = "//runtime:" + rt_target
 

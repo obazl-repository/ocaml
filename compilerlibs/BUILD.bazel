@@ -44,7 +44,7 @@ compiler_library(
         "//driver:ocamlcommon",
     ],
     visibility = [
-        "@baseline//:__subpackages__",
+        "@dev//:__subpackages__",
         "//bin:__subpackages__",
         "//boot:__subpackages__",
         "//debugger:__pkg__",

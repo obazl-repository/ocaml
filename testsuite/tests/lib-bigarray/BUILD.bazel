@@ -1,13 +1,4 @@
-load("//test:rules.bzl",
-     "test_archive",
-     "test_executable",
-     "test_library",
-     "test_module",
-     "test_signature",
-     "ocaml_test",
-     "expect_test",
-     "inline_expect_test",
-)
+load("//test:rules.bzl", "test_module", "expect_test")
 
 test_suite(
     name = "tests",

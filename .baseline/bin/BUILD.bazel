@@ -7,6 +7,5 @@ load("@ocamlcc//tools:TOOL_RUNNERS.bzl",
 
 run_ocamldep(
     name = "deps",
-    tool = "@baseline//bin:ocamldep.opt",
-    # tool = ":ocamldep.opt"
+    tool = "@dev//bin:ocamldep.opt",
 )

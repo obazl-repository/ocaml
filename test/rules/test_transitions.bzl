@@ -15,17 +15,17 @@ def _vv_test_in_transition_impl(settings, attr):
     config_emitter  = "vm"
 
     if settings["//config/ocaml/compiler"]== "baseline":
-        compiler = "@baseline//bin:ocamlc.byte"
-        ocamlrun = "@baseline//bin:ocamlrun"
-        runtime  = "@baseline//lib:camlrun"
+        compiler = "@dev//bin:ocamlc.byte"
+        ocamlrun = "@dev//bin:ocamlrun"
+        runtime  = "@dev//lib:camlrun"
     else:
         compiler = "//test:ocamlc.byte"
         ocamlrun = "//runtime:ocamlrun"
         runtime  = "//runtime:camlrun"
 
 
-    # mustach  = "@baseline//bin:mustach"
-    # cvt_emit = "@baseline//bin:cvt_emit.byte"
+    # mustach  = "@dev//bin:mustach"
+    # cvt_emit = "@dev//bin:cvt_emit.byte"
 
     if debug:
         print("setting executor:  %s" % config_executor)
@@ -80,10 +80,10 @@ def _vs_test_in_transition_impl(settings, attr):
     config_emitter  = "sys"
 
     if settings["//config/ocaml/compiler"]== "baseline":
-        compiler = "@baseline//bin:ocamlopt.byte"
+        compiler = "@dev//bin:ocamlopt.byte"
         # runtime  = "//runtime:asmrun"
-        runtime  = "@baseline//lib:asmrun"
-        ocamlrun = "@baseline//bin:ocamlrun"
+        runtime  = "@dev//lib:asmrun"
+        ocamlrun = "@dev//bin:ocamlrun"
     else:
         compiler = "//test:ocamlopt.byte"
         runtime  = "//runtime:asmrun"
@@ -148,11 +148,11 @@ def _ss_test_in_transition_impl(settings, attr):
     config_emitter  = "sys"
 
     compiler = "//test:ocamlopt.opt"
-    ocamlrun = "@baseline//bin:ocamlrun"
+    ocamlrun = "@dev//bin:ocamlrun"
     # ocamlrun = "//runtime:ocamlrun"
-    runtime  = "@baseline//lib:asmrun"
-    # mustach  = "@baseline//bin:mustach"
-    # cvt_emit = "@baseline//bin:cvt_emit.byte"
+    runtime  = "@dev//lib:asmrun"
+    # mustach  = "@dev//bin:mustach"
+    # cvt_emit = "@dev//bin:cvt_emit.byte"
     # else:
     #     fail("Protocol not yet supported for test: %s" % protocol)
 
@@ -213,9 +213,9 @@ def _sv_test_in_transition_impl(settings, attr):
 
     compiler = "//test:ocamlc.opt"
     # ocamlrun = "//runtime:ocamlrun"
-    runtime  = "@baseline//lib:camlrun"
-    # mustach  = "@baseline//bin:mustach"
-    # cvt_emit = "@baseline//bin:cvt_emit.byte"
+    runtime  = "@dev//lib:camlrun"
+    # mustach  = "@dev//bin:mustach"
+    # cvt_emit = "@dev//bin:cvt_emit.byte"
     # else:
     #     fail("Protocol not yet supported for test: %s" % protocol)
 

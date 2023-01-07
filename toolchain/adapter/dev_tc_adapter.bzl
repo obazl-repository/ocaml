@@ -126,13 +126,13 @@ dev_toolchain_adapter = rule(
         ################################
         ## Core Tools
         # "_ocamlc_opt": attr.label(
-        #     default = "@baseline//bin:ocamlc.opt",
+        #     default = "@dev//bin:ocamlc.opt",
         #     allow_single_file = True,
         #     # allow_files = True,
         #     executable = True,
         #     cfg = "exec"),
         # "_ocamlopt_opt": attr.label(
-        #     default = "@baseline//bin:ocamlopt.opt",
+        #     default = "@dev//bin:ocamlopt.opt",
         #     allow_single_file = True,
         #     # allow_files = True,
         #     executable = True,

@@ -1,4 +1,4 @@
-## compiler targets built by @baseline compilers
+## compiler targets built by @dev compilers
 
 ## intended as compiler deps of test rules e.g. expect_test
 

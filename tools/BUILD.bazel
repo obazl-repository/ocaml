@@ -412,7 +412,7 @@ alias(name = "lso", actual = ":ocamlobjinfo.opt.sh")
 # alias(name = "ocamlobjinfo", actual = ":ocamlobjinfo.opt")
 run_tool(
     name = "ocamlobjinfo.opt.sh",
-    tool = "@baseline//bin:ocamlobjinfo.opt",
+    tool = "@dev//bin:ocamlobjinfo.opt",
     arg  = "//:arg",
 )
 

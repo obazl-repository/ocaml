@@ -9,8 +9,8 @@
 
 # ocaml_tools: macro, expands to ocaml_tool_vm, ocaml_tool_sys
 
-## the _vm version uses @baseline/bin/ocamlc.opt to build the tools
-## the _sys version uses @baseline/bin/ocamlopt.opt to build the tools
+## the _vm version uses @dev/bin/ocamlc.opt to build the tools
+## the _sys version uses @dev/bin/ocamlopt.opt to build the tools
 
 ## CAVEAT: these do NOT rebuild the compiler; to use a new version of the
 ## compiler to build them, run coldstart to install the new versions
@@ -130,16 +130,16 @@ def _ocaml_tool_vm_in_transition_impl(settings, attr):
     elif protocol == "fb":  ## fastbuild, w/o compiler rebuild
         config_executor = "sys"
         config_emitter  = "vm"
-        compiler = "@baseline//bin:ocamlc.opt"
-        runtime  = "@baseline//lib:camlrun"
-        ocamlrun = "@baseline//lib:ocamlrun"
+        compiler = "@dev//bin:ocamlc.opt"
+        runtime  = "@dev//lib:camlrun"
+        ocamlrun = "@dev//lib:ocamlrun"
 
     elif protocol == "test":  ## with compiler rebuild
         config_executor = "sys"
         config_emitter  = "vm"
         compiler = "//test:ocamlc.opt"
-        ocamlrun = "@baseline//bin:ocamlrun"
-        runtime  = "@baseline//lib:camlrun"
+        ocamlrun = "@dev//bin:ocamlrun"
+        runtime  = "@dev//lib:camlrun"
 
     else:
         fail("Build protocol '{p}' not supported by this target.".format(p=protocol))
@@ -237,8 +237,8 @@ def _ocaml_tool_sys_in_transition_impl(settings, attr):
     elif protocol == "fb": # 'tool' is for build_tools
         config_executor = "sys"
         config_emitter  = "sys"
-        compiler = "@baseline//bin:ocamlopt.opt"
-        runtime  = "@baseline//lib:asmrun"
+        compiler = "@dev//bin:ocamlopt.opt"
+        runtime  = "@dev//lib:asmrun"
 
     elif protocol == "test":
         config_executor = "sys"

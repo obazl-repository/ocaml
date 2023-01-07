@@ -8,10 +8,10 @@ obazl_deps()
 
 ## coldstart snapshot for development:
 local_repository(
-    name = "baseline",
+    name = "dev",
     path = ".baseline",
     # repo_mapping = {
-    #     "@baseline": "@ocamlcc"
+    #     "@dev": "@ocamlcc"
     # }
 )
 

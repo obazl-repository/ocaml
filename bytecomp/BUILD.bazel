@@ -43,7 +43,7 @@ compiler_library(
         "//driver:Maindriver"
     ],
     visibility = [
-        "@baseline//:__subpackages__",
+        "@dev//:__subpackages__",
         "//bin:__subpackages__",
         "//boot:__subpackages__",
         "//dev:__subpackages__",

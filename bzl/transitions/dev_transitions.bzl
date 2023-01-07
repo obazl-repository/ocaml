@@ -3,7 +3,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 #####################################################
 def _dev_tc_compiler_out_transition_impl(settings, attr):
 
-    ## base is @baseline/bin:ocamlc.byte
+    ## base is @dev/bin:ocamlc.byte
     ## in contrast to std ocaml tc, whose base is boot/ocamlc.boot
 
     ## called for tc.compiler and tc.lexer
@@ -72,11 +72,11 @@ def _dev_tc_compiler_out_transition_impl(settings, attr):
     #emitter of the build host
     if config_executor in ["boot", "baseline", "vm"]:
         ## vm emitter
-        compiler = "@baseline//bin:ocamlc.opt"
-        runtime = "@baseline//lib:asmrun"
+        compiler = "@dev//bin:ocamlc.opt"
+        runtime = "@dev//lib:asmrun"
     else:
-        compiler = "@baseline//bin:ocamlopt.opt"
-        runtime = "@baseline//lib:asmrun"
+        compiler = "@dev//bin:ocamlopt.opt"
+        runtime = "@dev//lib:asmrun"
 
     if debug:
         print("setting compiler: %s" % compiler)

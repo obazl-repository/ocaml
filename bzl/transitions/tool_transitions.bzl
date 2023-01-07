@@ -21,14 +21,14 @@ def _build_tool_vm_in_transition_impl(settings, attr):
     config_executor = "boot"
     config_emitter  = "boot"
 
-    ## during coldstart use ocamlc.boot; after, @baseline//bin:ocamc.opt
+    ## during coldstart use ocamlc.boot; after, @dev//bin:ocamc.opt
     compiler = "//boot:ocamlc.boot"
     runtime  = "//runtime:camlrun"
     ocamlrun = "//runtime:ocamlrun"
 
-    # compiler = "@baseline//bin:ocamlc.opt"
-    # runtime  = "@baseline//lib:camlrun"
-    # ocamlrun = "@baseline//bin:ocamlrun"
+    # compiler = "@dev//bin:ocamlc.opt"
+    # runtime  = "@dev//lib:camlrun"
+    # ocamlrun = "@dev//bin:ocamlrun"
 
 
     # protocol = settings["//config/build/protocol"]
@@ -58,10 +58,10 @@ def _build_tool_vm_in_transition_impl(settings, attr):
     #     ## settings["//toolchain:cvt_emit"]
 
     # elif protocol == "test":
-    #     compiler = "@baseline//bin:ocamlc.opt"
-    #     lexer    = "@baseline//bin:ocamllex.opt"
-    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
-    #     runtime  = "@baseline//lib:asmrun"
+    #     compiler = "@dev//bin:ocamlc.opt"
+    #     lexer    = "@dev//bin:ocamllex.opt"
+    #     cvt_emit = "@dev//bin:cvt_emit.byte"
+    #     runtime  = "@dev//lib:asmrun"
     # else:
     #     fail("Protocol not yet supported: %s" % protocol)
 
@@ -112,10 +112,10 @@ def _build_tool_sys_in_transition_impl(settings, attr):
     config_emitter  = "sys"
 
     if settings["//config/build/protocol"] == "dev":
-        compiler = "@baseline//bin:ocamlopt.opt"
-        # lexer    = "@baseline//bin:ocamllex.opt"
-        cvt_emit = "@baseline//bin:cvt_emit.byte"
-        runtime  = "@baseline//lib:asmrun"
+        compiler = "@dev//bin:ocamlopt.opt"
+        # lexer    = "@dev//bin:ocamllex.opt"
+        cvt_emit = "@dev//bin:cvt_emit.byte"
+        runtime  = "@dev//lib:asmrun"
     else:
         compiler = "//bin:ocamlopt.opt"
         # lexer    = "//lex:ocamllex.opt"

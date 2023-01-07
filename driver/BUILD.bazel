@@ -268,7 +268,7 @@ compiler_module(
         "//stdlib:Stdlib.Sys",
     ],
     visibility = [
-        "@baseline//:__subpackages__",
+        "@dev//:__subpackages__",
         "//bin:__subpackages__",
         "//boot:__subpackages__",
         "//dev:__subpackages__",
@@ -478,7 +478,7 @@ compiler_module(
         "//stdlib:Primitives",
     ],
     visibility = [
-        "@baseline//:__subpackages__",
+        "@dev//:__subpackages__",
         "//:__pkg__",
         "//bin:__pkg__",
         "//boot:__subpackages__",

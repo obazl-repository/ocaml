@@ -75,17 +75,17 @@ def _std_ocamlc_byte_in_transition_impl(settings, attr):
         # cvt_emit = settings["//toolchain:cvt_emit"]
 
     elif protocol == "test":
-        compiler = "@baseline//bin:ocamlc.opt"
-        runtime  = "@baseline//lib:camlrun"
-        # cvt_emit = "@baseline//bin:cvt_emit.byte"
+        compiler = "@dev//bin:ocamlc.opt"
+        runtime  = "@dev//lib:camlrun"
+        # cvt_emit = "@dev//bin:cvt_emit.byte"
 
     # elif protocol == "dev":
     #     ## use coldstart ocamlc.opt to build ocamlc.byte
     #     config_executor = "sys"
     #     config_emitter  = "vm"
-    #     compiler = "@baseline//bin:ocamlc.opt"
-    #     runtime  = "@baseline//lib:asmrun"
-    #     cvt_emit = "@baseline//bin:cvt_emit.byte"
+    #     compiler = "@dev//bin:ocamlc.opt"
+    #     runtime  = "@dev//lib:asmrun"
+    #     cvt_emit = "@dev//bin:cvt_emit.byte"
 
     else:
         fail("Protocol not supported for this target: %s" % protocol)

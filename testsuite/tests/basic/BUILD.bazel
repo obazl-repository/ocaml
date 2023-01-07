@@ -74,7 +74,7 @@ test_suite(
 ## expect_vv_test, expect_vs_test,
 ## expect_ss_test, expect_sv_test
 expect_test(
-    name    = "Arrays_test",
+    name    = "arrays_test",
     test_module = ":Arrays",
     stdout  = "arrays.stdout",
     expected = "arrays.reference",
@@ -84,7 +84,7 @@ test_module(
     name   = "Arrays",
     struct = "arrays.ml",
     stdlib_deps   = [
-        # "//stdlib"
+        "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Gc",
     ]
 )
@@ -121,7 +121,7 @@ test_module(
 
 ## expect_test macro expansion:
 test_suite(
-    name = "Bigints_test",
+    name = "bigints_test",
     tests = [
         ":Bigints_vv_test",
         ":Bigints_vs_test",
@@ -237,7 +237,7 @@ test_module(
 
 ############
 expect_test(
-    name        = "Boxedints_test",
+    name        = "boxedints_test",
     test_module = ":Boxedints",
     stdout      = "boxedints.stdout",
     expected    = "boxedints.reference",
@@ -743,10 +743,22 @@ expect_test(
 test_module(
     name   = "Sets",
     struct = "sets.ml",
-    stdlib_deps   = [
-        "//stdlib:Stdlib.Set",
+    ## three options for stdlib_deps:
+    stdlib_deps = [
+        "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
     ]
+    # stdlib_deps = ["//stdlib"]
+    # stdlib_deps   = select({
+    #     "//config/ocaml/compiler/libs:archived?": [
+    #         "//stdlib"
+    #     ],
+    #     "//conditions:default": [
+    #         "//stdlib:Stdlib.Set",
+    #         "//stdlib:Stdlib.Printf",
+    #     ]
+    # })
 )
 
 ############
