@@ -30,7 +30,7 @@ SIG_OPTS    = []
 
 compiler_library(
     name     = "ocamlbytecomp",
-    # archive  = True,
+    cmxa_eligible = True,
     manifest = [
         ":Bytegen",
         ":Bytelibrarian",

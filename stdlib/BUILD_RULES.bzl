@@ -20,7 +20,7 @@ load("//bzl/rules:ocaml_transitions.bzl",
 load(":BUILD_STDLIB.bzl", "STDLIB_MANIFEST")
 
 ##############################
-def _stdlib_archive_impl(ctx):
+def _stdlib_library_impl(ctx):
 
     if ctx.attr.archive:
         return archive_impl(ctx)
@@ -30,12 +30,12 @@ def _stdlib_archive_impl(ctx):
         return library_impl(ctx)
 
 #####################
-stdlib_archive = rule(
-    implementation = _stdlib_archive_impl,
+stdlib_library = rule(
+    implementation = _stdlib_library_impl,
     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
     attrs = dict(
         archive_attrs(),
-        _rule = attr.string( default = "stdlib_archive" ),
+        _rule = attr.string( default = "stdlib_library" ),
         # _allowlist_function_transition = attr.label(
         #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"),
     ),
@@ -46,7 +46,7 @@ stdlib_archive = rule(
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
-stdlib_archive_cmxa = rule(
+stdlib_library_cmxa = rule(
     implementation = archive_impl,
     doc = """Generates an OCaml archive file using the bootstrap toolchain.""",
     attrs = dict(

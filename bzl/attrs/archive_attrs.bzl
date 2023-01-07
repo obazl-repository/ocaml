@@ -12,9 +12,8 @@ def archive_attrs(): ##FIXME: rename library_attrs
 
     return dict(
 
-        archive = attr.bool(
-            ## no default
-        ),
+        archive = attr.bool(),
+        cmxa_eligible = attr.bool(),
         _compilerlibs_archived = attr.label(
             default = "//config/ocaml/compiler/libs:archived"
         ),

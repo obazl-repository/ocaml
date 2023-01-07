@@ -27,16 +27,21 @@ load("//bzl:rules.bzl",
 # boot_archive(
 compiler_library(
     name = "ocamlcommon",
+    # toplevel = True,  ## eligible for cmxa archiving
+    cmxa_eligible = True,
     opts = ["-linkall"],
     manifest  = [
+        ## WARNING: rules_ocamlcc can put the members of unarchived
+        ## libs in order, but it cannot do the same for archived libs.
+        ## so this order must be retained if compiling with
+        ## archived libraries (--//config/ocaml/compiler/libs:archived)
         "//config:Config",
-        "//bytecomp:ocamlcommon",
-        "//driver:ocamlcommon",
-        # "//file_formats:ocamlcommon",
         "//utils:ocamlcommon",
-        "//lambda:ocamlcommon",
         "//parsing:ocamlcommon",
         "//typing:ocamlcommon",
+        "//bytecomp:ocamlcommon",
+        "//lambda:ocamlcommon",
+        "//driver:ocamlcommon",
     ],
     visibility = [
         "@baseline//:__subpackages__",

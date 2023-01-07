@@ -17,14 +17,14 @@ exports_files([
 ])
 
 ################################################################
-boot_library(
-    name = "file_formats",
-    manifest  = [
-        ":Cmi_format",
-        ":Cmt_format",
-        ":Linear_format",
-    ],
-)
+# boot_library(
+#     name = "file_formats",
+#     manifest  = [
+#         ":Cmi_format",
+#         ":Cmt_format",
+#         ":Linear_format",
+#     ],
+# )
 
 ## defined in compilerlibs/Makefile.compilerlibs as COMP_CMI WARNING:
 ## these should NOT be listed in COMP or COMP_CMI, since they are deps
@@ -33,17 +33,17 @@ boot_library(
 ## in COMP. So they are not needed as direct deps of ocamlcommon.
 ## Similarly, the Cmi/Cmt format modules are deps of modules in
 ## typing.
-boot_library(
-    name = "ocamlcommon",
-    manifest  = [
-        ":Cmi_format",
-        ":Cmt_format",
-        # ":Cmo_format_cmi",
-        # ":Cmx_format_cmi",
-        # ":Cmxs_format_cmi",
-    ],
-    visibility = ["//compilerlibs:__pkg__"]
-)
+# boot_library(
+#     name = "ocamlcommon",
+#     manifest  = [
+#         ":Cmi_format",
+#         ":Cmt_format",
+#         # ":Cmo_format_cmi",
+#         # ":Cmx_format_cmi",
+#         # ":Cmxs_format_cmi",
+#     ],
+#     visibility = ["//compilerlibs:__pkg__"]
+# )
 
 compiler_module(
     name   = "Cmi_format",

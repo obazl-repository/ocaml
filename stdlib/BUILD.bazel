@@ -8,8 +8,8 @@ load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 load(":BUILD_RULES.bzl",
      "kernel_module", "kernel_module_cmx",
      "kernel_signature",
-     "stdlib_archive",
-     "stdlib_archive_cmxa",
+     "stdlib_library",
+     "stdlib_library_cmxa",
      "stdlib_internal_signature",
      "stdlib_internal_module",
      "stdlib_module",
@@ -38,11 +38,11 @@ LABEL_OPTS = ["-nolabels"]
 ## This target just aggregates the resolver and submodules.
 ## They can be listed in any order.
 
-# stdlib_archive(
-# boot_library won't work because the compiler is hard-coded to expect stdlib.cma
+# WARNING: compiler is hard-coded to expect stdlib.cma if -pervasives
 
-stdlib_archive(
+stdlib_library(
     name       = "stdlib",
+    cmxa_eligible = True,
     # opts = ["-linkall"],
     ## makefiles pass -use-prims. does that make sense, for an archive?
     manifest   = STDLIB_MANIFEST,
@@ -50,7 +50,7 @@ stdlib_archive(
     visibility = ["//visibility:public"],
 )
 
-stdlib_archive_cmxa(
+stdlib_library_cmxa(
     name       = "stdlib.cmxa",
     # opts = ["-verbose"],
     ## makefiles pass -use-prims. does that make sense, for an archive?

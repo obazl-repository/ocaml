@@ -26,70 +26,71 @@ MODULE_OPTS = []
 SIG_OPTS    = ["-strict-formats"]
 
 ## dev/test target, builds everything
-boot_archive(
-    name = "asmcomp",
-    manifest  = [
-        ":Afl_instrument",
-        ":Asmgen",
-        ":Asmlibrarian",
-        ":Asmlink",
-        ":Asmpackager",
-        ":Branch_relaxation",
-        # ":Branch_relaxation_intf_cmi",
-        ":Cmm",
-        ":Cmm_helpers",
-        ":Cmm_invariants",
-        ":Cmmgen",
-        ":Cmmgen_state",
-        ":Coloring",
-        ":Comballoc",
-        ":CSEgen",
-        ":Dataflow",
-        ":Deadcode",
-        ":Emitaux",
-        ":Interf",
-        ":Interval",
-        ":Linear",
-        ":Linearize",
-        ":Linscan",
-        ":Liveness",
-        ":Mach",
-        ":Polling",
-        ":Printcmm",
-        ":Printlinear",
-        ":Printmach",
-        ":Reg",
-        ":Reloadgen",
-        ":Schedgen",
-        ":Selectgen",
-        ":Spill",
-        ":Split",
-        ":Strmatch",
+# boot_archive(
+#     name = "asmcomp",
+#     manifest  = [
+#         ":Afl_instrument",
+#         ":Asmgen",
+#         ":Asmlibrarian",
+#         ":Asmlink",
+#         ":Asmpackager",
+#         ":Branch_relaxation",
+#         # ":Branch_relaxation_intf_cmi",
+#         ":Cmm",
+#         ":Cmm_helpers",
+#         ":Cmm_invariants",
+#         ":Cmmgen",
+#         ":Cmmgen_state",
+#         ":Coloring",
+#         ":Comballoc",
+#         ":CSEgen",
+#         ":Dataflow",
+#         ":Deadcode",
+#         ":Emitaux",
+#         ":Interf",
+#         ":Interval",
+#         ":Linear",
+#         ":Linearize",
+#         ":Linscan",
+#         ":Liveness",
+#         ":Mach",
+#         ":Polling",
+#         ":Printcmm",
+#         ":Printlinear",
+#         ":Printmach",
+#         ":Reg",
+#         ":Reloadgen",
+#         ":Schedgen",
+#         ":Selectgen",
+#         ":Spill",
+#         ":Split",
+#         ":Strmatch",
 
-        ## arch-dependent configured deps:
-        "CSE", "Arch", "Emit", "Proc", "Reload", "Scheduling", "Selection"
+#         ## arch-dependent configured deps:
+#         "CSE", "Arch", "Emit", "Proc", "Reload", "Scheduling", "Selection"
 
-    ] + select(
-        {
-        # "//config/arch:x86_64":
-        "@platforms//cpu:x86_64":
-        [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
-        # "//config/arch:amd64":
-        # [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
-        # "//config/arch:i386":
-        "@platforms//cpu:i386":
-        ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
-    }, no_match_error = "Unsupported arch"),
+#     ] + select(
+#         {
+#         # "//config/arch:x86_64":
+#         "@platforms//cpu:x86_64":
+#         [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+#         # "//config/arch:amd64":
+#         # [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+#         # "//config/arch:i386":
+#         "@platforms//cpu:i386":
+#         ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+#     }, no_match_error = "Unsupported arch"),
 
-    # signatures  = [
-    #     ":Emitenv_cmi",
-    #     ":X86_ast_cmi",
-    # ],
-    visibility = ["//testsuite:__pkg__"],
-)
+#     # signatures  = [
+#     #     ":Emitenv_cmi",
+#     #     ":X86_ast_cmi",
+#     # ],
+#     visibility = ["//testsuite:__pkg__"],
+# )
 
 compiler_library(
     name    = "ocamloptcomp",
+    cmxa_eligible = True,
     visibility = [
         "//visibility:public",
         # "//testsuite:__pkg__",

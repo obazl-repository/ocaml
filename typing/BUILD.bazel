@@ -8,8 +8,7 @@
 
 load("//bzl:rules.bzl",
      "compiler_module",
-     "boot_archive",
-     "boot_library",
+     "compiler_library",
      "compiler_signature")
 
 load("//config:WARNINGS.bzl", "w")
@@ -36,63 +35,62 @@ exports_files([
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-boot_archive(
-    name = "typing",
-    manifest  = [
-        ":Btype",
-        ":Cmt2annot",
-        ":Ctype",
-        ":Datarepr",
-        ":Env",
-        ":Envaux",
-        ":Errortrace",
-        ":Ident",
-        ":Includeclass",
-        ":Includecore",
-        ":Includemod",
-        ":Includemod_errorprinter",
-        ":Mtype",
-        ":Oprint",
-        ":Parmatch",
-        ":Path",
-        ":Patterns",
-        ":Persistent_env",
-        ":Predef",
-        ":Primitive",
-        ":Printpat",
-        ":Printtyp",
-        ":Printtyped",
-        ":Rec_check",
-        ":Shape",
-        ":Signature_group",
-        ":Stypes",
-        ":Subst",
-        ":Tast_iterator",
-        ":Tast_mapper",
-        ":Type_immediacy",
-        ":Typeclass",
-        ":Typecore",
-        ":Typedecl",
-        ":Typedecl_immediacy",
-        ":Typedecl_properties",
-        ":Typedecl_separability",
-        ":Typedecl_unboxed",
-        ":Typedecl_variance",
-        ":Typedtree",
-        ":Typemod",
-        ":Typeopt",
-        ":Types",
-        ":Typetexp",
-        ":Untypeast",
+# compiler_library(
+#     name = "typing",
+#     manifest  = [
+#         ":Btype",
+#         ":Cmt2annot",
+#         ":Ctype",
+#         ":Datarepr",
+#         ":Env",
+#         ":Envaux",
+#         ":Errortrace",
+#         ":Ident",
+#         ":Includeclass",
+#         ":Includecore",
+#         ":Includemod",
+#         ":Includemod_errorprinter",
+#         ":Mtype",
+#         ":Oprint",
+#         ":Parmatch",
+#         ":Path",
+#         ":Patterns",
+#         ":Persistent_env",
+#         ":Predef",
+#         ":Primitive",
+#         ":Printpat",
+#         ":Printtyp",
+#         ":Printtyped",
+#         ":Rec_check",
+#         ":Shape",
+#         ":Signature_group",
+#         ":Stypes",
+#         ":Subst",
+#         ":Tast_iterator",
+#         ":Tast_mapper",
+#         ":Type_immediacy",
+#         ":Typeclass",
+#         ":Typecore",
+#         ":Typedecl",
+#         ":Typedecl_immediacy",
+#         ":Typedecl_properties",
+#         ":Typedecl_separability",
+#         ":Typedecl_unboxed",
+#         ":Typedecl_variance",
+#         ":Typedtree",
+#         ":Typemod",
+#         ":Typeopt",
+#         ":Types",
+#         ":Typetexp",
+#         ":Untypeast",
 
-        # ":Annot_cmi",
-        # ":Outcometree_cmi"
-    ],
-    visibility = ["//compilerlibs:__pkg__"]
-)
+#         # ":Annot_cmi",
+#         # ":Outcometree_cmi"
+#     ],
+#     visibility = ["//compilerlibs:__pkg__"]
+# )
 
-# boot_archive(
-boot_library(
+compiler_library(
     name = "ocamlcommon",
     manifest  = [
         ":Btype",

@@ -59,7 +59,7 @@ def rule_mnemonic(ctx):
     elif rule in ["test_signature"]:
         mnemonic = "CompileTestSig"
 
-    elif rule in ["boot_archive", "test_archive", "stdlib_archive"]:
+    elif rule in ["boot_archive", "test_archive"]:
         mnemonic = "ArchiveLib"
 
     elif rule in ["ocaml_test", "expect_test", "lambda_expect_test",
@@ -72,6 +72,11 @@ def rule_mnemonic(ctx):
             mnemonic = "Archiving compiler lib"
         else:
             mnemonic = "Packaging compiler lib"
+    elif rule == "stdlib_library":
+        if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+            mnemonic = "Archiving stdlib library"
+        else:
+            mnemonic = "Packaging stdlib library"
     else:
         fail(rule)
 
