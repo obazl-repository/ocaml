@@ -2,7 +2,11 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:common_settings.bzl",
      "bool_flag", "string_flag")
 
-load("//bzl:rules.bzl", "run_tool", "run_repl")
+load("//tools:TOOL_RUNNERS.bzl",
+     "run_ocamlcmt",
+     "run_ocamldep",
+     "run_tool",
+     "run_repl")
 
 exports_files(["Makefile.config", "VERSION", "BUILD.bazel"])
 
@@ -31,15 +35,33 @@ run_tool(
     arg  = ":arg",
 )
 
-run_tool(
-    name = "ocamlcmt",
-    tool = "//tools:ocamlcmt",
+run_ocamlcmt(
+    name = "cmt",
+    tool = "@baseline//bin:ocamlcmt.opt",
     arg  = ":arg",
 )
 
+run_ocamldep(
+    name = "deps",
+    tool = "@baseline//bin:ocamldep.opt",
+    # tool = ":ocamldep.opt"
+)
+
+# run_tool(
+#     name = "deps",
+#     tool = "@baseline//bin:ocamldep.opt",
+#     arg  = ":arg",
+# )
+
+run_tool(
+    name = "lso",
+    tool = "@baseline//bin:ocamlobjinfo.opt",
+    arg  = ":arg",
+)
 run_tool(
     name = "ocamlobjinfo",
-    tool = "//tools:ocamlobjinfo",
+    tool = "@baseline//bin:ocamlobjinfo.opt",
+    # tool = "//tools:ocamlobjinfo",
     arg  = ":arg",
 )
 

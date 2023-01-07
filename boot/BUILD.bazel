@@ -71,6 +71,8 @@ CHECKPOINT_DEPS = [
     "//bin:ocamloptx.optx",     # 20
     "//vendor/mustach",
     "//vendor/merge_json",
+    "//tools:ocamlcmt.byte",
+    "//tools:ocamlcmt.opt",
     "//tools:ocamldep.byte",
     "//tools:ocamldep.opt",
     "//tools:ocamlprof.byte",   # 25

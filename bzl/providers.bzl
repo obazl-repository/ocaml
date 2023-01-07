@@ -57,6 +57,7 @@ ModuleInfo, _new_moduleinfo = provider(
 def _SigInfo_init(*,
                   cmi  = None,
                   cmti = None,
+                  ##FIXME: rename sig_src, for consistency with ModuleInfo
                   mli  = None):
     return {
         "cmi"  : cmi,

@@ -18,15 +18,15 @@ load(":TOOL_RULES.bzl",
      "tool_signature"
 )
 
+load(":TOOL_RUNNERS.bzl",
+     "run_tool",
+     "run_ocamldep"
+)
+# load("//lex:BUILD_RULES.bzl", "run_ocamllex")
+
 load("//bzl/rules:COMPILER.bzl",
      "OCAMLC_PROLOGUE",
      "OCAML_COMPILER_OPTS")
-
-load(":TOOL_RUNNERS.bzl",
-     "run_ocamldep"
-)
-
-# load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
 exports_files([
     "check-parser-uptodate-or-warn.sh",
@@ -413,8 +413,14 @@ compiler_module(
 ## ocamlobjinfo - Display info on compiled files
 alias(name = "lso.byte", actual = ":ocamlobjinfo.byte")
 alias(name = "lso.opt", actual = ":ocamlobjinfo.opt")
-alias(name = "lso", actual = ":ocamlobjinfo.opt")
-alias(name = "ocamlobjinfo", actual = ":ocamlobjinfo.opt")
+alias(name = "lso", actual = ":ocamlobjinfo.opt.sh")
+# alias(name = "ocamlobjinfo", actual = ":ocamlobjinfo.opt")
+run_tool(
+    name = "ocamlobjinfo.opt.sh",
+    tool = "@baseline//bin:ocamlobjinfo.opt",
+    arg  = "//:arg",
+)
+
 ocaml_tools(
     name        = "ocamlobjinfo",
     prologue    = OCAMLC_PROLOGUE + ["//middle_end:ocamlmiddleend"],

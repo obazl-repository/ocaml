@@ -1,5 +1,5 @@
-load("//bzl/rules:run_tool.bzl", _run_tool = "run_tool")
-load("//bzl/rules:run_repl.bzl", _run_repl = "run_repl")
+# load("//bzl/rules:run_tool.bzl", _run_tool = "run_tool")
+# load("//bzl/rules:run_repl.bzl", _run_repl = "run_repl")
 
 # load("//bzl/rules:tool_module.bzl",  _tool_module  = "tool_module")
 # load("//bzl/rules:tool_signature.bzl", _tool_signature = "tool_signature")
@@ -117,7 +117,7 @@ flambda_compilers         = _flambda_compilers
 # ocamlc_runtime    = _ocamlc_runtime
 # ocamlc_fixpoint    = _ocamlc_fixpoint
 
-run_repl = _run_repl
-run_tool = _run_tool
+# run_repl = _run_repl
+# run_tool = _run_tool
 # tool_module  = _tool_module
 # tool_signature = _tool_signature

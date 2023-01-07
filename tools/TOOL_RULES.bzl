@@ -20,7 +20,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:rules.bzl", "run_tool", "run_repl")
+# load("//bzl:rules.bzl", "run_tool", "run_repl")
 
 load("//bzl:providers.bzl", "BootInfo", "ModuleInfo")
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")

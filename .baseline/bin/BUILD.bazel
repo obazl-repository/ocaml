@@ -1,0 +1,12 @@
+exports_files(glob(["**"]))
+
+load("@ocamlcc//tools:TOOL_RUNNERS.bzl",
+     "run_ocamlcmt",
+     "run_ocamldep"
+)
+
+run_ocamldep(
+    name = "deps",
+    tool = "@baseline//bin:ocamldep.opt",
+    # tool = ":ocamldep.opt"
+)
