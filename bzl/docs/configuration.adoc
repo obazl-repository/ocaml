@@ -2,6 +2,174 @@
 :toc: auto
 :toclevels: 3
 
+Configuration is a Work-In-Progress. The following <<Notes>> may
+help, but see also link:notes/config[]
+
+
+== Summary
+
+=== Toolchain Configurations
+
+
+=== Command-line options
+
+Two ways to set a boolean option to true
+
+   --//config/ocaml/compile:bin-annot
+   --//config/ocaml/compile:bin-annot=True
+
+Two ways to set a boolean option to false
+
+   --no//config/ocaml/compile:bin-annot
+   --//config/ocaml/compile:bin-annot=False
+
+=== OCaml Compilation
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| `//config/ocaml/compile:absname` | True | Inserts `-absname` to all compile targets
+| `//config/ocaml/compile:bin-annot` | False | Inserts `-bin-annot` to all compile targets
+| `//config/ocaml/compile:principal` | True | Inserts `-principal` to all compile targets
+| `//config/ocaml/compile:verbose` | False | Inserts `-verbose` to all compile targets
+| //config/ocaml:absname  | |
+| //config/ocaml/compiler/libs:archived  | |
+| //config/ocaml/compiler:compiler  | |
+| //config/ocaml:primitives  | |
+| //config/ocaml:principal  | |
+|===
+
+Remarks:
+
+* "All compile targets": all `*_module` and `*_signature` rule targets
+
+=== OCaml Linking
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //config/ocaml/cc/link:verbose  | |
+|===
+
+=== OCaml Archiving
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //config/ocaml/archive:verbose  | |
+|===
+
+
+=== Compiler Build Configuration
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //config/cmm/invariants:enabled  | |
+| //config/cmm/logging:enabled  | |
+| //config/ocaml/cmm/invariants:enabled  | |
+| //config/ocaml:with_cmm_invariants  | |
+| //config/ocaml:flat_float_array  | |
+|===
+
+=== Runtimes
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //runtime:DEBUG | |
+| //runtime:INSTRUCTION_TRACE | |
+| //runtime:INSTRUMENT | |
+| //runtime:args | |
+| //runtime:asan | |
+| //runtime:fastbuild | |
+| //runtime:msan | |
+| //runtime:primitives | |
+| //runtime:runtime | |
+| //runtime:trace | |
+| //runtime:use_prims | |
+| //config/variant:instrumented | |
+| //config:instrumented | |
+|===
+
+=== Diagnostics
+
+Verbosity, logging, etc.
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+|===
+
+=== Optimization (o11n)
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //config/ocaml/cc/compile/o11n/level:level  | |
+| //config/ocaml/o11n/xmo:enabled  | |
+|===
+
+=== Flambda
+
+[cols="3,1,5"]
+|===
+| //config/flambda/invariants:enabled  | |
+| //config/flambda/logging/raw:enabled  | |
+| //config/flambda/logging:enabled  | |
+| //config/flambda:verbose  | |
+| //config/ocaml/flambda/invariants:enabled  | |
+| //config/ocaml/flambda:enabled  | |
+|===
+
+=== CC configuration
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //config/cc:function-sections  | |
+| //config/cc:verbose  | |
+| //config/ocaml/cc/archive:verbose  | |
+| //config/ocaml/cc/asm:keep  | |
+| //config/ocaml/cc/asm:verbose  | |
+| //config/ocaml/cc/compile:verbose  | |
+|===
+
+
+=== Misc
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //config/mode:pedantic  | |
+| //config/ocaml:camlheaders  | |
+| //config/ocaml:sig_src | |
+| //config/pack:dynlink | |
+| //config/pack:ns | |
+| //config/target/emitter:emitter | |
+| //config/target/executor:executor | |
+| //config/toolchain:toolchain | |
+| //config/tools:verbose | |
+| //config/variant:pedantic | |
+| //config:debug | |
+| //config:manifest | |
+| //config:primitives | |
+| //config:sig_src | |
+| //config:target_host | |
+| //config:verbose | |
+| //config:warnings | |
+| //platform/xtarget:xtarget | |
+| //test:verbose | |
+| //testsuite/tests:with-stdlib | |
+| //toolchain/targetX/executor:executor | |
+| //toolchain:compiler | |
+| //tools:verbose | |
+| //:arg | |
+| //:verbose | |
+| //bin:verbose | |
+| //boot:verbose | |
+|===
+== Notes
 
 [IMPORTANT]
 ====
@@ -20,9 +188,6 @@ mostly), etc. See link:notes/config/census.adoc[config census].
   data file with data derived from the selected CC toolchain
 ====
 
-
-Configuration is a Work-In-Progress. The following notes may
-help, but see also link:notes/config[]
 
 Two broad classes:
 
@@ -63,7 +228,7 @@ WARNING: outdated. Most of the config stuff is now in link:/config[//config]
 The configuration information is communicated to build rules through
 Bazels _custom variable_ mechanism.
 
-== config settings
+=== config settings
 
 
 * `--//config:primitives=/path/to/primitives` - sets the file of
@@ -90,7 +255,7 @@ NB: example of file that needs this is asmcomp/reloadgen.ml. Compiled
   `["-w", "+a-4-9-41-42-44-45-48"]`
 
 
-== features
+=== features
 
 
 
@@ -133,12 +298,12 @@ link:https://devzone.nordicsemi.com/f/nordic-q-a/48438/what-is--fdata-sections-i
 
 Thin archives, --start-lib, --end-lib: link:https://maskray.me/blog/2022-01-16-archives-and-start-lib[Archives and --start-lib]
 
-== C config
+=== C config
 
 C compile flags for specific files may be set on the command line using `--per_file_copt`.
 
 
-== new regime
+=== new regime
 
 Distinct classes of config data.
 
