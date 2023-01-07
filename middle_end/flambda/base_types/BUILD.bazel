@@ -1,5 +1,5 @@
 load("//bzl:rules.bzl",
-     "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -7,26 +7,26 @@ load("//bzl:rules.bzl",
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-boot_library(
-    name = "base_types",
-    manifest  = [
-        ":Closure_element",
-        ":Closure_id",
-        ":Closure_origin",
-        ":Export_id",
-        ":Id_types",
-        ":Mutable_variable",
-        ":Set_of_closures_id",
-        ":Set_of_closures_origin",
-        ":Static_exception",
-        ":Tag",
-        ":Var_within_closure",
-    ],
-)
+# compiler_library(
+#     name = "base_types",
+#     manifest  = [
+#         ":Closure_element",
+#         ":Closure_id",
+#         ":Closure_origin",
+#         ":Export_id",
+#         ":Id_types",
+#         ":Mutable_variable",
+#         ":Set_of_closures_id",
+#         ":Set_of_closures_origin",
+#         ":Static_exception",
+#         ":Tag",
+#         ":Var_within_closure",
+#     ],
+# )
 
 ## compilerlibs/Makefile.compilerlibs:
 ## flambda/base_types deps embedded in MIDDLE_END
-boot_library(
+compiler_library(
     name = "ocamloptcomp",
     manifest  = [
         ":Closure_element",

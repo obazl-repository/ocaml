@@ -1,9 +1,7 @@
 load("//bzl:rules.bzl",
-     # "boot_compiler",
-     # "boot_executable",
+     "compiler_library",
      "compiler_module",
-     "compiler_signature",
-     "boot_library")
+     "compiler_signature")
 
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 
@@ -89,7 +87,7 @@ SIG_OPTS    =  ["-strict-formats"]
 #     visibility = ["//visibility:public"]
 # )
 
-BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
+# BOOT_OPTS = ["-strict-sequence", "-nostdlib", "-compat-32", "-w", "-31"]
 
 # ocaml_tool_r(
 #     name       = "ocamllex",
@@ -175,7 +173,7 @@ ocaml_tool_sys(
     visibility = ["//visibility:public"]
 )
 
-boot_library(
+compiler_library(
     name = "lex",
     manifest  = [
         ":Common",

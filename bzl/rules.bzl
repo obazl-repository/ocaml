@@ -37,8 +37,8 @@ load("//bzl/rules:build_module.bzl", _build_module = "build_module")
 # load("//bzl/rules:boot_config.bzl",
 #      _boot_config = "boot_config")
 
-load("//bzl/rules:boot_archive.bzl",
-     _boot_archive = "boot_archive")
+# load("//bzl/rules:boot_archive.bzl",
+#      _boot_archive = "boot_archive")
 
 # load("//bzl/rules:boot_executable.bzl", _boot_executable = "boot_executable")
 
@@ -46,9 +46,9 @@ load("//bzl/rules:boot_archive.bzl",
 #      _baseline_executable = "baseline_executable")
 
 # load("//bzl/rules:boot_compiler.bzl", _boot_compiler = "boot_compiler")
-load("//bzl/rules:boot_module.bzl", _boot_module = "boot_module")
-load("//bzl/rules:boot_signature.bzl", _boot_signature = "boot_signature")
-load("//bzl/rules:boot_library.bzl", _boot_library = "boot_library")
+# load("//bzl/rules:boot_module.bzl", _boot_module = "boot_module")
+# load("//bzl/rules:boot_signature.bzl", _boot_signature = "boot_signature")
+# load("//bzl/rules:boot_library.bzl", _boot_library = "boot_library")
 
 load("//bzl/rules:compiler_library.bzl",
      _compiler_library = "compiler_library")
@@ -75,13 +75,13 @@ build_tool_vm   = _build_tool_vm
 
 # boot_config      = _boot_config
 
-boot_archive      = _boot_archive
+# boot_archive      = _boot_archive
 
 # boot_executable      = _boot_executable
 # baseline_executable      = _baseline_executable
-ocaml_library  = _boot_library
-boot_library  = _boot_library
-boot_module      = _boot_module
+# ocaml_library  = _boot_library
+# boot_library  = _boot_library
+# boot_module      = _boot_module
 
 compiler_library     = _compiler_library
 compiler_module      = _compiler_module
@@ -90,7 +90,7 @@ compiler_module      = _compiler_module
 # boot_lexer = _boot_lexer
 
 bootstrap_repl   = _bootstrap_repl
-boot_signature   = _boot_signature
+# boot_signature   = _boot_signature
 compiler_signature   = _compiler_signature
 
 # boot_import_vm_executable = _boot_import_vm_executable

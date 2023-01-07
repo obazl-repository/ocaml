@@ -1,6 +1,5 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -26,27 +25,26 @@ exports_files([
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-boot_library(
-    name = "lambda",
-    manifest  = [
-        ":Debuginfo",
-        ":Lambda",
-        ":Matching",
-        ":Printlambda",
-        ":Runtimedef",
-        ":Simplif",
-        ":Switch",
-        ":Translattribute",
-        ":Translclass",
-        ":Translcore",
-        ":Translmod",
-        ":Translobj",
-        ":Translprim",
-    ],
-)
+# compiler_library(
+#     name = "lambda",
+#     manifest  = [
+#         ":Debuginfo",
+#         ":Lambda",
+#         ":Matching",
+#         ":Printlambda",
+#         ":Runtimedef",
+#         ":Simplif",
+#         ":Switch",
+#         ":Translattribute",
+#         ":Translclass",
+#         ":Translcore",
+#         ":Translmod",
+#         ":Translobj",
+#         ":Translprim",
+#     ],
+# )
 
-# boot_archive(
-boot_library(
+compiler_library(
     name = "ocamlcommon",
     manifest  = [
         ":Debuginfo",

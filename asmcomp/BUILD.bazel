@@ -1,6 +1,4 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
      "build_module",
      "build_tool_vm",
      "compiler_library",
@@ -26,7 +24,7 @@ MODULE_OPTS = []
 SIG_OPTS    = ["-strict-formats"]
 
 ## dev/test target, builds everything
-# boot_archive(
+# compiler_library(
 #     name = "asmcomp",
 #     manifest  = [
 #         ":Afl_instrument",
@@ -101,7 +99,7 @@ compiler_library(
     ],
 )
 
-boot_library(
+compiler_library(
     name = "optcomp",
     visibility = [
         "//compilerlibs:__pkg__",

@@ -1,7 +1,7 @@
 load("//bzl:rules.bzl",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
-     "boot_library",
 )
 
 MODULE_OPTS = []
@@ -17,7 +17,7 @@ exports_files([
 ])
 
 ################################################################
-# boot_library(
+# compiler_library(
 #     name = "file_formats",
 #     manifest  = [
 #         ":Cmi_format",
@@ -33,7 +33,7 @@ exports_files([
 ## in COMP. So they are not needed as direct deps of ocamlcommon.
 ## Similarly, the Cmi/Cmt format modules are deps of modules in
 ## typing.
-# boot_library(
+# compiler_library(
 #     name = "ocamlcommon",
 #     manifest  = [
 #         ":Cmi_format",

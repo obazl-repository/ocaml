@@ -1,5 +1,5 @@
 load("//bzl:rules.bzl",
-     "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -18,13 +18,13 @@ SIG_OPTS = ["-nostdlib"]
 # we can do this with `bazel run`
 # https://dev.to/bazel/bazel-can-write-to-the-source-folder-b9b
 
-boot_library(
-    name = "menhir",
-    manifest= [
-        ":MenhirLib",
-        ":Parser",
-    ],
-)
+# compiler_library(
+#     name = "menhir",
+#     manifest= [
+#         ":MenhirLib",
+#         ":Parser",
+#     ],
+# )
 
 ## FIXME: convert to namespace Ocaml (or Menhir or something)
 

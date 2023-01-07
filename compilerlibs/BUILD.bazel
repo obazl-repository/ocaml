@@ -1,6 +1,6 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
+     # "boot_archive",
+     # "boot_library",
      "compiler_library")
 
 ## NB: there is no compelling reason that we should put these targets

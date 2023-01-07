@@ -1,7 +1,7 @@
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 
 load("//bzl:rules.bzl",
-     "boot_library",
+     "compiler_library",
      "compiler_module",
 )
 
@@ -84,8 +84,9 @@ mustache(
     template = "ocamldebug.ml.mustache",
 )
 
-boot_library(
+compiler_library(
     name = "debugger_lib",  ## includes resolver Ocamldebug
+    cmxa_eligible = True,
     manifest  = [
         ":Ocamldebug",
         ":Ocamldebug.Breakpoints",

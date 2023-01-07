@@ -1,9 +1,6 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
-     # "boot_config",
-     # "boot_executable",
-     "boot_library",
      "build_tool",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -85,41 +82,38 @@ build_tool( ## only build as vm/vm with boot compiler
 # 	$(CAMLC) -a -linkall -o $@ $(COMMON)
 
 # obazl testing, build everything
-boot_library(
-# boot_archive(
-    name = "utils",
-    # mode = "bytecode",
-    manifest  = [
-        "Arg_helper",
-        "Binutils",
-        "Build_path_prefix_map",
-        # "Ccomp",
-        "Clflags",
-        "//config:Config",
-        "Consistbl",
-        "Diffing",
-        "Diffing_with_keys",
-        "Domainstate",
-        "Identifiable",
-        "Int_replace_polymorphic_compare",
-        "Lazy_backtrack",
-        "Load_path",
-        "Local_store",
-        "Misc",
-        "Numbers",
-        "Profile",
-        "Strongly_connected_components",
-        "Targetint",
-        "Terminfo",
-        "Warnings",
-    ],
-    visibility = ["//compilerlibs:__pkg__"]
-)
+# compiler_library(
+#     name = "utils",
+#     # mode = "bytecode",
+#     manifest  = [
+#         "Arg_helper",
+#         "Binutils",
+#         "Build_path_prefix_map",
+#         # "Ccomp",
+#         "Clflags",
+#         "//config:Config",
+#         "Consistbl",
+#         "Diffing",
+#         "Diffing_with_keys",
+#         "Domainstate",
+#         "Identifiable",
+#         "Int_replace_polymorphic_compare",
+#         "Lazy_backtrack",
+#         "Load_path",
+#         "Local_store",
+#         "Misc",
+#         "Numbers",
+#         "Profile",
+#         "Strongly_connected_components",
+#         "Targetint",
+#         "Terminfo",
+#         "Warnings",
+#     ],
+#     visibility = ["//compilerlibs:__pkg__"]
+# )
 
-# boot_archive(
-boot_library(
+compiler_library(
     name = "ocamlcommon",
-    # mode = "bytecode",
     manifest  = [
         ## list from compilerlibs/Makefile.compilerlibs
         ## ":Config" moved to //config/Config

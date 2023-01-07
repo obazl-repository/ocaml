@@ -1,13 +1,13 @@
 ## GENERATED FILE ##
 
 load("//bzl:rules.bzl",
-     "ocaml_library",
-     "ocaml_signature",
+     "compiler_library",
+     "compiler_signature",
 )
 
 SIG_OPTS = ["-nostdlib"]
 
-ocaml_library(
+compiler_library(
     name = "tools_unlabel-patches_lib",
     signatures  = [
         ":(symbol "1")_cmi",
@@ -17,7 +17,7 @@ ocaml_library(
     ],
 )
 
-ocaml_signature(
+compiler_signature(
     name = "(symbol "1")_cmi",
     src  = "1.mli",
     opts = SIG_OPTS,
@@ -26,7 +26,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_signature(
+compiler_signature(
     name = "(symbol "2")_cmi",
     src  = "2.mli",
     opts = SIG_OPTS,
@@ -35,7 +35,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_signature(
+compiler_signature(
     name = "(symbol "3")_cmi",
     src  = "3.mli",
     opts = SIG_OPTS,
@@ -44,7 +44,7 @@ ocaml_signature(
     ]
 )
 
-ocaml_signature(
+compiler_signature(
     name = "(symbol "4")_cmi",
     src  = "4.mli",
     opts = SIG_OPTS,

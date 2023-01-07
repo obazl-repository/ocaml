@@ -342,8 +342,8 @@ def executable_impl(ctx, tc, exe_name,
     ## all deps. Then we use the manifest to filter.
 
     manifest = ctx.files.prologue
-    if ctx.label.name == "ocamlobjinfo":
-        print("PROLOGUE: %s" % manifest)
+    # if ctx.label.name == "ocamlobjinfo":
+    #     print("PROLOGUE: %s" % manifest)
 
     filtering_depset = depset(
         order = dsorder,

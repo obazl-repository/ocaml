@@ -1,6 +1,5 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
+     "compiler_library",
      )
 
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
@@ -158,7 +157,7 @@ mustache(
 
 ## these contain "primitives?"
 
-boot_library(
+compiler_library(
     name = "primitives",
     manifest = [
         "CamlinternalFormat",

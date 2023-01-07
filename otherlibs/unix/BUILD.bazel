@@ -1,5 +1,4 @@
 load("//bzl:rules.bzl",
-     "boot_library",
      "compiler_library",
      "compiler_module",
      "compiler_signature",

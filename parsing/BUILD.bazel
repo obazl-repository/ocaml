@@ -7,8 +7,7 @@
 # -nostdlib -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats
 
 load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -37,33 +36,31 @@ exports_files([
 # of //parsing:CamlinternalMenhirLib we would have something like
 # //boot/menhir:Ocaml.MenhirLib
 
-boot_library(
-# boot_archive(
-    name = "parsing",
-    manifest  = [
-        ":Ast_helper",
-        ":Ast_invariants",
-        ":Ast_iterator",
-        ":Ast_mapper",
-        ":Attr_helper",
-        ":Builtin_attributes",
-        ":CamlinternalMenhirLib",
-        ":Depend",
-        ":Docstrings",
-        ":Lexer",
-        ":Location",
-        ":Longident",
-        ":Parse",
-        ":Parser",
-        ":Pprintast",
-        ":Printast",
-        ":Syntaxerr",
-    ],
-    visibility = ["//compilerlibs:__pkg__"]
-)
+# compiler_library(
+#     name = "parsing",
+#     manifest  = [
+#         ":Ast_helper",
+#         ":Ast_invariants",
+#         ":Ast_iterator",
+#         ":Ast_mapper",
+#         ":Attr_helper",
+#         ":Builtin_attributes",
+#         ":CamlinternalMenhirLib",
+#         ":Depend",
+#         ":Docstrings",
+#         ":Lexer",
+#         ":Location",
+#         ":Longident",
+#         ":Parse",
+#         ":Parser",
+#         ":Pprintast",
+#         ":Printast",
+#         ":Syntaxerr",
+#     ],
+#     visibility = ["//compilerlibs:__pkg__"]
+# )
 
-# boot_archive(
-boot_library(
+compiler_library(
     name = "ocamlcommon",
     manifest  = [
         ":Ast_helper",

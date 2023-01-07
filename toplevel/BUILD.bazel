@@ -1,7 +1,4 @@
 load("//bzl:rules.bzl",
-     # "boot_archive",
-     # "boot_executable",
-     "boot_library",
      "bootstrap_repl",
      "build_tool",
      "compiler_library",
@@ -103,23 +100,23 @@ genrule(
 
 ################################################################
 ## dev/test, build all
-boot_library(
-    name = "toplevel",
-    manifest  = [
-        # ":Expunge",
-        ":Genprintval",
-        ":Topcommon",
-        ":Topprinters",
-        ":Topdirs",
-        ":Toploop",
-        ":Topstart",
-    ],
-    # deps  = [
-    #     ":Topeval_cmi",
-    #     ":Topmain_cmi",
-    #     ":Trace_cmi",
-    # ],
-)
+# compiler_library(
+#     name = "toplevel",
+#     manifest  = [
+#         # ":Expunge",
+#         ":Genprintval",
+#         ":Topcommon",
+#         ":Topprinters",
+#         ":Topdirs",
+#         ":Toploop",
+#         ":Topstart",
+#     ],
+#     # deps  = [
+#     #     ":Topeval_cmi",
+#     #     ":Topmain_cmi",
+#     #     ":Trace_cmi",
+#     # ],
+# )
 
 ################################################################
 # # root Makefile:

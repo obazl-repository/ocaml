@@ -1,6 +1,4 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
      "compiler_library",
      "compiler_module",
      "compiler_signature",
@@ -82,7 +80,7 @@ compiler_library(
 ################################################################
 ## for //compilerlibs:ocamlcommmon archive:
 # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI
-boot_library(
+compiler_library(
     name = "ocamlcommon",
     manifest  = [
         ## we could aggregate the driver modules here,

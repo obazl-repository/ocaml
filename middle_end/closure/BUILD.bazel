@@ -1,5 +1,5 @@
 load("//bzl:rules.bzl",
-     "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -9,13 +9,13 @@ SIG_OPTS    = []
 
 STDLIB = ["//boot/lib:stdlib"]
 
-boot_library(
-    name = "closure",
-    manifest  = [
-        ":Closure",
-        ":Closure_middle_end",
-    ],
-)
+# compiler_library(
+#     name = "closure",
+#     manifest  = [
+#         ":Closure",
+#         ":Closure_middle_end",
+#     ],
+# )
 
 compiler_module(
     name   = "Closure",

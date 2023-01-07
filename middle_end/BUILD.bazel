@@ -1,5 +1,4 @@
 load("//bzl:rules.bzl",
-     "boot_library",
      "compiler_library",
      "compiler_module",
      "compiler_signature",
@@ -8,31 +7,31 @@ load("//bzl:rules.bzl",
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-compiler_library(
-    name = "middle_end",
-    manifest  = [
-        ":Backend_var",
-        ":Clambda",
-        ":Clambda_primitives",
-        ":Compilation_unit",
-        ":Compilenv",
-        ":Convert_primitives",
-        ":Internal_variable_names",
-        ":Linkage_name",
-        ":Printclambda",
-        ":Printclambda_primitives",
-        ":Semantics_of_primitives",
-        ":Symbol",
-        ":Variable",
+# compiler_library(
+#     name = "middle_end",
+#     manifest  = [
+#         ":Backend_var",
+#         ":Clambda",
+#         ":Clambda_primitives",
+#         ":Compilation_unit",
+#         ":Compilenv",
+#         ":Convert_primitives",
+#         ":Internal_variable_names",
+#         ":Linkage_name",
+#         ":Printclambda",
+#         ":Printclambda_primitives",
+#         ":Semantics_of_primitives",
+#         ":Symbol",
+#         ":Variable",
 
-        ":Backend_intf_cmi",
-    ],
-)
+#         ":Backend_intf_cmi",
+#     ],
+# )
 
 ## defined in compilerlibs/Makefile.compilerlibs
 ## //asmcomp:ocamloptcomp (archive) needs it as a lib, not an archive
 ## //tools:ocamlobjinfo (executable)
-boot_library(
+compiler_library(
     name = "ocamlmiddleend",
     manifest  = [
         ## NB: the makefiles take pains to put stuff in order, across
