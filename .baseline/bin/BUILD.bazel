@@ -5,6 +5,14 @@ load("@ocamlcc//tools:TOOL_RUNNERS.bzl",
      "run_ocamldep"
 )
 
+
+alias(name = "lstyp", actual = ":ocamlcmt.opt.sh")
+alias(name = "lst",   actual = ":ocamlcmt.opt.sh")
+run_ocamlcmt(
+    name = "ocamlcmt.opt.sh",
+    tool = "@dev//bin:ocamlcmt.opt",
+)
+
 run_ocamldep(
     name = "deps",
     tool = "@dev//bin:ocamldep.opt",

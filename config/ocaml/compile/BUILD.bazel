@@ -4,7 +4,7 @@ load("@bazel_skylib//rules:common_settings.bzl",
 bool_flag( name = "absname", build_setting_default = True)
 config_setting(name = "absname?", flag_values = {":absname": "True"})
 
-bool_flag( name = "bin-annot", build_setting_default = True)
+bool_flag( name = "bin-annot", build_setting_default = False)
 config_setting(name = "bin-annot?", flag_values = {":bin-annot": "True"})
 
 bool_flag( name = "principal", build_setting_default = True)

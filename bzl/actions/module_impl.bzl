@@ -268,13 +268,12 @@ def module_impl(ctx, module_name):
     # else:
     #     _options.append("-nopervasives")
 
+    out_cmt = None
     if ( ("-bin-annot" in _options)
          or ("-bin-annot" in tc.copts) ):
         out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
         action_outputs.append(out_cmt)
         default_outputs.append(out_cmt)
-    else:
-        out_cmt = None
 
     moduleInfo_ofile = None
     if ext == ".cmx":
@@ -700,9 +699,12 @@ def module_impl(ctx, module_name):
 
     moduleInfo_depset = depset(
         ## FIXME: add ofile?
-        direct= [provider_output_cmi, out_cm_]
-        + ([moduleInfo_ofile] if moduleInfo_ofile else [])
-        + ([out_cmt] if out_cmt else [])
+        direct= [in_structfile],
+        transitive = [depset(
+            [out_cm_, provider_output_cmi]
+            + ([moduleInfo_ofile] if moduleInfo_ofile else [])
+            + ([out_cmt] if out_cmt else [])
+        )]
     )
     moduleInfo = ModuleInfo(
         sig    = provider_output_cmi,
@@ -711,7 +713,7 @@ def module_impl(ctx, module_name):
         struct_src = in_structfile,
         cmt = out_cmt,
         ofile  = moduleInfo_ofile,
-        files = moduleInfo_depset
+        files = moduleInfo_depset ## FIXME: ???
     )
 
     if ctx.attr._rule in [
@@ -774,10 +776,12 @@ def module_impl(ctx, module_name):
         )
     else:
         outputGroupInfo = OutputGroupInfo(
-            cmi        = depset(direct=[provider_output_cmi]),
-            module     = moduleInfo_depset
+            structfile = depset([in_structfile]),
+            cmi    = depset(direct=[provider_output_cmi]),
+            cmt    = depset(direct=[out_cmt]) if out_cmt else depset(),
+            all    = moduleInfo_depset,
         )
-
+    ## FIXME: output groups should include cmti from sig?
     providers.append(outputGroupInfo)
 
     return providers

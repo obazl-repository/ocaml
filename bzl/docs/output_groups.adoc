@@ -1,0 +1,59 @@
+= Output groups
+
+By default, Bazel build commands print (to stdout) only the output(s)
+delivered by the `DefaultInfo` provider of the build target. The
+default outputs may include only a subset of the outputs delivered by
+the target to client code; the target rule may use custom
+xref:terminology.adoc#providers[providers] to deliver additional
+outputs. _Output groups_ may be used to tell Bazel to print additional
+outputs to stdout.
+
+For example, a rule that compiles a module (e.g.
+xref:rules.adoc#compiler_module[compiler_module]) using a compiler
+that emits native code (e.g. `ocamlopt.byte` or `ocamlopt.opt`) will
+deliver a `.cmx` file, a `.o` file, a `.cmi` file, and a `.cmt` file
+if the build options included `-bin-annot`. But it will only deliver
+the `.cmx` file in its `DefaultInfo` provider; the other outputs are
+delivered using a custom `ModuleInfo` provider, which is what client
+code uses to obtain the outputs.
+
+Sometimes it is useful to have Bazel print all the outputs, or some
+subset thereof, on the command line; for example, to see the paths of
+outputs. _Output groups_ are used for this purpose. Each rule defines
+the output groups it supports; to activate them, pass
+[nowrap]`--output_groups` on the command line. For example, to show
+the path of the `.cmt` file produced for `Stdlib.Buffer`:
+
+    bazel build stdlib:Stdlib.Buffer --//config/ocaml/compile:bin-annot --output_groups=cmt
+
+See link:https://bazel.build/extending/rules#requesting_output_files[Requesting output files] for more information.
+
+== Summary
+
+In the following tables, the first line (with _default_ output group)
+shows the default output (i.e. when `--output_groups` in _not_
+passed).
+
+[cols="1,5"]
+.Module output groups
+|===
+| Group | Content
+| _default_ | `.cmo` or `.cmx` file
+| `structfile` | `.ml` file
+| `cmi` | `.cmi` file
+| `cmt` | `.cmt` file if `-bin-annot` passed, else null
+| `all` | all outputs
+| blah
+|===
+
+[cols="1,5"]
+.Signature output groups
+|===
+| Group | Content
+| _default_ | `.cmi` file
+| `sigfile` | `.mli` file
+| `cmi` | `.cmi` file
+| `cmti` | `.cmti` file if `-bin-annot`, else null
+| `all` | all outputs
+| blah
+|===

@@ -125,13 +125,12 @@ def signature_impl(ctx, module_name):
     # else:
     #     _options.append("-nopervasives")
 
+    out_cmti = None
     if ( ("-bin-annot" in _options)
          or ("-bin-annot" in tc.copts) ):
         out_cmti = ctx.actions.declare_file(workdir + module_name + ".cmti")
         action_outputs.append(out_cmti)
         # default_outputs.append(out_cmt)
-    else:
-        out_cmt = None
 
     if debug:
         print("out_cmi %s" % out_cmi)
@@ -411,5 +410,14 @@ def signature_impl(ctx, module_name):
         providers.append(
             cc_common.merge_cc_infos(cc_infos = ccInfo_list)
         )
+
+    outputGroupInfo = OutputGroupInfo(
+        sigfile = depset(direct=[mlifile]),
+        cmi     = depset(direct=[out_cmi]),
+        cmti    = depset(direct=[out_cmti]) if out_cmti else depset(),
+        all     = depset(direct=[mlifile, out_cmi]
+                         + ([out_cmti] if out_cmti else []))
+    )
+    providers.append(outputGroupInfo)
 
     return providers

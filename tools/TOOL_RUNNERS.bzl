@@ -254,19 +254,23 @@ def _run_ocamlcmt_impl(ctx):
     #     # no --//:arg passed
     #     arg = ""
 
-    # if ctx.label.name == "ocamlcmt":
-    if ModuleInfo in ctx.attr.arg:
-        arg = ctx.attr.arg[ModuleInfo].cmt.short_path
-    elif SigInfo in ctx.attr.arg:
-        arg = ctx.attr.arg[SigInfo].cmti.short_path
-    # else:
-    #     arg = ctx.file.arg.short_path
+    # ALERT: we put an out transition fn on ctx.attr.arg, which forces
+    # it to be a list, so we must index it by int first
+    if ModuleInfo in ctx.attr.arg[0]:
+        arg_file = ctx.attr.arg[0][ModuleInfo].cmt
+        arg      = arg_file.short_path
+    elif SigInfo in ctx.attr.arg[0]:
+        arg_file = ctx.attr.arg[0][SigInfo].cmti
+        arg      = arg_file.short_path
+    else:
+        print("ctx.attr.arg: %s" % ctx.attr.arg[0][ModuleInfo])
+        fail("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-    cmt_files = []
-    if ModuleInfo in ctx.attr.arg:
-        cmt_files.append(ctx.attr.arg[ModuleInfo].cmt)
-    if SigInfo in ctx.attr.arg:
-        cmt_files.append(ctx.attr.arg[SigInfo].cmti)
+    # cmt_files = []
+    # if ModuleInfo in ctx.attr.arg:
+    #     cmt_files.append(ctx.attr.arg[ModuleInfo].cmt)
+    # if SigInfo in ctx.attr.arg:
+    #     cmt_files.append(ctx.attr.arg[SigInfo].cmti)
 
     if ctx.attr._verbose[BuildSettingInfo].value:
         verbose = "set -x"
@@ -289,12 +293,12 @@ def _run_ocamlcmt_impl(ctx):
 
     myrunfiles = ctx.runfiles(
         files = [
-            ctx.file.tool, ctx.file.arg
+            ctx.file.tool, arg_file
         ],
         transitive_files =  depset(
             transitive = [
                 ctx.attr.tool[DefaultInfo].default_runfiles.files,
-                depset(cmt_files)
+                # depset(cmt_files)
             ]
         )
     )
@@ -309,6 +313,17 @@ def _run_ocamlcmt_impl(ctx):
 
     # return expect_impl(ctx, exe_name)
 
+#############################################
+def _cmt_out_transition_impl(settings, attr):
+    print("cmt_out_transition")
+    return {"//config/ocaml/compile:bin-annot": True}
+
+_cmt_out_transition = transition(
+    implementation = _cmt_out_transition_impl,
+    inputs = [],
+    outputs = ["//config/ocaml/compile:bin-annot"]
+)
+
 #######################
 run_ocamlcmt = rule(
     implementation = _run_ocamlcmt_impl,
@@ -317,26 +332,21 @@ run_ocamlcmt = rule(
         tool = attr.label(
             allow_single_file = True,
         ),
-        # includes = attr.label_list(
-        #     default = [
-        #         "//asmcomp",
-        #         "//bytecomp",
-        #         "//stdlib"
-        #     ]
-        # ),
         arg = attr.label(
-            mandatory = True,
+            default = "@ocamlcc//:arg",
+            # allow_single_file = [".cmt", ".cmti"],
             allow_single_file = True,
-            default = "//tools:arg"
+            providers = [[ModuleInfo], [SigInfo]],
+            cfg = _cmt_out_transition
         ),
         _verbose = attr.label(
             default = "//tools:verbose"
         ),
 
         _rule = attr.string( default = "run_ocamlcmt" ),
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
     ),
     executable = True,
     toolchains = ["//toolchain/type:ocaml",
