@@ -1,7 +1,0 @@
-= macos
-
-Old but still informative:
-
-link:https://www.mikeash.com/pyblog/friday-qa-2009-11-06-linking-and-install-names.html[Friday Q&A 2009-11-06: Linking and Install Names]
-
-link:https://www.dribin.org/dave/blog/archives/2009/11/15/rpath/[Using @rpath -Why and How] (2009)

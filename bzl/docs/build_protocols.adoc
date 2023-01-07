@@ -57,7 +57,7 @@ The `//boot:checkpoint` run target builds the compilers using
  `boot/camlc`, just like the standard protocol, but it adds some
  bootstrapping steps in order to bring the built compilers into
  alignment with the baseline source code. It copies the built images
- to `.baseline` and exposes them in workspace `@baseline`. They are
+ to `.baseline` and exposes them in workspace `@dev`. They are
  used for compiler development.
 
 === Boot build stacks
@@ -65,15 +65,15 @@ The `//boot:checkpoint` run target builds the compilers using
 [cols="1,2"]
 |===
 | Installed | Build stack
-| `@baseline//bin:ocamlc.byte` | `(boot/ocamlc > ocamlc.byte) > ocamlc.byte`
-| `@baseline//bin:ocamlopt.byte` | `(boot/ocamlc > ocamlc.byte) > ocamlopt.byte`
-| `@baseline//bin:ocamlopt.opt` | `(boot/ocamlc > ocamlc.byte > ocamlopt.byte) > ocamlopt.opt`
-| `@baseline//bin:ocamlc.opt` | `(boot/ocamlc > ocamlc.byte >ocamlopt.byte > ocamlopt.opt) > ocamlc.opt`
+| `@dev//bin:ocamlc.byte` | `(boot/ocamlc > ocamlc.byte) > ocamlc.byte`
+| `@dev//bin:ocamlopt.byte` | `(boot/ocamlc > ocamlc.byte) > ocamlopt.byte`
+| `@dev//bin:ocamlopt.opt` | `(boot/ocamlc > ocamlc.byte > ocamlopt.byte) > ocamlopt.opt`
+| `@dev//bin:ocamlc.opt` | `(boot/ocamlc > ocamlc.byte >ocamlopt.byte > ocamlopt.opt) > ocamlc.opt`
 |===
 
 The same protocol is used to build the profiliing compilers
-(`@baseline//bin:ocamlcp.byte`, etc.) and the flambda compilers
-(`@baseline//ocamlc.optx`, etc.)
+(`@dev//bin:ocamlcp.byte`, etc.) and the flambda compilers
+(`@dev//ocamlc.optx`, etc.)
 
 
 == The Test Protocol (for development)
@@ -89,10 +89,10 @@ build stacks that would be required by the `std` protocol.
 [cols="1,2"]
 |===
 | *target* | *build stack*
-| `//test:ocamlc.byte` | `@baseline//bin/ocamlc.opt > ocamlc.byte`
-| `//test:ocamlopt.byte` | `@baseline//bin/ocamlc.opt > ocamlopt.byte`
-| `//test:ocamlopt.opt` | `@baseline//bin/ocamlopt.opt > ocamlopt.opt`
-| `//test:ocamlc.opt` | `@baseline//bin/ocamlopt.opt > ocamlc.opt`
+| `//test:ocamlc.byte` | `@dev//bin/ocamlc.opt > ocamlc.byte`
+| `//test:ocamlopt.byte` | `@dev//bin/ocamlc.opt > ocamlopt.byte`
+| `//test:ocamlopt.opt` | `@dev//bin/ocamlopt.opt > ocamlopt.opt`
+| `//test:ocamlc.opt` | `@dev//bin/ocamlopt.opt > ocamlc.opt`
 |===
 
 Targets in the testsuite depend on the `//test` compilers so they are

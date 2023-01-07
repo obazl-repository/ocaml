@@ -5,16 +5,8 @@
 
 == terminology
 
-[[library]]Library::
-In the world of OCaml the term "library" is heavily
-  overloaded. It can mean... a lot of things. Here it has one
-  unambiguous meaning: a named collection of modules and signatures.
-  Libraries are expressed using `*_library` rules like `ocaml_library`
-  and `compiler_library`, which do no more than aggregate the modules
-  and signatures listed in their `manifest` attributes. This allows
-  client code to depend on a collection of modules by name without
-  archiving it. But libraries may also be archived, by setting the
-  `archive` attribute on a library rule.
+[[library]]Library:: A named collection of modules and/or signatures,
+expressed using rules `compiler_library`, `test_library`, etc.
 
 [[archive]]Archive::
 An archive is a library packaged as an OCaml archive file (.cma
@@ -23,10 +15,12 @@ An archive is a library packaged as an OCaml archive file (.cma
 +
 NOTE: The OCaml sources use only a few librarys (which are expressed
 as archives in the legacy Makefile system); for example,
-`stdlib.cmx?a`, `ocamlbytecomp.cmx?a`. The ocamlcc Bazel build
+`stdlib.cmx?a`, `ocamlbytecomp.cmx?a`. The `rules_ocamlcc` rules
 expresses these as unarchived libraries by default. A global switch,
 [.nowrap]`--//config/ocaml/compiler/libs:archived`, may be set to
-switch to archived libraries. For more information see link:stdlib.adoc[stdlib].
+switch to archived libraries. For more information see
+xref:libraries.adoc[Libraries & Archives] and
+xref:stdlib.adoc[stdlib].
 
 Filesystem module (fs-module)::
 

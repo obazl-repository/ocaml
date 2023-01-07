@@ -6,6 +6,15 @@
 NOTE: each tool has two build targets, *.byte and *.opt. An alias for
 the *.opt version is defined for each; e.g. `:ocamldep` is aliased to `:ocamldep.opt`.
 
+== run targets
+
+As a convenience, targets have been defined in the root package, to minimize keystrokes:
+
+* bazel run :deps - runs @dev//bin:ocamldep.opt
+* bazel run :lso - runs @dev//bin:ocamlobjinfo.opt  (`:lso` == list object)
+* bazel run :lsp - runs @dev//bin:primreqs.opt (`:lsp` == list primitives)
+* bazel run :cmt - runs @dev//bin:ocamlcmt.opt
+
 == build targets
 
 NB: the leading `//` may be omitted in build commands, e.g. `$ bazel
@@ -73,23 +82,34 @@ Bazel label of the intended file, and they convert it to the
 appropriate filesystem path. They will also rebuild either the tool or
 the argument if the sources for either have changed:
 
+* `//tools:ocamldep.opt.sh`
 * `//tools:dumpobj.byte.sh`
 * `//tools:dumpobj.obj.sh`
 * `//tools:ocamlcmt.sh`
 * `//tools:ocamlobjinfo.byte.sh`
-* `//tools:ocamlobjinfo.obj.sh`
+* `//tools:ocamlobjinfo.opt.sh`
 * `//tools::primreq.sh`
 
 The leading `//` may be omitted. These targets take label arguments of the following form:
 
-    `--//tools:arg=<path to target`>
+    `--//:arg=<path to target`>
 
 Here `<path to target>` is a Bazel label, which the rules will convert
 to the correct filesystem path.
 
-For example, to inspect `Stdlib__Buffer.cmo` using `ocamlobjinfo`:
+Examples:
 
-    $ bazel run tools:ocamlobjinfo --//tools:arg=//stdlib:Stdlib.Buffer
+* Inspect `Stdlib__Buffer.cmo` using `ocamlobjinfo`:
+
+    $ bazel run tools:ocamlobjinfo.opt.sh --//:arg=//stdlib:Stdlib.Buffer
+
+* List dependencies of `testsuite/tests/basic:sets.ml`
+
+    $ bazel run tools:ocamldep.opt.sh --//:arg=testsuite/tests/basic:sets.ml
++
+NOTE: Notice the colon in `basic:sets.ml`. This is a Bazel label, not
+a file system path.
+
 
 As a convenience, aliases are defined in the root package:
 `//:ocamlobjinfo` is aliased to `tools:ocamlobjinfo`, etc. Saves a

@@ -27,3 +27,13 @@ export BAZEL_USE_CPP_ONLY_TOOLCHAIN=1
 
 https://www.smileykeith.com/2021/03/08/locking-xcode-in-bazel/
 
+
+
+link:https://mail.google.com/mail/u/1/#inbox/FMfcgzGmvBpdsCjhVczbKcqFFNSVHRQf[bazel-discuss: cc_rules with bazel on MacOS: what's the right way to disable "-undefined dynamic_lookup"?]
+
+
+Old but still informative:
+
+link:https://www.mikeash.com/pyblog/friday-qa-2009-11-06-linking-and-install-names.html[Friday Q&A 2009-11-06: Linking and Install Names]
+
+link:https://www.dribin.org/dave/blog/archives/2009/11/15/rpath/[Using @rpath -Why and How] (2009)

@@ -1,5 +1,11 @@
 = release checklist
 
+* --larch
+* debugging builds
+* no compiler rebuild for stdlib tests
+* menhir parser
+
+
 == build targets
 
 Skylib build_test:  //test:smoke

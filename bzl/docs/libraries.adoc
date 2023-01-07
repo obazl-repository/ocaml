@@ -1,1 +1,230 @@
 = libraries & archives
+
+In the world of OCaml the term "library" is heavily overloaded. It can
+mean... a lot of things. Here it has one unambiguous meaning: a named
+collection of modules and signatures. Libraries are expressed using
+`*_library` rules like `ocaml_library` and `compiler_library`, which
+do no more than aggregate the modules and signatures listed in their
+`manifest` attributes. This allows client code to depend on a
+collection of modules by name without archiving it. But libraries may
+also be archived, by setting the `archive` attribute on a library
+rule.
+
+
+The `archive` attribute on library rules can be set globally by
+passing `--//config/ocaml/compiler/libs:archived`.
+
+An alias for this (defined in `.bazelrc`) is `--larch`
+
+== cmxa_eligible
+
+Native libs cannot be archived if they depend on other archived native
+libs; try it and you'll get an error: `Option -a cannot be used
+with .cmxa input files.` This does not happen with bytecode archives.
+
+So library rules have an attribute, `cmxa_eligible`, that determines
+if they may be archived when `--//config/ocaml/compiler/libs:archived`
+is true and they are being built as native libraries. For "toplevel"
+libraries - those that are not dependencies of any other library, but
+may be dependencies of executables - `cmxa_eligible` should be set to
+True. Examples:
+
+* `//stdlib`
+* `//compilerlibs:ocamlcommon`
+* `//asmcomp:ocamloptcomp`
+* `//bytecomp:ocamlbytecomp`
+
+Others that must leave it at the default False:
+
+* `//typing:ocamlcommon` - a dependency of `//compilerlibs:ocamlcommon`
+* etc.
+
+Note that this only affects native builds.  VM archives may depend on other vm archives.
+
+IMPORTANT: This only affects libraries used internally to build a
+compiler. It does not affect dependencies of anything built _with_ a
+compiler.
+
+For example, test `//testsuite/tests/basic/sets.ml` depends directly
+on three modules:
+
+----
+    stdlib_deps   = [
+        "//stdlib:Stdlib.List",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set",
+    ]
+----
+
+Building this module with library archiving enabled will not change
+these to a dependency on the `stdlib` archive (target label:
+`//stdlib`). Bazel will ensure that the module depends on just those
+three `stdlib` submodules, even if
+`--//config/ocaml/compiler/libs:archived` is passed, causing target
+`//stdlib` to build an archive. Building with this configuration,
+either with or without the archive flag, yields this command:
+
+----
+  bazel-out/darwin-opt-ST-c18154ec5bb5/bin/runtime/ocamlrun \
+    bazel-out/darwin-fastbuild-ST-ef5f5322835c/bin/test/bin_sv/ocamlopt.byte \
+    -nostdlib \
+    -nopervasives \
+    -I \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs \
+    -I \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/CamlinternalFormatBasics.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Atomic.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Either.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Sys.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Nativeint.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Int32.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Obj.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/CamlinternalLazy.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Lazy.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Seq.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__List.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Set.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Char.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Int.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Uchar.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Bytes.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__String.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Buffer.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/CamlinternalFormat.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Printf.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs/Sets.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/std_exit.cmx \
+    bazel-out/darwin-opt-ST-c18154ec5bb5/bin/runtime/libasmrun.a \
+    -o \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs/Sets.vs.opt)
+----
+
+Bazel ensures that all the required dependencies are added to the
+command line, in order. Replace the three submodule dependencies with
+`//stdlib` (i.e. `stdlib_deps = ["//stdlib"]`) and the command line
+will include then entire `stdlib` library.
+
+----
+ bazel-out/darwin-opt-ST-c18154ec5bb5/bin/runtime/ocamlrun \
+    bazel-out/darwin-fastbuild-ST-ef5f5322835c/bin/test/bin_sv/ocamlopt.byte \
+    -nostdlib \
+    -nopervasives \
+    -I \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs \
+    -I \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/CamlinternalFormatBasics.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Char.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Int.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Atomic.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Either.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Sys.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Nativeint.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Int32.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Obj.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/CamlinternalLazy.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Lazy.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Seq.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Uchar.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Bytes.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__String.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Buffer.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/CamlinternalFormat.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__List.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Array.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Map.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/CamlinternalOO.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/CamlinternalMod.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Printf.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Arg.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__ArrayLabels.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Float.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Complex.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Bigarray.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Bool.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__BytesLabels.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Callback.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Mutex.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Condition.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Digest.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Domain.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Printexc.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Effect.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Int64.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Random.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Hashtbl.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Ephemeron.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Fun.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Filename.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Queue.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Stack.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Format.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Gc.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__In_channel.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Lexing.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__ListLabels.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Marshal.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Set.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__MoreLabels.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Oo.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Option.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Out_channel.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Parsing.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Result.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Scanf.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Semaphore.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__StringLabels.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__StdLabels.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Unit.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/Stdlib__Weak.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs/Sets.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/std_exit.cmx \
+    bazel-out/darwin-opt-ST-c18154ec5bb5/bin/runtime/libasmrun.a \
+    -o \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs/Sets.vs.opt)
+----
+
+
+To switch from such individuated dependencies to a dependency on the
+library or archive, a `select` clause must be added to the target,
+like so:
+
+----
+    stdlib_deps   = select({
+        "//config/ocaml/compiler/libs:archived?": [
+            "//stdlib"
+        ],
+        "//conditions:default": [
+            "//stdlib:Stdlib.Set",
+            "//stdlib:Stdlib.Printf",
+        ]
+    })
+----
+
+With this in place, a build of the executable with
+`--//config/ocaml/compiler/libs:archived` looks like this:
+
+----
+  bazel-out/darwin-opt-ST-c18154ec5bb5/bin/runtime/ocamlrun \
+    bazel-out/darwin-fastbuild-ST-ef5f5322835c/bin/test/bin_sv/ocamlopt.byte \
+    -nostdlib \
+    -nopervasives \
+    -I \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs \
+    -I \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/stdlib.cmxa \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs/Sets.cmx \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/stdlib/bin_sv_vs/std_exit.cmx \
+    bazel-out/darwin-opt-ST-c18154ec5bb5/bin/runtime/libasmrun.a \
+    -o \
+    bazel-out/darwin-fastbuild-ST-d85b208dc6a3/bin/testsuite/tests/basic/bin_sv_vs/Sets.vs.opt)
+----
+
+Note the presence of `stdlib.cmxa`.
+
+NOTE: This may or may not be something one would do in application
+code. We do it for `OCamlCC` in order to demonstrate capabilities.
