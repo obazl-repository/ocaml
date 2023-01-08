@@ -11,7 +11,7 @@
 * `--verbose_failures`
 
 
-== OCaml verbosity
+=== OCaml verbosity
 
 * `//config/ocaml/asm:verbose`
 * `//config/ocaml/compile:verbose`
@@ -19,9 +19,67 @@
 
 === CC verbosity
 
+These flags instruct Bazel to instruct the OCaml compiler to pass
+verbosity flags to the underlying CC toolchain tools as appropriate.
+They imply the corresponding OCaml verbosity flag.
+
+NOTE: As a convenience, a
+xref:configuration.adoc#config_group[config_group] named `ccvv` is
+defined in `.bazelrc`; it enables the OCaml verbosity switches listed
+above and the CC verbosity switches listed here.  To use it pass `--config=ccvv`.
+
+For example, when a native compiler (`ocamlopt.byte`, `ocamlopt.opt`)
+compiles a module, it generates assembler code, which it then passes
+to the assembler using a command string configured at config-time (by
+running the `./configure` script). Passing `-verbose` to the compiler
+tells it to print this command. The OCaml verbosity flags listed above
+instruct Bazel to insert this `-verbose` flag globally.
+
+The tool invoked by these commands may in turn expand the command
+line - in many cases, the tool is in fact a driver that runs another
+tool. For example the assembler is usually not invoked directly;
+rather it is invoked by calling the compiler with a flag that tells it
+to run the assembler only. We might like to see what that expansion
+is, for optimization purposes, for example.
+
+Example:
+
+Default assemble command on MacOS, set by `./configure`:
+
+    gcc -c -Wno-trigraphs  -o 'bazel-out/darwin-fastbuild-ST-aaef713aa55a/bin/typing/_BS_vs/Persistent_env.o' '/var/folders/wz/dx0cgvqx5qn802qmc3d4hcfr0000gq/T/camlasm9ca102.s'
+
+If we add `-v` to this, telling `gcc` to be more verbose, we get a lot more information:
+
+----
+ gcc -c -Wno-trigraphs -v  -o 'bazel-out/darwin-fastbuild-ST-aaef713aa55a/bin/typing/_BS_vs/Persistent_env.o' '/var/folders/wz/dx0cgvqx5qn802qmc3d4hcfr0000gq/T/camlasm18b8b8.s'
+Apple clang version 14.0.0 (clang-1400.0.29.202)
+Target: x86_64-apple-darwin22.1.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple x86_64-apple-macosx13.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=...
+ ... lots of additional flags ...
+-D__GCC_HAVE_DWARF2_CFI_ASM=1 -o /var/folders/wz/dx0cgvqx5qn802qmc3d4hcfr0000gq/T/camlasm18b8b8-e7395d.s -x assembler-with-cpp /var/folders/wz/dx0cgvqx5qn802qmc3d4hcfr0000gq/T/camlasm18b8b8.s
+----
+
+The configuration options listed below allow us to add a verbose flag
+to the command string at build time. The particular flag may vary
+depending on the CC toolchain; Bazel figures it out automatically.
+With the makefiles, this would require re-running `./configure`, but
+with Bazel, the command strings used to drive the CC toolchain are
+configured at build time.
+
 * `//config/ocaml/cc/asm:verbose`
 * `//config/ocaml/cc/compile:verbose`
 * `//config/ocaml/cc/link:verbose`
+
+WARNING: Changing any of these flags will trigger a complete rebuild,
+since they change the configuration file on which everything depends.
+
+NOTE: The `-ccopt` parameter supported by the compilers can be used to
+pass arguments to the linker (and to the C compiler when compiling C
+sources), but evidently it cannot be used to pass arguments to the
+assembler used to "compile" native modules.
+
 
 
 == Progress messages

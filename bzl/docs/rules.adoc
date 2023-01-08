@@ -1,0 +1,10 @@
+= rules
+
+== Summary
+
+[cols="1,5"]
+|===
+| Name | Function
+| `compiler_module` | Compiles one `.ml` file
+| `compiler_signature` | Compiles one `.mli` file
+|===

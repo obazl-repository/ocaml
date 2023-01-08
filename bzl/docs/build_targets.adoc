@@ -1,0 +1,30 @@
+= build targets
+
+Build targets are expressed as Bazel link:https://bazel.build/concepts/labels[labels].
+
+== compilers
+
+[cols="1,1"]
+|===
+| `//bin:ocamlc.byte` | std protocol
+| `//test:ocamlc.byte` | test protocol
+|===
+
+== tools
+
+Each tool has two build targets, one targeting the VM and one
+targeting Sys. Target names are suffixed accordingly: `ocamldep.byte`,
+`ocamldep.opt`. Since the native version will usually be preferable,
+aliases are defined mapping the suffix-free name to the `.opt` target,
+e.g. `ocamldep` is aliased to `ocamldep.opt`.
+
+
+Convenience targets:
+
+[cols="1,1,1"]
+|===
+| `@dev//bin:lso` | list objects | runs `@dev//bin:ocamlobjinfo.opt`
+| `@dev//bin:lst` | list types | runs `@dev//bin:ocamlcmp.opt`
+| `@dev//bin:lsp` | list primitives | runs `@dev//bin:primreq.opt`
+| `@dev//bin:deps` | list dependencies | runs `@dev//bin:ocamldep.opt`
+|===

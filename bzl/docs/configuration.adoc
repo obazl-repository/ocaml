@@ -1,15 +1,18 @@
 = Configuration
 :toc: auto
-:toclevels: 3
+:toclevels: 4
 
 Configuration is a Work-In-Progress. The following <<Notes>> may
 help, but see also link:notes/config[]
 
 
+== Config groups
+
+See link:https://bazel.build/run/bazelrc#config[--config] and xref:../../.bazelrc[.bazelrc].
+
 == Summary
 
-=== Toolchain Configurations
-
+CAUTION: WIP.
 
 === Command-line options
 
@@ -23,7 +26,24 @@ Two ways to set a boolean option to false
    --no//config/ocaml/compile:bin-annot
    --//config/ocaml/compile:bin-annot=False
 
-=== OCaml Compilation
+=== Toolchain Configurations
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| `//toolchain:compiler` | | Controls the compiler used by build
+  targets. Usually set by top-level build targets (e.g. compiler and
+  tool targets), and should not be set by user. See
+  xref:build_protocols.adoc[Build Protocols] for more information.
+|===
+
+=== Action Configurations
+
+Action configurations control build actions. As opposed to "build
+configurations" (like enabling flambda) that control the structure of
+the build outputs.
+
+==== OCaml Compilation
 
 [cols="3,1,5"]
 |===
@@ -31,36 +51,61 @@ Two ways to set a boolean option to false
 | `//config/ocaml/compile:absname` | True | Inserts `-absname` to all compile targets
 | `//config/ocaml/compile:bin-annot` | False | Inserts `-bin-annot` to all compile targets
 | `//config/ocaml/compile:principal` | True | Inserts `-principal` to all compile targets
-| `//config/ocaml/compile:verbose` | False | Inserts `-verbose` to all compile targets
-| //config/ocaml:absname  | |
-| //config/ocaml/compiler/libs:archived  | |
-| //config/ocaml/compiler:compiler  | |
-| //config/ocaml:primitives  | |
-| //config/ocaml:principal  | |
 |===
 
 Remarks:
 
 * "All compile targets": all `*_module` and `*_signature` rule targets
 
-=== OCaml Linking
+
+===== Diagnostics
+
+See xref:diagnostics.adoc[Diagnostics] for more information and guidance.
 
 [cols="3,1,5"]
+.OCaml diagnostics
 |===
 | Setting | Default | Remarks
+| `//config/ocaml/archive:verbose`  | False | Inserts `-verbose` for all OCaml archiving actions, telling the compiler to print the commands it uses to drive the C toolchain (archiver).
+| `//config/ocaml/compile:verbose` | False | Inserts `-verbose` to all OCaml compile actions, telling the compiler to print the commands it uses to drive the C toolchain (assembler, compiler).
+| `//config/ocaml/link:verbose` | False | Inserts `-verbose` for all OCaml link actions, telling the compiler to print the commands it uses to drive the C toolchain (linker).
+|===
+
+[cols="3,1,5"]
+.OCaml/cc diagnostics
+|===
+| Setting | Default | Remarks
+| //config/cc:verbose  | | obsolete?
+| //config/ocaml/cc/archive:verbose  | False | passes verbose flag to archiver when native OCaml compile
+r invokes it to create an OCaml archive file.
+| //config/ocaml/cc/asm:keep  | False | passes `-S`, to retain assembler source when native compiler compiles a module
+| //config/ocaml/cc/asm:verbose  | False | passes verbose flag to assembler when native OCaml compiler invokes it to compile a module.
 | //config/ocaml/cc/link:verbose  | |
+| //config/ocaml/cc/compile:verbose  | False | passes verbose flag to C compiler
 |===
 
-=== OCaml Archiving
+Abbreviations (defined in `.bazelrc`):
+
+* `--config=ccv` - 
+
+
+==== OCaml Linking
 
 [cols="3,1,5"]
 |===
 | Setting | Default | Remarks
-| //config/ocaml/archive:verbose  | |
 |===
 
+==== OCaml Archiving
 
-=== Compiler Build Configuration
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+|===
+
+=== Build Configurations
+
+==== Compilers
 
 [cols="3,1,5"]
 |===
@@ -70,47 +115,10 @@ Remarks:
 | //config/ocaml/cmm/invariants:enabled  | |
 | //config/ocaml:with_cmm_invariants  | |
 | //config/ocaml:flat_float_array  | |
+| `//config/ocaml/compiler/libs:archived`  | False | Determines whether or not libraries are archived.
 |===
 
-=== Runtimes
-
-[cols="3,1,5"]
-|===
-| Setting | Default | Remarks
-| //runtime:DEBUG | |
-| //runtime:INSTRUCTION_TRACE | |
-| //runtime:INSTRUMENT | |
-| //runtime:args | |
-| //runtime:asan | |
-| //runtime:fastbuild | |
-| //runtime:msan | |
-| //runtime:primitives | |
-| //runtime:runtime | |
-| //runtime:trace | |
-| //runtime:use_prims | |
-| //config/variant:instrumented | |
-| //config:instrumented | |
-|===
-
-=== Diagnostics
-
-Verbosity, logging, etc.
-
-[cols="3,1,5"]
-|===
-| Setting | Default | Remarks
-|===
-
-=== Optimization (o11n)
-
-[cols="3,1,5"]
-|===
-| Setting | Default | Remarks
-| //config/ocaml/cc/compile/o11n/level:level  | |
-| //config/ocaml/o11n/xmo:enabled  | |
-|===
-
-=== Flambda
+==== Flambda
 
 [cols="3,1,5"]
 |===
@@ -122,17 +130,53 @@ Verbosity, logging, etc.
 | //config/ocaml/flambda:enabled  | |
 |===
 
+==== Runtimes
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //runtime:DEBUG | |
+| //runtime:INSTRUCTION_TRACE | |
+| //runtime:INSTRUMENT | |
+| //config:instrumented | |
+| //runtime:args | |
+| //runtime:fastbuild | |
+| //runtime:runtime | |
+| //runtime:trace | |
+| //runtime:primitives | |
+| //runtime:use_prims | |
+|===
+
+Obsolete:
+
+* //config/variant:instrumented
+
+
+=== Diagnostics
+
+Verbosity, logging, etc.
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+|===
+
+=== Optimizations (o11n)
+
+[cols="3,1,5"]
+|===
+| Setting | Default | Remarks
+| //config/ocaml/cc/compile/o11n/level:level  | |
+| //config/ocaml/o11n/xmo:enabled  | |
+|===
+
+
 === CC configuration
 
 [cols="3,1,5"]
 |===
 | Setting | Default | Remarks
 | //config/cc:function-sections  | |
-| //config/cc:verbose  | |
-| //config/ocaml/cc/archive:verbose  | |
-| //config/ocaml/cc/asm:keep  | |
-| //config/ocaml/cc/asm:verbose  | |
-| //config/ocaml/cc/compile:verbose  | |
 |===
 
 
@@ -150,10 +194,8 @@ Verbosity, logging, etc.
 | //config/target/executor:executor | |
 | //config/toolchain:toolchain | |
 | //config/tools:verbose | |
-| //config/variant:pedantic | |
 | //config:debug | |
 | //config:manifest | |
-| //config:primitives | |
 | //config:sig_src | |
 | //config:target_host | |
 | //config:verbose | |
@@ -169,6 +211,17 @@ Verbosity, logging, etc.
 | //bin:verbose | |
 | //boot:verbose | |
 |===
+
+Obsolete:
+
+* //config/variant:pedantic
+
+== Open Issues
+
+* Which options are appropriate to which build actions?  Some are only appropriate to compilation, some only to linking, etc.
+  ** `-absname` - relevant to all build actions or just compilation?
+  ** `-principal` - compile only?
+
 == Notes
 
 [IMPORTANT]
@@ -231,9 +284,9 @@ Bazels _custom variable_ mechanism.
 === config settings
 
 
-* `--//config:primitives=/path/to/primitives` - sets the file of
+* `--//runtime:primitives=/path/to/primitives` - sets the file of
   primitives to be used with `-use-primitives. This is a global
-  setting. Default is `//runtime:primitives`.
+  setting. Default is `//runtime:primitives.dat`.
 
 NB: example of file that needs this is asmcomp/reloadgen.ml. Compiled
 

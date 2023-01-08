@@ -1,16 +1,13 @@
-= symbols & terminology
+= Terminology & symbols
 :toc: auto
 :toclevels: 3
 
 
 == terminology
 
-[[library]]Library:: A named collection of modules and/or signatures,
-expressed using rules `compiler_library`, `test_library`, etc.
-
 [[archive]]Archive::
-An archive is a library packaged as an OCaml archive file (.cma
-  or .cmxa file). Archives are expressed by library rules with
+An archive is a <<library>> packaged as an OCaml archive file (`.cma`
+  or `.cmxa` file). Archives are expressed by library rules with
   attribute `archive` set to True.
 +
 NOTE: The OCaml sources use only a few librarys (which are expressed
@@ -28,8 +25,10 @@ A module deterimined by a source file; for example, file `a.ml`,
 determines module `A`, which is thereby a filesystem module or
 fs-module for short.
 
-Namespace::
+[[library]]Library:: A named collection of modules and/or signatures,
+expressed using rules `compiler_library`, `test_library`, etc.
 
+Namespace::
 OCaml does not have first-class namespaces, and it does not define a
 mapping between symbol "paths" like `A.B.C` and the file system. Each
 module effectively determines a namespace, but only for the symbols
@@ -58,7 +57,7 @@ packed-module namespace (`Dynlink_compilerlibs`) and one aliasing
 namespace, `Stdlib`.
 
 
-[[resolver]]Resolver:: A resolver module (or just 'resolver' for
+[[resolver]]NS Resolver:: An _ns resolver module_ (or just 'resolver' for
 short) is a module containing module aliasing equations used to
 implement OCaml's pseudo-namespaces. In the OCaml community this is
 often called a "wrapper", but we eschew this term since there is no
@@ -70,6 +69,22 @@ module: `Stdlib`. The Bazel build adds a resolver for a second
 namespace, `Dynlink_compilerlibs`, which is implemented as a "packed"
 module the legacy Makefile system. See link:dynlink.adoc[dynlink] for
 more information.
+
+Output group:: A collection of output files for a target that may be
+requested using `--output_groups` on the command line. See
+xref:output_groups.adoc[Output groups] for more information.
+
+Provider:: A provider is a kind of specialized struct (in the Starlark
+language). Bazel rules use providers to deliver their outputs.
+
+Sigfile::
+A `.mli` source file.
+
+Structfile::
+A `.ml` source file.
+
+Starlark::
+The language of Bazel.  A constrainted Python variant.
 
 Toolchain::
 A toolchain is ...

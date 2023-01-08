@@ -189,6 +189,18 @@ Platform support:: Tested on MacOS and Linux (Ubuntu)
 link:https://obazl.github.io/docs_obazl/[The OBazl Toolsuite] - outdated but still useful.
 
 
+== Documentation
+
+Articles:
+
+* xref:bzl/docs/build_protocols.adoc[Build Protocols]
+* xref:bzl/docs/build_targets.adoc[Build Targets]
+* xref:bzl/docs/configuration.adoc[Configuration]
+* xref:bzl/docs/output_groups.adoc[Output Groups]
+* xref:bzl/docs/rules.adoc[Rules]
+* xref:bzl/docs/queries.adoc[Queries]
+* xref:bzl/docs/terminology.adoc[Symbols & Terminology]
+
 == Goals
 
 The original goals were modest: just build the compilers, mostly. That

@@ -137,7 +137,7 @@ special case of flag whose value must be a Bazel label.
 The authoritative source of information about config flag types is of
 course the source code:
 
-     bazel query config/ocaml:xmo --output=build
+     bazel query config/ocaml/o11n:xmo --output=build
 
 Config settings and flags are tagged.
 
