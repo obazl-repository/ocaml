@@ -36,9 +36,9 @@ available.
 and the current source code state), so they can be used to rebuild the
 compilers after source code changes:
 
-    $ bazel run boot:coldstart
+    $ bazel run boot:checkpoint
 
-7. After running coldstart, edit some code and run some tests:
+7. After running `boot:checkpoint`, edit some code and run some tests:
 
     $ bazel test testsuite/tests/basic:Boxedints_test   ## four tests, one for each compiler
     $ bazel test testsuite/tests/basic:Boxedints_vv_test   ## just the ocamlc.byte test
@@ -196,6 +196,8 @@ Articles:
 * xref:bzl/docs/build_protocols.adoc[Build Protocols]
 * xref:bzl/docs/build_targets.adoc[Build Targets]
 * xref:bzl/docs/configuration.adoc[Configuration]
+* xref:bzl/docs/diagnostics.adoc[Diagnostics]
+* xref:bzl/docs/cc_toolchain_integration.adoc[CC Toolchain Integration]
 * xref:bzl/docs/output_groups.adoc[Output Groups]
 * xref:bzl/docs/rules.adoc[Rules]
 * xref:bzl/docs/queries.adoc[Queries]
