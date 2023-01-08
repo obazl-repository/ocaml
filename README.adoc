@@ -195,9 +195,9 @@ Articles:
 
 * xref:bzl/docs/build_protocols.adoc[Build Protocols]
 * xref:bzl/docs/build_targets.adoc[Build Targets]
+* xref:bzl/docs/cc_toolchain_integration.adoc[CC Toolchain Integration]
 * xref:bzl/docs/configuration.adoc[Configuration]
 * xref:bzl/docs/diagnostics.adoc[Diagnostics]
-* xref:bzl/docs/cc_toolchain_integration.adoc[CC Toolchain Integration]
 * xref:bzl/docs/output_groups.adoc[Output Groups]
 * xref:bzl/docs/rules.adoc[Rules]
 * xref:bzl/docs/queries.adoc[Queries]

@@ -15,7 +15,9 @@ see this by passing `-verbose` to the OCaml compiler (in a target's
 For example on Mac, the OCaml compiler, when compiling a native module, will
 run something like the following to compile the assembly code it generates:
 
-    gcc -c -Wno-trigraphs  -o 'bazel-out/darwin-fastbuild-ST-aaef713aa55a/bin/typing/_BS_vs/Persistent_env.o' '/var/folders/wz/dx0cgvqx5qn802qmc3d4hcfr0000gq/T/camlasm9ca102.s'
+    gcc -c -Wno-trigraphs -o \
+    'bazel-out/darwin-fastbuild-ST-aaef713aa55a/bin/typing/_BS_vs/Persistent_env.o' \
+    '/var/folders/wz/dx0cgvqx5qn802qmc3d4hcfr0000gq/T/camlasm9ca102.s'
 
 This command is stored in `Config.asm` at configure-time. It is used
 by the `Proc` modules defined for each supported arch under `asmcomp`;
@@ -34,7 +36,21 @@ and uses some customized tools. So the above assemble command, when
 configured by Bazel instead of `./configure`, looks like this:
 
 ----
- exec env -i - DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk external/local_config_cc/wrapped_clang -c -D_FORTIFY_SOURCE=1 -fstack-protector -fcolor-diagnostics -Wall -Wthread-safety -Wself-assign -fno-omit-frame-pointer -g0 -O2 -DNDEBUG -DNS_BLOCK_ASSERTIONS=1 DEBUG_PREFIX_MAP_PWD=. -isysroot __BAZEL_XCODE_SDKROOT__ -F__BAZEL_XCODE_SDKROOT__/System/Library/Frameworks -F__BAZEL_XCODE_DEVELOPER_DIR__/Platforms/MacOSX.platform/Developer/Library/Frameworks -no-canonical-prefixes -pthread -no-canonical-prefixes -Wno-builtin-macro-redefined -D__DATE__="redacted" -D__TIMESTAMP__="redacted" -D__TIME__="redacted" -target x86_64-apple-macosx13.1 -Wno-trigraphs -v  -o 'bazel-out/darwin-fastbuild-ST-aaef713aa55a/bin/typing/_BS_vs/Persistent_env.o' '/var/folders/wz/dx0cgvqx5qn802qmc3d4hcfr0000gq/T/camlasm64188c.s'
+exec env -i - DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
+SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk \
+external/local_config_cc/wrapped_clang -c -D_FORTIFY_SOURCE=1 \
+-fstack-protector -fcolor-diagnostics -Wall -Wthread-safety \
+-Wself-assign -fno-omit-frame-pointer -g0 -O2 -DNDEBUG      \
+-DNS_BLOCK_ASSERTIONS=1 DEBUG_PREFIX_MAP_PWD=. -isysroot    \
+__BAZEL_XCODE_SDKROOT__ \
+-F__BAZEL_XCODE_SDKROOT__/System/Library/Frameworks     \
+-F__BAZEL_XCODE_DEVELOPER_DIR__/Platforms/MacOSX.platform/Developer/Library/Frameworks  \
+-no-canonical-prefixes -pthread -no-canonical-prefixes \
+-Wno-builtin-macro-redefined -D__DATE__="redacted" \
+-D__TIMESTAMP__="redacted" -D__TIME__="redacted" -target \
+x86_64-apple-macosx13.1 -Wno-trigraphs -v -o \
+'bazel-out/darwin-fastbuild-ST-aaef713aa55a/bin/typing/_BS_vs/Persistent_env.o' \
+'/var/folders/wz/dx0cgvqx5qn802qmc3d4hcfr0000gq/T/camlasm64188c.s'
 ----
 
 == linker
