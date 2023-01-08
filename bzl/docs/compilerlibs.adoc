@@ -132,7 +132,7 @@ rules for the key targets are:
   ** `OPTTOPLEVEL_CMI`
   ** `$(OPTTOPLEVEL:.cmo=.cmx)`
 
-== The OBazl build
+== The Bazel build
 
 The aggregating variables defined by the Makefile effectively define
 _libraries_ of modules and signatures, a library being nothing more
