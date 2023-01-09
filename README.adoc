@@ -191,6 +191,12 @@ link:https://obazl.github.io/docs_obazl/[The OBazl Toolsuite] - outdated but sti
 
 == Documentation
 
+If you are not familiar with Bazel, never fear. The documentation
+includes a lot of information about how Bazel works. But you should
+start by reviewing the link:https://bazel.build/concepts/[Concepts]
+section of the Bazel manual, and perhaps going through one of the
+link:https://bazel.build/start/cpp[build tutorials].
+
 Articles:
 
 * xref:bzl/docs/build_protocols.adoc[Build Protocols]
@@ -200,16 +206,23 @@ Articles:
 * xref:bzl/docs/configuration.adoc[Configuration]
 * xref:bzl/docs/debugging.adoc[Debugging]
 * xref:bzl/docs/diagnostics.adoc[Diagnostics]
+* xref:bzl/docs/dynamics.adoc[Dynamics]
+* xref:bzl/docs/excptions.adoc[Exceptions: warnings & errors]
 * xref:bzl/docs/libraries.adoc[Libraries & Archives]
 * xref:bzl/docs/output_groups.adoc[Output Groups]
 * xref:bzl/docs/rules.adoc[Rules]
 * xref:bzl/docs/performance.adoc[Performance]
 * xref:bzl/docs/preprocessing.adoc[Preprocessing]
+* xref:bzl/docs/primitives.adoc[Primitives]
 * xref:bzl/docs/queries.adoc[Queries]
+* xref:bzl/docs/repl.adoc[REPL]
 * xref:bzl/docs/stdlib.adoc[Stdlib]
 * xref:bzl/docs/terminology.adoc[Terminology & Symbols]
 * xref:bzl/docs/testing.adoc[Testing]
+* xref:bzl/docs/tools.adoc[Tools]
+* xref:bzl/docs/tool_runners.adoc[Tool runners]
 * xref:bzl/docs/verification.adoc[Verification]
+* xref:bzl/docs/windows.adoc[Windows]
 * xref:bzl/docs/workflows.adoc[Workflows]
 
 == Goals
@@ -312,14 +325,20 @@ separate project, but I list it here as a general goal anyway.
 
 == Non-Goals
 
-NOTE: These could turn into goals. It depends on adoption. If nobody
-  wants to use Bazel to develop the compilers and tools, then there
-  would be no point in enhancing it. If you _do_ use it, and you need
-  this stuff, please file an issue!
+NOTE: These are not _currently_ goals, but they could turn into goals.
+  It depends on adoption. If nobody wants to use Bazel to develop the
+  compilers and tools, then there would be no point in enhancing it.
+  If you _do_ use it, and you need this stuff, please file an issue!
+
+* CI builds
 
 * Documentation builds.
 
+* Editor/IDE integration
+
 * OPAM support
+
+* Windows support
 
 * Distribution: packaging builds for distribution is not a current goal. No
 point in supporting release builds unless and until the maintainers

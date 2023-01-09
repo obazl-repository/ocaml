@@ -1,0 +1,62 @@
+= dynamics
+
+Replicable builds are analogous to replicable experiments: the
+fundamental requirement is to start with fixed, known initial
+conditions. For Bazel this means that all inputs and outputs must be
+explicitly enumerated (usually in the form of target dependencies)
+_before_ the build is initiated. So it is not possible to add
+dependencies during the build.
+
+Build _configuration_ is another matter. Bazel does support dynamic
+build configuration. For example, if you need to depend on one file
+for a Linux x86_64 build, and a different file for a Mac arm build,
+you list _both_ files as inputs (dependencies), and use the built-in
+`select` function to choose one at build-time. In this case, the
+choice would be driven by configuration settings for `OS` and `CPU`
+that are automatically set by Bazel.
+
+Here is an example:
+
+.asmcomp/BUILD.bazel
+----
+compiler_module(
+    name   = "Scheduling",
+    struct = select({
+        "//config/arch:x86_64": "//asmcomp/amd64:scheduling.ml",
+        "//config/arch:arm"   : "//asmcomp/arm:scheduling.ml",
+        "//config/arch:arm64"   : "//asmcomp/arm64:scheduling.ml",
+        "//config/arch:i386"   : "//asmcomp/i386:scheduling.ml",
+        "//config/arch:ppc"   : "//asmcomp/power:scheduling.ml",
+        "//config/arch:riscv64"   : "//asmcomp/riscv:scheduling.ml",
+        "//config/arch:s390x"   : "//asmcomp/s390x:scheduling.ml",
+    }, no_match_error = "unknown arch"),
+    sig = "Scheduling_cmi",
+    opts = MODULE_OPTS,
+    deps   = [
+        "//asmcomp:Schedgen",
+    ],
+    visibility = ["//asmcomp:__pkg__"]
+)
+----
+
+Note that all possible `struct` dependencies are listed here; at build
+time, only one of them will be selected for compilation.
+
+In this example, the keys in the dict passed to the `select` function
+(i.e. `//config/arch:arm` etc.) are custom `config_setting` targets we've
+defined in `config/arch/BUILD.bazel`; for example:
+
+.config/arch/BUILD.bazel
+----
+config_setting(
+    name = "arm",
+    constraint_values = [
+        "@platforms//cpu:arm",
+    ]
+)
+----
+
+(Defining our own custom rules like this adds a level of indirection.
+The constraint value `@platforms//cpu` is set by Bazel, so we could
+have used `@platforms//cpu:arm` etc. directly in the `select`
+function.)

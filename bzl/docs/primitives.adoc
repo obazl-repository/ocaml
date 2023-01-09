@@ -1,0 +1,8 @@
+= primitives
+
+The Makefiles always(?) construct a `primitives` file, deriving it
+from the C source files (in `//runtime`) that define primitives. It
+uses `-use-prims` to pass this file on most build targets.
+
+This is inefficient, since `-use-prims` is only required if the
+primitives have changed, and furthermore it is not needed for all build actions.

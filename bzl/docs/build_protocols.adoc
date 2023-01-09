@@ -26,6 +26,11 @@ with the baseline source code. It uses the following build stack to produce `oca
     boot/ocamlc > ocamlc.byte > ocamlc.byte
 
 
+WARNING: The build protocols used by the various targets have not been
+thoroughly audited (this is still work-in-process), so they may not be
+optimal. E.g. a target might use a bootstrapping (recursive) build
+step where it does not need too.  Please file an issue if you find problems.
+
 == The Standard Protocol
 
 Package:  `//bin`

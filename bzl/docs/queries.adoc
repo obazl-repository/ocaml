@@ -215,7 +215,7 @@ The `expect_test` macro contains a nested macro, `test_executable`.
 
     bazel query testsuite/tests/basic:Boxedints.ss.opt  --output=build
 
-== dependencies
+== Dependencies
 
 * What build files does a target depend on?
 
@@ -236,30 +236,61 @@ NOTE: The `cquery` command runs _after_ all `select` functions have been resolve
 
     bazel query 'deps(//testsuite/tests/basic:Arrays)' --output maxrank
 
-== dep paths
+=== Dependency paths
 
-* show graph of all deps between `//lex:ocamllex` and `//runtime/caml:domain_state.h`:
+* show graph of _all_ deps between `//lex:ocamllex` and `//runtime/caml:domain_state.h`:
 
-    bazel cquery "allpaths(//lex:ocamllex, //runtime/caml:domain_state.h)" --output=graph --config=boot
+    bazel cquery "allpaths(//lex:ocamllex.byte, //runtime/caml:domain_state.h)" --output=graph
+    bazel cquery "allpaths(//lex:ocamllex.opt, //runtime/caml:domain_state.h)" --output=graph
 
 You can add something like ` | dot -Tsvg > /tmp/deps.svg` to view the graph.
 
-* show only "some" (arbitrary) path:
+* show only _some_ (arbitrary) path:
 
-    bazel cquery "somepath(//lex:ocamllex, //runtime/caml:domain_state.h)" --output=graph --config=boot
+    bazel cquery "somepath(//lex:ocamllex.byte, //runtime/caml:domain_state.h)" --output=graph
++
+WARNING: A `somepath` query will select one arbitrary path to return.
+
+* show that `//compilerlibs:ocamlcommon` does _not_ depend on
+  `//stdlib` (i.e. the stdlib library target, archived or not):
+
+    bazel query 'allpaths(//compilerlibs:ocamlcommon, //stdlib)'
+    INFO: Empty results
+
+* show that `//compilerlibs:ocamlcommon` has _does_ dependend on
+  `//stdlib:Stdlib` (i.e. the stdlib
+  xref:terminology.adoc#resolver[resolver] module):
++
+----
+bazel query 'somepath(compilerlibs:ocamlcommon, //stdlib:Stdlib)' --output=graph
+digraph mygraph {
+  node [shape=box];
+  "//compilerlibs:ocamlcommon"
+  "//compilerlibs:ocamlcommon" -> "//stdlib:Stdlib"
+  "//compilerlibs:ocamlcommon" -> "//utils:Arg_helper"
+  "//compilerlibs:ocamlcommon" -> "//utils:ocamlcommon"
+  "//utils:ocamlcommon"
+  "//utils:ocamlcommon" -> "//utils:Arg_helper"
+  "//utils:ocamlcommon" -> "//stdlib:Stdlib"
+  "//utils:Arg_helper"
+  "//utils:Arg_helper" -> "//stdlib:Stdlib"
+  "//stdlib:Stdlib"
+}
+----
++
 
 
-== reverse deps
+== Reverse dependencies
 
 * show everything that depends (directly or indirectly) on `//runtime/caml:domain_state.h`:
 
-    bazel query "rdeps(//..., //runtime/caml:domain_state.h)"
+    bazel query "rdeps(//..., //runtime/caml:domain_state.h)" --output=graph
 
 * to limit the depth add an int argument. E.g. to show only direct rdeps:
 
     bazel query "rdeps(//..., //runtime/caml:domain_state.h, 1)"
 
-== providers
+== Providers
 
     bazel cquery //testsuite/tests/lib-bigarray:Change_layout --output=starlark --starlark:expr="providers(target)"
 

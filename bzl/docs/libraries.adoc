@@ -23,7 +23,7 @@ libs; try it and you'll get an error: `Option -a cannot be used
 with .cmxa input files.` This does not happen with bytecode archives.
 
 So library rules have an attribute, `cmxa_eligible`, that determines
-if they may be archived when `--//config/ocaml/compiler/libs:archived`
+if they may be archived when [nowrap]`--//config/ocaml/compiler/libs:archived`
 is true and they are being built as native libraries. For "toplevel"
 libraries - those that are not dependencies of any other library, but
 may be dependencies of executables - `cmxa_eligible` should be set to
@@ -36,7 +36,7 @@ True. Examples:
 
 Others that must leave it at the default False:
 
-* `//typing:ocamlcommon` - a dependency of `//compilerlibs:ocamlcommon`
+* `//typing:ocamlcommon` - a dependency of `//compilerlibs:ocamlcommon`, which is cmxa-eligible
 * etc.
 
 Note that this only affects native builds.  VM archives may depend on other vm archives.

@@ -1,0 +1,119 @@
+= tool runners
+
+Bazel is a build engine. The core functionality is built around the
+task of running tools like compilers, linkers, assemblers, etc. that
+translate code from one form to another. Arranging for these tools to
+run is the responsibility of the build rules that deliver the outputs
+produced by the tools. But Bazel also includes the ability to build
+and run arbitrary executables.
+
+Builds commonly involve running a variety of "auxiliary" tools, often
+for the purpose of preprocesssing or generating source code. In a
+fully hermetic Bazel build, the tools themselves are built (by Bazel)
+before they are run. Indeed a truly hermetic build would build _all_
+tools from source, including compilers, linkers, etc.
+
+Some tools are internal, meant only to be used for in the service of
+building the ultimate output (e.g. a compiler). We call such tools
+"build tools". For example, the OCaml native compiler builds depend on
+tool `cvt_emit`, which preprocesses `emit.mlp` files to produce
+`emit.ml` files, which are dependencies of a module compilation rule.
+
+Other tools in the OCaml repo are intended for developers to run
+directly; for example, `ocamldep`, `ocamlobjinfo`, etc. are such
+tools. We call these tools "ocaml tools".
+
+We can design a rule for each internal build rule whose job is to run
+the tool; for example, rule `run_cvt_emit` is the rule that runs the
+`cvt_emit` tool. Such rules are ordinary build rules, like those that
+run the compilers: they take a file or files as input, run it through
+the tool, and deliver the output. Being executables, they can be also
+run from the command line using the `run` subcommand, but there is
+little point to doing this.
+
+But for user-oriented tools we need a different kind of rule.
+Such tools are usually not used to build things. In principle they could be so
+used, if the build process were to depend in some way on the output of
+the tool; for example, a build process might run `ocamlobjinfo` and
+parse its output in order to drive some further build action. But in
+general such tool are free-standing: the user is expected to run them
+directly from the command line, or via a shell script.
+
+Bazel supports a `run` subcommand that can be used to execute such
+tools under Bazel's control. This effectively provides a means of
+integrating such free-standing tools into the Bazel environment, with
+all that that entails. In particular, complete control over inputs and
+outputs, and a command line configured to work with the environment
+used to build the tool.
+
+Example: during development we build the (bytecode) repl `ocaml`. That
+gives us a VM executable, but it is not a deployment build, so it
+lacks references to a system `ocamlrun` and `stdlib`. So to run it
+directly from the command line, without the assistance of Bazel, we
+must:
+
+* find the correct `ocamlrun` and put it first on the command line;
+* find the (compiled) stdlib and add its directory with `-nostdlib
+  -I <stdlib_dir>` on the command line
+
+For other tools additional information must be provided. For example,
+`ocamlobjinfo` takes a compiled object. Since the Bazel build puts
+compiled outputs in its own directories, using `ocamlobjinfo` from the
+command line without Bazel would require that we first use a Bazel
+query to find out the path of the desired object file.
+
+This is cumbersome and error prone. To make it easier, we define
+"tool runner" rules that automate everything.
+
+Example: rule `run_ocamldep` runs the `ocamldep` tool. Here as a
+convenience we have named the target `deps` instead of `oamldep`:
+
+    bazel run @dev//bin:deps --//:args=//stdlib:Stdlib.Buffer
+    bazel run @dev//bin:deps --//:args=//stdlib:buffer.ml
+
+Note that although the `ocamldep` takes a file argument, the
+`run_ocamldep` rule also accepts a (module or signature) build target,
+from which it can infer the source file.
+
+== how it works
+
+"Runner" rules must emit an executable file, which Bazel will execute
+when run with `bazel run`.
+
+But (most) tools are already executables.  They can already be run that way.
+
+Of course OCaml VM executables are tools, but they are not
+executables; to run them, we need `ocamlrun`. So `bazel run` will not
+work with such tools.
+
+Example: to build `ocamldep`:
+
+    bazel build tools:ocamldep.byte
+
+Try to run it:
+
+----
+bazel run tools:ocamldep.byte
+Target //tools:ocamldep.byte up-to-date:
+  bazel-bin/tools/_vm/ocamldep.byte
+INFO: Elapsed time: 1.037s, Critical Path: 0.52s
+INFO: 6 processes: 4 internal, 2 darwin-sandbox.
+INFO: Build completed successfully, 6 total actions
+INFO: Running command line: bazel-bin/tools/_vm/ocamldep.byte
+/bin/bash: /private/var/tmp/_bazel_<uid>/013cebf6d2080cf0fc1fa8d00147c64e/execroot/ocamlcc/bazel-out/darwin-fastbuild-ST-58c0d0a350a9/bin/tools/_vm/ocamldep.byte: /dev/null: bad interpreter: Permission denied
+----
+
+IMPORTANT: In a production build, VM executables would include a
+"shebang" header with the path to `ocamlrun`. In Bazel development
+builds, the shebang uses `/dev/null`. This ensures that `ocamlrun` is
+always explicit on the command line, and prevents inadvertent
+mismatches of ocamlrun versions.
+
+So to provide `bazel run` support for VM executables we must define a runner rule.
+
+And even native executables may require command line arguments that
+could use a little assistance. For example `ocamlcmt` needs a `.cmti?`
+input file; the most user-friendly way to support this is to accept a
+build target as arg, and have the runner rule ensure first that the
+target is built with `-bin-annot`, and then that it can find the path
+to the desired `.cmti?` file.

@@ -1,0 +1,7 @@
+= repl
+
+a/k/a `ocaml`
+
+* `//toplevel:ocaml` - std build protocol
+* `@dev//bin:repl` - runs `@dev//bin:ocaml` directly
+* `//test:repl` - test protocol - builds `ocaml` using `@dev//bin:ocamlc.opt`

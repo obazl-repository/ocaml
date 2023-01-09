@@ -137,26 +137,32 @@ rules for the key targets are:
 The aggregating variables defined by the Makefile effectively define
 _libraries_ of modules and signatures, a library being nothing more
 than an aggregator. Such libraries are first-class build targets in
-OBazl, supported by the `boot_library` build rule. We can use that
-rule to build these libraries "where they live", so to speak; then
-other build targets can depend on the target label.
+`rules_ocamlcc`, supported by the `compiler_library` build rule.
+Because Bazel targets are identified by labels, we can build these
+libraries "where they live", so to speak, by defining the build
+targets in the directory (Bazel package) where the sources are
+located. Then other build targets can depend on them by target label.
 
-OBazl maintains a clear distinction between `library` and `archive`.
-An archive is effectively a way of packaging a library. The
-`boot_library` rule produces the collection of modules (and/or
-signatures) listed in its `manifest` attribute; the `boot_archive`
-rule produces an OCaml archive (`.cma` or `.cmxa`) of the modules
-listed in its `manifest` attribute.
+The `rules_ocamlcc` rules maintain a clear distinction between
+xref:terminology.adoc#library[library] and
+xref:terminology.adoc#archive[archive]. An archive is effectively a
+packaging a library. The `compiler_library` rule produces the
+collection of modules (and/or signatures) listed in its `manifest`
+attribute; when its `archive` attribute is set to `True`, it packages
+thos modules in an OCaml archive (`.cma` or `.cmxa`) file.
 
 Take for example the `PARSING` variable. It aggregates build targets
 in the `parsing` directory. We place a `BUILD.bazel` file in that
-directory, which turns it into a Bazel _package_, with label
-`//parsing`. We then write a `boot_library` target corresponding to
-the `PARSING` variable:
+directory, which turns it into a Bazel
+xref:terminology.adoc#package[package], with label `//parsing`. We
+then use the `compiler_library` rule to declare a target corresponding
+to the `PARSING` variable used by the Makefiles, which we name
+`ocamlcommon`, yielding target label `//parsing:ocamlcommon` (we could
+name it anything):
 
 ```
-boot_library(
-    name = "parsing",
+compiler_library(
+    name = "ocamlcommon",
     manifest  = [
         ":Ast_helper",
         ":Ast_invariants",
@@ -178,6 +184,7 @@ boot_library(
     ],
     visibility = ["//compilerlibs:__pkg__"]
 )
+
 ```
 
 Each of the entries in the `manifest` attribute refers to a target in
@@ -187,48 +194,41 @@ the same package; e.g. `:Ast_helper` is short-hand for
 `Ast_helper.cmo` (or `Ast_helper.cmx` if tell Bazel to target the
 "native" platform).
 
-The end result is that this `//parsing:parsing` target (abbreviated
-`parsing`) produces the list of `.cmo` (or `.cmx`) files listed in the
-Makefile's definition of `PARSING`. Now our `ocamlcommon` archive
-target can depend on this `boot_library` target instead of depending
-separately on each module in the `PARSING` variable.
+The end result is that this `//parsing:ocamlcommon` target
+(abbreviated `parsing`) produces the list of `.cmo` (or `.cmx`) files
+listed in the Makefile's definition of `PARSING`. Now our
+`//compilerlibs:ocamlcommon` target can depend on this
+`compile_library` target instead of depending separately on each
+module in the `PARSING` variable.
 
-But we can even better. The `ocamlcommon` archive depends on
-variable `COMMON`, which sums variables `UTILS`, `PARSING`, `TYPING`,
-`LAMBDA`, and `COMP`. For each of these we can define the
-corresponding `boot_library` target in the relevant directory, giving
+But we can do even better. The `ocamlcommon` target (in the Makefile)
+depends on variable `COMMON`, which sums variables `UTILS`, `PARSING`,
+`TYPING`, `LAMBDA`, and `COMP`. For each of these we can define the
+corresponding `compiler_library` target in the relevant directory, giving
 us targets:
 
-* `//utils:utils`
-* `//parsing:parsing`
+* `//utils:ocamlcommon`
+* `//parsing:ocamlcommon`
 * etc.
 
-But some of these variables are "hybrids": they aggregate from
-multiple directories. For example:
+But some of these Makefile variables are "hybrids": they aggregate
+resources from multiple directories. For example:
 
 * `TYPING` is almost all targets in `typing`, but adds two targets from `file_formats/`
-* `COMP` aggregates targets in `bytecomp` and `driver`, and there is
-no `comp` directory, so we cannot define target `//comp:comp`.
+* `COMP` aggregates targets in `bytecomp` and `driver`, and as there is
+no `comp` directory, so we cannot define target `//comp:ocamlcommon`.
 
 NOTE: As it turns out, some of these hybrid aggregates are
 unnecessary, at least with Bazel. For example the .cmi files in `COMP`
 are dependencies of the `bytecomp` modules also listed in `COMP`; they
 are not needed to build `//compilerlibs:ocamlcommon`, and at least
-with OBazl they are already expressed in the targets of the
-`//bytecomp` package. Since deps are transitive in OBazl, they will
-automatically be included in `//compilerlibs:ocamlcommon`, and
-available to the `//tools:ocamlobjinfo` target, for example.
-
-NOTE: The cmi deps are only dependencies of other cmi targets, not
-module targets. Example: `//bytecomp:Symtable_cmi` depends on
-`//file_formats:Cmo_format_cmi`. Note that it would make no sense for
-a module to depend on such an interface, since there is no
-`cmo_format.ml` struct to go with it to make a module. Modules only
-depend on modules.
-
+with `rules_ocamlcc` they are already expressed in the targets of the
+`//bytecomp` package. Since deps are transitive in `rules_ocamlcc`,
+they will automatically be included in `//compilerlibs:ocamlcommon`,
+and available to the `//tools:ocamlobjinfo` target, for example.
 
 There are several ways to handle this. But first notice that these
-aggregates are all in the service of producing target `ocamlcommon`.
+aggregates are all in the service of producing target `//compilerlibs:ocamlcommon`.
 So we can add clarity by naming the Bazel targets accordingly. Instead
 of `//parsing:parsing`, we will define `//parsing:ocamlcommon`, for
 example. Similarly for all the others, so our `ocamlcommon` target
@@ -237,8 +237,8 @@ packages. That is, each dependency of `//compilerlibs:ocamlcommon` will have tar
 name `:ocamlcommon` but a different package name:
 `//utils:ocamlcommon`, `//parsing:ocamlcommon`, etc.
 
-For `COMP`, since we do not have a `comp/` directory, and furthermore
-the targets it aggregates in `bytecomp/` and `driver/` are mutually
+For `COMP`, we do not have a `comp/` directory, and furthermore the
+targets it aggregates in `bytecomp/` and `driver/` are mutually
 independent. So we can disaggregate, and define targets in `bytecomp``
 and `driver/`:
 
@@ -246,8 +246,8 @@ and `driver/`:
   aggregated by `COMP`, and
 * `//driver:ocamlcommon` provides the six modules in `driver/` aggregated by `COMP`
 
-Then the archive target `//compilerlibs:ocamlcommon` will depend on
-these two `:ocamlcommon` targets rather than one `:comp` target.
+Then target `//compilerlibs:ocamlcommon` will depend on these two
+`:ocamlcommon` targets rather than one `:comp` target.
 
 Variable `TYPING` is also a hybrid, aggregating a few dozen targets in
 `typing/` plus two targets in `file_formats/`. But unlike `COMP`, in
@@ -255,40 +255,46 @@ involves cross-directory dependencies: many of the modules in
 `typing/` depend on `file_formats:Cmi_format` or
 `file_formats:Cmt_format`.
 
- We could define
-`//file_formats:ocamlcommon` for these, but unfortunately some
-`file_formats/` targets are also used in `COMP_CMI` and `ASMCOMP`.
+We could define `//file_formats:ocamlcommon` for these, but
+unfortunately some `file_formats/` targets are also used in `COMP_CMI`
+and `ASMCOMP`.
 
-The easy way to handle this is to _not_ define
-`//file_formats:ocamlcommon`, and instead simply depend on those
-`file_formats` targets in the other `:ocamlcommon` targets; for
-example, we can add those two targets as dependencies of
-`//typing:ocamlcommon`, and add `//file_formats:Linear_format` as a
-direct dependency of `//asmcomp:ocamlcommon`.
+The easy way to handle this is to _not_ aggregate the `file_formats`
+resources by defining library target `//file_formats:ocamlcommon`, and instead simply
+depend directly on those individual `file_formats` targets in the
+other `:ocamlcommon` targets. For example, we can add those two
+targets as dependencies of `//typing:ocamlcommon`, and add
+`//file_formats:Linear_format` as a direct dependency of
+`//asmcomp:ocamlcommon`.
 
 But notice that both `TYPING` and `COMP_CMI` are only used as part of
 `COMMON`, which is only used to build `//compilerlibs:ocamlcommon`.
 
-
-
-The result is that our target for building `ocamlcommon.cma/cmxa`
+The result is that our target for building `ocamlcommon.cmx?a`
 looks like this, in `compilerlibs/BUILD.bazel`:
 
-```
+----
 compiler_library(
     name = "ocamlcommon",
+    cmxa_eligible = True,                   <1>
     opts = ["-linkall"],
     manifest  = [
         "//config:Config",
-        "//bytecomp:ocamlcommon",
-        "//driver:ocamlcommon",
         "//utils:ocamlcommon",
-        "//lambda:ocamlcommon",
         "//parsing:ocamlcommon",
         "//typing:ocamlcommon",
+        "//bytecomp:ocamlcommon",
+        "//lambda:ocamlcommon",
+        "//driver:ocamlcommon",
     ],
     visibility = [
       ... targets restricting visibity of this target ...
     ]
 )
-```
+----
+<1> This attribute indicates that this target is not a dependency of
+any other library target, so it can be archived as a `.cmxa` file. See xref:libraries.adoc#cmxa_eligible[cmxa_eligible] for details.
+
+WARNING: Here `//config:Config` is the `rules_ocamlcc` replacement for
+the configuration module defined in `utils` in the Makefiles. See
+link:configuration.adoc[Configuration] for more information.

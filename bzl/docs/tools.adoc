@@ -3,10 +3,145 @@
 :toclevels: 3
 
 
-NOTE: each tool has two build targets, *.byte and *.opt. An alias for
+See also xref:tool_runners.adoc[Tool runners].
+
+== developer tools
+
+Each tool has two build targets, *.byte and *.opt. An alias for
 the *.opt version is defined for each; e.g. `:ocamldep` is aliased to `:ocamldep.opt`.
 
-== run targets
+Tool _build_ targets are defined in several packages:
+
+* `//tools` - e.g. `//tools:ocamldep.byte`. These targets are built
+  under the standard xref:build_protocols.adoc[build protocol] (i.e.
+  starting with `boot/ocamlc` and without any recursive bootstrapping
+  steps).
+
+* `@dev//bin` - e.g. `@dev//bin:ocamldep.byte`. These targets are
+  availabel after you run [nowrap]`bazel run boot:checkpoint`. They
+  run the compiled tools in `@dev` (i.e. in `.baseline/bin`), which
+  are built (by [nowrap]`boot:checkpoint`) under the `boot` build
+  protocol. In other words, running these targets does _not_ rebuild
+  the tools.
+
+* `//test` - e.g. `//test:ocamldep.byte`. These targets are built
+  under the `test` build protocol, which means they will be rebuilt
+  (incrementally, if the sources change) starting from
+  `@dev//bin:ocamlc.opt` or `@dev//bin:ocamlopt.opt`. Use these
+  targets if you are changing the tools themselves, or if you make
+  changes to the compiler sources or stdlib and you want the tools to
+  used those changes.
+
+=== Usage
+
+Each tool has an associated xref:tool_runners.adoc[tool runner]
+target. These must have different names than the build targets;
+otherwise we get name clashes that Bazel disallows.
+
+Each tool takes an argument which may be a source file (`ocamldep`), a
+compiled object or archive file (`ocamlobjinfo`), or a compiled `.cmt`
+file (`ocamlcmt`). To use the tool runners, these arguments must be
+passed using `--//:arg=<argument>`. This is inconvenient, but not
+overly so, and it has the virtue of integrating the arguments into the
+Bazel context. This is needed because `bazel run //pkg:tgt` does not
+launch the `:tgt` executable from the project root directory from
+which you run `bazel run`. Instead it switches to a Bazel internal
+directory, which you can see by running `$ bazel info execution_root`
+or passing `--//tools:verbose` with your `bazel run` command.. This
+means you cannot pass the tool paths relative to the project root.
+
+You could pass absolute paths, but that would only work for source
+file arguments. For compiled object arguments, you would have to
+discover where Bazel puts them. For example, if you build
+`testsuite/tests/basic/_BS_vv/Arrays`, the output will go somewhere
+like:
+
+    bazel-out/darwin-fastbuild-ST-96fabab2dcd0/bin/testsuite/tests/basic/_BS_vv/Arrays.cmo
+
+The tool runners are designed to find such paths if you pass them a
+Bazel build label using `--//:arg=<argument>`. For example to inspect
+`Arrays.cmo`:
+
+    bazel run @dev//bin:ocamlobjinfo --//:arg=//testsuite/tests/basic:Arrays --//tools:verbose
+
+This runs `.baseline/bin/ocamlobjinfo.opt`
+
+To save a little typing (no pun intended), each tool also has one or
+more aliases. In no particular order:
+
+=== ocamlcmt
+
+Aliases:  `cmt`, `lst` (list types)
+
+    bazel run @dev//bin:cmt --//:arg=//bytecomp:Bytegen
+    bazel run @dev//bin:cmt --//:arg=//bytecomp:Bytegen_cmi
+
+The toolrunner dynamically configures the build to add
+`--//config/ocaml/compile:bin-annot`, which tells the build rules to
+add `-bin-annot`.
+
+It can also determined if the argument is a module or a signature
+target, and accordingly find the `.cmt` or `.cmti` file.
+
+=== ocamldep
+
+Alias:  `deps`
+
+    bazel run @dev//bin:deps --//:arg=//typing:Ident
+    bazel run @dev//bin:deps --//:arg=//typing:ident.ml
+    bazel run @dev//bin:deps --//:arg=//typing:Ident_cmi
+    bazel run @dev//bin:deps --//:arg=//typing:ident.mli
+
+Runs `.baseline/lib/ocamldep.opt`
+
+The tool runner understands both Bazel build target labels and source
+file labels (but notice the difference in case: `Ident` v.
+`ident.ml`).
+
+WARNING: Source file labels are almost the same as file system paths,
+but the last segment separator must be a colon `:` intead of a solidus
+`/`. E.g. `//typing:ident.ml` instead of `//typing/ident.ml`. Asc
+noted you cannot simply pass a path relative to the project root;
+however in this case it will work with `--//:arg`, because Bazel will
+interpret `typing:ident.ml` as label `//typing:ident.ml`, not as a
+file system path:
+
+    azel run @dev//bin:deps --//:arg=typing:ident.mli
+
+=== ocamlobjinfo
+
+Aliases:  `lso` (list object)
+
+    bazel run @dev//bin:lso --//:arg=//stdlib:Stdlilb.Buffer
+    bazel run @dev//bin:lso --//:arg=//stdlib:Stdlilb.Buffer
+
+Runs `.baseline/lib/ocamlobjinfo.opt`
+
+=== dumpobj
+
+=== primreq
+
+Alias:  `lsp` (list primitives)
+
+----
+    bazel run @dev//bin:lsp --//:arg=//bytecomp:Meta
+    ...
+    INFO: Running command line: bazel-bin/external/dev/bin/primreq.sh
+    caml_get_global_data
+    caml_get_section_table
+    caml_invoke_traced_function
+    caml_realloc_global
+    caml_reify_bytecode
+    caml_static_release_bytecode
+----
+
+Runs `.baseline/bin/primreq.opt`
+
+== obsolete
+
+The following stuff is a little outdated but may be useful.
+
+=== run targets
 
 As a convenience, targets have been defined in the root package, to minimize keystrokes:
 
@@ -15,7 +150,7 @@ As a convenience, targets have been defined in the root package, to minimize key
 * bazel run :lsp - runs @dev//bin:primreqs.opt (`:lsp` == list primitives)
 * bazel run :cmt - runs @dev//bin:ocamlcmt.opt
 
-== build targets
+=== build targets
 
 NB: the leading `//` may be omitted in build commands, e.g. `$ bazel
 build tools:ocamldep` is equivalent to [.nowrap]`$ bazel build //tools:ocamldep`.
@@ -52,7 +187,7 @@ link:https://v2.ocaml.org/manual/profil.html[Profiling]:
 * `//tools:ocamlprof` -  prints execution counts gathered during the execution of a OCaml program instrumented with ocamlcp
 
 
-== running tools under bazel
+=== running tools under bazel
 
 Special support for:  ocamldep, ocamlobjinfo, dumpobj, primreq.
 
