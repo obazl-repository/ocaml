@@ -57,38 +57,10 @@ def _boot_checkpoint_impl(ctx):
 
     rfs = []
 
-    # for var in ctx.var:
-    #     print("CTX var: {k}: {v}".format(
-    #         k = var, v = ctx.var[var]))
-
-    ## we need to pass //config/target/executor, //config/target/emitter
-    ## as args to checkpoint.sh. We cannot set the 'args' attr here,
-    ## so we write them to files and pass them in runfiles.
-    ## the shell script reads them to discover what is being built
-    ## and needs to be copied to .baseline/bin.
-
-    # executor = ctx.actions.declare_file("executor")
-    # ctx.actions.write(
-    #     output  = executor,
-    #     content = ctx.attr._target_executor[BuildSettingInfo].value
-    # )
-    # emitter = ctx.actions.declare_file("emitter")
-    # ctx.actions.write(
-    #     output  = emitter,
-    #     content = ctx.attr._target_emitter[BuildSettingInfo].value
-    # )
-    # rfs.append(depset(direct = [executor, emitter]))
-
     for d in ctx.attr.data:
         # print("DATUM: %s" % d)
         rfs.append(d.files)
         rfs.append(d[DefaultInfo].default_runfiles.files)
-
-    # rfs.append(ctx.attr.lexer[DefaultInfo].files)
-    # rfs.append(ctx.attr.lexer[DefaultInfo].default_runfiles.files)
-    # for f in ctx.files.runtimes:
-    #     # print("RUNTIME: %s" % d)
-    #     rfs.append(f)
 
     runfiles = ctx.runfiles(
         files = ctx.files.runtimes,
@@ -114,7 +86,7 @@ boot_checkpoint = rule(
             allow_single_file = True,
             executable = True,
             cfg = "exec",
-            default = "//boot:checkpoint.sh",
+            default = "//boot:checkpoint_runner.sh",
         ),
         compilers = attr.label_list(
             allow_files = True

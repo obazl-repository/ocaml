@@ -80,13 +80,13 @@ def _boot_import_vm_executable(ctx):
     ctx.actions.symlink(output = tool,
                         target_file = ctx.file.tool)
 
-    runfiles = ctx.runfiles(
-        files = ctx.files._stdlib
-    )
+    # runfiles = ctx.runfiles(
+    #     files = ctx.files._stdlib
+    # )
 
     defaultInfo = DefaultInfo(
         executable = tool,
-        runfiles   = runfiles
+        # runfiles   = runfiles
     )
     return defaultInfo
 
@@ -103,14 +103,14 @@ boot_import_vm_executable = rule(
         ),
         # stdlib is a runtime dep of the linker, so we need to build
         # it and add it runfiles.
-        _stdlib = attr.label(
-            doc = "Stdlib archive", ## (not stdlib.cmx?a")
-            default = "//stdlib", # archive, not resolver
-            # allow_single_file = True, # won't work with boot_library
-            executable = False,
-            cfg = "exec"
-            # cfg = exe_deps_out_transition,
-        ),
+        # _stdlib = attr.label(
+        #     doc = "Stdlib archive", ## (not stdlib.cmx?a")
+        #     default = "//stdlib", # archive, not resolver
+        #     # allow_single_file = True, # won't work with boot_library
+        #     executable = False,
+        #     cfg = "exec"
+        #     # cfg = exe_deps_out_transition,
+        # ),
 
         # _ocamlrun = attr.label(
         #     allow_single_file = True,

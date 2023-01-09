@@ -32,30 +32,32 @@ def _run_tool_impl(ctx):
     if tgt.basename == "BUILD.bazel":
         # no --//:arg passed
         arg = ""
-
-    if ctx.label.name == "ocamlcmt":
-        if ModuleInfo in ctx.attr.arg:
-            arg = ctx.attr.arg[ModuleInfo].cmt.short_path
-        elif SigInfo in ctx.attr.arg:
-            arg = ctx.attr.arg[SigInfo].cmti.short_path
     else:
-        arg = ctx.file.arg.short_path
+        arg = tgt.short_path
 
-    cmt_files = []
-    if ModuleInfo in ctx.attr.arg:
-        cmt_files.append(ctx.attr.arg[ModuleInfo].cmt)
-    if SigInfo in ctx.attr.arg:
-        cmt_files.append(ctx.attr.arg[SigInfo].cmti)
+    # if ctx.label.name == "ocamlcmt":
+    #     if ModuleInfo in ctx.attr.arg:
+    #         arg = ctx.attr.arg[ModuleInfo].cmt.short_path
+    #     elif SigInfo in ctx.attr.arg:
+    #         arg = ctx.attr.arg[SigInfo].cmti.short_path
+    # else:
+    #     arg = ctx.file.arg.short_path
+
+    # cmt_files = []
+    # if ModuleInfo in ctx.attr.arg:
+    #     cmt_files.append(ctx.attr.arg[ModuleInfo].cmt)
+    # if SigInfo in ctx.attr.arg:
+    #     cmt_files.append(ctx.attr.arg[SigInfo].cmti)
 
     if ctx.attr._verbose[BuildSettingInfo].value:
-        verbose = "set -x"
+        verbose = "set -x; "
     else:
         verbose = ""
 
     cmd = "\n".join([
         # "echo ARGS: $@;",
         verbose,
-        "{pgm} $@ {arg};\n".format(
+        "{pgm} $@ {arg}\n".format(
             pgm = ctx.file.tool.short_path,
             arg = arg)
     ])
@@ -73,7 +75,7 @@ def _run_tool_impl(ctx):
         transitive_files =  depset(
             transitive = [
                 ctx.attr.tool[DefaultInfo].default_runfiles.files,
-                depset(cmt_files)
+                # depset(cmt_files)
             ]
         )
     )
@@ -101,7 +103,7 @@ run_tool = rule(
             default = "//:arg"
         ),
         _verbose = attr.label(
-            default = "//:verbose"
+            default = "//tools:verbose"
         ),
 
         _rule = attr.string( default = "run_tool" ),
@@ -273,7 +275,7 @@ def _run_ocamlcmt_impl(ctx):
     #     cmt_files.append(ctx.attr.arg[SigInfo].cmti)
 
     if ctx.attr._verbose[BuildSettingInfo].value:
-        verbose = "set -x"
+        verbose = "echo \"PWD: $(PWD)\"; set -x; "
     else:
         verbose = ""
 
@@ -358,42 +360,26 @@ run_ocamlcmt = rule(
 ##############################
 def _run_repl_impl(ctx):
 
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
-
-    workdir = tc.workdir
-
     runner = ctx.actions.declare_file(ctx.attr.name + ".sh")
+    ctx.actions.symlink(output = runner,
+                        target_file = ctx.file._runner)
 
-    rfs = ctx.attr._tool[DefaultInfo].default_runfiles.files.to_list()
+    rfs = ctx.attr.repl[DefaultInfo].default_runfiles.files.to_list()
 
-    cmd = " ".join([
-        # "echo PWD: ${PWD};",
-        # "echo `ls -l`;",
-        "{ocamlrun} {ocaml}".format(
-            ocamlrun = rfs[0].short_path,
-            ocaml    = rfs[1].short_path,
-        ),
-        "-noinit",
-        "-nostdlib",
-        "-I",
-        "stdlib/_dev_boot" ## FIXME: relativize
-    ])
-
-    ctx.actions.write(
-        output  = runner,
-        content = cmd,
-        is_executable = True
-    )
+    repl = ctx.expand_location("$(rootpath {})".format(
+        ctx.attr.repl.label.name
+        ), targets = [ctx.attr.repl])
+    print("repl: %s" % repl)
 
     myrunfiles = ctx.runfiles(
-        files = [
-            ctx.file._tool, ctx.file._stdlib
-        ],
+        files = ctx.files.data,
         transitive_files =  depset(
             transitive = [
-                ctx.attr._tool[DefaultInfo].default_runfiles.files,
+                ctx.attr.repl[DefaultInfo].default_runfiles.files,
+                depset(ctx.files._stdlib),
                 ctx.attr._stdlib[BootInfo].sigs,
                 ctx.attr._stdlib[BootInfo].cli_link_deps,
+                depset(ctx.files._runfiles_tool)
             ]
         )
     )
@@ -411,14 +397,38 @@ def _run_repl_impl(ctx):
 #######################
 run_repl = rule(
     implementation = _run_repl_impl,
-    doc = "Compile and test an OCaml program.",
+    doc = "Run a repl.",
     attrs = dict(
-        _tool = attr.label(
+        _runner = attr.label(
             allow_single_file = True,
-            default = "//toplevel:ocaml.tmp"
+            executable = True,
+            cfg = "exec",
+            default = "//toplevel:repl_runner.sh",
         ),
-        _stdlib = attr.label(
+        _runfiles_tool = attr.label(
+            default = "@bazel_tools//tools/bash/runfiles"
+        ),
+        data = attr.label_list(
+            allow_files = True,
+        ),
+
+        repl = attr.label(
             allow_single_file = True,
+            # default = "//toplevel:ocaml.byte"
+        ),
+        # stdlib? get it from repl runfiles?
+        opts = attr.string_list(
+            default = [
+                "-noinit",
+                "-nopervasives",
+                "-nostdlib",
+                # "-I",
+                # "stdlib/_dev_boot" ## FIXME: relativize
+            ]
+        ),
+
+        _stdlib = attr.label(
+            # allow_single_file = True,
             default = "//stdlib" # FIXME: relativize
         ),
         _rule = attr.string( default = "run_repl" ),
@@ -427,9 +437,9 @@ run_repl = rule(
         # ),
     ),
     executable = True,
-    toolchains = ["//toolchain/type:ocaml",
-                  ## //toolchain/type:profile,",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
+    # toolchains = ["//toolchain/type:ocaml",
+    #               ## //toolchain/type:profile,",
+    #               "@bazel_tools//tools/cpp:toolchain_type"]
 )
 
 # ################################################################

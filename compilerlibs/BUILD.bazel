@@ -27,7 +27,6 @@ load("//bzl:rules.bzl",
 # boot_archive(
 compiler_library(
     name = "ocamlcommon",
-    # toplevel = True,  ## eligible for cmxa archiving
     cmxa_eligible = True,
     opts = ["-linkall"],
     manifest  = [

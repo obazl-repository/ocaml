@@ -74,12 +74,13 @@ ocaml_tools( # expands to targets ocamldep.byte, ocamldep.opt
     name     = "ocamldep",
     prologue = OCAMLC_PROLOGUE,
     main     = ":Ocamldep",
-    opts     = OCAML_COMPILER_OPTS
+    opts     = OCAML_COMPILER_OPTS ##  + ["-verbose", "-ccopt", "-Wl,-v"],
 )
 
 tool_module(
     name   = "Ocamldep",
     struct = "ocamldep.ml",
+    # opts = ["-verbose", "-ccopt", "-verbose"],
     warnings = [w.MISSING_MLI],
     deps   = [
         "//driver:Makedepend"

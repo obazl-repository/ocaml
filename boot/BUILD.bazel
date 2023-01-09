@@ -69,8 +69,12 @@ CHECKPOINT_DEPS = [
     "//bin:ocamlc.optx",
     "//bin:ocamlopt.optx",
     "//bin:ocamloptx.optx",     # 20
+
+    "//toplevel:ocaml.byte",
+
     "//vendor/mustach",
     "//vendor/merge_json",
+
     "//tools:ocamlcmt.byte",
     "//tools:ocamlcmt.opt",
     "//tools:ocamldep.byte",
@@ -83,6 +87,8 @@ CHECKPOINT_DEPS = [
     "//tools:dumpobj.opt",      # 30
     "//tools:primreq.byte",
     "//tools:primreq.opt",
+
+    "//toplevel:expunger.byte",
     "//debugger:ocamldebug.byte",
     "//debugger:ocamldebug.opt",
 
@@ -96,7 +102,7 @@ CHECKPOINT_DEPS = [
 
 boot_checkpoint(
     name = "checkpoint",
-    runner = "checkpoint_runner.sh",
+    # runner = "checkpoint_runner.sh",
     runtimes = [
         # "//runtime:asmrun",
         # "//runtime:camlrun",

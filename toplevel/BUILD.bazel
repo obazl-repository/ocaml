@@ -1,15 +1,24 @@
 load("//bzl:rules.bzl",
      "bootstrap_repl",
-     "build_tool",
+     "build_tool_vm",
      "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
+load("//bzl/rules:COMPILER.bzl",
+     "OCAMLC_PROLOGUE",
+     "OCAML_COMPILER_OPTS")
 
-load("//tools:TOOL_RULES.bzl",
-     "ocaml_tool_vm")
+load("//tools:TOOL_RULES.bzl", "ocaml_tool_vm")
+
+load("//tools:TOOL_RUNNERS.bzl", "run_repl")
 
 load("//stdlib:BUILD_STDLIB.bzl", "STDLIB_MODULE_NAMES")
+
+load(":BUILD_RULES.bzl", "run_expunger")
+
+
+exports_files(["repl_runner.sh"])
 
 MODULE_OPTS = []
 SIG_OPTS    = []
@@ -40,27 +49,6 @@ SIG_OPTS    = []
 
 # ./boot/ocamlrun ./boot/ocamlc -nostdlib -I ./boot -use-prims runtime/primitives -g -I toplevel/byte -linkall -o ocaml.tmp compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma compilerlibs/ocamltoplevel.cma toplevel/topstart.cmo
 
-## TEMPORARY until we get expunge working
-ocaml_tool_vm(
-    name = "ocaml.tmp",
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
-        ":ocamltoplevel",
-    ],
-    main = ":Topstart",
-    opts = ["-linkall"],
-    args = [
-        "-nostdlib",
-        "-I", "/Users/gar/obazl-repository/ocamlcc/bazel-bin/stdlib/_dev_ocamlc.byte",
-        "-noinit"
-    ],
-    visibility = [
-        "//:__pkg__",
-        "//testsuite/tests:__subpackages__"
-    ]
-)
-
 # ./boot/ocamlrun expunge ocaml.tmp ocaml  camlinternalFormatBasics stdlib stdlib__Either stdlib__Sys stdlib__Obj stdlib__Atomic camlinternalLazy stdlib__Lazy stdlib__Seq stdlib__Option stdlib__Result stdlib__Bool stdlib__Char stdlib__Uchar stdlib__List stdlib__Int stdlib__Bytes stdlib__String stdlib__Unit stdlib__Marshal stdlib__Array stdlib__Float stdlib__Int32 stdlib__Int64 stdlib__Nativeint stdlib__Lexing stdlib__Parsing stdlib__Set stdlib__Map stdlib__Stack stdlib__Queue stdlib__Buffer stdlib__Mutex stdlib__Condition stdlib__Semaphore stdlib__Domain camlinternalFormat stdlib__Printf stdlib__Arg stdlib__Printexc stdlib__Fun stdlib__Gc stdlib__Digest stdlib__Bigarray stdlib__Random stdlib__Hashtbl stdlib__Weak stdlib__Format stdlib__Scanf stdlib__Callback camlinternalOO stdlib__Oo camlinternalMod stdlib__Ephemeron stdlib__Filename stdlib__Complex stdlib__ArrayLabels stdlib__ListLabels stdlib__BytesLabels stdlib__StringLabels stdlib__MoreLabels stdlib__StdLabels stdlib__In_channel stdlib__Out_channel stdlib__Effect outcometree topdirs toploop
 
 
@@ -82,20 +70,68 @@ ocaml_tool_vm(
 #     expunge = STDLIB_MODULE_NAMES + ["outcometree", "topprinters" "topdirs", "toploop"]
 # )
 
-genrule(
-    name = "gen_ocaml",
-    outs = ["ocaml"],
-    executable = True,
-    srcs = [":ocaml.tmp", ":expunge"],
-    tools = ["@dev//bin:ocamlrun"],
-    cmd  = " ".join([
-        "$(execpath @dev//bin:ocamlrun)",
-        "$(location :expunge)",
-        "$(location :ocaml.tmp)",
-        "$(location ocaml)",
-    ] + STDLIB_MODULE_NAMES + ["outcometree", "topprinters", "topdirs", "toploop"]
-    ),
-    visibility = ["//:__pkg__"]
+# genrule(
+#     name = "gen_ocaml",
+#     outs = ["ocaml"],
+#     executable = True,
+#     srcs = [":ocaml.tmp", ":expunge.byte"],
+#     tools = ["//runtime:ocamlrun"],
+#     cmd  = " ".join([
+#         "$(execpath //runtime:ocamlrun)",
+#         "$(location :expunge.byte)",
+#         "$(location :ocaml.tmp)",
+#         "$(location ocaml)",
+#     ] + STDLIB_MODULE_NAMES + ["outcometree", "topprinters", "topdirs", "toploop"]
+#     ),
+#     visibility = [
+#         "//:__pkg__",
+#         "@dev//bin:__pkg__"
+#     ]
+# )
+
+run_repl(
+    name = "repl",
+    repl = ":ocaml.byte",
+    data = [
+        "//runtime:ocamlrun",
+        ":ocaml.byte"],
+    args = ["$(rlocationpath //runtime:ocamlrun)",
+            "$(rlocationpath :ocaml.byte)"]
+)
+
+#toplevel_expunge(
+#expunge_toplevel(
+run_expunger(
+    name = "ocaml.byte",
+    ocamlrun = "//runtime:ocamlrun",
+    expunger = ":expunger.byte",
+    toplevel = ":pre-repl.byte",
+    retain = [
+        "outcometree", "topprinters", "topdirs", "toploop"
+    ] + STDLIB_MODULE_NAMES,
+    visibility = [
+        "//:__pkg__",
+        "//boot:__pkg__",
+        "@dev//bin:__pkg__"
+    ]
+)
+
+ocaml_tool_vm(
+    name = "pre-repl.byte",
+    prologue = OCAMLC_PROLOGUE + [
+        ":ocamltoplevel",
+    ],
+    main = ":Topstart",
+    opts = ["-linkall"] + OCAML_COMPILER_OPTS,
+    args = [ # passed on 'bazel run', NOT on 'bazel build'
+        # "-nostdlib",
+        # "-noinit"
+    ],
+    visibility = [
+        "//:__pkg__",
+        "//testsuite/tests:__subpackages__",
+        "@dev//bin:__pkg__",
+    ]
 )
 
 ################################################################
@@ -166,18 +202,19 @@ compiler_library(
 )
 
 ################################################################
-build_tool(  ## moved to //utils:expunge
-    name     = "expunge",
-    prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//bytecomp:ocamlbytecomp",
-    ],
+build_tool_vm(  ## moveto //utils:expunge?
+    name     = "expunger.byte",
+    prologue = OCAMLC_PROLOGUE,
     main     = ":Expunge",
-    opts = [
-        "-nostdlib",
-        # "-verbose"
-    ],
-    visibility = ["//asmcomp:__subpackages__"]
+    opts     = OCAML_COMPILER_OPTS,
+    # opts = [
+    #     "-nostdlib",
+    #     # "-verbose"
+    # ],
+    visibility = [
+        "//boot:__pkg__",
+        "//asmcomp:__subpackages__"
+    ]
 )
 
 compiler_module(
@@ -587,7 +624,8 @@ compiler_module(
     name   = "Topstart",
     struct = "topstart.ml",
     opts = MODULE_OPTS,
-    deps   = [":Topmain"]
+    deps   = [":Topmain"],
+    stdlib_deps = ["//stdlib:Primitives"]
 )
 
 compiler_module(

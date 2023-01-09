@@ -2,12 +2,23 @@ exports_files(glob(["**"]))
 
 load("@ocamlcc//tools:TOOL_RUNNERS.bzl",
      "run_ocamlcmt",
-     "run_ocamldep"
-)
+     "run_ocamldep",
+     "run_tool",
+     "run_repl")
 
+run_repl(
+    name = "repl",
+    repl = ":ocaml.byte",
+    data = [
+        ":ocamlrun",
+        ":ocaml.byte"],
+    args = ["$(rlocationpath :ocamlrun)",
+            "$(rlocationpath :ocaml.byte)"]
+)
 
 alias(name = "lstyp", actual = ":ocamlcmt.opt.sh")
 alias(name = "lst",   actual = ":ocamlcmt.opt.sh")
+alias(name = "cmt",   actual = ":ocamlcmt.opt.sh")
 run_ocamlcmt(
     name = "ocamlcmt.opt.sh",
     tool = "@dev//bin:ocamlcmt.opt",
@@ -16,4 +27,30 @@ run_ocamlcmt(
 run_ocamldep(
     name = "deps",
     tool = "@dev//bin:ocamldep.opt",
+)
+
+run_tool(
+    name = "dumpobj",
+    tool = "@dev//bin:dumpobj.opt",
+            # default = "@ocamlcc//:arg",
+    arg  = ":arg",
+)
+
+run_tool(
+    name = "lso",
+    tool = "@dev//bin:ocamlobjinfo.opt",
+    arg  = "@ocamlcc//:arg",
+)
+run_tool(
+    name = "ocamlobjinfo",
+    tool = "@dev//bin:ocamlobjinfo.opt",
+    # tool = "//tools:ocamlobjinfo",
+    arg  = "@ocamlcc//:arg",
+)
+
+alias(name = "lsp",   actual = ":primreq")
+run_tool(
+    name = "primreq",
+    tool = "@dev//bin:primreq.opt",
+    arg  = "@ocamlcc//:arg",
 )

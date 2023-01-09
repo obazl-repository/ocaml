@@ -125,7 +125,7 @@ repl_test = rule(
 
         _repl    = attr.label(
             allow_single_file = True,
-            default = "//toplevel:ocaml.tmp", #FIXME get expunge running
+            default = "//toplevel:ocaml.byte",
             executable = True,
             cfg = "exec"
         ),

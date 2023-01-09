@@ -13,29 +13,29 @@ MODULE_OPTS = []
 SIG_OPTS    = []
 
 # boot_archive(
-compiler_library(
-    name = "driver",
-    manifest  = [
-        ":Compenv",
-        ":Compile",
-        ":Compmisc",
-        ":Errors",
-        ":Main",
-        ":Main_args",
-        ":Maindriver",
-        ":Makedepend",
-        ":Optcompile",
-        ":Opterrors",
-        ":Optmain",
-        ":Optmaindriver",
-        ":Pparse",
-        ":Compile_common",
-    ],
-    visibility = [
-        "//boot:__subpackages__",
-        "//testsuite:__pkg__"
-    ]
-)
+# compiler_library(
+#     name = "driver",
+#     manifest  = [
+#         ":Compenv",
+#         ":Compile",
+#         ":Compmisc",
+#         ":Errors",
+#         ":Main",
+#         ":Main_args",
+#         ":Maindriver",
+#         ":Makedepend",
+#         ":Optcompile",
+#         ":Opterrors",
+#         ":Optmain",
+#         ":Optmaindriver",
+#         ":Pparse",
+#         ":Compile_common",
+#     ],
+#     visibility = [
+#         "//boot:__subpackages__",
+#         "//testsuite:__pkg__"
+#     ]
+# )
 
 ## for //compilerlibs:ocamlcommmon archive:
 # defined in compilerlibs/Makefile.compilerlibs as COMP, COMP_CMI

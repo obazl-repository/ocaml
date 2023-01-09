@@ -1,6 +1,5 @@
 load("//bzl:rules.bzl",
-     "boot_archive",
-     "boot_library",
+     "compiler_library",
      "compiler_module",
      "compiler_signature",
 )
@@ -14,7 +13,7 @@ SIG_OPTS    = [] # ["-nostdlib"] + COMPFLAGS
 # 	$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -cclib -lunix -linkall \
 # 	  $(PTHREAD_CAML_LIBS) $^
 
-boot_archive(
+compiler_library(
     name = "threads_lib",
     # cm_name = "threads",
     opts = ["-linkall"],
