@@ -1,4 +1,6 @@
 = performance
+:toc: auto
+:toclevels: 3
 
 Some informal measurements. Note that Bazel always keeps track of
 "Elapsed time".
@@ -9,6 +11,60 @@ Machines:
   MHz DDR4; macos: 13.0.1 (22A400)
 
 * linux: Google cloud compute engine, 16 cpu (Xeon@ 2.30GHz), 60GB mem
+
+TIP:  Evidently it is better to have 16 cpus than 8.
+
+
+== boot:checkpoint
+
+This target builds lots of stuff: all the compilers and all the tools, and copies it to `.baseline`.
+
+Observation: apparently Bazel's parallelization works.  The mac build,
+which uses half as many cpus, takes roughly twice as long as the linux
+build.
+
+=== macos
+
+----
+$ /usr/bin/time bazel run boot:checkpoint
+INFO: Analyzed target //boot:checkpoint (63 packages loaded, 19815 targets configured).
+INFO: Found 1 target...
+Target //boot:checkpoint up-to-date:
+  bazel-bin/boot/checkpoint.sh
+INFO: Elapsed time: 387.496s, Critical Path: 230.46s
+INFO: 20747 processes: 9988 internal, 10759 darwin-sandbox.
+INFO: Build completed successfully, 20747 total actions
+INFO: Running command line: bazel-bin/boot/checkpoint.sh ocamlcc/lex/_vm/ocamllex.byte ... elided ...
+Making .baseline directories
+Installing WORKSPACE and BUILD files
+Installing programs
+Setting permissions
+Checkpoint completed.
+      388.86 real         0.48 user         0.86 sys
+----
+
+
+=== linux
+
+----
+$ /usr/bin/time bazel run boot:checkpoint
+INFO: Analyzed target //boot:checkpoint (107 packages loaded, 17260 targets configured).
+INFO: Found 1 target...
+Target //boot:checkpoint up-to-date:
+  bazel-bin/boot/checkpoint.sh
+INFO: Elapsed time: 181.682s, Critical Path: 158.93s
+INFO: 20926 processes: 9972 internal, 10954 linux-sandbox.
+INFO: Build completed successfully, 20926 total actions
+INFO: Running command line: bazel-bin/boot/checkpoint.sh ... elided ...
+Making .baseline directories
+Installing WORKSPACE and BUILD files
+Installing programs
+Setting permissions
+Checkpoint completed.
+0.51user 0.49system 3:02.50elapsed 0%CPU (0avgtext+0avgdata 9092maxresident)k
+0inputs+377736outputs (0major+74417minor)pagefaults 0swaps
+----
+
 
 == tests
 
@@ -51,9 +107,7 @@ Executed 174 out of 174 tests: 173 tests pass and 1 fails locally.
 real    1m37.073s
 user    0m0.079s
 sys     0m0.061s
-
 ----
-
 
 == compiler builds
 
@@ -90,7 +144,7 @@ INFO: Build completed successfully, 1896 total actions
 ----
 
 
-=== linux
+==== linux
 
 ----
 $ /usr/bin/time bazel build test:ocamlopt.opt
