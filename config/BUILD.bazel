@@ -204,8 +204,8 @@ config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
 
 # label_flag( name = "camlheaders", build_setting_default = "//stdlib:camlheaders")
 
-label_flag( name = "primitives",
-            build_setting_default = "//runtime:primitives")
+# label_flag( name = "primitives",
+#             build_setting_default = "//runtime:primitives")
 
 string_list_flag(name = "warnings",
                  build_setting_default = [

@@ -26,6 +26,9 @@ SIG_OPTS    = []
 ################################################################
 # makefile target is in compilerlibs/Makefile.compilerlibs
 
+# Note the difference between :ocamlbytecomp, which is just for vm
+# compilation, and :ocamlcommon below, which is a dependency of
+# //compilerlibs:ocamlcommon.
 compiler_library(
     name     = "ocamlbytecomp",
     cmxa_eligible = True,
@@ -86,12 +89,6 @@ compiler_library(
         ## we could aggregate the driver modules here,
         ## but instead we define //driver:ocamlcommon,
         ## so //compilerlibs:ocamlcommon must depend on both.
-        # "//driver:Compenv",
-        # "//driver:Compile_common",
-        # "//driver:Compmisc",
-        # "//driver:Main_args",
-        # "//driver:Makedepend",
-        # "//driver:Pparse",
         ":Bytesections",
         ":Dll",
         ":Meta",

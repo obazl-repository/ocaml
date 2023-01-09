@@ -115,8 +115,6 @@ build_tool( ## only build as vm/vm with boot compiler
 compiler_library(
     name = "ocamlcommon",
     manifest  = [
-        ## list from compilerlibs/Makefile.compilerlibs
-        ## ":Config" moved to //config/Config
         ":Arg_helper",
         ":Binutils",
         ":Build_path_prefix_map",

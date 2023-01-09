@@ -26,10 +26,11 @@ load(":ocaml_transitions.bzl",
 ################################################################
 ################################################################
 def _std_ocamlc_byte_in_transition_impl(settings, attr):
-    debug = False
+    debug = True
     if debug:
         print("TRANSITION: std_ocamlc_byte_in_transition: %s" % attr.name)
-        print("tc name: %s" % attr.name)
+        print("tc name: %s" % attr)
+        print("settings: %s" % settings)
 
     protocol = settings["//config/build/protocol"]
 

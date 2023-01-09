@@ -13,8 +13,8 @@ package(default_visibility = ["//visibility:public"])
 # bool_flag( name = "instrumented", build_setting_default = False)
 # config_setting(name = "instrumented?", flag_values = {":instrumented": "True"})
 
-bool_flag( name = "absname", build_setting_default = True)
-config_setting(name = "absname?", flag_values = {":absname": "True"})
+# bool_flag( name = "absname", build_setting_default = True)
+# config_setting(name = "absname?", flag_values = {":absname": "True"})
 
 # bool_flag( name = "bin-annot", build_setting_default = True)
 # config_setting(name = "bin-annot?", flag_values = {":bin-annot": "True"})
@@ -23,8 +23,8 @@ bool_flag( name = "flat_float_array", build_setting_default = True)
 config_setting(name = "flat_float_array?",
                flag_values = {":flat_float_array": "True"})
 
-bool_flag( name = "principal", build_setting_default = True)
-config_setting(name = "principal?", flag_values = {":principal": "True"})
+# bool_flag( name = "principal", build_setting_default = True)
+# config_setting(name = "principal?", flag_values = {":principal": "True"})
 
 bool_flag( name = "sig_src", build_setting_default = False)
 config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
@@ -36,8 +36,8 @@ config_setting(name = "with_cmm_invariants?",
 label_flag( name = "camlheaders",
             build_setting_default = "//config:camlheaders")
 
-label_flag( name = "primitives",
-            build_setting_default = "//runtime:primitives")
+# label_flag( name = "primitives",
+#             build_setting_default = "//runtime:primitives")
 
 # string_list_flag(name = "warnings",
 #                  build_setting_default = [

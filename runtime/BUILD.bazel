@@ -963,10 +963,10 @@ config_setting(name = "trace?", flag_values = {":trace": "True"})
 # )
 
 #### sanitizers
-bool_flag(name = "asan", build_setting_default = False)
-config_setting(name = "asan?", flag_values = {":asan": "True"})
-bool_flag(name = "msan", build_setting_default = False)
-config_setting(name = "msan?", flag_values = {":msan": "True"})
+# bool_flag(name = "asan", build_setting_default = False)
+# config_setting(name = "asan?", flag_values = {":asan": "True"})
+# bool_flag(name = "msan", build_setting_default = False)
+# config_setting(name = "msan?", flag_values = {":msan": "True"})
 
 
 ################
@@ -976,7 +976,7 @@ config_setting(name = "use_prims?", flag_values = {":use_prims": "True"})
 
 label_flag(
     name = "primitives",
-    build_setting_default = "//runtime:primitives_dat"
+    build_setting_default = "//runtime:primitives.dat"
 )
 
 ################

@@ -133,7 +133,7 @@ tool_module(
     struct = "actions.ml",
     sig    = "Actions_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Variables",
         ":Result",
@@ -179,7 +179,7 @@ tool_signature(
     name = "Actions_helpers_cmi",
     src  = "actions_helpers.mli",
     opts = SIG_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Variables",
         ":Result",
@@ -257,7 +257,7 @@ tool_signature(
     name = "Environments_cmi",
     src  = "environments.mli",
     opts = SIG_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [":Variables"]
 )
 
@@ -387,7 +387,7 @@ tool_module(
     struct = "ocaml_backends.ml",
     sig    = "Ocaml_backends_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
 )
 
 tool_signature(
@@ -401,7 +401,7 @@ tool_module(
     struct = "ocaml_commands.ml",
     sig    = "Ocaml_commands_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [":Ocaml_files"]
 )
 
@@ -416,7 +416,7 @@ tool_module(
     struct = "ocaml_compilers.ml",
     sig    = "Ocaml_compilers_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Variables",
         ":Ocamltest_stdlib",
@@ -464,7 +464,7 @@ tool_module(
     struct = "ocaml_files.ml",
     sig    = "Ocaml_files_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Ocamltest_stdlib",
         ":Ocamltest_config",
@@ -485,7 +485,7 @@ tool_module(
     struct = "ocaml_filetypes.ml",
     sig    = "Ocaml_filetypes_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Ocamltest_config",
         ":Ocaml_backends",
@@ -509,7 +509,7 @@ tool_module(
     struct = "ocaml_flags.ml",
     sig    = "Ocaml_flags_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Ocaml_variables",
         ":Ocaml_files",
@@ -534,7 +534,7 @@ tool_module(
     struct = "ocaml_modifiers.ml",
     sig    = "Ocaml_modifiers_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Ocamltest_stdlib",
         ":Ocamltest_config",
@@ -610,7 +610,7 @@ tool_module(
     struct = "ocaml_toplevels.ml",
     sig    = "Ocaml_toplevels_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Variables",
         ":Ocamltest_stdlib",
@@ -640,7 +640,7 @@ tool_module(
     struct = "ocaml_variables.ml",
     sig    = "Ocaml_variables_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Variables",
         ":Ocamltest_stdlib",
@@ -661,7 +661,7 @@ tool_module(
     struct = "ocamltest_config.ml",
     sig    = "Ocamltest_config_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         # ":Variables",
         # ":Ocamltest_stdlib",
@@ -681,7 +681,7 @@ tool_module(
     struct = "ocamltest_stdlib.ml",
     sig    = "Ocamltest_stdlib_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Ocamltest_unix",
         ":Ocamltest_config",
@@ -704,7 +704,7 @@ tool_signature(
     name = "Ocamltest_stdlib_cmi",
     src  = "ocamltest_stdlib.mli",
     opts = SIG_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Ocamltest_unix_cmi",
         "//stdlib:Stdlib.Sys_cmi",
@@ -788,7 +788,7 @@ tool_module(
     struct = "result.ml",
     sig    = "Result_cmi",
     opts   = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         "//stdlib:Stdlib"
     ]
@@ -805,7 +805,7 @@ tool_module(
     struct = "run_command.ml",
     sig    = "Run_command_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         ":Ocamltest_stdlib",
         "//stdlib:Stdlib.Array",
@@ -816,7 +816,7 @@ tool_signature(
     name = "Run_command_cmi",
     src  = "run_command.mli",
     opts = SIG_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     # deps   = ["//stdlib:Stdlib"]
 )
 
@@ -894,7 +894,7 @@ tool_module(
     struct = "tsl_lexer.ml",
     sig    = "Tsl_lexer_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.List",
@@ -994,7 +994,7 @@ tool_module(
     struct = "variables.ml",
     sig    = "Variables_cmi",
     opts = MODULE_OPTS,
-    stdlib_primitives = True,
+    ## stdlib_primitives = True,
     deps   = [
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Printf",

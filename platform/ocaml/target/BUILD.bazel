@@ -23,14 +23,14 @@ platform(name = "sys_vm_sys", parents = [":sys_vm"],
          constraint_values = ["//platform/constraints/ocaml/target/emitter:sys"])
 
 # dev stages: boot, baseline, dev, prod
-platform(name = "sys_vm_vm_boot", parents = [":sys_vm_vm"],
-         constraint_values = ["//platform/constraints/stage:boot"])
+# platform(name = "sys_vm_vm_boot", parents = [":sys_vm_vm"],
+#          constraint_values = ["//platform/constraints/stage:boot"])
 
-platform(name = "sys_vm_vm_baseline", parents = [":sys_vm_vm"],
-         constraint_values = ["//platform/constraints/stage:baseline"])
+# platform(name = "sys_vm_vm_baseline", parents = [":sys_vm_vm"],
+#          constraint_values = ["//platform/constraints/stage:baseline"])
 
-platform(name = "sys_vm_vm_dev", parents = [":sys_vm_vm"],
-         constraint_values = ["//platform/constraints/stage:dev"])
+# platform(name = "sys_vm_vm_dev", parents = [":sys_vm_vm"],
+#          constraint_values = ["//platform/constraints/stage:dev"])
 
 ################################################################
 platform(name = "sys_sys_sys",   # ocamlopt.opt

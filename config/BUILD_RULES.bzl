@@ -416,7 +416,6 @@ def _ocaml_cc_config_impl(ctx):
             ctx.attr._xcode_sdkroot[BuildSettingInfo].value)
 
     json_map["asm"] = envsetup + assembler + " -c " + asmargs
-    # json_map["asm"] = assembler + " -c " + asmargs
 
     linker  = cc_config_map["c_compiler_path"]
     arglist = []

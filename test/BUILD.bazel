@@ -18,7 +18,7 @@ load("//bzl/rules:COMPILER.bzl",
      "OCAML_COMPILER_OPTS")
 
 load("//test/rules:TEST_RULES.bzl",
-     # "tocaml_compilers",
+     # "test_repl",
      "test_ocamlc_byte",
      "test_ocamlopt_byte",
      "test_ocamlopt_opt",
