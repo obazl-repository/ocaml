@@ -26,9 +26,15 @@ def _reset_cc_config_transition_impl(settings, attr):
     if debug:
         print("reset_cc_config_transition: %s" % attr.name)
 
+    if settings["//runtime"] == "dbg":
+        mode = "dbg"
+    # if //runtime:DEBUG then mode = ???
+    else:
+        mode = "opt"
+
     return {
-        "//command_line_option:host_compilation_mode": "opt",
-        "//command_line_option:compilation_mode": "opt",
+        "//command_line_option:host_compilation_mode": mode,
+        "//command_line_option:compilation_mode"     : mode,
 
         ## these are not used by cc targets, so we set them to a
         ## unique dummy value so that the transition is always to the
@@ -47,6 +53,7 @@ def _reset_cc_config_transition_impl(settings, attr):
 reset_cc_config_transition = transition(
     implementation = _reset_cc_config_transition_impl,
     inputs = [
+        "//runtime",
         "//toolchain:runtime",
         "//toolchain:ocamlrun",
     ],
