@@ -32,40 +32,40 @@ test_suite(
         ":Arrays_test",
         ":Bigints_test",
         ":Boxedints_test",
-        ":constprop_test",
-        ":divint_test",
-        ":equality_test",
-        ":eval_order_1_test",
-        ":eval_order_2_test",
-        ":eval_order_3_test",
-        ":eval_order_4_test",
-        ":eval_order_6_test",
-        ":eval_order_7_test",
-        ":eval_order_pr10283_test",
-        ":float_test",
-        ":float_physical_equality_test",
-        ":includestruct_test",
-        ":localexn_test",
-        ":localfunction_test",
-        ":maps_test",
-        ":min_int_test",
-        ":opt_variants_test",
-        ":patmatch_test",
-        ":patmatch_for_multiple_test",
-        ":patmatch_incoherence_test",
-        ":patmatch_split_no_or_test",
-        ":pr7253_test",
-        ":pr7533_test",
-        ":pr7657_test",
-        ":recvalues_test",
-        ":sets_test",
-        ":stringmatch_test",
-        ":switch_opts_test",
-        ":tailcalls_test",
-        ":trigraph_test",
-        ":tuple_match_test",
+        ":Constprop_test",
+        ":Divint_test",
+        ":Equality_test",
+        ":Eval_order_1_test",
+        ":Eval_order_2_test",
+        ":Eval_order_3_test",
+        ":Eval_order_4_test",
+        ":Eval_order_6_test",
+        ":Eval_order_7_test",
+        ":Eval_order_pr10283_test",
+        ":Float_test",
+        ":Float_physical_equality_test",
+        ":Includestruct_test",
+        ":Localexn_test",
+        ":Localfunction_test",
+        ":Maps_test",
+        ":Min_int_test",
+        ":Opt_variants_test",
+        ":Patmatch_test",
+        ":Patmatch_for_multiple_test",
+        ":Patmatch_incoherence_test",
+        ":Patmatch_split_no_or_test",
+        ":Pr7253_test",
+        ":Pr7533_test",
+        ":Pr7657_test",
+        ":Recvalues_test",
+        ":Sets_test",
+        ":Stringmatch_test",
+        ":Switch_opts_test",
+        ":Tailcalls_test",
+        ":Trigraph_test",
+        ":Tuple_match_test",
         # ":unit_naming_test",
-        ":zero_divided_by_n_test",
+        ":Zero_divided_by_n_test",
     ],
 )
 
@@ -74,7 +74,7 @@ test_suite(
 ## expect_vv_test, expect_vs_test,
 ## expect_ss_test, expect_sv_test
 expect_test(
-    name    = "arrays_test",
+    name    = "Arrays_test",
     test_module = ":Arrays",
     stdout  = "arrays.stdout",
     expected = "arrays.reference",
@@ -90,6 +90,8 @@ test_module(
 )
 
 ############
+## For demo purposes we include the explicit expansion of test_executable.
+
 ## test_executable expands to <x>_test_executable and sh_binary
 ## targets (runners), where <x> = vv | vs | ss | sv indicates the
 ## compiler used to build the code; and sh_binary targets for vv, sv
@@ -121,7 +123,7 @@ test_module(
 
 ## expect_test macro expansion:
 test_suite(
-    name = "bigints_test",
+    name = "Bigints_test",
     tests = [
         ":Bigints_vv_test",
         ":Bigints_vs_test",
@@ -237,7 +239,7 @@ test_module(
 
 ############
 expect_test(
-    name        = "boxedints_test",
+    name        = "Boxedints_test",
     test_module = ":Boxedints",
     stdout      = "boxedints.stdout",
     expected    = "boxedints.reference",
@@ -281,7 +283,7 @@ test_module( # not a test, used by unit_naming_test
 
 ############
 expect_test(
-    name        = "constprop_test",
+    name        = "Constprop_test",
     test_module = ":Constprop",
     stdout      = "constprop.stdout",
     expected    = "constprop.ml.reference",
@@ -310,7 +312,7 @@ cc_preprocess(
 
 ############
 expect_test(
-    name        = "divint_test",
+    name        = "Divint_test",
     test_module = ":Divint",
     stdout      = "divint.stdout",
     expected    = "divint.reference",
@@ -331,7 +333,7 @@ test_module(
 
 ############
 expect_test(
-    name        = "equality_test",
+    name        = "Equality_test",
     test_module = ":Equality",
     stdout      = "equality.stdout",
     expected    = "equality.reference",
@@ -349,7 +351,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "eval_order_1_test",
+    name    = "Eval_order_1_test",
     stdout  = "eval_order_1.stdout",
     expected = "eval_order_1.reference",
     test_module    = ":Eval_order_1",
@@ -366,7 +368,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "eval_order_2_test",
+    name    = "Eval_order_2_test",
     stdout  = "eval_order_2.stdout",
     expected = "eval_order_2.reference",
     test_module    = ":Eval_order_2",
@@ -380,7 +382,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "eval_order_3_test",
+    name    = "Eval_order_3_test",
     stdout  = "eval_order_3.stdout",
     expected = "eval_order_3.reference",
     test_module    = ":Eval_order_3",
@@ -398,7 +400,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "eval_order_4_test",
+    name    = "Eval_order_4_test",
     stdout  = "eval_order_4.stdout",
     expected = "eval_order_4.reference",
     test_module    = ":Eval_order_4",
@@ -412,7 +414,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "eval_order_6_test",
+    name    = "Eval_order_6_test",
     stdout  = "eval_order_6.stdout",
     expected = "eval_order_6.reference",
     test_module    = ":Eval_order_6",
@@ -430,7 +432,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "eval_order_7_test",
+    name    = "Eval_order_7_test",
     stdout  = "eval_order_7.stdout",
     expected = "eval_order_7.reference",
     test_module    = ":Eval_order_7",
@@ -445,7 +447,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "eval_order_pr10283_test",
+    name    = "Eval_order_pr10283_test",
     stdout  = "eval_order_pr10283.stdout",
     expected = "eval_order_pr10283.reference",
     test_module    = ":Eval_order_pr10283",
@@ -461,7 +463,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "float_test",
+    name    = "Float_test",
     stdout  = "float.stdout",
     expected = "float.reference",
     test_module    = ":Float",
@@ -479,7 +481,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "float_physical_equality_test",
+    name    = "Float_physical_equality_test",
     stdout  = "float_physical_equality.stdout",
     expected = "float_physical_equality.reference",
     test_module    = ":Float_physical_equality",
@@ -493,7 +495,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "includestruct_test",
+    name    = "Includestruct_test",
     stdout  = "includestruct.stdout",
     expected = "includestruct.reference",
     test_module    = ":Includestruct",
@@ -515,7 +517,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "localexn_test",
+    name    = "Localexn_test",
     stdout  = "localexn.stdout",
     expected = "localexn.reference",
     test_module    = ":Localexn",
@@ -529,7 +531,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "localfunction_test",
+    name    = "Localfunction_test",
     stdout  = "localfunction.stdout",
     expected = "localfunction.reference",
     test_module    = ":Localfunction",
@@ -546,7 +548,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "maps_test",
+    name    = "Maps_test",
     stdout  = "maps.stdout",
     expected = "maps.reference",
     test_module    = ":Maps",
@@ -566,7 +568,7 @@ test_module(
 
 ############
 expect_test(
-    name        = "min_int_test",
+    name        = "Min_int_test",
     test_module = ":Min_int",
     stdout      = "min_int.stdout",
     expected    = "min_int.reference",
@@ -583,7 +585,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "opt_variants_test",
+    name    = "Opt_variants_test",
     stdout  = "opt_variants.stdout",
     expected = "opt_variants.reference",
     test_module    = ":Opt_variants",
@@ -608,7 +610,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "patmatch_test",
+    name    = "Patmatch_test",
     stdout  = "patmatch.stdout",
     expected = "patmatch.reference",
     test_module    = ":Patmatch",
@@ -628,7 +630,7 @@ test_module(
 
 ###################
 inline_expect_test(
-    name = "patmatch_for_multiple_test",
+    name = "Patmatch_for_multiple_test",
     src  = "patmatch_for_multiple.ml",
     opts = ["-drawlambda", "-dlambda"], # "-pervasives"],
     deps = ["//stdlib"],
@@ -638,7 +640,7 @@ inline_expect_test(
 
 ###################
 inline_expect_test(
-    name = "patmatch_incoherence_test",
+    name = "Patmatch_incoherence_test",
     src  = "patmatch_incoherence.ml",
     timeout = "short",
     tags = ["inline_expect"]
@@ -646,7 +648,7 @@ inline_expect_test(
 
 ###################
 inline_expect_test(
-    name = "patmatch_split_no_or_test",
+    name = "Patmatch_split_no_or_test",
     src  = "patmatch_split_no_or.ml",
     opts = ["-nopervasives", "-dlambda"],
     timeout = "short",
@@ -655,7 +657,7 @@ inline_expect_test(
 
 ############
 expect_test(
-    name    = "pr7253_test",
+    name    = "Pr7253_test",
     stdout  = "pr7253.stdout",
     expected = "pr7253.reference",
     test_module    = ":Pr7253",
@@ -674,7 +676,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "pr7533_test",
+    name    = "Pr7533_test",
     stdout  = "pr7533.stdout",
     expected = "pr7533.reference",
     test_module    = ":Pr7533",
@@ -694,7 +696,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "pr7657_test",
+    name    = "Pr7657_test",
     stdout  = "pr7657.stdout",
     expected = "pr7657.reference",
     test_module    = ":Pr7657",
@@ -714,7 +716,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "recvalues_test",
+    name    = "Recvalues_test",
     stdout  = "recvalues.stdout",
     expected = "recvalues.reference",
     test_module    = ":Recvalues",
@@ -734,7 +736,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "sets_test",
+    name    = "Sets_test",
     stdout  = "sets.stdout",
     expected = "sets.reference",
     test_module    = ":Sets",
@@ -763,7 +765,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "stringmatch_test",
+    name    = "Stringmatch_test",
     stdout  = "stringmatch.stdout",
     expected = "stringmatch.reference",
     test_module    = ":Stringmatch",
@@ -780,7 +782,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "switch_opts_test",
+    name    = "Switch_opts_test",
     stdout  = "switch_opts.stdout",
     expected = "switch_opts.reference",
     test_module    = ":Switch_opts",
@@ -797,7 +799,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "tailcalls_test",
+    name    = "Tailcalls_test",
     stdout  = "tailcalls.stdout",
     expected = "tailcalls.reference",
     test_module    = ":Tailcalls",
@@ -811,7 +813,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "trigraph_test",
+    name    = "Trigraph_test",
     test_module = ":Trigraph",
     stdout  = "trigraph.stdout",
     expected = "trigraph.reference",
@@ -840,7 +842,7 @@ test_module(
 
 ############
 expect_test(
-    name    = "tuple_match_test",
+    name    = "Tuple_match_test",
     stdout  = "tuple_match.stdout",
     expected = "tuple_match.reference",
     test_module    = ":Tuple_match",
@@ -871,7 +873,7 @@ compile_fail_test(
 
 ############
 expect_test(
-    name    = "zero_divided_by_n_test",
+    name    = "Zero_divided_by_n_test",
     stdout  = "zero_divided_by_n.stdout",
     expected = "zero_divided_by_n.reference",
     test_module    = ":Zero_divided_by_n",
