@@ -3,11 +3,6 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
-# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
-
-load("//bzl/transitions:dev_transitions.bzl",
-     "dev_tc_compiler_out_transition")
-
 ## expect_test
 
 ## builds an executable and runs it
