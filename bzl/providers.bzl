@@ -217,6 +217,7 @@ OcamlNsMarker        = provider(doc = "OCaml Namespace Marker provider.")
 OcamlSignatureMarker = provider(doc = "OCaml Signature Marker provider.")
 OcamlTestMarker      = provider(doc = "OCaml Test Marker provider.")
 
+StdLibMarker         = provider(doc = "Std compiler Library Marker provider.")
 StdStructMarker      = provider(doc = "Std compiler Struct Marker provider.")
 StdSigMarker         = provider(doc = "Std compiler Sig Marker provider.")
 # CompilerMarker       = provider(doc = "Compiler Marker provider.")

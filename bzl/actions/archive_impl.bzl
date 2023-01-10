@@ -7,7 +7,7 @@ load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
      "new_deps_aggregator",
-     "OcamlArchiveProvider",
+     "StdLibMarker",
      "StdlibLibMarker")
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
@@ -282,6 +282,9 @@ def archive_impl(ctx):
 
     if ctx.attr._rule == "stdlib_library":
         providers.append(StdlibLibMarker())
+
+    if ctx.attr._rule == "compiler_library":
+        providers.append(StdLibMarker())
 
     # print("boot provider:")
     # print(bootProvider)

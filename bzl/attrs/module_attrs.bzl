@@ -3,6 +3,7 @@ load("//bzl:providers.bzl",
      "OcamlLibraryMarker",
      "OcamlSignatureProvider",
      "ModuleInfo",
+     "StdLibMarker",
      "StdlibLibMarker",
      "StdStructMarker",
      "StdSigMarker",
@@ -85,12 +86,10 @@ def module_attrs():
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
             providers = [
-                # [OcamlArchiveProvider],
-                # [OcamlLibraryMarker],
-                # [OcamlSignatureProvider],
                 # [StdStructMarker, ModuleInfo],
                 # [CcInfo]
                 [ModuleInfo],
+                [StdLibMarker]
             ],
             # transition undoes changes that may have been made by ns_lib
             # cfg = compile_deps_out_transition,

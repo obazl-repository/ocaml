@@ -1,12 +1,10 @@
 load("//bzl:providers.bzl",
      "ModuleInfo",
-     "OcamlArchiveProvider",
-     "OcamlLibraryMarker",
+     "StdLibMarker",
+     "StdlibLibMarker",
 )
 
 load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
-
-# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 def exec_common_attrs():
 
@@ -139,9 +137,9 @@ def executable_attrs():
 
         prologue = attr.label_list(
             doc = "List of OCaml dependencies.",
-            providers = [[OcamlArchiveProvider],
-                         [OcamlLibraryMarker],
-                         [ModuleInfo],
+            providers = [[ModuleInfo],
+                         [StdLibMarker],
+                         [StdlibLibMarker],
                          [CcInfo]],
             # cfg = exe_deps_out_transition,
         ),
@@ -157,8 +155,8 @@ def executable_attrs():
 
         epilogue = attr.label_list(
             doc = "List of OCaml dependencies.",
-            providers = [[OcamlArchiveProvider],
-                         [OcamlLibraryMarker],
+            providers = [[StdLibMarker],
+                         [StdlibLibMarker],
                          [ModuleInfo],
                          [CcInfo]],
             # cfg = exe_deps_out_transition,
