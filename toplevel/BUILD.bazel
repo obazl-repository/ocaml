@@ -99,8 +99,7 @@ run_repl(
             "$(rlocationpath :ocaml.byte)"]
 )
 
-#toplevel_expunge(
-#expunge_toplevel(
+alias(name = "ocaml", actual = ":ocaml.byte")
 run_expunger(
     name = "ocaml.byte",
     ocamlrun = "//runtime:ocamlrun",
