@@ -68,7 +68,11 @@ Checkpoint completed.
 
 == tests
 
-Run all supported tests (`bazel test testsuite/tests`).
+Run all supported tests (`bazel test testsuite/tests`). Note that each
+test case (source file) is compiled and run four times, once for each
+of the Big Four compilers. This could of course be optimized. (There
+is one known test failure, due to a problem in the Bazel code which I
+just haven't gotten around to fixing.)
 
 ==== macos
 

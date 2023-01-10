@@ -76,8 +76,6 @@ ruleset is heavily customized for the sole purpose of building the
 OCaml compilers and tools, it is included in this repository and is
 not intended for use as a free-standing ruleset.
 
-More detailed documentation is in link:bzl/docs[bzl/docs].
-
 Why use a minimal ruleset? Several reasons. Bootstrapping requires
 some special support that is never needed for ordinary OCaml builds,
 so we do not want to add that overhead to the standard ruleset. The
@@ -129,21 +127,21 @@ into archive files; this can be changed globally by passing a command-line
 flag. See link:bzl/docs/libraries.adoc[libraries & archives] for more
 information.
 
-Default: `-nopervasives`:: By default the build rules always use
+Nopervasives:: By default the build rules always use
 `-nopervasives`. This requires that otherwise implicit dependencies
 (`stdlib.cmx?a`, `std_exit.cm[o,x]`) be explicitly listed on the
 command line, along with `-open stdlib`.  The rules do this automatically.
 
 Fine-grained dependencies:: All dependencies are expressed as
 dependencies on module, signature, or library dependencies. Libraries
-are archived by default, so a dependency on a library is equivalent to
-(direct) dependencies on each of its dependencies. For example,
-`asmcomp:Asmgen` depends on three `Stdlib` submodules. They rather
-than the (archived) library are listed as dependencies. Along with
-archiveless builds and `-nopervasives` , this means that changing a
-`Stdlib` submodule will _not_ force a rebuild of a stdlib archive and
-thus anything that depends on it. Only targets that depend directly or
-indirectly on the changed code will be rebuilt.
+are not archived by default, so a dependency on a library is
+equivalent to (direct) dependencies on each of its dependencies. For
+example, `asmcomp:Asmgen` depends on three `Stdlib` submodules. They,
+rather than the (archived) library, are listed as dependencies. Along
+with archiveless builds and `-nopervasives` , this means that changing
+a `Stdlib` submodule will _not_ force a rebuild of a stdlib archive
+and thus anything that depends on it. Only targets that depend
+directly or indirectly on the changed code will be rebuilt.
 
 Dependency types:: The Bazel rules also enforce a rudimentary type
 discipline on dependencies. Signatures may only depend on signatures;
@@ -166,12 +164,12 @@ command strings they use to drive the C compiler, assembler, and
 linker. The legacy system uses the `.configure` script to set these
 strings. This introduces a risk, since there is no guarantee that the
 C toolchain detected and used by `.configure` will be the one seen at
-runtime. The Bazel code sets these configurations at build-time rather
-than configure-time; it derives them from the selected Bazel
-toolchain. This guarantees that the correct C toolchain will be used
-at runtime (that is, when the compilers are run under Bazel's
-control). See link:bzl/docs/ocaml_cc_config.adoc[ocamlcc config] for
-more info.
+runtime -- what happens if the user has installed both GCC and Clang?
+The Bazel code sets these configurations at build-time rather than
+configure-time; it derives them from the selected Bazel toolchain.
+This guarantees that the correct C toolchain will be used at runtime
+(that is, when the compilers are run under Bazel's control). See
+link:bzl/docs/ocaml_cc_config.adoc[ocamlcc config] for more info.
 
 Testing support:: The legacy build system uses a custom test tool,
 `ocamltest`, that orchestrates a variety of tasks that are usually
@@ -197,6 +195,13 @@ start by reviewing the link:https://bazel.build/concepts/[Concepts]
 section of the Bazel manual, and perhaps going through one of the
 link:https://bazel.build/start/cpp[build tutorials].
 
+CAUTION: these articles contain a lot of information but they are
+drafts and in some cases are incomplete. You can find more additional
+rough information in link:bzl/docs/notes[].
+
+A good place to start is xref:bzl/docs/terminology.adoc[Terminology &
+Symbols], followed by xref:bzl/docs/build_protocols.adoc[Build Protocols].
+
 Articles:
 
 * xref:bzl/docs/build_protocols.adoc[Build Protocols]
@@ -207,10 +212,9 @@ Articles:
 * xref:bzl/docs/debugging.adoc[Debugging]
 * xref:bzl/docs/diagnostics.adoc[Diagnostics]
 * xref:bzl/docs/dynamics.adoc[Dynamics]
-* xref:bzl/docs/excptions.adoc[Exceptions: warnings & errors]
+// * xref:bzl/docs/exceptions.adoc[Exceptions: warnings & errors]
 * xref:bzl/docs/libraries.adoc[Libraries & Archives]
 * xref:bzl/docs/output_groups.adoc[Output Groups]
-* xref:bzl/docs/rules.adoc[Rules]
 * xref:bzl/docs/performance.adoc[Performance]
 * xref:bzl/docs/preprocessing.adoc[Preprocessing]
 * xref:bzl/docs/primitives.adoc[Primitives]
@@ -222,7 +226,7 @@ Articles:
 * xref:bzl/docs/tools.adoc[Tools]
 * xref:bzl/docs/tool_runners.adoc[Tool runners]
 * xref:bzl/docs/verification.adoc[Verification]
-* xref:bzl/docs/windows.adoc[Windows]
+// * xref:bzl/docs/windows.adoc[Windows]
 * xref:bzl/docs/workflows.adoc[Workflows]
 
 == Goals

@@ -2,6 +2,15 @@
 
 a/k/a `ocaml`
 
-* `//toplevel:ocaml` - std build protocol
-* `@dev//bin:repl` - runs `@dev//bin:ocaml` directly
-* `//test:repl` - test protocol - builds `ocaml` using `@dev//bin:ocamlc.opt`
+* `bazel build //toplevel:ocaml.byte` - builds `ocaml` under standard build protocol
+* `//toplevel:ocaml` - alias for `//toplevel:ocaml.byte`
+* `bazel run //toplevel:repl` - builds and runs `//toplevel:ocaml.byte`
+* `bazel run @dev//bin:repl` - runs `@dev//bin:ocaml` directly (no rebuild)
+* `//test:repl` - builds and runs `ocaml.byte` under the `test`
+  protocol, using `@dev//bin:ocamlc.opt` (not yet implemented)
+
+WARNING: These `bazel run` commands launch the repl from a
+Bazel-controlled directory, _not_ from the directory in which `bazel
+run` was executed. This means that toplevel commands like `#directory`
+and `#use` must use absolute paths. This shortcoming will be addressed
+in a future version.  See also xref:tool_runners.adoc[Tool runners].

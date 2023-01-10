@@ -1,8 +1,50 @@
 = primitives
 
-The Makefiles always(?) construct a `primitives` file, deriving it
-from the C source files (in `//runtime`) that define primitives. It
-uses `-use-prims` to pass this file on most build targets.
+CAUTION: Support for `-use-prims` is disabled pending analysis and design of a
+correct and efficient implementation. That means you won't be able to
+change the primitives under this version. If this is a priority for
+you, please file an issue.
 
-This is inefficient, since `-use-prims` is only required if the
+The legacy build uses a shell script `runtime/gen_primitives.sh` to
+extract (using `sed`) the list of primitives from C source files in
+`runtime`, and uses it to generate some files:
+
+* `runtime/primitives`
+* `runtime/prims.c`
+
+The Makefiles use `-use-prims` to pass `runtime/primitives` to most
+build targets.
+
+This is misleading and inefficient, since `-use-prims` is only required if the
 primitives have changed, and furthermore it is not needed for all build actions.
+
+`rules_ocamlcc` uses `runtime/primitives.json` to generate these files (and
+renames `primitives` to `primitives.dat`).
+
+Proper use of `-use-prims` is still undetermined, so for now we just don't use it.
+
+[WARNING]
+====
+**Objection**: under the legacy build, the C sources are the
+authoritative source of information on primitives. Using
+`runtime/primitives.json` means we now have two sources of info.
+
+**Response 1** We could generate `runtime/primitives.json` at
+  configure-time and use it at build-time, just to eliminate shell
+  scripts and tools from the build process.
+
+**Response 2** We could emit `primitives.h` containing one macro for
+  each primitive and include it in each file defining a primitive. For example instead of (in alloc.c)
+
+  CAMLprim value caml_alloc_dummy(value size)
+
+we could have something like
+
+  CAMLprim_alloc_dummy(value size)
+
+with `CAMLprim_alloc_dummy` a macro that expands appropriately. But I
+guess that does not really buy us anything.
+
+
+**Response 3** We could also templatize the c sources in some manner
+====

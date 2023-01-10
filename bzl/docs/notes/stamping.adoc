@@ -1,0 +1,6 @@
+= version stamping
+
+link:https://bazel.build/docs/user-manual#workspace-status[Workspace status] (Bazel doc)
+
+link:https://docs.aspect.build/rules/aspect_bazel_lib/docs/stamping/[Version stamping] from Aspect
+
