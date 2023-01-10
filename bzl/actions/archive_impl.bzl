@@ -7,7 +7,8 @@ load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
      "new_deps_aggregator",
-     "OcamlArchiveProvider")
+     "OcamlArchiveProvider",
+     "StdlibLibMarker")
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
@@ -248,10 +249,6 @@ def archive_impl(ctx):
     )
     newDefaultInfo = DefaultInfo(files = defaultDepset)
 
-    ocamlArchiveProvider = OcamlArchiveProvider(
-        # manifest = manifest_depset
-    )
-
     ## now add archive to link_deps
     cli_link_deps_depset = depset(
         order = dsorder,
@@ -277,8 +274,14 @@ def archive_impl(ctx):
     providers = [
         newDefaultInfo,
         bootProvider,
-        ocamlArchiveProvider
+        # ocamlArchiveProvider
     ]
+    # ocamlArchiveProvider = OcamlArchiveProvider(
+    #     # manifest = manifest_depset
+    # )
+
+    if ctx.attr._rule == "stdlib_library":
+        providers.append(StdlibLibMarker())
 
     # print("boot provider:")
     # print(bootProvider)

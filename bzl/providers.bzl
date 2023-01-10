@@ -221,6 +221,8 @@ StdStructMarker      = provider(doc = "Std compiler Struct Marker provider.")
 StdSigMarker         = provider(doc = "Std compiler Sig Marker provider.")
 # CompilerMarker       = provider(doc = "Compiler Marker provider.")
 # CompilerSigMarker    = provider(doc = "Compiler Sig Marker provider.")
+
+StdlibLibMarker   = provider(doc = "Stdlib library Marker provider.")
 StdlibStructMarker   = provider(doc = "Stdlib Struct Marker provider.")
 StdlibSigMarker      = provider(doc = "Stdlib Sig Marker provider.")
 TestExecutableMarker = provider(doc = "Test Executable Marker provider.")
