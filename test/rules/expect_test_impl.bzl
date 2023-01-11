@@ -3,6 +3,8 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
+load("//bzl:providers.bzl", "HybridExecutableMarker")
+
 ## expect_test
 
 ## builds an executable and runs it
@@ -17,12 +19,12 @@ def expect_test_impl(ctx):
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
-    if tc.config_executor in ["boot", "baseline", "vm"]:
-        ext      = ".byte"
-    else:
-        ext      = ".opt"
+    # if tc.config_executor in ["boot", "baseline", "vm"]:
+    #     ext      = ".byte"
+    # else:
+    #     ext      = ".opt"
 
-    exe_name = ctx.label.name + ext
+    # exe_name = ctx.label.name + ext
 
     ## FIXME: ocamltest diffs both the compiler stderr/stdout, and the
     ## stdout/stderr of the compiled test case executable.
@@ -36,10 +38,13 @@ def expect_test_impl(ctx):
     ## see compiler_fail_test.bzl for starters
 
     # exe = executable_impl(ctx, tc, exe_name, tc.workdir)
-    exe = ctx.file.test_executable
+    # pgm = exe[0].files.to_list()[0]
+    pgm = ctx.file.test_executable
 
     if debug:
-        print("exe: %s" % exe)
+        print("pgm: %s" % pgm)
+        if HybridExecutableMarker in ctx.attr.test_executable:
+            print("hybrid!")
         print("tc.config_executor: %s" % tc.config_executor)
         print("tc.config_emitter: %s" % tc.config_emitter)
 
@@ -48,17 +53,18 @@ def expect_test_impl(ctx):
         #     print("RF: %s" % f)
         print("OCAMLRUN: %s" % tc.ocamlrun)
 
-    # pgm = exe[0].files.to_list()[0]
-    pgm = ctx.file.test_executable
-
     if tc.config_executor in ["boot", "baseline","vm"]:
         if tc.config_emitter == "sys":
             ocamlrun = None
             ocamlrun_path = ""
             pgm_cmd = pgm.short_path
         else:
-            ocamlrun_path = tc.ocamlrun.short_path
-            pgm_cmd = tc.ocamlrun.short_path + " ocamlcc/" + pgm.short_path
+            if HybridExecutableMarker in ctx.attr.test_executable:
+                ocamlrun_path = ""
+                pgm_cmd = pgm.short_path
+            else:
+                ocamlrun_path = tc.ocamlrun.short_path
+                pgm_cmd = tc.ocamlrun.short_path + " ocamlcc/" + pgm.short_path
     else:
         if tc.config_emitter == "sys":
             ocamlrun = None

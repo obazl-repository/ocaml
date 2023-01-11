@@ -190,6 +190,12 @@ To fully specify a build target we need to specify all three parts.  The form is
 This level of explicitness is only needed for cross-compilation. For
 local builds, `<runtime>_` may be omitted.
 
+WARNING: This schema unfortunately breaks down if we use a vm emitter
+with `-custom` to link an executable. In that case the output will be
+a vm/sys hybrid that can be run directly from the command line without
+`ocamlrun`. Haven't figured out what to do about that yet. Another
+emitter type? "h" for "hybrid"?
+
 === standard compiler names:
 
 Standard naming schema: `ocaml<emitter>.<executor>`, where `<emitter>`

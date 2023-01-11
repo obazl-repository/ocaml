@@ -1,50 +1,332 @@
+## Purpose: test dynamic linking to module with external sym dep
 
+## Driver routines use dynlink lib to dynamically load plugins that
+## call functions implemented in C. The C code can be linked either
+## statically or dynamically. If dynamically, then the dynamic loader
+## must load the dll*.so shared library, which must be located where
+## the loader can find it.
+
+## There are two drivers, Main and Registry. We have two sets of tests
+## for each: one for static linking and one for dynamic linking. Each
+## set in turn includes a test for each of the (VM-emitting)compilers.
 
 load("//test:rules.bzl",
+     "test_executable",
+     "test_library",
      "test_module",
+
+     "vv_test_executable",
+     "vs_test_executable",
+     "ss_test_executable",
+     "sv_test_executable",
+
+     "expect_test",
+     "expect_vv_test",
+     "expect_vs_test",
+     "expect_ss_test",
+     "expect_sv_test",
 )
 
-MODULE_OPTS = []
+load("//bzl/rules:COMPILER.bzl",
+     "MACOS_CC_UDEBUG_HACK",
+     "OCAML_COMPILER_OPTS")
 
-test_suite(
-    name = "testsuite_tests_lib-dynlink-bytecode_lib",
-    tests  = [
-        ":Main",
-        ":Plug1",
-        ":Plug2",
+# test_suite(
+#     name = "testsuite_tests_lib-dynlink-bytecode_lib",
+#     tests  = [
+#         ":Main",
+#         ":Plug1",
+#         ":Plug2",
+#         ":Registry",
+#     ],
+# )
+
+
+# test_executable(
+#     name    = "main",
+#     main    = ":Main",
+# )
+
+sh_binary(
+    name = "Main.vv.byte.sh",
+    srcs = ["//test/rules:test_executable.sh"],
+    env  = select({
+        "//test:verbose?": {"VERBOSE": "true"},
+        "//conditions:default": {"VERBOSE": "false"}
+    }),
+    args = [
+        "$(rootpath //runtime:ocamlrun)",
+        "$(rootpath :Main.vv.byte)",
+        "$(rootpath :plug1_lib)",
+        "$(rootpath :plug2_lib)",
+    ],
+    data = [
+        "//runtime:ocamlrun",
+        ":Main.vv.byte",
+        ":plug1_lib",
+        ":dllplug1.so",
+        ":plug2_lib",
+        ":dllplug2.so"
+    ],
+    deps = ["@bazel_tools//tools/bash/runfiles"]
+)
+
+# test_executable macro expansion:
+vv_test_executable(
+    name    = "Main.vv.opt",
+    prologue= [
+        ## FIXME: these all should come from :Main
+        "//stdlib",
+        "//otherlibs/dynlink",
         ":Registry",
     ],
+    main    = ":Main",
+    # opts = ["-custom"],
+    epilogue = [
+        ":dllplug1.so",
+        ":dllplug2.so",
+        # ":plug1_lib",
+        # ":plug2_lib",
+    ],
+)
+
+vs_test_executable(
+    name    = "Main.vs.opt",
+    prologue= [
+        "//stdlib",
+        "//otherlibs/dynlink",
+        ":Registry",
+        ":plug1_lib",
+        ":plug2_lib",
+    ],
+    main    = ":Main",
+    # args = ["plug1_lib", "plug2_lib"],
+    opts  = OCAML_COMPILER_OPTS # + ["-custom"]
 )
 
 test_module(
     name   = "Main",
     struct = "main.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//otherlibs/dynlink",
+        ":Registry"
+    ],
+    stdlib_deps   = ["//stdlib:Stdlib.Marshal"]
+)
+
+################################################################
+## Case 2:  Registry
+
+#  The main module Registry does not call the plugins; they call it.
+#  This means that they must be linked after Registry module. The
+#  Bazel executable rules provide attributes prologue, main, and
+#  epilogue as a convenience, to make the link ordering explicit.
+################################################################
+## static link
+## by default no archives
+## enable archiving with --//config/ocaml/compiler/libs:archived
+## of --larch (flag alias in .bazelrc)
+
+## the test runner:
+expect_vv_test(
+    name    = "Registry_vvs_test",
+    test_executable = ":Registry.vv.custom",
+    stdout  = "registry.stdout",
+    expected = "static.reference",
+    timeout  = "short",
+    tags     = ["vv", "dynlink", "ccdeps"],
+)
+
+## build and run this to see stdout w/o test machinery
+vv_test_executable(
+    ## WARNING: this target uses ocamlc.byte with -custom, so it emits
+    ## a hybrid vm/sys executable that can be run directly from the
+    ## cmd line, w/o ocamlrun. Hence the "custom" extension.
+    name    = "Registry.vv.custom",
+    prologue= [
+        ## FIXME: these are indirect deps of main, they should be
+        ## added automatically
+        "//stdlib",
+        "//otherlibs/dynlink",
+    ],
+    main    = ":Registry",
+    epilogue = [
+        ":plug1_lib",
+        ":plug2_lib",
+    ],
+    opts = ["-linkall"],
+    ocamlrun = "//runtime:ocamlrun"
+ )
+
+test_module(
+    name   = "Registry",
+    struct = "registry.ml",
+    stdlib_deps   = ["//stdlib:Primitives"],
+)
+
+################################################################
+## Plugins
+################################################################
+test_library(
+    name  = "plug1_lib",
+    cmxa_eligible = True,
+    manifest = [
+        ":Plug1",
     ]
 )
 
 test_module(
     name   = "Plug1",
     struct = "plug1.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    deps = [
+        ":Registry",
+    ],
+    cc_deps = select({
+        "//config/ocaml/test/vmruntime:custom?": [":stub1"],
+        "//config/ocaml/test/vmruntime:dynamic?": ["dllplug1.so"],
+        "//conditions:default": [":stub1"]
+    }),
+    opts = ["-linkall"],
+    stdlib_deps   = ["//stdlib:Primitives"]
+)
+
+## Because linkstatic=True, this will produce libstub1.so
+cc_library(
+    name = "stub1",
+    linkstatic = True,
+    srcs = [
+        "stub1.c",
+        "//runtime/caml:alloc.h",
+        "//runtime/caml:camlatomic.h",
+        "//runtime/caml:config.h",
+        "//runtime/caml:domain.h",
+        # "//runtime/caml:domain_state.h",
+        "//runtime/caml:m.h",
+        "//runtime/caml:memory.h",
+        "//runtime/caml:misc.h",
+        "//runtime/caml:mlvalues.h",
+        "//runtime/caml:s.h",
+        "//runtime/caml:signals.h",
+    ],
+    # we need this dep to get domain_state.h for mlvalues.h,
+    # since domain_state.h is a CcInfo dep (delivered by cc_mustache),
+    # unlike caml/s.h, which is produced by a genrule
+    deps = ["//runtime/caml:domain_state_h"],
+    copts= [
+        "-Iruntime",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
+    ] + MACOS_CC_UDEBUG_HACK,
+)
+
+## Because linkshared=True, this will produce dllplug1.so
+cc_binary(
+    name = "dllplug1.so",
+    linkshared = True,
+    srcs = [
+        "stub1.c",
+        "//runtime/caml:alloc.h",
+        "//runtime/caml:camlatomic.h",
+        "//runtime/caml:config.h",
+        "//runtime/caml:domain.h",
+        # "//runtime/caml:domain_state.h",
+        "//runtime/caml:m.h",
+        "//runtime/caml:memory.h",
+        "//runtime/caml:misc.h",
+        "//runtime/caml:mlvalues.h",
+        "//runtime/caml:s.h",
+        "//runtime/caml:signals.h",
+    ],
+    # we need this dep to get domain_state.h for mlvalues.h,
+    # since domain_state.h is a CcInfo dep (delivered by cc_mustache),
+    # unlike caml/s.h, which is produced by a genrule
+    deps = ["//runtime/caml:domain_state_h"],
+    copts= [
+        "-Iruntime",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
+    ] + MACOS_CC_UDEBUG_HACK,
+)
+
+################################################################
+test_library(
+    name  = "plug2_lib",
+    cmxa_eligible = True,
+    manifest = [
+        ":Plug2",
     ]
 )
 
 test_module(
     name   = "Plug2",
     struct = "plug2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [":Registry"],
+    cc_deps = select({
+        "//config/ocaml/test/vmruntime:custom?": [":stub2"],
+        "//config/ocaml/test/vmruntime:dynamic?": ["dllplug2.so"],
+        "//conditions:default": [":stub2"]
+    }),
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
-test_module(
-    name   = "Registry",
-    struct = "registry.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+cc_library(
+    name = "stub2",
+    linkstatic = True,
+    srcs = [
+        "stub2.c",
+        "//runtime/caml:alloc.h",
+        "//runtime/caml:camlatomic.h",
+        "//runtime/caml:config.h",
+        "//runtime/caml:domain.h",
+        # "//runtime/caml:domain_state.h",
+        "//runtime/caml:m.h",
+        "//runtime/caml:memory.h",
+        "//runtime/caml:misc.h",
+        "//runtime/caml:mlvalues.h",
+        "//runtime/caml:s.h",
+        "//runtime/caml:signals.h",
+    ],
+    # we need this dep to get domain_state.h for mlvalues.h,
+    # since domain_state.h is a CcInfo dep (delivered by cc_mustache),
+    # unlike caml/s.h, which is produced by a genrule
+    deps = ["//runtime/caml:domain_state_h"],
+    copts= [
+        "-Iruntime",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
+    ] + MACOS_CC_UDEBUG_HACK
 )
+
+cc_binary(
+    name = "dllplug2.so",
+    linkshared = True,
+    srcs = [
+        "stub2.c",
+        "//runtime/caml:alloc.h",
+        "//runtime/caml:camlatomic.h",
+        "//runtime/caml:config.h",
+        "//runtime/caml:domain.h",
+        # "//runtime/caml:domain_state.h",
+        "//runtime/caml:m.h",
+        "//runtime/caml:memory.h",
+        "//runtime/caml:misc.h",
+        "//runtime/caml:mlvalues.h",
+        "//runtime/caml:s.h",
+        "//runtime/caml:signals.h",
+    ],
+    # we need this dep to get domain_state.h for mlvalues.h,
+    # since domain_state.h is a CcInfo dep (delivered by cc_mustache),
+    # unlike caml/s.h, which is produced by a genrule
+    deps = ["//runtime/caml:domain_state_h"],
+    copts= [
+        "-Iruntime",
+        "-Iruntime/caml",
+        "-I$(GENDIR)/runtime",
+        "-I$(GENDIR)/runtime/caml",
+    ] + MACOS_CC_UDEBUG_HACK
+)
+
 

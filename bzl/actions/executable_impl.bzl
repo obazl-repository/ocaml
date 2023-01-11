@@ -14,6 +14,7 @@ load("//bzl:providers.bzl",
      "new_deps_aggregator",
      "OcamlExecutableMarker",
      "OcamlTestMarker",
+     "HybridExecutableMarker",
      "TestExecutableMarker"
 )
 
@@ -246,19 +247,22 @@ def executable_impl(ctx, tc, exe_name,
         ## OCaml cc link subcmd
 
         # print("runtime files: %s" % runtime_files)
-    elif "-custom" in ctx.attr.opts:
-        # for f in ctx.files._runtime:  # libcamlrun.a
-        # for f in tc.runtime:  # libcamlrun.a
-            # print("tc.RUNTIME: %s" % f)
-            # runtime_files.append(f)
-            # # will add -L<f.dirname> below
-            # cc_libdirs.append(f.dirname)
-        print("custom tc.RUNTIME: %s" % tc.runtime)
-        runtime_files.append(tc.runtime)
-        ## add tc.runtime.path to args?
-        # will add -L<f.dirname> below
-        # cc_libdirs.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
-        cc_libdirs.append(tc.runtime.dirname)
+
+    ## WARNING: -custom automatically added if we have a static cc dep
+    # elif "-custom" in ctx.attr.opts:
+    #     # for f in ctx.files._runtime:  # libcamlrun.a
+    #     # for f in tc.runtime:  # libcamlrun.a
+    #         # print("tc.RUNTIME: %s" % f)
+    #         # runtime_files.append(f)
+    #         # # will add -L<f.dirname> below
+    #         # cc_libdirs.append(f.dirname)
+    #     print("custom tc.RUNTIME: %s" % tc.runtime)
+    #     runtime_files.append(tc.runtime)
+    #     ## add tc.runtime.path to args?
+    #     # will add -L<f.dirname> below
+    #     # cc_libdirs.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
+    #     cc_libdirs.append(tc.runtime.dirname)
+
     else:  # stem != ocamlc
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
         runtime_path = tc.runtime.path
@@ -531,13 +535,14 @@ def executable_impl(ctx, tc, exe_name,
         print("static_cc_deps:  %s" % static_cc_deps)
         print("dynamic_cc_deps: %s" % dynamic_cc_deps)
 
-     # from rules_ocaml:
+    vmruntime_custom = False
     cclib_linkpaths = []
     ## FIXME: find a better way to determine target executor:
     if stem in ["ocamlc", "ocamlcp"]:
         # FIXME: if cc deps are encoded in archive files we do not
         # need this...
         if len(static_cc_deps) > 0:
+            vmruntime_custom = True
             args.add("-custom")
             # args.add("-use-runtime")
             # args.add(ctx.file.ocamlrun)
@@ -660,11 +665,13 @@ def executable_impl(ctx, tc, exe_name,
         # fail()
     mnemonic = rule_mnemonic(ctx)
 
+    executable = tc.executable
+
     ################
     ctx.actions.run(
         # env = {"DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
         #        "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"},
-        executable = tc.executable.path,
+        executable = executable.path,
         arguments = [args],
         inputs = inputs_depset,
         outputs = [out_exe],
@@ -757,10 +764,15 @@ def executable_impl(ctx, tc, exe_name,
         exe_provider = OcamlExecutableMarker()
     # elif ctx.attr._rule == "boot_executable":
     #     exe_provider = OcamlExecutableMarker()
+
     elif ctx.attr._rule in ["test_executable",
                             "vv_test_executable",
                             "ss_test_executable"]:
-        exe_provider = TestExecutableMarker()
+        if vmruntime_custom:
+            exe_provider = HybridExecutableMarker()
+        else:
+            exe_provider = TestExecutableMarker()
+
     elif ctx.attr._rule == "bootstrap_repl":
         exe_provider = OcamlExecutableMarker()
     # elif ctx.attr._rule == "baseline_test":

@@ -228,6 +228,8 @@ StdSigMarker         = provider(doc = "Std compiler Sig Marker provider.")
 StdlibLibMarker   = provider(doc = "Stdlib library Marker provider.")
 StdlibStructMarker   = provider(doc = "Stdlib Struct Marker provider.")
 StdlibSigMarker      = provider(doc = "Stdlib Sig Marker provider.")
+
+HybridExecutableMarker = provider(doc = "Marks vm executables built with -custom.")
 TestExecutableMarker = provider(doc = "Test Executable Marker provider.")
 
 ################################################################

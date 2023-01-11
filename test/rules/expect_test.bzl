@@ -1,6 +1,8 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:providers.bzl", "ModuleInfo", "TestExecutableMarker")
+load("//bzl:providers.bzl",
+     "ModuleInfo",
+     "HybridExecutableMarker", "TestExecutableMarker")
 
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
 load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
@@ -40,7 +42,7 @@ expect_vv_test = rule(
             doc = "Label of test executable.",
             mandatory = True,
             allow_single_file = True,
-            providers = [[TestExecutableMarker]],
+            providers = [[TestExecutableMarker], [HybridExecutableMarker]],
             default = None,
             # cfg = exe_deps_out_transition,
         ),
@@ -169,7 +171,7 @@ expect_sv_test = rule(
             doc = "Label of test executable.",
             mandatory = True,
             allow_single_file = True,
-            providers = [[TestExecutableMarker]],
+            providers = [[TestExecutableMarker], [HybridExecutableMarker]],
             default = None,
             # cfg = exe_deps_out_transition,
         ),
