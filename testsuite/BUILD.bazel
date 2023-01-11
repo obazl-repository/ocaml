@@ -1,0 +1,13 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+
+# build the lib targets used to construct compilers
+build_test(
+    name = "libs",
+    targets = [
+        "//asmcomp:ocamloptcomp",
+        "//bytecomp:ocamlbytecomp",
+        "//bytecomp:ocamlcommon",
+        "//compilerlibs:ocamlcommon",
+        "//driver:ocamlcommon"
+    ],
+)

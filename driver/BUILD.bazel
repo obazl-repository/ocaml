@@ -50,7 +50,10 @@ compiler_library(
         ":Makedepend",
         ":Pparse",
     ],
-    visibility = ["//compilerlibs:__pkg__"]
+    visibility = [
+        "//compilerlibs:__pkg__",
+        "//testsuite:__pkg__"
+    ]
 )
 
 ## compilerlibs/Makefile.compilerlibs
