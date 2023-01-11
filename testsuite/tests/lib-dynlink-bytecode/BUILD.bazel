@@ -10,6 +10,16 @@
 ## for each: one for static linking and one for dynamic linking. Each
 ## set in turn includes a test for each of the (VM-emitting)compilers.
 
+## Static: we have several ways of integrating static C libs:
+##  A. directly on the link cmd line, with -custom
+##  B. indirectly, by registering cc dep metadata in archive files:
+##     i. both the cclib (& path) and -custom registered with archive
+##     ii. only the cclib registered, & -custom is added to link cmd line
+
+## So all methods require the use of -custom; methods A and B.ii put
+## it explicitly on the cmd line; method B.i relies on the linker to
+## add it behind the scenes.
+
 load("//test:rules.bzl",
      "test_executable",
      "test_library",
@@ -47,6 +57,17 @@ load("//bzl/rules:COMPILER.bzl",
 #     main    = ":Main",
 # )
 
+################################################################
+## Case 2:  Main
+
+## Main calls Registry, then uses dynlink to load plugin archives
+## passed on cmd line. The plugins also call Registry, and depend on
+## cc libs.
+
+## This case uses dynamic linking for the cc deps, in contrast to the
+## Registry case (below), which uses static linking.
+
+################################################################
 sh_binary(
     name = "Main.vv.byte.sh",
     srcs = ["//test/rules:test_executable.sh"],
@@ -154,7 +175,7 @@ vv_test_executable(
         ":plug1_lib",
         ":plug2_lib",
     ],
-    opts = ["-linkall"],
+    opts = ["-linkall", "-verbose"],
     ocamlrun = "//runtime:ocamlrun"
  )
 
@@ -170,6 +191,7 @@ test_module(
 test_library(
     name  = "plug1_lib",
     cmxa_eligible = True,
+    opts = ["-custom", "-verbose"],
     manifest = [
         ":Plug1",
     ]
@@ -253,6 +275,7 @@ cc_binary(
 ################################################################
 test_library(
     name  = "plug2_lib",
+    opts = ["-custom", "-verbose"],
     cmxa_eligible = True,
     manifest = [
         ":Plug2",

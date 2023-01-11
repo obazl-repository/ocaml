@@ -542,16 +542,27 @@ def executable_impl(ctx, tc, exe_name,
         # FIXME: if cc deps are encoded in archive files we do not
         # need this...
         if len(static_cc_deps) > 0:
-            vmruntime_custom = True
-            args.add("-custom")
+            # vmruntime_custom = True
+
+            ## FIXME: if -custom was passed in building an archive (so
+            ## it has "Force custom: YES") then we do not need to pass
+            ## it explicitly here. But how can we determine if "Force
+            ## custom" is enabled in an archive?
+
+            # args.add("-custom")
+
             # args.add("-use-runtime")
             # args.add(ctx.file.ocamlrun)
+            # args.add("-I", ctx.file.ocamlrun.dirname)
 
             sincludes = []
             includes = []
             for dep in static_cc_deps:
 
-                ## CASE: no archives? then add dep to cmd line
+                ## CASE: no archives? then add dep and -I dir to cmd line
+
+                if not ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+                    args.add(dep.path)
 
                 ## CASE: libs archived? then cc deps are encoded in
                 ## archive files, so do not add lib to cmd line, but
@@ -560,11 +571,7 @@ def executable_impl(ctx, tc, exe_name,
                 ## does no harm, it just duplicates info already in
                 ## the archive metadata
 
-                if not ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
-                    args.add(dep.path)
-
                 includes.append(dep.dirname)
-
 
             #     bn = dep.basename[3:] # drop initial 'lib'
             #     bn = bn[:-2]  # drop final '.a'
