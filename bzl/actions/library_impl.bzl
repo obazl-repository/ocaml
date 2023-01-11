@@ -4,7 +4,8 @@ load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
      "new_deps_aggregator",
-     "OcamlLibraryMarker")
+     "StdLibMarker",
+     "StdlibLibMarker")
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
 
@@ -138,10 +139,8 @@ def library_impl(ctx):
 
     providers = [
         defaultInfo,
-        # outputGroupInfo,
         bootProvider,
         ccInfo_provider,
-        OcamlLibraryMarker(marker = "OcamlLibraryMarker")
     ]
 
     if ctx.attr._rule == "stdlib_library":
