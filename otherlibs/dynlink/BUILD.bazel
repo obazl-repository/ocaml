@@ -49,6 +49,7 @@ SIG_OPTS    = []
 
 compiler_library(
     name = "dynlink",
+    cmxa_eligible = True,
     manifest  = [
         ":Dynlink",             # selected, byte or native
         ":Dynlink_common",
@@ -58,7 +59,10 @@ compiler_library(
         ":pack_dynlink":  [":compilerlibs_packed"],
         "//conditions:default"   :  [":compilerlibs"],
     }),
-    visibility = ["//debugger:__pkg__"]
+    visibility = [
+        "//debugger:__pkg__",
+        "//testsuite/tests:__subpackages__"
+    ]
 )
 
 
@@ -68,7 +72,6 @@ compiler_library(
 #   typing/outcometree.mli \
 #   file_formats/cmo_format.mli \
 #   file_formats/cmxs_format.mli
-
 
 
 config_setting(
@@ -96,7 +99,11 @@ compiler_module(
     }),
     sig    = "Dynlink_cmi",
     opts = MODULE_OPTS,
-    sig_deps = ["Dynlink_compilerlibs.Cmo_format_cmi"],
+    sig_deps = [
+        "Dynlink_compilerlibs.Cmo_format_cmi",
+        ## if emitter == sys
+        ":Dynlink_compilerlibs.Cmxs_format_cmi",
+    ],
     deps   = [
         ":Dynlink_compilerlibs.Config",
         ":Dynlink_common",
@@ -130,7 +137,7 @@ compiler_module(
         # "//platform/constraints/ocaml/emitter:sys_emitter?": [
         "//config/target/executor:sys_executor?": [
         # "//toolchain/target/executor:sys_executor?": [
-            # ":Dynlink_compilerlibs.Cmxs_format_cmi",
+            ":Dynlink_compilerlibs.Cmxs_format_cmi",
             # "//stdlib:Stdlib.Filename",
         ]
     # }) + select({

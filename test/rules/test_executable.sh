@@ -42,7 +42,7 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
 # --- end runfiles.bash initialization v2 ---
 
 # echo "MANIFEST: ${RUNFILES_MANIFEST_FILE}"
-# echo "`cat ${RUNFILES_MANIFEST_FILE}`"
+echo "`cat ${RUNFILES_MANIFEST_FILE}`"
 
 # OCAMLRUN=""
 RUNTIMEDIR=""
@@ -53,6 +53,8 @@ WD=_boot
 # echo "STDLIB_RLOC: $STDLIB_RLOC"
 # STDLIBDIR=$(dirname $(rlocation $STDLIB_RLOC))
 
+OCAMLRUN="$(rlocation ocamlcc/runtime/ocamlrun)"
+
 # OCAMLRUN=runtime/ocamlrun
 # TESTEXE=$BINDIR/ocamlc.byte
 # CAMLHEADERS="-I `dirname $(rlocation ocamlcc/config/camlheaders/camlheader)`"
@@ -60,8 +62,13 @@ WD=_boot
 
 # CMD="$OCAMLRUN $TESTEXE_PATH -nostdlib -I $STDLIBDIR $CAMLHEADERS -I $RUNTIMEDIR $@"
 
-CMD="$OCAMLRUN $TESTEXE_PATH $@"
+LIBDIR="$(rlocation ocamlcc/testsuite/tests/lib-dynlink-bytecode/dllplug1.so)"
+LIBDIR="$(dirname $LIBDIR)"
+LIBDIR="testsuite/tests/lib-dynlink-bytecode"
 
+LDPATH=$LIBDIR
+
+CMD="CAML_LD_LIBRARY_PATH=$LDPATH $OCAMLRUN $TESTEXE_PATH $@"
 
 if [ $VERBOSE = "true" ]
 then

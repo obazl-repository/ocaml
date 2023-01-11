@@ -33,18 +33,21 @@ test_module_ = rule(
         #     doc = "The compiler always opens Stdlib, so everything depends on it.",
         #     default = "//stdlib:Stdlib"
         # ),
-        # _allowlist_function_transition = attr.label(
-        #     default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        # ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
         _rule = attr.string( default = "test_module" ),
     ),
     ## Should not be run as direct CLI build, only as a dep of
     ## toplevel test rule, which sets config. (?)
-    # cfg = vv_test_in_transition,
+
+    ## cfg must match that of test executable rules, otherwise we may
+    ## get the dreaded Interface mismatch (for e.g. Stdlib)
+    cfg = vv_test_in_transition,
     provides = [BootInfo,ModuleInfo],
     executable = False,
-    # fragments = ["platform", "cpp"],
-    # host_fragments = ["platform",  "cpp"],
+    fragments = ["platform", "cpp"],
+    host_fragments = ["platform",  "cpp"],
     # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",

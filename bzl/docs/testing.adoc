@@ -1,13 +1,13 @@
-= testing
+= Testing
 :toc: auto
 :toclevels: 3
 
-== quickstart
+== Quickstart
 
 TIP: By default the test runner will halt at the first error. Pass
 `--keep_going` to keep going.
 
-=== running tests
+=== Running tests
 
 Test target names are constructed from filename stems normalized to
 module names; they always have suffix `_test`. For example, from
@@ -48,7 +48,7 @@ this target builds all the compilers, builds all the tests, and runs all the tes
 
   ** `$ bazel test testsuite/tests/basic:Arrays_test --test_tag_filters=vv,ss`
 
-=== building, linking, and running test executables
+=== Building, linking, and running test executables
 
 Bazel test rules (like our `expect_test`, `ocaml_test` etc.) must emit
 an executable, which the Bazel test machinery will then run. The
@@ -176,8 +176,6 @@ with the listed tags.  Currently we use the following tags:
   ** `inline_expect`
   ** `vv` - tests built using the ocamlc.byte compiler
   ** `ss` -  tests built using the ocamlopt.opt compiler
-  ** `vvss` -  tests built using either ocamlc.byte or ocamlopt.opt
-
 
 === rule: ocaml_test
 

@@ -18,7 +18,7 @@ def _run_tool_impl(ctx):
     # tgt = ctx.expand_location(
     #     "$(location {})".format(ctx.attr.arg))
     #     # [ctx.attr.arg])
-    tgt = ctx.file.arg
+    tgt = ctx.files.arg[0]
     print("TGT %s" % tgt)
 
         # elif OcamlArchiveProvider in ctx.attr.arg:
@@ -70,8 +70,8 @@ def _run_tool_impl(ctx):
 
     myrunfiles = ctx.runfiles(
         files = [
-            ctx.file.tool, ctx.file.arg
-        ],
+            ctx.file.tool
+        ] + ctx.files.arg,
         transitive_files =  depset(
             transitive = [
                 ctx.attr.tool[DefaultInfo].default_runfiles.files,
@@ -99,7 +99,7 @@ run_tool = rule(
             allow_single_file = True,
         ),
         arg = attr.label(
-            allow_single_file = True,
+            # allow_single_file = True,
             default = "//:arg"
         ),
         _verbose = attr.label(

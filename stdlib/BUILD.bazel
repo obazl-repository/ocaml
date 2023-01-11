@@ -1751,6 +1751,7 @@ kernel_module(
     name   = "Std_exit",
     struct = "std_exit.ml",
     sig    = ":Std_exit_cmi",
+    ## std_exit depends on 'do_at_exit' which is defined in Stdlib
     stdlib_deps   = [":Stdlib"]
 )
 

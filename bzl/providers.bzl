@@ -147,6 +147,7 @@ BootInfo, _new_ocamlbootinfo = provider(
 ##########################
 DepsAggregator = provider(
     fields = {
+        "stdlib"  : "either Stdlib.cmo/x or stdlib.cmx?a",
         "deps"    : "struct of BootInfo providers",
         "ccinfos" : "list of CcInfo providers",
     }
@@ -154,6 +155,7 @@ DepsAggregator = provider(
 
 def new_deps_aggregator():
     return DepsAggregator(
+        stdlib = None,
         deps = BootInfo(
             sigs          = [],
             structs       = [],

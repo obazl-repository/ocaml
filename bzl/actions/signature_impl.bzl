@@ -402,7 +402,8 @@ def signature_impl(ctx, module_name):
 
     if ctx.attr._rule in [
         "compiler_signature",
-        "ns_signature"
+        "ns_signature",
+        "test_signature"
     ]:
         providers.append(StdSigMarker())
 

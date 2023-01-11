@@ -761,8 +761,9 @@ def module_impl(ctx, module_name):
 
     if debug_ccdeps:
         dump_CcInfo(ctx, ccInfo_provider)
-        print("Dumping ccInfo_provider: %s" % ccinfo_to_string(ctx, ccInfo_provider))
-        print("Module provides: %s" % ccInfo_provider)
+        print("Dumping ccInfo_provider for %s" % ctx.label)
+        print("%s" % ccinfo_to_string(ctx, ccInfo_provider))
+        # print("Module provides: %s" % ccInfo_provider)
 
     if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):

@@ -77,6 +77,11 @@ def rule_mnemonic(ctx):
             mnemonic = "Archiving stdlib library"
         else:
             mnemonic = "Packaging stdlib library"
+    elif rule == "test_library":
+        if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+            mnemonic = "Archiving test lib"
+        else:
+            mnemonic = "Packaging test lib"
     else:
         fail(rule)
 

@@ -112,6 +112,21 @@ def executable_impl(ctx, tc, exe_name,
     if ctx.attr.main:
         depsets = aggregate_deps(ctx, ctx.attr.main, depsets, manifest)
 
+    for dep in ctx.attr.epilogue:
+        ## FIXME: need we to check to see if Stdlib is an indirect dep?
+        depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        # depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        if dep.label.name in ["Stdlib", "Primitives"]:
+            open_stdlib = True
+            stdlib_module_target = dep
+        elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
+            open_stdlib = True
+        elif dep.label.name == "stdlib": ## stdlib archive OR library
+            open_stdlib = True
+            stdlib_library_target = dep
+            ##FIXME: make sure stdlib.cmx?a gets added to inputs and runfiles
+
+
     sigs_depset = depset(
         order=dsorder,
         transitive = [merge_depsets(depsets, "sigs")])
@@ -388,7 +403,63 @@ def executable_impl(ctx, tc, exe_name,
     #         # cmd_args.append("-I")
     #         # cmd_args.append(paths.dirname(stdlibs[0]))
 
-    args.add_all(includes, before_each="-I", uniquify=True)
+    ## hack for test typing-missing-cmi:
+    for inc in includes:
+        if inc.find("subdir") < 0:  ## not found
+            args.add("-I", inc)
+    # args.add_all(includes, before_each="-I", uniquify=True)
+
+   ################################################################
+    ## cc deps other than runtimes (e.g. libcamlstr, libunix, etc.)
+    ################################################################
+    if debug_ccdeps:
+        dump_CcInfo(ctx, ccInfo_provider)
+        print("%s" % ccinfo_to_string(ctx, ccInfo_provider))
+    ## to construct cmd line we need to extract the cc files from
+    ## merged CcInfo provider:
+    [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
+    if debug_ccdeps:
+        print("static_cc_deps:  %s" % static_cc_deps)
+        print("dynamic_cc_deps: %s" % dynamic_cc_deps)
+
+     # from rules_ocaml:
+    cclib_linkpaths = []
+    ## FIXME: find a better way to determine target executor:
+    if stem in ["ocamlc", "ocamlcp"]:
+        if len(static_cc_deps) > 0:
+            args.add("-custom")
+            # args.add("-use-runtime")
+            # args.add(ctx.file.ocamlrun)
+
+            sincludes = []
+            for dep in static_cc_deps:
+                args.add(dep.path)
+                bn = dep.basename[3:] # drop initial 'lib'
+                bn = bn[:-2]  # drop final '.a'
+                # args.add("-cclib", "-l" + bn)
+                sincludes.append(dep.dirname)
+                # args.add("-dllpath", paths.dirname(dep.short_path))
+                # args.add("-dllpath", dep.dirname)
+            #     sincludes.append("-L" + dep.dirname)
+            # args.add_all(sincludes, before_each="-ccopt", uniquify=True)
+            args.add_all(sincludes, before_each="-I", uniquify=True)
+
+    ## executables ALWAYS depend on std_exit.cm[o,x], which depends on
+    ## Stdlib module, which depends on CamlinternalFormatBasics,
+    ## so IF Stdlib module not already in cli_link_deps, we
+    ## need to add all std_exit deps to cmd line.
+    cli_link_deps_list = cli_link_deps_depset.to_list()
+    ## HACK alert: this is horribly inefficient but it will do for now:
+    already_has_stdlib = False
+    for dep in cli_link_deps_list:
+        if dep.basename in ["Stdlib.cmo", "Stdlib.cmx"]:
+            already_has_stdlib = True
+
+    if not already_has_stdlib:
+        for dep in ctx.attr._std_exit[BootInfo].cli_link_deps.to_list():
+            print("std_exit dep: %s" % dep)
+            if dep.basename not in ["std_exit.cmo", "std_exit.cmx"]:
+                args.add(dep)
 
     ## FIXME: for ocamlcc we do not need this?
     if ctx.attr.cc_linkopts:
@@ -420,7 +491,7 @@ def executable_impl(ctx, tc, exe_name,
     if ("test_exe" in ctx.attr.tags):
         # or "test_vs" in ctx.attr.tags):
         # rule ss_test_executable has only 'main', no prologue
-        for dep in cli_link_deps_depset.to_list():
+        for dep in cli_link_deps_list:
             args.add(dep)
     elif ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
         ## FIXME: this strategy works for archives, where we want to
@@ -436,7 +507,7 @@ def executable_impl(ctx, tc, exe_name,
             ##are not added to cli.
             args.add(ctx.file.main)
     else:
-        for dep in cli_link_deps_depset.to_list():
+        for dep in cli_link_deps_list:
             args.add(dep)
 
     ## this won't work since a direct module dep may depend on a
@@ -446,42 +517,13 @@ def executable_impl(ctx, tc, exe_name,
     #     args.add(dep)
     # args.add(ctx.file.main)
 
-    if hasattr(ctx.attr, "epilogue"):
-        args.add_all(ctx.files.epilogue)
+    # if hasattr(ctx.attr, "epilogue"):
+    #     args.add_all(ctx.files.epilogue)
 
     # if -nopervasives, then std_exit must be explicit on the cmd line
     # if -pervasives, it only needs to be in the inputs depset
     if not pervasives:
         args.add_all(ctx.files._std_exit)
-
-    ################################################################
-    ## cc deps other than runtimes (e.g. libcamlstr, libunix, etc.)
-    ################################################################
-    if debug_ccdeps:
-        dump_CcInfo(ctx, ccInfo_provider)
-        print("x: %s" % ccinfo_to_string(ctx, ccInfo_provider))
-        print("Module provides: %s" % ccInfo_provider)
-    ## to construct cmd line we need to extract the cc files from
-    ## merged CcInfo provider:
-    [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
-    if debug_ccdeps:
-        print("static_cc_deps:  %s" % static_cc_deps)
-        print("dynamic_cc_deps: %s" % dynamic_cc_deps)
-
-    # from rules_ocaml:
-    cclib_linkpaths = []
-    ## FIXME: find a better way to determine target executor:
-    if stem in ["ocamlc", "ocamlcp"]:
-        if len(static_cc_deps) > 0:
-            args.add("-custom")
-            sincludes = []
-            for dep in static_cc_deps:
-                bn = dep.basename[3:] # drop initial 'lib'
-                bn = bn[:-2]  # drop final '.a'
-                args.add("-cclib", "-l" + bn)
-                # includes.append(dep.dirname)
-                sincludes.append("-L" + dep.dirname)
-            args.add_all(sincludes, before_each="-ccopt", uniquify=True)
 
     # if target == "vm":
     #     if ctx.attr.vm_runtime[OcamlVmRuntimeProvider].kind == "dynamic":
@@ -538,7 +580,12 @@ def executable_impl(ctx, tc, exe_name,
     # print("lbl: %s" % ctx.label)
     # print("exe effective_compiler: %s" % effective_compiler.path)
 
-    std_exit_files = ctx.attr._std_exit[ModuleInfo].files
+    print("std_exit bootinfo: %s"% ctx.attr._std_exit[BootInfo])
+    std_exit_inputs_depsets = []
+    std_exit_inputs_depsets.append(ctx.attr._std_exit[BootInfo].sigs)
+    std_exit_inputs_depsets.append(ctx.attr._std_exit[BootInfo].cli_link_deps)
+    std_exit_inputs_depsets.append(ctx.attr._std_exit[BootInfo].ofiles)
+
     # if ctx.label.name in ["cvt_emit.byte", "ocamlopt.opt"]:
     #     print("std_exit files: %s" % std_exit_files)
     #     print("sig: %s" % ctx.attr._std_exit[ModuleInfo].sig)
@@ -557,11 +604,11 @@ def executable_impl(ctx, tc, exe_name,
         ,
         transitive = []
         + runtime_depsets
-        + [std_exit_files]
+        + std_exit_inputs_depsets
         + [depset(
              [tc.executable]
-        + static_cc_deps
-        + dynamic_cc_deps
+            + static_cc_deps
+            + dynamic_cc_deps
             + ctx.files.prologue  #
             + ctx.files.epilogue
             # + ctx.files.stdlib
@@ -570,11 +617,12 @@ def executable_impl(ctx, tc, exe_name,
             # ctx.files._camlheaders
             # + ctx.files._runtime
             + camlheaders
+            # + stdlib_input
         )]
         #FIXME: primitives should be provided by target, not tc?
         # + [depset([tc.primitives])] # if tc.primitives else []
         + [
-            sigs_depset,
+            # sigs_depset,
             cli_link_deps_depset,
             archived_cmx_depset,
             ofiles_depset,

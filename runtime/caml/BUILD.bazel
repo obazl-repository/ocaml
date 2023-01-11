@@ -12,6 +12,7 @@ cc_mustache(
         "//boot:__pkg__",
         "//runtime:__subpackages__",
         "//otherlibs:__subpackages__",
+        "//testsuite/tests:__subpackages__",
         "//yacc:__pkg__"
     ]
 )
@@ -77,6 +78,7 @@ genrule(
         "//boot:__pkg__",
         "//otherlibs:__subpackages__",
         "//runtime:__pkg__",
+        "//testsuite/tests:__subpackages__",
         "//utils:__pkg__"
     ]
 )

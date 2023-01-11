@@ -45,6 +45,11 @@ def aggregate_deps(ctx,
         if CcInfo not in target:
             fail("Target lacks providers BootInfo, CcInfo: %s" % target)
 
+    if target.label.package == "stdlib":
+        if target.label.name == "stdlib":
+            print("stdlib target: %s" % target)
+            # fail("stdlib: %s" % target.label)
+
     if OcamlSignatureProvider in target:
         depsets.deps.mli.append(target[OcamlSignatureProvider].mli)
 

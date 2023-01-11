@@ -144,4 +144,10 @@ def library_impl(ctx):
         OcamlLibraryMarker(marker = "OcamlLibraryMarker")
     ]
 
+    if ctx.attr._rule == "stdlib_library":
+        providers.append(StdlibLibMarker())
+
+    if ctx.attr._rule in ["compiler_library", "test_library"]:
+        providers.append(StdLibMarker())
+
     return providers

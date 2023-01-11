@@ -10,6 +10,9 @@ load("//bzl:providers.bzl",
      "OcamlArchiveProvider")
 
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
+load("//bzl/rules/common:impl_ccdeps.bzl",
+     "extract_cclibs",
+     "dump_CcInfo", "ccinfo_to_string")
 
 load("//bzl/rules/common:options.bzl", "get_options")
 
@@ -20,6 +23,7 @@ load("//bzl/rules/common:DEPS.bzl",
 ###############################
 def archive_impl(ctx):
     debug = False
+    debug_ccdeps = True
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
@@ -129,6 +133,11 @@ def archive_impl(ctx):
         transitive = [merge_depsets(depsets, "archived_cmx")]
     )
 
+    ccInfo_provider = cc_common.merge_cc_infos(
+        cc_infos = depsets.ccinfos
+            # cc_infos = cc_deps_primary + cc_deps_secondary
+    )
+
     paths_depset  = depset(
         order = dsorder,
         direct = [out_archive.dirname],
@@ -156,6 +165,40 @@ def archive_impl(ctx):
     ## solve double-link problem:
 
     # print("manifest: %s" % manifest)
+
+    if debug_ccdeps:
+        dump_CcInfo(ctx, ccInfo_provider)
+        print("Dumping ccInfo_provider for %s" % ctx.label)
+        print("%s" % ccinfo_to_string(ctx, ccInfo_provider))
+
+    ## to construct cmd line we need to extract the cc files from
+    ## merged CcInfo provider:
+    [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
+    if debug_ccdeps:
+        print("static_cc_deps:  %s" % static_cc_deps)
+        print("dynamic_cc_deps: %s" % dynamic_cc_deps)
+
+    sincludes = []
+    for dep in static_cc_deps:
+        bn = dep.basename[3:] # drop initial 'lib'
+        bn = bn[:-2]  # drop final '.a'
+        # args.add("-cclib", "-l" + bn)
+        # args.add("-dllpath", dep.dirname)
+        # includes.append(dep.dirname)
+        # sincludes.append("-L" + paths.dirname(dep.short_path))
+    # args.add_all(sincludes, before_each="-ccopt", uniquify=True)
+
+    for dep in dynamic_cc_deps:
+        bn = dep.basename[3:] # drop initial 'lib'
+        bn = bn[:-3]  # drop final '.so'  ##FIXME: dylib on mac?
+        if dep.basename.startswith("dll"):
+            # args.add("-foo", dep)
+            args.add("-dllib", "-l" + bn)
+            args.add("-dllpath", paths.dirname(dep.short_path))
+        else:
+            args.add("-cclib", "-l" + bn)
+            sincludes.append("-L" + dep.dirname)
+    args.add_all(sincludes, before_each="-ccopt", uniquify=True)
 
     if ctx.attr.cc_deps:
         for (dep, linkmode) in ctx.attr.cc_deps.items():
@@ -279,6 +322,16 @@ def archive_impl(ctx):
         bootProvider,
         ocamlArchiveProvider
     ]
+    providers.append(ccInfo_provider)
+    # ocamlArchiveProvider = OcamlArchiveProvider(
+    #     # manifest = manifest_depset
+    # )
+
+    if ctx.attr._rule == "stdlib_library":
+        providers.append(StdlibLibMarker())
+
+    if ctx.attr._rule in ["compiler_library", "test_library"]:
+        providers.append(StdLibMarker())
 
     # print("boot provider:")
     # print(bootProvider)

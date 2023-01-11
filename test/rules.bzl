@@ -21,7 +21,6 @@ load("//test/rules:inline_expect_test.bzl",
 load("//test/rules:lambda_expect_test.bzl",
      _lambda_expect_test = "lambda_expect_test")
 
-load("//test/rules:test_archive.bzl", _test_archive = "test_archive")
 load("//test/rules:test_executable.bzl",
      _test_executable = "test_executable",
      _vv_test_executable = "vv_test_executable",
@@ -47,7 +46,6 @@ compile_fail_test = _compile_fail_test
 
 inline_expect_test = _inline_expect_test
 lambda_expect_test = _lambda_expect_test
-test_archive = _test_archive
 test_executable = _test_executable
 vv_test_executable = _vv_test_executable
 vs_test_executable = _vs_test_executable

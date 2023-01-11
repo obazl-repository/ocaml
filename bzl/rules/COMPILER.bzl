@@ -82,3 +82,13 @@ OCAMLOPTP_PROLOGUE = select({
     "//driver:Main_args",
     "//tools:Ocamlcp_common"
 ]
+
+MACOS_CC_UDEBUG_HACK = select({
+    # DO NOT FORGET THIS for rules_cc targets! Without it we get
+    # Undefined symbol "_caml_failed_assert", because libasmrun.a is
+    # always built with -c opt, which does NOT define -DDEBUG, and
+    # this file may be compiled with -c fastbuild, and Bazel adds
+    # -DDEBUG on macos under fastbuild (a bug)
+        "//config:macos_fastbuild?": ["-UDEBUG"],
+    "//conditions:default":  []
+})
