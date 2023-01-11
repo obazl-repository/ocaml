@@ -179,14 +179,20 @@ def archive_impl(ctx):
         print("static_cc_deps:  %s" % static_cc_deps)
         print("dynamic_cc_deps: %s" % dynamic_cc_deps)
 
+    includes = []
+
     sincludes = []
     for dep in static_cc_deps:
+        # args.add(dep.basename)
         bn = dep.basename[3:] # drop initial 'lib'
         bn = bn[:-2]  # drop final '.a'
-        # args.add("-cclib", "-l" + bn)
+        # args.add("-cclib", dep.path)
+        args.add("-cclib", "-l" + bn)
         # args.add("-dllpath", dep.dirname)
-        # includes.append(dep.dirname)
+        includes.append(dep.dirname)
         # sincludes.append("-L" + paths.dirname(dep.short_path))
+        sincludes.append("-L" + dep.dirname)
+
     # args.add_all(sincludes, before_each="-ccopt", uniquify=True)
 
     for dep in dynamic_cc_deps:
@@ -236,7 +242,6 @@ def archive_impl(ctx):
     linkargs_list = []
     ## merge archive submanifests, to get list of all modules included
     ## in archives. use list to filter cmd line args
-    includes = []
 
     ## To get cli args in right order, we need then merged depset of
     ## all deps. Then we use the manifest to filter.

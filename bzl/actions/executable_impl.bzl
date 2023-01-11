@@ -316,8 +316,8 @@ def executable_impl(ctx, tc, exe_name,
     # for hdr in ctx.files._camlheaders:
     #     includes.append(hdr.dirname)
 
-    for path in paths_depset.to_list():
-        includes.append(path)
+    # for path in paths_depset.to_list():
+    #     includes.append(path)
 
     # if ctx.file.stdlib:
     #     includes.append(ctx.file.stdlib.dirname)
@@ -356,6 +356,7 @@ def executable_impl(ctx, tc, exe_name,
     ## To get cli args in right order, we need the merged depset of
     ## all deps. Then we use the manifest to filter.
 
+    ## NB: do not add epilogue to manifest, it would break dep ordering
     manifest = ctx.files.prologue
     # if ctx.label.name == "ocamlobjinfo":
     #     print("PROLOGUE: %s" % manifest)
@@ -409,41 +410,6 @@ def executable_impl(ctx, tc, exe_name,
             args.add("-I", inc)
     # args.add_all(includes, before_each="-I", uniquify=True)
 
-   ################################################################
-    ## cc deps other than runtimes (e.g. libcamlstr, libunix, etc.)
-    ################################################################
-    if debug_ccdeps:
-        dump_CcInfo(ctx, ccInfo_provider)
-        print("%s" % ccinfo_to_string(ctx, ccInfo_provider))
-    ## to construct cmd line we need to extract the cc files from
-    ## merged CcInfo provider:
-    [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
-    if debug_ccdeps:
-        print("static_cc_deps:  %s" % static_cc_deps)
-        print("dynamic_cc_deps: %s" % dynamic_cc_deps)
-
-     # from rules_ocaml:
-    cclib_linkpaths = []
-    ## FIXME: find a better way to determine target executor:
-    if stem in ["ocamlc", "ocamlcp"]:
-        if len(static_cc_deps) > 0:
-            args.add("-custom")
-            # args.add("-use-runtime")
-            # args.add(ctx.file.ocamlrun)
-
-            sincludes = []
-            for dep in static_cc_deps:
-                args.add(dep.path)
-                bn = dep.basename[3:] # drop initial 'lib'
-                bn = bn[:-2]  # drop final '.a'
-                # args.add("-cclib", "-l" + bn)
-                sincludes.append(dep.dirname)
-                # args.add("-dllpath", paths.dirname(dep.short_path))
-                # args.add("-dllpath", dep.dirname)
-            #     sincludes.append("-L" + dep.dirname)
-            # args.add_all(sincludes, before_each="-ccopt", uniquify=True)
-            args.add_all(sincludes, before_each="-I", uniquify=True)
-
     ## executables ALWAYS depend on std_exit.cm[o,x], which depends on
     ## Stdlib module, which depends on CamlinternalFormatBasics,
     ## so IF Stdlib module not already in cli_link_deps, we
@@ -488,7 +454,7 @@ def executable_impl(ctx, tc, exe_name,
     ##FIXME: this logic is for building compilers only?
     ## ordinary executables might not list stdib archive dep?
 
-    if ("test_exe" in ctx.attr.tags):
+    if ("test_exe" in ctx.attr.tags):  ## FIXME: why?
         # or "test_vs" in ctx.attr.tags):
         # rule ss_test_executable has only 'main', no prologue
         for dep in cli_link_deps_list:
@@ -506,6 +472,10 @@ def executable_impl(ctx, tc, exe_name,
             ##filtering_depset; but they are not in manifest so they
             ##are not added to cli.
             args.add(ctx.file.main)
+
+        if hasattr(ctx.attr, "epilogue"):
+            args.add_all(ctx.files.epilogue)
+
     else:
         for dep in cli_link_deps_list:
             args.add(dep)
@@ -516,9 +486,6 @@ def executable_impl(ctx, tc, exe_name,
     # for dep in cli_link_deps_depset.to_list():
     #     args.add(dep)
     # args.add(ctx.file.main)
-
-    # if hasattr(ctx.attr, "epilogue"):
-    #     args.add_all(ctx.files.epilogue)
 
     # if -nopervasives, then std_exit must be explicit on the cmd line
     # if -pervasives, it only needs to be in the inputs depset
@@ -550,6 +517,60 @@ def executable_impl(ctx, tc, exe_name,
 
     #     cclib_linkpaths.append("-L" + cclib.dirname)
     # args.add_all(cclib_linkpaths, before_each="-ccopt", uniquify=True)
+
+   ################################################################
+    ## cc deps other than runtimes (e.g. libcamlstr, libunix, etc.)
+    ################################################################
+    if debug_ccdeps:
+        dump_CcInfo(ctx, ccInfo_provider)
+        print("%s" % ccinfo_to_string(ctx, ccInfo_provider))
+    ## to construct cmd line we need to extract the cc files from
+    ## merged CcInfo provider:
+    [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
+    if debug_ccdeps:
+        print("static_cc_deps:  %s" % static_cc_deps)
+        print("dynamic_cc_deps: %s" % dynamic_cc_deps)
+
+     # from rules_ocaml:
+    cclib_linkpaths = []
+    ## FIXME: find a better way to determine target executor:
+    if stem in ["ocamlc", "ocamlcp"]:
+        # FIXME: if cc deps are encoded in archive files we do not
+        # need this...
+        if len(static_cc_deps) > 0:
+            args.add("-custom")
+            # args.add("-use-runtime")
+            # args.add(ctx.file.ocamlrun)
+
+            sincludes = []
+            includes = []
+            for dep in static_cc_deps:
+
+                ## CASE: no archives? then add dep to cmd line
+
+                ## CASE: libs archived? then cc deps are encoded in
+                ## archive files, so do not add lib to cmd line, but
+                ## do add path for searching
+                ## NB: adding dep to cmd line when libs are archived
+                ## does no harm, it just duplicates info already in
+                ## the archive metadata
+
+                if not ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+                    args.add(dep.path)
+
+                includes.append(dep.dirname)
+
+
+            #     bn = dep.basename[3:] # drop initial 'lib'
+            #     bn = bn[:-2]  # drop final '.a'
+            #     # args.add("-cclib", "-l" + bn)
+            #     sincludes.append(dep.dirname)
+            #     # args.add("-dllpath", paths.dirname(dep.short_path))
+            #     # args.add("-dllpath", dep.dirname)
+                # sincludes.append("-L" + dep.dirname)
+
+            # args.add_all(sincludes, before_each="-ccopt", uniquify=True)
+            args.add_all(includes, before_each="-I", uniquify=True)
 
     args.add("-o", out_exe)
 

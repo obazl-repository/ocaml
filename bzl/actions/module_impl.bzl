@@ -438,10 +438,13 @@ def module_impl(ctx, module_name):
         transitive = [merge_depsets(depsets, "archived_cmx")]
     )
 
-    ccInfo_provider = cc_common.merge_cc_infos(
-        cc_infos = depsets.ccinfos
+    if len(depsets.ccinfos) > 0:
+        ccInfo_provider = cc_common.merge_cc_infos(
+            cc_infos = depsets.ccinfos
             # cc_infos = cc_deps_primary + cc_deps_secondary
-    )
+        )
+    else:
+        ccInfo_provider = None
 
     paths_depset  = depset(
         order = dsorder,
@@ -757,7 +760,8 @@ def module_impl(ctx, module_name):
     )
     providers.append(bootProvider)
 
-    providers.append(ccInfo_provider)
+    if ccInfo_provider:
+        providers.append(ccInfo_provider)
 
     if debug_ccdeps:
         dump_CcInfo(ctx, ccInfo_provider)
