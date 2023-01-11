@@ -1,0 +1,91 @@
+= Developer Guide: CC Dependencies
+:toc: auto
+:toclevels: 3
+
+== rules_cc
+
+The Bazel rules for OCamlCC are designed to work with the standard
+link:https://bazel.build/rules/lib/CcInfo[CcInfo] provider used by
+link:https://bazel.build/reference/be/c-cpp[rules_cc], the standard
+ruleset for building C/C++ code.
+
+This means, among other things, that module targets can depend
+directly on any target that produces a `CcInfo` provider. This
+includes the rules in `rules_cc`, such as `cc_library` and
+`cc_binary`, as well as a custom rule, `cc_assemble`, which is used to
+compile (assemble) the assembly code in `//runtime`.
+
+[IMPORTANT]
+====
+_**Alway use link:https://bazel.build/reference/be/c-cpp[rules_cc] to
+build C/C++ code**_. The only exception to this rule should be tests
+intended to exercise the C compilation facilities of the OCaml
+compilers.
+====
+
+Dependencies on `CcInfo`-producing targets are expressed via the
+`cc_deps` attribute, which takes a list of labels.
+
+
+== linking considerations
+
+Recommended practice is to add C libraries to OCaml archive files. The
+OCaml compilers add metadata about the libraries to the `.cmx?a` file,
+and at link time use it to automatically link the code. When an
+archive file is viewed with `ocamlobjinfo`, the following fields are displayed:
+
+----
+Extra C object files:
+Extra C options:
+Extra dynamically-loaded libraries:
+----
+
+If you've instructed the compiler to add a C library to the archive
+you will see it listed. Any arguments you have passed using `--ccopt`
+will be shown as `Extra C options`; for example, if you pass a share
+library and a `-L` directory, you will see both.
+
+Static C libraries (`lib*.a`) can be added by listing directly on the
+command line, without an option letter. For example:
+
+----
+  bazel-out/darwin-opt-ST-c18154ec5bb5/bin/runtime/ocamlrun \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bin/_BS/ocamlc.byte \
+    -nostdlib \
+    -nopervasives \
+    libstub1.a \
+    bazel-out/darwin-fastbuild-ST-462396b1cbfe/bin/testsuite/tests/lib-dynlink-bytecode/bin_vv_vv/Plug1.cmo \
+    -a \
+    -o \
+    bazel-out/darwin-fastbuild/bin/testsuite/tests/lib-dynlink-bytecode/_BS_vv/plug1_lib.cma)
+----
+
+In this example, the archive would show `Extra C object files: libstub1.a`.
+
+Alternatively, `-cclib` can be used:
+
+----
+  bazel-out/darwin-opt-ST-c18154ec5bb5/bin/runtime/ocamlrun \
+    bazel-out/darwin-fastbuild-ST-94e7e090169c/bin/bin/_BS/ocamlc.byte \
+    -nostdlib \
+    -nopervasives \
+    -cclib \
+    -lstub1 \
+    bazel-out/darwin-fastbuild-ST-462396b1cbfe/bin/testsuite/tests/lib-dynlink-bytecode/bin_vv_vv/Plug1.cmo \
+    -a \
+    -o \
+    bazel-out/darwin-fastbuild/bin/testsuite/tests/lib-dynlink-bytecode/_BS_vv/plug1_lib.cma)
+----
+
+which results in: `Extra C object files: -lstub1`
+
+The Bazel rules capable of producing archive files
+(`compiler_library`, `test_library`) use the first method, passing the
+static library directy. This has the advantage of explicitness, since
+`-lstub1` on the command line does not tell us whether the library is
+`libstub1.a` or `libstub1.so`.
+
+==== Link search paths
+
+At link time, the OCaml linker will see that C libraries are listed in
+an archive file and proceed to link them.

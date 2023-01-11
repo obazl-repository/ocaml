@@ -1,4 +1,6 @@
-= bazel dev guide
+=  Developer Guide
+
+== Introduction
 
 IMPORTANT: The config_setting rule has a `constraint_values`
 attribute; buried in the doc (literally parenthesized) is this note:
