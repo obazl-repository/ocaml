@@ -18,7 +18,6 @@ load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-
 ocaml_tools(
     name = "ocamldebug",
     prologue = [
@@ -66,7 +65,7 @@ ocaml_tools(
 )
 
 ## resolver
-## NB: aliases one sig w/o struct: Parser_aux
+## NB: aliases one free-standing sig: Parser_aux
 tool_module(
     name   = "Ocamldebug",
     opts = MODULE_OPTS + [

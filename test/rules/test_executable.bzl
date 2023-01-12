@@ -169,12 +169,12 @@ def test_executable(name, main,
             "//conditions:default": {"VERBOSE": "false"}
         }),
         args = ["$(rootpath //runtime:ocamlrun)",
-                "$(rootpath :{}.vv.byte)".format(name),
+                "$(rootpath :{}.vv.byte)".format(main),
                 # "$(rlocationpath //stdlib:stdlib)"
                 ],
         data = [
             "//runtime:ocamlrun",
-            ":{}.vv.byte".format(name),
+            ":{}.vv.byte".format(main),
             # "//stdlib",
             # "//stdlib:Std_exit",
             # "//config/camlheaders",

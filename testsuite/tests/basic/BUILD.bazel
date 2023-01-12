@@ -179,6 +179,10 @@ expect_sv_test(
 ## test_executable macro expansion:
 vv_test_executable(
     name    = "Bigints.vv.byte",
+    # prologue = [
+    #     "//stdlib:CamlinternalFormatBasics",
+    #     "//stdlib:Stdlib"
+    # ],
     main    = ":Bigints",
 )
 ## to run the vv.byte executable:

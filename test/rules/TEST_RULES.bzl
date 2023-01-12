@@ -41,7 +41,7 @@ def _test_ocamlc_byte_in_transition_impl(settings, attr):
     }
 
 ####
-test_ocamlc_byte_in_transition = transition(
+_test_ocamlc_byte_in_transition = transition(
     implementation = _test_ocamlc_byte_in_transition_impl,
     inputs  = TRANSITION_CONFIGS,
     outputs = TRANSITION_CONFIGS
@@ -61,7 +61,6 @@ def _test_ocamlc_byte_impl(ctx):
 test_ocamlc_byte = rule(
     implementation = _test_ocamlc_byte_impl,
     doc = "Builds a compiler",
-
     attrs = dict(
         executable_attrs(),
         _allowlist_function_transition = attr.label(
@@ -69,7 +68,7 @@ test_ocamlc_byte = rule(
         ),
         _rule = attr.string( default = "test_ocamlc_byte" ),
     ),
-    cfg = test_ocamlc_byte_in_transition,
+    cfg = _test_ocamlc_byte_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",

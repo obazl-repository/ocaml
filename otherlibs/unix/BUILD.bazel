@@ -27,11 +27,7 @@ compiler_module(
     }),
     sig    = "Unix_cmi",
     opts = MODULE_OPTS,
-    cc_deps   = [
-       ":unix", ## cc_library
-    ],
-    # cc_deps = [
-    # ]
+    cc_deps   = [":unix"],
     stdlib_deps = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Bytes",
