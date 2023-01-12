@@ -12,29 +12,15 @@ load("//test:rules.bzl",
 test_suite(
     name = "tests",
     tests = [
-        # ":anonymous_test",
+        ":Anonymous_test",
         ":Main_expect_test",
         ":Recursive_module_init_expect_test",
         ":Recursive_module_evaluation_errors",
     ],
 )
 
-# test_executable(
-#     name    = "anonymous",
-#     main    = ":Anonymous",
-# )
-
-# ocaml_test(
-#     name = "anonymous_test",
-#     main = ":Anonymous",
-#     prologue = [
-#     ],
-#     timeout = "short"
-# )
-
-# flags = "-c -nostdlib -nopervasives -dlambda -dno-unique-ids"
-
-lambda_expect_test(  ## ocamlc.byte
+##FIXME: rename, compile_log_diff_test or similar
+lambda_expect_test(
     name   = "Anonymous_test",
     test_module = ":Anonymous",
     expected = "anonymous.ocamlc.reference",
@@ -75,18 +61,6 @@ test_module(
     ],
     stdlib_deps = ["//stdlib:CamlinternalMod"]
 )
-
-# ocaml_test(
-#     name = "main_test",
-#     main = ":Main",
-#     prologue = [
-#         ":Offset",
-#         ":Pr4008",
-#         ":Pr7427",
-#         ":Pr6726"
-#     ],
-#     timeout = "short"
-# )
 
 expect_test(
     name     = "Main_expect_test",
