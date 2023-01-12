@@ -1,7 +1,6 @@
 load("//tools:TOOL_RULES.bzl", "ocaml_tool_vm")
 
 load("//test:rules.bzl",
-     "test_archive",
      "test_executable",
      "test_library",
      "test_module",

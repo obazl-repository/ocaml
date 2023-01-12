@@ -12,9 +12,24 @@ def archive_attrs(): ##FIXME: rename library_attrs
 
     return dict(
 
-        archive = attr.bool(),
-        cmxa_eligible = attr.bool(),
+        archive = attr.bool(
+            doc = "Determines whether the lib is archived or not. Default: False",
+            default = False
+        ),
+        archive_cc = attr.bool(
+            doc = """
+            Detemines whether cc deps metadata is embedded in archive - 'Extra C object files', 'Extra dynamically-loaded libraries', 'Extra C options', and 'Force custom'.
+            Only takes effect if archive = True.
+            If a static lib is among the deps, 'Force custom' will be set to YES (same as passing -custom).
+            Default: False
+            """,
+            default = False
+        ),
+        cmxa_eligible = attr.bool(
+            doc = "Determines whether lib is eligible for archiving when compiled for native targets."
+        ),
         _compilerlibs_archived = attr.label(
+            doc = "Global flag controlling archiving of libraries",
             default = "//config/ocaml/compiler/libs:archived"
         ),
 
@@ -68,6 +83,13 @@ def archive_attrs(): ##FIXME: rename library_attrs
             """,
             providers = [[CcInfo]]
         ),
+
+        _cc_debug = attr.label(
+            doc = "Controls debug print stmts in Bazel code.",
+            default = "//config/build/cc:debug"
+        ),
+
+        ## FIXME: do we need this?
         cc_linkopts = attr.string_list(
             doc = "List of C/C++ link options. E.g. `[\"-lstd++\", \"lunix\"]`.",
         ),

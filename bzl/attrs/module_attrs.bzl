@@ -116,6 +116,12 @@ def module_attrs():
         cc_deps = attr.label_list(
             providers = [CcInfo],
         ),
+
+        _cc_debug = attr.label(
+            doc = "Controls debug print stmts in Bazel code.",
+            default = "//config/build/cc:debug"
+        ),
+
         # cc_deps = attr.label_keyed_string_dict(
             # doc = """Dictionary specifying C/C++ library dependencies. Key: a target label; value: a linkmode string, which determines which file to link. Valid linkmodes: 'default', 'static', 'dynamic', 'shared' (synonym for 'dynamic'). For more information see [CC Dependencies: Linkmode](../ug/cc_deps.md#linkmode).
             # """,

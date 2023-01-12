@@ -1,4 +1,5 @@
 load("//bzl:providers.bzl",
+     "ArchiveCcMarker",
      "BootInfo", "DepsAggregator",
      "ModuleInfo", "OcamlSignatureProvider")
 
@@ -45,9 +46,9 @@ def aggregate_deps(ctx,
         if CcInfo not in target:
             fail("Target lacks providers BootInfo, CcInfo: %s" % target)
 
-    if target.label.package == "stdlib":
-        if target.label.name == "stdlib":
-            print("stdlib target: %s" % target)
+    # if target.label.package == "stdlib":
+    #     if target.label.name == "stdlib":
+    #         print("stdlib target: %s" % target)
             # fail("stdlib: %s" % target.label)
 
     if OcamlSignatureProvider in target:
@@ -107,7 +108,10 @@ def aggregate_deps(ctx,
         ## construct a CcInfo provider containing the shared lib.
         ## Since the target also contains a CcInfo, we need to add it
         ## to the list also, so they will be merged.
-        depsets.ccinfos.append(target[CcInfo])
+        if ArchiveCcMarker in target:
+            depsets.ccinfos_archived.append(target[CcInfo])
+        else:
+            depsets.ccinfos.append(target[CcInfo])
 
         # (libname, filtered_ccinfo) = filter_ccinfo(dep)
         # if debug_cc:
@@ -127,7 +131,10 @@ def aggregate_deps(ctx,
         #     # dump_CcInfo(ctx, dep[CcInfo])
 
         ccInfo = normalize_ccinfo(ctx, target)
-        depsets.ccinfos.append(ccInfo)
+        if ArchiveCcMarker in target:
+            depsets.ccinfos_archived.append(ccInfo)
+        else:
+            depsets.ccinfos.append(ccInfo)
 
     return depsets
 

@@ -4,22 +4,22 @@ load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 load("//bzl:rules.bzl", "cc_preprocess")
 
 load("//test:rules.bzl",
-     "test_archive",
      "test_executable",
      "vv_test_executable",
      "vs_test_executable",
      "ss_test_executable",
      "sv_test_executable",
 
+     "test_library",
+     "test_module",
+     "test_signature",
+
+
      "expect_test",
      "expect_vv_test",
      "expect_vs_test",
      "expect_ss_test",
      "expect_sv_test",
-
-     "test_library",
-     "test_module",
-     "test_signature",
 
      "compile_fail_test",
      "inline_expect_test",

@@ -4,6 +4,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
+     "ArchiveCcMarker",
      "BootInfo",
      "ModuleInfo",
      "new_deps_aggregator",
@@ -134,10 +135,18 @@ def archive_impl(ctx):
         transitive = [merge_depsets(depsets, "archived_cmx")]
     )
 
-    ccInfo_provider = cc_common.merge_cc_infos(
-        cc_infos = depsets.ccinfos
+    if len(depsets.ccinfos) > 0:
+        ccInfo_provider = cc_common.merge_cc_infos(
+            cc_infos = depsets.ccinfos
             # cc_infos = cc_deps_primary + cc_deps_secondary
-    )
+        )
+        if ctx.attr._cc_debug[BuildSettingInfo].value:
+            if debug_ccdeps:
+                dump_CcInfo(ctx, ccInfo_provider)
+            print("ccInfo_provider for %s" % ctx.label)
+            print("%s" % ccinfo_to_string(ctx, ccInfo_provider))
+    else:
+        ccInfo_provider = None
 
     paths_depset  = depset(
         order = dsorder,
@@ -167,46 +176,48 @@ def archive_impl(ctx):
 
     # print("manifest: %s" % manifest)
 
-    if debug_ccdeps:
-        dump_CcInfo(ctx, ccInfo_provider)
-        print("Dumping ccInfo_provider for %s" % ctx.label)
-        print("%s" % ccinfo_to_string(ctx, ccInfo_provider))
+    includes = []
 
     ## to construct cmd line we need to extract the cc files from
     ## merged CcInfo provider:
-    [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
-    if debug_ccdeps:
-        print("static_cc_deps:  %s" % static_cc_deps)
-        print("dynamic_cc_deps: %s" % dynamic_cc_deps)
+    if ccInfo_provider:
+        [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
+        if debug_ccdeps:
+            print("static_cc_deps:  %s" % static_cc_deps)
+            print("dynamic_cc_deps: %s" % dynamic_cc_deps)
 
-    includes = []
+        sincludes = []
 
-    sincludes = []
-    for dep in static_cc_deps:
-        # args.add(dep.basename)
-        bn = dep.basename[3:] # drop initial 'lib'
-        bn = bn[:-2]  # drop final '.a'
-        # args.add("-cclib", dep.path)
-        args.add("-cclib", "-l" + bn)
-        # args.add("-dllpath", dep.dirname)
-        includes.append(dep.dirname)
-        # sincludes.append("-L" + paths.dirname(dep.short_path))
-        sincludes.append("-L" + dep.dirname)
+        if ctx.attr.archive or ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+            if ctx.attr.archive_cc:
+                args.add("-custom")
 
-    # args.add_all(sincludes, before_each="-ccopt", uniquify=True)
+                for dep in static_cc_deps:
+                    # args.add(dep.basename)
+                    bn = dep.basename[3:] # drop initial 'lib'
+                    bn = bn[:-2]  # drop final '.a'
+                    # args.add("-cclib", dep.path)
+                    args.add("-cclib", "-l" + bn)
+                    # args.add("-dllpath", dep.dirname)
+                    includes.append(dep.dirname)
+                    # sincludes.append("-L" + paths.dirname(dep.short_path))
+                    sincludes.append("-L" + dep.dirname)
 
-    for dep in dynamic_cc_deps:
-        bn = dep.basename[3:] # drop initial 'lib'
-        bn = bn[:-3]  # drop final '.so'  ##FIXME: dylib on mac?
-        if dep.basename.startswith("dll"):
-            # args.add("-foo", dep)
-            args.add("-dllib", "-l" + bn)
-            args.add("-dllpath", paths.dirname(dep.short_path))
-        else:
-            args.add("-cclib", "-l" + bn)
-            sincludes.append("-L" + dep.dirname)
-    args.add_all(sincludes, before_each="-ccopt", uniquify=True)
+                args.add_all(sincludes, before_each="-ccopt", uniquify=True)
 
+            for dep in dynamic_cc_deps:
+                bn = dep.basename[3:] # drop initial 'lib'
+                bn = bn[:-3]  # drop final '.so'  ##FIXME: dylib on mac?
+                if dep.basename.startswith("dll"):
+                    # args.add("-foo", dep)
+                    args.add("-dllib", "-l" + bn)
+                    args.add("-dllpath", paths.dirname(dep.short_path))
+                else:
+                    args.add("-cclib", "-l" + bn)
+                    sincludes.append("-L" + dep.dirname)
+                args.add_all(sincludes, before_each="-ccopt", uniquify=True)
+
+    ## FIXME: should be handled by aggregate_deps
     if ctx.attr.cc_deps:
         for (dep, linkmode) in ctx.attr.cc_deps.items():
             print("CCDEP: {dep}, mode: {mode}".format(
@@ -325,7 +336,13 @@ def archive_impl(ctx):
         # ocamlArchiveProvider
     ]
 
-    providers.append(ccInfo_provider)
+    if ccInfo_provider:
+        providers.append(ccInfo_provider)
+
+        if ctx.attr.archive or ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+            if ctx.attr.archive_cc:
+                # this means we have included cc metadata in the archive
+                providers.append(ArchiveCcMarker())
 
     if ctx.attr._rule == "stdlib_library":
         providers.append(StdlibLibMarker())

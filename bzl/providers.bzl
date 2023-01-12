@@ -147,15 +147,14 @@ BootInfo, _new_ocamlbootinfo = provider(
 ##########################
 DepsAggregator = provider(
     fields = {
-        "stdlib"  : "either Stdlib.cmo/x or stdlib.cmx?a",
         "deps"    : "struct of BootInfo providers",
         "ccinfos" : "list of CcInfo providers",
+        "ccinfos_archived" : "list of ccinfos whose metadata is archived",
     }
 )
 
 def new_deps_aggregator():
     return DepsAggregator(
-        stdlib = None,
         deps = BootInfo(
             sigs          = [],
             structs       = [],
@@ -170,7 +169,8 @@ def new_deps_aggregator():
             # astructs    = [], # archived cmx structs, for linking
             # cmts        = [],
         ),
-        ccinfos           = []
+        ccinfos           = [],
+        ccinfos_archived  = []
     )
 
 ################################################################
@@ -228,6 +228,8 @@ StdSigMarker         = provider(doc = "Std compiler Sig Marker provider.")
 StdlibLibMarker   = provider(doc = "Stdlib library Marker provider.")
 StdlibStructMarker   = provider(doc = "Stdlib Struct Marker provider.")
 StdlibSigMarker      = provider(doc = "Stdlib Sig Marker provider.")
+
+ArchiveCcMarker      = provider(doc = "Signal from archive rule to executablerule indicating it contains CC metadata.")
 
 HybridExecutableMarker = provider(doc = "Marks vm executables built with -custom.")
 TestExecutableMarker = provider(doc = "Test Executable Marker provider.")

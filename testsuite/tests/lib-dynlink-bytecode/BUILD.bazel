@@ -150,20 +150,30 @@ test_module(
 
 ## the test runner:
 expect_vv_test(
-    name    = "Registry_vvs_test",
-    test_executable = ":Registry.vv.custom",
+    name    = "Registry_vv_test",
+    test_executable = ":Registry.vv.bin",
     stdout  = "registry.stdout",
     expected = "static.reference",
     timeout  = "short",
     tags     = ["vv", "dynlink", "ccdeps"],
 )
 
+# expect_vv_test(
+#     name    = "Registry_static_test",
+#     test_executable = ":Registry.vv.static",
+#     stdout  = "registry.stdout",
+#     expected = "static.reference",
+#     timeout  = "short",
+#     tags     = ["vv", "dynlink", "ccdeps"],
+# )
+
 ## build and run this to see stdout w/o test machinery
 vv_test_executable(
     ## WARNING: this target uses ocamlc.byte with -custom, so it emits
     ## a hybrid vm/sys executable that can be run directly from the
-    ## cmd line, w/o ocamlrun. Hence the "custom" extension.
-    name    = "Registry.vv.custom",
+    ## cmd line, w/o ocamlrun. Hence the "bin" extension -
+    ## bytecode-in-native.
+    name    = "Registry.vv.bin",
     prologue= [
         ## FIXME: these are indirect deps of main, they should be
         ## added automatically
@@ -191,7 +201,13 @@ test_module(
 test_library(
     name  = "plug1_lib",
     cmxa_eligible = True,
-    opts = ["-custom", "-verbose"],
+    ## to build with archive_cc enabled,
+    ## either archive=True or --//config/ocaml/compiler/libs:archived
+    ## must also be set
+    archive_cc = select({
+        "//testsuite:archive_cc?": True,
+        "//conditions:default": False
+    }),
     manifest = [
         ":Plug1",
     ]
@@ -204,7 +220,10 @@ test_module(
         ":Registry",
     ],
     cc_deps = select({
-        "//config/ocaml/test/vmruntime:custom?": [":stub1"],
+        "//config/ocaml/test/vmruntime:custom?": [
+            ":stub1",
+            ":stub2"  ## CcInfo merging will eliminate the duplicate stub2
+        ],
         "//config/ocaml/test/vmruntime:dynamic?": ["dllplug1.so"],
         "//conditions:default": [":stub1"]
     }),
@@ -275,7 +294,10 @@ cc_binary(
 ################################################################
 test_library(
     name  = "plug2_lib",
-    opts = ["-custom", "-verbose"],
+    archive_cc = select({
+        "//testsuite:archive_cc?": True,
+        "//conditions:default": False
+    }),
     cmxa_eligible = True,
     manifest = [
         ":Plug2",

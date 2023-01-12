@@ -1,5 +1,4 @@
 load("//test:rules.bzl",
-     "test_archive",
      "test_executable",
      "test_library",
      "test_module",
@@ -116,8 +115,7 @@ test_module(
     name   = "Pr4008",
     struct = "pr4008.ml",
     stdlib_deps   = [
-        # "//stdlib:Primitives",
-        "//stdlib:CamlinternalMod",
+        "//stdlib:Primitives",
         "//stdlib:Stdlib.List",
     ]
 )
@@ -160,7 +158,7 @@ test_module(
     struct = "recursive_module_init.ml",
     # dump = ["lambda"],
     stdlib_deps = [
-        "//stdlib:primitives",
+        "//stdlib:Primitives",
         # "//stdlib:CamlinternalOO",
         # "//stdlib:CamlinternalMod",
         "//stdlib:Stdlib.List",

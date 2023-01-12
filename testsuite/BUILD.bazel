@@ -1,4 +1,13 @@
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
+## controls 'archive_cc' attribute of test_library rules
+bool_flag(name = "archive_cc", build_setting_default = False,
+          tags = ["cc"],
+          visibility = ["//visibility:public"])
+config_setting(name = "archive_cc?",
+               tags = ["cc"],
+               flag_values = {":archive_cc": "True"})
 
 # build the lib targets used to construct compilers
 build_test(

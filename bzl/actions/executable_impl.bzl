@@ -9,6 +9,7 @@ load(":BUILD.bzl",
      "get_build_executor")
 
 load("//bzl:providers.bzl",
+     "ArchiveCcMarker",
      "BootInfo",
      "ModuleInfo",
      "new_deps_aggregator",
@@ -31,6 +32,57 @@ load("//bzl/rules/common:impl_ccdeps.bzl",
      "dump_CcInfo", "ccinfo_to_string")
 
 load("//bzl:functions.bzl", "filestem")
+
+def handle_cc_deps(ctx, args, includes, vmruntime_custom, depsets, cc_deps):
+    ## FIXME: if -custom was passed in building an archive (so
+    ## it has "Force custom: YES") then we do not need to pass
+    ## it explicitly here. But how can we determine if "Force
+    ## custom" is enabled in an archive?
+
+    ## If we have at least one archive dep WITHOUT ArchiveCcMarker,
+    ## then we add -custom.
+
+    ## For each archive WITHOUT ArchiveCcMarker, we also need
+    ## to add the cc deps. ?? Problem is CcInfo providers are
+    ## separate from archive deps.
+
+    if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+        if not depsets.archive_cc:
+            vmruntime_custom = True # indicate HybridExecutableMarker
+            args.add("-custom")
+        else:
+            vmruntime_custom = True # indicate HybridExecutableMarker
+            args.add("-custom")
+
+        # args.add("-use-runtime")
+        # args.add(ctx.file.ocamlrun)
+        # args.add("-I", ctx.file.ocamlrun.dirname)
+
+        sincludes = []
+        includes = []
+        for dep in cc_deps:
+
+            ## CASE: no archives? then add dep and -I dir to cmd line
+
+            if not ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+                args.add(dep.path)
+
+            ## CASE: libs archived? then cc deps are encoded in
+            ## archive files, so do not add lib to cmd line, but
+            ## do add path for searching
+            ## NB: adding dep to cmd line when libs are archived
+            ## does no harm, it just duplicates info already in
+            ## the archive metadata
+
+            includes.append(dep.dirname)
+
+            #     bn = dep.basename[3:] # drop initial 'lib'
+            #     bn = bn[:-2]  # drop final '.a'
+            #     # args.add("-cclib", "-l" + bn)
+            #     sincludes.append(dep.dirname)
+            #     # args.add("-dllpath", paths.dirname(dep.short_path))
+            #     # args.add("-dllpath", dep.dirname)
+                # sincludes.append("-L" + dep.dirname)
 
 #########################
 def executable_impl(ctx, tc, exe_name,
@@ -166,6 +218,10 @@ def executable_impl(ctx, tc, exe_name,
             # cc_infos = cc_deps_primary + cc_deps_secondary
     )
 
+    ccInfo_archived_provider = cc_common.merge_cc_infos(
+        cc_infos = depsets.ccinfos_archived
+    )
+
     paths_depset  = depset(
         order = dsorder,
         transitive = [merge_depsets(depsets, "paths")]
@@ -249,6 +305,8 @@ def executable_impl(ctx, tc, exe_name,
         # print("runtime files: %s" % runtime_files)
 
     ## WARNING: -custom automatically added if we have a static cc dep
+    ## and no ArchiveCcMarker
+
     # elif "-custom" in ctx.attr.opts:
     #     # for f in ctx.files._runtime:  # libcamlrun.a
     #     # for f in tc.runtime:  # libcamlrun.a
@@ -528,12 +586,19 @@ def executable_impl(ctx, tc, exe_name,
     if debug_ccdeps:
         dump_CcInfo(ctx, ccInfo_provider)
         print("%s" % ccinfo_to_string(ctx, ccInfo_provider))
+        print("CcInfos archived:")
+        print("%s" % ccinfo_to_string(ctx, ccInfo_archived_provider))
+
     ## to construct cmd line we need to extract the cc files from
     ## merged CcInfo provider:
     [static_cc_deps, dynamic_cc_deps] = extract_cclibs(ctx, ccInfo_provider)
+    [static_cc_archived_deps,
+     dynamic_cc_archived_deps] = extract_cclibs(ctx, ccInfo_archived_provider)
     if debug_ccdeps:
         print("static_cc_deps:  %s" % static_cc_deps)
         print("dynamic_cc_deps: %s" % dynamic_cc_deps)
+        print("static_cc_archived_deps:  %s" % static_cc_archived_deps)
+        print("dynamic_cc_archived_deps: %s" % dynamic_cc_archived_deps)
 
     vmruntime_custom = False
     cclib_linkpaths = []
@@ -542,47 +607,25 @@ def executable_impl(ctx, tc, exe_name,
         # FIXME: if cc deps are encoded in archive files we do not
         # need this...
         if len(static_cc_deps) > 0:
-            # vmruntime_custom = True
-
-            ## FIXME: if -custom was passed in building an archive (so
-            ## it has "Force custom: YES") then we do not need to pass
-            ## it explicitly here. But how can we determine if "Force
-            ## custom" is enabled in an archive?
-
-            # args.add("-custom")
-
-            # args.add("-use-runtime")
-            # args.add(ctx.file.ocamlrun)
-            # args.add("-I", ctx.file.ocamlrun.dirname)
-
-            sincludes = []
             includes = []
+            vmruntime_custom = True # indicate HybridExecutableMarker
             for dep in static_cc_deps:
-
-                ## CASE: no archives? then add dep and -I dir to cmd line
-
-                if not ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
-                    args.add(dep.path)
-
-                ## CASE: libs archived? then cc deps are encoded in
-                ## archive files, so do not add lib to cmd line, but
-                ## do add path for searching
-                ## NB: adding dep to cmd line when libs are archived
-                ## does no harm, it just duplicates info already in
-                ## the archive metadata
-
+                args.add(dep.path)
                 includes.append(dep.dirname)
 
-            #     bn = dep.basename[3:] # drop initial 'lib'
-            #     bn = bn[:-2]  # drop final '.a'
-            #     # args.add("-cclib", "-l" + bn)
-            #     sincludes.append(dep.dirname)
-            #     # args.add("-dllpath", paths.dirname(dep.short_path))
-            #     # args.add("-dllpath", dep.dirname)
-                # sincludes.append("-L" + dep.dirname)
-
-            # args.add_all(sincludes, before_each="-ccopt", uniquify=True)
+        if len(static_cc_archived_deps) > 0:
+            includes = []
+            for dep in static_cc_archived_deps:
+                print("cc archived: %s" % dep)
+                # fail("archived")
+                includes.append(dep.dirname)
             args.add_all(includes, before_each="-I", uniquify=True)
+
+            # handle_cc_deps(ctx, args, includes, vmruntime_custom,
+            #                depsets, static_cc_archived_deps)
+
+    if vmruntime_custom:
+        args.add("-custom")
 
     args.add("-o", out_exe)
 
@@ -641,6 +684,7 @@ def executable_impl(ctx, tc, exe_name,
         + [depset(
              [tc.executable]
             + static_cc_deps
+            + static_cc_archived_deps
             + dynamic_cc_deps
             + ctx.files.prologue  #
             + ctx.files.epilogue
