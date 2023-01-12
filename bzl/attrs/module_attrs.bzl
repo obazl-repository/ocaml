@@ -89,7 +89,8 @@ def module_attrs():
                 # [StdStructMarker, ModuleInfo],
                 # [CcInfo]
                 [ModuleInfo],
-                [StdLibMarker]
+                [StdLibMarker],
+                # []
             ],
             # transition undoes changes that may have been made by ns_lib
             # cfg = compile_deps_out_transition,

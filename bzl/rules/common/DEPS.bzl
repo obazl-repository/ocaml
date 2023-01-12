@@ -16,7 +16,8 @@ COMPILE_LINK = 2
 def aggregate_deps(ctx,
                    target, # a Target
                    depsets, # a struct
-                   archive_manifest = []): # target will be added to archive
+                   archive_manifest = [], # target will be added to archive
+                   suppress_cmi = False): # for testing
 
     # archive manifest tells us where to put a cm[o|x] file.
     # if file is in manifest, it is archive, so it goes into archived_cmx
@@ -73,8 +74,10 @@ def aggregate_deps(ctx,
             # print("DefaultInfo.files: %s" % target[DefaultInfo].files)
             # print("BootInfo.linkdeps: %s" % target[BootInfo].cli_link_deps)
             # fail("COMMON")
-        depsets.deps.sigs.append(
-            depset([target[ModuleInfo].sig]))
+
+        if not suppress_cmi:
+            depsets.deps.sigs.append(
+                depset([target[ModuleInfo].sig]))
 
         if target[ModuleInfo].ofile:
             depsets.deps.ofiles.append(depset([target[ModuleInfo].ofile]))

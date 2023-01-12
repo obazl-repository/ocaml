@@ -17,96 +17,64 @@ load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:impl_ccdeps.bzl", "dump_CcInfo", "ccinfo_to_string")
 load("//bzl/rules/common:options.bzl", "get_options")
 
-##############################################
-def gen_compile_script(ctx, executable, args):
+################################################################
+## Tasks, in order:
+# 0. setup - toolchain, options
+# a. construct outputs depset
+#      outputs do not depend on deps, but we include outputs
+#      when we merge deps, so we can later use them in providers
+# b. merge deps
+# c. construct inputs depset
+# d. construct cmd line
+# e. run action
+# f. construct providers
 
-    script = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
-
-    ctx.actions.write(
-        output = script,
-        content = args,
-        is_executable = True
-    )
-
-    return script
-
-#####################
-def module_impl(ctx, module_name):
-
-    basename = ctx.label.name
-    from_name = basename[:1].capitalize() + basename[1:]
-
-    debug = False
-    debug_bootstrap = False
-    debug_ccdeps = False
-
-    cc_toolchain = find_cpp_toolchain(ctx)
-
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
-
-    workdir = tc.workdir
-
-    #########################
-    args = ctx.actions.args()
-
-    # if tc.protocol == "dev":
-
-    toolarg = tc.tool_arg
-    if toolarg:
-        args.add(toolarg.path)
-        toolarg_input = [toolarg]
-    else:
-        toolarg_input = []
-
-    # config is what we're building (target)
-    # in boot mode, build exe/emitter is determined by boot stack
-    # e.g. ocamlopt.byte is built by ocamlc.byte
-    # in dev mode: defaults to native tools
-    # e.g. ocamlopt.byte is built by ocamlc.opt
-
+################################################################
+################
+def construct_outputs(ctx, _options, tc, workdir, ext,
+                      from_name,
+                      module_name ## may be changed
+                      ):
+    debug = True
     if debug:
-        print("TGT: %s" % ctx.label)
-        print("tc.build_executor: %s" % tc.build_executor)
-        print("tc.config_executor: %s" % tc.config_executor)
-        print("tc.config_emitter: %s" % tc.config_emitter)
+        print("contruct_outputs: %s" % ctx.label)
+        print("from_name: %s" % from_name)
 
-    compiler = tc.compiler[DefaultInfo].files_to_run.executable
-    # 'optx' - flambda-built
-    if compiler.basename in [
-        "ocamlc.byte", "ocamlc.opt", "ocamlc.boot",
-        "ocamlc.optx",
-    ]:
-        ext = ".cmo"
-    elif compiler.basename in [
-        "ocamlopt.byte",
-        "ocamlopt.opt",
-        "ocamloptx.byte",
-        "ocamloptx.opt",
-        "ocamloptx.optx",
-    ]:
-        ext = ".cmx"
-    else:
-        fail("bad compiler basename: %s" % compiler.basename)
-        # if tc.protocol == "dev":
-        #     if tc.config_emitter == "sys":
-        #         ext = ".cmx"
-        #     else:
-        #         ext = ".cmo"
-        # else:
-        #     if tc.config_executor == "sys":
-        #         ext = ".cmx"
-        #     else:
-        #         ext = ".cmo"
+    # Two kinds of ModuleInfo outputs:
+    # ** action outputs produced by this rule
+    # ** dep outputs passed on from deps.
+    # In particular, we always provide a .cmi file, but
+    # this could be either an action output or a deps output.
 
-    ################################################################
-    ################  OUTPUTS  ################
+    # Action outputs for ModuleInfo:
+    #   a. a .cmi file if 'sig' attr is empty or a src file
+    #   b. a .cmt file if -bin-annot AND .cmi is an action output
+    #   c. a .cmo or a .cmx file
+    #   d. possibly a .o file
+    #   e. a .cmt file if -bin-annot
 
-    pack_ns = False
-    if hasattr(ctx.attr, "_pack_ns"):
-        if ctx.attr._pack_ns:
-            if ctx.attr._pack_ns[BuildSettingInfo].value:
-                pack_ns = ctx.attr._pack_ns[BuildSettingInfo].value
-                # print("GOT PACK NS: %s" % pack_ns)
+    # Dep outputs for ModuleInfo:
+    #   a. a .cmi file if passed via 'sig' attr
+    #   b. a .cmti file if passed via 'sig' attr
+
+    # ModuleInfo also to contain .ml src file and .mli if we have one
+    # Remaining deps output via BootInfo provider
+
+    # Tasks:
+    # A. prep input src files, possibly renaming, & symlinking to workdir
+    #   a. handle sig: declare outfiles, symlink to workdir
+    #   b. derive module name: fixed if we got .cmi,
+    #      otherwise maybe ns prefixed etc.
+    #   c. handle struct - rename if namespaced, link src to workdir
+    #      i.e. derive in_structfile
+    # B. declare output files
+
+    # pack_ns = False
+    # if hasattr(ctx.attr, "_pack_ns"):
+    #     if ctx.attr._pack_ns:
+    #         if ctx.attr._pack_ns[BuildSettingInfo].value:
+    #             pack_ns = ctx.attr._pack_ns[BuildSettingInfo].value
+    #             # print("GOT PACK NS: %s" % pack_ns)
 
     ################
     includes   = []
@@ -133,10 +101,31 @@ def module_impl(ctx, module_name):
     mlifile = None
     cmifile = None
     sig_src = None
-
     sig_inputs = []
+
+    # provider_output_cmi: never an input
+    #   may be action output, if sig attr is empty or src file
+    #   always a provider output
+    provider_output_cmi = None
+
+    # If sig attr non-empty, it must be either a src file or sig target
     if ctx.attr.sig:
-        if ctx.file.sig.is_source:
+        if OcamlSignatureProvider in ctx.attr.sig:
+            ## cmi already compiled
+            # in case sig was compiled into a tmp dir (e.g. _build) to avoid nameclash,
+            # symlink here
+            sigProvider = ctx.attr.sig[OcamlSignatureProvider]
+            provider_output_cmi = sigProvider.cmi
+            provider_output_mli = sigProvider.mli
+            sig_inputs.append(provider_output_cmi)
+            sig_inputs.append(provider_output_mli)
+            mli_dir = paths.dirname(provider_output_mli.short_path)
+            ## force module name to match compiled cmi
+            extlen = len(ctx.file.sig.extension)
+            module_name = ctx.file.sig.basename[:-(extlen + 1)]
+
+        ## else sig is a src file, either is_source or generated
+        elif ctx.file.sig.is_source:
             # need to symlink .mli, to match symlink of .ml
             sig_src = ctx.actions.declare_file(
                 workdir + module_name + ".mli"
@@ -149,18 +138,6 @@ def module_impl(ctx, module_name):
             action_outputs.append(action_output_cmi)
             provider_output_cmi = action_output_cmi
             mli_dir = None
-        elif OcamlSignatureProvider in ctx.attr.sig:
-            # in case sig was compiled into a tmp dir (e.g. _build) to avoid nameclash,
-            # symlink here
-            sigProvider = ctx.attr.sig[OcamlSignatureProvider]
-            provider_output_cmi = sigProvider.cmi
-            provider_output_mli = sigProvider.mli
-            sig_inputs.append(provider_output_cmi)
-            sig_inputs.append(provider_output_mli)
-            mli_dir = paths.dirname(provider_output_mli.short_path)
-            ## force module name to match compiled cmi
-            extlen = len(ctx.file.sig.extension)
-            module_name = ctx.file.sig.basename[:-(extlen + 1)]
         else:
             # generated sigfile, e.g. by cp, rename, link
             # need to symlink .mli, to match symlink of .ml
@@ -175,7 +152,7 @@ def module_impl(ctx, module_name):
             action_outputs.append(action_output_cmi)
             provider_output_cmi = action_output_cmi
             mli_dir = None
-    else: ## no sig
+    else: ## sig attr empty
         # compiler will generate .cmi
         # put src in workdir as well
         action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
@@ -183,6 +160,7 @@ def module_impl(ctx, module_name):
         provider_output_cmi = action_output_cmi
         mli_dir = None
 
+    ## Task: determine module name, adding ns prefix if required
     ## struct: put in same dir as mli/cmi, rename if namespaced
     if from_name == module_name:  ## not namespaced
         # if ctx.label.name == "CamlinternalFormatBasics":
@@ -190,11 +168,10 @@ def module_impl(ctx, module_name):
             # print("cmi is_source? %s" % provider_output_cmi.is_source)
         if ctx.file.struct.is_source:
             # structfile in src dir, make sure in same dir as sig
+
             if ctx.file.sig:
-                if ctx.file.sig.is_source:
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-                elif OcamlSignatureProvider in ctx.attr.sig:
+                # if we also have a sig...
+                if OcamlSignatureProvider in ctx.attr.sig:
                     # sig file is compiled .cmo
                     # force name of module to match compiled sig
                     extlen = len(ctx.file.sig.extension)
@@ -203,11 +180,15 @@ def module_impl(ctx, module_name):
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                     # print("lbl: %s" % ctx.label)
                     # print("IN STRUCTFILE: %s" % in_structfile)
+                elif ctx.file.sig.is_source:
+                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                 else:
                     # generated sigfile
                     in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-            else: # no sig - cmi will be generated, put both in workdir
+            else: # sig attr empty
+                # no sig - cmi handled above, here link structfile to workdir
                 # in_structfile = ctx.file.struct
                 in_structfile = ctx.actions.declare_file(workdir + ctx.file.struct.basename)
                 ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
@@ -215,7 +196,17 @@ def module_impl(ctx, module_name):
         else: # structfile is generated, e.g. by ocamllex or a genrule.
             # make sure it's in same dir as mli/cmi IF we have ctx.file.sig
             if ctx.file.sig:
-                if ctx.file.sig.is_source:
+                if OcamlSignatureProvider in ctx.attr.sig:
+                    # print("xxxxxxxxxxxxxxxx %s" % ctx.label)
+                    # force name of module to match compiled sig
+                    extlen = len(ctx.file.sig.extension)
+                    module_name = ctx.file.sig.basename[:-(extlen + 1)]
+                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                    # print("lbl: %s" % ctx.label)
+                    # print("IN STRUCTFILE: %s" % in_structfile)
+
+                elif ctx.file.sig.is_source:
                     in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                     ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                     if paths.dirname(ctx.file.struct.short_path) != mli_dir:
@@ -232,19 +223,12 @@ def module_impl(ctx, module_name):
                             print("not symlinking src: {src}".format(
                                 src = ctx.file.struct.path))
                             in_structfile = ctx.file.struct
-                else: # sig file is compiled .cmo
-                    # print("xxxxxxxxxxxxxxxx %s" % ctx.label)
-                    # force name of module to match compiled sig
-                    extlen = len(ctx.file.sig.extension)
-                    module_name = ctx.file.sig.basename[:-(extlen + 1)]
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-                    # print("lbl: %s" % ctx.label)
-                    # print("IN STRUCTFILE: %s" % in_structfile)
+                else: # sig file is generated src
+                    None
             else:  ## no sig file, will emit cmi, put both in workdir
                 in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
                 ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-    else:  ## namespaced
+    else:  ## we're namespaced
         in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
         ctx.actions.symlink(
             output = in_structfile, target_file = ctx.file.struct
@@ -260,14 +244,6 @@ def module_impl(ctx, module_name):
     # direct_linkargs.append(out_cm_)
     default_outputs.append(out_cm_)
 
-    (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
-
-    if "-pervasives" in _options:
-        cancel_opts.append("-nopervasives")
-        _options.remove("-pervasives")
-    # else:
-    #     _options.append("-nopervasives")
-
     out_cmt = None
     if ( ("-bin-annot" in _options)
          or ("-bin-annot" in tc.copts) ):
@@ -275,28 +251,49 @@ def module_impl(ctx, module_name):
         action_outputs.append(out_cmt)
         default_outputs.append(out_cmt)
 
-    moduleInfo_ofile = None
+    # moduleInfo_ofile = None
     if ext == ".cmx":
         # if not ctx.attr._rule.startswith("bootstrap"):
         out_o = ctx.actions.declare_file(workdir + module_name + ".o")
                                          # sibling = out_cm_)
         action_outputs.append(out_o)
         default_outputs.append(out_o)
-        moduleInfo_ofile = out_o
+        # moduleInfo_ofile = out_o
         # print("OUT_O: %s" % out_o)
         # direct_linkargs.append(out_o)
+    else:
+        out_o = None
 
+    out_logfile = None
     if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):
 
-        out_dump = ctx.actions.declare_file(
+        out_logfile = ctx.actions.declare_file(
+            ## Suffix .dump is fixed by compiler
             out_cm_.basename + ".dump",
             sibling = out_cm_,
         )
-        action_outputs.append(out_dump)
+        action_outputs.append(out_logfile)
 
-    ################################################################
-    ################  DEPS  ################
+    return (module_name,
+            action_outputs,
+            default_outputs,
+            out_cm_,
+            out_o,
+            out_cmt,
+            out_logfile,
+            provider_output_cmi,
+            in_structfile,
+            direct_inputs,
+            sig_inputs,
+            includes,
+            sig_src)
+
+################################################################
+################
+def merge_deps(ctx, ext, open_stdlib,
+               provider_output_cmi, out_cm_, out_o):
+
     depsets = new_deps_aggregator()
 
     # if ctx.attr._manifest[BuildSettingInfo].value:
@@ -318,13 +315,9 @@ def module_impl(ctx, module_name):
             if provider_output_cmi:
                 depsets.deps.sigs.append(depset([provider_output_cmi]))
 
-    open_stdlib = False
-    stdlib_module_target  = None
-    stdlib_primitives_target  = None
-    stdlib_library_target = None
-
     for dep in ctx.attr.deps:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
+
         # if len(ctx.attr.stdlib_deps) < 1:
         # if dep.label.package == "stdlib":
         #     if dep.label.name in ["Primitives", "Stdlib"]:
@@ -346,19 +339,19 @@ def module_impl(ctx, module_name):
             depsets = aggregate_deps(ctx, dep, depsets, manifest)
 
     if hasattr(ctx.attr, "stdlib_deps"):
-        if len(ctx.attr.stdlib_deps) > 0:
-            if not ctx.label.name == "Stdlib":
-                open_stdlib = True
+        # if len(ctx.attr.stdlib_deps) > 0:
+        #     if not ctx.label.name == "Stdlib":
+        #         open_stdlib = True
         for dep in ctx.attr.stdlib_deps:
             depsets = aggregate_deps(ctx, dep, depsets, manifest)
-            if dep.label.name == "Primitives":
-                stdlib_primitives_target = dep
-            elif dep.label.name == "Stdlib":  ## Stdlib resolver
-                stdlib_module_target = dep
-            elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
-                stdlib_module_target = dep
-            elif dep.label.name == "stdlib": ## stdlib archive OR library
-                stdlib_library_target = dep
+            # if dep.label.name == "Primitives":
+            #     stdlib_primitives_target = dep
+            # elif dep.label.name == "Stdlib":  ## Stdlib resolver
+            #     stdlib_module_target = dep
+            # elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
+            #     stdlib_module_target = dep
+            # elif dep.label.name == "stdlib": ## stdlib archive OR library
+            #     stdlib_library_target = dep
 
         ## Now what if this module is to be archived, and this dep is
         ## a sibling submodule? If it is a sibling it goes in
@@ -452,38 +445,37 @@ def module_impl(ctx, module_name):
         transitive = [merge_depsets(depsets, "paths")]
     )
 
-    ################################################################
-    ################
-    # indirect_ppx_codep_depsets      = []
-    # indirect_ppx_codep_path_depsets = []
-    indirect_cc_deps  = {}
+    ## FIXME: put merged depsets into new DepsAggregator
+    return (depsets,
+            sigs_depset,
+            cli_link_deps_depset,
+            afiles_depset,
+            ofiles_depset,
+            archived_cmx_depset,
+            ccInfo_provider,
+            paths_depset)
 
-    resolver = None
-    resolver_deps = []
-    if hasattr(ctx.attr, "ns"):
-        if ctx.attr.ns:
-            resolver = ctx.attr.ns[ModuleInfo]
-            resolver_deps.append(resolver.sig)
-            resolver_deps.append(resolver.struct)
-            nsname = resolver.struct.basename[:-4]
-            args.add_all(["-open", nsname])
+################################################################
+def construct_args(ctx, tc, _options, cancel_opts,
+                   direct_inputs,
+                   open_stdlib,
+                   # stdlib_depset,
+                   ext,
+                   # resolver_args
+                   ):
 
-            # includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
-            direct_inputs.append(ctx.attr.ns[ModuleInfo].sig)
-            direct_inputs.append(ctx.attr.ns[ModuleInfo].struct)
-    # if hasattr(ctx.attr, "ns"):
-    #     if ctx.attr.ns:
-    #         includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
+    args = ctx.actions.args()
 
-    stdlib_depset =[]
+    if tc.tool_arg:
+        args.add(tc.tool_arg.path)
 
-    # if --//config/ocaml/compiler/libs:archived
-    # if hasattr(ctx.attr, "stdlib_primitives"): # test rules
-    #     if ctx.attr.stdlib_primitives:
-    #         if hasattr(ctx.attr, "_stdlib"):
-    #             print("stdlib: %s" % ctx.attr._stdlib[ModuleInfo].files)
-    #             includes.append(ctx.file._stdlib.dirname)
-    #             stdlib_depset.append(ctx.attr._stdlib[ModuleInfo].files)
+    # if tc.protocol == "dev":
+
+    if "-pervasives" in _options:
+        cancel_opts.append("-nopervasives")
+        _options.remove("-pervasives")
+    # else:
+    #     _options.append("-nopervasives")
 
     if hasattr(ctx.attr, "_opts"):
         args.add_all(ctx.attr._opts)
@@ -563,26 +555,166 @@ def module_impl(ctx, module_name):
                 if d == "instruction-selection":
                     args.add("-dsel")
 
-    merged_input_depsets = [merge_depsets(depsets, "sigs")]
+    return args
+
+##############################################
+def gen_compile_script(ctx, executable, args):
+
+    script = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
+
+    ctx.actions.write(
+        output = script,
+        content = args,
+        is_executable = True
+    )
+
+    return script
+
+#####################
+def module_impl(ctx, module_name):
+
+    debug = True
+    debug_bootstrap = False
+    debug_ccdeps = False
+
+    basename = ctx.label.name
+    from_name = basename[:1].capitalize() + basename[1:]
+
+    cc_toolchain = find_cpp_toolchain(ctx)
+
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
+
+    workdir = tc.workdir
+
+    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+
+    if debug:
+        print("TGT: %s" % ctx.label)
+        print("tc.build_executor: %s" % tc.build_executor)
+        print("tc.config_executor: %s" % tc.config_executor)
+        print("tc.config_emitter: %s" % tc.config_emitter)
+
+    # 'optx' - flambda-built
+    if compiler.basename in [
+        "ocamlc.byte", "ocamlc.opt", "ocamlc.boot",
+        "ocamlc.optx",
+    ]:
+        ext = ".cmo"
+    elif compiler.basename in [
+        "ocamlopt.byte",
+        "ocamlopt.opt",
+        "ocamloptx.byte",
+        "ocamloptx.opt",
+        "ocamloptx.optx",
+    ]:
+        ext = ".cmx"
+    else:
+        fail("bad compiler basename: %s" % compiler.basename)
+
+    (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
+
+    ################################################################
+    ################  OUTPUTS  ################
+    (module_name,
+     action_outputs,
+     default_outputs,
+     out_cm_,
+     out_o,
+     out_cmt,
+     out_logfile,
+     provider_output_cmi,
+     in_structfile,
+     direct_inputs,
+     sig_inputs,
+     includes,
+     sig_src) = construct_outputs(ctx, _options, tc,
+                                  workdir, ext,
+                                  from_name, module_name)
+
+    ################################################################
+    ################  DEPS  ################
+    stdlib_module_target  = None
+    stdlib_primitives_target  = None
+    stdlib_library_target = None
+    stdlib_depset =[]
+
+    # if --//config/ocaml/compiler/libs:archived
+    # if hasattr(ctx.attr, "stdlib_primitives"): # test rules
+    #     if ctx.attr.stdlib_primitives:
+    #         if hasattr(ctx.attr, "_stdlib"):
+    #             print("stdlib: %s" % ctx.attr._stdlib[ModuleInfo].files)
+    #             includes.append(ctx.file._stdlib.dirname)
+    #             stdlib_depset.append(ctx.attr._stdlib[ModuleInfo].files)
+
+    open_stdlib = False
+    if hasattr(ctx.attr, "stdlib_deps"):
+        if len(ctx.attr.stdlib_deps) > 0:
+            if not ctx.label.name == "Stdlib":
+                open_stdlib = True
+        for dep in ctx.attr.stdlib_deps:
+            if dep.label.name == "Primitives":
+                stdlib_primitives_target = dep
+            elif dep.label.name == "Stdlib":  ## Stdlib resolver
+                stdlib_module_target = dep
+            elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
+                stdlib_module_target = dep
+            elif dep.label.name == "stdlib": ## stdlib archive OR library
+                stdlib_library_target = dep
+
+    (depsets,
+     sigs_depset,
+     cli_link_deps_depset,
+     afiles_depset,
+     ofiles_depset,
+     archived_cmx_depset,
+     ccInfo_provider,
+     paths_depset) = merge_deps(ctx, ext, open_stdlib,
+                                       provider_output_cmi, out_cm_, out_o)
+
+    ################################################################
+    #### construct inputs depset
+
+    resolver = None
+    resolver_deps = []
+    ## ns rules used by debugger and dynlink with hand-rolled resolvers
+    if hasattr(ctx.attr, "ns"):
+        if ctx.attr.ns:
+            resolver = ctx.attr.ns[ModuleInfo]
+            resolver_deps.append(resolver.sig)
+            resolver_deps.append(resolver.struct)
+            nsname = resolver.struct.basename[:-4]
+            args.add_all(["-open", nsname])
+
+            # includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
+            direct_inputs.append(ctx.attr.ns[ModuleInfo].sig)
+            direct_inputs.append(ctx.attr.ns[ModuleInfo].struct)
+    # if hasattr(ctx.attr, "ns"):
+    #     if ctx.attr.ns:
+    #         includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
+
+    ## testing: to emulate the situation where a cmi file is missing,
+    ## test_module has attr 'suppress_cmi', listing cmi deps to be removed
+    ## from the inputs to this target.
+    merged_sigs = merge_depsets(depsets, "sigs")
+    if hasattr(ctx.attr, "suppress_cmi"):
+        if len(ctx.attr.suppress_cmi) > 0:
+            suppressed_cmis = []
+            for dep in ctx.attr.suppress_cmi:
+                suppressed_cmis.extend(dep[BootInfo].sigs.to_list())
+            msigs = []
+            for sig in merged_sigs.to_list():
+                if sig not in suppressed_cmis:
+                    msigs.append(sig)
+            input_sigs_depset = depset(msigs)
+        else:
+            input_sigs_depset = merged_sigs
+    else:
+        input_sigs_depset = merged_sigs
+
+    merged_input_depsets = [input_sigs_depset]
     merged_input_depsets.append(merge_depsets(depsets, "cli_link_deps"))
     if ext == ".cmx":
         merged_input_depsets.append(archived_cmx_depset)
-
-    # OCaml srcs use three namespaces:
-    #     Stdlib, Dynlink_compilerlibs, Ocamldebug
-    ################ Direct Deps ################
-
-    #NB: this will (may?) put stdlib in search path, even if target
-    # does not depend on stdlib. that's ok because target may depend
-    # on primitives that are exported by //stdlib:Stdlib
-
-    includes.extend(paths_depset.to_list())
-
-    runtime_deps = []
-    # print("module: %s" % ctx.label)
-    # for x in tc.runtime[CcInfo].linking_context.linker_inputs.to_list():
-    #     for lib in x.libraries:
-    #         runtime_deps.extend(lib.objects)
 
     inputs_depset = depset(
         order = dsorder,
@@ -592,8 +724,8 @@ def module_impl(ctx, module_name):
         + depsets.deps.mli
         + resolver_deps
         + [tc.executable]
-        + toolarg_input
-        + runtime_deps
+        + ([tc.tool_arg] if tc.tool_arg else [])
+        # + runtime_deps
         ,
         transitive = []
         + merged_input_depsets
@@ -605,11 +737,71 @@ def module_impl(ctx, module_name):
         ## cc driver
         + [cc_toolchain.all_files]
     )
+
+    ################################################################
+    ################  CMD LINE  ################
+    args = construct_args(ctx, tc, _options, cancel_opts,
+                          direct_inputs,
+                          open_stdlib,
+                          # stdlib_depset,
+                          ext,
+                          # resolver_args,
+                          )
+
+    toolarg = tc.tool_arg
+    if toolarg:
+        toolarg_input = [toolarg]
+    else:
+        toolarg_input = []
+
+    # OCaml srcs use three namespaces:
+    #     Stdlib, Dynlink_compilerlibs, Ocamldebug
+    ################ Direct Deps ################
+
+    #NB: this will (may?) put stdlib in search path, even if target
+    # does not depend on stdlib. that's ok because target may depend
+    # on primitives that are exported by //stdlib:Stdlib
+
+    includes.extend(paths_depset.to_list())
+
+    # runtime_deps = []
+    # print("module: %s" % ctx.label)
+    # for x in tc.runtime[CcInfo].linking_context.linker_inputs.to_list():
+    #     for lib in x.libraries:
+    #         runtime_deps.extend(lib.objects)
+
+    # if ctx.label.package == "testsuite/tests/typing-missing-cmi":
+    #     if ctx.label.name == "Main":
+    #         print("inputs: %s" % sig_inputs)
+    #         fail()
+
+    # inputs_depset = depset(
+    #     order = dsorder,
+    #     direct = []
+    #     + sig_inputs
+    #     + direct_inputs
+    #     + depsets.deps.mli
+    #     + resolver_deps
+    #     + [tc.executable]
+    #     + toolarg_input
+    #     + runtime_deps
+    #     ,
+    #     transitive = []
+    #     + merged_input_depsets
+    #     # + [tc.compiler[DefaultInfo].default_runfiles.files]
+    #     + stdlib_depset
+    #     # + ns_deps
+    #     # + bottomup_ns_inputs
+    #     ## depend on cc tc - makes bazel stuff accessible to ocaml's
+    #     ## cc driver
+    #     + [cc_toolchain.all_files]
+    # )
+
     # if ctx.label.name == "Misc":
     #     print("inputs_depset: %s" % inputs_depset)
 
-    if pack_ns:
-        args.add("-for-pack", pack_ns)
+    # if pack_ns:
+    #     args.add("-for-pack", pack_ns)
 
     if sig_src:
         includes.append(sig_src.dirname)
@@ -699,12 +891,15 @@ def module_impl(ctx, module_name):
     )
     providers = [defaultInfo]
 
+    cmi_depset = depset(direct=[provider_output_cmi])
+
     moduleInfo_depset = depset(
         ## FIXME: add ofile?
         direct= [in_structfile],
         transitive = [depset(
             [out_cm_, provider_output_cmi]
-            + ([moduleInfo_ofile] if moduleInfo_ofile else [])
+            + ([out_o] if out_o else [])
+            # + ([moduleInfo_ofile] if moduleInfo_ofile else [])
             + ([out_cmt] if out_cmt else [])
         )]
     )
@@ -715,7 +910,7 @@ def module_impl(ctx, module_name):
         struct_src = in_structfile,
         structfile = ctx.file.struct.basename,
         cmt = out_cmt,
-        ofile  = moduleInfo_ofile,
+        ofile  = out_o, ## moduleInfo_ofile,
         files = moduleInfo_depset ## FIXME: ???
     )
 
@@ -771,20 +966,20 @@ def module_impl(ctx, module_name):
     if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):
         # if len(ctx.attr.dump) > 0:
-        d = DumpInfo(dump = out_dump,
+        d = DumpInfo(dump = out_logfile,
                      src = ctx.file.struct.path)
         providers.append(d)
         outputGroupInfo = OutputGroupInfo(
-            cmi        = depset(direct=[provider_output_cmi]),
+            cmi        = cmi_depset,
             module     = moduleInfo_depset,
-            log = depset([out_dump]),
-            all    = depset(direct=[out_dump],
+            log = depset([out_logfile]),
+            all    = depset(direct=[out_logfile],
                             transitive= [moduleInfo_depset]),
         )
     else:
         outputGroupInfo = OutputGroupInfo(
             structfile = depset([in_structfile]),
-            cmi    = depset(direct=[provider_output_cmi]),
+            cmi    = cmi_depset,
             cmt    = depset(direct=[out_cmt]) if out_cmt else depset(),
             all    = moduleInfo_depset,
         )
