@@ -540,8 +540,6 @@ def module_impl(ctx, module_name):
                 args.add("-drawlambda")
             if d == "lambda":
                 args.add("-dlambda")
-            if d == "rawclambda":
-                args.add("-drawclambda")
             if d == "rawflambda":
                 args.add("-drawflambda")
             if d == "flambda":
@@ -551,9 +549,6 @@ def module_impl(ctx, module_name):
             if d == "flambda-verbose":
                 args.add("-dflambda-verbose")
 
-            if d == "instruction-selection":
-                args.add("-dsel")
-
             if ext == ".cmo":
                 if d == "instr":
                     args.add("-dinstr")
@@ -561,8 +556,12 @@ def module_impl(ctx, module_name):
             if ext == ".cmx":
                 if d == "clambda":
                     args.add("-dclambda")
+                if d == "rawclambda":
+                    args.add("-drawclambda")
                 if d == "cmm":
                     args.add("-dcmm")
+                if d == "instruction-selection":
+                    args.add("-dsel")
 
     merged_input_depsets = [merge_depsets(depsets, "sigs")]
     merged_input_depsets.append(merge_depsets(depsets, "cli_link_deps"))
@@ -714,6 +713,7 @@ def module_impl(ctx, module_name):
         # sig_src = in_structfile,
         struct = out_cm_,
         struct_src = in_structfile,
+        structfile = ctx.file.struct.basename,
         cmt = out_cmt,
         ofile  = moduleInfo_ofile,
         files = moduleInfo_depset ## FIXME: ???
@@ -771,12 +771,15 @@ def module_impl(ctx, module_name):
     if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):
         # if len(ctx.attr.dump) > 0:
-        d = DumpInfo(dump = out_dump)
+        d = DumpInfo(dump = out_dump,
+                     src = ctx.file.struct.path)
         providers.append(d)
         outputGroupInfo = OutputGroupInfo(
             cmi        = depset(direct=[provider_output_cmi]),
             module     = moduleInfo_depset,
-            log = depset([out_dump])
+            log = depset([out_dump]),
+            all    = depset(direct=[out_dump],
+                            transitive= [moduleInfo_depset]),
         )
     else:
         outputGroupInfo = OutputGroupInfo(

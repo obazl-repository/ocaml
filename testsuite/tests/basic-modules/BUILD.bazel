@@ -12,49 +12,68 @@ load("//test:rules.bzl",
 test_suite(
     name = "tests",
     tests = [
-        ":anonymous_test",
+        # ":anonymous_test",
         ":Main_expect_test",
         ":Recursive_module_init_expect_test",
         ":Recursive_module_evaluation_errors",
     ],
 )
 
-# ocaml_test just compiles and runs executable, w/o diffing
-ocaml_test(
-    name = "anonymous_test",
-    main = ":Anonymous",
-    prologue = [
-    ],
-    timeout = "short"
+# test_executable(
+#     name    = "anonymous",
+#     main    = ":Anonymous",
+# )
+
+# ocaml_test(
+#     name = "anonymous_test",
+#     main = ":Anonymous",
+#     prologue = [
+#     ],
+#     timeout = "short"
+# )
+
+# flags = "-c -nostdlib -nopervasives -dlambda -dno-unique-ids"
+
+lambda_expect_test(  ## ocamlc.byte
+    name   = "Anonymous_test",
+    test_module = ":Anonymous",
+    expected = "anonymous.ocamlc.reference",
 )
 
-# lambda_expect_test(
+# lambda_expect_vs_test(  ## ocamlopt.byte
 #     name   = "Anonymous_test",
 #     struct   = "anonymous.ml",
 #     expect   = "anonymous.ocamlc.reference",
-#     stdlib_deps = ["//stdlib"]         # FIXME: make this implicit?
+#     deps = ["//stdlib"]         # FIXME: make this implicit?
+# )
+
+# lambda_expect_xx_test(  ## ocamloptx.optx
+#     name   = "Anonymous_test",
+#     struct   = "anonymous.ml",
+#     expect   = "anonymous.ocamlc.reference",
+#     deps = ["//stdlib"]         # FIXME: make this implicit?
 # )
 
 test_module(
     name   = "Anonymous",
     struct   = "anonymous.ml",
-    # dump = [
-    #     "lambda",
-    #     # "rawlambda",
-    #     # "clambda",
-    #     # "rawclambda",
-    #     # "cmm",
-    #     # "parsetree",
-    #     # "instr"
-    #     # "instruction-selection"
-    # ],
-    # opts   = [
+    dump = [
+        "lambda",
+        # "rawlambda",
+        # "cmm",
+        # "parsetree",
+        # "instr",
+        # "clambda",     ## native
+        # "rawclambda",  ## native
+        # "instruction-selection" # native?
+    ],
+    opts   = [
     #     "-nostdlib",
     #     "-nopervasives",
     #     # "-dno-locations",
-    #     # "-dno-unique-ids"
-    # ],
-    stdlib_deps = ["//stdlib"]
+        "-dno-unique-ids"
+    ],
+    stdlib_deps = ["//stdlib:CamlinternalMod"]
 )
 
 # ocaml_test(
