@@ -322,6 +322,7 @@ def executable_impl(ctx, tc, exe_name,
     #     cc_libdirs.append(tc.runtime.dirname)
 
     else:  # stem != ocamlc
+        args.add(tc.runtime) ## FIXME: put this at end of cmd, just before -o
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
         runtime_path = tc.runtime.path
 

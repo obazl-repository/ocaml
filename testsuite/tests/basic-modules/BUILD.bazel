@@ -115,7 +115,7 @@ test_module(
     name   = "Pr4008",
     struct = "pr4008.ml",
     stdlib_deps   = [
-        "//stdlib:Primitives",
+        "//stdlib:CamlinternalMod",
         "//stdlib:Stdlib.List",
     ]
 )
@@ -158,9 +158,9 @@ test_module(
     struct = "recursive_module_init.ml",
     # dump = ["lambda"],
     stdlib_deps = [
-        "//stdlib:Primitives",
-        # "//stdlib:CamlinternalOO",
-        # "//stdlib:CamlinternalMod",
+        # "//stdlib:Primitives",
+        "//stdlib:CamlinternalOO",
+        "//stdlib:CamlinternalMod",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
     ]
