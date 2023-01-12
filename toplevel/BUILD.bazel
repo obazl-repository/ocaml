@@ -126,6 +126,7 @@ ocaml_tool_vm(
         # "-nostdlib",
         # "-noinit"
     ],
+    tags     = ["tool"],
     visibility = [
         "//:__pkg__",
         "//testsuite/tests:__subpackages__",

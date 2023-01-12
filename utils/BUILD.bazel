@@ -70,6 +70,7 @@ build_tool( ## only build as vm/vm with boot compiler
         "//bytecomp:ocamlbytecomp",
     ],
     main = "//toplevel:Expunge",
+    tags     = ["tool"],
     visibility = ["//toplevel:__pkg__"]
 )
 

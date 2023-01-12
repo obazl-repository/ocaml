@@ -45,7 +45,7 @@ environment_group(
 
 # ../../boot/ocamlrun ../../ocamlc -nostdlib -I ../../stdlib -linkall -o expect_test ../../compilerlibs/ocamlcommon.cma ../../compilerlibs/ocamlbytecomp.cma ../../compilerlibs/ocamltoplevel.cma expect_test.cmo
 
-ocaml_tool_vm(
+ocaml_tool_vm( #FIXME: use compiler rule?
     name = "inline_expect",
     prologue = [
         "//stdlib",
@@ -55,6 +55,7 @@ ocaml_tool_vm(
     ],
     main = ":Expect_test",
     opts = ["-linkall"],
+    tags     = ["compiler"], # this tool is effectively a compiler
     visibility = [
         "//ocamltest:__pkg__",
         "//testsuite:__subpackages__"

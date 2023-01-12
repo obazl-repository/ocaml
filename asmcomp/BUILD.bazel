@@ -855,6 +855,7 @@ build_tool_vm(
     #     "//stdlib:Stdlib.Sys",
     #     "//stdlib:Stdlib.Array",
     ],
+    tags     = ["tool"],
     visibility = ["//boot:__pkg__", "//asmcomp:__subpackages__"]
 )
 

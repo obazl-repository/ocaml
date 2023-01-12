@@ -146,6 +146,7 @@ def flambda_compilers(name,
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -154,6 +155,7 @@ def flambda_compilers(name,
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -162,6 +164,7 @@ def flambda_compilers(name,
         prologue   = OCAMLC_PROLOGUE,
         main       = OCAMLC_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -174,6 +177,7 @@ def flambda_compilers(name,
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -182,5 +186,6 @@ def flambda_compilers(name,
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )

@@ -269,63 +269,6 @@ def executable_impl(ctx, tc, exe_name,
     # if tc.config_executor == "sys":  ## target_executor
     # if compiler.basename in ["ocamlopt.opt", "ocamlopt.byte",
     #                          "ocamloptx.optx", "ocamloptx.byte"]:
-    if stem in ["ocamlc", "ocamlcp"]:
-
-        ## if target_executor(tc) == "sys"
-
-        # native compilers need libasmrun
-        # WARNING: if we do not add libasmrun.a as a dep here,
-        # OCaml will try to link /usr/local/lib/ocaml/libasmrun.a
-        # to see, pass -verbose to the ocaml_compiler.opts or use
-        # --//config/ocaml/link:verbose
-        # print("lbl: %s" % ctx.label)
-        # print("exe runtime: %s" % ctx.attr._runtime)
-        # print("exe runtime files: %s" % ctx.attr._runtime.files)
-
-        # for f in ctx.files._runtime: ## libasmrun.a
-        # for f in tc.runtime: ## libasmrun.a
-
-        # print("tc.COMPILER: %s" % tc.compiler)
-        # print("tc.RUNTIME: %s" % tc.runtime.path)
-
-        ## FIXME: linux: pick .a or .pic.a???
-
-        # make sure -lcamlrun can be resolved
-
-        runtime_path = tc.runtime.path
-        runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
-        ## NB: Asmlink looks for libasmrun.a in the std search
-        ## space (-I dirs), not the link srch space (-L dirs)
-        includes.append(tc.runtime.dirname) #[0][DefaultInfo].files.to_list()[0].dirname)
-        # cc_libdirs.append(f.dirname)
-
-        ## do not add to CLI - asmcomp/asmlink adds it to the
-        ## OCaml cc link subcmd
-
-        # print("runtime files: %s" % runtime_files)
-
-    ## WARNING: -custom automatically added if we have a static cc dep
-    ## and no ArchiveCcMarker
-
-    # elif "-custom" in ctx.attr.opts:
-    #     # for f in ctx.files._runtime:  # libcamlrun.a
-    #     # for f in tc.runtime:  # libcamlrun.a
-    #         # print("tc.RUNTIME: %s" % f)
-    #         # runtime_files.append(f)
-    #         # # will add -L<f.dirname> below
-    #         # cc_libdirs.append(f.dirname)
-    #     print("custom tc.RUNTIME: %s" % tc.runtime)
-    #     runtime_files.append(tc.runtime)
-    #     ## add tc.runtime.path to args?
-    #     # will add -L<f.dirname> below
-    #     # cc_libdirs.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
-    #     cc_libdirs.append(tc.runtime.dirname)
-
-    else:  # stem != ocamlc
-        args.add(tc.runtime) ## FIXME: put this at end of cmd, just before -o
-        runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
-        runtime_path = tc.runtime.path
-
     (_options, cancel_opts) = get_options(rule, ctx)
     # print("_options: %s" % _options)
     # print("cancel_opts: %s" % cancel_opts)
@@ -517,28 +460,55 @@ def executable_impl(ctx, tc, exe_name,
     ##FIXME: this logic is for building compilers only?
     ## ordinary executables might not list stdib archive dep?
 
-    if ("test_exe" in ctx.attr.tags):  ## FIXME: why?
-        # or "test_vs" in ctx.attr.tags):
-        # rule ss_test_executable has only 'main', no prologue
-        for dep in cli_link_deps_list:
-            args.add(dep)
-    elif ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+    # if ("test_exe" in ctx.attr.tags):  ## FIXME: why?
+    #     # or "test_vs" in ctx.attr.tags):
+    #     # rule ss_test_executable has only 'main', no prologue
+    #     for dep in cli_link_deps_list:
+    #         args.add(dep)
+    if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
         ## FIXME: this strategy works for archives, where we want to
         ## archive only those modules explicitly listed in manifest.
-        ## but it does not executables.
-        for dep in filtering_depset.to_list():
-            if dep in manifest:
+        ## but it does not work for executables with prologue, main,
+        ## epilogue, where we need the entire cli_link_deps.
+
+        ## FIX this ghastly hack!
+        if (ctx.attr._rule.endswith("executable")
+            or "tool" in ctx.attr.tags):
+            # build_tool_*, ocaml_tool_*, test_*_executable
+            for dep in cli_link_deps_list:
                 args.add(dep)
-        # ## 'main' dep must come last on cmd line
-        if ctx.file.main:
-            ##FIXME: what about main's deps? they should be in
-            ##filtering_depset; but they are not in manifest so they
-            ##are not added to cli.
-            args.add(ctx.file.main)
 
-        if hasattr(ctx.attr, "epilogue"):
-            args.add_all(ctx.files.epilogue)
+        elif "compiler" in ctx.attr.tags:
+            ## don't compiler rules have same
+            ## needs as std executables? problem would seem to be
+            ## incorrect cli_link_deps when lib archiving is enabled -
+            ## adding them results in duplicate module definitions due
+            ## to overlap of direct deps and archives. archive rule is
+            ## not removing submodules from cli_link_deps.
+            ## happens with --//testsuite:archive_cc --larch
+            ## does not happen without --larch (no-archives)
 
+            # for dep in cli_link_deps_list:
+            #     args.add(dep)
+
+            # until we get cli_link_deps fixed:
+            for dep in filtering_depset.to_list():
+                if dep in manifest:
+                    args.add(dep)
+
+            # ## 'main' dep, then epilogue must come last on cmd line
+            if ctx.file.main:
+                ##FIXME: what about main's deps? they should be in
+                ##filtering_depset; but they are not in manifest so they
+                ##are not added to cli.
+                args.add(ctx.file.main)
+
+            if hasattr(ctx.attr, "epilogue"):
+                args.add_all(ctx.files.epilogue)
+
+        else:
+            print("tgt label: %s" % ctx.label)
+            fail("bad exec rule: %s" % ctx.attr._rule)
     else:
         for dep in cli_link_deps_list:
             args.add(dep)
@@ -554,6 +524,7 @@ def executable_impl(ctx, tc, exe_name,
     # if -pervasives, it only needs to be in the inputs depset
     if not pervasives:
         args.add_all(ctx.files._std_exit)
+        # args.add_all(ctx.attr._std_exit[BootInfo].cli_link_deps)
 
     # if target == "vm":
     #     if ctx.attr.vm_runtime[OcamlVmRuntimeProvider].kind == "dynamic":
@@ -624,6 +595,62 @@ def executable_impl(ctx, tc, exe_name,
 
             # handle_cc_deps(ctx, args, includes, vmruntime_custom,
             #                depsets, static_cc_archived_deps)
+    if stem in ["ocamlc", "ocamlcp"]:
+
+        ## if target_executor(tc) == "sys"
+
+        # native compilers need libasmrun
+        # WARNING: if we do not add libasmrun.a as a dep here,
+        # OCaml will try to link /usr/local/lib/ocaml/libasmrun.a
+        # to see, pass -verbose to the ocaml_compiler.opts or use
+        # --//config/ocaml/link:verbose
+        # print("lbl: %s" % ctx.label)
+        # print("exe runtime: %s" % ctx.attr._runtime)
+        # print("exe runtime files: %s" % ctx.attr._runtime.files)
+
+        # for f in ctx.files._runtime: ## libasmrun.a
+        # for f in tc.runtime: ## libasmrun.a
+
+        # print("tc.COMPILER: %s" % tc.compiler)
+        # print("tc.RUNTIME: %s" % tc.runtime.path)
+
+        ## FIXME: linux: pick .a or .pic.a???
+
+        # make sure -lcamlrun can be resolved
+
+        runtime_path = tc.runtime.path
+        runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
+        ## NB: Asmlink looks for libasmrun.a in the std search
+        ## space (-I dirs), not the link srch space (-L dirs)
+        includes.append(tc.runtime.dirname) #[0][DefaultInfo].files.to_list()[0].dirname)
+        # cc_libdirs.append(f.dirname)
+
+        ## do not add to CLI - asmcomp/asmlink adds it to the
+        ## OCaml cc link subcmd
+
+        # print("runtime files: %s" % runtime_files)
+
+    ## WARNING: -custom automatically added if we have a static cc dep
+    ## and no ArchiveCcMarker
+
+    # elif "-custom" in ctx.attr.opts:
+    #     # for f in ctx.files._runtime:  # libcamlrun.a
+    #     # for f in tc.runtime:  # libcamlrun.a
+    #         # print("tc.RUNTIME: %s" % f)
+    #         # runtime_files.append(f)
+    #         # # will add -L<f.dirname> below
+    #         # cc_libdirs.append(f.dirname)
+    #     print("custom tc.RUNTIME: %s" % tc.runtime)
+    #     runtime_files.append(tc.runtime)
+    #     ## add tc.runtime.path to args?
+    #     # will add -L<f.dirname> below
+    #     # cc_libdirs.append(tc.runtime[DefaultInfo].files.to_list()[0].dirname)
+    #     cc_libdirs.append(tc.runtime.dirname)
+
+    else:  # stem != ocamlc
+        args.add(tc.runtime) ## FIXME: put this at end of cmd, just before -o
+        runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
+        runtime_path = tc.runtime.path
 
     if vmruntime_custom:
         args.add("-custom")
@@ -657,7 +684,7 @@ def executable_impl(ctx, tc, exe_name,
     # print("lbl: %s" % ctx.label)
     # print("exe effective_compiler: %s" % effective_compiler.path)
 
-    print("std_exit bootinfo: %s"% ctx.attr._std_exit[BootInfo])
+    # print("std_exit bootinfo: %s"% ctx.attr._std_exit[BootInfo])
     std_exit_inputs_depsets = []
     std_exit_inputs_depsets.append(ctx.attr._std_exit[BootInfo].sigs)
     std_exit_inputs_depsets.append(ctx.attr._std_exit[BootInfo].cli_link_deps)

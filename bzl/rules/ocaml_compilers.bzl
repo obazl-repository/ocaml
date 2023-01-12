@@ -282,6 +282,7 @@ def std_compilers(name,
         prologue   = OCAMLC_PROLOGUE,
         main       = OCAMLC_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -290,6 +291,7 @@ def std_compilers(name,
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -298,6 +300,7 @@ def std_compilers(name,
         prologue   = OCAMLOPT_PROLOGUE,
         main       = OCAMLOPT_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -306,6 +309,7 @@ def std_compilers(name,
         prologue   = OCAMLC_PROLOGUE,
         main       = OCAMLC_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -322,7 +326,10 @@ def profiling_compilers(name,
     std_ocamlc_byte(
         name = "ocamlcp.byte",
         prologue = OCAMLCP_PROLOGUE,
-        main = OCAMLCP_MAIN
+        main = OCAMLCP_MAIN,
+        opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
+        visibility = ["//visibility:public"]
     )
 
     std_ocamlc_opt(
@@ -330,6 +337,7 @@ def profiling_compilers(name,
         prologue   = OCAMLCP_PROLOGUE,
         main       = OCAMLCP_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -338,6 +346,7 @@ def profiling_compilers(name,
         prologue   = OCAMLOPTP_PROLOGUE,
         main       = OCAMLOPTP_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 
@@ -346,6 +355,7 @@ def profiling_compilers(name,
         prologue   = OCAMLOPTP_PROLOGUE,
         main       = OCAMLOPTP_MAIN,
         opts       = OCAML_COMPILER_OPTS,
+        tags = ["compiler"],
         visibility = ["//visibility:public"]
     )
 

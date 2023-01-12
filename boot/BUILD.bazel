@@ -179,6 +179,7 @@ boot_ocamlc_byte(
     prologue   = OCAMLC_PROLOGUE,
     main       = OCAMLC_MAIN,
     opts       = OCAML_COMPILER_OPTS,
+    tags       = ["compiler"],
     visibility = ["//visibility:public"]
 )
 
@@ -187,6 +188,7 @@ boot_ocamlopt_byte(
     prologue   = OCAMLOPT_PROLOGUE,
     main       = OCAMLOPT_MAIN,
     opts       = OCAML_COMPILER_OPTS,
+    tags       = ["compiler"],
     visibility = ["//visibility:public"]
 )
 
@@ -195,6 +197,7 @@ boot_ocamlopt_opt(
     prologue   = OCAMLOPT_PROLOGUE,
     main       = OCAMLOPT_MAIN,
     opts       = OCAML_COMPILER_OPTS,
+    tags       = ["compiler"],
     visibility = ["//visibility:public"]
 )
 
@@ -203,6 +206,7 @@ boot_ocamlc_opt(
     prologue   = OCAMLC_PROLOGUE,
     main       = OCAMLC_MAIN,
     opts       = OCAML_COMPILER_OPTS,
+    tags       = ["compiler"],
     visibility = ["//visibility:public"]
 )
 

@@ -75,6 +75,7 @@ ocaml_tools( # expands to targets ocamldep.byte, ocamldep.opt
     prologue = OCAMLC_PROLOGUE,
     main     = ":Ocamldep",
     opts     = OCAML_COMPILER_OPTS ##  + ["-verbose", "-ccopt", "-Wl,-v"],
+    tags     = ["tool"]
 )
 
 tool_module(
@@ -187,7 +188,8 @@ ocaml_tools( # expands to tgts ocamlprof.byte, ocamlprof.opt
     # warnings   = ["$(WARNINGS)"],
     # use_prims  = True,
     # toolchains = ["//toolchain/profile/ocaml"]
-    opts         = OCAML_COMPILER_OPTS
+    opts         = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 tool_module(
@@ -249,7 +251,8 @@ ocaml_tools( # expands to tgts ocamlmklib.byte, ocamlmklib.opt
         "//utils:Build_path_prefix_map",
         "//utils:Misc",
     ],
-    opts     = OCAML_COMPILER_OPTS
+    opts     = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 compiler_module(
@@ -300,7 +303,8 @@ ocaml_tools(
         "//utils:Profile",
         "//utils:Ccomp",
     ],
-    opts     = OCAML_COMPILER_OPTS
+    opts     = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 compiler_module(
@@ -329,7 +333,8 @@ ocaml_tools( # expands to ocamlcmt.byte, ocamlcmt.opt
     name        = "ocamlcmt",
     prologue    = OCAMLC_PROLOGUE,
     main        = ":Ocamlcmt",
-    opts        = OCAML_COMPILER_OPTS
+    opts        = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 compiler_module(
@@ -376,7 +381,8 @@ ocaml_tools(
     name        = "dumpobj",
     prologue    = OCAMLC_PROLOGUE + ["//bytecomp:Opnames"],
     main        = ":Dumpobj",
-    opts        = OCAML_COMPILER_OPTS
+    opts        = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 compiler_module(
@@ -421,7 +427,8 @@ ocaml_tools(
     name        = "ocamlobjinfo",
     prologue    = OCAMLC_PROLOGUE + ["//middle_end:ocamlmiddleend"],
     main        = ":Objinfo",
-    opts        = ["-linkall"] + OCAML_COMPILER_OPTS
+    opts        = ["-linkall"] + OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 compiler_module(
@@ -472,7 +479,8 @@ ocaml_tools(
     name        = "primreq",
     prologue    = OCAMLC_PROLOGUE,
     main        = ":Primreq",
-    opts        = OCAML_COMPILER_OPTS
+    opts        = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 compiler_module(
@@ -496,7 +504,8 @@ ocaml_tools(
     name     = "stripdebug",
     prologue = OCAMLC_PROLOGUE,
     main     = ":Stripdebug",
-    opts     = OCAML_COMPILER_OPTS
+    opts     = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 # ../boot/ocamlrun ../boot/ocamlc
@@ -534,7 +543,8 @@ ocaml_tools(
         "//otherlibs/str"
     ],
     main     = ":Lintapidiff",
-    opts     = OCAML_COMPILER_OPTS
+    opts     = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 compiler_module(
@@ -690,7 +700,8 @@ ocaml_tools(
     name     = "cmpbyt",
     prologue = OCAMLC_PROLOGUE,
     main     = ":Cmpbyt",
-    opts     = OCAML_COMPILER_OPTS
+    opts     = OCAML_COMPILER_OPTS,
+    tags     = ["tool"]
 )
 
 compiler_module(
