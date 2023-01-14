@@ -722,13 +722,13 @@ compiler_module(
     struct = "load_path.ml",
     sig    = "Load_path_cmi",
     opts = MODULE_OPTS,
-    open   = ["//stdlib:Stdlib"],
     deps   = [
         "//config:Config",
         ":Local_store",
         ":Misc",
     ],
     stdlib_deps = [
+        # "//stdlib:Stdlib",
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Filename",
         "//stdlib:Stdlib.List",
