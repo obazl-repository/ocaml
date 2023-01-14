@@ -37,16 +37,63 @@ the `//testsuite/tests/lib-dynlink-bytecode:plug1_lib` build target.
 That target uses the `test_library` rule, and is a dependency of the
 test executable target for this test.
 
+Tests often write something to `stdout`, which the test runner
+compares to some expected output in a file. Usually the output is not
+printed to the screen; the test just reports pass/fail, and you'll
+only see the output if the test fails, in which case the test
+machinery writes the output to a log file.
+
+But especially during development it is useful to run the test program
+and see the output onscreen. This is easy with the Bazel rules, since
+the test executable target is distinct from the test runner target.
+Taking again `lib-dynlink-bytecode` as an example, we can run a test
+executable directly:
+
+    bazel run testsuite/tests/lib-dynlink-bytecode:Registry.vv.custom
+
+which prints:
+
+----
+This is stub1!
+ABCDEF
+This is stub2, calling stub1:
+This is stub1!
+Ok!
+----
+
+making it easy to edit-compile-run.
+
+NOTE: ".vv.custom" (instead of ".vv.byte" or ".vv.opt") indicates that
+the executable was built by `ocamlc.byte` with `-custom`, resulting in
+a hybrid vm/sys executable that can be run without `ocamlrun`.
+
+Once you've got the code where you
+want it, you can run it as a test:
+
+----
+bazel test testsuite/tests/lib-dynlink-bytecode:Registry_custom_test
+...
+//testsuite/tests/lib-dynlink-bytecode:Registry_custom_test              PASSED in 0.1s
+Executed 1 out of 1 test: 1 test passes.
+----
+
+IMPORTANT: The target names here are ad-hoc; I have not yet settled on
+a naming convention. The important point is that test runner target
+`:Registry_custom_test` lists the executable target
+`Registry.vv.custom` as a dependency in its `test_executable`
+attribute.
 
 === Expressiveness
 
 CC dependencies can be expressed for modules, libraries/archives, and
-executables. Such dependencies are always encapsulated in `CcInfo`
-providers, which are always propageted in target dependency graphs. So
-you can attach a C library directly to the OCaml module that uses it,
-and it will be passed up the chain of dependencies to any executable
-that links the OCaml module. If the module is included in an archive,
-the C library will automatically be added to the archive metadata.
+executables. Such dependencies are always encapsulated in
+link:https://bazel.build/rules/lib/CcInfo[CcInfo] providers, which are
+always propagated in target dependency graphs. So you can attach a C
+library directly to the OCaml module that uses it, and it will be
+passed up the chain of dependencies to any executable that links the
+OCaml module. If the module is included in an archive, you can
+configure your build to automatically add the C library (and
+`-custom`) to the archive metadata.
 
 For example, in the `lib-dynlink-bytecode` test example, `libstub1.a`
 is attached to module `Plug.cmo`; the module is included in archive
@@ -58,7 +105,8 @@ IMPORTANT: This works even if `plug1_lib` is an unarchived library. In
 that case an archive file will not be created, but the `libstub1.a`
 dependency will be propagated in the dependency tree of `Plug.cmo`.
 That tree is available to the test executable rule reponsible for
-running the OCaml linker, so it will extract the library and add it to the link command line.
+running the OCaml linker, so it will extract the library and add it to
+the link command line.
 
 == The Rules
 

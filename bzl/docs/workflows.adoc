@@ -1,13 +1,24 @@
 = workflows
 
-
-If you get an error like this:
+== Setup
 
 ----
-ERROR: /home/<uid>/ocamlcc/toolchain/BUILD.bazel:1:11: every rule of type label_flag implicitly depends upon the target '@dev//bin:ocamlc.opt', but this target could not be found because of: no such target '@dev//bin:ocamlc.opt': target 'ocamlc.opt' not declared in package 'bin' defined by /home/<uid>/.cache/bazel/_bazel_<uid>/f4012e66d98647d4c49d9c650a5ae78c/external/baseline/bin/BUILD.bazel (Tip: use `query "@dev//bin:*"` to see all the targets in that package)
+    bazel run boot:checkpoint <1>
+    bazel run boot:clean   <2>
 ----
+<1> Builds all compilers and tools, and installs them to `@dev` (actual path: `.baseline`)
+<2> Removes files added to `.baseline` by `boot:checkpoint`
 
-then you need to run `$ bazel run boot:checkpoint`
+Runnable targets in `@dev//bin` will directly run the executable files
+installed by `boot:checkpoint` in `.baseline/bin`, so they will not be
+recompiled. This is the fastest way to run tools such as
+`ocamlobjinfo`, `ocamlcmt`, `primreq`, etc. Test targets (in
+`//testsuite`) _will_rebuild the compilers and tools as needed (and
+incrementally), using the compilers in `@dev/bin` as the base. For
+example, if you change some source code and then run a "vv" test (one
+that builds the test code using `ocamlc.byte`), the compiler
+(`ocamlc.byte`) will be incrementally rebuilt using
+`@dev//bin:ocamlc.opt`, and then used to compile the test code..
 
 == Compiler development
 
@@ -18,3 +29,15 @@ then you need to run `$ bazel run boot:checkpoint`
 
 
 == Tools development
+
+
+== Troubleshooting
+
+If you get an error like this:
+
+----
+ERROR: /home/<uid>/ocamlcc/toolchain/BUILD.bazel:1:11: every rule of type label_flag implicitly depends upon the target '@dev//bin:ocamlc.opt', but this target could not be found because of: no such target '@dev//bin:ocamlc.opt': target 'ocamlc.opt' not declared in package 'bin' defined by /home/<uid>/.cache/bazel/_bazel_<uid>/f4012e66d98647d4c49d9c650a5ae78c/external/baseline/bin/BUILD.bazel (Tip: use `query "@dev//bin:*"` to see all the targets in that package)
+----
+
+then you need to run `$ bazel run boot:checkpoint`
+

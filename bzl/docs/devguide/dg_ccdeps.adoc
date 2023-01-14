@@ -1,6 +1,6 @@
 = Developer Guide: CC Dependencies
 :toc: auto
-:toclevels: 3
+:toclevels: 5
 
 == rules_cc
 
@@ -29,21 +29,37 @@ Dependencies on `CcInfo`-producing targets are expressed via the
 
 == linking considerations
 
-Recommended practice is to add C libraries to OCaml archive files. The
-OCaml compilers add metadata about the libraries to the `.cmx?a` file,
-and at link time use it to automatically link the code. When an
-archive file is viewed with `ocamlobjinfo`, the following fields are displayed:
+The standard OCaml recommendation is to add C libraries to
+OCaml archive files. The OCaml compilers add metadata about the
+libraries to the `.cmx?a` file, and at link time use it to
+automatically do the right thing.
+
+When an archive file is viewed with `ocamlobjinfo`, the following
+fields are displayed:
 
 ----
+Force custom:
 Extra C object files:
 Extra C options:
 Extra dynamically-loaded libraries:
 ----
 
+[TIP]
+====
+You can easily run `ocamlobjinfo` in your (hermetic) build
+environment by first running `bazel run boot:checkpoint` and then:
+
+    bazel run @dev//bin:lso --//:arg=//path/to:target
+
+The OCamlCC Bazel rules will ensure that //path/to:target is rebuilt
+if necessary. See xref:../tools.adoc[Tools] for more information.
+====
+
 If you've instructed the compiler to add a C library to the archive
 you will see it listed. Any arguments you have passed using `--ccopt`
-will be shown as `Extra C options`; for example, if you pass a share
-library and a `-L` directory, you will see both.
+will be shown as `Extra C options`; for example, if you pass a shared
+library and a `-L` directory, you will see both. If you pass
+`-custom`, you will see `Force custom: YES`.
 
 Static C libraries (`lib*.a`) can be added by listing directly on the
 command line, without an option letter. For example:
@@ -85,7 +101,45 @@ static library directy. This has the advantage of explicitness, since
 `-lstub1` on the command line does not tell us whether the library is
 `libstub1.a` or `libstub1.so`.
 
-==== Link search paths
+== Bytecode CC dependencies
+
+
+=== Static libraries
+
+Several methods are available for linking VM code and static CC
+libraries to produce an executable:
+
+* List the full library paths directly in the link command. The
+  compilers know what to do with files named `lib....a`.
+* Use the standard C convention of passing arguments of the form
+  `-lfoo` to indicate that `libfoo.a`(or `libfoo.so`) should be
+  linked. To do this you use OCaml option `-cclib`, e.g. `-cclib
+  -lfoo`. To communicate the directory containing the library, you
+  follow the C example of using `-L`, but you pass it with `-ccopt`
+  instead of `-cclib`: [nowrap]`-cclib -lfoo -ccopt -Lfoo/bar`.
+
+As a convenience, the OCaml compilers accept the same arguments for
+building archive files as for linking executables. Instead of linking,
+they add metadata about the C libraries to the archive file. You can
+use `ocamlobjinfo` to inspect it. Then when the archive file is used
+as input to build an executable, the OCaml linker will retrieve the
+metadata and use it to find and link the C libraries.
+
+Regardless of method, to link static C libraries to bytecode you must
+pass OCaml option `-custom`. There are several ways to do this as
+well:
+
+
+
+=== Shared libraries
+
+=== Dynamic Linking
+
+
+== Native CC dependencies
+
+
+== Link search paths
 
 At link time, the OCaml linker will see that C libraries are listed in
 an archive file and proceed to link them.
