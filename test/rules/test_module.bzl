@@ -1,6 +1,9 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load("//bzl:providers.bzl", "BootInfo", "ModuleInfo")
+load("//bzl:providers.bzl",
+     "BootInfo", "ModuleInfo",
+     "StdLibMarker")
+
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 load("//bzl/actions:module_impl.bzl", "module_impl")
 
@@ -21,7 +24,19 @@ test_module_ = rule(
     doc = "Compiles a module.",
     attrs = dict(
         module_attrs(),
-        dump = attr.string_list(),
+        suppress_cmi = attr.label_list(
+            doc = "For testing only: do not pass on cmi files in Providers.",
+            providers = [
+                [ModuleInfo],
+                [StdLibMarker],
+            ],
+        ),
+        #FIXME: rename 'dump' > 'logging'
+        dump = attr.string_list(
+            doc = """
+            List of 'dump' options without the -d, e.g. 'lambda' for -dambda
+            """
+        ),
         # open_stdlib = attr.bool(),
         # stdlib_primitives = attr.bool(default = False),
         # _stdlib = attr.label(
