@@ -19,7 +19,7 @@ load("//bzl/actions:module_impl.bzl", "module_impl")
 load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 
 ######################
-def _compile_fail_test(ctx):
+def _compile_fail_test_impl(ctx):
 
     (this, extension) = paths.split_extension(ctx.file.struct.basename)
     module_name = this[:1].capitalize() + this[1:]
@@ -616,6 +616,7 @@ def _compile_fail_test(ctx):
     args.extend(["diff", "-w", dump, ctx.file.expected.path])
 
     script = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
+
     ctx.actions.write(
         output = script,
         content = " ".join(args),
@@ -665,7 +666,7 @@ def _compile_fail_test(ctx):
 
 ####################
 compile_fail_test = rule(
-    implementation = _compile_fail_test,
+    implementation = _compile_fail_test_impl,
     doc = "Compiles a module with the bootstrap compiler.",
     attrs = dict(
         module_attrs(),

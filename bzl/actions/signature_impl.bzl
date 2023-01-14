@@ -195,10 +195,13 @@ def signature_impl(ctx, module_name):
         direct = [out_cmi],
         transitive = [merge_depsets(depsets, "sigs")])
 
-    cli_link_deps_depset = depset(
-        order = dsorder,
-        transitive = [merge_depsets(depsets, "cli_link_deps")]
-    )
+    if depsets.deps.cli_link_deps != []:
+        cli_link_deps_depset = depset(
+            order = dsorder,
+            transitive = [merge_depsets(depsets, "cli_link_deps")]
+        )
+    else:
+        cli_link_deps_depset = []
 
     afiles_depset  = depset(
         order=dsorder,

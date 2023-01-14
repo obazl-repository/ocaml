@@ -149,6 +149,11 @@ BootInfo, _new_ocamlbootinfo = provider(
     init = _BootInfo_init
 )
 
+def dump_bootinfo(bi):
+    print("sigs: %s" % bi.sigs)
+    print("structs: %s" % bi.structs)
+    print("linkdeps: %s" % bi.cli_link_deps)
+
 ##########################
 DepsAggregator = provider(
     fields = {

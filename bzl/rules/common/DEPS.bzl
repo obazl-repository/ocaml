@@ -27,11 +27,14 @@ def aggregate_deps(ctx,
     this = ctx.label.package + "/" + ctx.label.name
 
     debug = False
-    # if target.label.name == "Ppxlib_driver":
+    # if ctx.label.name == "Load_path_cmi":
     #     debug = True
+
     if debug:
+        print("target lbl: %s" % ctx.label)
         print("aggregate_deps: %s" % target)
         print("manifest: %s" % archive_manifest)
+        print("cli_link_deps: %s" % target[BootInfo].cli_link_deps)
         for m in archive_manifest:
             print("m: %s" % m)
             print("m=this %s" % (m == this))
@@ -66,7 +69,8 @@ def aggregate_deps(ctx,
 
     if provider:
         depsets.deps.sigs.append(provider.sigs)
-        depsets.deps.cli_link_deps.append(provider.cli_link_deps)
+        if provider.cli_link_deps != []:
+            depsets.deps.cli_link_deps.append(provider.cli_link_deps)
 
     if ModuleInfo in target:
         # if target.label.name == "Common":
@@ -84,20 +88,26 @@ def aggregate_deps(ctx,
 
         if archiving:
             if target not in archive_manifest:
-                depsets.deps.cli_link_deps.append(
-                    depset([target[ModuleInfo].struct]))
+                if provider.cli_link_deps != []:
+                    depsets.deps.cli_link_deps.append(
+                        depset([target[ModuleInfo].struct]))
             else:
                 depsets.deps.archived_cmx.append(target[ModuleInfo].struct)
         else:
-            depsets.deps.cli_link_deps.append(
-                depset([target[ModuleInfo].struct]))
+            if provider.cli_link_deps != []:
+                depsets.deps.cli_link_deps.append(
+                    depset([target[ModuleInfo].struct]))
 
     if provider:
         depsets.deps.afiles.append(provider.afiles)
         if provider.ofiles != []:
             depsets.deps.ofiles.append(provider.ofiles)
-        depsets.deps.archived_cmx.append(provider.archived_cmx)
-        depsets.deps.paths.append(provider.paths)
+
+        if provider.archived_cmx != []:
+            depsets.deps.archived_cmx.append(provider.archived_cmx)
+
+        if provider.paths != []:
+            depsets.deps.paths.append(provider.paths)
 
     if CcInfo in target:
         ## if target == vm, and vmruntime = dynamic, then cc_binary
