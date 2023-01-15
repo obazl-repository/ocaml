@@ -3,12 +3,11 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load(":BUILD.bzl", "progress_msg", "get_build_executor")
-
 load("//bzl:providers.bzl",
      "BootInfo", "dump_bootinfo",
      "DumpInfo", "ModuleInfo", "NsResolverInfo",
      "DepsAggregator",
+     "StdLibMarker",
      "StdStructMarker",
      "StdlibStructMarker",
      "new_deps_aggregator", "OcamlSignatureProvider")
@@ -19,21 +18,25 @@ load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:impl_ccdeps.bzl", "dump_CcInfo", "ccinfo_to_string")
 load("//bzl/rules/common:options.bzl", "get_options")
 
-load(":module_compile_action.bzl", "construct_module_compile_action")
+load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
+load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 
-##################################
-def module_impl(ctx, module_name):
+load("//bzl/actions:module_compile_action.bzl", "construct_module_compile_action")
 
+################################################################
+def compile_module_test_impl(ctx):
     debug = False
     debug_ccdeps = False
 
     if ctx.label.name == "Load_path":
         debug = True
 
+    (this, extension) = paths.split_extension(ctx.file.struct.basename)
+    module_name = this[:1].capitalize() + this[1:]
+
     (inputs,
      outputs, # dictionary of files
-     executor,
-     executor_arg,  ## ignore - only used for compile_module_test
+     executable,
      workdir,
      args) = construct_module_compile_action(ctx, module_name)
 
@@ -47,13 +50,12 @@ def module_impl(ctx, module_name):
         print("INPUT.cmi: %s" % inputs.cmi)
         # fail()
 
+    # if ctx.label.name == "Bytesections":
+    #     fail()
+
     outs = []
     for v in outputs.values():
         if v: outs.append(v)
-
-    print("OUTS: %s" % outs)
-    # if ctx.attr._rule == "test_infer_signature":
-    #     fail()
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
@@ -62,13 +64,13 @@ def module_impl(ctx, module_name):
     ################
     ctx.actions.run(
         # env        = env,
-        executable = executor.path,
+        executable = executable.path,
         arguments = [args],
         # inputs: from deps we get a list of depsets, so:
         # inputs = depset(direct=[action inputfiles...],
         #                 transitive=[deps dsets...])
         inputs    = depset(
-            direct = inputs.files + [executor],
+            direct = inputs.files + [executable],
             transitive = []
             + inputs.bootinfo.sigs
             + inputs.bootinfo.structs
@@ -174,7 +176,6 @@ def module_impl(ctx, module_name):
             )
             providers.append(nsResolverInfo)
 
-    this_path = outputs["cmstruct"].dirname
     bootProvider = BootInfo(
         # sigs     = sigs_depset,
         sigs     = depset(order=dsorder,
@@ -196,10 +197,9 @@ def module_impl(ctx, module_name):
                           transitive = inputs.bootinfo.ofiles),
 
         # archived_cmx  = depset(transitive(depsets.deps.archived_cmx)), #_depset,
-
         paths    = depset(
             order = dsorder,
-            direct = [this_path],
+            direct = [outputs["cmstruct"].dirname],
             transitive = inputs.bootinfo.paths
         )
     )

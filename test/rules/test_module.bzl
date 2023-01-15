@@ -1,7 +1,9 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
-     "BootInfo", "ModuleInfo",
+     "BootInfo",
+     "ModuleInfo",
+     "SigInfo",
      "StdLibMarker")
 
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")
@@ -28,6 +30,7 @@ test_module_ = rule(
             doc = "For testing only: do not pass on cmi files in Providers.",
             providers = [
                 [ModuleInfo],
+                [SigInfo],
                 [StdLibMarker],
             ],
         ),

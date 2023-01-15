@@ -33,6 +33,26 @@ load("//bzl/rules/common:options.bzl", "get_options")
 # f. construct providers
 
 ################################################################
+def declare_output_file(ctx, workdir, fname, ext, sibling = None):
+    if ctx.attr._rule == "compile_module_test":
+        return workdir + fname + ext
+    else:
+        if sibling:
+            return ctx.actions.declare_file(
+                workdir + fname + ext,
+                sibling = sibling
+            )
+        else:
+            return ctx.actions.declare_file(
+                workdir + fname + ext
+            )
+
+################################################################
+def declare_input_file(ctx, workdir, fname, ext, symlink):
+    tmpfile = ctx.actions.declare_file(workdir + fname + ext)
+    ctx.actions.symlink(output = tmpfile, target_file = symlink)
+    return tmpfile
+
 ################
 def construct_outputs(ctx, _options, tc, workdir, ext,
                       # from_name,
@@ -149,15 +169,14 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
         ## else sig is a src file, either is_source or generated
         elif ctx.file.sig.is_source:
             # need to symlink .mli, to match symlink of .ml
-            sig_src = ctx.actions.declare_file(
-                workdir + module_name + ".mli"
-            )
+            sig_src = declare_output_file(ctx, workdir, module_name, ".mli")
             outputs["sigfile"] = sig_src
             # sig_inputs.append(sig_src)
             ctx.actions.symlink(output = sig_src,
                                 target_file = ctx.file.sig)
 
-            action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+            action_output_cmi = declare_output_file(ctx, workdir, module_name, ".cmi")
+            # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
             action_outputs.append(action_output_cmi)
             # provider_output_cmi = action_output_cmi
             outputs["cmi"] = action_output_cmi
@@ -165,34 +184,39 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
         else:
             # generated sigfile, e.g. by cp, rename, link
             # need to symlink .mli, to match symlink of .ml
-            sig_src = ctx.actions.declare_file(
-                workdir + module_name + ".mli"
-            )
+            sig_src = declare_input_file(ctx, workdir, module_name, ".mli", ctx.file.sig)
+            # sig_src = ctx.actions.declare_file(
+            #     workdir + module_name + ".mli"
+            # )
+            # ctx.actions.symlink(output = sig_src,
+            #                     target_file = ctx.file.sig)
             outputs["sigfile"] = sig_src
-            # sig_inputs.append(sig_src)
-            ctx.actions.symlink(output = sig_src,
-                                target_file = ctx.file.sig)
 
-            action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+            # sig_inputs.append(sig_src)
+
+            action_output_cmi = declare_output_file(ctx, workdir, module_name, ".cmi")
+            # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
             action_outputs.append(action_output_cmi)
-            # provider_output_cmi = action_output_cmi
             outputs["cmi"] = action_output_cmi
             mli_dir = None
     else: ## sig attr empty
         # compiler will generate .cmi
         # put src in workdir as well
-        action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
+        action_output_cmi = declare_output_file(ctx, workdir, module_name, ".cmi")
+        # action_output_cmi = ctx.actions.declare_file(workdir + module_name + ".cmi")
         action_outputs.append(action_output_cmi)
-        # provider_output_cmi = action_output_cmi
         outputs["cmi"] = action_output_cmi
         mli_dir = None
 
     # direct_inputs = [in_structfile]
 
-    out_cm_ = ctx.actions.declare_file(workdir + module_name + ext)
-    # sibling = new_cmi) # fname)
-    if debug:
-        print("OUT_CM_: %s" % out_cm_.path)
+    if ctx.attr._rule == "compile_module_test":
+        out_cm_ = module_name + ext
+    else:
+        out_cm_ = declare_output_file(ctx, workdir, module_name, ext)
+
+    # out_cm_ = ctx.actions.declare_file(workdir + module_name + ext)
+    if debug: print("OUT_CM_: %s" % out_cm_.path)
     action_outputs.append(out_cm_)
     outputs["cmstruct"] = out_cm_
     # direct_linkargs.append(out_cm_)
@@ -201,7 +225,8 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
     out_cmt = None
     if ( ("-bin-annot" in _options)
          or ("-bin-annot" in tc.copts) ):
-        out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
+        out_cmt = declare_output_file(ctx, workdir, module_name, ".cmt")
+        # out_cmt = ctx.actions.declare_file(workdir + module_name + ".cmt")
         action_outputs.append(out_cmt)
         outputs["cmt"] = out_cmt
         # default_outputs.append(out_cmt)
@@ -209,7 +234,8 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
     # moduleInfo_ofile = None
     if ext == ".cmx":
         # if not ctx.attr._rule.startswith("bootstrap"):
-        out_o = ctx.actions.declare_file(workdir + module_name + ".o")
+        out_o = declare_output_file(ctx, workdir, module_name, ".o")
+        # out_o = ctx.actions.declare_file(workdir + module_name + ".o")
                                          # sibling = out_cm_)
         action_outputs.append(out_o)
         outputs["ofile"] = out_o
@@ -224,11 +250,15 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
     if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):
 
-        out_logfile = ctx.actions.declare_file(
-            ## Suffix .dump is fixed by compiler
-            out_cm_.basename + ".dump",
-            sibling = out_cm_,
+        out_logfile = declare_output_file(ctx,
+            "", out_cm_.basename, ".dump", ## sfx fixed by compiler
+            sibling = out_cm_
         )
+        # out_logfile = ctx.actions.declare_file(
+        #     ## Suffix .dump is fixed by compiler
+        #     out_cm_.basename + ".dump",
+        #     sibling = out_cm_,
+        # )
         action_outputs.append(out_logfile)
         outputs["logfile"] = out_logfile
 
@@ -249,8 +279,46 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
             # sig_src
             )
 
+################
+def construct_inference_outputs(ctx, _options, tc,
+                                workdir, ext,
+                                module_name):
+    debug = False
+
+    if debug:
+        print("contruct_inference_outputs: %s" % ctx.label)
+
+    outputs = {
+        "cmi": None,
+        "sigfile": None,
+        "cmti": None,
+
+        "cmstruct": None,
+        "cmt": None,
+        "structfile": None,
+        "ofile": None,
+        "logfile": None,
+        "workdir": None,
+    }
+
+    ################
+    action_outputs   = []
+    ## ignore ctx.attr.sig, compiler will generate .mli
+
+    # NB: use src file name, not mormalized module name
+    action_output_mli = declare_output_file(
+        ctx, workdir,
+        ##module_name,
+        ctx.file.struct.basename,
+        "i")
+    action_outputs.append(action_output_mli)
+    outputs["mli"] = action_output_mli
+
+    return (outputs, module_name)
+
 ################################################################
 def construct_inputs(ctx, tc, ext, workdir,
+                     executor, executor_arg,
                      from_name, module_name,
                      # direct_inputs,  # in_structfile
                      # stdlib_depset,
@@ -261,12 +329,21 @@ def construct_inputs(ctx, tc, ext, workdir,
                      ):
 
     debug = False
+    debug_suppress_cmis = False
 
     in_files   = []
     in_depsets = []
 
-    if tc.tool_arg:
-        in_files.append(tc.tool_arg)
+    # compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    # if compiler.basename.startswith("ocamlc"):
+    #     in_files.append(compiler)
+
+    in_files.append(executor)
+    if executor_arg:
+        in_files.append(executor_arg)
+
+    # if tc.tool_arg:
+    #     in_files.append(tc.tool_arg)
 
     ## Task: determine in_structfile.
     ## may be different than src, either by renaming or if it is
@@ -322,22 +399,26 @@ def construct_inputs(ctx, tc, ext, workdir,
                     # force name of module to match compiled sig
                     extlen = len(ctx.file.sig.extension)
                     module_name = ctx.file.sig.basename[:-(extlen + 1)]
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
-                    # print("lbl: %s" % ctx.label)
-                    # print("IN STRUCTFILE: %s" % in_structfile)
+                    in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
+                    # in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+
                 elif ctx.file.sig.is_source:
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                    in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
+                    # in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                 else:
                     # generated sigfile
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                    in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
+                    # in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+
             else: # sig attr empty
                 # no sig - cmi handled above, here link structfile to workdir
                 # in_structfile = ctx.file.struct
-                in_structfile = ctx.actions.declare_file(workdir + ctx.file.struct.basename)
-                ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                in_structfile = declare_input_file(ctx, workdir, ctx.file.struct.basename, "", ctx.file.struct)
+                # in_structfile = ctx.actions.declare_file(workdir + ctx.file.struct.basename)
+                # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
 
         else: # structfile is generated, e.g. by ocamllex or a genrule,
             # so it is not in the original src dir
@@ -348,8 +429,9 @@ def construct_inputs(ctx, tc, ext, workdir,
                     # force name of module to match compiled sig
                     extlen = len(ctx.file.sig.extension)
                     module_name = ctx.file.sig.basename[:-(extlen + 1)]
-                    in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-                    ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                    in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
+                    # in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                    # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                     # print("lbl: %s" % ctx.label)
                     # print("IN STRUCTFILE: %s" % in_structfile)
 
@@ -358,11 +440,12 @@ def construct_inputs(ctx, tc, ext, workdir,
                     # outputs["structfile"] = in_structfile
                     # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
                     if paths.dirname(ctx.file.struct.short_path) != mli_dir:
-                        in_structfile = ctx.actions.declare_file(
-                            workdir + module_name + ".ml") # ctx.file.struct.basename)
-                        ctx.actions.symlink(
-                            output = in_structfile,
-                            target_file = ctx.file.struct)
+                        in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
+                        # in_structfile = ctx.actions.declare_file(
+                        #     workdir + module_name + ".ml") # ctx.file.struct.basename)
+                        # ctx.actions.symlink(
+                        #     output = in_structfile,
+                        #     target_file = ctx.file.struct)
                         if debug:
                             print("symlinked {src} => {dst}".format(
                                 src = ctx.file.struct, dst = in_structfile))
@@ -374,13 +457,16 @@ def construct_inputs(ctx, tc, ext, workdir,
                 else: # sig file is generated src
                     fail("Unhandled case: sigfile is generated")
             else:  ## no sig file, will emit cmi, put both in workdir
-                in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-                ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
+                # in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+                # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+
     else:  ## we're namespaced
-        in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-        ctx.actions.symlink(
-            output = in_structfile, target_file = ctx.file.struct
-        )
+        in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
+        # in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
+        # ctx.actions.symlink(
+        #     output = in_structfile, target_file = ctx.file.struct
+        # )
 
     # outputs["structfile"] = in_structfile
     in_files.append(in_structfile)
@@ -409,28 +495,57 @@ def construct_inputs(ctx, tc, ext, workdir,
     #     if ctx.attr.ns:
     #         includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
 
-    # We do need to merge sigs, in order to filter out suppressed cmis
-    # for testing, to emulate the situation where a cmi file is
-    # missing. Rule 'test_module' has attr 'suppress_cmi', listing cmi
-    # deps to be removed from the inputs to this target.
+    ## IF we have ctx.attr.suppress_cmi, then we need to reconstruct
+    ## our BuildInfo to exclude suppressed cmis. This is required for
+    ## one test case. In that cae we need to merge sigs, in order to
+    ## filter out suppressed cmis for testing, to emulate the
+    ## situation where a cmi file is missing. Rule 'test_module' has
+    ## attr 'suppress_cmi', listing cmi deps to be removed from the
+    ## inputs to this target.
 
-    merged_sigs = merge_depsets(depsets, "sigs")
+    ## TODO: see about writing a custom one-off rule+implementation
+    ## for that test case.
+
     if hasattr(ctx.attr, "suppress_cmi"):
         if len(ctx.attr.suppress_cmi) > 0:
+            ## TODO: in this case, update depsets.deps (ie. BootInfo)
+            merged_sigs = merge_depsets(depsets, "sigs")
+            if debug_suppress_cmis:
+                print("merged_sigs: %s" % merged_sigs)
             suppressed_cmis = []
             for dep in ctx.attr.suppress_cmi:
+                if debug_suppress_cmis:
+                    print("SUPPRESS: %s" % dep)
                 suppressed_cmis.extend(dep[BootInfo].sigs.to_list())
+            if debug_suppress_cmis:
+                print("suppressing: %s" % suppressed_cmis)
             msigs = []
             for sig in merged_sigs.to_list():
                 if sig not in suppressed_cmis:
                     msigs.append(sig)
+            if debug_suppress_cmis:
+                print("msigs: %s" % msigs)
             input_sigs_depset = depset(msigs)
+            bootInfo = BootInfo(
+                # sigs    = msigs,
+                sigs    = [input_sigs_depset],
+                structs = depsets.deps.structs,
+                cli_link_deps = depsets.deps.cli_link_deps,
+                afiles = depsets.deps.afiles,
+                ofiles = depsets.deps.ofiles,
+                archived_cmx = depsets.deps.archived_cmx,
+                paths = depsets.deps.paths,
+            )
         else:
-            input_sigs_depset = merged_sigs
+            bootInfo = depsets.deps
     else:
-        input_sigs_depset = merged_sigs
+        bootInfo = depsets.deps
+        # else:
+        #     input_sigs_depset = merged_sigs
+    # else:
+    #     input_sigs_depset = merged_sigs
 
-    merged_input_depsets = [] #[input_sigs_depset]
+    # merged_input_depsets = [] #[input_sigs_depset]
 
     # merged_input_depsets.append(merge_depsets(depsets, "cli_link_deps"))
     # if ext == ".cmx":
@@ -473,18 +588,13 @@ def construct_inputs(ctx, tc, ext, workdir,
     #     sigs = depsets.deps.sigs,
     # )
 
-    if ctx.label.name == "Load_path":
-        print("depsets.deps.sigs: %s" % depsets.deps.sigs)
-        print("depsets.deps.cli_link_deps: %s" % depsets.deps.cli_link_deps)
-        print("depsets.deps.afiles: %s" % depsets.deps.afiles)
-        # fail()
 
     # construct_inputs return:
     return struct(structfile = in_structfile,
                   cmi = in_cmi,
                   files = in_files,
                   # depsets = in_depsets,
-                  bootinfo  = depsets.deps,
+                  bootinfo  = bootInfo,
                   ccinfo    = depsets.ccinfos,
                   ccinfo_archived = depsets.ccinfos_archived)
 
@@ -662,6 +772,10 @@ def merge_deps(ctx,
             )
 
 ################################################################
+def adapt_includes(inc):
+    return inc.removeprefix("bazel-out/darwin-fastbuild/bin/")
+    # return inc
+
 def construct_args(ctx, tc, _options, cancel_opts,
                    ext,
                    inputs,
@@ -685,9 +799,11 @@ def construct_args(ctx, tc, _options, cancel_opts,
             if (dep.label.name.startswith("Stdlib")
                 or dep.label.name == "Primitives"):
                 ## dep is either Stdlib resolver or a stdlib submodule
-                includes.append(
-                    dep[DefaultInfo].files.to_list()[0].dirname
-                )
+                if ctx.attr._rule == "compile_module_test":
+                    inc = paths.dirname(dep[DefaultInfo].files.to_list()[0].short_path)
+                else:
+                    inc = dep[DefaultInfo].files.to_list()[0].dirname
+                includes.append(inc)
 
             elif dep.label.name == "stdlib":
                 ## dep is stdlib library, possibly archived
@@ -701,11 +817,16 @@ def construct_args(ctx, tc, _options, cancel_opts,
                     stdlibs = stdlibstr.split(" ")
                     includes.append(paths.dirname(stdlibs[0]))
 
-    toolarg = tc.tool_arg
-    if toolarg:
-        toolarg_input = [toolarg]
-    else:
-        toolarg_input = []
+    # compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    # if compiler.basename.startswith("ocamlc"):
+    #     toolarg_input = [compiler]
+        # args.add(compiler.path)
+
+    # toolarg = tc.tool_arg
+    # if toolarg:
+    #     toolarg_input = [toolarg]
+    # else:
+    #     toolarg_input = []
 
     merged_paths = depset(transitive = depsets.deps.paths)
     includes.extend(merged_paths.to_list())
@@ -718,13 +839,33 @@ def construct_args(ctx, tc, _options, cancel_opts,
     if outputs["sigfile"]:
         includes.append(outputs["sigfile"].dirname)
 
-    includes.append(tc.runtime.dirname)
+    # includes.append(tc.runtime.dirname)
 
     args = ctx.actions.args()
 
-    if tc.tool_arg:
-        # for vm executors
-        args.add(tc.tool_arg.path)
+    # if ctx.attr._rule == "compile_module_test":
+    #     args.add(tc.ocamlrun.short_path) # executable)
+
+    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    if not ctx.attr._rule == "compile_module_test":
+        print("TGT: %s" % ctx.label)
+        print("tool compiler: %s" % tc.compiler)
+        print("tool exec: %s" % tc.executable)
+        print("tool arg: %s" % tc.tool_arg)
+        # fail(tc.tool_arg)
+        # if tc.tool_arg:
+        #     # for vm executors
+        #     print("YYYYYYYYYYYYYYYY")
+
+        if compiler.extension not in ["opt", "optx"]:
+            args.add(compiler.path)
+            if ctx.label.name == "Stdlib.Either":
+                print("Either compiler: %s" % compiler)
+                # fail(ctx.label)
+        # elif compiler.basename.endswith(".boot"):
+        #     args.add(tc.tool_arg.path)
+    # else:
+    #     fail("XXXXXXXXXXXXXXXX")
 
     # if tc.protocol == "dev":
 
@@ -812,7 +953,15 @@ def construct_args(ctx, tc, _options, cancel_opts,
                 if d == "instruction-selection":
                     args.add("-dsel")
 
-    args.add_all(includes, before_each="-I", uniquify = True)
+    if ctx.attr._rule == "compile_module_test":
+        args.add_all(includes,
+                     map_each = adapt_includes,
+                     before_each="-I",
+                     uniquify = True)
+    else:
+        args.add_all(includes,
+                     before_each="-I",
+                     uniquify = True)
 
     # if sig_src: # not used yet
     #     args.add(sig_src)
@@ -826,10 +975,26 @@ def construct_args(ctx, tc, _options, cancel_opts,
         args.add("-I", inputs.structfile.dirname)
         if inputs.cmi:
             args.add("-cmi-file", inputs.cmi)
-        args.add("-impl", inputs.structfile)
-        args.add("-c")
-        # args.add("-o", out_cm_)
-        args.add("-o", outputs["cmstruct"])
+
+        if ctx.attr._rule == "compile_module_test":
+            # args.add("-impl", inputs.structfile.short_path)
+            # src file not symlinked into workdir:
+            # args.add("-I", ctx.file.struct.dirname + "/_BS_vv")
+            args.add("-impl", ctx.file.struct.path)
+            # fixme: deps dirs also need adjusting
+        else:
+            args.add("-impl", inputs.structfile.path)
+
+        if ctx.attr._rule == "test_infer_signature":
+            args.add("-i")
+            # args.add("-o", outputs["mli"])
+        else:
+            args.add("-c")
+
+            if ctx.attr._rule == "compile_module_test":
+                args.add("-o", outputs["cmstruct"])
+            else:
+                args.add("-o", outputs["cmstruct"])
 
     return args
 
@@ -863,13 +1028,21 @@ def construct_module_compile_action(ctx, module_name):
 
     compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
-    if debug:
-        print("TGT: %s" % ctx.label)
-        print("tc.build_executor: %s" % tc.build_executor)
-        print("tc.config_executor: %s" % tc.config_executor)
-        print("tc.config_emitter: %s" % tc.config_emitter)
+    if compiler.extension in ["byte", "boot"]:
+        executor = tc.ocamlrun
+        executor_arg = compiler
+    else:
+        executor = compiler
+        executor_arg = None
+
+    # if debug:
+    #     print("TGT: %s" % ctx.label)
+    #     print("tc.build_executor: %s" % tc.build_executor)
+    #     print("tc.config_executor: %s" % tc.config_executor)
+    #     print("tc.config_emitter: %s" % tc.config_emitter)
 
     # 'optx' - flambda-built
+    # if compiler.stem in ["ocamlc"]:
     if compiler.basename in [
         "ocamlc.byte", "ocamlc.opt", "ocamlc.boot",
         "ocamlc.optx",
@@ -890,23 +1063,29 @@ def construct_module_compile_action(ctx, module_name):
 
     ################################################################
     ################  OUTPUTS  ################
-    (outputs,  # includes in_structfile
-     module_name,
-     # action_outputs,
-     # default_outputs,
-     # out_cm_,
-     # out_o,
-     # out_cmt,
-     # out_logfile,
-     # provider_output_cmi,
-     # in_structfile,
-     # direct_inputs, ## in_structfile
-     # sig_inputs, # cmi, mli
-     # includes,
-     # sig_src
-     ) = construct_outputs(ctx, _options, tc,
-                           workdir, ext,
-                           module_name)
+    if ctx.attr._rule == "test_infer_signature":
+        (outputs, module_name) = construct_inference_outputs(ctx, _options, tc,
+                                                             workdir, ext,
+                                                             module_name)
+        print("outputs: %s" % outputs)
+    else:
+        (outputs,  # includes in_structfile
+         module_name,
+         # action_outputs,
+         # default_outputs,
+         # out_cm_,
+         # out_o,
+         # out_cmt,
+         # out_logfile,
+         # provider_output_cmi,
+         # in_structfile,
+         # direct_inputs, ## in_structfile
+         # sig_inputs, # cmi, mli
+         # includes,
+         # sig_src
+         ) = construct_outputs(ctx, _options, tc,
+                               workdir, ext,
+                               module_name)
 
     ################################################################
     ################  DEPS  ################
@@ -949,6 +1128,7 @@ def construct_module_compile_action(ctx, module_name):
     ## so return struct with files, depsets flds
     # inputs_depset =
     inputs = construct_inputs(ctx, tc, ext, workdir,
+                              executor, executor_arg,
                               from_name, module_name,
                               # direct_inputs,
                               # stdlib_depset,
@@ -977,7 +1157,9 @@ def construct_module_compile_action(ctx, module_name):
     return (inputs,  # => struct, flds: files, depsets
             # action_outputs, # => dictionary 'outputs'
             outputs,
-            tc.executable,
+            # tc.ocamlrun, ## executable,
+            executor,
+            executor_arg,
             workdir,
             args,
 

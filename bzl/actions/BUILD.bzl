@@ -49,6 +49,9 @@ def rule_mnemonic(ctx):
     elif rule in ["test_module"]:
         mnemonic = "CompileTestModule"
 
+    elif rule in ["test_infer_signature"]:
+        mnemonic = "InferSignature"
+
     elif rule in ["compiler_signature",
                   "stdlib_signature", "stdlib_internal_signature",
                   "kernel_signature",
