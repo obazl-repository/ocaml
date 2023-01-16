@@ -1,5 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 load("//bzl:rules.bzl", "cc_preprocess")
 
@@ -14,6 +15,8 @@ load("//test:rules.bzl",
      "test_module",
      "test_signature",
 
+     "inline_expect_module",
+     "inline_expect_test",
 
      "expect_test",
      "expect_vv_test",
@@ -22,7 +25,6 @@ load("//test:rules.bzl",
      "expect_sv_test",
 
      "compile_fail_test",
-     "inline_expect_test",
      "ocaml_test",
 )
 
@@ -633,30 +635,57 @@ test_module(
 )
 
 ###################
-inline_expect_test(
+diff_test(
     name = "Patmatch_for_multiple_test",
-    src  = "patmatch_for_multiple.ml",
-    opts = ["-drawlambda", "-dlambda"], # "-pervasives"],
-    deps = ["//stdlib"],
+    file1 = "patmatch_for_multiple.ml",
+    file2 = "Patmatch_for_multiple_expect",
     timeout = "short",
     tags = ["inline_expect"]
 )
 
+inline_expect_module(
+    name = "Patmatch_for_multiple_expect",
+    struct = "patmatch_for_multiple.ml",
+    opts = ["-drawlambda", "-dlambda"],
+    nocopts = True,
+    stdlib_deps = ["//stdlib"],
+)
+
 ###################
-inline_expect_test(
+diff_test(
     name = "Patmatch_incoherence_test",
-    src  = "patmatch_incoherence.ml",
+    file1 = "patmatch_incoherence.ml",
+    file2 = "Patmatch_incoherence_expect2",
     timeout = "short",
     tags = ["inline_expect"]
 )
 
+inline_expect_module(
+    name = "Patmatch_incoherence_expect2",
+    struct = ":Patmatch_incoherence_expect",
+    opts = ["-no-principal"]
+)
+
+inline_expect_module(
+    name = "Patmatch_incoherence_expect",
+    struct = "patmatch_incoherence.ml",
+    opts = ["-no-principal"]
+    # warnings = [w.PARTIAL_MATCH_8],
+)
+
 ###################
-inline_expect_test(
+diff_test(
     name = "Patmatch_split_no_or_test",
-    src  = "patmatch_split_no_or.ml",
-    opts = ["-nopervasives", "-dlambda"],
+    file1 = "patmatch_split_no_or.ml",
+    file2 = "Patmatch_split_no_or_expect",
     timeout = "short",
     tags = ["inline_expect"]
+)
+
+inline_expect_module(
+    name = "Patmatch_split_no_or_expect",
+    struct = "patmatch_split_no_or.ml",
+    opts   = ["-dlambda"]
 )
 
 ############
