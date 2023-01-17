@@ -18,7 +18,7 @@ load(":test_transitions.bzl",
      "sv_test_in_transition"
      )
 
-load(":expect_test_impl.bzl", "expect_test_impl")
+load(":batch_expect_test_impl.bzl", "batch_expect_test_impl")
 
 # load(":expect_vv_test.bzl", "expect_vv_test")
 # load(":expect_ss_test.bzl", "expect_ss_test")
@@ -33,7 +33,7 @@ load(":expect_test_impl.bzl", "expect_test_impl")
 
 #######################
 expect_vv_test = rule(
-    implementation = expect_test_impl,
+    implementation = batch_expect_test_impl,
     doc = "Run a test executable built with ocamlc.byte",
     attrs = dict(
         exec_common_attrs(),
@@ -47,8 +47,8 @@ expect_vv_test = rule(
             # cfg = exe_deps_out_transition,
         ),
 
-        stdout   = attr.string( ),
-        expected = attr.label(
+        stdout_actual = attr.string( ),
+        stdout_expected = attr.label(
             allow_single_file = True,
         ),
 
@@ -77,7 +77,7 @@ expect_vv_test = rule(
 
 #######################
 expect_vs_test = rule(
-    implementation = expect_test_impl,
+    implementation = batch_expect_test_impl,
     doc = "Run a test executable built with ocamlopt.byte",
     attrs = dict(
         exec_common_attrs(),
@@ -91,8 +91,8 @@ expect_vs_test = rule(
             # cfg = exe_deps_out_transition,
         ),
 
-        stdout   = attr.string( ),
-        expected = attr.label(
+        stdout_actual = attr.string( ),
+        stdout_expected = attr.label(
             allow_single_file = True,
         ),
 
@@ -119,7 +119,7 @@ expect_vs_test = rule(
 
 #######################
 expect_ss_test = rule(
-    implementation = expect_test_impl,
+    implementation = batch_expect_test_impl,
     doc = "Run a test executable built with ocamlopt.opt",
     attrs = dict(
         exec_common_attrs(),
@@ -133,8 +133,8 @@ expect_ss_test = rule(
             # cfg = exe_deps_out_transition,
         ),
 
-        stdout   = attr.string( ),
-        expected = attr.label(
+        stdout_actual   = attr.string( ),
+        stdout_expected = attr.label(
             allow_single_file = True,
         ),
 
@@ -162,7 +162,7 @@ expect_ss_test = rule(
 
 #######################
 expect_sv_test = rule(
-    implementation = expect_test_impl,
+    implementation = batch_expect_test_impl,
     doc = "Run a test executable built with ocamlc.opt",
     attrs = dict(
         exec_common_attrs(),
@@ -176,8 +176,8 @@ expect_sv_test = rule(
             # cfg = exe_deps_out_transition,
         ),
 
-        stdout   = attr.string( ),
-        expected = attr.label(
+        stdout_actual   = attr.string( ),
+        stdout_expected = attr.label(
             allow_single_file = True,
         ),
 
@@ -205,8 +205,8 @@ expect_sv_test = rule(
 ###############################################################
 ####  MACRO - generates two test targets plus on test_suite
 ################################################################
-def expect_test(name,
-                stdout, expected,
+def batch_expect_test(name,
+                stdout_actual, stdout_expected,
                 test_module,
                 timeout = "short",
                 **kwargs):
@@ -240,8 +240,8 @@ def expect_test(name,
     expect_vv_test(
         name     = vv_name,
         test_executable = executable + ".vv.byte",
-        stdout   = stdout,
-        expected = expected,
+        stdout_actual   = stdout_actual,
+        stdout_expected = stdout_expected,
         timeout  = timeout,
         tags     = ["vv"],
         **kwargs
@@ -250,8 +250,8 @@ def expect_test(name,
     expect_vs_test(
         name     = vs_name,
         test_executable = executable + ".vs.opt",
-        stdout   = stdout,
-        expected = expected,
+        stdout_actual   = stdout_actual,
+        stdout_expected = stdout_expected,
         timeout  = timeout,
         tags     = ["vs"],
         **kwargs
@@ -260,8 +260,8 @@ def expect_test(name,
     expect_ss_test(
         name     = ss_name,
         test_executable = executable + ".ss.opt",
-        stdout   = stdout,
-        expected = expected,
+        stdout_actual   = stdout_actual,
+        stdout_expected = stdout_expected,
         timeout  = timeout,
         tags     = ["ss",],
         **kwargs
@@ -270,8 +270,8 @@ def expect_test(name,
     expect_sv_test(
         name     = sv_name,
         test_executable = executable + ".vv.byte",
-        stdout   = stdout,
-        expected = expected,
+        stdout_actual   = stdout_actual,
+        stdout_expected = stdout_expected,
         timeout  = timeout,
         tags     = ["sv"],
         **kwargs

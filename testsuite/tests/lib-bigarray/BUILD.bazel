@@ -1,7 +1,7 @@
-load("//test:rules.bzl", "test_module", "expect_test")
+load("//test:rules.bzl", "test_module", "batch_expect_test")
 
 test_suite(
-    name = "tests",
+    name = "lib-bigarray",
     tests  = [
         ":Bigarrays_test",
         ":Change_layout_test",
@@ -11,10 +11,10 @@ test_suite(
     ],
 )
 
-expect_test(
+batch_expect_test(
     name    = "Bigarrays_test",
-    stdout  = "Bigarrays.stdout",
-    expected= "bigarrays.reference",
+    stdout_actual   = "Bigarrays.stdout",
+    stdout_expected = "bigarrays.reference",
     test_module = ":Bigarrays",
     timeout = "short"
 )
@@ -31,10 +31,10 @@ test_module(
     ]
 )
 
-expect_test(
+batch_expect_test(
     name     = "Change_layout_test",
-    stdout   = "change_layout.stdout",
-    expected = "change_layout.reference",
+    stdout_actual   = "change_layout.stdout",
+    stdout_expected = "change_layout.reference",
     test_module = ":Change_layout",
     timeout  = "short"
 )
@@ -48,10 +48,10 @@ test_module(
     ]
 )
 
-expect_test(
+batch_expect_test(
     name     = "Fftba_test",
-    stdout   = "fftba.stdout",
-    expected = "fftba.reference",
+    stdout_actual   = "fftba.stdout",
+    stdout_expected = "fftba.reference",
     test_module = ":Fftba",
     timeout  = "short"
 )
@@ -62,10 +62,10 @@ test_module(
     stdlib_deps   = ["//stdlib:Stdlib.Bigarray"]
 )
 
-expect_test(
+batch_expect_test(
     name     = "Pr5115_test",
-    stdout   = "pr5115.stdout",
-    expected = "pr5115.reference",
+    stdout_actual   = "pr5115.stdout",
+    stdout_expected = "pr5115.reference",
     test_module = ":Pr5115",
     timeout  = "short"
 )
@@ -79,10 +79,10 @@ test_module(
     ]
 )
 
-expect_test(
+batch_expect_test(
     name     = "Weak_bigarray_test",
-    stdout   = "weak_bigarray.stdout",
-    expected = "weak_bigarray.reference",
+    stdout_actual   = "weak_bigarray.stdout",
+    stdout_expected = "weak_bigarray.reference",
     test_module = ":Weak_bigarray",
     timeout  = "short"
 )

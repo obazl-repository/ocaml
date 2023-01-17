@@ -4,13 +4,13 @@ load("//test:rules.bzl",
      "test_module",
      "test_signature",
      "ocaml_test",
-     "expect_test",
+     "batch_expect_test",
      "inline_expect_test",
      "lambda_expect_test"
 )
 
 test_suite(
-    name = "tests",
+    name = "basic-modules",
     tests = [
         ":Anonymous_test",
         ":Main_expect_test",
@@ -64,11 +64,11 @@ test_module(
     stdlib_deps = ["//stdlib:CamlinternalMod"]
 )
 
-expect_test(
+batch_expect_test(
     name     = "Main_expect_test",
     test_module = ":Main",
-    stdout   = "Main.stdout",
-    expected   = "main.reference",
+    stdout_actual   = "Main.stdout",
+    stdout_expected = "main.reference",
     timeout = "short"
 )
 
@@ -129,7 +129,7 @@ test_module(
 
 inline_expect_test(
     name = "Recursive_module_evaluation_errors",
-    src  = "recursive_module_evaluation_errors.ml",
+    struct  = "recursive_module_evaluation_errors.ml",
     deps = [
         ## FIXME: deps ordering not working, these must be listed in
         ## this order. This should happen automatically.
@@ -140,11 +140,11 @@ inline_expect_test(
     tags = ["inline_expect"]
 )
 
-expect_test(
+batch_expect_test(
     name     = "Recursive_module_init_expect_test",
     test_module = ":Recursive_module_init",
-    stdout   = "Recursive_module_init.stdout",
-    expected = "recursive_module_init.reference",
+    stdout_actual   = "Recursive_module_init.stdout",
+    stdout_expected = "recursive_module_init.reference",
     timeout = "short"
 )
 

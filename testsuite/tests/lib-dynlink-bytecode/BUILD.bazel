@@ -25,10 +25,10 @@ load("//test:rules.bzl",
      "test_library",
      "test_module",
 
-     "vv_test_executable",
-     "vs_test_executable",
-     "ss_test_executable",
-     "sv_test_executable",
+     "test_vv_executable",
+     "test_vs_executable",
+     "test_ss_executable",
+     "test_sv_executable",
 
      "expect_test",
      "expect_vv_test",
@@ -93,7 +93,7 @@ sh_binary(
 )
 
 # test_executable macro expansion:
-vv_test_executable(
+test_vv_executable(
     name    = "Main.vv.opt",
     prologue= [
         ## FIXME: these all should come from :Main
@@ -111,7 +111,7 @@ vv_test_executable(
     ],
 )
 
-vs_test_executable(
+test_vs_executable(
     name    = "Main.vs.opt",
     prologue= [
         "//stdlib",
@@ -168,7 +168,7 @@ expect_vv_test(
 # )
 
 ## build and run this to see stdout w/o test machinery
-vv_test_executable(
+test_vv_executable(
     ## WARNING: this target uses ocamlc.byte with -custom, so it emits
     ## a hybrid vm/sys executable that can be run directly from the
     ## cmd line, w/o ocamlrun. Hence the "bin" extension -

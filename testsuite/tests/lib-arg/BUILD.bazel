@@ -3,14 +3,14 @@ load("//test:rules.bzl",
      "test_module",
      "test_signature",
      "ocaml_test",
-     "expect_test",
+     "batch_expect_test",
      "inline_expect_test",
 )
 
 MODULE_OPTS = []
 
 test_suite(
-    name = "tests",
+    name = "lib-arg",
     tests  = [
         ":Test_rest_all_test",
         ":Testarg_test",
@@ -20,7 +20,7 @@ test_suite(
 
 inline_expect_test(
     name   = "Test_rest_all_test",
-    src = "test_rest_all.ml",
+    struct = "test_rest_all.ml",
     deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib",
@@ -28,10 +28,10 @@ inline_expect_test(
     timeout = "short"
 )
 
-expect_test(
+batch_expect_test(
     name     = "Testarg_test",
-    stdout   = "testarg.stdout",
-    expected = "testarg.reference",
+    stdout_actual   = "testarg.stdout",
+    stdout_expected = "testarg.reference",
     test_module = ":Testarg",
     timeout  = "short"
 )
@@ -46,10 +46,10 @@ test_module(
     ]
 )
 
-expect_test(
+batch_expect_test(
     name     = "Testerror_test",
-    stdout   = "testerror.stdout",
-    expected = "testerror.reference",
+    stdout_actual   = "testerror.stdout",
+    stdout_expected = "testerror.reference",
     test_module = ":Testerror",
     timeout  = "short"
 )

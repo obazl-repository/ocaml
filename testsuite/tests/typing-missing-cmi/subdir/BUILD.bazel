@@ -1,23 +1,7 @@
+load("//test:rules.bzl", "test_module")
 
+filegroup(name = "Mstruct", srcs = [":M"],
+          visibility = ["//testsuite/tests/typing-missing-cmi:__pkg__"])
 
-load("//test:rules.bzl",
-     "test_module",
-)
-
-MODULE_OPTS = []
-
-test_suite(
-    name = "testsuite_tests_typing-missing-cmi_subdir_lib",
-    tests  = [
-        ":M",
-    ],
-)
-
-test_module(
-    name   = "M",
-    struct = "m.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
+test_module(name   = "M", struct = "m.ml")
 

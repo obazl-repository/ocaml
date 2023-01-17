@@ -31,7 +31,7 @@ def _test_executable_impl(ctx):
     return executable_impl(ctx, tc, exe_name, workdir)
 
 #######################
-vv_test_executable = rule(
+test_vv_executable = rule(
     implementation = _test_executable_impl,
     doc = "Links OCaml executable binary using ocamlc.byte",
     attrs = dict(
@@ -43,7 +43,7 @@ vv_test_executable = rule(
         #     # cfg = reset_cc_config_transition ## only build once
         #     # default = "//config/runtime" # label flag set by transition
         # ),
-        _rule = attr.string( default = "vv_test_executable" ),
+        _rule = attr.string( default = "test_vv_executable" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -60,7 +60,7 @@ vv_test_executable = rule(
 )
 
 #######################
-vs_test_executable = rule(
+test_vs_executable = rule(
     implementation = _test_executable_impl,
     doc = "Links OCaml executable binary using ocamlopt.byte",
     attrs = dict(
@@ -86,7 +86,7 @@ vs_test_executable = rule(
 )
 
 #######################
-ss_test_executable = rule(
+test_ss_executable = rule(
     implementation = _test_executable_impl,
     doc = "Links OCaml executable binary using ocamlopt.opt",
     attrs = dict(
@@ -99,7 +99,7 @@ ss_test_executable = rule(
         #     # cfg = reset_cc_config_transition ## only build once
         #     # default = "//config/runtime" # label flag set by transition
         # ),
-        _rule = attr.string( default = "ss_test_executable" ),
+        _rule = attr.string( default = "test_ss_executable" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -116,7 +116,7 @@ ss_test_executable = rule(
 )
 
 #######################
-sv_test_executable = rule(
+test_sv_executable = rule(
     implementation = _test_executable_impl,
     doc = "Links OCaml executable binary using ocamlc.opt",
     attrs = dict(
@@ -153,7 +153,7 @@ def test_executable(name, main,
     else:
         main = main
 
-    vv_test_executable(
+    test_vv_executable(
         name    = main + ".vv.byte",
         main    = main,
         opts    = opts,
@@ -185,7 +185,7 @@ def test_executable(name, main,
         ]
     )
 
-    vs_test_executable(
+    test_vs_executable(
         name    = main + ".vs.opt",
         main    = main,
         opts    = opts + OCAML_COMPILER_OPTS,
@@ -193,7 +193,7 @@ def test_executable(name, main,
         **kwargs
     )
 
-    ss_test_executable(
+    test_ss_executable(
         name    = main + ".ss.opt",
         main    = main,
         opts    = opts + OCAML_COMPILER_OPTS,
@@ -201,7 +201,7 @@ def test_executable(name, main,
         **kwargs
     )
 
-    sv_test_executable(
+    test_sv_executable(
         name    = main + ".sv.byte",
         main    = main,
         opts    = opts,

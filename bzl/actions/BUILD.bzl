@@ -33,9 +33,9 @@ def rule_mnemonic(ctx):
     elif rule in ["test_executable"]:
         ## all [sv][sv]_test_executable rules use this rule name
         mnemonic = "LinkTestExecutable"
-    elif rule in ["vv_test_executable"]:
+    elif rule in ["test_vv_executable"]:
         mnemonic = "LinkVvTestExecutable"
-    elif rule in ["ss_test_executable"]:
+    elif rule in ["test_ss_executable"]:
         mnemonic = "LinkSsTestExecutable"
 
     elif rule in ["compiler_module", "build_module",
@@ -48,6 +48,9 @@ def rule_mnemonic(ctx):
 
     elif rule in ["test_module"]:
         mnemonic = "CompileTestModule"
+
+    elif rule in ["test_expect_module"]:
+        mnemonic = "CompileTestExpectModule"
 
     elif rule in ["test_infer_signature"]:
         mnemonic = "InferSignature"

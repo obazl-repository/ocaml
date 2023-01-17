@@ -13,7 +13,7 @@ load("//bzl:providers.bzl", "HybridExecutableMarker")
 ## then diffs it against expected output.
 
 ##############################
-def expect_test_impl(ctx):
+def batch_expect_test_impl(ctx):
 
     debug = False
 
@@ -82,7 +82,7 @@ def expect_test_impl(ctx):
     # print("ROOT: %s" % pgm.short_path)
     # stdout = runner.dirname + "/" + ctx.attr.stdout
     # stdout = ctx.attr.stdout
-    stdout = ctx.attr.stdout
+    stdout = ctx.attr.stdout_actual
 
     if debug:
         print("tc.name: %s" % tc.name)
@@ -114,7 +114,7 @@ def expect_test_impl(ctx):
         ),
 
         "diff -w {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
-            src = ctx.file.expected.path,
+            src = ctx.file.stdout_expected.path,
             dst = stdout
         ),
 
@@ -150,7 +150,7 @@ def expect_test_impl(ctx):
     myrunfiles = ctx.runfiles(
         files = [runner, pgm],
         transitive_files =  depset([
-            ctx.file.expected
+            ctx.file.stdout_expected
             ] + [tc.ocamlrun] if tc.ocamlrun else [],
         )
     )
@@ -167,7 +167,7 @@ def expect_test_impl(ctx):
 
 # #######################
 # expect_test = rule(
-#     implementation = _expect_test_impl,
+#     implementation = _batch_expect_test_impl,
 #     doc = "Compile and test an OCaml program.",
 #     attrs = dict(
 #         executable_attrs(),

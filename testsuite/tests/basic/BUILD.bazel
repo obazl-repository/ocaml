@@ -3,13 +3,15 @@ package(default_visibility = ["//visibility:public"])
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 load("//bzl:rules.bzl", "cc_preprocess")
+load("//config:WARNINGS.bzl", "w")
+
 
 load("//test:rules.bzl",
      "test_executable",
-     "vv_test_executable",
-     "vs_test_executable",
-     "ss_test_executable",
-     "sv_test_executable",
+     "test_vv_executable",
+     "test_vs_executable",
+     "test_ss_executable",
+     "test_sv_executable",
 
      "test_library",
      "test_module",
@@ -18,7 +20,7 @@ load("//test:rules.bzl",
      "inline_expect_module",
      "inline_expect_test",
 
-     "expect_test",
+     "batch_expect_test",
      "expect_vv_test",
      "expect_vs_test",
      "expect_ss_test",
@@ -29,7 +31,7 @@ load("//test:rules.bzl",
 )
 
 test_suite(
-    name = "tests",
+    name = "basic",
     tests = [
         ":Arrays_test",
         ":Bigints_test",
@@ -75,11 +77,11 @@ test_suite(
 ## expect_test expands to: test_suite,
 ## expect_vv_test, expect_vs_test,
 ## expect_ss_test, expect_sv_test
-expect_test(
+batch_expect_test(
     name    = "Arrays_test",
     test_module = ":Arrays",
-    stdout  = "arrays.stdout",
-    expected = "arrays.reference",
+    stdout_actual  = "arrays.stdout",
+    stdout_expected = "arrays.reference",
 )
 
 test_module(
@@ -105,20 +107,11 @@ test_module(
 ## NB: the arrays test emits nothing to stdout, so we demonstrate the
 ## expansion below, for bigints.ml, which does write to stdout.
 
-# expect_test(
+# batch_expect_test(
 #     name    = "bigints_test",
-#     stdout  = "bigints.stdout",
-#     expected = "bigints.reference",
-#     opts   = ["-nopervasives", "-open", "Stdlib"],
-#     # prologue = select({
-#     #     "//testsuite/tests:with-stdlib?":["//stdlib"],
-#     #     "//conditions:default": [
-#     #         "//stdlib:CamlinternalFormatBasics",
-#     #         "//stdlib:Stdlib",
-#     #         "//stdlib:Stdlib.Sys"
-#     #     ]
-#     # }),
-#     test_executable = ":Bigints",
+#     test_module = ":Bigints",
+#     stdout_actual  = "bigints.stdout",
+#     stdout_expected = "bigints.reference",
 # )
 
 ## to run tests selectively pass --test_tag_filters=...
@@ -137,17 +130,17 @@ test_suite(
 expect_vv_test(
     name    = "Bigints_vv_test",
     test_executable = ":Bigints.vv.byte",
-    stdout  = "bigints.stdout",
-    expected = "bigints.reference",
+    stdout_actual  = "bigints.stdout",
+    stdout_expected = "bigints.reference",
     timeout  = "short",
-    tags     = ["vv", "vvss"],
+    tags     = ["vv"],
 )
 
 expect_vs_test(
     name    = "Bigints_vs_test",
     test_executable = ":Bigints.vs.opt",
-    stdout  = "bigints.stdout",
-    expected = "bigints.reference",
+    stdout_actual  = "bigints.stdout",
+    stdout_expected = "bigints.reference",
     timeout  = "short",
     tags     = ["vs"],
     opts  = OCAML_COMPILER_OPTS
@@ -156,30 +149,32 @@ expect_vs_test(
 expect_ss_test(
     name    = "Bigints_ss_test",
     test_executable = ":Bigints.ss.opt",
-    stdout  = "bigints.stdout",
-    expected = "bigints.reference",
+    stdout_actual  = "bigints.stdout",
+    stdout_expected = "bigints.reference",
     timeout  = "short",
-    tags     = ["ss", "vvss"],
+    tags     = ["ss"],
     opts  = OCAML_COMPILER_OPTS
 )
 
 expect_sv_test(
     name    = "Bigints_sv_test",
     test_executable = ":Bigints.sv.byte",
-    stdout  = "bigints.stdout",
-    expected = "bigints.reference",
+    stdout_actual = "bigints.stdout",
+    stdout_expected = "bigints.reference",
     timeout  = "short",
     tags     = ["sv"],
     opts  = OCAML_COMPILER_OPTS
 )
 
+## The expansion of expect_test includes another macro,
+## 'test_executable.
 # test_executable(
 #     name    = "bigints",
 #     main    = ":Bigints",
 # )
 
 ## test_executable macro expansion:
-vv_test_executable(
+test_vv_executable(
     name    = "Bigints.vv.byte",
     # prologue = [
     #     "//stdlib:CamlinternalFormatBasics",
@@ -202,17 +197,17 @@ sh_binary(
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
-vs_test_executable(
+test_vs_executable(
     name    = "Bigints.vs.opt",
     main    = ":Bigints",
     opts  = OCAML_COMPILER_OPTS
 )
-ss_test_executable(
+test_ss_executable(
     name    = "Bigints.ss.opt",
     main    = ":Bigints",
     opts  = OCAML_COMPILER_OPTS
 )
-sv_test_executable(
+test_sv_executable(
     name    = "Bigints.sv.byte",
     main    = ":Bigints",
     opts  = OCAML_COMPILER_OPTS
@@ -244,11 +239,11 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name        = "Boxedints_test",
     test_module = ":Boxedints",
-    stdout      = "boxedints.stdout",
-    expected    = "boxedints.reference",
+    stdout_actual   = "boxedints.stdout",
+    stdout_expected = "boxedints.reference",
 )
 
 # test_executable(
@@ -288,11 +283,11 @@ test_module( # not a test, used by unit_naming_test
 # *)
 
 ############
-expect_test(
+batch_expect_test(
     name        = "Constprop_test",
     test_module = ":Constprop",
-    stdout      = "constprop.stdout",
-    expected    = "constprop.ml.reference",
+    stdout_actual = "constprop.stdout",
+    stdout_expected    = "constprop.ml.reference",
 )
 
 test_module(
@@ -317,11 +312,11 @@ cc_preprocess(
 ################################################################
 
 ############
-expect_test(
+batch_expect_test(
     name        = "Divint_test",
     test_module = ":Divint",
-    stdout      = "divint.stdout",
-    expected    = "divint.reference",
+    stdout_actual = "divint.stdout",
+    stdout_expected    = "divint.reference",
 )
 
 test_module(
@@ -338,11 +333,11 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name        = "Equality_test",
     test_module = ":Equality",
-    stdout      = "equality.stdout",
-    expected    = "equality.reference",
+    stdout_actual = "equality.stdout",
+    stdout_expected    = "equality.reference",
 )
 
 test_module(
@@ -356,10 +351,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Eval_order_1_test",
-    stdout  = "eval_order_1.stdout",
-    expected = "eval_order_1.reference",
+    stdout_actual = "eval_order_1.stdout",
+    stdout_expected = "eval_order_1.reference",
     test_module    = ":Eval_order_1",
 )
 
@@ -373,10 +368,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Eval_order_2_test",
-    stdout  = "eval_order_2.stdout",
-    expected = "eval_order_2.reference",
+    stdout_actual = "eval_order_2.stdout",
+    stdout_expected = "eval_order_2.reference",
     test_module    = ":Eval_order_2",
 )
 
@@ -387,10 +382,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Eval_order_3_test",
-    stdout  = "eval_order_3.stdout",
-    expected = "eval_order_3.reference",
+    stdout_actual = "eval_order_3.stdout",
+    stdout_expected = "eval_order_3.reference",
     test_module    = ":Eval_order_3",
 )
 
@@ -405,10 +400,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Eval_order_4_test",
-    stdout  = "eval_order_4.stdout",
-    expected = "eval_order_4.reference",
+    stdout_actual = "eval_order_4.stdout",
+    stdout_expected = "eval_order_4.reference",
     test_module    = ":Eval_order_4",
 )
 
@@ -419,10 +414,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Eval_order_6_test",
-    stdout  = "eval_order_6.stdout",
-    expected = "eval_order_6.reference",
+    stdout_actual = "eval_order_6.stdout",
+    stdout_expected = "eval_order_6.reference",
     test_module    = ":Eval_order_6",
 )
 
@@ -437,10 +432,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Eval_order_7_test",
-    stdout  = "eval_order_7.stdout",
-    expected = "eval_order_7.reference",
+    stdout_actual = "eval_order_7.stdout",
+    stdout_expected = "eval_order_7.reference",
     test_module    = ":Eval_order_7",
 )
 
@@ -452,10 +447,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Eval_order_pr10283_test",
-    stdout  = "eval_order_pr10283.stdout",
-    expected = "eval_order_pr10283.reference",
+    stdout_actual = "eval_order_pr10283.stdout",
+    stdout_expected = "eval_order_pr10283.reference",
     test_module    = ":Eval_order_pr10283",
 )
 test_module(
@@ -468,10 +463,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Float_test",
-    stdout  = "float.stdout",
-    expected = "float.reference",
+    stdout_actual = "float.stdout",
+    stdout_expected = "float.reference",
     test_module    = ":Float",
 )
 
@@ -486,10 +481,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Float_physical_equality_test",
-    stdout  = "float_physical_equality.stdout",
-    expected = "float_physical_equality.reference",
+    stdout_actual = "float_physical_equality.stdout",
+    stdout_expected = "float_physical_equality.reference",
     test_module    = ":Float_physical_equality",
 )
 
@@ -500,10 +495,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Includestruct_test",
-    stdout  = "includestruct.stdout",
-    expected = "includestruct.reference",
+    stdout_actual = "includestruct.stdout",
+    stdout_expected = "includestruct.reference",
     test_module    = ":Includestruct",
 )
 
@@ -522,10 +517,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Localexn_test",
-    stdout  = "localexn.stdout",
-    expected = "localexn.reference",
+    stdout_actual = "localexn.stdout",
+    stdout_expected = "localexn.reference",
     test_module    = ":Localexn",
 )
 
@@ -536,10 +531,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Localfunction_test",
-    stdout  = "localfunction.stdout",
-    expected = "localfunction.reference",
+    stdout_actual = "localfunction.stdout",
+    stdout_expected = "localfunction.reference",
     test_module    = ":Localfunction",
 )
 
@@ -553,10 +548,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Maps_test",
-    stdout  = "maps.stdout",
-    expected = "maps.reference",
+    stdout_actual = "maps.stdout",
+    stdout_expected = "maps.reference",
     test_module    = ":Maps",
 )
 
@@ -573,11 +568,11 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name        = "Min_int_test",
     test_module = ":Min_int",
-    stdout      = "min_int.stdout",
-    expected    = "min_int.reference",
+    stdout_actual = "min_int.stdout",
+    stdout_expected = "min_int.reference",
 )
 
 test_module(
@@ -590,10 +585,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Opt_variants_test",
-    stdout  = "opt_variants.stdout",
-    expected = "opt_variants.reference",
+    stdout_actual = "opt_variants.stdout",
+    stdout_expected = "opt_variants.reference",
     test_module    = ":Opt_variants",
 )
 
@@ -615,10 +610,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Patmatch_test",
-    stdout  = "patmatch.stdout",
-    expected = "patmatch.reference",
+    stdout_actual = "patmatch.stdout",
+    stdout_expected = "patmatch.reference",
     test_module    = ":Patmatch",
 )
 
@@ -647,7 +642,7 @@ inline_expect_module(
     name = "Patmatch_for_multiple_expect",
     struct = "patmatch_for_multiple.ml",
     opts = ["-drawlambda", "-dlambda"],
-    nocopts = True,
+    # nocopts = True,
     stdlib_deps = ["//stdlib"],
 )
 
@@ -689,10 +684,10 @@ inline_expect_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Pr7253_test",
-    stdout  = "pr7253.stdout",
-    expected = "pr7253.reference",
+    stdout_actual = "pr7253.stdout",
+    stdout_expected = "pr7253.reference",
     test_module    = ":Pr7253",
 )
 
@@ -708,10 +703,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Pr7533_test",
-    stdout  = "pr7533.stdout",
-    expected = "pr7533.reference",
+    stdout_actual = "pr7533.stdout",
+    stdout_expected = "pr7533.reference",
     test_module    = ":Pr7533",
 )
 
@@ -728,10 +723,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Pr7657_test",
-    stdout  = "pr7657.stdout",
-    expected = "pr7657.reference",
+    stdout_actual = "pr7657.stdout",
+    stdout_expected = "pr7657.reference",
     test_module    = ":Pr7657",
     opts  = OCAML_COMPILER_OPTS
 )
@@ -748,10 +743,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Recvalues_test",
-    stdout  = "recvalues.stdout",
-    expected = "recvalues.reference",
+    stdout_actual = "recvalues.stdout",
+    stdout_expected = "recvalues.reference",
     test_module    = ":Recvalues",
 )
 
@@ -768,10 +763,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Sets_test",
-    stdout  = "sets.stdout",
-    expected = "sets.reference",
+    stdout_actual = "sets.stdout",
+    stdout_expected = "sets.reference",
     test_module    = ":Sets",
 )
 
@@ -797,10 +792,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Stringmatch_test",
-    stdout  = "stringmatch.stdout",
-    expected = "stringmatch.reference",
+    stdout_actual = "stringmatch.stdout",
+    stdout_expected = "stringmatch.reference",
     test_module    = ":Stringmatch",
 )
 
@@ -814,10 +809,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Switch_opts_test",
-    stdout  = "switch_opts.stdout",
-    expected = "switch_opts.reference",
+    stdout_actual = "switch_opts.stdout",
+    stdout_expected = "switch_opts.reference",
     test_module    = ":Switch_opts",
 )
 
@@ -831,10 +826,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Tailcalls_test",
-    stdout  = "tailcalls.stdout",
-    expected = "tailcalls.reference",
+    stdout_actual = "tailcalls.stdout",
+    stdout_expected = "tailcalls.reference",
     test_module    = ":Tailcalls",
 )
 
@@ -845,11 +840,11 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Trigraph_test",
     test_module = ":Trigraph",
-    stdout  = "trigraph.stdout",
-    expected = "trigraph.reference",
+    stdout_actual = "trigraph.stdout",
+    stdout_expected = "trigraph.reference",
 )
 
 # test_module(
@@ -874,10 +869,10 @@ test_module(
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Tuple_match_test",
-    stdout  = "tuple_match.stdout",
-    expected = "tuple_match.reference",
+    stdout_actual = "tuple_match.stdout",
+    stdout_expected = "tuple_match.reference",
     test_module    = ":Tuple_match",
     # prologue = ["//stdlib:Primitives"],
     opts = ["-open", "Stdlib"]
@@ -895,20 +890,19 @@ test_module(
 )
 
 compile_fail_test(
-# test_module(
     name   = "unit_naming_test",
     struct = "unit_naming.ml",
-    expected = "unit_naming.compilers.reference",
+    stdout_expected = "unit_naming.compilers.reference",
     stdlib_deps   = [
         ":CamlCase"
     ],
 )
 
 ############
-expect_test(
+batch_expect_test(
     name    = "Zero_divided_by_n_test",
-    stdout  = "zero_divided_by_n.stdout",
-    expected = "zero_divided_by_n.reference",
+    stdout_actual = "zero_divided_by_n.stdout",
+    stdout_expected = "zero_divided_by_n.reference",
     test_module    = ":Zero_divided_by_n",
 )
 

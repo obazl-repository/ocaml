@@ -1,68 +1,84 @@
-
-
 load("//test:rules.bzl",
+     "test_executable",
+     "test_vv_executable",
+     "test_vs_executable",
+     "test_ss_executable",
+     "test_sv_executable",
+
+     "batch_expect_test",
+     "expect_vv_test",
+     "expect_vs_test",
+     "expect_ss_test",
+     "expect_sv_test",
+
+     "test_library",
      "test_module",
+     "test_signature",
+
+     "compile_fail_test",
+     "compile_module_test",
+     "inline_expect_test",
+     "ocaml_test",
 )
 
-MODULE_OPTS = []
-
 test_suite(
-    name = "testsuite_tests_typing-missing-cmi_lib",
+    name = "typing-missing-cmi",
     tests  = [
-        ":A",
-        ":B",
-        ":C",
-        ":Main",
-        ":Main_ok",
-        ":Test",
+        ":Main_test",
+        # ":Main_ok",
+        # ":Test",
+    ],
+)
+
+compile_module_test(
+    name   = "Main_test",
+    struct = "main.ml",
+    deps   = [":A", ":B"],
+    stdlib_deps   = ["//stdlib:Stdlib"],
+    opts = ["-verbose"],
+    suppress_cmi = ["//testsuite/tests/typing-missing-cmi/subdir:M"],
+    stdout  = "main.stdout",
+    expected = "test.compilers.reference",
+    # exit_code =  2,
+    timeout = "short",
+    tags = ["cmi"]
+)
+
+batch_expect_test(
+    name    = "Main_ok_test",
+    test_module = ":Main_ok",
+    stdout_actual  = "main_ok.stdout",
+    stdout_expected = "main.ml.reference",
+)
+
+test_module(
+    name   = "Main_ok",
+    struct = "main_ok.ml",
+    deps   = [
+        ":C"
     ],
 )
 
 test_module(
     name   = "A",
     struct = "a.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [
+        "//testsuite/tests/typing-missing-cmi/subdir:M"
+    ],
 )
 
 test_module(
     name   = "B",
     struct = "b.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//testsuite/tests/typing-missing-cmi/subdir:M"
     ]
 )
 
 test_module(
     name   = "C",
     struct = "c.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        "//testsuite/tests/typing-missing-cmi/subdir:M"
     ]
 )
-
-test_module(
-    name   = "Main",
-    struct = "main.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Main_ok",
-    struct = "main_ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Test",
-    struct = "test.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-

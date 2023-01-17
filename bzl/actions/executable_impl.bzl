@@ -462,7 +462,7 @@ def executable_impl(ctx, tc, exe_name,
 
     # if ("test_exe" in ctx.attr.tags):  ## FIXME: why?
     #     # or "test_vs" in ctx.attr.tags):
-    #     # rule ss_test_executable has only 'main', no prologue
+    #     # rule test_ss_executable has only 'main', no prologue
     #     for dep in cli_link_deps_list:
     #         args.add(dep)
     if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
@@ -696,6 +696,12 @@ def executable_impl(ctx, tc, exe_name,
     #     print("struct: %s" % ctx.attr._std_exit[ModuleInfo].struct)
 
 
+    if debug:
+        print("cli_link_deps_depset: %s" % cli_link_deps_depset)
+        print("archived_cmx_depset: %s" % archived_cmx_depset)
+        print("ofiles_depset: %s" % ofiles_depset)
+        print("afiles_depset: %s" % afiles_depset)
+
     inputs_depset = depset(
         direct = []
         + [ctx.file.main] if ctx.file.main else []
@@ -845,8 +851,8 @@ def executable_impl(ctx, tc, exe_name,
     #     exe_provider = OcamlExecutableMarker()
 
     elif ctx.attr._rule in ["test_executable",
-                            "vv_test_executable",
-                            "ss_test_executable"]:
+                            "test_vv_executable",
+                            "test_ss_executable"]:
         if vmruntime_custom:
             exe_provider = HybridExecutableMarker()
         else:

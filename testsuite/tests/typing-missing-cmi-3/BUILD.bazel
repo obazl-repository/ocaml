@@ -1,41 +1,41 @@
-
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
 load("//test:rules.bzl",
      "test_module",
+     "inline_expect_module",
 )
 
-MODULE_OPTS = []
-
 test_suite(
-    name = "testsuite_tests_typing-missing-cmi-3_lib",
+    name = "typing-missing-cmi-3",
     tests  = [
-        ":Middle",
-        ":Original",
-        ":User",
+        ":User_test",
     ],
+)
+
+###################
+diff_test(
+    name = "User_test",
+    file1 = "user.ml",
+    file2 = "User_expect",
+    timeout = "short",
+    tags = ["inline_expect", "cmi"]
+)
+
+inline_expect_module(
+    name = "User_expect",
+    struct  = "user.ml",
+    deps = [":Middle"],
+    stdlib_deps = ["//stdlib:Stdlib"],
+    suppress_cmi = [":Original"]
 )
 
 test_module(
     name   = "Middle",
     struct = "middle.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps   = [":Original"]
 )
 
 test_module(
     name   = "Original",
     struct = "original.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
-
-test_module(
-    name   = "User",
-    struct = "user.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-

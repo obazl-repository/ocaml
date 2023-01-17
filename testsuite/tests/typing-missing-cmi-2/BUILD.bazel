@@ -1,54 +1,39 @@
-
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
 load("//test:rules.bzl",
      "test_module",
+     "test_infer_signature",
      "test_signature",
 )
 
-MODULE_OPTS = []
-SIG_OPTS = ["-nostdlib"]
-
 test_suite(
-    name = "testsuite_tests_typing-missing-cmi-2_lib",
-    tests  = [
-        ":Baz",
-        ":Test",
-    ],
-    # signatures  = [
-    #     ":Bar_cmi",
-    #     ":Foo_cmi",
-    # ],
+    name  = "typing-missing-cmi-2",
+    tests = ["Baz_test"]
+)
+
+diff_test(
+    name = "Baz_test",
+    file1 = ":Baz",
+    file2 = "test.compilers.reference",
+    timeout = "short",
+    tags = ["inline_expect", "cmi"]
+)
+
+test_infer_signature(
+    name   = "Baz",
+    struct = "baz.ml",
+    sig_deps   = ["Bar_cmi"],
+    suppress_cmi = [":Foo_cmi"]
 )
 
 test_signature(
     name = "Bar_cmi",
     src  = "bar.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Baz",
-    struct = "baz.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps   = [":Foo_cmi"]
 )
 
 test_signature(
     name = "Foo_cmi",
     src  = "foo.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Test",
-    struct = "test.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
