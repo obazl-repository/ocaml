@@ -7,7 +7,9 @@ load(":BUILD.bzl", "progress_msg", "get_build_executor")
 
 load("//bzl:providers.bzl",
      "BootInfo", "dump_bootinfo",
-     "DumpInfo", "ModuleInfo", "NsResolverInfo",
+     "DumpInfo",
+     "ModuleInfo",
+     "NsResolverInfo",
      "DepsAggregator",
      "StdStructMarker",
      "StdlibStructMarker",

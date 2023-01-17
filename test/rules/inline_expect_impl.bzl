@@ -1,474 +1,242 @@
-## inline_expect: generates a shell script that runs the inline_expect
-## tool, then compares actual to expected outputs. All inputs,
-## including ocamlrun, must be added to runfiles for the shell script.
-
-## The inline_expect tool itself functions as the compiler, so it
-## needs all the dependencies of the file under test; they must be
-## added to runfiles too.
-
-load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("@bazel_skylib//lib:collections.bzl", "collections")
-
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-load("//bzl/actions:BUILD.bzl", "progress_msg")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
-     "new_deps_aggregator",
-     "OcamlExecutableMarker",
-     "OcamlTestMarker"
-)
+     "BootInfo", "dump_bootinfo",
+     "DumpInfo", "ModuleInfo", "NsResolverInfo",
+     "DepsAggregator",
+     "StdLibMarker",
+     "StdStructMarker",
+     "StdlibStructMarker",
+     "new_deps_aggregator", "OcamlSignatureProvider")
 
+load("//bzl:functions.bzl", "get_module_name") #, "get_workdir")
+load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 load("//bzl/rules/common:impl_common.bzl", "dsorder")
-
+load("//bzl/rules/common:impl_ccdeps.bzl", "dump_CcInfo", "ccinfo_to_string")
 load("//bzl/rules/common:options.bzl", "get_options")
 
-load("//bzl/rules/common:DEPS.bzl",
-     "aggregate_deps",
-     "merge_depsets")
+load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
+load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 
-#########################
-def inline_expect_impl(ctx, tc, exe_name, workdir):
+load("//bzl/actions:module_compile_action.bzl", "construct_module_compile_action")
 
-    debug = False
-    # if ctx.label.name == "test":
-        # debug = True
+# load(":compile_module_test_impl", "compile_module_test_impl")
+
+cmd_runfiles = [
+    # "echo PATH: $(echo $PATH);",
+    # # --- begin runfiles.bash initialization v2 ---
+    # "set -uo pipefail;",
+    # "set +e;",
+    # "set -x;",
+    # #"f=tools/bash/runfiles/runfiles.bash;",
+    # #"f=bazel_tools/tools/bash/runfiles/runfiles.bash;",
+    # "f=external/bazel_tools/tools/bash/runfiles/runfiles.bash;",
+    # # "echo F: `cat $f`;"
+    # # "f={};".format(ctx.file._runfiles_tool.short_path),
+    # # "source \"${RUNFILES_DIR:-/dev/null}/$f\" 2>/dev/null; ",
+
+        # "source \"${RUNFILES_DIR:-/dev/null}/$f\" 2>/dev/null || \\ ",
+    # "source \"$(grep -sm1 \"^$f \" \"${RUNFILES_MANIFEST_FILE:-/dev/null}\" | cut -f2- -d' ')\" 2>/dev/null;", ##  || \\ ",
+
+        # # "source \"$0.runfiles/$f\" 2>/dev/null || \\ ",
+    # # "source \"$(grep -sm1 \"^$f \" \"$0.runfiles_manifest\" | cut -f2- -d' ')\" 2>/dev/null || \\ ",
+    # # "source \"$(grep -sm1 \"^$f \" \"$0.exe.runfiles_manifest\" | cut -f2- -d' ')\" 2>/dev/null || \\ ",
+    # # "{ echo>&2 \"ERROR: cannot find $f\"; exit 1; }; f=; set -e ",
+    # # # --- end runfiles.bash initialization v2 ---
+
+        # "echo \"MANIFEST: ${RUNFILES_DIR}\"; ",
+    # "echo \"`ls ${RUNFILES_DIR}`\"; ",
+
+        # # "$(rlocation ocamlcc/config/camlheaders/camlheader)"
+
+        # # "echo \"MANIFEST: ${RUNFILES_MANIFEST_FILE}\"; ",
+    # # "echo \"`cat ${RUNFILES_MANIFEST_FILE}`\"; "
+]
+
+################################################################
+def inline_expect_test_impl(ctx):
+# def _this_impl(ctx):
+    debug = True
+    debug_ccdeps = True
+
+    if ctx.label.name == "Load_path":
+        debug = True
+
+    (this, extension) = paths.split_extension(ctx.file.struct.basename)
+    module_name = this[:1].capitalize() + this[1:]
+
+    (inputs,
+     outputs, # dictionary of files
+     executor,
+     executor_arg,
+     workdir,
+     cmd_args) = construct_module_compile_action(ctx, module_name)
 
     if debug:
-        print("inline_expect: {kind}: {tgt}".format(
-            kind = ctx.attr._rule,
-            tgt  = ctx.label.name
-        ))
+        print("compiling module: %s" % ctx.label)
+        print("INPUT BOOTINFO:")
+        dump_bootinfo(inputs.bootinfo)
+        print("OUTPUTS: %s" % outputs)
+        print("INPUT FILES: %s" % inputs.files)
+        print("INPUT.structfile: %s" % inputs.structfile)
+        print("INPUT.cmi: %s" % inputs.cmi)
 
-    ################  DEPS  ################
-    depsets = new_deps_aggregator()
+        print("CMD ARGS: %s" % cmd_args)
+        print("EXECUTOR: %s" % executor)
+        print("EXECUTOR ARG: %s" % executor_arg)
 
-    includes  = []
+        # fail()
 
-    manifest = []
+    # if ctx.label.name == "Bytesections":
+    #     fail()
 
-    # aggregate_deps(ctx, ctx.attr._stdlib, depsets, manifest)
-    # aggregate_deps(ctx, ctx.attr._std_exit, depsets, manifest)
+    outs = []
+    for v in outputs.values():
+        if v: outs.append(v)
 
-    open_stdlib = False
-    stdlib_module_target  = None
-    stdlib_library_target = None
+    cc_toolchain = find_cpp_toolchain(ctx)
 
-    for dep in ctx.attr.deps:
-        aggregate_deps(ctx, dep, depsets, manifest)
-        # depsets = aggregate_deps(ctx, dep, depsets, manifest)
-        if dep.label.name in ["Stdlib", "Primitives"]:
-            open_stdlib = True
-            stdlib_module_target = dep
-            break;
-        elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
-            open_stdlib = True
-        elif dep.label.name == "stdlib": ## stdlib archive OR library
-            open_stdlib = True
-            stdlib_library_target = dep
-            break;
-    # for dep in ctx.attr.deps:
-    #     aggregate_deps(ctx, dep, depsets, manifest)
+    ################
+    # PROBLEM: normally we symlink src files to workdir, compile, and
+    # add symlink srcs to provider. But this doesn't work when we
+    # drive the compile from a shell script. The problem is that the
+    # symlinks do not transfer - we write the shell script, then Bazel
+    # runs it _after_ this target has finished, so the links are no
+    # longer there. In an ordinary compile they're retained because we
+    # emit them in a provider.
 
-    # if ctx.attr.main:
-    #     depsets = aggregate_deps(ctx, ctx.attr.main, depsets, manifest)
+    # Here we add them to runfiles, but they do not show up in the
+    # sandbox. We add the symlink path to the cmd link with -I, but
+    # symlinked file is not there. Evidently only symlinks whose
+    # targets were created are retained.
 
-    sigs_depset = depset(
-        order=dsorder,
-        transitive = [merge_depsets(depsets, "sigs")])
-
-    cli_link_deps_depset = depset(
-        order = dsorder,
-        transitive = [merge_depsets(depsets, "cli_link_deps")]
-    )
-
-    afiles_depset  = depset(
-        order=dsorder,
-        transitive = [merge_depsets(depsets, "afiles")]
-    )
-
-    ofiles_depset  = depset(
-        order=dsorder,
-        transitive = [merge_depsets(depsets, "ofiles")]
-    )
-
-    archived_cmx_depset = depset(
-        order=dsorder,
-        transitive = [merge_depsets(depsets, "archived_cmx")]
-    )
-
-    paths_depset  = depset(
-        order = dsorder,
-        transitive = [merge_depsets(depsets, "paths")]
-    )
-
-    #########################
-    args = [] ## "#!/bin/sh"]
-
-    # args.append("echo PATH: $PATH;")
-
-    ## debugging
-# --- begin runfiles.bash initialization v2 ---
-# Copy-pasted from the Bazel Bash runfiles library v2.
-# https://github.com/bazelbuild/bazel/blob/master/tools/bash/runfiles/runfiles.bash
-
-    args.extend([
-        # "set -x",
-        # "echo PWD: $(PWD);",
-        # "ls -la;",
-        # "echo RUNFILES_DIR: $RUNFILES_DIR;",
-        "set -uo pipefail; set +e;",
-        "f=bazel_tools/tools/bash/runfiles/runfiles.bash ",
-        "source \"${RUNFILES_DIR:-/dev/null}/$f\" 2>/dev/null || \\",
-        "    source \"$(grep -sm1 \"^$f \" \"${RUNFILES_MANIFEST_FILE:-/dev/null}\" | cut -f2- -d' ')\" 2>/dev/null || \\",
-        "    source \"$0.runfiles/$f\" 2>/dev/null || \\",
-        "    source \"$(grep -sm1 \"^$f \" \"$0.runfiles_manifest\" | cut -f2- -d' ')\" 2>/dev/null || \\",
-        "    source \"$(grep -sm1 \"^$f \" \"$0.exe.runfiles_manifest\" | cut -f2- -d' ')\" 2>/dev/null || \\",
-        "    { echo \"ERROR: cannot find $f\"; exit 1; };", ##  f=; set -e; ",
-    ])
-    # --- end runfiles.bash initialization v2 ---
-
-    args.append("if [ -x ${RUNFILES_DIR+x} ]")
-    args.append("then")
-    args.append("    echo \"MANIFEST: ${RUNFILES_MANIFEST_FILE}\"")
-    args.append("else")
-    args.append("    echo \"RUNFILES_DIR: ${RUNFILES_DIR}\"")
-    args.append("fi")
-    args.append("echo STDLIB: $(rlocation ocamlcc/stdlib/bin_ocamlc_byte_ocamlc_byte/Stdlib.cmo)")
-
-    cmd_args = []
-    cmd_args.append("echo PWD: $PWD;")
-    cmd_args.append(tc.ocamlrun.short_path)
-
-    executable = ctx.file._tool
-    if debug:
-        print("EXPECT executable: %s" % ctx.attr._tool)
-
-    cmd_args.append(executable.short_path)
-
-    ## inline-expect arg -repo-root - meaning?
-    # cmd_args.append("-repo-root")
-
-    ## FIXME: accomodate -use-primitives
-    ## (currently we assume not needed)
-    primitives_depset = []
-
-    ## not to be confused with runfiles, which are runtime deps. but
-    ## since we run the inline_expect tool, which does the linking,
-    ## these linktime files must be added to runfiles (i.e. they are
-    ## runfiles of the shell script we're generating).
-    linktime_files = []
-    if tc.config_executor == "sys":
-        # native compilers need libasmrun
-        # WARNING: if we do not add libasmrun.a as a dep here,
-        # OCaml will try to link /usr/local/lib/ocaml/libasmrun.a
-        # to see, pass -verbose to the ocaml_compiler.opts or use
-        # --//config/ocaml/link:verbose
-        print("lbl: %s" % ctx.label)
-        print("exe runtime: %s" % ctx.attr._runtime)
-        print("exe runtime files: %s" % ctx.attr._runtime.files)
-
-        for f in ctx.files._runtime:
-            linktime_files.append(f)
-            includes.append(f.dirname)
-            # cmd_args.add_all(["-ccopt", "-L" + f.dirname])
-
-            ## do not add to CLI - asmcomp/asmlink adds it to the
-            ## OCaml cc link subcmd
-            # cmd_args.add(f.path)
-        print("runtime files: %s" % linktime_files)
-    elif "-custom" in ctx.attr.opts:
-        print("lbl: %s" % ctx.label)
-        print("tc.name: %s" % tc.name)
-        print("EXE runtime: %s" % ctx.attr._runtime)
-        print("exe runtime files: %s" % ctx.attr._runtime.files)
-        for f in ctx.files._runtime:
-            print("EXE runtime.path: %s" % f.path)
-            linktime_files.append(f)
-            # includes.append(f.dirname)
-            # cmd_args.add_all(["-ccopt", "-L" + f.dirname])
-
-    # if ctx.attr.cc_deps:
-    #     for f in ctx.files.cc_deps:
-    #         # cmd_args.add_all(["-ccopt", "-L" + f.path])
-    #         # cmd_args.add_all(["-ccopt", f.basename])
-    #         cmd_args.add(f.path)
-    #         linktime_files.append(f)
-    #         includes.append(f.dirname)
-
-    # NB: These are options for the inline_expect tool. Since it
-    # functions as a compiler it takes the same(?) options as
-    # ocamlc.byte, plus a few others specific to the tool.
-    (_options, cancel_opts) = get_options(rule, ctx)
-
-    ## remove options that inline_expect does not understand:
-    cancel_opts.extend(["-bin-annot", "-opaque", "-principal"])
-
-    if "-pervasives" in _options:
-        cancel_opts.append("-nopervasives")
-        _options.remove("-pervasives")
-    else:
-        _options.append("-nopervasives")
-
-    tc_opts = []
-
-    # if not ctx.attr.nocopts:
-        # for opt in tc.copts:
-        #     if opt not in NEGATION_OPTS:
-        #         cmd_args.add(opt)
-        #     else:
-        # cmd_args.add_all(tc.copts)
-    tc_opts.extend(tc.copts) ## compile opts for both .ml, .mli
-
-    # if src is .ml
-    tc_opts.extend(tc.structopts) ## compile opts for .ml only
-
-    # if src is .mli
-    # tc_opts.extend(tc.sigopts)
-
-    cmd_args.extend(_options)
-
-    for opt in tc_opts:
-        if opt not in cancel_opts:
-            cmd_args.append(opt)
-
-    ## do not use std warnings from toolchain:
-    # cmd_args.extend(tc.warnings[BuildSettingInfo].value)
-
-    for w in ctx.attr.warnings:
-        cmd_args.extend(["-w",
-                      w if w.startswith("-")
-                      else "-" + w])
-
-    # cmd_args.append("-nostdlib")  # always
-    # cmd_args.append("-nocwd")
-    ## FIXME: not all modules depend on stdlib
-    if open_stdlib:
-        cmd_args.append("-open")
-        cmd_args.append("Stdlib")
-    # cmd_args.append("-I")
-    # cmd_args.append("ocamlcc/stdlib/bin_ocamlc_byte_ocamlc_byte")
-    # cmd_args.append("-I")
-    # cmd_args.append("stdlib/bin_ocamlc_byte_ocamlc_byte")
-    # cmd_args.append("-I")
-
-    ## NOTES: If target depends on stdlib, then we need the dirpath
-    ## for the stdlib. Getting it from ctx.attr.deps will not work,
-    ## since these are relative to this target, which just emits the
-    ## shell script. We need a path that works for the shell script
-    ## when we run it under Bazel. That's what runfiles are for - we
-    ## add stdlib to runfiles when we generate the script, then when
-    ## we run the script we need to path of the runfile. And that is
-    ## what ctx.expand_location is for, together with "make vars", in
-    ## this case '$(rootpath)'.
-
-    ## If we passed --//config/ocaml/compiler/libs:archived, then
-    ## //stdlib is one file, stdlib.cmx?a, and we use $(rootpath).
-    ## Otherwise, it is the lib of cmo/x files and we use $(rootpaths).
-    if stdlib_module_target:
-        stdlib = ctx.expand_location("$(rootpath //stdlib:Stdlib)",
-                                     targets=[stdlib_module_target])
-        cmd_args.append("-I")
-        cmd_args.append(paths.dirname(stdlib))
-    elif stdlib_library_target:
-        if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
-            stdlib = ctx.expand_location("$(rootpath //stdlib)",
-                                         targets=[stdlib_library_target])
-            cmd_args.append("-I")
-            cmd_args.append(paths.dirname(stdlib))
-        else:
-            stdlibstr = ctx.expand_location("$(rootpaths //stdlib)",
-                                         targets=[stdlib_library_target])
-            stdlibs = stdlibstr.split(" ")
-            cmd_args.append("-I")
-            cmd_args.append(paths.dirname(stdlibs[0]))
-
-    # cmd_args.append(paths.dirname(stdlib))
-    # cmd_args.append("$(rlocation ocamlcc/stdlib/bin_ocamlc_byte_ocamlc_byte/Stdlib.cmo")
-
-
-    # if ctx.attr.cc_linkopts:
-    #     for lopt in ctx.attr.cc_linkopts:
-    #         if lopt == "verbose":
-    #             # if platform == mac:
-    #             cmd_args.add_all(["-ccopt", "-Wl,-v"])
-    #         else:
-    #             cmd_args.add_all(["-ccopt", lopt])
-
-    for path in paths_depset.to_list():
-        includes.append(path)
-
-    for inc in includes:
-        cmd_args.append("-I")
-        cmd_args.append(inc)
-
-    cmd_args.append(ctx.file.src.path)
-   # manifest = ctx.files.prologue
-
-    # filtering_depset = depset(
-    #     order = dsorder,
-    #     direct = ctx.files.prologue, #  + [ctx.file.main],
-    #     transitive = [cli_link_deps_depset]
-    # )
-
-    # for dep in filtering_depset.to_list():
-    #     if dep in manifest:
-    #         cmd_args.add(dep)
-
-    mnemonic = "OcamlInlineExpectTest"
-
-    cmd_args.append(";")
-    cmd_args.extend(["diff", "-w",
-                ctx.file.src.path,
-                ctx.file.src.path + ".corrected;"])
-
-
-    cmd = cmd_args[0]
-    for arg in cmd_args[1:]:
-        cmd = cmd + " \\\n" + arg
-
-    runner = ctx.actions.declare_file(workdir + ctx.file.src.basename + ".test_runner.sh")
-
+    ##################
+    args_file = ctx.actions.declare_file(ctx.attr.name + ".compile.args")
     ctx.actions.write(
-        output  = runner,
-        # content = "\n".join(args) + "\n",
-        content = cmd,
-        # content = "\n".join(args) + "\n" + cmd,
+        output = args_file,
+        content = cmd_args,
         is_executable = True
     )
 
-    #### RUNFILE DEPS ####
-    ## compilers: store the tool(s) used to build in runfiles
-    ## e.g. if we're linking ocamlopt.byte, we store the ocamlc.byte used to compile/link
-    ## if we're linking ocamlc.opt, we store the camlopt.byte used
-    ## that way each (vm) executable carries its "history",
-    ## and the coldstart can use that history to install all the compilers
+    runner = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
+    cmd_prologue = [
+        "echo PWD: $(PWD);",
+    ]
 
-    # compiler_runfiles = []
-    # for rf in tc.compiler[DefaultInfo].default_runfiles.files.to_list():
-    #     if rf.short_path.startswith("stdlib"):
-    #         # print("STDLIB: %s" % rf)
-    #         compiler_runfiles.append(rf)
-    #     if rf.path.endswith("ocamlrun"):
-    #         # print("OCAMLRUN: %s" % rf)
-    #         compiler_runfiles.append(rf)
-    ##FIXME: add tc.stdlib, tc.std_exit
-    # for f in ctx.files._camlheaders:
-    #     compiler_runfiles.append(f)
+    if hasattr(ctx.attr, "suppress_cmi"):
+        suppressed_cmis = []
+        for dep in ctx.attr.suppress_cmi:
+            suppressed_cmis.extend(dep[BootInfo].sigs.to_list())
+        for cmi in suppressed_cmis:
+            cmd_prologue.append("rm -f {}; ".format(cmi.short_path))
+    cmd_prologue.append("")
+
+    cmd = "\n".join([
+        "{} \\".format(executor.short_path),
+        "{} \\".format(executor_arg.short_path if executor_arg else ""),
+        # "-help \\",
+        # "-verbose \\",
+        "-args \\",
+        "{} \\".format(args_file.short_path),
+        "1> \\",
+        "compile.stdout \\",
+        "2>&1 ; \\",
+        "echo RC: $?;"
+    ])
+
+    cmd_epilogue = "\n".join([
+        # skip first line containing src file path - non-portable
+        "diff <(tail -n \\+2 {}) <(tail -n \\+2 compile.stdout)".format(
+            ctx.file.expected.short_path
+        )
+    ])
+
+    ctx.actions.write(
+        output = runner,
+        # content = cmd,
+        content = "\n".join(cmd_prologue) + cmd + cmd_epilogue,
+        is_executable = True
+    )
+    ##################
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
 
     runfiles = []
-    # if ocamlrun:
-    #     runfiles.append(tc.compiler[DefaultInfo].default_runfiles)
-    # runfiles.append(executable)
-    runfiles.append(ctx.file.src)
-    # runfiles.append(ctx.file._stdlib)
-    # if ocamlrun:
-    #     runfiles = [tc.compiler[DefaultInfo].default_runfiles.files]
-    # print("runfiles tc.compiler: %s" % tc.compiler)
-    # print("runfiles tc.ocamlrun: %s" % tc.ocamlrun)
-    # if tc.protocol == "dev":
-    #     runfiles.append(tc.ocamlrun)
-    # elif ocamlrun:
-    #     runfiles.append(tc.compiler[DefaultInfo].default_runfiles.files.to_list)
-
-    # print("EXE runfiles: %s" % runfiles)
-
-    # if tc.config_executor in ["boot", "baseline","vm"]:
-    #     # ocamlrun = exe[0].default_runfiles.files.to_list()[0]
-    #     ocamlrun = tc.ocamlrun
-    #     # pgm_cmd = ocamlrun.short_path + " " + pgm.short_path
-    # else:
-    #     ocamlrun = None
-    #     # pgm_cmd = pgm.short_path
-
-
-    data_runfiles = []
-    # if ctx.attr.data:
-    #     data_runfiles = [depset(direct = ctx.files.data)]
-
-
-    inputs_depset = depset(
-        direct = []
-        + runfiles
-        ,
-        transitive = []
-        + [depset(
-            linktime_files
-            # + [effective_compiler]
-            # + [ctx.file._stdlib]
-            # ctx.files._camlheaders
-            # + ctx.files._runtime
-            # + ctx.files._stdlib
-            # + camlheaders
-        )]
-        #FIXME: primitives should be provided by target, not tc?
-        # + [depset([tc.primitives])] # if tc.primitives else []
-        + [
-            sigs_depset,
-            cli_link_deps_depset,
-            archived_cmx_depset,
-            ofiles_depset,
-            afiles_depset
-        ]
-        + primitives_depset
-        # + [cc_toolchain.all_files]
-        # + data_inputs
-        # + [depset(action_inputs_ccdep_filelist)]
-    )
-
-    if debug:
-        print("EXPECT runfiles tool: %s" % ctx.attr._runfiles_tool[DefaultInfo].files)
-        print("EXPECT runfiles file: %s" % ctx.files._runfiles_tool)
-
-    # if ctx.attr.strip_data_prefixes:
-    #   myrunfiles = ctx.runfiles(
-    #     # files = ctx.files.data + compiler_runfiles + [ctx.file._std_exit],
-    #     #   transitive_files =  depset([ctx.file._stdlib])
-    #   )
-    # else:
     myrunfiles = ctx.runfiles(
         files = [
-            # tc.ocamlrun
-            # ctx.files.data,
-        ],
+            executor,
+            args_file,
+            ctx.file.struct, ctx.file.expected,
+            ctx.file._runfiles_tool
+        ] + ([executor_arg] if executor_arg else []),
         transitive_files =  depset(
-            transitive = [
-                depset(ctx.files._runfiles_tool),
-                ctx.attr._tool[DefaultInfo].default_runfiles.files,
-
-                ## bash runfiles tool:
-                ctx.attr._runfiles_tool[DefaultInfo].default_runfiles.files,
-                depset(direct=runfiles),
-                depset([tc.ocamlrun]),
-                inputs_depset,
-
-            sigs_depset,
-            cli_link_deps_depset,
-            archived_cmx_depset,
-            ofiles_depset,
-            afiles_depset,
-                # ctx.attr._stdlib.files,
-            ]
+            transitive = []
+            + inputs.bootinfo.sigs
+            + inputs.bootinfo.structs
+            + inputs.bootinfo.cli_link_deps
+            # etc.
+            + [ctx.attr._runfiles_tool[DefaultInfo].files]
+            + [ctx.attr._runfiles_tool[DefaultInfo].default_runfiles.files]
+            + [cc_toolchain.all_files] ##FIXME: only for sys outputs
+        ),
             # direct=compiler_runfiles,
             # transitive = [depset(
             #     # [ctx.file._std_exit, ctx.file._stdlib]
             # )]
-            )
     )
 
-    ##########################
+    print("BASH %s" % ctx.file._runfiles_tool.path)
+
+    ################################################################
     defaultInfo = DefaultInfo(
-        executable=runner,
-        # files = depset([out_exe]),
-        runfiles = myrunfiles
+        executable = runner,
+        runfiles   = myrunfiles
     )
-
-    providers = [
-        defaultInfo,
-        # exe_provider
-    ]
-    # print("out_exe: %s" % out_exe)
-    # print("exe prov: %s" % defaultInfo)
+    providers = [defaultInfo]
 
     return providers
+
+################################################################
+compile_module_test = rule(
+    implementation = _this_impl,
+    doc = "Compiles a module.",
+    attrs = dict(
+        module_attrs(),
+        suppress_cmi = attr.label_list(
+            doc = "For testing only: do not pass on cmi files in Providers.",
+            providers = [
+                [ModuleInfo],
+                [StdLibMarker],
+            ],
+        ),
+        stdout   = attr.string(
+            # label?
+            # mandatory = True,
+            # allow_single_file = True
+        ),
+        expected = attr.label(
+            mandatory = True,
+            allow_single_file = True
+        ),
+        # stdlib_primitives = attr.bool(default = True),
+        # _stdlib = attr.label(
+        #     doc = "The commpiler always opens Stdlib, so everything depends on it.",
+
+        #     default = "//stdlib"
+        # ),
+        _runfiles_tool = attr.label(
+            allow_single_file = True,
+            default = "@bazel_tools//tools/bash/runfiles"
+        ),
+        _rule = attr.string( default = "compile_module_test" ),
+    ),
+    # cfg = compile_mode_in_transition,
+    test = True,
+    fragments = ["platform", "cpp"],
+    host_fragments = ["platform",  "cpp"],
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)

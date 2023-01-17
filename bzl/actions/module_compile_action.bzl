@@ -316,6 +316,75 @@ def construct_inference_outputs(ctx, _options, tc,
 
     return (outputs, module_name)
 
+################
+def construct_inline_expect_outputs(ctx, _options, tc,
+                                    workdir, ext,
+                                    module_name):
+    debug = False
+
+    if debug:
+        print("contruct_inline_expect_outputs: %s" % ctx.label)
+
+    outputs = {
+        "cmi": None,
+        "sigfile": None,
+        "cmti": None,
+
+        "cmstruct": None,
+        "cmt": None,
+        "structfile": None,
+        "ofile": None,
+        "logfile": None,
+        "workdir": None,
+    }
+
+    ################
+    action_outputs   = []
+
+    return (outputs, module_name)
+
+################
+def construct_expect_module_outputs(ctx, _options, tc,
+                                    workdir, ext,
+                                    module_name):
+    debug = False
+
+    if debug:
+        print("contruct_expect_module_outputs: %s" % ctx.label)
+
+    outputs = {
+        "cmi": None,
+        "sigfile": None,
+        "cmti": None,
+
+        "cmstruct": None,
+        "cmt": None,
+        "structfile": None,
+        "ofile": None,
+        "logfile": None,
+        "workdir": None,
+        "corrected": None, # inline expect compiler output
+    }
+
+    ################
+    action_outputs   = []
+    ## ignore ctx.attr.sig, compiler will generate .mli
+
+    # NB: use src file name, not mormalized module name
+    action_output_file = declare_output_file(
+        ctx,
+        workdir,
+        ##module_name,
+        ctx.file.struct.basename,
+        ".corrected")
+    action_outputs.append(action_output_file)
+    outputs["corrected"] = action_output_file
+    # if ctx.label.name == "Patmatch_incoherence_expect2":
+    #     print("corrected: %s" % outputs["corrected"])
+    #     fail(ctx.label)
+
+    return (outputs, module_name)
+
 ################################################################
 def construct_inputs(ctx, tc, ext, workdir,
                      executor, executor_arg,
@@ -383,7 +452,17 @@ def construct_inputs(ctx, tc, ext, workdir,
 
     ## struct: put struct in same dir as mli/cmi, rename if namespaced
     mli_dir = None
-    if from_name == module_name:  ## not namespaced
+
+    if module_name == None:
+        ## inline_expect_module preprocessor
+        # in_structfile = ctx.file.struct
+        if ctx.file.struct.is_source:
+            in_structfile = declare_input_file(
+                ctx, workdir, ctx.file.struct.basename, "", ctx.file.struct)
+        else:
+            in_structfile = ctx.file.struct
+
+    elif from_name == module_name:  ## not namespaced
         # if ctx.label.name == "CamlinternalFormatBasics":
             # print("NOT NAMESPACED")
             # print("cmi is_source? %s" % provider_output_cmi.is_source)
@@ -420,7 +499,7 @@ def construct_inputs(ctx, tc, ext, workdir,
                 # in_structfile = ctx.actions.declare_file(workdir + ctx.file.struct.basename)
                 # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
 
-        else: # structfile is generated, e.g. by ocamllex or a genrule,
+        else: # structfile is generated, e.g. by preprocessing
             # so it is not in the original src dir
             # make sure it's in same dir as mli/cmi IF we have ctx.file.sig
             if ctx.file.sig:
@@ -457,9 +536,17 @@ def construct_inputs(ctx, tc, ext, workdir,
                 else: # sig file is generated src
                     fail("Unhandled case: sigfile is generated")
             else:  ## no sig file, will emit cmi, put both in workdir
-                in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
-                # in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-                # ctx.actions.symlink(output = in_structfile, target_file = ctx.file.struct)
+                if ctx.label.name == "Patmatch_incoherence_expect2":
+                    fail(ctx.label)
+
+                if ctx.attr._rule == "inline_expect_module":
+                    struct_ext = ".corrected"
+                else:
+                    struct_ext = ".ml"
+
+                in_structfile = declare_input_file(
+                    ctx, workdir, module_name, struct_ext, ## ".ml",
+                    ctx.file.struct)
 
     else:  ## we're namespaced
         in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
@@ -467,6 +554,12 @@ def construct_inputs(ctx, tc, ext, workdir,
         # ctx.actions.symlink(
         #     output = in_structfile, target_file = ctx.file.struct
         # )
+
+    # if ctx.label.name == "Patmatch_incoherence_expect2":
+    #     print("struct attr: %s" % ctx.file.struct)
+    #     print("struct attr is_source: %s" % ctx.file.struct.is_source)
+    #     print("in_structfile: %s" % in_structfile)
+    #     fail(ctx.label)
 
     # outputs["structfile"] = in_structfile
     in_files.append(in_structfile)
@@ -846,8 +939,12 @@ def construct_args(ctx, tc, _options, cancel_opts,
     # if ctx.attr._rule == "compile_module_test":
     #     args.add(tc.ocamlrun.short_path) # executable)
 
-    compiler = tc.compiler[DefaultInfo].files_to_run.executable
-    if not ctx.attr._rule == "compile_module_test":
+    if ctx.attr._rule == "inline_expect_module":
+        compiler = ctx.file._expect_compiler
+    else:
+        compiler = tc.compiler[DefaultInfo].files_to_run.executable
+
+    if not ctx.attr._rule in ["compile_module_test", "inline_expect_test"]:
         print("TGT: %s" % ctx.label)
         print("tool compiler: %s" % tc.compiler)
         print("tool exec: %s" % tc.executable)
@@ -859,15 +956,13 @@ def construct_args(ctx, tc, _options, cancel_opts,
 
         if compiler.extension not in ["opt", "optx"]:
             args.add(compiler.path)
-            if ctx.label.name == "Stdlib.Either":
-                print("Either compiler: %s" % compiler)
-                # fail(ctx.label)
-        # elif compiler.basename.endswith(".boot"):
-        #     args.add(tc.tool_arg.path)
-    # else:
-    #     fail("XXXXXXXXXXXXXXXX")
+
 
     # if tc.protocol == "dev":
+
+    if ctx.attr._rule == "inline_expect_module":
+        args.add("-nostdlib")
+        args.add("-nopervasives")
 
     if "-pervasives" in _options:
         # default is -nopervasives
@@ -879,20 +974,22 @@ def construct_args(ctx, tc, _options, cancel_opts,
 
     tc_opts = []
     if not ctx.attr.nocopts:  ## FIXME: obsolete?
-        # for opt in tc.copts:
-        #     if opt not in NEGATION_OPTS:
-        #         args.add(opt)
-        #     else:
-        # args.add_all(tc.copts)
-        tc_opts.extend(tc.copts)
+        if ctx.attr._rule != "inline_expect_module":
+            tc_opts.extend(tc.copts)
 
     tc_opts.extend(tc.structopts)
+
+    # if ctx.label.name.endswith("_expect"):
+    #     print("tc opts: %s" % tc_opts)
+    #     print("tc warnings: %s" % tc.warnings[BuildSettingInfo].value)
+        # fail(ctx.label)
 
     for opt in tc_opts:
         if opt not in cancel_opts:
             args.add(opt)
 
-    args.add_all(tc.warnings[BuildSettingInfo].value)
+    if not ctx.attr._rule == "inline_expect_module":
+        args.add_all(tc.warnings[BuildSettingInfo].value)
 
     for w in ctx.attr.warnings:
         args.add_all(["-w",
@@ -976,7 +1073,16 @@ def construct_args(ctx, tc, _options, cancel_opts,
         if inputs.cmi:
             args.add("-cmi-file", inputs.cmi)
 
-        if ctx.attr._rule == "compile_module_test":
+        if ctx.attr._rule == "inline_expect_test":
+            ## FIXME: get these from attrib? tc?
+            args.add("-nostdlib")
+            args.add("-nopervasives")
+            args.add(ctx.file.struct.path)
+
+        if ctx.attr._rule == "inline_expect_module":
+            args.add(inputs.structfile.path)
+
+        elif ctx.attr._rule == "compile_module_test":
             # args.add("-impl", inputs.structfile.short_path)
             # src file not symlinked into workdir:
             # args.add("-I", ctx.file.struct.dirname + "/_BS_vv")
@@ -985,12 +1091,13 @@ def construct_args(ctx, tc, _options, cancel_opts,
         else:
             args.add("-impl", inputs.structfile.path)
 
-        if ctx.attr._rule == "test_infer_signature":
+        if ctx.attr._rule in ["inline_expect_test", "inline_expect_module"]:
+            None
+        elif ctx.attr._rule == "test_infer_signature":
             args.add("-i")
             # args.add("-o", outputs["mli"])
         else:
             args.add("-c")
-
             if ctx.attr._rule == "compile_module_test":
                 args.add("-o", outputs["cmstruct"])
             else:
@@ -1026,9 +1133,18 @@ def construct_module_compile_action(ctx, module_name):
 
     workdir = tc.workdir
 
-    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    if ctx.attr._rule == "inline_expect_module":
+        compiler = ctx.file._expect_compiler
+    else:
+        compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
-    if compiler.extension in ["byte", "boot"]:
+    if ctx.attr._rule == "inline_expect_test":
+        executor = tc.ocamlrun
+        executor_arg = ctx.file._tool
+    elif ctx.attr._rule == "inline_expect_module":
+        executor = tc.ocamlrun
+        executor_arg = ctx.file._expect_compiler
+    elif compiler.extension in ["byte", "boot"]:
         executor = tc.ocamlrun
         executor_arg = compiler
     else:
@@ -1046,6 +1162,7 @@ def construct_module_compile_action(ctx, module_name):
     if compiler.basename in [
         "ocamlc.byte", "ocamlc.opt", "ocamlc.boot",
         "ocamlc.optx",
+        "inline_expect"
     ]:
         ext = ".cmo"
     elif compiler.basename in [
@@ -1060,14 +1177,28 @@ def construct_module_compile_action(ctx, module_name):
         fail("bad compiler basename: %s" % compiler.basename)
 
     (_options, cancel_opts) = get_options(ctx.attr._rule, ctx)
+    # if ctx.label.name.endswith("_expect"):
+    #     print("options: %s" % _options)
+    #     print("cancel_opts: %s" % cancel_opts)
+    #     fail(ctx.label)
 
     ################################################################
     ################  OUTPUTS  ################
-    if ctx.attr._rule == "test_infer_signature":
-        (outputs, module_name) = construct_inference_outputs(ctx, _options, tc,
-                                                             workdir, ext,
-                                                             module_name)
-        print("outputs: %s" % outputs)
+    if ctx.attr._rule == "inline_expect_test":
+        (outputs, module_name
+         ) = construct_inline_expect_outputs(ctx, _options, tc,
+                                             workdir, ext,
+                                             module_name)
+    elif ctx.attr._rule == "inline_expect_module":
+        (outputs, module_name
+         ) = construct_expect_module_outputs(ctx, _options, tc,
+                                             workdir, ext,
+                                             module_name)
+    elif ctx.attr._rule == "test_infer_signature":
+        (outputs, module_name
+         ) = construct_inference_outputs(ctx, _options, tc,
+                                         workdir, ext,
+                                         module_name)
     else:
         (outputs,  # includes in_structfile
          module_name,
