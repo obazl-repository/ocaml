@@ -92,12 +92,13 @@ def tc_tool_arg(ctx):
 
     debug = False
 
-    tc_config_executor = ctx.attr.config_executor[BuildSettingInfo].value
+    # tc_config_executor = ctx.attr.config_executor[BuildSettingInfo].value
 
     if debug:
         print("TC.TOOL_ARG: %s" % ctx.label)
-        print("tc.build_executor: %s" % tc_build_executor(ctx))
-        print("tc.config_executor: %s" % tc_config_executor)
+        print("compiler: %s" % ctx.file.compiler)
+        # print("tc.build_executor: %s" % tc_build_executor(ctx))
+        # print("tc.config_executor: %s" % tc_config_executor)
 
     if ctx.file.compiler.basename.endswith(".opt"):
         return None
