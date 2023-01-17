@@ -18,7 +18,7 @@ load("//config:WARNINGS.bzl", "w")
 
 
 ## warnings
-NAME_OUT_OF_SCOPE = "40"
+NAME_OUT_OF_SCOPE_40 = "40"
 
 MODULE_OPTS = []
 SIG_OPTS    = ["-strict-formats"]
@@ -210,7 +210,7 @@ compiler_module(
         "//config/arch:s390x"   : "//asmcomp/s390x:CSE.ml",
     }, no_match_error = "unknown arch"),
     opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI, w.NAME_OUT_OF_SCOPE],
+    warnings = [w.MISSING_MLI_70, w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         ":Cmm",
         ":CSEgen",
@@ -223,7 +223,7 @@ compiler_module(
     struct = "CSEgen.ml",
     sig    = "CSEgen_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         ":Cmm",
         ":Mach",
@@ -297,7 +297,7 @@ compiler_module(
         "//config/arch:s390x"   : "//asmcomp/s390x:arch.ml",
     }, no_match_error = "unknown arch"),
     opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     deps   = [
         "//utils:Clflags"
     ],
@@ -863,7 +863,7 @@ build_module(
     name   = "Cvt_emit",
     struct = "cvt_emit_ml",
     opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     stdlib_deps   = [
         # "//stdlib",
         "//stdlib:Primitives",
@@ -987,7 +987,7 @@ compiler_module(
     struct = "emitaux.ml",
     sig    = "Emitaux_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         "//config:Config",
         "//lambda:Debuginfo",
@@ -1134,7 +1134,7 @@ compiler_module(
     struct = "linearize.ml",
     sig    = "Linearize_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         "//lambda:Debuginfo",
         "//utils:Misc",
@@ -1169,7 +1169,7 @@ compiler_module(
     struct = "linscan.ml",
     sig    = "Linscan_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         ":Interval",
         ":Proc",
@@ -1252,7 +1252,7 @@ compiler_module(
     struct = "polling.ml",
     sig    = "Polling_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         "//utils:Misc",
         "//utils:Numbers",
@@ -1348,7 +1348,7 @@ compiler_module(
     struct = "printmach.ml",
     sig    = "Printmach_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         "//lambda:Debuginfo",
         "//utils:Clflags",
@@ -1532,7 +1532,7 @@ compiler_module(
     struct = "schedgen.ml",
     sig    = "Schedgen_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         "//utils:Clflags",
         ":Cmm",
@@ -1620,7 +1620,7 @@ compiler_module(
     struct = "selectgen.ml",
     sig    = "Selectgen_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         "//lambda:Debuginfo",
         "//middle_end:Backend_var",
@@ -1867,7 +1867,7 @@ compiler_module(
     struct = "x86_proc.ml",
     sig    = "X86_proc_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         "//config:Config",
         "//utils:Ccomp",

@@ -480,7 +480,7 @@ compiler_module(
     struct = "diffing.ml",
     sig    = "Diffing_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     open   = ["//stdlib:Stdlib"],
     deps   = [
         ":Misc",
@@ -516,7 +516,7 @@ compiler_module(
     sig    = "Diffing_with_keys_cmi",
     opts = MODULE_OPTS,
     open   = ["//stdlib:Stdlib"],
-    warnings = [w.NAME_OUT_OF_SCOPE],
+    warnings = [w.NAME_OUT_OF_SCOPE_40],
     deps   = [
         ":Diffing",
         ":Misc",

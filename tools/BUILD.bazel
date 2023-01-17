@@ -82,7 +82,7 @@ tool_module(
     name   = "Ocamldep",
     struct = "ocamldep.ml",
     # opts = ["-verbose", "-ccopt", "-verbose"],
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     deps   = [
         "//driver:Makedepend"
     ],
@@ -101,7 +101,7 @@ tool_module(
 compiler_module(
     name   = "Ocamlcp",
     struct = "ocamlcp.ml",
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     deps   = [
         "//driver:Compenv",
         "//driver:Main_args",
@@ -120,7 +120,7 @@ compiler_module(
 compiler_module(
     name   = "Ocamloptp",
     struct = "ocamloptp.ml",
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     deps   = [
         "//driver:Compenv",
         "//driver:Main_args",
@@ -139,7 +139,7 @@ compiler_module(
 compiler_module(
     name   = "Ocamlcp_common",
     struct = "ocamlcp_common.ml",
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     deps   = [
         "//driver:Main_args",
     ],
@@ -195,7 +195,7 @@ ocaml_tools( # expands to tgts ocamlprof.byte, ocamlprof.opt
 tool_module(
     name   = "Ocamlprof",
     struct = "ocamlprof.ml",
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     deps   = [
         "//parsing:Location",
         "//parsing:Parse",
@@ -258,7 +258,7 @@ ocaml_tools( # expands to tgts ocamlmklib.byte, ocamlmklib.opt
 compiler_module(
     name   = "Ocamlmklib",
     struct = "ocamlmklib.ml",
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     deps   = [
         "//config:Config",
         "//utils:Misc",
@@ -310,7 +310,7 @@ ocaml_tools(
 compiler_module(
     name   = "Ocamlmktop",
     struct = "ocamlmktop.ml",
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     deps   = [
         "//config:Config",
         "//utils:Ccomp",
@@ -340,7 +340,7 @@ ocaml_tools( # expands to ocamlcmt.byte, ocamlcmt.opt
 compiler_module(
     name        = "Ocamlcmt",
     struct      = "ocamlcmt.ml",
-    warnings    = [w.MISSING_MLI],
+    warnings    = [w.MISSING_MLI_70],
     deps        = [
         "//driver:Compmisc",
         "//file_formats:Cmt_format",
@@ -434,7 +434,7 @@ ocaml_tools(
 compiler_module(
     name        = "Objinfo",
     struct      = "objinfo.ml",
-    warnings    = [w.MISSING_MLI],
+    warnings    = [w.MISSING_MLI_70],
     deps        = [
         "//bytecomp:Bytesections",
         "//bytecomp:Symtable",
@@ -486,7 +486,7 @@ ocaml_tools(
 compiler_module(
     name        = "Primreq",
     struct      = "primreq.ml",
-    warnings    = [w.MISSING_MLI],
+    warnings    = [w.MISSING_MLI_70],
     deps        = [
         "//config:Config",
         "//utils:Misc",
@@ -512,7 +512,7 @@ ocaml_tools(
 compiler_module(
     name        = "Stripdebug",
     struct      = "stripdebug.ml",
-    warnings    = [w.MISSING_MLI],
+    warnings    = [w.MISSING_MLI_70],
     deps        = [
         "//bytecomp:Bytesections",
         "//utils:Misc",
@@ -707,7 +707,7 @@ ocaml_tools(
 compiler_module(
     name        = "Cmpbyt",
     struct      = "cmpbyt.ml",
-    warnings    = [w.MISSING_MLI],
+    warnings    = [w.MISSING_MLI_70],
     deps        = [
         "//bytecomp:Bytesections",
     ],
@@ -777,7 +777,7 @@ compiler_module(
 #         "//stdlib:Stdlib.Printf",
 #     ],
 #     opts = ["-nostdlib"],
-#     warnings = [w.MISSING_MLI]
+#     warnings = [w.MISSING_MLI_70]
 # )
 
 # run_ocamllex(

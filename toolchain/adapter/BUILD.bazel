@@ -42,6 +42,12 @@ STD_COPTS = [
     "-strict-sequence",
 ]
 
+STD_STRUCTOPTS = select({
+    ## FIXME: -principal should not be used for boot stage
+    # "//config/ocaml/compile:principal?" : ["-principal"],
+    "//conditions:default": []
+})
+
 STD_LOPTS = [
     # "-nocwd",
     "-nostdlib",
@@ -65,11 +71,7 @@ dev_toolchain_adapter(
     }),
     linkopts    = STD_LOPTS,
     sigopts     = [],
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )
@@ -87,11 +89,7 @@ ocaml_tc_adapter(
         "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
@@ -109,11 +107,7 @@ ocaml_tc_adapter(
         "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
@@ -131,11 +125,7 @@ ocaml_tc_adapter(
         "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
@@ -154,11 +144,7 @@ ocaml_tc_adapter(
         "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
@@ -176,11 +162,7 @@ ocaml_tc_adapter(
         "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
@@ -198,11 +180,7 @@ ocaml_tc_adapter(
         "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
@@ -220,11 +198,7 @@ ocaml_tc_adapter(
         "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     linkopts    = STD_LOPTS,
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
@@ -245,13 +219,8 @@ boot_toolchain_adapter(
         "//config/ocaml/o11n/xmo:enabled?" : [],
         "//conditions:default": ["-opaque"]
     }),
-    structopts  = select({
-        ## FIXME: -principal should not be used for boot stage
-        "//config/ocaml/compile:principal?" : ["-principal"],
-        "//conditions:default": []
-    }),
+    structopts  = STD_STRUCTOPTS,
     linkopts    = STD_LOPTS,
-
     # warnings  - use defaults
     # primitives  = "//runtime:primitives",
 )

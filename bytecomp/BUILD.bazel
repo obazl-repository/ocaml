@@ -503,7 +503,7 @@ compiler_module(
     # makefiles generate opcodes.mli from opcodes.ml - why bother?
     # sig    = ":Opcodes_cmi",
     opts = MODULE_OPTS + ["-open", "Stdlib"],
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     stdlib_deps   = ["//stdlib:Stdlib"],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
@@ -708,7 +708,7 @@ compiler_module(
     name = "Opnames",
     struct = ":opnames.ml",
     opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI],
+    warnings = [w.MISSING_MLI_70],
     stdlib_deps = ["//stdlib:Stdlib"]
 )
 
