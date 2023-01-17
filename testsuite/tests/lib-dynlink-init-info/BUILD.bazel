@@ -1,22 +1,17 @@
-
-
 load("//test:rules.bzl",
      "test_module",
 )
 
-MODULE_OPTS = []
-
-test_suite(
-    name = "testsuite_tests_lib-dynlink-init-info_lib",
-    tests  = [
-        ":Test",
-    ],
-)
+# test_suite(
+#     name = "testsuite_tests_lib-dynlink-init-info_lib",
+#     tests  = [
+#         ":Test",
+#     ],
+# )
 
 test_module(
     name   = "Test",
     struct = "test.ml",
-    opts = MODULE_OPTS,
     deps   = [
     ]
 )

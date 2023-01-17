@@ -14,14 +14,17 @@ def _vv_test_in_transition_impl(settings, attr):
     config_executor = "vm"
     config_emitter  = "vm"
 
+    ## FIXME: control with //test:compiler == "@dev"?
+    ## //config/build/protocol="dev"?
+    ## //test/protocol="dev"?
     if settings["//config/ocaml/compiler"]== "baseline":
         compiler = "@dev//bin:ocamlc.byte"
-        ocamlrun = "@dev//bin:ocamlrun"
         runtime  = "@dev//lib:camlrun"
+        ocamlrun = "@dev//bin:ocamlrun"
     else:
         compiler = "//test:ocamlc.byte"
-        ocamlrun = "//runtime:ocamlrun"
         runtime  = "//runtime:camlrun"
+        ocamlrun = "//runtime:ocamlrun"
 
 
     # mustach  = "@dev//bin:mustach"
@@ -81,7 +84,6 @@ def _vs_test_in_transition_impl(settings, attr):
 
     if settings["//config/ocaml/compiler"]== "baseline":
         compiler = "@dev//bin:ocamlopt.byte"
-        # runtime  = "//runtime:asmrun"
         runtime  = "@dev//lib:asmrun"
         ocamlrun = "@dev//bin:ocamlrun"
     else:
@@ -147,10 +149,15 @@ def _ss_test_in_transition_impl(settings, attr):
     config_executor = "sys"
     config_emitter  = "sys"
 
-    compiler = "//test:ocamlopt.opt"
-    ocamlrun = "@dev//bin:ocamlrun"
-    # ocamlrun = "//runtime:ocamlrun"
-    runtime  = "@dev//lib:asmrun"
+    if settings["//config/ocaml/compiler"]== "baseline":
+        compiler = "@dev//bin:ocamlopt.opt"
+        runtime  = "@dev//lib:asmrun"
+        ocamlrun = "@dev//bin:ocamlrun"
+    else:
+        compiler = "//test:ocamlopt.opt"
+        runtime  = "//runtime:asmrun"
+        ocamlrun = "//runtime:ocamlrun"
+
     # mustach  = "@dev//bin:mustach"
     # cvt_emit = "@dev//bin:cvt_emit.byte"
     # else:
@@ -177,7 +184,8 @@ def _ss_test_in_transition_impl(settings, attr):
 ss_test_in_transition = transition(
     implementation = _ss_test_in_transition_impl,
     inputs = [
-        "//config/build/protocol",
+        "//config/ocaml/compiler",
+        "//config/build/protocol"
         # "//config/target/executor",
         # "//config/target/emitter",
     ],
@@ -211,9 +219,15 @@ def _sv_test_in_transition_impl(settings, attr):
     config_executor = "sys"
     config_emitter  = "vm"
 
-    compiler = "//test:ocamlc.opt"
-    # ocamlrun = "//runtime:ocamlrun"
-    runtime  = "@dev//lib:camlrun"
+    if settings["//config/ocaml/compiler"]== "baseline":
+        compiler = "@dev//bin:ocamlc.opt"
+        runtime  = "@dev//lib:camlrun"
+        ocamlrun = "@dev//bin:ocamlrun"
+    else:
+        compiler = "//test:ocamlc.opt"
+        runtime  = "//runtime:camlrun"
+        ocamlrun = "//runtime:ocamlrun"
+
     # mustach  = "@dev//bin:mustach"
     # cvt_emit = "@dev//bin:cvt_emit.byte"
     # else:
@@ -240,7 +254,8 @@ def _sv_test_in_transition_impl(settings, attr):
 sv_test_in_transition = transition(
     implementation = _sv_test_in_transition_impl,
     inputs = [
-        "//config/build/protocol",
+        "//config/ocaml/compiler",
+        "//config/build/protocol"
         # "//config/target/executor",
         # "//config/target/emitter",
     ],

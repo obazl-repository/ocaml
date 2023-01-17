@@ -114,16 +114,16 @@ test_module(
 test_module(
     name   = "Expect_test",
     struct = "expect_test.ml",
-    opts = MODULE_OPTS,
+    opts = MODULE_OPTS + ["-linkall"],
     deps   = [
-        # "//stdlib",
         "//toplevel:Toploop",
         "//driver:Main_args",
         "//parsing:Location",
         "//parsing:Printast",
-        # "//parsing:Parsetree_cmi",
     ],
+    sig_deps = ["//parsing:Parsetree_cmi"],
     stdlib_deps =[
+        # "//stdlib",
         "//stdlib:Stdlib.StdLabels",
     ]
 )

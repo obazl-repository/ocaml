@@ -1,5 +1,11 @@
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 
+## enable set -x etc. in sh runner
+bool_flag(name = "verbose", build_setting_default = False,
+          visibility = ["//testsuite/tests:__subpackages__"])
+config_setting(name = "verbose?", flag_values = {":verbose": "True"},
+          visibility = ["//testsuite/tests:__subpackages__"])
+
 bool_flag( name = "with-stdlib", build_setting_default = False)
 config_setting(name = "with-stdlib?",
                flag_values = {":with-stdlib": "True"})
@@ -7,9 +13,13 @@ config_setting(name = "with-stdlib?",
 test_suite(
     name = "tests",
     tests = [
-        "//testsuite/tests/basic:tests",
-        "//testsuite/tests/basic-modules:tests",
-        "//testsuite/tests/lib-arg:tests",
-        "//testsuite/tests/lib-bigarray:tests"
+        "//testsuite/tests/basic",
+        "//testsuite/tests/basic-modules",
+        "//testsuite/tests/lib-arg",
+        "//testsuite/tests/lib-bigarray",
+
+        "//testsuite/tests/typing-missing-cmi",
+        "//testsuite/tests/typing-missing-cmi-2",
+        "//testsuite/tests/typing-missing-cmi-3"
     ],
 )

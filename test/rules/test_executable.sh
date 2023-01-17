@@ -53,7 +53,7 @@ WD=_boot
 # echo "STDLIB_RLOC: $STDLIB_RLOC"
 # STDLIBDIR=$(dirname $(rlocation $STDLIB_RLOC))
 
-OCAMLRUN="$(rlocation ocamlcc/runtime/ocamlrun)"
+# OCAMLRUN="$(rlocation ocamlcc/runtime/ocamlrun)"
 
 # OCAMLRUN=runtime/ocamlrun
 # TESTEXE=$BINDIR/ocamlc.byte
@@ -62,13 +62,7 @@ OCAMLRUN="$(rlocation ocamlcc/runtime/ocamlrun)"
 
 # CMD="$OCAMLRUN $TESTEXE_PATH -nostdlib -I $STDLIBDIR $CAMLHEADERS -I $RUNTIMEDIR $@"
 
-LIBDIR="$(rlocation ocamlcc/testsuite/tests/lib-dynlink-bytecode/dllplug1.so)"
-LIBDIR="$(dirname $LIBDIR)"
-LIBDIR="testsuite/tests/lib-dynlink-bytecode"
-
-LDPATH=$LIBDIR
-
-CMD="CAML_LD_LIBRARY_PATH=$LDPATH $OCAMLRUN $TESTEXE_PATH $@"
+CMD="$OCAMLRUN $TESTEXE_PATH $@"
 
 if [ $VERBOSE = "true" ]
 then

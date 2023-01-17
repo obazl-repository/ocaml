@@ -1,20 +1,19 @@
-
-
 load("//test:rules.bzl",
      "test_module",
+     "inline_expect_test",
 )
 
 MODULE_OPTS = []
 
-test_suite(
-    name = "testsuite_tests_typing-poly_lib",
-    tests  = [
-        ":Error_messages",
-        ":Poly",
-        ":Pr7636",
-        ":Pr9603",
-    ],
-)
+# test_suite(
+#     name = "typing-poly",
+#     tests  = [
+#         ":Error_messages",
+#         ":Poly",
+#         ":Pr7636",
+#         ":Pr9603",
+#     ],
+# )
 
 test_module(
     name   = "Error_messages",
@@ -24,27 +23,29 @@ test_module(
     ]
 )
 
-test_module(
-    name   = "Poly",
-    struct = "poly.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+inline_expect_test(
+    name   = "Poly_test",
+    src = "poly.ml",
+    deps = [
+        "//stdlib",
+        # "//stdlib:Stdlib.StdLabels"
+    ],
+    timeout = "short",
+    tags = ["inline_expect"]
 )
 
-test_module(
-    name   = "Pr7636",
-    struct = "pr7636.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+inline_expect_test(
+    name   = "Pr7636_test",
+    src = "pr7636.ml",
+    timeout = "short",
+    tags = ["inline_expect"]
 )
 
-test_module(
-    name   = "Pr9603",
-    struct = "pr9603.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+inline_expect_test(
+    name = "Pr9603_test",
+    src  = "pr9603.ml",
+    # opts = ["-drawlambda", "-dlambda"], # "-pervasives"],
+    # deps = ["//stdlib"],
+    timeout = "short",
+    tags = ["inline_expect"]
 )
-

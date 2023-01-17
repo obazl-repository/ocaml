@@ -1,65 +1,62 @@
-
-
 load("//test:rules.bzl",
      "test_module",
      "test_signature",
 )
 
 MODULE_OPTS = []
-SIG_OPTS = ["-nostdlib"]
+SIG_OPTS = []
 
-test_suite(
-    name = "testsuite_tests_lib-dynlink-initializers_lib",
-    tests  = [
-        ":Test10_main",
-        ":Test10_plugin",
-        ":Test1_inited_second",
-        ":Test1_main",
-        ":Test1_plugin",
-        ":Test2_inited_first",
-        ":Test2_main",
-        ":Test2_plugin",
-        ":Test3_main",
-        ":Test3_plugin_a",
-        ":Test3_plugin_b",
-        ":Test4_main",
-        ":Test4_plugin_a",
-        ":Test4_plugin_b",
-        ":Test5_main",
-        ":Test5_plugin_a",
-        ":Test5_plugin_b",
-        ":Test5_second_plugin",
-        ":Test6_main",
-        ":Test6_plugin",
-        ":Test6_second_plugin",
-        ":Test7_main",
-        ":Test7_plugin",
-        ":Test8_main",
-        ":Test8_plugin_a",
-        ":Test8_plugin_b",
-        ":Test9_main",
-        ":Test9_plugin",
-        ":Test9_second_plugin",
-    ],
-    # signatures  = [
-    #     ":Test7_interface_only_cmi",
-    # ],
-)
+# test_suite(
+#     name = "testsuite_tests_lib-dynlink-initializers_lib",
+#     tests  = [
+#         ":Test10_main",
+#         ":Test10_plugin",
+#         ":Test1_inited_second",
+#         ":Test1_main",
+#         ":Test1_plugin",
+#         ":Test2_inited_first",
+#         ":Test2_main",
+#         ":Test2_plugin",
+#         ":Test3_main",
+#         ":Test3_plugin_a",
+#         ":Test3_plugin_b",
+#         ":Test4_main",
+#         ":Test4_plugin_a",
+#         ":Test4_plugin_b",
+#         ":Test5_main",
+#         ":Test5_plugin_a",
+#         ":Test5_plugin_b",
+#         ":Test5_second_plugin",
+#         ":Test6_main",
+#         ":Test6_plugin",
+#         ":Test6_second_plugin",
+#         ":Test7_main",
+#         ":Test7_plugin",
+#         ":Test8_main",
+#         ":Test8_plugin_a",
+#         ":Test8_plugin_b",
+#         ":Test9_main",
+#         ":Test9_plugin",
+#         ":Test9_second_plugin",
+#     ],
+#     # signatures  = [
+#     #     ":Test7_interface_only_cmi",
+#     # ],
+# )
 
 test_module(
     name   = "Test10_main",
     struct = "test10_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
+    stdlib_deps   = ["//stdlib:Stdlib.Printexc"]
 )
 
 test_module(
     name   = "Test10_plugin",
     struct = "test10_plugin.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
@@ -67,240 +64,220 @@ test_module(
     struct = "test1_inited_second.ml",
     opts = MODULE_OPTS,
     deps   = [
-    ]
+        "Test1_main"
+   ]
 )
 
 test_module(
     name   = "Test1_main",
     struct = "test1_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test1_plugin",
     struct = "test1_plugin.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [":Test1_inited_second"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test2_inited_first",
     struct = "test2_inited_first.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test2_main",
     struct = "test2_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [
+        "//otherlibs/dynlink",
+        ":Test2_inited_first"
+    ],
 )
 
 test_module(
     name   = "Test2_plugin",
     struct = "test2_plugin.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [":Test2_inited_first"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test3_main",
     struct = "test3_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
+    # stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test3_plugin_a",
     struct = "test3_plugin_a.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test3_plugin_b",
     struct = "test3_plugin_b.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [":Test3_plugin_a"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test4_main",
     struct = "test4_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
 )
 
 test_module(
     name   = "Test4_plugin_a",
     struct = "test4_plugin_a.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [":Test4_plugin_b"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test4_plugin_b",
     struct = "test4_plugin_b.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test5_main",
     struct = "test5_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
 )
 
 test_module(
     name   = "Test5_plugin_a",
     struct = "test5_plugin_a.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test5_plugin_b",
     struct = "test5_plugin_b.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test5_second_plugin",
     struct = "test5_second_plugin.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [":Test5_plugin_a"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test6_main",
     struct = "test6_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
 )
 
 test_module(
     name   = "Test6_plugin",
     struct = "test6_plugin.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test6_second_plugin",
     struct = "test6_second_plugin.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [":Test6_plugin"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_signature(
     name = "Test7_interface_only_cmi",
     src  = "test7_interface_only.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
 )
 
 test_module(
     name   = "Test7_main",
     struct = "test7_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
+    sig_deps   = [":Test7_interface_only_cmi"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test7_plugin",
     struct = "test7_plugin.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    sig_deps   = [":Test7_interface_only_cmi"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test8_main",
     struct = "test8_main.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
 )
 
 test_module(
     name   = "Test8_plugin_a",
     struct = "test8_plugin_a.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    sig_deps = [":Test8_plugin_b_cmi"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test8_plugin_b",
     struct = "test8_plugin_b.ml",
     sig    = "Test8_plugin_b_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = [":Test8_plugin_a"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_signature(
     name = "Test8_plugin_b_cmi",
     src  = "test8_plugin_b.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
 )
 
 test_module(
     name   = "Test9_main",
     struct = "test9_main.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    deps = ["//otherlibs/dynlink"],
 )
 
 test_module(
     name   = "Test9_plugin",
     struct = "test9_plugin.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    sig_deps = [":Test9_second_plugin_cmi"],
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_module(
     name   = "Test9_second_plugin",
     struct = "test9_second_plugin.ml",
     sig    = "Test9_second_plugin_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Primitives"]
 )
 
 test_signature(
     name = "Test9_second_plugin_cmi",
     src  = "test9_second_plugin.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
 )
 
