@@ -1,4 +1,6 @@
 = workflows
+:toc: auto
+:toclevels: 3
 
 == Setup
 
@@ -29,6 +31,57 @@ that builds the test code using `ocamlc.byte`), the compiler
 
 
 == Tools development
+
+
+== Test case development
+
+Tests involve composition of multiple rules. For finished tests,
+macros can be used to automatically expand to the required targets.
+During development the rules may be used directly. For example, to
+develop an xref:test_rules.adoc#expect_test[expect] test the following
+protocol would be used:
+
+=== Start with `ocamlc.byte`
+
+Most rules use this compiler by default. But the rules are designed
+such that the compiler used is determined by configuration settings,
+which may be set higher up in the dependency tree. So once you've got
+things working for `ocamlc.byte` you build top-level targets that set
+the configuration to use the other compilers. For example, rule
+`expect_vv_test` will build and run a test using compiler
+`//test:ocamlc.byte`. Once that works, you can write a target for rule
+`expect_ss_test` with the same dependencies as your `expect_vv_test`
+target. Everything will be the same, except that the `ocamlopt.opt`
+compiler will be used (and any other configuration changes entailed by
+using that compiler will be made automatically).
+
+===  Write a `test_module` target
+
+By default `test_module` targets use compiler `//test:ocamlc.byte`.
+
+=== Define a `test_vv_executable` target
+
+This target will compile and link your test module.
+
+=== Define an `expect_vv_test` target
+
+This will produce a test runner the executes your test executable in the test environment.
+
+=== Switch to the `expect_test` macro
+
+Once you've got your test case working for `ocamlc.byte`, write the
+`expect_test` macro target (and don't forget to comment out the
+explicit `test_vv_executable` and `expect_vv_test` targets you have
+used for development). This will expand to the targets required for
+all four compilers.
+
+If your test has trouble with one of the compilers, repeat the steps
+you used to get `ocamlc.byte` working, but use the appropriate rules,
+for example for `ocamlc.opt` you would used `test_sv_executable` and
+`expect_sv_test`.
+
+In the end you will have two targets: one for `test_module` and one
+for the `expect_test` macro.
 
 
 == Troubleshooting

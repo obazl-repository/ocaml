@@ -192,7 +192,9 @@ The `expect_test` macro contains a nested macro, `test_executable`.
 
     bazel query 'filter(".*int.*", kind(".*_test rule", //testsuite/tests/basic...))'
 
-== Inspecting BUILD.bazel source code
+== Macro expansion
+
+See xref:macros.adoc[Macros] for more information.
 
 * Show the code of a particular `expect_vv_test` target:
 

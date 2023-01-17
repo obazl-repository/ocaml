@@ -136,12 +136,19 @@ actual/expected diffing (except within the test code itself).
 
 === rule: expect_test
 
-Expect tests run a test executable, which must emit some result to
-stdout; redirects stdout to an "actual" file; compares actual to
-expected.
+Expect tests:
+
+* run a test executable, which must emit some result to
+stdout;
+* redirect stdout to an "actual" file;
+* compares actual to expected output.
+
+CAUTION: `expect_test` is a macro, not a rule; it expands to the rules
+described below. See xref:macros.adoc#expect_test[Macros: expect_test]
+for more information.
 
 There is one expect test rule per compiler; they are named using the
-abbreviations explained in link:terminology[symbols & terminology], in
+abbreviations explained in link:terminology[Terminology], in
 order to indicate which compiler is used to build the test. The naming
 schema is `expect_<compiler>_test`. For example, the `expect_vv_test`
 uses `ocamlc.byte` to build its target.
