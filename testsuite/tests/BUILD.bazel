@@ -17,6 +17,9 @@ test_suite(
         "//testsuite/tests/basic-modules",
         "//testsuite/tests/lib-arg",
         "//testsuite/tests/lib-bigarray",
+        "//testsuite/tests/lib-atomic",
+
+        "//testsuite/tests/typing-labels",
 
         "//testsuite/tests/typing-missing-cmi",
         "//testsuite/tests/typing-missing-cmi-2",

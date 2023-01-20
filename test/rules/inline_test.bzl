@@ -1,12 +1,16 @@
 ## WARNING: this rule only used once, for //tools:cvt_emit.byte
 
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
-load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
+load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
 load("//bzl/transitions:dev_transitions.bzl",
      "dev_tc_compiler_out_transition")
+
+load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
+
+load("test_executable.bzl", "test_executable")
 
 load(":test_transitions.bzl",
      "vv_test_in_transition",
@@ -15,26 +19,26 @@ load(":test_transitions.bzl",
      "sv_test_in_transition"
      )
 
-##############################
-def _inline_test_impl(ctx):
+load(":inline_test_impl.bzl", "inline_test_impl")
 
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
-
-    if tc.config_executor in ["boot", "baseline", "vm"]:
-        ext = ".byte"
-    else:
-        ext = ".opt"
-
-    exe_name = ctx.label.name + ext
-
-    return executable_impl(ctx, tc, exe_name, tc.workdir)
+load("//bzl:providers.bzl",
+     "ModuleInfo",
+     "HybridExecutableMarker", "TestExecutableMarker")
 
 #######################
-inline_vv_test = rule(
-    implementation = _inline_test_impl,
-    doc = "Compile and test an OCaml program.",
-    attrs = dict(
-        executable_attrs(),
+def inline_attrs(kind):
+    return dict(
+        exec_common_attrs(),
+
+        test_executable = attr.label(
+            doc = "Label of test executable.",
+            mandatory = True,
+            allow_single_file = True,
+            providers = [[TestExecutableMarker],
+                         [HybridExecutableMarker]], # -custom runtime
+            default = None,
+        ),
+
         # _runtime = attr.label(
         #     # allow_single_file = True,
         #     default = "//toolchain:runtime",
@@ -46,99 +50,43 @@ inline_vv_test = rule(
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
-    ),
-    cfg = vv_test_in_transition,
-    test = True,
-    fragments = ["cpp"],
-    toolchains = ["//toolchain/type:ocaml",
-                  ## //toolchain/type:profile,",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
+    )
+
+############################
+test_in_transitions = dict(
+    vv = vv_test_in_transition,
+    vs = vs_test_in_transition,
+    ss = ss_test_in_transition,
+    sv = sv_test_in_transition,
 )
 
-#######################
-inline_vs_test = rule(
-    implementation = _inline_test_impl,
-    doc = "Compile and test an OCaml program.",
-    attrs = dict(
-        executable_attrs(),
-        # _runtime = attr.label(
-        #     # allow_single_file = True,
-        #     default = "//toolchain:runtime",
-        #     executable = False,
-        #     # cfg = reset_cc_config_transition ## only build once
-        #     # default = "//config/runtime" # label flag set by transition
-        # ),
-        _rule = attr.string( default = "inline_test" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
-    ),
-    cfg = vs_test_in_transition,
-    test = True,
-    fragments = ["cpp"],
-    toolchains = ["//toolchain/type:ocaml",
-                  ## //toolchain/type:profile,",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
-)
+#####################
+## Inline rule definitions
+def inline_rule(kind):
+
+    return rule(
+        implementation = inline_test_impl,
+        doc = "Run an inline test executable built with {} compiler".format(kind),
+        attrs = inline_attrs(kind),
+        cfg = test_in_transitions[kind],
+        test = True,
+        fragments = ["cpp"],
+        toolchains = ["//toolchain/type:ocaml",
+                      "@bazel_tools//tools/cpp:toolchain_type"])
 
 #######################
-inline_ss_test = rule(
-    implementation = _inline_test_impl,
-    doc = "Compile and test an OCaml program.",
-    attrs = dict(
-        executable_attrs(),
-        # _runtime = attr.label(
-        #     # allow_single_file = True,
-        #     default = "//toolchain:runtime",
-        #     executable = False,
-        #     # cfg = reset_cc_config_transition ## only build once
-        #     # default = "//config/runtime" # label flag set by transition
-        # ),
-        _rule = attr.string( default = "inline_test" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
-    ),
-    cfg = ss_test_in_transition,
-    test = True,
-    fragments = ["cpp"],
-    toolchains = ["//toolchain/type:ocaml",
-                  ## //toolchain/type:profile,",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
-)
-
-#######################
-inline_sv_test = rule(
-    implementation = _inline_test_impl,
-    doc = "Compile and test an OCaml program.",
-    attrs = dict(
-        executable_attrs(),
-        # _runtime = attr.label(
-        #     # allow_single_file = True,
-        #     default = "//toolchain:runtime",
-        #     executable = False,
-        #     # cfg = reset_cc_config_transition ## only build once
-        #     # default = "//config/runtime" # label flag set by transition
-        # ),
-        _rule = attr.string( default = "inline_test" ),
-        _allowlist_function_transition = attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-        ),
-    ),
-    cfg = sv_test_in_transition,
-    test = True,
-    fragments = ["cpp"],
-    toolchains = ["//toolchain/type:ocaml",
-                  ## //toolchain/type:profile,",
-                  "@bazel_tools//tools/cpp:toolchain_type"]
-)
+inline_vv_test = inline_rule("vv")
+inline_vs_test = inline_rule("vs")
+inline_ss_test = inline_rule("ss")
+inline_sv_test = inline_rule("sv")
 
 ###############################################################
 ####  MACRO - generates inline_**_test targets
 ################################################################
 def inline_test_macro(name,
-                      main,
-                      opts = [],
+                      test_module,
+                      opts  = OCAML_COMPILER_OPTS,
+                      timeout = "short",
                       **kwargs):
 
     if name.endswith("_test"):
@@ -146,15 +94,20 @@ def inline_test_macro(name,
     else:
         stem = name
 
-    if main.startswith(":"):
-        main = main[1:]
+    if test_module.startswith(":"):
+        test_name = test_module[1:]
     else:
-        main = main
+        test_name = test_module
+    print("test_name: %s" % test_name)
 
-    vv_name = main + "_inline_vv_test"
-    vs_name = main + "_inline_vs_test"
-    ss_name = main + "_inline_ss_test"
-    sv_name = main + "_inline_sv_test"
+    executable = test_name + ".exe"
+
+    vv_name = test_name + "_vv_test"
+    vs_name = test_name + "_vs_test"
+    ss_name = test_name + "_ss_test"
+    sv_name = test_name + "_sv_test"
+
+    print("vv_name: %s" % vv_name)
 
     native.test_suite(
         name  = stem + "_test",
@@ -163,25 +116,39 @@ def inline_test_macro(name,
 
     inline_vv_test(
         name = vv_name,
-        main = main,
+        test_executable = executable,
+        timeout = timeout,
+        tags = ["vv", "inline"],
         **kwargs
     )
 
     inline_vs_test(
         name = vs_name,
-        main = main,
+        test_executable = executable,
+        timeout = timeout,
+        tags = ["vs", "inline"],
         **kwargs
     )
 
     inline_ss_test(
         name = ss_name,
-        main = main,
+        test_executable = executable,
+        timeout = timeout,
+        tags = ["ss", "inline"],
         **kwargs
     )
 
     inline_sv_test(
         name = sv_name,
-        main = main,
+        test_executable = executable,
+        timeout = timeout,
+        tags = ["sv", "inline"],
         **kwargs
     )
 
+    test_executable(
+        name    = executable,
+        main    = test_module,
+        opts    = opts,
+        **kwargs
+    )

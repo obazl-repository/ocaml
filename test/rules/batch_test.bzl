@@ -11,9 +11,7 @@ load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
-load("test_executable.bzl",
-     "test_executable",
-     test_executable_macro = "test_executable_macro")
+load("test_executable.bzl", "test_executable")
 
 load(":test_transitions.bzl",
      "vv_test_in_transition",
@@ -78,9 +76,9 @@ def batch_attrs(kind):
 #############################
 batch_in_transitions = dict(
     vv = vv_test_in_transition,
-    vs  = vs_test_in_transition,
-    ss    = ss_test_in_transition,
-    sv  = sv_test_in_transition,
+    vs = vs_test_in_transition,
+    ss = ss_test_in_transition,
+    sv = sv_test_in_transition,
 )
 
 #####################
@@ -129,18 +127,6 @@ def batch_test_macro(name,
     ss_name = test_name + "_ss_test"
     sv_name = test_name + "_sv_test"
 
-    # test_executable_macro(
-    #     name    = executable,
-    #     main    = executable,
-    #     **kwargs
-    # )
-    test_executable(
-        name    = executable,
-        main    = test_module,
-        opts    = opts,
-        **kwargs
-    )
-
     native.test_suite(
         name  = stem + "_test",
         tests = [vv_name, vs_name, ss_name, sv_name]
@@ -183,6 +169,13 @@ def batch_test_macro(name,
         stdout_expected = stdout_expected,
         timeout  = timeout,
         tags     = ["sv"],
+        **kwargs
+    )
+
+    test_executable(
+        name    = executable,
+        main    = test_module,
+        opts    = opts,
         **kwargs
     )
 

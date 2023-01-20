@@ -1,39 +1,17 @@
 load("//test:rules.bzl",
-     "inline_vv_test",
-     "inline_vs_test",
-     "inline_ss_test",
-     "inline_sv_test",
      "inline_test_macro",
      "test_module",
-     "test_executable"
 )
 
 test_suite(
     name = "lib-atomic",
-    tests  = [":Atomic_test"]
+    tests  = [":Test_atomic_test"]
 )
 
 inline_test_macro(
     name = "Test_atomic_test",
-    main = ":Test_atomic",
+    test_module = ":Test_atomic",
     timeout = "short"
-)
-
-# inline_vv_test(
-#     name = "Test_atomic_inline_vv_test",
-#     main = ":Test_atomic",
-#     timeout = "short"
-# )
-
-# inline_ss_test(
-#     name = "Test_atomic_inline_ss_test",
-#     main = ":Test_atomic",
-#     timeout = "short"
-# )
-
-test_executable(
-    name = "Test_atomic.byte",
-    main = ":Test_atomic"
 )
 
 test_module(
