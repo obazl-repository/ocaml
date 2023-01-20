@@ -893,7 +893,8 @@ def construct_args(ctx, tc, _options, cancel_opts,
                 or dep.label.name == "Primitives"):
                 ## dep is either Stdlib resolver or a stdlib submodule
                 if ctx.attr._rule == "compile_module_test":
-                    inc = paths.dirname(dep[DefaultInfo].files.to_list()[0].short_path)
+                    # inc = paths.dirname(dep[DefaultInfo].files.to_list()[0].path)
+                    inc = dep[DefaultInfo].files.to_list()[0].dirname
                 else:
                     inc = dep[DefaultInfo].files.to_list()[0].dirname
                 includes.append(inc)
@@ -988,7 +989,7 @@ def construct_args(ctx, tc, _options, cancel_opts,
         if opt not in cancel_opts:
             args.add(opt)
 
-    if not ctx.attr._rule == "inline_expect_module":
+    if ctx.attr._rule not in ["inline_expect_module", "test_module"]:
         args.add_all(tc.warnings[BuildSettingInfo].value)
 
     for w in ctx.attr.warnings:

@@ -130,6 +130,7 @@ def module_impl(ctx, module_name):
     )
 
     moduleInfo = ModuleInfo(
+        name   = module_name,
         sig    = outputs["cmi"] if outputs["cmi"] else inputs.cmi,
         sig_src = outputs["sigfile"],
         cmti =  outputs["cmti"],

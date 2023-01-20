@@ -86,9 +86,9 @@ def module_attrs():
         deps = attr.label_list(
             doc = "List of OCaml dependencies.",
             providers = [
-                # [StdStructMarker, ModuleInfo],
+                [StdStructMarker, ModuleInfo],
                 # [CcInfo]
-                [ModuleInfo],
+                # [ModuleInfo],
                 [StdLibMarker],
                 # []
             ],
