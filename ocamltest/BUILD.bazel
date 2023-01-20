@@ -38,7 +38,7 @@ SIG_OPTS    = ["-nopervasives"]
 
 ##FIXME: one-off rule for this? it always produces an executable,
 ##either native or vm + -custom
-test_executable(
+test_executable_macro(
     name = "ocamltest",
     opts = select({
         "//config/target/executor:boot_executor?": ["-custom"],

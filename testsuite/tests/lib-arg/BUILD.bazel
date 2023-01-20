@@ -1,8 +1,7 @@
 load("//test:rules.bzl",
-     "test_executable",
+     "test_executable_macro",
      "test_module",
      "test_signature",
-     "ocaml_test",
      "batch_expect_test",
      "inline_expect_test",
 )

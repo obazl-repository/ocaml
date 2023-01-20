@@ -9,7 +9,7 @@ load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
-load("test_executable.bzl", test_executable = "test_executable")
+load("test_executable.bzl", test_executable_macro = "test_executable_macro")
 
 load(":test_transitions.bzl",
      "vv_test_in_transition",
@@ -20,19 +20,16 @@ load(":test_transitions.bzl",
 
 load(":batch_expect_test_impl.bzl", "batch_expect_test_impl")
 
-# load(":expect_vv_test.bzl", "expect_vv_test")
-# load(":expect_ss_test.bzl", "expect_ss_test")
-
-## expect_test macro
-## expands to expect_xx_test where xx == vv | vs | ss | sv
+## batch_expect_test macro
+## expands to batch_expect_xx_test where xx == vv | vs | ss | sv
 
 ## builds an executable and runs it
 ## executable is expected to write to stdout
-## expect_test redirects output to file,
+## batch_expect_test redirects output to file,
 ## then diffs it against expected output.
 
 #######################
-expect_vv_test = rule(
+batch_expect_vv_test = rule(
     implementation = batch_expect_test_impl,
     doc = "Run a test executable built with ocamlc.byte",
     attrs = dict(
@@ -62,7 +59,7 @@ expect_vv_test = rule(
             # default = "//config/runtime" # label flag set by transition
         ),
 
-        _rule = attr.string( default = "expect_test" ),
+        _rule = attr.string( default = "batch_expect_test" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -76,7 +73,7 @@ expect_vv_test = rule(
 )
 
 #######################
-expect_vs_test = rule(
+batch_expect_vs_test = rule(
     implementation = batch_expect_test_impl,
     doc = "Run a test executable built with ocamlopt.byte",
     attrs = dict(
@@ -104,7 +101,7 @@ expect_vs_test = rule(
             # default = "//config/runtime" # label flag set by transition
         ),
 
-        _rule = attr.string( default = "expect_test" ),
+        _rule = attr.string( default = "batch_expect_test" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -118,7 +115,7 @@ expect_vs_test = rule(
 )
 
 #######################
-expect_ss_test = rule(
+batch_expect_ss_test = rule(
     implementation = batch_expect_test_impl,
     doc = "Run a test executable built with ocamlopt.opt",
     attrs = dict(
@@ -146,7 +143,7 @@ expect_ss_test = rule(
             # default = "//config/runtime" # label flag set by transition
         ),
 
-        _rule = attr.string( default = "expect_test" ),
+        _rule = attr.string( default = "batch_expect_test" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -161,7 +158,7 @@ expect_ss_test = rule(
 )
 
 #######################
-expect_sv_test = rule(
+batch_expect_sv_test = rule(
     implementation = batch_expect_test_impl,
     doc = "Run a test executable built with ocamlc.opt",
     attrs = dict(
@@ -189,7 +186,7 @@ expect_sv_test = rule(
             # default = "//config/runtime" # label flag set by transition
         ),
 
-        _rule = attr.string( default = "expect_test" ),
+        _rule = attr.string( default = "batch_expect_test" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -226,7 +223,7 @@ def batch_expect_test(name,
     ss_name = executable + "_ss_test"
     sv_name = executable + "_sv_test"
 
-    test_executable(
+    test_executable_macro(
         name    = executable,
         main    = executable,
         **kwargs
@@ -237,7 +234,7 @@ def batch_expect_test(name,
         tests = [vv_name, vs_name, ss_name, sv_name]
     )
 
-    expect_vv_test(
+    batch_expect_vv_test(
         name     = vv_name,
         test_executable = executable + ".vv.byte",
         stdout_actual   = stdout_actual,
@@ -247,7 +244,7 @@ def batch_expect_test(name,
         **kwargs
     )
 
-    expect_vs_test(
+    batch_expect_vs_test(
         name     = vs_name,
         test_executable = executable + ".vs.opt",
         stdout_actual   = stdout_actual,
@@ -257,7 +254,7 @@ def batch_expect_test(name,
         **kwargs
     )
 
-    expect_ss_test(
+    batch_expect_ss_test(
         name     = ss_name,
         test_executable = executable + ".ss.opt",
         stdout_actual   = stdout_actual,
@@ -267,7 +264,7 @@ def batch_expect_test(name,
         **kwargs
     )
 
-    expect_sv_test(
+    batch_expect_sv_test(
         name     = sv_name,
         test_executable = executable + ".vv.byte",
         stdout_actual   = stdout_actual,

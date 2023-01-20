@@ -1,7 +1,7 @@
 load("//tools:TOOL_RULES.bzl", "ocaml_tool_vm")
 
 load("//test:rules.bzl",
-     "test_executable",
+     "test_executable_macro",
      "test_library",
      "test_module",
      "test_signature",
@@ -72,7 +72,7 @@ ocaml_tool_vm( #FIXME: use compiler rule?
 #   parsecmmaux parsecmm lexcmm codegen_main)
 
 ################
-test_executable(
+test_executable_macro(
     name = "codegen",
     main = ":Codegen_main",
     opts = ["-w", "+40", "-g"],

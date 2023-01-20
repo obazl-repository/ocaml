@@ -19,6 +19,7 @@
 
 ################################################################
 def _ModuleInfo_init(*,
+                     name = None,
                      sig = None,
                      sig_src = None,
                      cmti = None,
@@ -29,6 +30,7 @@ def _ModuleInfo_init(*,
                      ofile = None,
                      files = None):
     return {
+        "name": name,
         "sig" : sig,
         "sig_src": sig_src,
         "cmti": cmti,
@@ -43,6 +45,7 @@ def _ModuleInfo_init(*,
 ModuleInfo, _new_moduleinfo = provider(
     doc = "foo",
     fields = {
+        "name": "Normalized module name",
         "sig"   : "One .cmi file",
         "sig_src"   : "One .mli file",
         "cmti"  : "One .cmti file",
@@ -103,6 +106,8 @@ NsResolverInfo, _new_nsresolverinfo = provider(
 
 
 ##########################
+## MAYBE: add stdlib list, so we can easily add stdlib deps to
+## runfiles when needed?
 def _BootInfo_init(*,
                    sigs          = [],
                    structs       = [],

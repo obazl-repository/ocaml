@@ -52,7 +52,7 @@ load("//bzl/rules:COMPILER.bzl",
 # )
 
 
-# test_executable(
+# test_executable_macro(
 #     name    = "main",
 #     main    = ":Main",
 # )

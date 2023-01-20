@@ -1,7 +1,6 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
 load("//test:rules.bzl",
-     "test_module",
      "test_infer_signature",
      "test_signature",
 )

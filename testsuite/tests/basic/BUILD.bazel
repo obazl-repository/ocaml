@@ -7,6 +7,7 @@ load("//config:WARNINGS.bzl", "w")
 
 
 load("//test:rules.bzl",
+     "test_executable_macro",
      "test_executable",
      "test_vv_executable",
      "test_vs_executable",
@@ -21,13 +22,13 @@ load("//test:rules.bzl",
      "inline_expect_test",
 
      "batch_expect_test",
-     "expect_vv_test",
-     "expect_vs_test",
-     "expect_ss_test",
-     "expect_sv_test",
+     "batch_expect_vv_test",
+     "batch_expect_vs_test",
+     "batch_expect_ss_test",
+     "batch_expect_sv_test",
 
      "compile_fail_test",
-     "ocaml_test",
+     # "ocaml_test",
 )
 
 test_suite(
@@ -74,9 +75,19 @@ test_suite(
 )
 
 ############
-## expect_test expands to: test_suite,
-## expect_vv_test, expect_vs_test,
-## expect_ss_test, expect_sv_test
+## batch_expect_test expands to: test_suite,
+## batch_expect_vv_test, batch_expect_vs_test,
+## batch_expect_ss_test, batch_expect_sv_test
+
+# batch_test(
+# )
+# test_batch_runner(
+# )
+# test_batch_executable(
+# )
+# test_batch_module(
+# )
+
 batch_expect_test(
     name    = "Arrays_test",
     test_module = ":Arrays",
@@ -116,7 +127,7 @@ test_module(
 
 ## to run tests selectively pass --test_tag_filters=...
 
-## expect_test macro expansion:
+## batch_expect_test macro expansion:
 test_suite(
     name = "Bigints_test",
     tests = [
@@ -127,7 +138,7 @@ test_suite(
     ]
 )
 
-expect_vv_test(
+batch_expect_vv_test(
     name    = "Bigints_vv_test",
     test_executable = ":Bigints.vv.byte",
     stdout_actual  = "bigints.stdout",
@@ -136,44 +147,13 @@ expect_vv_test(
     tags     = ["vv"],
 )
 
-expect_vs_test(
-    name    = "Bigints_vs_test",
-    test_executable = ":Bigints.vs.opt",
-    stdout_actual  = "bigints.stdout",
-    stdout_expected = "bigints.reference",
-    timeout  = "short",
-    tags     = ["vs"],
-    opts  = OCAML_COMPILER_OPTS
-)
-
-expect_ss_test(
-    name    = "Bigints_ss_test",
-    test_executable = ":Bigints.ss.opt",
-    stdout_actual  = "bigints.stdout",
-    stdout_expected = "bigints.reference",
-    timeout  = "short",
-    tags     = ["ss"],
-    opts  = OCAML_COMPILER_OPTS
-)
-
-expect_sv_test(
-    name    = "Bigints_sv_test",
-    test_executable = ":Bigints.sv.byte",
-    stdout_actual = "bigints.stdout",
-    stdout_expected = "bigints.reference",
-    timeout  = "short",
-    tags     = ["sv"],
-    opts  = OCAML_COMPILER_OPTS
-)
-
-## The expansion of expect_test includes another macro,
-## 'test_executable.
-# test_executable(
-#     name    = "bigints",
-#     main    = ":Bigints",
-# )
-
 ## test_executable macro expansion:
+test_executable(
+    name    = "Bigints.exe",
+    main    = ":Bigints",
+    opts  = OCAML_COMPILER_OPTS
+)
+
 test_vv_executable(
     name    = "Bigints.vv.byte",
     # prologue = [
@@ -196,6 +176,44 @@ sh_binary(
             ":Bigints.vv.byte"],
     deps = ["@bazel_tools//tools/bash/runfiles"]
 )
+
+#####################
+batch_expect_vs_test(
+    name    = "Bigints_vs_test",
+    test_executable = ":Bigints.vs.opt",
+    stdout_actual  = "bigints.stdout",
+    stdout_expected = "bigints.reference",
+    timeout  = "short",
+    tags     = ["vs"],
+    opts  = OCAML_COMPILER_OPTS
+)
+
+batch_expect_ss_test(
+    name    = "Bigints_ss_test",
+    test_executable = ":Bigints.ss.opt",
+    stdout_actual  = "bigints.stdout",
+    stdout_expected = "bigints.reference",
+    timeout  = "short",
+    tags     = ["ss"],
+    opts  = OCAML_COMPILER_OPTS
+)
+
+batch_expect_sv_test(
+    name    = "Bigints_sv_test",
+    test_executable = ":Bigints.sv.byte",
+    stdout_actual = "bigints.stdout",
+    stdout_expected = "bigints.reference",
+    timeout  = "short",
+    tags     = ["sv"],
+    opts  = OCAML_COMPILER_OPTS
+)
+
+## The expansion of batch_expect_test includes another macro,
+## 'test_executable.
+# test_executable_macro(
+#     name    = "bigints",
+#     main    = ":Bigints",
+# )
 
 test_vs_executable(
     name    = "Bigints.vs.opt",
@@ -246,7 +264,7 @@ batch_expect_test(
     stdout_expected = "boxedints.reference",
 )
 
-# test_executable(
+# test_executable_macro(
 #     name    = "boxedints",
 #     main    = ":Boxedints",
 # )

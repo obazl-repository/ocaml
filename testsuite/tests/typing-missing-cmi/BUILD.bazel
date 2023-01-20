@@ -1,24 +1,7 @@
 load("//test:rules.bzl",
-     "test_executable",
-     "test_vv_executable",
-     "test_vs_executable",
-     "test_ss_executable",
-     "test_sv_executable",
-
      "batch_expect_test",
-     "expect_vv_test",
-     "expect_vs_test",
-     "expect_ss_test",
-     "expect_sv_test",
-
-     "test_library",
      "test_module",
-     "test_signature",
-
-     "compile_fail_test",
-     "compile_module_test",
-     "inline_expect_test",
-     "ocaml_test",
+     "compile_module_testx",
 )
 
 test_suite(

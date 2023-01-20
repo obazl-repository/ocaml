@@ -1,5 +1,41 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
+#######################
+def runtime_preamble(debug=False):
+    args = []
+
+    if debug:
+        args.append("set -x;")
+        args.append("echo PWD: $(PWD);")
+
+    args.extend([
+        # "ls -la;",
+        # "echo RUNFILES_DIR: $RUNFILES_DIR;",
+        "set -uo pipefail; set +e;",
+        "f=bazel_tools/tools/bash/runfiles/runfiles.bash ",
+        "source \"${RUNFILES_DIR:-/dev/null}/$f\" 2>/dev/null || \\",
+        "    source \"$(grep -sm1 \"^$f \" \"${RUNFILES_MANIFEST_FILE:-/dev/null}\" | cut -f2- -d' ')\" 2>/dev/null || \\",
+        "    source \"$0.runfiles/$f\" 2>/dev/null || \\",
+        "    source \"$(grep -sm1 \"^$f \" \"$0.runfiles_manifest\" | cut -f2- -d' ')\" 2>/dev/null || \\",
+        "    source \"$(grep -sm1 \"^$f \" \"$0.exe.runfiles_manifest\" | cut -f2- -d' ')\" 2>/dev/null || \\",
+        "    { echo \"ERROR: cannot find $f\"; exit 1; };", ##  f=; set -e; ",
+    ])
+    # --- end runfiles.bash initialization v2 ---
+
+    if debug:
+        args.append("if [ -x ${RUNFILES_DIR+x} ]")
+        args.append("then")
+        args.append("    echo \"MANIFEST: ${RUNFILES_MANIFEST_FILE}\"")
+        args.append("    cat ${RUNFILES_MANIFEST_FILE}")
+        args.append("else")
+        args.append("    echo \"RUNFILES_DIR: ${RUNFILES_DIR}\"")
+        args.append("fi")
+
+    args.append("")
+
+    return "\n".join(args)
+
+#######################
 def rule_mnemonic(ctx):
 
     rule = ctx.attr._rule
@@ -68,11 +104,16 @@ def rule_mnemonic(ctx):
     elif rule in ["boot_archive", "test_archive"]:
         mnemonic = "ArchiveLib"
 
-    elif rule in ["ocaml_test", "expect_test", "lambda_expect_test",
+    elif rule in ["expect_test", "lambda_expect_test",
                   "compile_fail_test"]:
         mnemonic = "Testing"
+
+    elif rule == "inline_test":
+        mnemonic = "InlineTest"
+
     elif rule in ["run_ocamllex"]:
         mnemonic = "Running ocamllex"
+
     elif rule == "compiler_library":
         if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
             mnemonic = "Archiving compiler lib"
