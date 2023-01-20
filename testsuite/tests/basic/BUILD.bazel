@@ -21,11 +21,11 @@ load("//test:rules.bzl",
      "inline_expect_module",
      "inline_expect_test",
 
-     "batch_expect_test",
-     "batch_expect_vv_test",
-     "batch_expect_vs_test",
-     "batch_expect_ss_test",
-     "batch_expect_sv_test",
+     "batch_test_macro",
+     "batch_vv_test",
+     "batch_vs_test",
+     "batch_ss_test",
+     "batch_sv_test",
 
      "compile_fail_test",
      # "ocaml_test",
@@ -75,9 +75,9 @@ test_suite(
 )
 
 ############
-## batch_expect_test expands to: test_suite,
-## batch_expect_vv_test, batch_expect_vs_test,
-## batch_expect_ss_test, batch_expect_sv_test
+## batch_test_macro expands to: test_suite,
+## batch_vv_test, batch_vs_test,
+## batch_ss_test, batch_sv_test
 
 # batch_test(
 # )
@@ -88,7 +88,7 @@ test_suite(
 # test_batch_module(
 # )
 
-batch_expect_test(
+batch_test_macro(
     name    = "Arrays_test",
     test_module = ":Arrays",
     stdout_actual  = "arrays.stdout",
@@ -105,20 +105,17 @@ test_module(
 )
 
 ############
-## For demo purposes we include the explicit expansion of test_executable.
+## For demo purposes we include the explicit expansion of macros.
 
-## test_executable expands to <x>_test_executable and sh_binary
-## targets (runners), where <x> = vv | vs | ss | sv indicates the
-## compiler used to build the code; and sh_binary targets for vv, sv
-## generated names. The sh_binary targets (foo.vv.byte.sh,
-## foo.sv.byte.sh) may be used to run the vm executables from the
-## cmd line (using 'bazel run' only). Test rules depend on the
-## executable targets but not the sh_binary ones.
+## batch_test_macro expands to:
+## * batch_xx_test targets, where <x> = vv | vs | ss | sv indicates the compiler used to build the code.
+## * one test_executable target, which links the executable run by batch_xx_test
+## * one test_suite target that runs all the batch_xx_test tests
 
 ## NB: the arrays test emits nothing to stdout, so we demonstrate the
-## expansion below, for bigints.ml, which does write to stdout.
+## expansion for bigints.ml, which does write to stdout.
 
-# batch_expect_test(
+# batch_test_macro(
 #     name    = "bigints_test",
 #     test_module = ":Bigints",
 #     stdout_actual  = "bigints.stdout",
@@ -127,7 +124,7 @@ test_module(
 
 ## to run tests selectively pass --test_tag_filters=...
 
-## batch_expect_test macro expansion:
+## batch_test_macro macro expansion:
 test_suite(
     name = "Bigints_test",
     tests = [
@@ -138,49 +135,20 @@ test_suite(
     ]
 )
 
-batch_expect_vv_test(
+#####################
+batch_vv_test(
     name    = "Bigints_vv_test",
-    test_executable = ":Bigints.vv.byte",
+    test_executable = ":Bigints.exe",
     stdout_actual  = "bigints.stdout",
     stdout_expected = "bigints.reference",
+    # diff_args = ["-w", "-y"],
     timeout  = "short",
     tags     = ["vv"],
 )
 
-## test_executable macro expansion:
-test_executable(
-    name    = "Bigints.exe",
-    main    = ":Bigints",
-    opts  = OCAML_COMPILER_OPTS
-)
-
-test_vv_executable(
-    name    = "Bigints.vv.byte",
-    # prologue = [
-    #     "//stdlib:CamlinternalFormatBasics",
-    #     "//stdlib:Stdlib"
-    # ],
-    main    = ":Bigints",
-)
-## to run the vv.byte executable:
-sh_binary(
-    name = "Bigints.vv.byte.sh",
-    srcs = ["//test/rules:test_executable.sh"],
-    env  = select({
-        "//test:verbose?": {"VERBOSE": "true"},
-        "//conditions:default": {"VERBOSE": "false"}
-    }),
-    args = ["$(rootpath //runtime:ocamlrun)",
-            "$(rootpath :Bigints.vv.byte)"],
-    data = ["//runtime:ocamlrun",
-            ":Bigints.vv.byte"],
-    deps = ["@bazel_tools//tools/bash/runfiles"]
-)
-
-#####################
-batch_expect_vs_test(
+batch_vs_test(
     name    = "Bigints_vs_test",
-    test_executable = ":Bigints.vs.opt",
+    test_executable = ":Bigints.exe",
     stdout_actual  = "bigints.stdout",
     stdout_expected = "bigints.reference",
     timeout  = "short",
@@ -188,9 +156,9 @@ batch_expect_vs_test(
     opts  = OCAML_COMPILER_OPTS
 )
 
-batch_expect_ss_test(
+batch_ss_test(
     name    = "Bigints_ss_test",
-    test_executable = ":Bigints.ss.opt",
+    test_executable = ":Bigints.exe",
     stdout_actual  = "bigints.stdout",
     stdout_expected = "bigints.reference",
     timeout  = "short",
@@ -198,9 +166,9 @@ batch_expect_ss_test(
     opts  = OCAML_COMPILER_OPTS
 )
 
-batch_expect_sv_test(
+batch_sv_test(
     name    = "Bigints_sv_test",
-    test_executable = ":Bigints.sv.byte",
+    test_executable = ":Bigints.exe",
     stdout_actual = "bigints.stdout",
     stdout_expected = "bigints.reference",
     timeout  = "short",
@@ -208,66 +176,26 @@ batch_expect_sv_test(
     opts  = OCAML_COMPILER_OPTS
 )
 
-## The expansion of batch_expect_test includes another macro,
-## 'test_executable.
-# test_executable_macro(
-#     name    = "bigints",
-#     main    = ":Bigints",
-# )
-
-test_vs_executable(
-    name    = "Bigints.vs.opt",
+# run 'bazel run testsuite/tests/basic:Bigints.exe' to see stdout/stderr
+test_executable(
+    name    = "Bigints.exe",
     main    = ":Bigints",
-    opts  = OCAML_COMPILER_OPTS
-)
-test_ss_executable(
-    name    = "Bigints.ss.opt",
-    main    = ":Bigints",
-    opts  = OCAML_COMPILER_OPTS
-)
-test_sv_executable(
-    name    = "Bigints.sv.byte",
-    main    = ":Bigints",
-    opts  = OCAML_COMPILER_OPTS
-)
-## to run the vv.byte executable:
-sh_binary(
-    name = "Bigints.sv.byte.sh",
-    srcs = ["//test/rules:test_executable.sh"],
-    env  = select({
-        "//test:verbose?": {"VERBOSE": "true"},
-        "//conditions:default": {"VERBOSE": "false"}
-    }),
-    args = ["$(rootpath //runtime:ocamlrun)",
-            "$(rootpath :Bigints.sv.byte)"],
-    data = ["//runtime:ocamlrun",
-            ":Bigints.sv.byte"],
-    deps = ["@bazel_tools//tools/bash/runfiles"]
 )
 
 test_module(
     name   = "Bigints",
     struct = "bigints.ml",
     stdlib_deps = ["//stdlib:Stdlib.Sys"]
-    # open   = ["//stdlib:Stdlib"],
-    # stdlib_deps   = select({
-    #     "//testsuite/tests:with-stdlib?":["//stdlib"],
-    #     "//conditions:default": ["//stdlib:Stdlib.Sys"]
-    # })
 )
 
-############
-batch_expect_test(
+################################################################
+#################
+batch_test_macro(
     name        = "Boxedints_test",
     test_module = ":Boxedints",
     stdout_actual   = "boxedints.stdout",
     stdout_expected = "boxedints.reference",
 )
-
-# test_executable_macro(
-#     name    = "boxedints",
-#     main    = ":Boxedints",
-# )
 
 test_module(
     name   = "Boxedints",
@@ -300,8 +228,8 @@ test_module( # not a test, used by unit_naming_test
 #    * native
 # *)
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name        = "Constprop_test",
     test_module = ":Constprop",
     stdout_actual = "constprop.stdout",
@@ -329,8 +257,8 @@ cc_preprocess(
 
 ################################################################
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name        = "Divint_test",
     test_module = ":Divint",
     stdout_actual = "divint.stdout",
@@ -350,8 +278,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name        = "Equality_test",
     test_module = ":Equality",
     stdout_actual = "equality.stdout",
@@ -368,8 +296,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Eval_order_1_test",
     stdout_actual = "eval_order_1.stdout",
     stdout_expected = "eval_order_1.reference",
@@ -385,8 +313,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Eval_order_2_test",
     stdout_actual = "eval_order_2.stdout",
     stdout_expected = "eval_order_2.reference",
@@ -399,8 +327,8 @@ test_module(
     stdlib_deps   = ["//stdlib:Primitives"]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Eval_order_3_test",
     stdout_actual = "eval_order_3.stdout",
     stdout_expected = "eval_order_3.reference",
@@ -417,8 +345,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Eval_order_4_test",
     stdout_actual = "eval_order_4.stdout",
     stdout_expected = "eval_order_4.reference",
@@ -431,8 +359,8 @@ test_module(
     stdlib_deps   = ["//stdlib:Primitives"]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Eval_order_6_test",
     stdout_actual = "eval_order_6.stdout",
     stdout_expected = "eval_order_6.reference",
@@ -449,8 +377,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Eval_order_7_test",
     stdout_actual = "eval_order_7.stdout",
     stdout_expected = "eval_order_7.reference",
@@ -464,8 +392,8 @@ test_module(
     open   = ["//stdlib:Stdlib"],
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Eval_order_pr10283_test",
     stdout_actual = "eval_order_pr10283.stdout",
     stdout_expected = "eval_order_pr10283.reference",
@@ -480,8 +408,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Float_test",
     stdout_actual = "float.stdout",
     stdout_expected = "float.reference",
@@ -498,8 +426,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Float_physical_equality_test",
     stdout_actual = "float_physical_equality.stdout",
     stdout_expected = "float_physical_equality.reference",
@@ -512,8 +440,8 @@ test_module(
     stdlib_deps   = ["//stdlib:Primitives"]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Includestruct_test",
     stdout_actual = "includestruct.stdout",
     stdout_expected = "includestruct.reference",
@@ -534,8 +462,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Localexn_test",
     stdout_actual = "localexn.stdout",
     stdout_expected = "localexn.reference",
@@ -548,8 +476,8 @@ test_module(
     stdlib_deps   = ["//stdlib:Primitives"]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Localfunction_test",
     stdout_actual = "localfunction.stdout",
     stdout_expected = "localfunction.reference",
@@ -565,8 +493,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Maps_test",
     stdout_actual = "maps.stdout",
     stdout_expected = "maps.reference",
@@ -585,8 +513,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name        = "Min_int_test",
     test_module = ":Min_int",
     stdout_actual = "min_int.stdout",
@@ -602,8 +530,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Opt_variants_test",
     stdout_actual = "opt_variants.stdout",
     stdout_expected = "opt_variants.reference",
@@ -627,8 +555,8 @@ test_module(
     ]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Patmatch_test",
     stdout_actual = "patmatch.stdout",
     stdout_expected = "patmatch.reference",
@@ -701,8 +629,8 @@ inline_expect_module(
     opts   = ["-dlambda"]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Pr7253_test",
     stdout_actual = "pr7253.stdout",
     stdout_expected = "pr7253.reference",
@@ -720,8 +648,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Pr7533_test",
     stdout_actual = "pr7533.stdout",
     stdout_expected = "pr7533.reference",
@@ -740,8 +668,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Pr7657_test",
     stdout_actual = "pr7657.stdout",
     stdout_expected = "pr7657.reference",
@@ -760,8 +688,8 @@ test_module(
     stdlib_deps  =["//stdlib:Primitives"]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Recvalues_test",
     stdout_actual = "recvalues.stdout",
     stdout_expected = "recvalues.reference",
@@ -780,8 +708,8 @@ test_module(
     })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Sets_test",
     stdout_actual = "sets.stdout",
     stdout_expected = "sets.reference",
@@ -809,8 +737,8 @@ test_module(
     # })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Stringmatch_test",
     stdout_actual = "stringmatch.stdout",
     stdout_expected = "stringmatch.reference",
@@ -826,8 +754,8 @@ test_module(
     ]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Switch_opts_test",
     stdout_actual = "switch_opts.stdout",
     stdout_expected = "switch_opts.reference",
@@ -843,8 +771,8 @@ test_module(
     ]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Tailcalls_test",
     stdout_actual = "tailcalls.stdout",
     stdout_expected = "tailcalls.reference",
@@ -857,37 +785,22 @@ test_module(
     stdlib_deps   = ["//stdlib:Primitives"]
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Trigraph_test",
     test_module = ":Trigraph",
     stdout_actual = "trigraph.stdout",
     stdout_expected = "trigraph.reference",
 )
 
-# test_module(
-#     name    = "trigraph",
-#     # prologue = select({
-#     #     "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-#     #     "//conditions:default": []
-#     # }),
-#     main    = ":Trigraph",
-# )
-
 test_module(
     name   = "Trigraph",
     struct = "trigraph.ml",
-    # if --//config/ocaml/compiler/libs:archived? is set, then use
-    # _stdlib and ignore these:
     stdlib_deps = ["//stdlib:Stdlib"],
-    # stdlib_deps   = select({
-    #     "//config/ocaml/compiler/libs:archived?": ["//stdlib"],
-    #     "//conditions:default": ["//stdlib:Primitives"]
-    # })
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Tuple_match_test",
     stdout_actual = "tuple_match.stdout",
     stdout_expected = "tuple_match.reference",
@@ -916,8 +829,8 @@ compile_fail_test(
     ],
 )
 
-############
-batch_expect_test(
+#################
+batch_test_macro(
     name    = "Zero_divided_by_n_test",
     stdout_actual = "zero_divided_by_n.stdout",
     stdout_expected = "zero_divided_by_n.reference",

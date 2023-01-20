@@ -1,8 +1,6 @@
 load("//test:rules.bzl",
-     "test_executable_macro",
      "test_module",
-     "test_signature",
-     "batch_expect_test",
+     "batch_test_macro",
      "inline_expect_test",
 )
 
@@ -27,7 +25,7 @@ inline_expect_test(
     timeout = "short"
 )
 
-batch_expect_test(
+batch_test_macro(
     name     = "Testarg_test",
     stdout_actual   = "testarg.stdout",
     stdout_expected = "testarg.reference",
@@ -45,7 +43,7 @@ test_module(
     ]
 )
 
-batch_expect_test(
+batch_test_macro(
     name     = "Testerror_test",
     stdout_actual   = "testerror.stdout",
     stdout_expected = "testerror.reference",

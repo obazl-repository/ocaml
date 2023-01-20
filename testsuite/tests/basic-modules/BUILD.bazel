@@ -3,7 +3,7 @@ load("//test:rules.bzl",
      "test_library",
      "test_module",
      "test_signature",
-     "batch_expect_test",
+     "batch_test_macro",
      "inline_expect_test",
      "lambda_expect_test"
 )
@@ -63,7 +63,7 @@ test_module(
     stdlib_deps = ["//stdlib:CamlinternalMod"]
 )
 
-batch_expect_test(
+batch_test_macro(
     name     = "Main_expect_test",
     test_module = ":Main",
     stdout_actual   = "Main.stdout",
@@ -139,7 +139,7 @@ inline_expect_test(
     tags = ["inline_expect"]
 )
 
-batch_expect_test(
+batch_test_macro(
     name     = "Recursive_module_init_expect_test",
     test_module = ":Recursive_module_init",
     stdout_actual   = "Recursive_module_init.stdout",

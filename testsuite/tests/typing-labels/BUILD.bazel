@@ -1,41 +1,69 @@
-
-
 load("//test:rules.bzl",
      "test_module",
+     "batch_test_macro"
 )
 
-MODULE_OPTS = []
-
 test_suite(
-    name = "testsuite_tests_typing-labels_lib",
-    tests  = [
-        ":Mixin",
-        ":Mixin2",
-        ":Mixin3",
+    name            = "typing-labels",
+    tests           = [
+        ":Mixin_test",
+        ":Mixin2_test",
+        ":Mixin3_test",
     ],
 )
 
-test_module(
-    name   = "Mixin",
-    struct = "mixin.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+##################
+batch_test_macro(
+    name            = "Mixin_test",
+    test_module     = ":Mixin",
+    stdout_actual   = "mixin.stdout",
+    stdout_expected = "mixin.reference",
 )
 
 test_module(
-    name   = "Mixin2",
-    struct = "mixin2.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    name            = "Mixin",
+    struct          = "mixin.ml",
+    stdlib_deps     = [
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib.MoreLabels",
+        "//stdlib:Stdlib.StdLabels"
     ]
 )
 
+##################
+batch_test_macro(
+    name            = "Mixin2_test",
+    test_module     = ":Mixin2",
+    stdout_actual   = "mixin2.stdout",
+    stdout_expected = "mixin2.reference",
+)
+
 test_module(
-    name   = "Mixin3",
-    struct = "mixin3.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    name            = "Mixin2",
+    struct          = "mixin2.ml",
+    stdlib_deps     = [
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib.MoreLabels",
+        "//stdlib:Stdlib.StdLabels"
+    ]
+)
+
+##################
+batch_test_macro(
+    name            = "Mixin3_test",
+    test_module     = ":Mixin3",
+    stdout_actual   = "mixin3.stdout",
+    stdout_expected = "mixin3.reference",
+)
+
+test_module(
+    name            = "Mixin3",
+    struct          = "mixin3.ml",
+    stdlib_deps     = [
+        # "//stdlib"
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib.MoreLabels",
+        "//stdlib:Stdlib.StdLabels"
     ]
 )
 

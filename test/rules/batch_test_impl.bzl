@@ -13,7 +13,7 @@ load("//bzl:providers.bzl", "HybridExecutableMarker")
 ## then diffs it against expected output.
 
 ##############################
-def batch_expect_test_impl(ctx):
+def batch_test_impl(ctx):
 
     debug = False
 
@@ -113,19 +113,21 @@ def batch_expect_test_impl(ctx):
             stdout = stdout
         ),
 
-        "diff -w {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
+        "diff {diffargs} {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
+            diffargs = " ".join(ctx.attr.diff_args),
             src = ctx.file.stdout_expected.path,
             dst = stdout
         ),
 
-        "if [ $? -eq 0 ]",
-        "then",
-        # "    echo PASS",
-        "    :",
-        "else",
-        # "    echo FAIL",
-        "    exit 1",
-        "fi",
+        # "RC=$?;",
+        # "if [ $RC -eq 0 ]",
+        # "then",
+        # # "    echo PASS",
+        # "    :",
+        # "else",
+        # # "    echo FAIL;",
+        # "    exit $RC",
+        # "fi",
 
         # "cp -v ${{TEST_TMPDIR}}/{stdout} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(stdout=stdout),
         # "echo SH: %s" % runner.path,
@@ -162,40 +164,3 @@ def batch_expect_test_impl(ctx):
     )
 
     return [defaultInfo]
-
-    # return expect_impl(ctx, exe_name)
-
-# #######################
-# expect_test = rule(
-#     implementation = _batch_expect_test_impl,
-#     doc = "Compile and test an OCaml program.",
-#     attrs = dict(
-#         executable_attrs(),
-
-#         stdout = attr.string( ),
-#         expect = attr.label(
-#             allow_single_file = True,
-#         ),
-
-#         _runtime = attr.label(
-#             allow_single_file = True,
-#             default = "//toolchain:runtime",
-#             executable = False,
-#             # cfg = reset_cc_config_transition ## only build once
-#             # default = "//config/runtime" # label flag set by transition
-#         ),
-
-#         _rule = attr.string( default = "expect_test" ),
-#         _allowlist_function_transition = attr.label(
-#             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
-#         ),
-#     ),
-#     # cfg = reset_config_transition,
-#     # cfg = "exec",
-#     cfg = dev_tc_compiler_out_transition,
-#     test = True,
-#     fragments = ["cpp"],
-#     toolchains = ["//toolchain/type:ocaml",
-#                   ## //toolchain/type:profile,",
-#                   "@bazel_tools//tools/cpp:toolchain_type"]
-# )
