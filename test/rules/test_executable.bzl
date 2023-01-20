@@ -3,6 +3,9 @@ load("//bzl/attrs:executable_attrs.bzl", "executable_attrs")
 
 # load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
 
+load("//bzl:providers.bzl",
+     "ModuleInfo")
+
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 
 load("//bzl/transitions:dev_transitions.bzl",
@@ -26,9 +29,44 @@ def _test_executable_impl(ctx):
     # else:
     #     ext = ".opt"
 
-    exe_name = ctx.label.name
+    exe_name = ctx.attr.main[ModuleInfo].name
 
     return executable_impl(ctx, tc, exe_name, workdir)
+
+#######################
+test_executable = rule(
+    implementation = _test_executable_impl,
+    doc = "Links OCaml executable binary using ocamlc.byte",
+    attrs = dict(
+        executable_attrs(),
+
+        _runfiles_tool = attr.label(
+            allow_single_file = True,
+            default = "@bazel_tools//tools/bash/runfiles"
+        ),
+
+        # _runtime = attr.label(
+        #     allow_single_file = True,
+        #     default = "//toolchain:runtime",
+        #     executable = False,
+        #     # cfg = reset_cc_config_transition ## only build once
+        #     # default = "//config/runtime" # label flag set by transition
+        # ),
+        _rule = attr.string( default = "test_executable" ),
+        _allowlist_function_transition = attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+        ),
+    ),
+    # cfg = reset_config_transition,
+    # cfg = "exec",
+    # cfg = dev_tc_compiler_out_transition,
+    # cfg = vv_test_in_transition,
+    executable = True,
+    fragments = ["cpp"],
+    toolchains = ["//toolchain/type:ocaml",
+                  ## //toolchain/type:profile,",
+                  "@bazel_tools//tools/cpp:toolchain_type"]
+)
 
 #######################
 test_vv_executable = rule(
@@ -144,9 +182,9 @@ test_sv_executable = rule(
 ###############################################################
 ####  MACRO - generates two exec targets, vm and sys
 ################################################################
-def test_executable(name, main,
-                    opts = [],
-                    **kwargs):
+def test_executable_macro(name, main,
+                          opts = [],
+                          **kwargs):
 
     if main.startswith(":"):
         main = main[1:]
