@@ -14,16 +14,18 @@ load("//test/rules:batch_test.bzl",
      _batch_sv_test = "batch_sv_test",
      _batch_test_macro = "batch_test_macro")
 
-load("//test/rules:compile_module_test.bzl",
-     _compile_module_testx = "compile_module_testx")
+# load("//test/rules:compile_module_test.bzl",
+#      _compile_module_testx = "compile_module_testx")
 
 load("//test/rules:compile_fail_test.bzl",
      _compile_fail_test = "compile_fail_test")
 
 load("//test/rules:inline_expect_test.bzl",
      _inline_expect_test = "inline_expect_test")
-load("//test/rules:lambda_expect_test.bzl",
-     _lambda_expect_test = "lambda_expect_test")
+
+load("//test/rules:compile_dump_diff_test.bzl",
+     _compile_dump_diff_test_macro = "compile_dump_diff_test_macro")
+     # _compile_dump_diff_test_sys_macro = "compile_dump_diff_test_sys_macro")
 
 load("//test/rules:test_executable.bzl",
      _test_executable_macro = "test_executable_macro",
@@ -56,11 +58,12 @@ batch_ss_test = _batch_ss_test
 batch_sv_test = _batch_sv_test
 batch_test_macro = _batch_test_macro
 
-compile_module_testx = _compile_module_testx
+# compile_module_testx = _compile_module_testx
 compile_fail_test = _compile_fail_test
 
 inline_expect_test = _inline_expect_test
-lambda_expect_test = _lambda_expect_test
+compile_dump_diff_test_macro = _compile_dump_diff_test_macro
+# compile_dump_diff_test_sys_macro = _compile_dump_diff_test_sys_macro
 test_executable_macro = _test_executable_macro
 test_executable = _test_executable
 test_vv_executable = _test_vv_executable

@@ -78,10 +78,6 @@ def batch_test_impl(ctx):
         # pgm_cmd = pgm.short_path
 
     runner = ctx.actions.declare_file(ctx.attr.name + ".sh")
-    # stdout = ctx.actions.declare_file(ctx.attr.stdout)
-    # print("ROOT: %s" % pgm.short_path)
-    # stdout = runner.dirname + "/" + ctx.attr.stdout
-    # stdout = ctx.attr.stdout
     stdout = ctx.attr.stdout_actual
 
     if debug:
@@ -94,18 +90,6 @@ def batch_test_impl(ctx):
         print("STDOUT: %s" % stdout)
 
     cmd = "\n".join([
-        # "{pgm} > ${{TEST_TMPDIR}}/{stdout};".format(
-        # "#!/bin/bash",
-        # "set -x;",
-        # "echo PWD: $PWD",
-        # "echo OCAMLRUN: {};".format(ocamlrun_path),
-
-        # "{ocamlrun} {pgm}".format(
-        #     ocamlrun = ocamlrun_path,
-        #     pgm = pgm.short_path),
-
-        # "echo `\"{pgm}\"`".format(pgm = pgm_cmd),
-
         "{ocamlrun} {pgm} {redir} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{stdout};".format(
             ocamlrun = ocamlrun_path,
             redir = ">",
@@ -113,6 +97,7 @@ def batch_test_impl(ctx):
             stdout = stdout
         ),
 
+        ## FIXME: split 'diff' action into separate rule???
         "diff {diffargs} {src} ${{TEST_UNDECLARED_OUTPUTS_DIR}}/{dst}".format(
             diffargs = " ".join(ctx.attr.diff_args),
             src = ctx.file.stdout_expected.path,

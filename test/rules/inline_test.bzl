@@ -12,12 +12,7 @@ load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 
 load("test_executable.bzl", "test_executable")
 
-load(":test_transitions.bzl",
-     "vv_test_in_transition",
-     "vs_test_in_transition",
-     "ss_test_in_transition",
-     "sv_test_in_transition"
-     )
+load(":test_transitions.bzl", "test_in_transitions")
 
 load(":inline_test_impl.bzl", "inline_test_impl")
 
@@ -51,14 +46,6 @@ def inline_attrs(kind):
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
     )
-
-############################
-test_in_transitions = dict(
-    vv = vv_test_in_transition,
-    vs = vs_test_in_transition,
-    ss = ss_test_in_transition,
-    sv = sv_test_in_transition,
-)
 
 #####################
 ## Inline rule definitions

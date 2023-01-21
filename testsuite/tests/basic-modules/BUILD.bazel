@@ -4,8 +4,9 @@ load("//test:rules.bzl",
      "test_module",
      "test_signature",
      "batch_test_macro",
+     "batch_vv_test",
      "inline_expect_test",
-     "lambda_expect_test"
+     "compile_dump_diff_test_macro"
 )
 
 test_suite(
@@ -18,28 +19,14 @@ test_suite(
     ],
 )
 
-##FIXME: rename, compile_log_diff_test or similar
-lambda_expect_test(
+compile_dump_diff_test_macro(
     name   = "Anonymous_test",
     test_module = ":Anonymous",
-    expected = "anonymous.ocamlc.reference",
-    timeout = "short",
+    vm_expected = "anonymous.ocamlc.reference",
+    sys_expected = "anonymous.ocamlopt.reference",
+    flambda_expected = "anonymous.ocamlopt.flambda.reference",
     tags = ["lambda"]
 )
-
-# lambda_expect_vs_test(  ## ocamlopt.byte
-#     name   = "Anonymous_test",
-#     struct   = "anonymous.ml",
-#     expect   = "anonymous.ocamlc.reference",
-#     deps = ["//stdlib"]         # FIXME: make this implicit?
-# )
-
-# lambda_expect_xx_test(  ## ocamloptx.optx
-#     name   = "Anonymous_test",
-#     struct   = "anonymous.ml",
-#     expect   = "anonymous.ocamlc.reference",
-#     deps = ["//stdlib"]         # FIXME: make this implicit?
-# )
 
 test_module(
     name   = "Anonymous",
@@ -54,12 +41,7 @@ test_module(
         # "rawclambda",  ## native
         # "instruction-selection" # native?
     ],
-    opts   = [
-    #     "-nostdlib",
-    #     "-nopervasives",
-    #     # "-dno-locations",
-        "-dno-unique-ids"
-    ],
+    opts   = ["-dno-unique-ids"],
     stdlib_deps = ["//stdlib:CamlinternalMod"]
 )
 

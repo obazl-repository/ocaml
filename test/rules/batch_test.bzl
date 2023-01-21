@@ -9,16 +9,9 @@ load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
 
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 
-# load("//bzl/transitions:tc_transitions.bzl", "reset_config_transition")
-
 load("test_executable.bzl", "test_executable")
 
-load(":test_transitions.bzl",
-     "vv_test_in_transition",
-     "vs_test_in_transition",
-     "ss_test_in_transition",
-     "sv_test_in_transition"
-     )
+load(":test_transitions.bzl", "test_in_transitions")
 
 load(":batch_test_impl.bzl", "batch_test_impl")
 
@@ -55,6 +48,11 @@ def batch_attrs(kind):
             allow_single_file = True,
         ),
 
+        log_actual = attr.string( ),
+        log_expected = attr.label(
+            allow_single_file = True,
+        ),
+
         diff_args = attr.string_list(
             default = ["-w"]
         ),
@@ -73,14 +71,6 @@ def batch_attrs(kind):
         ),
     )
 
-#############################
-batch_in_transitions = dict(
-    vv = vv_test_in_transition,
-    vs = vs_test_in_transition,
-    ss = ss_test_in_transition,
-    sv = sv_test_in_transition,
-)
-
 #####################
 ## Batch rule definitions
 def batch_rule(kind):
@@ -89,7 +79,7 @@ def batch_rule(kind):
         implementation = batch_test_impl,
         doc = "Run a test executable built with {} compiler".format(kind),
         attrs = batch_attrs(kind),
-        cfg = batch_in_transitions[kind],
+        cfg = test_in_transitions[kind],
         test = True,
         fragments = ["cpp"],
         toolchains = ["//toolchain/type:ocaml",
@@ -105,9 +95,15 @@ batch_sv_test = batch_rule("sv")
 ####  MACRO - generates two test targets plus on test_suite
 ################################################################
 def batch_test_macro(name,
-                     stdout_actual, stdout_expected,
                      test_module,
+                     # log_actual = None,
+                     # log_expected = None,
+                     stdout_actual, ## = None,
+                     stdout_expected, ## = None,
+                     # stderr_actual = None,
+                     # stderr_expected = None,
                      opts  = OCAML_COMPILER_OPTS,
+                     tags  = [],
                      timeout = "short",
                      **kwargs):
 
@@ -138,7 +134,7 @@ def batch_test_macro(name,
         stdout_actual   = stdout_actual,
         stdout_expected = stdout_expected,
         timeout  = timeout,
-        tags     = ["vv"],
+        tags     = ["vv"] + tags,
         **kwargs
     )
 
@@ -148,7 +144,7 @@ def batch_test_macro(name,
         stdout_actual   = stdout_actual,
         stdout_expected = stdout_expected,
         timeout  = timeout,
-        tags     = ["vs"],
+        tags     = ["vs"] + tags,
         **kwargs
     )
 
@@ -158,7 +154,7 @@ def batch_test_macro(name,
         stdout_actual   = stdout_actual,
         stdout_expected = stdout_expected,
         timeout  = timeout,
-        tags     = ["ss",],
+        tags     = ["ss"] + tags,
         **kwargs
     )
 
@@ -168,7 +164,7 @@ def batch_test_macro(name,
         stdout_actual   = stdout_actual,
         stdout_expected = stdout_expected,
         timeout  = timeout,
-        tags     = ["sv"],
+        tags     = ["sv"] + tags,
         **kwargs
     )
 
