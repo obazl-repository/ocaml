@@ -1,473 +1,470 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
+# load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
-load("//test:rules.bzl",
-     "test_module",
+load("//test/rules:test_executable.bzl", "test_executable")
+load("//test/rules:test_module.bzl", "test_module")
+
+# load("//test/rules:compile_module_test.bzl", "compile_module_test")
+
+load("//test/rules:inline_expect_module.bzl",
+     # "inline_expect_module",
+     "inline_expect_test",
 )
 
-MODULE_OPTS = []
-
 test_suite(
-    name = "testsuite_tests_typing-misc_lib",
+    name = "typing-misc",
     tests  = [
-        ":Build_as_type",
-        ":Constraints",
-        ":Deep",
-        ":Disambiguate_principality",
-        ":Empty_ppx",
-        ":Empty_variant",
-        ":Enrich_typedecl",
-        ":Exotic_unifications",
-        ":External_arity",
-        ":Filter_params",
-        ":Gpr2277",
-        ":Includeclass_errors",
-        ":Injectivity",
-        ":Inside_out",
-        ":Is_expansive",
-        ":Labels",
-        ":Mapping",
-        ":Normalize_type",
-        ":Occur_check",
-        ":Optbinders",
-        ":Pat_type_sharing",
-        ":Pattern_open",
-        ":Polyvars",
-        ":Pr6416",
-        ":Pr6634",
-        ":Pr6939-flat-float-array",
-        ":Pr6939-no-flat-float-array",
-        ":Pr7103",
-        ":Pr7228",
-        ":Pr7668_bad",
-        ":Pr7712",
-        ":Pr7937",
-        ":Pr8548",
-        ":Pr8548_split",
-        ":Printing",
-        ":Range",
-        ":Range_intf",
-        ":Ranged",
-        ":Ranged_intf",
-        ":Records",
-        ":Scope_escape",
-        ":Typecore_empty_polyvariant_error",
-        ":Typecore_errors",
-        ":Typecore_nolabel_errors",
-        ":Typetexp_errors",
-        ":Unbound_type_variables",
-        ":Unique_names_in_unification",
-        ":Variance",
-        ":Variant",
-        ":Wellfounded",
-        ":Wrong_kind",
+        ":Build_as_type_test",
+        ":Constraints_test",
+        ":Deep_test",
+        ":Disambiguate_principality_test",
+        ":Empty_variant_test",
+        ":Enrich_typedecl_test",
+        ":Exotic_unifications_test",
+        ":External_arity_test",
+        ":Filter_params_test",
+        ":Gpr2277_test",
+        ":Includeclass_errors_test",
+        ":Injectivity_test",
+        ":Inside_out_test",
+        ":Is_expansive_test",
+        ":Labels_test",
+        # ":Mapping_test",
+        ":Normalize_type_test",
+        ":Occur_check_test",
+        ":Optbinders_test",
+        ":Pat_type_sharing_test",
+        ":Pattern_open_test",
+        ":Polyvars_test",
+        ":Pr6416_test",
+        ":Pr6634_test",
+        ":Pr6939-flat-float-array_test",
+        #FIXME ":Pr6939-no-flat-float-array_test",
+        ":Pr7103_test",
+        ":Pr7228_test",
+        #FIXME:  ":Pr7668_bad_test",
+        ":Pr7712_test",
+        ":Pr7937_test",
+        ":Pr8548_test",
+        ":Pr8548_split_test",
+        ":Printing_test",
+        # ":Range_test",
+        # ":Range_intf_test",
+        # ":Ranged_test",
+        # ":Ranged_intf_test",
+        ":Records_test",
+        ":Scope_escape_test",
+        # ":Typecore_empty_polyvariant_error_test",
+        ":Typecore_errors_test",
+        ":Typecore_nolabel_errors_test",
+        ":Typetexp_errors_test",
+        ":Unbound_type_variables_test",
+        ":Unique_names_in_unification_test",
+        ":Variance_test",
+        ":Variant_test",
+        ":Wellfounded_test",
+        ":Wrong_kind_test",
     ],
 )
 
-test_module(
-    name   = "Build_as_type",
+inline_expect_test(
+    name   = "Build_as_type_test",
     struct = "build_as_type.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Constraints",
+inline_expect_test(
+    name   = "Constraints_test",
     struct = "constraints.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:CamlinternalOO", "//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Deep",
+inline_expect_test(
+    name   = "Deep_test",
     struct = "deep.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib", "//stdlib:Stdlib.List"]
 )
 
-test_module(
-    name   = "Disambiguate_principality",
+inline_expect_test(
+    name   = "Disambiguate_principality_test",
     struct = "disambiguate_principality.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Empty_ppx",
-    struct = "empty_ppx.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Empty_variant",
+inline_expect_test(
+    name   = "Empty_variant_test",
     struct = "empty_variant.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib.Printf"]
 )
 
-test_module(
-    name   = "Enrich_typedecl",
+inline_expect_test(
+    name   = "Enrich_typedecl_test",
     struct = "enrich_typedecl.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Exotic_unifications",
+inline_expect_test(
+    name   = "Exotic_unifications_test",
     struct = "exotic_unifications.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:CamlinternalOO", "//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "External_arity",
+inline_expect_test(
+    name   = "External_arity_test",
     struct = "external_arity.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib", "//stdlib:Stdlib.Obj"]
 )
 
-test_module(
-    name   = "Filter_params",
+inline_expect_test(
+    name   = "Filter_params_test",
     struct = "filter_params.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Gpr2277",
+inline_expect_test(
+    name   = "Gpr2277_test",
     struct = "gpr2277.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Includeclass_errors",
+inline_expect_test(
+    name   = "Includeclass_errors_test",
     struct = "includeclass_errors.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Injectivity",
+inline_expect_test(
+    name   = "Injectivity_test",
     struct = "injectivity.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = [
+        "//stdlib:CamlinternalMod",
+        "//stdlib:Stdlib",
+        "//stdlib:Stdlib.Array",
+        "//stdlib:Stdlib.Obj"]
 )
 
-test_module(
-    name   = "Inside_out",
+inline_expect_test(
+    name   = "Inside_out_test",
     struct = "inside_out.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Is_expansive",
+inline_expect_test(
+    name   = "Is_expansive_test",
     struct = "is_expansive.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Labels",
+inline_expect_test(
+    name   = "Labels_test",
     struct = "labels.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:CamlinternalOO", "//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Mapping",
-    struct = "mapping.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Normalize_type",
+inline_expect_test(
+    name   = "Normalize_type_test",
     struct = "normalize_type.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Occur_check",
+inline_expect_test(
+    name   = "Occur_check_test",
     struct = "occur_check.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Optbinders",
+inline_expect_test(
+    name   = "Optbinders_test",
     struct = "optbinders.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Pat_type_sharing",
+inline_expect_test(
+    name   = "Pat_type_sharing_test",
     struct = "pat_type_sharing.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pattern_open",
+inline_expect_test(
+    name   = "Pattern_open_test",
     struct = "pattern_open.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps = ["//stdlib:Stdlib.Format"]
 )
 
-test_module(
-    name   = "Polyvars",
+inline_expect_test(
+    name   = "Polyvars_test",
     struct = "polyvars.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Pr6416",
+inline_expect_test(
+    name   = "Pr6416_test",
     struct = "pr6416.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    opts   = ["-no-alias-deps", "-w", "+40"],
+    stdlib_deps = ["//stdlib:CamlinternalOO"]
 )
 
-test_module(
-    name   = "Pr6634",
+inline_expect_test(
+    name   = "Pr6634_test",
     struct = "pr6634.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pr6939-flat-float-array",
+## FIXME: this will fail if compiler not configured with flat-float-array
+inline_expect_test( #FIXME: ocamltest runs expect compiler twice
+    name   = "Pr6939-flat-float-array_test",
     struct = "pr6939-flat-float-array.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pr6939-no-flat-float-array",
+## FIXME: this will fail if compiler configured with flat-float-array
+inline_expect_test(
+    name   = "Pr6939-no-flat-float-array_test",
     struct = "pr6939-no-flat-float-array.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pr7103",
+inline_expect_test(
+    name   = "Pr7103_test",
     struct = "pr7103.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pr7228",
+inline_expect_test(
+    name   = "Pr7228_test",
     struct = "pr7228.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pr7668_bad",
+inline_expect_test(
+    name   = "Pr7668_bad_test",
     struct = "pr7668_bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pr7712",
+inline_expect_test(
+    name   = "Pr7712_test",
     struct = "pr7712.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pr7937",
+inline_expect_test(
+    name   = "Pr7937_test",
     struct = "pr7937.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Pr8548",
+inline_expect_test(
+    name   = "Pr8548_test",
     struct = "pr8548.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Pr8548_split",
-    struct = "pr8548_split.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Printing",
+inline_expect_test(
+    name   = "Printing_test",
     struct = "printing.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:CamlinternalOO",
+                     "//stdlib:Stdlib",
+                     "//stdlib:Stdlib.List"]
+)
+
+################################################################
+# (* TEST
+# readonly_files = "mapping.ml range_intf.ml ranged_intf.ml range.ml ranged.ml"
+# * setup-ocamlc.byte-build-env
+# ** ocamlc.byte
+# flags = "-no-alias-deps -w -49 -o Pr8548__Mapping"
+# module = "mapping.ml"
+# ** ocamlc.byte
+# flags = "-no-alias-deps -open Pr8548__Mapping -o pr8548__Range_intf.cmo"
+# module = "range_intf.ml"
+# *** ocamlc.byte
+# flags = "-no-alias-deps -open Pr8548__Mapping -o pr8548__Range.cmo"
+# module = "range.ml"
+# *** ocamlc.byte
+# flags = "-no-alias-deps -open Pr8548__Mapping -o pr8548__Ranged_intf.cmo"
+# module = "ranged_intf.ml"
+# **** ocamlc.byte
+# flags = "-no-alias-deps -open Pr8548__Mapping -o pr8548__Ranged.cmo"
+# module = "ranged.ml"
+# ocamlc_byte_exit_status = "0"
+# *)
+
+# inline_expect_test(
+#     name   = "Pr8548_split_test",
+#     struct = "pr8548_split.ml",
+# )
+
+build_test(
+    name = "Pr8548_split_test",
+    targets = [
+        ":Pr8548__Mapping",
+        ":Pr8548__Range",
+        ":Pr8548__Range_intf",
+        ":Pr8548__Ranged",
+        ":Pr8548__Ranged_intf",
+    ],
+)
+
+# module_compile_test(
+test_module(
+    name   = "Pr8548__Mapping",
+    module = "Pr8548__Mapping",
+    struct = "mapping.ml",
+    opts   = ["-no-alias-deps", "-w", "-49"],
+    rc_expected = 0
 )
 
 test_module(
-    name   = "Range",
+    name   = "Pr8548__Range",
+    module = "Pr8548__Range",
+    opts   = ["-no-alias-deps", "-open", "Pr8548__Mapping"],
     struct = "range.ml",
-    opts = MODULE_OPTS,
     deps   = [
+        ":Pr8548__Mapping",
+        ":Pr8548__Range_intf"
     ]
 )
 
 test_module(
-    name   = "Range_intf",
+    name   = "Pr8548__Range_intf",
+    module = "Pr8548__Range_intf",
     struct = "range_intf.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    opts   = ["-no-alias-deps", "-open", "Pr8548__Mapping"],
+    deps   = [":Pr8548__Mapping"]
 )
 
 test_module(
-    name   = "Ranged",
+    name   = "Pr8548__Ranged",
+    module = "Pr8548__Ranged",
     struct = "ranged.ml",
-    opts = MODULE_OPTS,
+    opts   = ["-no-alias-deps", "-open", "Pr8548__Mapping"],
     deps   = [
+        ":Pr8548__Mapping",
+        ":Pr8548__Ranged_intf",
+        ":Pr8548__Range",
+        ":Pr8548__Range_intf"
     ]
 )
 
 test_module(
-    name   = "Ranged_intf",
+    name   = "Pr8548__Ranged_intf",
+    module = "Pr8548__Ranged_intf",
     struct = "ranged_intf.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    opts   = ["-no-alias-deps", "-open", "Pr8548__Mapping"],
+    deps   = [":Pr8548__Mapping", ":Pr8548__Range_intf"]
 )
 
-test_module(
-    name   = "Records",
+################################################################
+inline_expect_test(
+    name   = "Records_test",
     struct = "records.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib",
+                     "//stdlib:Stdlib.Complex"]
 )
 
-test_module(
-    name   = "Scope_escape",
+inline_expect_test(
+    name   = "Scope_escape_test",
     struct = "scope_escape.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Typecore_empty_polyvariant_error",
-    struct = "typecore_empty_polyvariant_error.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
+# (* TEST
+#   readonly_files = "empty_ppx.ml"
+#   * setup-ocamlc.byte-build-env
+#   ** ocamlc.byte with ocamlcommon
+#   all_modules="empty_ppx.ml"
+#   program="ppx.exe"
+#   *** toplevel
+#   all_modules="${test_file}"
+#   flags="-ppx '${ocamlrun} ${test_build_directory_prefix}/ocamlc.byte/ppx.exe'"
+# *)
 
-test_module(
-    name   = "Typecore_errors",
+## ocamltest cmd line:
+## ocamlrun ocaml -noinit -no-version -noprompt -nostdlib -I ... -ppx ocamlrun ppx.exe ocamlcommon.cma
+##   Redirecting stdin to typecore_empty_polyvariant_error.ml
+##   redirecting stdout, stderr to ocamlc.byte.output
+
+# genrule(
+#     name = "ppx_runner",
+#     outs = ["typecore_empty_polyvariant_error.ppx.ml"],
+#     srcs = ["typecore_empty_polyvariant_error.ml",
+#             ":ppx.exe"
+#             ],
+#     tools = [
+#         # "@dev//bin:ocamlrun",
+#         "//runtime:ocamlrun",
+#     ],
+#     cmd   = " ".join([
+#         "$(execpath //runtime:ocamlrun)",
+#         "$(location :ppx.exe)",
+#         "$(location typecore_empty_polyvariant_error.ml)",
+#         "$(location typecore_empty_polyvariant_error.ppx.ml)"
+#     ])
+# )
+# test_executable(
+#     name = "ppx.exe",
+#     main = ":Empty_ppx",
+#     # opts = ["-custom"]
+# )
+# test_module(
+#     name   = "Empty_ppx",
+#     struct = "empty_ppx.ml",
+#     deps   = ["//parsing:Ast_helper",
+#               "//parsing:Ast_mapper"],
+#     sig_deps = ["//parsing:Parsetree_cmi"]
+# )
+
+################################################################
+inline_expect_test(
+    name   = "Typecore_errors_test",
     struct = "typecore_errors.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps   = [
+        "//stdlib:CamlinternalOO",
+        "//stdlib:Stdlib"
     ]
 )
 
-test_module(
-    name   = "Typecore_nolabel_errors",
+inline_expect_test(
+    name   = "Typecore_nolabel_errors_test",
     struct = "typecore_nolabel_errors.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    opts   = ["-nolabels"],
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Typetexp_errors",
+inline_expect_test(
+    name   = "Typetexp_errors_test",
     struct = "typetexp_errors.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Unbound_type_variables",
+inline_expect_test(
+    name   = "Unbound_type_variables_test",
     struct = "unbound_type_variables.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Unique_names_in_unification",
+inline_expect_test(
+    name   = "Unique_names_in_unification_test",
     struct = "unique_names_in_unification.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Variance",
+inline_expect_test(
+    name   = "Variance_test",
     struct = "variance.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
 
-test_module(
-    name   = "Variant",
+inline_expect_test(
+    name   = "Variant_test",
     struct = "variant.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Wellfounded",
+inline_expect_test(
+    name   = "Wellfounded_test",
     struct = "wellfounded.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_module(
-    name   = "Wrong_kind",
+# inline_expect_test expands to:
+#   inline_expect_test > diff_test
+###################
+inline_expect_test(
+    name   = "Wrong_kind_test",
     struct = "wrong_kind.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib"]
 )
+
+# diff_test(
+#     name = "Wrong_kind_test",
+#     file1 = "wrong_kind.ml",
+#     file2 = ":Wrong_kind",
+#     timeout = "short",
+#     tags = ["inline_expect"]
+# )
+# inline_expect_module(
+#     name   = "Wrong_kind",
+#     struct = "wrong_kind.ml",
+#     stdlib_deps   = ["//stdlib:Stdlib"]
+# )
 
