@@ -1,0 +1,313 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+
+load("//test:rules.bzl", "test_module")
+load("//test/rules:batch_test.bzl", "batch_native_tests")
+
+load(":BUILD.bzl", "codegen_test", "genbin", "asmgen_test")
+
+test_suite(
+    name = "asmgen",
+    tests  = [
+        ":misc_builds",
+        ":catch_builds",
+        ":even_odd_builds",
+        ":quicksort_builds",
+        ":tagged_builds"
+    ]
+)
+
+build_test(
+    name = "misc_builds",
+    targets = [
+        ":arith",
+        ":checkbound",
+        ":fib",
+        ":immediates",
+        ## FIXME ":invariants"
+        ":pgcd",
+        ":soli",
+        ":tak",
+    ]
+)
+
+build_test(
+    name = "catch_builds",
+    targets = [
+        ":catch-float",
+        ":catch-multiple",
+        ":catch-rec-deadhandler",
+        ":catch-rec",
+        ":catch-try-float",
+        ":catch-try",
+    ]
+)
+
+build_test(
+    name = "even_odd_builds",
+    targets = [
+        ":even-odd-spill-float",
+        ":even-odd-spill",
+        ":even-odd",
+    ]
+)
+
+build_test(
+    name = "quicksort_builds",
+    targets = [
+        ":quicksort",
+        ":quicksort2",
+    ]
+)
+
+build_test(
+    name = "tagged_builds",
+    targets = [
+        ":tagged-fib",
+        ":tagged-integr",
+        ":tagged-quicksort",
+        ":tagged-tak",
+    ]
+)
+
+
+############
+asmgen_test(
+    name = "arith",
+    cmm = "arith.cmm",
+    c_srcs = ["mainarith.c"])
+# genbin(name="arith.out", srcs=["mainarith.c", ":arith.s"])
+# genasm(name = "arith", cmm="arith.cmm")
+
+############
+asmgen_test(
+    name = "catch-float",
+    cmm = "catch-float.cmm",
+    c_srcs = ["main.c"],
+    defines = ["FLOAT_CATCH", "FUN=catch_float"])
+# genbin(name="catch-float.out",
+#        srcs=["main.c", ":catch-float.s"],
+#        defines = ["FLOAT_CATCH", "FUN=catch_float"])
+# genasm(name = "catch-float", cmm="catch-float.cmm")
+
+############
+asmgen_test(
+    name = "catch-multiple",
+    cmm = "catch-multiple.cmm",
+    c_srcs = ["main.c"],
+    defines = ["INT_INT", "FUN=catch_multiple"])
+
+############
+asmgen_test(
+    name = "catch-rec-deadhandler",
+    cmm = "catch-rec-deadhandler.cmm",
+    codegen_opts = ["-dlive"],
+    c_srcs = ["main.c"],
+    defines = ["UNIT_INT", "FUN=catch_rec_deadhandler"])
+
+############
+asmgen_test(
+    name = "catch-rec",
+    cmm = "catch-rec.cmm",
+    c_srcs = ["main.c"],
+    defines = ["INT_INT", "FUN=catch_fact"])
+
+############
+asmgen_test(
+    name = "catch-try-float",
+    cmm = "catch-try-float.cmm",
+    c_srcs = ["main.c"],
+    defines = ["FLOAT_CATCH", "FUN=catch_try_float"])
+
+############
+asmgen_test(
+    name = "catch-try",
+    cmm = "catch-try.cmm",
+    c_srcs = ["main.c"],
+    defines = ["INT_INT", "FUN=catch_exit"])
+
+############
+asmgen_test(
+    name = "checkbound",
+    cmm = "checkbound.cmm",
+    c_srcs = ["main.c"],
+    defines = ["CHECKBOUND"])
+
+############
+asmgen_test(
+    name = "even-odd-spill-float",
+    cmm = "even-odd-spill-float.cmm",
+    c_srcs = ["main.c"],
+    defines = ["INT_FLOAT", "FUN=is_even"])
+
+############
+asmgen_test(
+    name = "even-odd-spill",
+    cmm = "even-odd-spill.cmm",
+    c_srcs = ["main.c"],
+    c_opts = ["-DINT_INT", "-DFUN=is_even"])
+    # defines = ["INT_INT", "FUN=is_even"])
+
+############
+asmgen_test(
+    name = "even-odd",
+    cmm = "even-odd.cmm",
+    c_srcs = ["main.c"],
+    # test_fn = "is_even",
+    # test_type = "INT_INT",
+    defines = ["INT_INT", "FUN=is_even"])
+
+############
+asmgen_test(
+    name = "fib",
+    cmm = "fib.cmm",
+    # main = ":main",
+    c_srcs = ["main.c"],
+    defines = ["INT_INT", "FUN=fib"])
+
+############
+asmgen_test(
+    name = "immediates",
+    cmm = "immediates.cmm",
+    c_srcs = ["mainimmed.c"],
+    textual_hdrs = ["immediates.tbl"],
+    defines = ["INT_INT", "FUN=catch_exit"])
+
+############
+# * skip
+# reason = "This test is currently broken"
+# asmgen_test(
+#     name = "integr",
+#     cmm = "integr.cmm",
+#     c_srcs = ["main.c"],
+#     defines = ["INT_FLOAT", "FUN=test"])
+
+############
+# (* TEST
+# * native-compiler
+# ** setup-simple-build-env
+# *** codegen
+# codegen_exit_status = "2"
+# *)
+# asmgen_test(
+#     name = "invariants",
+#     cmm = "invariants.cmm",
+#     c_srcs = ["main.c"],
+#     defines = ["INT_INT", "FUN=catch_exit"])
+
+codegen_test(name = "invariants", cmm = "invariants.cmm")
+
+############
+asmgen_test(
+    name = "pgcd",
+    cmm = "pgcd.cmm",
+    c_srcs = ["main.c"],
+    defines = ["INT_INT", "FUN=pgcd_30030"])
+
+############
+asmgen_test(
+    name = "quicksort",
+    cmm = "quicksort.cmm",
+    c_srcs = ["main.c"],
+    defines = ["SORT", "FUN=quicksort"])
+
+############
+asmgen_test(
+    name = "quicksort2",
+    cmm = "quicksort2.cmm",
+    c_srcs = ["main.c"],
+    defines = ["SORT", "FUN=quicksort"])
+
+############
+asmgen_test(
+    name = "soli",
+    cmm = "soli.cmm",
+    c_srcs = ["main.c"],
+    defines = ["UNIT_INT", "FUN=solitaire"])
+
+############
+asmgen_test(
+    name = "tagged-fib",
+    cmm = "tagged-fib.cmm",
+    c_srcs = ["main.c"],
+    defines = ["INT_INT", "FUN=fib"])
+
+############
+asmgen_test(
+    name = "tagged-integr",
+    cmm = "tagged-integr.cmm",
+    c_srcs = ["main.c"],
+    defines = ["INT_FLOAT", "FUN=test"])
+
+############
+asmgen_test(
+    name = "tagged-quicksort",
+    cmm = "tagged-quicksort.cmm",
+    c_srcs = ["main.c"],
+    defines = ["SORT", "FUN=quicksort"])
+
+############
+asmgen_test(
+    name = "tagged-tak",
+    cmm = "tagged-tak.cmm",
+    c_srcs = ["main.c"],
+    defines = ["UNIT_INT", "FUN=takmain"])
+
+############
+asmgen_test(
+    name = "tak",
+    cmm = "tak.cmm",
+    c_srcs = ["main.c"],
+    defines = ["UNIT_INT", "FUN=takmain"])
+
+
+################################################################
+# cc_library(
+#     name = "main",
+#     linkstatic = True,
+#     srcs = ["main.c", "//runtime/caml:config.h",
+#             "//runtime/caml:m.h", "//runtime/caml:s.h"],
+#     copts = ["-x", "c",
+#              "-I", "runtime",
+#              "-I$(GENDIR)/runtime/caml"],
+#     deps = [
+#         # "//testsuite/tools:asmgen_amd64",
+#         ##FIXME: adding asmrun dep causes bazel to add '[S]' to link
+#         ##cmd, which breaks it, no idea why
+#         # "//runtime:asmrun",
+#     ],
+# )
+
+# cc_library(
+#     name = "mainarith",
+#     linkstatic = True,
+#     srcs = ["mainarith.c", "//runtime/caml:config.h",
+#             "//runtime/caml:m.h", "//runtime/caml:s.h"],
+#     copts = ["-x", "c",
+#              "-I", "runtime",
+#              "-I$(GENDIR)/runtime/caml"],
+#     deps = [
+#         # "//testsuite/tools:asmgen_amd64",
+#         ##FIXME: adding asmrun dep causes bazel to add '[S]' to link
+#         ##cmd, which breaks it, no idea why
+#         # "//runtime:asmrun",
+#     ],
+# )
+
+# cc_library(
+#     name = "mainimmed",
+#     linkstatic = True,
+#     srcs = ["mainimmed.c", "//runtime/caml:config.h",
+#             "//runtime/caml:m.h", "//runtime/caml:s.h"],
+#     textual_hdrs = ["immediates.tbl"],
+#     copts = ["-x", "c",
+#              "-I", "runtime",
+#              "-I$(GENDIR)/runtime/caml"],
+#     deps = [
+#         # "//testsuite/tools:asmgen_amd64",
+#         ##FIXME: adding asmrun dep causes bazel to add '[S]' to link
+#         ##cmd, which breaks it, no idea why
+#         # "//runtime:asmrun",
+#     ],
+# )
+
+

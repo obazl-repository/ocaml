@@ -13,6 +13,7 @@ config_setting(name = "with-stdlib?",
 test_suite(
     name = "tests",
     tests = [
+        "//testsuite/tests/asmgen",
         "//testsuite/tests/basic",
         "//testsuite/tests/basic-modules",
         "//testsuite/tests/lib-arg",
@@ -20,6 +21,7 @@ test_suite(
         "//testsuite/tests/lib-atomic",
 
         "//testsuite/tests/typing-labels",
+        "//testsuite/tests/typing-misc",
 
         "//testsuite/tests/typing-missing-cmi",
         "//testsuite/tests/typing-missing-cmi-2",

@@ -1,7 +1,9 @@
 load("//tools:TOOL_RULES.bzl", "ocaml_tool_vm")
 
+load("//bzl:rules.bzl", "cc_assemble")
+
 load("//test:rules.bzl",
-     "test_executable_macro",
+     "test_executable",
      "test_library",
      "test_module",
      "test_signature",
@@ -9,20 +11,29 @@ load("//test:rules.bzl",
 
 load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
-MODULE_OPTS = ["-nostdlib"]
-SIG_OPTS = ["-nostdlib"]
+package(default_visibility = ["//testsuite/tests:__subpackages__"])
 
-test_library(
-    name = "testsuite_tools_lib",
-    manifest  = [
-        ":Codegen_main",
-        ":Expect_test",
-        ":Parsecmmaux",
-    ],
-    # signatures  = [
-    #     ":Lexcmm_cmi",
-    # ],
-)
+ASM_DEFINES = [
+    "NATIVE_CODE",
+    "TARGET_$(ARCH)",
+    "MODEL_$(MODEL)",
+    "SYS_$(SYSTEM)"
+]
+
+MODULE_OPTS = []
+SIG_OPTS    = []
+
+# test_library(
+#     name = "testsuite_tools_lib",
+#     manifest  = [
+#         ":Codegen_main",
+#         ":Expect_test",
+#         ":Parsecmmaux",
+#     ],
+#     # signatures  = [
+#     #     ":Lexcmm_cmi",
+#     # ],
+# )
 
 ################################################################
 # expect_MAIN=expect_test
@@ -32,16 +43,16 @@ test_library(
 # expect_LIBS := $(addprefix $(COMPILERLIBSDIR)/,\
 #   ocamlcommon ocamlbytecomp ocamltoplevel)
 
-environment(name = "vm") ## secret bazel thing, undocumented
-environment_group(
-    name = "vm_env",
-    defaults = [
-        ":vm",
-    ],
-    environments = [
-        ":vm",
-    ],
-)
+# environment(name = "vm") ## secret bazel thing, undocumented
+# environment_group(
+#     name = "vm_env",
+#     defaults = [
+#         ":vm",
+#     ],
+#     environments = [
+#         ":vm",
+#     ],
+# )
 
 # ../../boot/ocamlrun ../../ocamlc -nostdlib -I ../../stdlib -linkall -o expect_test ../../compilerlibs/ocamlcommon.cma ../../compilerlibs/ocamlbytecomp.cma ../../compilerlibs/ocamltoplevel.cma expect_test.cmo
 
@@ -72,9 +83,11 @@ ocaml_tool_vm( #FIXME: use compiler rule?
 #   parsecmmaux parsecmm lexcmm codegen_main)
 
 ################
-test_executable_macro(
+#FIXME: use ocaml_tool?
+test_executable(
     name = "codegen",
     main = ":Codegen_main",
+    compiler = "@dev//bin:ocamlopt.opt",
     opts = ["-w", "+40", "-g"],
     prologue = [
         "//compilerlibs:ocamlcommon",
@@ -83,8 +96,8 @@ test_executable_macro(
         ":Parsecmm",
         ":Lexcmm",
     ],
+    visibility = ["//testsuite/tests:__subpackages__"]
 )
-
 
 ############
 test_module(
@@ -208,3 +221,13 @@ test_signature(
     ]
 )
 
+################################################################
+# %.$(O): %.S
+# 	$(ASPP) $(OC_ASPPFLAGS) -o $@ $<
+cc_assemble(
+    name = "asmgen_amd64",
+    src = "asmgen_amd64.S",
+    defines = ASM_DEFINES,
+    ## This tc provides custom MAKE vars
+    toolchains = ["//profile/system/local"],
+)
