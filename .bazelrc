@@ -3,6 +3,23 @@ build --flag_alias=tgt=//config/target/executor
 build --flag_alias=stdlib=//testsuite/tests:with-stdlib
 build --flag_alias=larch=//config/ocaml/compiler/libs:archived
 
+build:ocamlc.byte --//toolchain:compiler=@dev//bin:ocamlc.byte
+build:ocamlopt.byte --//toolchain:runtime=@dev//lib:camlrun
+
+build:ocamlopt.byte --//toolchain:compiler=@dev//bin:ocamlopt.byte
+build:ocamlopt.byte --//toolchain:runtime=@dev//lib:asmrun
+
+build:ocamlopt.opt --//toolchain:compiler=@dev//bin:ocamlopt.opt
+build:ocamlopt.opt --//toolchain:runtime=@dev//lib:asmrun
+
+build:ocamlc.opt --//toolchain:compiler=@dev//bin:ocamlc.opt
+build:ocamlc.opt --//toolchain:runtime=@dev//lib:camlrun
+
+# flamba
+build:ocamloptx.byte --//toolchain:compiler=@dev//bin:ocamloptx.byte
+build:ocamloptx.opt  --//toolchain:compiler=@dev//bin:ocamloptx.opt
+build:ocamloptx.optx --//toolchain:compiler=@dev//bin:ocamloptx.optx
+
 build --nokeep_going
 
 # "may improve build speed for builds that use transitions."
@@ -31,10 +48,18 @@ common:show --subcommands=pretty_print
 common:show --verbose_failures
 ## suppress INFO msgs etc. emitted by 'bazel run'
 # common:q --nobuild
-common:q --ui_event_filters=-info
+
 common:q --noshow_progress
-# common:q --ui_event_filters=-stdout
-# common:q --ui_event_filters=-stderr
+## ui events: fatal, error, warning, info, progress, debug,
+## start, finish, subcommand, stdout, stderr, pass, fail,
+## timeout, cancelled or depchecker
+common:q --ui_event_filters=-info
+common:q --ui_event_filters=-progress
+common:q --ui_event_filters=-subcommand
+common:q --ui_event_filters=-fail
+# common:q --ui_event_filters=-error
+common:q --ui_event_filters=-stdout
+common:q --ui_event_filters=-stderr
 
 common:bep --build_event_json_file=bep.json
 common:bep --build_event_publish_all_actions
