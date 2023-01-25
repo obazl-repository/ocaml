@@ -53,7 +53,7 @@ def codegen(name, cmm, opts=[]):
     outfile = stem + ".s"
 
     native.genrule(
-        name = name + "_gen",
+        name = name,
         outs = [outfile],
         srcs = [cmm],
         tools = ["//testsuite/tools:codegen"],
@@ -65,7 +65,7 @@ def codegen(name, cmm, opts=[]):
             "-S",
             "$(location {}); ".format(cmm),
             "cp $(rootpath {}) \"$@\" ;".format(outfile),
-        ])
+        ]),
     )
 
 def codegen_test(name, cmm, opts=[]):
@@ -94,7 +94,7 @@ def asmgen_test(name, cmm,
         stem = cmm[:-4]
 
     asm_src = stem + ".s"
-    codegen(name = stem, cmm=cmm, opts=codegen_opts)
+    codegen(name = stem + "_gen", cmm=cmm, opts=codegen_opts)
 
     asm_tgt = stem + "_s"
     cc_assemble(
