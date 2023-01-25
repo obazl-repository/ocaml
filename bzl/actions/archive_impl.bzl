@@ -25,7 +25,7 @@ load("//bzl/rules/common:DEPS.bzl",
 ###############################
 def archive_impl(ctx):
     debug = False
-    debug_ccdeps = True
+    debug_ccdeps = False
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
@@ -264,9 +264,16 @@ def archive_impl(ctx):
 
     args.add_all(includes, before_each="-I", uniquify=True)
 
+    archive_deps = []
     for dep in filtering_depset.to_list():
         if dep in manifest:
             args.add(dep)
+        else:
+            archive_deps.append(dep)
+    if ctx.attr.name == "ocamlcommon":
+        print("manifest: %s" % manifest)
+        print("archive_deps: %s" % archive_deps)
+        # fail("archive: %s" % ctx.label)
 
     args.add("-a")
     args.add("-o", out_archive)
@@ -312,7 +319,7 @@ def archive_impl(ctx):
     cli_link_deps_depset = depset(
         order = dsorder,
         direct = [out_archive],
-        # transitive = [merge_depsets(depsets, "cli_link_deps")]
+        transitive = [depset(archive_deps)]
     )
 
     afiles_depset  = depset(

@@ -112,6 +112,7 @@ cc_library(
         ":archasm",
     ],
     deps = [
+        ":archasm",
         "//runtime/caml:hdrs",
         "//runtime/caml:domain_state_h",
         "//runtime/caml:fail_h",
@@ -152,13 +153,13 @@ cc_library(
         "//conditions:default"   : [
             "NATIVE_CODE",
             ## custom make vars:
-            # "TARGET_$(ARCH)",
+            "TARGET_$(ARCH)",
             "MODEL_$(MODEL)",
             "SYS_$(SYSTEM)"
         ]
-    }) + select({
-        "//platform/arch:amd64?": ["TARGET_amd64"],
-        "//conditions:default"  : ["TARGET_$(ARCH)"]
+    # }) + select({
+    #     "//platform/arch:amd64?": ["TARGET_amd64"],
+    #     "//conditions:default"  : ["TARGET_$(ARCH)"]
     }),
     #BUG: zig builds the archive with 'rcsD' which causes link error
     #due to "absolute symbol". But linkopts is ignored. Dunno how to
@@ -231,6 +232,7 @@ cc_assemble(
         "SYS_$(SYSTEM)"
     ],
     toolchains = ["//profile/system/local"],
+    visibility = ["//testsuite/tests:__subpackages__"]
 )
 
 ################################################################
@@ -248,68 +250,69 @@ mustache(
     toolchains = ["//profile/system/local"],
 )
 
-genrule(
-    outs = ["amd64.mustached.S"],
-    name = "amd64_mustache_test",
-    srcs = [
-        "arch_s",
-        # "//runtime:asmrun",
-        "//runtime/caml:config.h",
-        "//runtime/caml:domain_state.tbl",
-        "//runtime/caml:m.h",
-        "//runtime/caml:s_h"
-    ],
-    cmd  = " ".join([
-        "gcc -E",
-        "-Wno-trigraphs",
-        # "-I", "`dirname $(location //runtime:asmrun)`",
-        "-I", "runtime", # caml/m.h etc.
-        # "-I", "`dirname $(location //runtime/caml:config.h)`",
-        "-I", "`dirname $(location //runtime/caml:domain_state.tbl)`",
-        "-I", "`dirname $(location //runtime/caml:s_h)`",
-        # "-I", "`dirname $(location //runtime/caml:m.h)`",
-        "-DNATIVE_CODE",
-        "-DTARGET_amd64",
-        "-DMODEL_default",
-        "-DSYS_macosx",
-        "-o",
-        "$(location amd64.mustached.S)",
-        "$(location arch_s)"
-    ]),
-    # toolchains = ["//profile/system/local"],
-    # visibility = ["//boot:__pkg__"]
-)
+# genrule(
+#     outs = ["amd64.mustached.S"],
+#     name = "amd64_mustache_test",
+#     srcs = [
+#         "arch_s",
+#         # "//runtime:asmrun",
+#         "//runtime/caml:config.h",
+#         "//runtime/caml:domain_state.tbl",
+#         "//runtime/caml:m.h",
+#         "//runtime/caml:s_h"
+#     ],
+#     cmd  = " ".join([
+#         "gcc -E",
+#         "-Wno-trigraphs",
+#         # "-I", "`dirname $(location //runtime:asmrun)`",
+#         "-I", "runtime", # caml/m.h etc.
+#         # "-I", "`dirname $(location //runtime/caml:config.h)`",
+#         "-I", "`dirname $(location //runtime/caml:domain_state.tbl)`",
+#         "-I", "`dirname $(location //runtime/caml:s_h)`",
+#         # "-I", "`dirname $(location //runtime/caml:m.h)`",
+#         "-DNATIVE_CODE",
+#         "-DTARGET_amd64",
+#         "-DMODEL_default",
+#         "-DSYS_macosx",
+#         "-o",
+#         "$(location amd64.mustached.S)",
+#         "$(location arch_s)"
+#     ]),
+#     # toolchains = ["//profile/system/local"],
+#     # visibility = ["//boot:__pkg__"]
+# )
 
-genrule(
-    outs = ["amd64.pp.S"],
-    name = "amd64_test",
-    srcs = [
-        "amd64.original.S",
-        # "//runtime:asmrun",
-        "//runtime/caml:config.h",
-        "//runtime/caml:domain_state.tbl",
-        "//runtime/caml:m.h",
-        "//runtime/caml:s_h"
-    ],
-    cmd  = " ".join([
-        "gcc -E",
-        "-Wno-trigraphs",
-        # "-I", "`dirname $(location //runtime:asmrun)`",
-        "-I", "`dirname $(location //runtime/caml:config.h)`",
-        "-I", "`dirname $(location //runtime/caml:domain_state.tbl)`",
-        "-I", "`dirname $(location //runtime/caml:s_h)`",
-        "-I", "`dirname $(location //runtime/caml:m.h)`",
-        "-DNATIVE_CODE",
-        "-DTARGET_amd64",
-        "-DMODEL_default",
-        "-DSYS_macosx",
-        "-o",
-        "$(location amd64.pp.S)",
-        "$(location amd64.original.S)"
-    ]),
-    # toolchains = ["//profile/system/local"],
-    # visibility = ["//boot:__pkg__"]
-)
+## for testing:
+# genrule(
+#     outs = ["amd64.pp.S"],
+#     name = "amd64_test",
+#     srcs = [
+#         "amd64.original.S",
+#         # "//runtime:asmrun",
+#         "//runtime/caml:config.h",
+#         "//runtime/caml:domain_state.tbl",
+#         "//runtime/caml:m.h",
+#         "//runtime/caml:s_h"
+#     ],
+#     cmd  = " ".join([
+#         "gcc -E",
+#         "-Wno-trigraphs",
+#         # "-I", "`dirname $(location //runtime:asmrun)`",
+#         "-I", "`dirname $(location //runtime/caml:config.h)`",
+#         "-I", "`dirname $(location //runtime/caml:domain_state.tbl)`",
+#         "-I", "`dirname $(location //runtime/caml:s_h)`",
+#         "-I", "`dirname $(location //runtime/caml:m.h)`",
+#         "-DNATIVE_CODE",
+#         "-DTARGET_amd64",
+#         "-DMODEL_default",
+#         "-DSYS_macosx",
+#         "-o",
+#         "$(location amd64.pp.S)",
+#         "$(location amd64.original.S)"
+#     ]),
+#     # toolchains = ["//profile/system/local"],
+#     # visibility = ["//boot:__pkg__"]
+# )
 
 ################################################################
 ## WARNING: on windows the build for asm files is different, see //Makefile
