@@ -25,18 +25,6 @@ ASM_DEFINES = [
 MODULE_OPTS = []
 SIG_OPTS    = []
 
-# test_library(
-#     name = "testsuite_tools_lib",
-#     manifest  = [
-#         ":Codegen_main",
-#         ":Expect_test",
-#         ":Parsecmmaux",
-#     ],
-#     # signatures  = [
-#     #     ":Lexcmm_cmi",
-#     # ],
-# )
-
 ################################################################
 # expect_MAIN=expect_test
 # expect_PROG=$(expect_MAIN)$(EXE)
@@ -44,17 +32,6 @@ SIG_OPTS    = []
 # expect_OCAMLFLAGS = $(addprefix -I $(ROOTDIR)/,$(expect_DIRS))
 # expect_LIBS := $(addprefix $(COMPILERLIBSDIR)/,\
 #   ocamlcommon ocamlbytecomp ocamltoplevel)
-
-# environment(name = "vm") ## secret bazel thing, undocumented
-# environment_group(
-#     name = "vm_env",
-#     defaults = [
-#         ":vm",
-#     ],
-#     environments = [
-#         ":vm",
-#     ],
-# )
 
 # ../../boot/ocamlrun ../../ocamlc -nostdlib -I ../../stdlib -linkall -o expect_test ../../compilerlibs/ocamlcommon.cma ../../compilerlibs/ocamlbytecomp.cma ../../compilerlibs/ocamltoplevel.cma expect_test.cmo
 
@@ -90,7 +67,8 @@ test_executable(
     name = "codegen",
     stem = "codegen",
     main = ":Codegen_main",
-    # compiler = "@dev//bin:ocamlopt.opt",
+    # makefiles build a vm executable, we build a native executable:
+    compiler = "@dev//bin:ocamlopt.opt",
     opts = ["-w", "+40", "-g"],
     prologue = [
         # "//stdlib",
@@ -201,7 +179,8 @@ test_module(
         # "//parsing:Location",
         ":Parsecmmaux"
     ],
-    stdlib_deps = ["//stdlib:Stdlib.Parsing"]
+    stdlib_deps = ["//stdlib:Stdlib.Parsing"],
+    warnings = [w.FRAGILE_MATCH_4, w.UNUSED_VAR_STRICT_27]
 )
 
 genrule(
