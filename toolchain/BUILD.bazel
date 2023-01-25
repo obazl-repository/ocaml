@@ -11,9 +11,9 @@ label_setting(name="ocamlrun",
               build_setting_default = "//runtime:ocamlrun",
               visibility = ["//visibility:public"])
 
-label_setting(name="runtime",
-              build_setting_default = "//runtime:asmrun",
-              visibility = ["//visibility:public"])
+label_flag(name="runtime",
+           build_setting_default = "//runtime:camlrun",
+           visibility = ["//visibility:public"])
 
 label_setting(name="cvt_emit",
               build_setting_default = "//asmcomp:cvt_emit.byte",

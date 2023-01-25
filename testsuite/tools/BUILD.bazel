@@ -11,6 +11,8 @@ load("//test:rules.bzl",
 
 load("//lex:BUILD_RULES.bzl", "run_ocamllex")
 
+load("//config:WARNINGS.bzl", "w")
+
 package(default_visibility = ["//testsuite/tests:__subpackages__"])
 
 ASM_DEFINES = [
@@ -86,15 +88,17 @@ ocaml_tool_vm( #FIXME: use compiler rule?
 #FIXME: use ocaml_tool?
 test_executable(
     name = "codegen",
+    stem = "codegen",
     main = ":Codegen_main",
-    compiler = "@dev//bin:ocamlopt.opt",
+    # compiler = "@dev//bin:ocamlopt.opt",
     opts = ["-w", "+40", "-g"],
     prologue = [
-        "//compilerlibs:ocamlcommon",
-        "//asmcomp:ocamloptcomp",
-        ":Parsecmmaux",
-        ":Parsecmm",
-        ":Lexcmm",
+        # "//stdlib",
+        # "//compilerlibs:ocamlcommon",
+        # "//asmcomp:ocamloptcomp",
+        # ":Parsecmmaux",
+        # ":Parsecmm",
+        # ":Lexcmm",
     ],
     visibility = ["//testsuite/tests:__subpackages__"]
 )
@@ -104,14 +108,25 @@ test_module(
     name   = "Codegen_main",
     struct = "codegen_main.ml",
     opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI_70],
     deps   = [
-        "//asmcomp:Asmgen",
-        "//asmcomp:Emit",
-        "//asmcomp:Emitaux",
-        "//middle_end:Compilenv",
-        "//utils:Clflags",
+        "//utils:ocamlcommon",
+        # "//utils:Clflags",
+
+        "//asmcomp:ocamloptcomp",
+        "//compilerlibs:ocamlcommon",
+        # "//asmcomp:Asmgen",
+        # "//asmcomp:Emit",
+        # "//asmcomp:Emitaux",
+        # "//middle_end:Compilenv",
+
+
         ":Lexcmm",
-        ":Parsecmm"
+        ":Parsecmm",
+
+        ":Parsecmmaux",
+        # ":Parsecmm",
+        # ":Lexcmm",
     ],
     stdlib_deps = [
         "//stdlib:Stdlib.Arg",
@@ -128,13 +143,22 @@ test_module(
     name   = "Expect_test",
     struct = "expect_test.ml",
     opts = MODULE_OPTS + ["-linkall"],
+    warnings = [
+        w.FRAGILE_MATCH_4,
+        w.MISSING_RECORD_FIELD_PATTERN_9,
+        w.DISAMBIGUATED_NAME_42,
+        w.OPEN_SHADOW_IDENTIFIER_44,
+        w.MISSING_MLI_70
+    ],
     deps   = [
         "//toplevel:Toploop",
+    ],
+    sig_deps = ["//parsing:Parsetree_cmi"],
+    libOCaml_deps = [
         "//driver:Main_args",
         "//parsing:Location",
         "//parsing:Printast",
     ],
-    sig_deps = ["//parsing:Parsetree_cmi"],
     stdlib_deps =[
         # "//stdlib",
         "//stdlib:Stdlib.StdLabels",
@@ -170,9 +194,11 @@ test_module(
     struct = "parsecmm.ml",
     opts = MODULE_OPTS,
     deps   = [
-        "//asmcomp:Cmm",
-        "//lambda:Lambda",
-        "//parsing:Location",
+        "//compilerlibs:ocamlcommon",
+        "//asmcomp:ocamloptcomp",
+        # "//asmcomp:Cmm",
+        # "//lambda:Lambda",
+        # "//parsing:Location",
         ":Parsecmmaux"
     ],
     stdlib_deps = ["//stdlib:Stdlib.Parsing"]
@@ -201,9 +227,10 @@ test_module(
     sig    = "Parsecmmaux_cmi",
     opts = MODULE_OPTS,
     deps   = [
-        "//lambda:Lambda",
-        "//middle_end:Backend_var",
-        "//parsing:Location",
+        "//compilerlibs:ocamlcommon"
+        # "//lambda:Lambda",
+        # "//middle_end:Backend_var",
+        # "//parsing:Location",
     ],
     stdlib_deps =[
         "//stdlib:Stdlib.Hashtbl",
