@@ -1,21 +1,46 @@
 load("//test:rules.bzl",
+     "batch_test_macro",
+     "test_executable",
      "test_module",
 )
 
-MODULE_OPTS = []
+load("//config:WARNINGS.bzl", "w")
 
-# test_suite(
-#     name = "testsuite_tests_ast-invariants_lib",
-#     tests  = [
-#         ":Test",
-#     ],
+test_suite(
+    name = "ast-invariants",
+    tests  = [
+        ":Test_test",
+    ],
+)
+
+batch_test_macro(
+    name    = "Test_test",
+    stdout_actual = "test.stdout",
+    stdout_expected = "test.reference",
+    test_module    = ":Test",
+)
+
+# test_executable(
+#     name    = "Test.bin",
+#     main    = ":Test",
 # )
 
 test_module(
     name   = "Test",
     struct = "test.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    warnings = [
+        w.FRAGILE_MATCH_4,
+        w.MISSING_RECORD_FIELD_PATTERN_9,
+        w.MISSING_MLI_70
+    ],
+    deps = ["//otherlibs/unix:libUnix"],
+    sig_deps = ["//parsing:Parsetree_cmi"],
+    libOCaml_deps = [
+        "//parsing:Ast_invariants",
+        "//parsing:Parse"
+    ],
+    stdlib_deps   = [
+        # "//stdlib"
+        "//stdlib:Stdlib.Filename"
     ]
 )
-

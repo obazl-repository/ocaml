@@ -17,6 +17,38 @@ load(":test_transitions.bzl",
      "ss_test_in_transition",
      "sv_test_in_transition")
 
+
+################################################
+def _in_transition_impl(settings, attr):
+    print("test_executable _in_transition")
+    print("attr.compiler: %s" % attr.compiler)
+
+    if attr.compiler:
+        if attr.compiler.name in ["ocamlopt.opt", "ocamlopt.byte"]:
+            return {
+                "//toolchain:compiler"    : attr.compiler,
+                "//toolchain:runtime"     : "@dev//lib:asmrun",
+                "//toolchain:ocamlrun"    : "@dev//bin:ocamlrun"
+            }
+        else:
+            fail(attr.compiler)
+    else:
+        return {}
+
+_in_transition = transition(
+    implementation = _in_transition_impl,
+    inputs = [
+        "//toolchain:compiler",
+        "//toolchain:ocamlrun",
+        "//toolchain:runtime",
+    ],
+    outputs = [
+        "//toolchain:compiler",
+        "//toolchain:ocamlrun",
+        "//toolchain:runtime",
+    ]
+)
+
 ##############################
 def _test_executable_impl(ctx):
 
@@ -29,7 +61,10 @@ def _test_executable_impl(ctx):
     # else:
     #     ext = ".opt"
 
-    exe_name = ctx.attr.main[ModuleInfo].name
+    if ctx.attr.stem:
+        exe_name = ctx.attr.stem
+    else:
+        exe_name = ctx.attr.main[ModuleInfo].name
 
     return executable_impl(ctx, tc, exe_name, workdir)
 
@@ -39,6 +74,13 @@ test_executable = rule(
     doc = "Links OCaml executable binary using ocamlc.byte",
     attrs = dict(
         executable_attrs(),
+        stem = attr.string(
+            doc = "Used to construct executable name. Default uses filename in 'main' as stem."
+        ),
+
+        compiler = attr.label(
+            allow_single_file = True,
+        ),
 
         _runfiles_tool = attr.label(
             allow_single_file = True,
@@ -60,7 +102,7 @@ test_executable = rule(
     # cfg = reset_config_transition,
     # cfg = "exec",
     # cfg = dev_tc_compiler_out_transition,
-    # cfg = vv_test_in_transition,
+    cfg = _in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",

@@ -9,7 +9,8 @@ load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
 
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 
-load("test_executable.bzl", "test_executable")
+load(":test_executable.bzl", "test_executable")
+load(":test_module.bzl", "test_module")
 
 load(":test_transitions.bzl", "test_in_transitions")
 
@@ -102,7 +103,7 @@ def batch_test_macro(name,
                      stdout_expected, ## = None,
                      # stderr_actual = None,
                      # stderr_expected = None,
-                     opts  = OCAML_COMPILER_OPTS,
+                     opts  = [],
                      tags  = [],
                      timeout = "short",
                      **kwargs):
@@ -171,7 +172,77 @@ def batch_test_macro(name,
     test_executable(
         name    = executable,
         main    = test_module,
-        opts    = opts,
+        opts    = OCAML_COMPILER_OPTS + opts,
+        **kwargs
+    )
+
+    ## TODO: flambda test rules
+
+###############################################################
+####  MACRO - generates native tests
+################################################################
+def batch_native_tests(name,
+                       struct,
+                       stdout_expected,
+                       stdout_actual = None,
+                       stdlib_deps = [],
+                       # stderr_actual = None,
+                       # stderr_expected = None,
+                       opts  = [],
+                       tags  = [],
+                       timeout = "short",
+                       **kwargs):
+
+    if name.endswith("_test"):
+        stem = name[:-5]
+    else:
+        stem = name
+
+    if struct.startswith(":"):
+        structfile = struct[1:]
+    else:
+        structfile = struct
+    executable = name + ".exe"
+
+    vs_name = stem + "_vs_test"
+    ss_name = stem + "_ss_test"
+
+    native.test_suite(
+        name  = stem + "native_tests",
+        tests = [vs_name, ss_name]
+    )
+
+    batch_vs_test(
+        name     = vs_name,
+        test_executable = executable,
+        stdout_actual   = stdout_actual,
+        stdout_expected = stdout_expected,
+        timeout  = timeout,
+        tags     = ["vs"] + tags,
+        **kwargs
+    )
+
+    batch_ss_test(
+        name     = ss_name,
+        test_executable = executable,
+        stdout_actual   = stdout_actual,
+        stdout_expected = stdout_expected,
+        timeout  = timeout,
+        tags     = ["ss"] + tags,
+        **kwargs
+    )
+
+    test_executable(
+        name    = executable,
+        main    = ":" + stem,
+        opts    = OCAML_COMPILER_OPTS + opts,
+        **kwargs
+    )
+
+    test_module(
+        name   = stem,
+        struct = struct,
+        stdlib_deps = stdlib_deps,
         **kwargs
     )
 

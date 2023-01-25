@@ -9,7 +9,7 @@ MODULE_OPTS = []
 test_suite(
     name = "testsuite_tests_statmemprof_lib",
     tests  = [
-        ":Alloc_counts",
+        # ":Alloc_counts_test", ## skip
         ":Arrays_in_major",
         ":Arrays_in_minor",
         ":Blocking_in_callback",
@@ -26,20 +26,19 @@ test_suite(
     ],
 )
 
-test_module(
-    name   = "Alloc_counts",
-    struct = "alloc_counts.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
+# test_module(
+#     name   = "Alloc_counts",
+#     struct = "alloc_counts.ml",
+#     opts = MODULE_OPTS,
+#     deps   = [
+#     ]
+# )
 
 test_module(
     name   = "Arrays_in_major",
     struct = "arrays_in_major.ml",
     opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib.Gc"]
 )
 
 test_module(

@@ -1,7 +1,7 @@
 load("//test:rules.bzl",
      "batch_test_macro",
      "test_module",
-     "compile_module_testx",
+     # "compile_module_testx",
 )
 
 test_suite(
@@ -13,8 +13,23 @@ test_suite(
     ],
 )
 
-compile_module_testx(
-    name   = "Main_test",
+# compile_module_testx(
+#     name   = "Main_test",
+#     struct = "main.ml",
+#     deps   = [":A", ":B"],
+#     stdlib_deps   = ["//stdlib:Stdlib"],
+#     opts = ["-verbose"],
+#     suppress_cmi = ["//testsuite/tests/typing-missing-cmi/subdir:M"],
+#     rc_expected = 2,
+#     stderr_actual  = "main.ml.stderr",
+#     stderr_expected = "test.compilers.reference",
+#     # stdout_actual  = "main.stdout",
+#     # timeout = "short",
+#     tags = ["cmi"]
+# )
+
+test_module(
+    name   = "Main",
     struct = "main.ml",
     deps   = [":A", ":B"],
     stdlib_deps   = ["//stdlib:Stdlib"],
@@ -25,7 +40,7 @@ compile_module_testx(
     stderr_expected = "test.compilers.reference",
     # stdout_actual  = "main.stdout",
     # timeout = "short",
-    tags = ["cmi"]
+    # tags = ["cmi"]
 )
 
 batch_test_macro(

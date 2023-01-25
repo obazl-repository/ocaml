@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//test:rules.bzl",
      "test_executable_macro",
      "test_library",
@@ -5,7 +6,7 @@ load("//test:rules.bzl",
      "test_signature",
      "batch_test_macro",
      "batch_vv_test",
-     "inline_expect_test",
+     "inline_expect_module",
      "compile_dump_diff_test_macro"
 )
 
@@ -15,7 +16,7 @@ test_suite(
         ":Anonymous_test",
         ":Main_expect_test",
         ":Recursive_module_init_expect_test",
-        ":Recursive_module_evaluation_errors",
+        ":Recursive_module_evaluation_errors_test",
     ],
 )
 
@@ -108,19 +109,27 @@ test_module(
     stdlib_deps = ["//stdlib:Stdlib"]
 )
 
-inline_expect_test(
+################################################################
+diff_test(
+    name = "Recursive_module_evaluation_errors_test",
+    file1 = "recursive_module_evaluation_errors.ml",
+    file2 = ":Recursive_module_evaluation_errors",
+    timeout = "short",
+    tags = ["inline_expect"]
+)
+
+inline_expect_module(
     name = "Recursive_module_evaluation_errors",
     struct  = "recursive_module_evaluation_errors.ml",
-    deps = [
+    stdlib_deps = [
         ## FIXME: deps ordering not working, these must be listed in
         ## this order. This should happen automatically.
         "//stdlib:CamlinternalMod",
         "//stdlib:Stdlib",
     ],
-    timeout = "short",
-    tags = ["inline_expect"]
 )
 
+################################################################
 batch_test_macro(
     name     = "Recursive_module_init_expect_test",
     test_module = ":Recursive_module_init",

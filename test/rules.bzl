@@ -20,8 +20,10 @@ load("//test/rules:batch_test.bzl",
 load("//test/rules:compile_fail_test.bzl",
      _compile_fail_test = "compile_fail_test")
 
-load("//test/rules:inline_expect_test.bzl",
-     _inline_expect_test = "inline_expect_test")
+# load("//test/rules:inline_expect_test.bzl",
+#      _inline_expect_test = "inline_expect_test")
+load("//test/rules:inline_expect_module.bzl",
+     _inline_expect_module  = "inline_expect_module")
 
 load("//test/rules:compile_dump_diff_test.bzl",
      _compile_dump_diff_test_macro = "compile_dump_diff_test_macro")
@@ -38,8 +40,6 @@ load("//test/rules:test_executable.bzl",
 load("//test/rules:test_library.bzl", _test_library = "test_library")
 
 load("//test/rules:test_module.bzl",  _test_module  = "test_module")
-load("//test/rules:inline_expect_module.bzl",
-     _inline_expect_module  = "inline_expect_module")
 load("//test/rules:test_infer_signature.bzl",
      _test_infer_signature  = "test_infer_signature")
 load("//test/rules:test_signature.bzl", _test_signature = "test_signature")
@@ -61,7 +61,9 @@ batch_test_macro = _batch_test_macro
 # compile_module_testx = _compile_module_testx
 compile_fail_test = _compile_fail_test
 
-inline_expect_test = _inline_expect_test
+# inline_expect_test = _inline_expect_test
+inline_expect_module  = _inline_expect_module
+
 compile_dump_diff_test_macro = _compile_dump_diff_test_macro
 # compile_dump_diff_test_sys_macro = _compile_dump_diff_test_sys_macro
 test_executable_macro = _test_executable_macro
@@ -72,6 +74,5 @@ test_ss_executable = _test_ss_executable
 test_sv_executable = _test_sv_executable
 test_library = _test_library
 test_module  = _test_module
-inline_expect_module  = _inline_expect_module
 test_infer_signature = _test_infer_signature
 test_signature = _test_signature

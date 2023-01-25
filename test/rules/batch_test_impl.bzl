@@ -78,7 +78,10 @@ def batch_test_impl(ctx):
         # pgm_cmd = pgm.short_path
 
     runner = ctx.actions.declare_file(ctx.attr.name + ".sh")
-    stdout = ctx.attr.stdout_actual
+    if ctx.attr.stdout_actual:
+        stdout = ctx.attr.stdout_actual
+    else:
+        stdout = ctx.file.test_executable.basename + ".stdout"
 
     if debug:
         print("tc.name: %s" % tc.name)

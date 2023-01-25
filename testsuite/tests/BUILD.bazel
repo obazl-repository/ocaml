@@ -14,6 +14,7 @@ test_suite(
     name = "tests",
     tests = [
         "//testsuite/tests/asmgen",
+        "//testsuite/tests/array-functions",
         "//testsuite/tests/basic",
         "//testsuite/tests/basic-modules",
         "//testsuite/tests/lib-arg",

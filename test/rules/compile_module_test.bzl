@@ -59,7 +59,7 @@ cmd_runfiles = [
 ################################################################
 def _this_impl(ctx):
     debug = True
-    debug_ccdeps = True
+    debug_ccdeps = False
 
     if ctx.label.name == "Load_path":
         debug = True
@@ -120,10 +120,16 @@ def _this_impl(ctx):
         is_executable = True
     )
 
-    runner = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
+    # runner = ctx.actions.declare_file(ctx.attr.name + ".compile.sh")
+
     cmd_prologue = [
-        "echo PWD: $(PWD);",
+    "set -uo pipefail;",
+    "set +e;",
     ]
+    if (ctx.attr.verbose
+        or ctx.attr._sh_verbose[BuildSettingInfo].value):
+        cmd_prologue.append("echo PWD: $(PWD);")
+        cmd_prologue.append("set -x;")
 
     if hasattr(ctx.attr, "suppress_cmi"):
         suppressed_cmis = []
@@ -133,76 +139,128 @@ def _this_impl(ctx):
             cmd_prologue.append("rm -f {}; ".format(cmi.short_path))
     cmd_prologue.append("")
 
+    if ctx.file.stdout_actual:
+        stdout_actual = ctx.actions.declare_file(ctx.file.stdout_actual.path)
+    else:
+        stdout_actual = ctx.actions.declare_file(ctx.file.struct.basename + ".stdout")
+
+    # if ctx.file.stderr_actual:
+    #     stderr_actual = ctx.actions.declare_file(ctx.file.stderr_actual.basename)
+    # else:
+    #     stderr_actual = ctx.actions.declare_file(ctx.file.struct.basename + ".stderr")
+
     cmd = "\n".join([
-        "{} \\".format(executor.short_path),
-        "{} \\".format(executor_arg.short_path if executor_arg else ""),
+        "{} \\".format(executor.path),
+        "{} \\".format(executor_arg.path if executor_arg else ""),
         # "-help \\",
         # "-verbose \\",
         "-args \\",
-        "{} \\".format(args_file.short_path),
-        "1> \\",
-        "compile.stdout \\",
-        "2>&1 ; \\",
-        "echo RC: $?;"
+        "{} \\".format(args_file.path),
+        # "1> \\",
+        # "{} \\".format(stdout_actual.short_path),
+        # "2> \\",
+        # "{} ; ".format(ctx.outputs.stderr_actual.short_path),
+        # "RC=$?;",
+        # "if [ $RC == \"{rc}\" ]".format(rc=ctx.attr.rc_expected),
+        # "then",
+        # "    exit 0",
+        # "else",
+        # "    exit $RC",
+        # "fi"
     ])
 
-    cmd_epilogue = "\n".join([
-        # skip first line containing src file path - non-portable
-        "diff <(tail -n \\+2 {}) <(tail -n \\+2 compile.stdout)".format(
-            ctx.file.expected.short_path
-        )
-    ])
+    # cmd_epilogue = "\n".join([
+    #     # skip first line containing src file path - non-portable
+    #     "diff <(tail -n \\+2 {actual}) <(tail -n \\+2 {expected})".format(
+    #         actual=ctx.file.stdout_expected.short_path,
+    #         expected=ctx.file.stdout_actual.short_path
+    #     )
+    # ])
 
-    ctx.actions.write(
-        output = runner,
-        # content = cmd,
-        content = "\n".join(cmd_prologue) + cmd + cmd_epilogue,
-        is_executable = True
-    )
-    ##################
-    tc = ctx.toolchains["//toolchain/type:ocaml"]
+    cmd = " ".join(cmd_prologue) + cmd ##  + cmd_epilogue,
+    print("CMD: %s" % cmd)
 
-    runfiles = []
-    myrunfiles = ctx.runfiles(
-        files = [
-            executor,
-            args_file,
-            ctx.file.struct, ctx.file.expected,
-            ctx.file._runfiles_tool
-        ] + ([executor_arg] if executor_arg else []),
-        transitive_files =  depset(
+    ctx.actions.run_shell(
+        inputs = depset(
+            direct = [executor, executor_arg,
+                      ctx.file.struct, ctx.file.stderr_expected,
+                      args_file],
             transitive = []
             + inputs.bootinfo.sigs
             + inputs.bootinfo.structs
             + inputs.bootinfo.cli_link_deps
-            # etc.
-            + [ctx.attr._runfiles_tool[DefaultInfo].files]
-            + [ctx.attr._runfiles_tool[DefaultInfo].default_runfiles.files]
-            + [cc_toolchain.all_files] ##FIXME: only for sys outputs
         ),
-            # direct=compiler_runfiles,
-            # transitive = [depset(
-            #     # [ctx.file._std_exit, ctx.file._stdlib]
-            # )]
+        # outputs = outs,
+        outputs = [stdout_actual, ctx.outputs.stderr_actual],
+        tools = [executor, executor_arg],
+        # arguments = [args],
+        command = cmd
     )
 
-    print("BASH %s" % ctx.file._runfiles_tool.path)
+    # ctx.actions.write(
+    #     output = runner,
+    #     # content = cmd,
+    #     content = "\n".join(cmd_prologue) + cmd, ##  + cmd_epilogue,
+    #     is_executable = True
+    # )
+
+    # ctx.actions.write(
+    #     output = ctx.outputs.stdout_actual,
+    #     content = "",
+    #     is_executable = False
+    # )
+    ##################
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
+
+    # runfiles = []
+    # myrunfiles = ctx.runfiles(
+    #     files = [
+    #         executor,
+    #         args_file,
+    #         ctx.file.struct,
+    #         # ctx.file.stdout_actual,
+    #         # ctx.file.stdout_expected,
+    #         ctx.file.stderr_expected,
+    #         ctx.file._runfiles_tool
+    #     ] + ([executor_arg] if executor_arg else []),
+    #     transitive_files =  depset(
+    #         transitive = []
+    #         + inputs.bootinfo.sigs
+    #         + inputs.bootinfo.structs
+    #         + inputs.bootinfo.cli_link_deps
+    #         # etc.
+    #         + [ctx.attr._runfiles_tool[DefaultInfo].files]
+    #         + [ctx.attr._runfiles_tool[DefaultInfo].default_runfiles.files]
+    #         + [cc_toolchain.all_files] ##FIXME: only for sys outputs
+    #     ),
+    #         # direct=compiler_runfiles,
+    #         # transitive = [depset(
+    #         #     # [ctx.file._std_exit, ctx.file._stdlib]
+    #         # )]
+    # )
+
+    # print("BASH %s" % ctx.file._runfiles_tool.path)
 
     ################################################################
     defaultInfo = DefaultInfo(
-        executable = runner,
-        runfiles   = myrunfiles
+        files = depset([ctx.outputs.stderr_actual])
+        ## FIXME: plus cmo/cmx if expected RC == 0
+
+        # executable = runner,
+        # runfiles   = myrunfiles
     )
     providers = [defaultInfo]
 
     return providers
 
 ################################################################
-compile_module_test = rule(
+compile_module_testx = rule(
     implementation = _this_impl,
     doc = "Compiles a module.",
     attrs = dict(
         module_attrs(),
+        verbose = attr.bool(),
+        _sh_verbose = attr.label(default = "//testsuite/tests:verbose"),
         suppress_cmi = attr.label_list(
             doc = "For testing only: do not pass on cmi files in Providers.",
             providers = [
@@ -210,15 +268,25 @@ compile_module_test = rule(
                 [StdLibMarker],
             ],
         ),
-        stdout   = attr.string(
-            # label?
+        rc_expected = attr.int(),
+        stdout_actual = attr.label(
             # mandatory = True,
-            # allow_single_file = True
+            allow_single_file = True,
         ),
-        expected = attr.label(
-            mandatory = True,
+        stdout_expected = attr.label(
+            # mandatory = True,
             allow_single_file = True
         ),
+
+        stderr_actual = attr.output(
+            # mandatory = True,
+            # allow_single_file = True,
+        ),
+        stderr_expected = attr.label(
+            # mandatory = True,
+            allow_single_file = True
+        ),
+
         # stdlib_primitives = attr.bool(default = True),
         # _stdlib = attr.label(
         #     doc = "The commpiler always opens Stdlib, so everything depends on it.",
@@ -232,7 +300,7 @@ compile_module_test = rule(
         _rule = attr.string( default = "compile_module_test" ),
     ),
     # cfg = compile_mode_in_transition,
-    test = True,
+    # test = True,
     fragments = ["platform", "cpp"],
     host_fragments = ["platform",  "cpp"],
     toolchains = ["//toolchain/type:ocaml",

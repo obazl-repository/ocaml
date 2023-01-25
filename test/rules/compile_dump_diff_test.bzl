@@ -189,14 +189,15 @@ def compile_dump_diff_test_macro(name,
             tags = ["sv", "dump"] + tags,
             **kwargs
         )
-        compile_dump_diff_xv_test(
-            name = xv_name,
-            test_module = test_module,
-            expected = vm_expected,
-            timeout = timeout,
-            tags = ["xv", "flambda", "dump"] + tags,
-            **kwargs
-        )
+        if flambda_expected:
+            compile_dump_diff_xv_test(
+                name = xv_name,
+                test_module = test_module,
+                expected = vm_expected,
+                timeout = timeout,
+                tags = ["xv", "flambda", "dump"] + tags,
+                **kwargs
+            )
 
     if sys_expected:
         compile_dump_diff_ss_test(
@@ -215,14 +216,15 @@ def compile_dump_diff_test_macro(name,
             tags = ["vs", "dump"] + tags,
             **kwargs
         )
-        compile_dump_diff_ss_test(
-            name = xs_name,
-            test_module = test_module,
-            expected = sys_expected,
-            timeout = timeout,
-            tags = ["vs", "dump"] + tags,
-            **kwargs
-        )
+        if flambda_expected:
+            compile_dump_diff_xs_test(
+                name = xs_name,
+                test_module = test_module,
+                expected = sys_expected,
+                timeout = timeout,
+                tags = ["vs", "dump"] + tags,
+                **kwargs
+            )
 
     if flambda_expected:
         compile_dump_diff_vx_test(

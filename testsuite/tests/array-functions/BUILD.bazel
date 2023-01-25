@@ -1,22 +1,27 @@
 load("//test:rules.bzl",
-     "test_library",
+     "batch_test_macro",
      "test_module",
 )
 
-MODULE_OPTS = []
+test_suite(
+    name = "array-functions",
+    tests  = [
+        ":Test_test",
+    ],
+)
 
-# test_suite(
-#     name = "testsuite_tests_array-functions_lib",
-#     tests  = [
-#         ":Test",
-#     ],
-# )
+batch_test_macro(
+    name    = "Test_test",
+    stdout_actual = "test.stdout",
+    stdout_expected = "test.reference",
+    test_module    = ":Test",
+)
 
 test_module(
     name   = "Test",
     struct = "test.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    opts = ["-w", "+a"],
+    stdlib_deps   = [
         "//stdlib:Stdlib.Array"
     ]
 )

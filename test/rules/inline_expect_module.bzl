@@ -1,4 +1,6 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
+
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
@@ -24,15 +26,12 @@ load("//bzl/actions:module_compile_action.bzl", "construct_module_compile_action
 
 ######################
 def _inline_expect_module_impl(ctx):
-
     debug = False
     debug_ccdeps = False
 
     (this, extension) = paths.split_extension(ctx.file.struct.basename)
     module_name = this[:1].capitalize() + this[1:]
     module_name = None
-
-    # return module_impl(ctx, module_name)
 
     (inputs,
      outputs, # dictionary of files
@@ -55,10 +54,6 @@ def _inline_expect_module_impl(ctx):
     for v in outputs.values():
         if v: outs.append(v)
 
-    print("OUTS: %s" % outs)
-    # if ctx.attr._rule == "test_infer_signature":
-    #     fail()
-
     cc_toolchain = find_cpp_toolchain(ctx)
 
     ##FIXME: use rule-specific mnemonic, e.g CompileStdlibModule
@@ -68,9 +63,6 @@ def _inline_expect_module_impl(ctx):
         # env        = env,
         executable = executor.path,
         arguments = [args],
-        # inputs: from deps we get a list of depsets, so:
-        # inputs = depset(direct=[action inputfiles...],
-        #                 transitive=[deps dsets...])
         inputs    = depset(
             direct = inputs.files + [executor],
             transitive = []
@@ -80,7 +72,7 @@ def _inline_expect_module_impl(ctx):
             # etc.
             + [cc_toolchain.all_files] ##FIXME: only for sys outputs
         ),
-        outputs   = outs,
+        outputs   = outs, ## <input>.corrected
         # tools = [],
         mnemonic = "CompileModule",
         # progress_message = progress_msg(workdir, ctx)
@@ -156,9 +148,41 @@ inline_expect_module = rule(
     executable = False,
     fragments = ["platform", "cpp"],
     host_fragments = ["platform",  "cpp"],
-    # incompatible_use_toolchain_transition = True, #FIXME: obsolete?
     toolchains = ["//toolchain/type:ocaml",
                   ## //toolchain/type:profile,",
                   "@bazel_tools//tools/cpp:toolchain_type"]
 )
+
+################################################################
+####  MACRO
+################################################################
+def inline_expect_test(name,
+                       struct,
+                       timeout = "short",
+                       **kwargs):
+
+    if name.endswith("_test"):
+        stem = name[:-5]
+    else:
+        stem = name
+
+    if struct.startswith(":"):
+        structfile = struct[1:]
+    else:
+        structfile = struct
+
+    diff_test(
+        name = stem + "_test",
+        file1 = structfile,
+        file2 = ":" + stem,
+        timeout = timeout,
+        tags = ["inline_expect"]
+    )
+
+    inline_expect_module(
+        name   = stem,
+        struct = structfile,
+
+        **kwargs
+    )
 

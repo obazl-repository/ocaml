@@ -5,9 +5,7 @@ load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 load("//bzl:rules.bzl", "cc_preprocess")
 load("//config:WARNINGS.bzl", "w")
 
-
 load("//test:rules.bzl",
-     "test_executable_macro",
      "test_executable",
      "test_vv_executable",
      "test_vs_executable",
@@ -19,7 +17,7 @@ load("//test:rules.bzl",
      "test_signature",
 
      "inline_expect_module",
-     "inline_expect_test",
+     # "inline_expect_test",
 
      "batch_test_macro",
      "batch_vv_test",
@@ -185,7 +183,10 @@ test_executable(
 test_module(
     name   = "Bigints",
     struct = "bigints.ml",
-    stdlib_deps = ["//stdlib:Stdlib.Sys"]
+    stdlib_deps = [
+        # "//stdlib",
+        "//stdlib:Stdlib.Sys"
+    ]
 )
 
 ################################################################
@@ -195,12 +196,13 @@ batch_test_macro(
     test_module = ":Boxedints",
     stdout_actual   = "boxedints.stdout",
     stdout_expected = "boxedints.reference",
+    # opts = ["-custom"],
 )
 
 test_module(
     name   = "Boxedints",
     struct = "boxedints.ml",
-    open   = ["//stdlib:Stdlib"],
+    # open   = ["//stdlib:Stdlib"],
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
@@ -208,7 +210,8 @@ test_module(
             "//stdlib:Stdlib.List",
             "//stdlib:Stdlib.Printf"
         ]
-    })
+    }),
+    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_MODULE_60]
 )
 
 ################################################################
@@ -275,7 +278,8 @@ test_module(
             "//stdlib:Stdlib.List",
             "//stdlib:Stdlib.Printf"
         ]
-    })
+    }),
+    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_FOR_INDEX_35]
 )
 
 #################
@@ -324,7 +328,8 @@ batch_test_macro(
 test_module(
     name   = "Eval_order_2",
     struct = "eval_order_2.ml",
-    stdlib_deps   = ["//stdlib:Primitives"]
+    stdlib_deps   = ["//stdlib:Primitives"],
+    warnings = [w.UNUSED_VAR_STRICT_27]
 )
 
 #################
@@ -342,7 +347,8 @@ test_module(
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Printf"]
-    })
+    }),
+    warnings = [w.UNUSED_VAR_STRICT_27]
 )
 
 #################
@@ -356,7 +362,8 @@ batch_test_macro(
 test_module(
     name   = "Eval_order_4",
     struct = "eval_order_4.ml",
-    stdlib_deps   = ["//stdlib:Primitives"]
+    stdlib_deps   = ["//stdlib:Primitives"],
+    warnings = [w.UNUSED_VAR_STRICT_27]
 )
 
 #################
@@ -374,7 +381,11 @@ test_module(
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Int"]
-    })
+    }),
+    warnings = [
+        w.MISSING_RECORD_FIELD_PATTERN_9,
+        w.MATCH_ON_MUTABLE_STATE_PREVENT_UNCURRY_68
+    ]
 )
 
 #################
@@ -459,7 +470,10 @@ test_module(
             "//stdlib:Stdlib.Printexc",
             "//stdlib:Stdlib.Printf",
         ]
-    })
+    }),
+    warnings = [w.UNUSED_VALUE_DECLARATION_32,
+                w.UNUSED_MODULE_60,
+                w.UNUSED_VAR_STRICT_27]
 )
 
 #################
@@ -572,7 +586,13 @@ test_module(
             "//stdlib:Stdlib.List",
             "//stdlib:Stdlib.Printf",
         ]
-    })
+    }),
+    warnings = [
+        w.AMBIGUOUS_NAME_41,
+        w.DISAMBIGUATED_NAME_42,
+        w.FRAGILE_MATCH_4,
+        w.OPEN_SHADOW_LABEL_CONSTRUCTOR_45,
+        w.UNUSED_VAR_STRICT_27]
 )
 
 ###################
@@ -618,7 +638,7 @@ inline_expect_module(
 diff_test(
     name = "Patmatch_split_no_or_test",
     file1 = "patmatch_split_no_or.ml",
-    file2 = "Patmatch_split_no_or_expect",
+    file2 = ":Patmatch_split_no_or_expect",
     timeout = "short",
     tags = ["inline_expect"]
 )
@@ -645,7 +665,8 @@ test_module(
         "//conditions:default": [
             "//stdlib:Stdlib.Printexc",
         ]
-    })
+    }),
+    warnings = [w.UNUSED_VAR_STRICT_27]
 )
 
 #################
@@ -685,7 +706,11 @@ test_module(
         "-no-strict-sequence",
         # "-w", "-21-5"
     ],
-    stdlib_deps  =["//stdlib:Primitives"]
+    stdlib_deps  =["//stdlib:Primitives"],
+    warnings = [
+        w.ELIMINATED_OPTIONAL_ARGUMENTS_48,
+        w.UNUSED_VAR_STRICT_27
+    ]
 )
 
 #################
@@ -705,7 +730,8 @@ test_module(
             "//stdlib:Stdlib.Gc",
             "//stdlib:Stdlib.List",
         ]
-    })
+    }),
+    warnings = [w.UNUSED_FOR_INDEX_35]
 )
 
 #################
@@ -719,22 +745,12 @@ batch_test_macro(
 test_module(
     name   = "Sets",
     struct = "sets.ml",
-    ## three options for stdlib_deps:
     stdlib_deps = [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Set",
-    ]
-    # stdlib_deps = ["//stdlib"]
-    # stdlib_deps   = select({
-    #     "//config/ocaml/compiler/libs:archived?": [
-    #         "//stdlib"
-    #     ],
-    #     "//conditions:default": [
-    #         "//stdlib:Stdlib.Set",
-    #         "//stdlib:Stdlib.Printf",
-    #     ]
-    # })
+    ],
+    warnings = [w.UNUSED_MODULE_60]
 )
 
 #################
@@ -751,7 +767,8 @@ test_module(
     stdlib_deps   = [
         "//stdlib:Stdlib.String",
 
-    ]
+    ],
+    warnings = [w.UNUSED_REC_FLAG_39]
 )
 
 #################
@@ -768,7 +785,8 @@ test_module(
     stdlib_deps   = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
-    ]
+    ],
+    warnings = [w.UNUSED_VAR_STRICT_27]
 )
 
 #################
@@ -796,7 +814,7 @@ batch_test_macro(
 test_module(
     name   = "Trigraph",
     struct = "trigraph.ml",
-    stdlib_deps = ["//stdlib:Stdlib"],
+    stdlib_deps = ["//stdlib:Stdlib"]
 )
 
 #################

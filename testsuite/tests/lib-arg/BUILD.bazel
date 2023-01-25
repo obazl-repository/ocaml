@@ -1,28 +1,38 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//test:rules.bzl",
      "test_module",
      "batch_test_macro",
-     "inline_expect_test",
+     "inline_expect_module",
+     # "inline_expect_test",
 )
 
-MODULE_OPTS = []
+load("//config:WARNINGS.bzl", "w")
 
 test_suite(
     name = "lib-arg",
     tests  = [
-        ":Test_rest_all_test",
+        # ":Test_rest_all_test",
         ":Testarg_test",
         ":Testerror_test",
     ],
 )
 
-inline_expect_test(
-    name   = "Test_rest_all_test",
+diff_test(
+    name = "Test_rest_all_test",
+    file1 = "test_rest_all.ml",
+    file2 = ":Test_rest_all",
+    timeout = "short",
+    tags = ["inline_expect"]
+)
+
+inline_expect_module(
+    name   = "Test_rest_all",
     struct = "test_rest_all.ml",
-    deps = [
+    stdlib_deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib",
     ],
-    timeout = "short"
+    # timeout = "short"
 )
 
 batch_test_macro(
@@ -36,7 +46,7 @@ batch_test_macro(
 test_module(
     name   = "Testarg",
     struct = "testarg.ml",
-    opts = MODULE_OPTS,
+    warnings = [w.MISSING_MLI_70],
     stdlib_deps   = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Printf"
@@ -54,7 +64,7 @@ batch_test_macro(
 test_module(
     name   = "Testerror",
     struct = "testerror.ml",
-    opts = MODULE_OPTS,
+    warnings = [w.UNEXPECTED_DOCSTRING_50, w.MISSING_MLI_70],
     stdlib_deps   = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Array"

@@ -15,10 +15,21 @@ load(":test_transitions.bzl",
 ######################
 def _test_module_impl(ctx):
 
-    (this, extension) = paths.split_extension(ctx.file.struct.basename)
-    module_name = this[:1].capitalize() + this[1:]
+    if ctx.attr.module:
+        module_name = ctx.attr.module
+    else:
+        (this, extension) = paths.split_extension(ctx.file.struct.basename)
+        module_name = this[:1].capitalize() + this[1:]
 
-    return module_impl(ctx, module_name)
+    if ctx.attr.rc_expected == 0:
+        if ctx.attr.stderr_expected:
+            # compile succeeds but writes warnings to stderr
+            return module_impl(ctx, module_name)
+        else:
+            return module_impl(ctx, module_name)
+    else:
+        # compile expected to fail
+        return module_impl(ctx, module_name)
 
 ####################
 test_module_ = rule(
@@ -26,6 +37,26 @@ test_module_ = rule(
     doc = "Compiles a module.",
     attrs = dict(
         module_attrs(),
+
+        rc_expected = attr.int(default = 0),
+        stdout_actual = attr.label(
+            # mandatory = True,
+            allow_single_file = True,
+        ),
+        stdout_expected = attr.label(
+            # mandatory = True,
+            allow_single_file = True
+        ),
+
+        stderr_actual = attr.output(
+            # mandatory = True,
+            # allow_single_file = True,
+        ),
+        stderr_expected = attr.label(
+            # mandatory = True,
+            allow_single_file = True
+        ),
+
         suppress_cmi = attr.label_list(
             doc = "For testing only: do not pass on cmi files in Providers.",
             providers = [
@@ -40,13 +71,17 @@ test_module_ = rule(
             List of 'dump' options without the -d, e.g. 'lambda' for -dambda
             """
         ),
+        _libOCaml = attr.label(
+            # allow_single_file = True,
+            default = "//compilerlibs:ocamlcommon"
+        ),
         # open_stdlib = attr.bool(),
         # stdlib_primitives = attr.bool(default = False),
-        # _stdlib = attr.label(
-        #     ## only added to depgraph if stdlib_primitives == True
-        #     # allow_single_file = True,
-        #     default = "//stdlib"
-        # ),
+        _stdlib = attr.label(
+            ## only added to depgraph if stdlib_primitives == True
+            # allow_single_file = True,
+            default = "//stdlib"
+        ),
         # _resolver = attr.label(
         #     doc = "The compiler always opens Stdlib, so everything depends on it.",
         #     default = "//stdlib:Stdlib"
@@ -101,5 +136,3 @@ def test_module(name,
     #     tags   = ["test_module", "cmx"],
     #     **kwargs
     # )
-
-

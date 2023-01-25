@@ -1,6 +1,6 @@
-load("//test:rules.bzl",
-     "test_module",
-)
+load("//test:rules.bzl", "test_module")
+load("//test/rules:batch_test.bzl", "batch_native_tests")
+# load("//test/rules:inline_test.bzl", "inline_native_tests")
 
 MODULE_OPTS = []
 
@@ -38,53 +38,30 @@ test_module(
     ]
 )
 
-test_module(
-    name   = "Bind_tuples",
-    struct = "bind_tuples.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
+# test_module(
+# inline_native_tests(
+#     name   = "Bind_tuples",
+#     struct = "bind_tuples.ml",
+#     opts = MODULE_OPTS,
+#     stdlib_deps   = ["//stdlib:Stdlib.Gc"],
+#     stdout_actual = "eval_order_6.stdout",
+#     stdout_expected = "eval_order_6.reference",
+# )
 
-test_module(
+batch_native_tests(
     name   = "Compare",
     struct = "compare.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps   = ["//stdlib:Stdlib"],
+    stdout_expected = ":compare.reference",
 )
 
-test_module(
-    name   = "Func_sections",
-    struct = "func_sections.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Is_static",
-    struct = "is_static.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Is_static_flambda",
-    struct = "is_static_flambda.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Is_static_flambda_dep",
-    struct = "is_static_flambda_dep.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
+# batch_native_tests(
+#     name   = "Func_sections",
+#     struct = "func_sections.ml",
+#     opts = MODULE_OPTS,
+#     deps   = [
+#     ]
+# )
 
 test_module(
     name   = "Lift_mutable_let_flambda",
@@ -94,13 +71,15 @@ test_module(
     ]
 )
 
-test_module(
-    name   = "Optargs",
-    struct = "optargs.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
+# inline_native_tests(
+#     name   = "Optargs",
+#     struct = "optargs.ml",
+# )
+
+# compile_module_native_tests(
+#     name   = "Poll_attr_both",
+#     struct = "poll_attr_both.ml",
+# )
 
 test_module(
     name   = "Polling_insertion",
