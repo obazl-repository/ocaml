@@ -446,12 +446,15 @@ def executable_impl(ctx, tc, exe_name,
     ## need to add all std_exit deps to cmd line.
     cli_link_deps_list = cli_link_deps_depset.to_list()
     ## HACK alert: this is horribly inefficient but it will do for now:
-    already_has_stdlib = False
+    already_has_stdlib_module = False
+    print("tgt: %s" % ctx.label)
     for dep in cli_link_deps_list:
-        if dep.basename in ["Stdlib.cmo", "Stdlib.cmx"]:
-            already_has_stdlib = True
+        # print("cli link: %s" % dep)
+        if dep.basename in ["Stdlib.cmo", "Stdlib.cmx",
+                            "stdlib.cma", "stdlib.cmxa"]:
+            already_has_stdlib_module = True
 
-    if not already_has_stdlib:
+    if not already_has_stdlib_module:
         for dep in ctx.attr._std_exit[BootInfo].cli_link_deps.to_list():
             print("std_exit dep: %s" % dep)
             if dep.basename not in ["std_exit.cmo", "std_exit.cmx"]:
@@ -501,6 +504,21 @@ def executable_impl(ctx, tc, exe_name,
             # build_tool_*, ocaml_tool_*, test_*_executable
             for dep in cli_link_deps_list:
                 args.add(dep)
+            # None
+
+            # for dep in filtering_depset.to_list():
+            #     if dep in manifest:
+            #         args.add(dep)
+            # if ctx.file.main:
+            #     ##FIXME: what about main's deps? they should be in
+            #     ##filtering_depset; but they are not in manifest so they
+            #     ##are not added to cli.
+            #     for dep in ctx.attr.main[BootInfo].cli_link_deps.to_list():
+            #         args.add(dep)
+            #         # args.add(ctx.file.main)
+
+            # if hasattr(ctx.attr, "epilogue"):
+            #     args.add_all(ctx.files.epilogue)
 
         elif "compiler" in ctx.attr.tags:
             ## don't compiler rules have same
@@ -596,30 +614,37 @@ def executable_impl(ctx, tc, exe_name,
         print("static_cc_archived_deps:  %s" % static_cc_archived_deps)
         print("dynamic_cc_archived_deps: %s" % dynamic_cc_archived_deps)
 
+    ## WARNING: is -custom is explicitly passed as an opt, then
+    ## libcamlrun.a must be linked. Otherwise, -custom (and
+    ## libcamlrun.a) will be inserted automatically if a static cc lib
+    ## dep is found.
     vmruntime_custom = False
     cclib_linkpaths = []
+    if len(static_cc_deps) > 0:
+        includes = []
+        for dep in static_cc_deps:
+            args.add(dep.path)
+            # includes.append(dep.dirname)
+        # args.add_all(includes, before_each="-I", uniquify=True)
+
+    if len(static_cc_archived_deps) > 0:
+        includes = []
+        for dep in static_cc_archived_deps:
+            print("cc archived: %s" % dep)
+            # fail("archived")
+            includes.append(dep.dirname)
+        args.add_all(includes, before_each="-I", uniquify=True)
+
     ## FIXME: find a better way to determine target executor:
     if compiler_stem in ["ocamlc", "ocamlcp"]:
         # FIXME: if cc deps are encoded in archive files we do not
         # need this...
-        if len(static_cc_deps) > 0:
-            includes = []
-            vmruntime_custom = True # indicate HybridExecutableMarker
-            for dep in static_cc_deps:
-                args.add(dep.path)
-                includes.append(dep.dirname)
-
-        if len(static_cc_archived_deps) > 0:
-            includes = []
-            for dep in static_cc_archived_deps:
-                print("cc archived: %s" % dep)
-                # fail("archived")
-                includes.append(dep.dirname)
-            args.add_all(includes, before_each="-I", uniquify=True)
-
             # handle_cc_deps(ctx, args, includes, vmruntime_custom,
             #                depsets, static_cc_archived_deps)
-    if compiler_stem in ["ocamlc", "ocamlcp"]:
+        if len(static_cc_deps) > 0:
+            vmruntime_custom = True # indicate HybridExecutableMarker
+
+    # if compiler_stem in ["ocamlc", "ocamlcp"]:
 
         ## if target_executor(tc) == "sys"
 
@@ -644,6 +669,30 @@ def executable_impl(ctx, tc, exe_name,
 
         runtime_path = tc.runtime.path
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
+
+        # compiler builds that do not need libcamlrun.a
+        if not ctx.attr._rule in ["std_ocamlc_byte",
+                                  "std_ocamlopt_byte",
+                                  "std_ocamlopt_byte",
+                                  "ocamlc_optx",
+                                  "build_tool_vm"]:
+
+            if vmruntime_custom:
+                args.add("-custom")
+                # not necesssary, but for explicitness:
+                args.add(tc.runtime.path)
+                args.add("-I", tc.runtime.dirname)
+
+        # bn = tc.runtime.basename[3:] # drop initial 'lib'
+        # bn = bn[:-2]  # drop final '.a'
+        # args.add("-ccopt", "-L" + tc.runtime.dirname)
+        # args.add("-cclib", "-l" + bn)
+
+            #     sincludes.append(dep.dirname)
+            #     # args.add("-dllpath", paths.dirname(dep.short_path))
+            #     # args.add("-dllpath", dep.dirname)
+                # sincludes.append("-L" + dep.dirname)
+
         ## NB: Asmlink looks for libasmrun.a in the std search
         ## space (-I dirs), not the link srch space (-L dirs)
         includes.append(tc.runtime.dirname) #[0][DefaultInfo].files.to_list()[0].dirname)
@@ -675,9 +724,6 @@ def executable_impl(ctx, tc, exe_name,
         args.add(tc.runtime) ## FIXME: put this at end of cmd, just before -o
         runtime_files.append(tc.runtime) # [0][DefaultInfo].files)
         runtime_path = tc.runtime.path
-
-    if vmruntime_custom:
-        args.add("-custom")
 
     args.add("-o", out_exe)
 
@@ -851,14 +897,17 @@ def executable_impl(ctx, tc, exe_name,
     if ctx.attr._rule == "test_executable":
         if compiler_stem in ["ocamlc", "ocamlcp"]:
             runner = ctx.actions.declare_file(workdir + ctx.attr.name + ".sh")
-            cmd = "{ocamlrun} {pgm}".format(
+
+            cmd_prologue = "#!/bin/sh\n"
+
+            cmd = "{ocamlrun} {pgm} $@".format(
                 ocamlrun = tc.ocamlrun.short_path,
                 pgm = out_exe.short_path
             )
 
             ctx.actions.write(
                 output  = runner,
-                content = cmd,
+                content = cmd_prologue + cmd,
                 # content = runtime_preamble(debug=True) + cmd,
                 is_executable = True
             )

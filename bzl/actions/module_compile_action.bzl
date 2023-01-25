@@ -720,6 +720,30 @@ def merge_deps(ctx,
     #     print("Stdlib manifest: %s" % manifest)
         # fail("X")
 
+    #WARNING: always do stdlib_deps first, since others may depend on it
+    if hasattr(ctx.attr, "stdlib_deps"):
+        if hasattr(ctx.attr, "_stdlib"):
+            if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+                # for dep in ctx.attr._stdlib:
+                depsets = aggregate_deps(ctx, ctx.attr._stdlib, depsets, manifest)
+            else:
+                for dep in ctx.attr.stdlib_deps:
+                    depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        else:
+            for dep in ctx.attr.stdlib_deps:
+                depsets = aggregate_deps(ctx, dep, depsets, manifest)
+
+    if hasattr(ctx.attr, "libOCaml_deps"):
+        if hasattr(ctx.attr, "_libOCaml"):
+            if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+                depsets = aggregate_deps(ctx, ctx.attr._libOCaml, depsets, manifest)
+            else:
+                for dep in ctx.attr.libOCaml_deps:
+                    depsets = aggregate_deps(ctx, dep, depsets, manifest)
+        else:
+            for dep in ctx.attr.libOCaml_deps:
+                depsets = aggregate_deps(ctx, dep, depsets, manifest)
+
     if ctx.attr.sig: #FIXME
         if OcamlSignatureProvider in ctx.attr.sig:
             depsets = aggregate_deps(ctx, ctx.attr.sig, depsets, manifest)
@@ -744,21 +768,6 @@ def merge_deps(ctx,
     if hasattr(ctx.attr, "sig_deps"):
         for dep in ctx.attr.sig_deps:
             depsets = aggregate_deps(ctx, dep, depsets, manifest)
-
-    if hasattr(ctx.attr, "stdlib_deps"):
-        # if len(ctx.attr.stdlib_deps) > 0:
-        #     if not ctx.label.name == "Stdlib":
-        #         open_stdlib = True
-        for dep in ctx.attr.stdlib_deps:
-            depsets = aggregate_deps(ctx, dep, depsets, manifest)
-            # if dep.label.name == "Primitives":
-            #     stdlib_primitives_target = dep
-            # elif dep.label.name == "Stdlib":  ## Stdlib resolver
-            #     stdlib_module_target = dep
-            # elif dep.label.name.startswith("Stdlib"): ## stdlib submodule
-            #     stdlib_module_target = dep
-            # elif dep.label.name == "stdlib": ## stdlib archive OR library
-            #     stdlib_library_target = dep
 
     # At this point depsets.deps is our aggregated BootInfo
 
@@ -885,6 +894,9 @@ def construct_args(ctx, tc, _options, cancel_opts,
 
     open_stdlib = False
     if hasattr(ctx.attr, "stdlib_deps"):
+        # if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
+        #     open_stdlib = True
+
         if len(ctx.attr.stdlib_deps) > 0:
             if not ctx.label.name == "Stdlib":
                 open_stdlib = True
@@ -945,7 +957,7 @@ def construct_args(ctx, tc, _options, cancel_opts,
     else:
         compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
-    if not ctx.attr._rule in ["compile_module_test", "inline_expect_test"]:
+    if not ctx.attr._rule in ["compile_module_test", "inline_expect_runner"]:
         print("TGT: %s" % ctx.label)
         print("tool compiler: %s" % tc.compiler)
         print("tool exec: %s" % tc.executable)
@@ -957,9 +969,6 @@ def construct_args(ctx, tc, _options, cancel_opts,
 
         if compiler.extension not in ["opt", "optx"]:
             args.add(compiler.path)
-
-
-    # if tc.protocol == "dev":
 
     if ctx.attr._rule == "inline_expect_module":
         args.add("-nostdlib")
@@ -985,9 +994,18 @@ def construct_args(ctx, tc, _options, cancel_opts,
     #     print("tc warnings: %s" % tc.warnings[BuildSettingInfo].value)
         # fail(ctx.label)
 
-    for opt in tc_opts:
-        if opt not in cancel_opts:
-            args.add(opt)
+    if not ctx.attr._rule == "inline_expect_runner":
+        for opt in tc_opts:
+            if opt not in cancel_opts:
+                args.add(opt)
+
+    args.add_all(_options)
+
+    if ctx.attr._rule == "test_module":
+        # if ctx.attr._werrors:
+        args.add("-w", "@A")
+        # else:
+        # args.add("-w", "+A")
 
     if ctx.attr._rule not in ["inline_expect_module", "test_module"]:
         args.add_all(tc.warnings[BuildSettingInfo].value)
@@ -998,7 +1016,8 @@ def construct_args(ctx, tc, _options, cancel_opts,
                       else w if w.startswith("-")
                       else "-" + w])
 
-    args.add_all(_options)
+    if not ctx.file.sig:
+        args.add("-w", "-70")
 
     if open_stdlib:
         ##NB: -no-alias-deps is about _link_ deps, not compile deps
@@ -1074,7 +1093,7 @@ def construct_args(ctx, tc, _options, cancel_opts,
         if inputs.cmi:
             args.add("-cmi-file", inputs.cmi)
 
-        if ctx.attr._rule == "inline_expect_test":
+        if ctx.attr._rule == "inline_expect_runner":
             ## FIXME: get these from attrib? tc?
             args.add("-nostdlib")
             args.add("-nopervasives")
@@ -1083,6 +1102,8 @@ def construct_args(ctx, tc, _options, cancel_opts,
         if ctx.attr._rule == "inline_expect_module":
             args.add(inputs.structfile.path)
 
+        elif ctx.attr._rule == "inline_expect_runner":
+            None
         elif ctx.attr._rule == "compile_module_test":
             # args.add("-impl", inputs.structfile.short_path)
             # src file not symlinked into workdir:
@@ -1092,7 +1113,7 @@ def construct_args(ctx, tc, _options, cancel_opts,
         else:
             args.add("-impl", inputs.structfile.path)
 
-        if ctx.attr._rule in ["inline_expect_test", "inline_expect_module"]:
+        if ctx.attr._rule in ["inline_expect_runner", "inline_expect_module"]:
             None
         elif ctx.attr._rule == "test_infer_signature":
             args.add("-i")
@@ -1139,7 +1160,7 @@ def construct_module_compile_action(ctx, module_name):
     else:
         compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
-    if ctx.attr._rule == "inline_expect_test":
+    if ctx.attr._rule == "inline_expect_runner":
         executor = tc.ocamlrun
         executor_arg = ctx.file._tool
     elif ctx.attr._rule == "inline_expect_module":
@@ -1161,7 +1182,9 @@ def construct_module_compile_action(ctx, module_name):
     # 'optx' - flambda-built
     # if compiler.stem in ["ocamlc"]:
     if compiler.basename in [
-        "ocamlc.byte", "ocamlc.opt", "ocamlc.boot",
+        "ocamlc.byte",
+        "ocamlc.opt",
+        "ocamlc.boot",
         "ocamlc.optx",
         "inline_expect"
     ]:
@@ -1169,6 +1192,7 @@ def construct_module_compile_action(ctx, module_name):
     elif compiler.basename in [
         "ocamlopt.byte",
         "ocamlopt.opt",
+        "ocamlopt.optx",
         "ocamloptx.byte",
         "ocamloptx.opt",
         "ocamloptx.optx",
@@ -1185,7 +1209,7 @@ def construct_module_compile_action(ctx, module_name):
 
     ################################################################
     ################  OUTPUTS  ################
-    if ctx.attr._rule == "inline_expect_test":
+    if ctx.attr._rule == "inline_expect_runner":
         (outputs, module_name
          ) = construct_inline_expect_outputs(ctx, _options, tc,
                                              workdir, ext,
@@ -1274,15 +1298,10 @@ def construct_module_compile_action(ctx, module_name):
     ################  CMD LINE  ################
     args = construct_args(ctx, tc,
                           _options, cancel_opts,
-                          # direct_inputs,
                           ext,
                           inputs,
                           outputs,
                           depsets,
-                          # paths_depset,
-                          # sig_src,
-                          # in_structfile,
-                          # out_cm_
                           )
 
     ## construct_module_compile_action(ctx) return:

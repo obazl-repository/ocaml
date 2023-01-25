@@ -13,7 +13,8 @@ load("//bzl:providers.bzl",
 def module_attrs():
 
     return dict(
-        # module = attr.string(doc = "Module name; overrides name attr"),
+        module = attr.string(doc = "Module name; overrides name attr"),
+
         opts = attr.string_list(
             doc = "List of OCaml options. Will override configurable default options."
         ),
@@ -78,6 +79,10 @@ def module_attrs():
         stdlib_deps = attr.label_list(
             doc = "Used if NOT //config/ocaml/compiler/libs:archived?.",
             providers = [[StdlibStructMarker], [StdlibLibMarker]]
+        ),
+        libOCaml_deps = attr.label_list(
+            doc = "All deps that are also in compilerlibs:ocamlcommon",
+            providers = [[StdStructMarker], [StdLibMarker]]
         ),
         sig_deps = attr.label_list(
             doc = "Sig deps",

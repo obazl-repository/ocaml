@@ -3,7 +3,7 @@ load("//bzl:providers.bzl",
      "ModuleInfo",
      "DepsAggregator",
      "new_deps_aggregator",
-
+     "StdLibMarker",
      "OcamlArchiveProvider",
      "OcamlLibraryMarker")
 
@@ -12,9 +12,13 @@ def archive_attrs(): ##FIXME: rename library_attrs
 
     return dict(
 
+        archivable = attr.bool(
+            doc = "Determines whether the lib is eligible for archiving",
+            default = True
+        ),
         archive = attr.bool(
             doc = "Determines whether the lib is archived or not. Default: False",
-            default = False
+            # default = False
         ),
         archive_cc = attr.bool(
             doc = """
@@ -62,6 +66,7 @@ def archive_attrs(): ##FIXME: rename library_attrs
             doc = "List of component modules.",
             providers = [[OcamlLibraryMarker],
                          [OcamlArchiveProvider],
+                         [StdLibMarker],
                          [ModuleInfo],
                          [CcInfo]],
             # cfg = manifest_out_transition
