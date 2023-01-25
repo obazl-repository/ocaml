@@ -214,6 +214,7 @@ Articles:
 * xref:bzl/docs/dynamics.adoc[Dynamics]
 // * xref:bzl/docs/exceptions.adoc[Exceptions: warnings & errors]
 * xref:bzl/docs/libraries.adoc[Libraries & Archives]
+* xref:bzl/docs/macros.adoc[Macros]
 * xref:bzl/docs/output_groups.adoc[Output Groups]
 * xref:bzl/docs/performance.adoc[Performance]
 * xref:bzl/docs/preprocessing.adoc[Preprocessing]

@@ -1,0 +1,132 @@
+= macros
+:toc: auto
+:toclevels: 3
+
+The OCamlCC rules use several macros to reduce the amount of code in
+BUILD.bazel files.
+
+Macros introduce a mismatch between what the developer sees in the
+files and what Bazel sees. In particular it means that you cannot
+determine the build target labels from the BUILD.bazel file alone. A
+few simple queries can show you how Bazel expands the macros; see
+xref:queries.adoc#macro_expansion[Macro expansion] for some examples.
+
+=== expect_test
+
+See xref:test_rules.adoc#rule_expect_test[rule: expect_test] for a
+description of expect tests.
+
+Summary: Compile a `test_module`; link it to form a test executable;
+run the executable using an `expect_*_test` rule. Repeat, once per
+compiler. See also xref:workflows.adoc#test_case_development[Workflows: test case development].
+
+Attributes of the `expect_test` macro:
+
+* `test_module` - label of a `test_module` target
+* `stdout` - name of a file, to which `stdout` will be redirected
+* `expected` - name of file containing expected `stdout` output
+
+Example:
+
+.testsuite/tests/basic/BUILD.bazel
+----
+expect_test(
+    name    = "Bigints_test",
+    test_module = ":Bigints",
+    stdout  = "bigints.stdout",
+    expected = "bigints.reference",
+)
+----
+
+The link:../../test/rules/expect_test.bzl[expect_test] macro expands
+to a series of `expect_*\_test` targets, one per compiler, plus another
+macro, `test_executable`, that generates the corresponding series of
+`test_*_executable` targets, and finally a `test_suite` target to run
+all the expanded test rules.
+
+[cols="1,1,5"]
+|===
+| Rule | Compiler | Comment
+| `expect_vv_test` |  `//test:ocamlc.byte` | compilers in pkg `//test` will be rebuilt as required from base compilers in `@dev//bin`
+| `expect_sv_test` |  `//test:ocamlopt.byte` |
+| `expect_ss_test` |  `//test:ocamlopt.opt` |
+| `expect_sv_test` |  `//test:ocamlc.opt` |
+| `test_suite` | | Predefined rule aggregating a set of test targets
+|===
+
+(See xref:terminology.adoc#ocamlcc_bazel_naming_conventions[Naming conventions] for an explanation of `vv`, `vs`, etc.)
+
+The attributes of the `expect_*\_test` rules are the same those for
+the `expect_test` macro, except for a few additional attributes
+automatically added by the macro. Example:
+
+.testsuite/tests/basic/BUILD.bazel
+----
+expect_vv_test(
+    name    = "Bigints_vv_test",
+    test_executable = ":Bigints.vv.byte",  <1>
+    stdout  = "bigints.stdout",
+    expected = "bigints.reference",
+    timeout  = "short",                <2>
+    tags     = ["vv"],
+)
+----
+<1> Label derived from `test_module` attribute of `expect_test` macro
+<2> A standard Bazel test attribute, added by macro; overridable
+<3> Another standard attribute; we can add whatever string tags we want
+
+Its expansion also includes another macro, `test_executable`, whose
+expansion includes the targets for the `test_executable` attribute of
+the `expect_*_test` targets.
+
+The names of the `expect_*_test` targets are derived from the
+`test_module` attribute of the `expect_test` macro by adding suffixes.
+The labels for the `test_executable` attribute are similarly derived
+(see section <<test_executable>> for more on this). For example, if
+the test module is `Bigints`, then the generated code will be:
+
+* `expect_vv_test( name = "Bigints_vv_test", test_executable="Bigints.vv.byte", ...)`
+* `expect_vs_test( name = "Bigints_vs_test" test_executable="Bigints.vs.opt", ...)`
+* `expect_ss_test( name = "Bigints_ss_test" test_executable="Bigints.ss.opt", ...)`
+* `expect_sv_test( name = "Bigints_sv_test" test_executable="Bigints.sv.byte", ...)`
+
+The name of the `test_suite` is derived from the `name` attribute of
+the `expect_test` macro.
+
+Each `expect_*_test` rule has an attribute, `test_executable`, that
+takes the label of a <<test_executable>> target. Macro expansion
+derives this label from the `test_module` attribute of the
+`expect_test` macro.
+
+
+All the test cases but one in `//testsuite/test` use the macro. The
+exception is test case `testsuite/tests/basic/bigints.ml`; it shows
+what we would have to write for a test case if we did not use the
+macro; in other words it demontrates the marcro expansion.
+
+
+=== test_executable
+
+One rule per compiler:
+
+[cols="1,5"]
+|===
+| Rule | Compiler
+| `test_vv_executable` |  `ocamlc.byte`
+| `test_sv_executable` |  `ocamlopt.byte`
+| `test_ss_executable` |  `ocamlopt.opt`
+| `test_sv_executable` |  `ocamlc.opt`
+|===
+
+
+The names of the `test_*\_executable` targets are derived from the
+`test_module` attribute of the `expect_test` macro by adding suffixes
+and exec extensions '.byte' or '.opt'. For example, if the test module
+is `Bigints`, then the generated target names will be:
+
+* `test_vv_executable( name = "Bigints.vv.byte", ...)`
+* `test_vs_executable( name = "Bigints.vs.opt", ...)`
+* `test_ss_executable( name = "Bigints.ss.opt", ...)`
+* `test_sv_executable( name = "Bigints.sv.byte", ...)`
+
+

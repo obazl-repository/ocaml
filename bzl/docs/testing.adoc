@@ -4,12 +4,98 @@
 
 The test rules are documented in article xref:test_rules.adoc[Test rules].
 
-== Quickstart
+== Overview
+
+Testing a compiler is a little more complicated than testing an ordinary program or library.
+
+=== Standard test protocols
+
+* Classic unit testing: compile and link a module that uses some form
+  of assertions to test code. When run under test, reports pass/fail.
+  No other outputs - no stdout/stderr output.
++
+The Bazel rule runs the executable directly.
+
+* Batch expect testing: compile and link a module that does some work
+  and writes data to stdout or stderr. The test procedure is to run
+  the executable, capture the actual output, and compare it to
+  expected output. Expected output file is input to the test. Test
+  reports pass if actual output matches expected output, otherwise
+  fail.
++
+The Bazel rule constructs a shell script that takes an executable as
+input, runs it, and redirects its stdout/stderr to user-specified
+files. This is required because Bazel's method for directly running
+executables does not support redirection of stdout/stderr.
+
+* Inline expect testing: uses a modified version of the compiler (the
+  "expect compiler") to process expect extension code (e.g.
+  [nowrap]`[%%expect{|... |}]`) that is embedded in the input source
+  file. Output is a copy of the input source file (with extension
+  ".corrected"), with the content of such `expect` expressions
+  replaced by the result of expect processing. As in the case of batch
+  expect testing, the test procedure compares this actual output with
+  expected output, which is usually the original source file.
++
+The Bazel rule for inline expect testing is similar to the standard
+ rule used to compile modules. But instead of running a "standard"
+ compiler (e.g. `ocamlc.byte`) to translate a `.ml` file to a `.cmo`
+ (or `.cmx`) file, it uses the "expect compiler" to process the input
+ source file and emit a `.corrected` file. It then symlinks the
+ `.corrected` file produced by the expect compiler to a user-specified
+ output file.
+
+=== Compiler side-effect testing
+
+To test a compiler we need to verify not only that it emits correct
+code (verified by standard test procedures as above); we also need to
+verify that it correctly responds to bad input. In principal, for each
+error the compiler can catch, we need a test case whose input triggers
+the exception. Standard test procedures cannot handle such cases,
+because they are based on the assumption that the code under test
+builds successfully. If the compiler throws an error for a standard
+test case, then the test case cannot be executed.
+
+Furthermore, the OCaml "compilers" (e.g. `ocamlc.byte`) are actually
+command processors that drive the OCaml toolchain. They can be used
+for more than just compiling and linking. A common example is
+extraction of a signature (`.mli` file) from a `.ml` file, by passing
+`-i` to the compiler command. Other command line options activate
+other "side-effects", such as printing intermediate data structures to
+stdout or to a file.
+
+All of these side effects must also be tested.
+
+* Compiler warnings: a successful compile may have the side-effect of printing data to stdout/stderr; for example warning messages.  The test procedure must capture stdout/stderr and compare it to expected.
++
+Example: link:../../testsuite/tests/tmc/partial_application.ml[].
+
+* Compile failures: the compiler will print data to stdout/stderr, and
+  exit with a non-zero code. The test procedure must capture the
+  outputs and the exit code, and compare both to expected.
++
+Example: link:../../testsuite/tests/typing-missing-cmi[].
+
+* Compile logs: compilation proceeds as in the standard case (i.e.
+  produces a `.cmo` output etc.), but logging options (e.g.
+  `-dlambda`) direct the compiler to log the requested information to
+  stdout/stderr (or to a file if `-dump-into-file` is specified).
+
+The Bazel rules are complicated slightly by a wart in the Bazel
+machinery: the "action" normally used to run compilers directly
+(without going through a shell), `ctx.actions.run`, does not support
+redirection of stdout or stderr. So while it works just fine for
+"normal" builds, where printing stdout/stderr to the terminal is
+sufficient, it cannot be used for tests where we need to capture
+stdout/stderr to files. So for those kinds of tests we have a second
+set of rules that construct shell scripts to run the tools, which
+enables us to control all outputs.
+
+== Running tests
 
 TIP: By default the test runner will halt at the first error. Pass
 `--keep_going` to keep going.
 
-=== Running tests
 
 Test target names are constructed from filename stems normalized to
 module names; they always have suffix `_test`. For example, from
@@ -50,7 +136,7 @@ this target builds all the compilers, builds all the tests, and runs all the tes
 
   ** `$ bazel test testsuite/tests/basic:Arrays_test --test_tag_filters=vv,ss`
 
-=== Building, linking, and running test executables
+== Building, linking, and running test executables
 
 Bazel test rules (like our `expect_test`, `ocaml_test` etc.) must emit
 an executable, which the Bazel test machinery will then run. The
@@ -67,7 +153,7 @@ compile test module -> link test executable -> run test executable
 This makes it possible to develop test cases outside of the test
 framework. Specically, you can run your test executable as an ordinary
 executble, in order to develop its stdout, before running it under the
-control of the testing apparatu[qs.
+control of the testing apparatus.
 
 The `arrays.ml` test emits nothing to stdout, so for the following we
 will use `boxedints.ml` instead, which does.

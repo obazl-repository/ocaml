@@ -1,0 +1,14 @@
+= diagnostics
+
+== Bazel dump
+
+Subcommand `dump` "[d]umps the internal state of the bazel server process."
+
+link:https://bazel.build/reference/command-line-reference#dump[Dump options]
+
+Useful `dump` options:
+
+* `--action_cache`
+* `--rules` - Dump rules, including counts and memory usage (if memory is tracked).
+* `--skyframe=<off, summary, count, deps, or rdeps>`
+  ** `summary`: prints node and edge counts

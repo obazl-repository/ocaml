@@ -1,0 +1,163 @@
+= test rule notes
+:toc: auto
+:toclevels: 3
+
+== design
+
+Two kinds of test:
+
+* verify functionality of compiler (or other tool) on anomalous inputs (e.g. triggering warnings/errors)
+  ** method:  `ctx.actions.run_shell` to capture outputs, `diff_test` to verify correctness
+
+* verify correctness of compiled programs/libraries (premissed on succesful builds). methods:
+  ** classic unit tests: proper test rule using `ctx.actions.run` to link and emit (test) executable
+  ** batch expect tests: test executable linked using std non-test rule,
+     then non-test "runner" rule uses `ctx.actions.run_shell` to run
+     executable and capture outputs, then `diff_test` for the test
+     proper
+
+=== tool tests - compilation, linking, etc.
+
+Standard compile rules (`compiler_module`) use `ctx.actions.run` and ignore stdout/stderr.
+
+Test compile rules
+
+* use `ctx.actions.run_shell`
+* redirect stdout/stderr
+* capture other side-effect outputs, e.g. `.dump` file
+
+* dedicated rule for `-i`, to extract sig from structfile
+
+Cases:
+
+* functional compile module - compilation outputs only, no
+  stdout/stderr or logfiles. Program tests implicitly verify
+  compilation and linking.
+* cofunctional compile module - handle side-effects
+  ** compile succeeds, with expected side-effects:
+    *** warning msgs to stderr, e.g. link:../../testsuite/tests/tmc/partial_application.ml[].
+    *** dumpfile for `-dlambda` etc.
+    *** `.mli` file for `-i`
+
+  ** compile fails:
+   *** error msgs to stderr,e.g. link:../../testsuite/tests/typing-missing-cmi[]
+
+
+* inline expect module "compilation" using expect compiler
+  ** success: output to `.corrected`
+  ** fail: should not happen
+    *** diff of .corrected to expected may fail, but expect compiler should always succeed
+
+=== program tests
+
+Verify correctness of compiled/linked outputs.
+
+Library testing always goes through a (test) program.
+
+Test executables: classic and expect.
+
+Classic test executables: the usual unit test stuff. When run, reports pass/fail, no stdout/stderr unless fail
+
+Expect test executables: should run successfully, emitting data to
+stdout/stderr or a file. The actual test is then a diff rule that
+compares actual to expected.
+
+* functional test executable: reports pass/fail; this is the test
+
+* cofunctional test executable - run should always succeed and emit
+  stdout/stderr/other file; the test proper is the later diff test
+
+=== rules
+
+[cols="1,1,2,2,3,5"]
+|===
+| Rule | Build action (ctx.actions) | Tool | Tool action | Outputs | Remarks
+
+| test_module | run |std compiler | compile module | .cmo etc. | attrs: `inline` bool, `batch`: ["stdout", "stderr"]
+| (test_inline_module) | run |std compiler | compile module | .cmo etc. | use `test_module(inline=True...)`
+| test_executable | run | std compiler | link executable | std* executable | link test_modules
+| inline_test | run | std compiler | link test_inline_modules | test executable | For classic unit testing; reports pass/fail (e.g. lib-atomic)
+| ?test_inline_executable? | run | std compiler | link executable | std* executable | link test_inline_modules
+| test_batch_module | run |std compiler | compile module | .cmo etc. | For batch expect testing; test data to stdout/stderr
+| test_batch_executable | run | std compiler | link executable | std* executable | link test_batch_modules
+| test_batch_runner | run_shell | test_executable | run executable, capturing stdout etc. | stdout etc. files | run test_executable outout
+| batch_test | write | |  | test shell script to run diff | diffs output of batch_runner against expected (pass/fail)
+| test_inline_expect_module | run | expect compiler | inline expect processing | .corrected file | For inline expect testing
+|===
+*NB: "std executable" = non-test executable
+
+WARNING: FIXME: rules `inline_XX_test` produces runnables for native
+compilers but not for compilers targeting the vm. For that to work we
+need to either use run_shell, or set the `camlheader` to point to the
+right ocamlrun. Or emit ocamlrun with the pgm as runfile?
+
+== current
+
+* `compiler_module`
+  ** no transition
+  **  `module_impl`
+    *** `constuct_module_compile_action`
+    *** `ctx.actions.run`
+
+* `test_module`
+  ** no transition
+  ** `module_impl`
+    *** `constuct_module_compile_action`
+      **** remove tc.warnings
+      **** 'dump' attrib
+    *** `ctx.actions.run`
+
+* `inline_expect_module`
+  ** no transition
+  ** executable = False
+  ** `constuct_module_compile_action`
+  ** `ctx.actions.run`
+    *** runs expect compiler
+    *** emits `.corrected` file
+    *** TODO: link .corrected file to user-specified file name
+
+* `test_infer_signature`
+  ** no transition
+  ** executable = False
+  ** `constuct_module_compile_action`
+  ** `ctx.actions.run_shell`
+    *** runs compiler with `-i`
+    *** redirects stdout to .mli file
+
+FIXME: replace `batch_expect_test` with test exec runner plus diff_test (maybe make it a macro)
+
+* `batch_expect_test` - macro, expands to `batch_expect_vv_test` etc.
+  ** vv_test_in_transition, sets compiler
+  ** test = True
+  ** input: test executable (from `test_vv_executable`)
+  ** `batch_expect_test_impl`
+  ** writes shell script that:
+    *** runs `test_executable`
+    *** redirects stdout to use-specified stdout_actual file
+    *** diffs stdout_actual to stdout_expected
+
+FIXME: replace `inline_expect_test` with `inline_expect_module` plus `diff_test`
+
+* `inline_expect_test`
+  ** `exec` transition on _tool == expect test compiler
+  ** test = True
+  ** `constuct_module_compile_action`
+    *** custom logic for `inline_expect_test`
+      **** sets executor to ocamlrun
+      **** sets executor_arg to _tool (expect compiler)
+      ****  adds `-nostdlib`, `-nopervasives`
+      **** adds input structfile to args
+      **** sets action_outputs to []
+  ** writes executable shell script that:
+    *** runs expect compiler
+    *** redirects stdout to file
+    *** compares actual to expected
+
+* `compile_module_test`
+  ** no transition
+  ** test = False
+  ** `constuct_module_compile_action`
+  ** `ctx.actions.run_shell`
+    *** runs compiler
+    *** redirects stdout, stderr to user-specified files
+

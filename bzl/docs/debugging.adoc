@@ -137,3 +137,11 @@ but since `--no/runtime:dbg` would be the default it could be omitted.
 * `-c opt`
 
 macos: `-DNDEBUG`, `-g0`, `-O2`, etc.
+
+== Bazel dump
+
+Subcommand `dump` "[d]umps the internal state of the bazel server process."
+
+CAUTION: For use by Bazel rule developers only.  Data formats etc. may not be stable.
+
+See link:devguide/dg_diagnostics.adoc[DevGuide: Diagnostics] for details.
