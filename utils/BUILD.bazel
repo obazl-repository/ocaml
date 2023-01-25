@@ -115,6 +115,7 @@ build_tool( ## only build as vm/vm with boot compiler
 
 compiler_library(
     name = "ocamlcommon",
+    # cmxa_eligible = True,
     manifest  = [
         ":Arg_helper",
         ":Binutils",
@@ -138,7 +139,10 @@ compiler_library(
         ":Terminfo",
         ":Warnings",
     ],
-    visibility = ["//compilerlibs:__pkg__"]
+    visibility = [
+        "//compilerlibs:__pkg__",
+        "//testsuite/tools:__subpackages__"
+    ]
 )
 
 ################################################################

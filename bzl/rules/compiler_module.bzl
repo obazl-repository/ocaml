@@ -18,6 +18,10 @@ compiler_module = rule( # same as tool_module(?)
     doc = "Compiles a module needed by compilers.",
     attrs = dict(
         module_attrs(),
+        _stdlib = attr.label(
+            # allow_single_file = True,
+            default = "//stdlib"
+        ),
         _rule = attr.string( default = "compiler_module" ),
     ),
     provides = [BootInfo,ModuleInfo],

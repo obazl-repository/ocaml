@@ -46,6 +46,7 @@ SIG_OPTS    = []
 
 compiler_library(
     name = "ocamlcommon",
+    archivable = False,
     manifest  = [
         ":Debuginfo",
         ":Lambda",

@@ -22,7 +22,7 @@ ocaml_tools(
     name = "ocamldebug",
     prologue = [
         "//compilerlibs:ocamlcommon",
-        "//otherlibs/unix:unix_lib",
+        "//otherlibs/unix:libUnix",
         "//otherlibs/dynlink",
         "//toplevel:Genprintval",
         "//toplevel:Topprinters",

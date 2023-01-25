@@ -33,6 +33,7 @@ SIG_OPTS    = []
 ## //tools:ocamlobjinfo (executable)
 compiler_library(
     name = "ocamlmiddleend",
+    archivable = False,
     manifest  = [
         ## NB: the makefiles take pains to put stuff in order, across
         ## pkg boundaries in some cases. OBazl doesn't need that, so

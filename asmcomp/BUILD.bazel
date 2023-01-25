@@ -95,12 +95,71 @@ compiler_library(
     ],
     manifest = [
         "//middle_end:ocamlmiddleend",
-        ":optcomp",
-    ],
+        # ":optcomp",
+        ":Afl_instrument",
+        ":Asmgen",
+        ":Asmlibrarian",
+        ":Asmlink",
+        ":Asmpackager",
+        ":Branch_relaxation",
+        ":Cmm",
+        ":Cmm_helpers",
+        ":Cmm_invariants",
+        ":Cmmgen",
+        ":Cmmgen_state",
+        ":Coloring",
+        ":Comballoc",
+        ":CSEgen",
+        ":Dataflow",
+        ":Deadcode",
+        ":Emitaux",
+        ":Interf",
+        ":Interval",
+        ":Linear",
+        ":Linearize",
+        ":Linscan",
+        ":Liveness",
+        ":Mach",
+        ":Polling",
+        ":Printcmm",
+        ":Printlinear",
+        ":Printmach",
+        ":Reg",
+        ":Reloadgen",
+        ":Schedgen",
+        ":Selectgen",
+        ":Spill",
+        ":Split",
+        ":Strmatch",
+
+        # ":Branch_relaxation_intf_cmi",
+
+        "//file_formats:Linear_format",
+        "//driver:Opterrors",
+        "//driver:Optcompile",
+        "//driver:Optmaindriver",
+
+        ## arch-dependent configured deps:
+        ":Arch",
+        ":CSE",
+        ":Emit",
+        ":Proc",
+        ":Reload",
+        ":Scheduling",
+        ":Selection"
+    ] + select(
+        # $(ARCH_SPECIFIC_ASMCOMP) = INTEL_ASM = x86_[proc,dsl,gas,masm]
+        {
+        "//config/arch:x86_64":
+        [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+        "//config/arch:i386":
+        ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+    }, no_match_error = "Unsupported arch"),
 )
 
 compiler_library(
     name = "optcomp",
+    archive = 0,
     visibility = [
         "//compilerlibs:__pkg__",
         "//testsuite:__pkg__",

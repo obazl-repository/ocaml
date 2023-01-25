@@ -89,43 +89,48 @@ def _cc_assemble_impl(ctx):
             transitive = [cc_toolchain.all_files, merged_contexts.headers]
         ),
         outputs = [output_file],
+        mnemonic = "CcAssemble"
     )
 
     ################################################################
-    compilation_ctx = cc_common.create_compilation_context(
-        # headers=unbound,
-        # system_includes=unbound,
-        # includes=unbound,
-        # quote_includes=unbound,
-        # framework_includes=unbound,
-        # defines=unbound,
-        # local_defines=unbound
-    )
+    # compilation_ctx = cc_common.create_compilation_context(
+    #     # headers=unbound,
+    #     # system_includes=unbound,
+    #     # includes=unbound,
+    #     # quote_includes=unbound,
+    #     # framework_includes=unbound,
+    #     # defines=unbound,
+    #     # local_defines=unbound
+    # )
 
-    compilation_outputs = cc_common.create_compilation_outputs(
-        objects=depset([output_file]),
-        pic_objects=None)
+    # compilation_outputs = cc_common.create_compilation_outputs(
+    #     objects=depset([output_file]),
+    #     pic_objects=None)
 
-    (linking_ctx, linking_outputs) = cc_common.create_linking_context_from_compilation_outputs(
-        actions = ctx.actions,
-        feature_configuration = feature_configuration,
-        cc_toolchain = cc_toolchain,
-        compilation_outputs = compilation_outputs,
-        user_link_flags=[],
-        linking_contexts=[],
-        name = "cc_assemble_outputs",
-        language='c++',
-        alwayslink=False,
-        additional_inputs=[],
-        disallow_static_libraries=False,
-        disallow_dynamic_library=False,
-        grep_includes=None)
+    # (linking_ctx, linking_outputs) = cc_common.create_linking_context_from_compilation_outputs(
+    #     actions = ctx.actions,
+    #     feature_configuration = feature_configuration,
+    #     cc_toolchain = cc_toolchain,
+    #     compilation_outputs = compilation_outputs,
+    #     user_link_flags=[],
+    #     linking_contexts=[],
+    #     name = "cc_assemble_outputs",
+    #     language='c++',
+    #     alwayslink=False,
+    #     additional_inputs=[],
+    #     disallow_static_libraries=False,
+    #     disallow_dynamic_library=False,
+    #     grep_includes=None)
 
     ccinfo = cc_common.merge_cc_infos(
-        cc_infos = [
-            CcInfo(compilation_context = compilation_ctx,
-                   linking_context = linking_ctx)
-        ] +[dep[CcInfo] for dep in ctx.attr.deps])
+        cc_infos =
+        [
+            CcInfo(compilation_context = merged_contexts)
+            # compilation_ctx),
+            # linking_context = linking_ctx)
+        ]
+    )
+        # ] +[dep[CcInfo] for dep in ctx.attr.deps])
 
     return [
         DefaultInfo(files = depset([output_file])),

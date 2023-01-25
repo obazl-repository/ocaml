@@ -73,7 +73,7 @@ test_executable_macro(
         "//config/target/emitter:sys_emitter?": ["//asmcomp:ocamloptcomp"],
         "//conditions:default": ["//bytecomp:ocamlbytecomp"]
     }) + [
-        "//otherlibs/unix:unix_lib",
+        "//otherlibs/unix:libUnix",
         ":ocamltest_manifest"
     ],
     main = ":Main",
@@ -743,7 +743,7 @@ tool_module(
     }),
     opts = MODULE_OPTS,
     deps   = [
-        "//otherlibs/unix:unix_lib",
+        "//otherlibs/unix:libUnix",
         "//stdlib:Stdlib.Printf",
     ]
 )

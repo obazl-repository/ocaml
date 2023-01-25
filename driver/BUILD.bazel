@@ -42,6 +42,7 @@ SIG_OPTS    = []
 # boot_archive(
 compiler_library(
     name = "ocamlcommon",
+    archivable = False,
     manifest  = [
         ":Compenv",
         ":Compile_common",

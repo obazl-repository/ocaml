@@ -38,8 +38,8 @@ compiler_library(
         "//utils:ocamlcommon",
         "//parsing:ocamlcommon",
         "//typing:ocamlcommon",
-        "//bytecomp:ocamlcommon",
         "//lambda:ocamlcommon",
+        "//bytecomp:ocamlcommon",
         "//driver:ocamlcommon",
     ],
     visibility = [

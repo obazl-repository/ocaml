@@ -106,6 +106,7 @@ compiler_module(
     ],
     visibility = [
         "//otherlibs/dynlink:__pkg__",
+        "//testsuite/tests:__subpackages__",
         "//tools:__pkg__",
         "//toplevel:__subpackages__",
         "//typing:__pkg__"
@@ -145,7 +146,10 @@ compiler_module(
     stdlib_deps = [
         "//stdlib:Stdlib.List",
     ],
-    visibility = ["//driver:__pkg__"]
+    visibility = [
+        "//driver:__pkg__",
+        "//testsuite/tests:__subpackages__",
+    ]
 )
 
 compiler_signature(
@@ -219,6 +223,7 @@ compiler_module(
     visibility = [
         "//driver:__pkg__",
         "//otherlibs/dynlink:__pkg__",
+        "//testsuite/tests:__subpackages__",
         "//typing:__pkg__"
     ]
 )
@@ -613,6 +618,7 @@ compiler_module(
     ],
     visibility = [
         "//driver:__pkg__",
+        "//testsuite/tests:__subpackages__",
         "//tools:__pkg__",
         "//toplevel:__pkg__",
         "//typing:__pkg__"

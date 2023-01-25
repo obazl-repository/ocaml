@@ -28,6 +28,7 @@ SIG_OPTS    = []
 ## flambda/base_types deps embedded in MIDDLE_END
 compiler_library(
     name = "ocamloptcomp",
+    archivable = False,
     manifest  = [
         ":Closure_element",
         ":Closure_id",

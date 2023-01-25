@@ -74,6 +74,7 @@ SIG_OPTS    = []
 ## rest are grouped in MIDDLE_END_FLAMBDA.
 compiler_library(
     name = "ocamloptcomp",
+    archivable = False,
     manifest  = [
         ## inlined in MIDDLE_END:
         ":Pass_wrapper",

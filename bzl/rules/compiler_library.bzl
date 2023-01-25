@@ -6,6 +6,8 @@ load("//bzl/attrs:archive_attrs.bzl", "archive_attrs")
 load("//bzl/actions:library_impl.bzl", "library_impl")
 # load("//bzl/attrs:library_attrs.bzl", "library_attrs")
 
+load("//bzl:functions.bzl", "filestem")
+
 def _compiler_library_impl(ctx):
 
     # print("lbl: %s" % ctx.label)
@@ -16,13 +18,23 @@ def _compiler_library_impl(ctx):
 
     # if (ctx.attr.archive or ctx.attr._compilerlibs_archived[BuildSettingInfo].value):
     #     return archive_impl(ctx)
+
+    tc = ctx.toolchains["//toolchain/type:ocaml"]
+    compiler = tc.compiler[DefaultInfo].files_to_run.executable
+    compiler_stem = filestem(compiler)
+
     if ctx.attr.archive:
         return archive_impl(ctx)
+    elif not ctx.attr.archivable:
+        return library_impl(ctx)
     elif ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
-        if ctx.attr.cmxa_eligible:
-            return archive_impl(ctx)
+        if compiler_stem in ["ocamlopt", "ocamloptx"]:
+            if ctx.attr.cmxa_eligible:
+                return archive_impl(ctx)
+            else:
+                return library_impl(ctx)
         else:
-            return library_impl(ctx)
+            return archive_impl(ctx)
     else:
         return library_impl(ctx)
 
