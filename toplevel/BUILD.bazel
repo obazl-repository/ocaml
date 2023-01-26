@@ -244,6 +244,10 @@ compiler_module(
     struct = "genprintval.ml",
     sig    = "Genprintval_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//parsing:Lexer",
         "//parsing:Longident",
@@ -294,6 +298,12 @@ compiler_module(
     struct = "topcommon.ml",
     sig    = "Topcommon_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-eliminated-optional-arguments",
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+    ],
     deps   = [
         "//bytecomp:Dll",
         "//config:Config",
@@ -365,6 +375,11 @@ compiler_module(
     struct = "topdirs.ml",
     sig    = "Topdirs_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//bytecomp:Dll",
         "//config:Config",
@@ -426,6 +441,15 @@ compiler_module(
     }),
     sig    = ":Topeval_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        # "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        # "-open-shadow-identifier",
+        # "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//bytecomp:Bytegen",
         "//bytecomp:Dll",
@@ -495,6 +519,10 @@ compiler_module(
     struct = "toploop.ml",
     sig    = "Toploop_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-disambiguated-name",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//config:Config",
         "//driver:Compenv",
@@ -560,6 +588,11 @@ compiler_module(
     }),
     sig    = ":Topmain_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//driver:Compenv",
         "//driver:Compmisc",
@@ -604,6 +637,10 @@ compiler_module(
     struct = "topprinters.ml",
     sig    = ":Topprinters_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-disambiguated-name",
+        "-name-out-of-scope",
+    ],
     deps   = ["//typing:Ctype"],
     visibility = ["//debugger:__pkg__"]
 )
@@ -637,6 +674,9 @@ compiler_module(
     }),
     sig    = ":Trace_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+    ],
     deps   = [
         "//bytecomp:Meta",
         "//parsing:Longident",

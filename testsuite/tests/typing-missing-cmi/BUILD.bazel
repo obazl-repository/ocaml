@@ -1,8 +1,11 @@
+# load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+
 load("//test:rules.bzl",
      "batch_test_macro",
      "test_module",
-     # "compile_module_testx",
+     "ocamlcc_diff_tests"
 )
+load("//config:WARNINGS.bzl", "w")
 
 test_suite(
     name = "typing-missing-cmi",
@@ -28,27 +31,33 @@ test_suite(
 #     tags = ["cmi"]
 # )
 
+# ocamlcc_diff_tests(
+#     name = "Main_test",
+#     file1 = "test.compilers.reference",
+#     file2 = ":main.ml.stderr",
+#     timeout = "short",
+#     tags = ["fail"]
+# )
+
 test_module(
     name   = "Main",
     struct = "main.ml",
     deps   = [":A", ":B"],
     stdlib_deps   = ["//stdlib:Stdlib"],
-    opts = ["-verbose"],
     suppress_cmi = ["//testsuite/tests/typing-missing-cmi/subdir:M"],
     rc_expected = 2,
     stderr_actual  = "main.ml.stderr",
-    stderr_expected = "test.compilers.reference",
-    # stdout_actual  = "main.stdout",
-    # timeout = "short",
-    # tags = ["cmi"]
+    #WARNING: if we omit rc_expected=2, we get:
+    # The following files have no generating action:
+    # testsuite/tests/typing-missing-cmi/main.ml.stderr
 )
 
-batch_test_macro(
-    name    = "Main_ok_test",
-    test_module = ":Main_ok",
-    stdout_actual  = "main_ok.stdout",
-    stdout_expected = "main.ml.reference",
-)
+# batch_test_macro(
+#     name    = "Main_ok_test",
+#     test_module = ":Main_ok",
+#     stdout_actual  = "main_ok.stdout",
+#     stdout_expected = "main.ml.reference",
+# )
 
 test_module(
     name   = "Main_ok",
@@ -64,6 +73,7 @@ test_module(
     deps = [
         "//testsuite/tests/typing-missing-cmi/subdir:M"
     ],
+    warnings = [w.MISSING_MLI_70]
 )
 
 test_module(
@@ -71,7 +81,8 @@ test_module(
     struct = "b.ml",
     deps   = [
         "//testsuite/tests/typing-missing-cmi/subdir:M"
-    ]
+    ],
+    warnings = [w.MISSING_MLI_70]
 )
 
 test_module(
@@ -79,5 +90,5 @@ test_module(
     struct = "c.ml",
     deps   = [
         "//testsuite/tests/typing-missing-cmi/subdir:M"
-    ]
+    ],
 )

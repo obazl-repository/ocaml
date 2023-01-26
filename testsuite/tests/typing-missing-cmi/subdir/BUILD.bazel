@@ -1,7 +1,9 @@
 load("//test:rules.bzl", "test_module")
+load("//config:WARNINGS.bzl", "w")
 
 filegroup(name = "Mstruct", srcs = [":M"],
           visibility = ["//testsuite/tests/typing-missing-cmi:__pkg__"])
 
-test_module(name   = "M", struct = "m.ml")
+test_module(name   = "M", struct = "m.ml",
+            warnings = [w.MISSING_MLI_70, w.UNUSED_MODULE_60])
 

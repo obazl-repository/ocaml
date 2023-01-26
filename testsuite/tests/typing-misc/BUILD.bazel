@@ -11,6 +11,7 @@ load("//test/rules:inline_expect_module.bzl",
      # "inline_expect_module",
      "inline_expect_test",
 )
+load("//config:WARNINGS.bzl", "w")
 
 test_suite(
     name = "typing-misc",
@@ -294,8 +295,8 @@ test_module(
     name   = "Pr8548__Mapping",
     module = "Pr8548__Mapping",
     struct = "mapping.ml",
-    opts   = ["-no-alias-deps", "-w", "-49"],
-    rc_expected = 0
+    opts   = ["-no-alias-deps"],
+    warnings = [w.NO_CMI_FILE_49],
 )
 
 test_module(
@@ -306,7 +307,8 @@ test_module(
     deps   = [
         ":Pr8548__Mapping",
         ":Pr8548__Range_intf"
-    ]
+    ],
+    warnings = [w.UNUSED_VALUE_DECLARATION_32]
 )
 
 test_module(

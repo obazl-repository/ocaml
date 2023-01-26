@@ -10,6 +10,8 @@ load("//test:rules.bzl",
      "compile_dump_diff_test_macro"
 )
 
+load("//config:WARNINGS.bzl", "w")
+
 test_suite(
     name = "basic-modules",
     tests = [
@@ -23,6 +25,7 @@ test_suite(
 compile_dump_diff_test_macro(
     name   = "Anonymous_test",
     test_module = ":Anonymous",
+    logfile_actual = ":anonymous.ml.lambda",
     vm_expected = "anonymous.ocamlc.reference",
     sys_expected = "anonymous.ocamlopt.reference",
     flambda_expected = "anonymous.ocamlopt.flambda.reference",
@@ -32,18 +35,20 @@ compile_dump_diff_test_macro(
 test_module(
     name   = "Anonymous",
     struct   = "anonymous.ml",
+    logfile_actual = "anonymous.ml.lambda",
     dump = [
         "lambda",
         # "rawlambda",
-        # "cmm",
         # "parsetree",
         # "instr",
+        # "cmm",         ## native
         # "clambda",     ## native
         # "rawclambda",  ## native
         # "instruction-selection" # native?
     ],
     opts   = ["-dno-unique-ids"],
-    stdlib_deps = ["//stdlib:CamlinternalMod"]
+    stdlib_deps = ["//stdlib:CamlinternalMod"],
+    warnings = [w.UNUSED_TYPE_DECLARATION_34, w.UNUSED_VALUE_DECLARATION_32]
 )
 
 batch_test_macro(
@@ -68,6 +73,7 @@ test_module(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Set",
     ],
+    warnings = [w.UNUSED_MODULE_60, w.UNUSED_VALUE_DECLARATION_32]
 )
 
 test_signature(
@@ -86,6 +92,7 @@ test_module(
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.String",
     ],
+    warnings = [w.UNUSED_VALUE_DECLARATION_32, w.UNUSED_VAR_STRICT_27]
 )
 
 test_module(
@@ -100,7 +107,8 @@ test_module(
 test_module(
     name   = "Pr6726",
     struct = "pr6726.ml",
-    stdlib_deps = ["//stdlib:Stdlib"]
+    stdlib_deps = ["//stdlib:Stdlib"],
+    warnings = [w.UNUSED_VAR_STRICT_27]
 )
 
 test_module(

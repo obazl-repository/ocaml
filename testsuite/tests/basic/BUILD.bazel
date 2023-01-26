@@ -67,7 +67,7 @@ test_suite(
         ":Tailcalls_test",
         ":Trigraph_test",
         ":Tuple_match_test",
-        # ":unit_naming_test",
+        # ":Unit_naming_test",
         ":Zero_divided_by_n_test",
     ],
 )
@@ -838,13 +838,21 @@ test_module(
     ]
 )
 
-compile_fail_test(
-    name   = "unit_naming_test",
+# ocamlcc_diff_test(
+#     name = "Unit_naming_test",
+#     file1 = "unit_naming.compilers.reference",
+#     file2 = ":unit_naming.ml.stderr",
+#     timeout = "short",
+#     tags = ["fail"]
+# )
+
+test_module(
+    name   = "Unit_naming",
     struct = "unit_naming.ml",
-    stdout_expected = "unit_naming.compilers.reference",
-    stdlib_deps   = [
-        ":CamlCase"
-    ],
+    rc_expected = 2,
+    stderr_actual = "unit_naming.ml.stderr",
+    deps   = [":CamlCase"],
+    stdlib_deps = ["//stdlib:Stdlib"]
 )
 
 #################

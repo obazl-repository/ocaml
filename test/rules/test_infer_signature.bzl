@@ -19,7 +19,7 @@ load("//bzl/actions:module_impl.bzl", "module_impl")
 load(":test_transitions.bzl",
      "vv_test_in_transition")
 
-load("//bzl/actions:module_compile_action.bzl", "construct_module_compile_action")
+load("//bzl/actions:module_compile_config.bzl", "construct_module_compile_config")
 
 ######################
 def _test_infer_signature_impl(ctx):
@@ -37,7 +37,7 @@ def _test_infer_signature_impl(ctx):
      executor,
      executor_arg,
      workdir,
-     args) = construct_module_compile_action(ctx, module_name)
+     args) = construct_module_compile_config(ctx, module_name)
 
     outs = []
     for v in outputs.values():

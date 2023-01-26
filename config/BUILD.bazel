@@ -35,6 +35,7 @@ compiler_module(
     name   = "Config",
     struct = "config.ml",
     sig    = "Config_cmi",
+    warnings = ["-unused-value-declaration"],
     # open   = ["//stdlib:Stdlib"],
     stdlib_deps   = [
         "//stdlib:Stdlib.List",
@@ -209,9 +210,7 @@ config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
 
 # used by all toolchains:
 string_list_flag(name = "warnings",
-                 build_setting_default = [
-                     # "-w", "+a-4-9-41-42-44-45-48",
-                     "-warn-error", "+a"])
+                 build_setting_default = [])
 
 config_setting(
     name = "macos_fastbuild?",

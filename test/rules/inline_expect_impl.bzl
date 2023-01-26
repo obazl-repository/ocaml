@@ -21,7 +21,7 @@ load("//bzl/rules/common:options.bzl", "get_options")
 load("//bzl/actions:BUILD.bzl", "progress_msg", "get_build_executor")
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 
-load("//bzl/actions:module_compile_action.bzl", "construct_module_compile_action")
+load("//bzl/actions:module_compile_config.bzl", "construct_module_compile_config")
 
 # load(":compile_module_test_impl", "compile_module_test_impl")
 
@@ -73,7 +73,7 @@ def inline_expect_test_impl(ctx):
      executor,
      executor_arg,
      workdir,
-     cmd_args) = construct_module_compile_action(ctx, module_name)
+     cmd_args) = construct_module_compile_config(ctx, module_name)
 
     if debug:
         print("compiling module: %s" % ctx.label)

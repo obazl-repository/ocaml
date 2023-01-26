@@ -8,6 +8,8 @@ load("//bzl:providers.bzl",
 
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 load("//bzl/actions:module_impl.bzl", "module_impl")
+load("//bzl/actions:module_compile_plus.bzl",
+     "module_compile_plus")
 
 load(":test_transitions.bzl",
      "vv_test_in_transition")
@@ -22,14 +24,21 @@ def _test_module_impl(ctx):
         module_name = this[:1].capitalize() + this[1:]
 
     if ctx.attr.rc_expected == 0:
-        if ctx.attr.stderr_expected:
+        if (ctx.attr.stderr_actual
+            or ctx.attr.stdout_actual
+            or ctx.attr.logfile_actual):
             # compile succeeds but writes warnings to stderr
-            return module_impl(ctx, module_name)
+            return module_compile_plus(ctx, module_name)
+            ## return module_impl(ctx, module_name)
         else:
+            # compile succeeds, no side-effects
             return module_impl(ctx, module_name)
     else:
         # compile expected to fail
-        return module_impl(ctx, module_name)
+        # at least one of stdout and stderr must be specified
+        if not (ctx.attr.stdout_actual or ctx.attr.stderr_actual):
+            fail("If expected rc is non-zero, at least one of stdout_actual or stderr_actual must be specified.")
+        return module_compile_plus(ctx, module_name)
 
 ####################
 test_module_ = rule(
@@ -38,23 +47,17 @@ test_module_ = rule(
     attrs = dict(
         module_attrs(),
 
+        warnings = attr.string_list(), #default = ["@A"]),
         rc_expected = attr.int(default = 0),
-        stdout_actual = attr.label(
-            # mandatory = True,
-            allow_single_file = True,
-        ),
-        stdout_expected = attr.label(
-            # mandatory = True,
-            allow_single_file = True
-        ),
-
-        stderr_actual = attr.output(
-            # mandatory = True,
-            # allow_single_file = True,
-        ),
-        stderr_expected = attr.label(
-            # mandatory = True,
-            allow_single_file = True
+        stdout_actual = attr.output(),
+        stderr_actual = attr.output(),
+        logfile_actual = attr.output(), # for e.g. -dlambda dumpfile
+        # stdout_expected = attr.label(allow_single_file = True),
+        # stderr_expected = attr.label(allow_single_file = True),
+        dump = attr.string_list( #FIXME: rename 'dump' > 'logging'
+            doc = """
+            List of 'dump' options without the -d, e.g. 'lambda' for -dambda
+            """
         ),
 
         suppress_cmi = attr.label_list(
@@ -64,12 +67,6 @@ test_module_ = rule(
                 [SigInfo],
                 [StdLibMarker],
             ],
-        ),
-        #FIXME: rename 'dump' > 'logging'
-        dump = attr.string_list(
-            doc = """
-            List of 'dump' options without the -d, e.g. 'lambda' for -dambda
-            """
         ),
         _libOCaml = attr.label(
             # allow_single_file = True,

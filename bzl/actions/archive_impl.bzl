@@ -254,7 +254,7 @@ def archive_impl(ctx):
     ## merge archive submanifests, to get list of all modules included
     ## in archives. use list to filter cmd line args
 
-    ## To get cli args in right order, we need then merged depset of
+    ## To get cli args in right order, we need the merged depset of
     ## all deps. Then we use the manifest to filter.
 
     filtering_depset = depset(

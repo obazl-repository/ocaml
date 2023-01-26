@@ -23,7 +23,7 @@ def module_attrs():
         ),
 
         warnings = attr.string_list(
-            doc = "List of ids, with or without '-' prefix. Do not include '-w'"
+            doc = "List of ids, with or without '-/+' prefix; default is '-'. Do not include '-w'"
         ),
 
         open = attr.label_list(

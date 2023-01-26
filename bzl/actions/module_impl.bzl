@@ -21,7 +21,7 @@ load("//bzl/rules/common:impl_common.bzl", "dsorder")
 load("//bzl/rules/common:impl_ccdeps.bzl", "dump_CcInfo", "ccinfo_to_string")
 load("//bzl/rules/common:options.bzl", "get_options")
 
-load(":module_compile_action.bzl", "construct_module_compile_action")
+load(":module_compile_config.bzl", "construct_module_compile_config")
 
 ##################################
 def module_impl(ctx, module_name):
@@ -29,15 +29,15 @@ def module_impl(ctx, module_name):
     debug = False
     debug_ccdeps = False
 
-    if ctx.label.name == "Load_path":
-        debug = True
+    # if ctx.label.name == "Load_path":
+    #     debug = True
 
     (inputs,
      outputs, # dictionary of files
      executor,
      executor_arg,  ## ignore - only used for compile_module_test
      workdir,
-     args) = construct_module_compile_action(ctx, module_name)
+     args) = construct_module_compile_config(ctx, module_name)
 
     if debug:
         print("compiling module: %s" % ctx.label)
@@ -53,7 +53,7 @@ def module_impl(ctx, module_name):
     for v in outputs.values():
         if v: outs.append(v)
 
-    print("OUTS: %s" % outs)
+    # print("OUTS: %s" % outs)
     # if ctx.attr._rule == "test_infer_signature":
     #     fail()
 

@@ -111,6 +111,9 @@ compiler_module(
     struct = "cmt_format.ml",
     sig    = "Cmt_format_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//config:Config",
         "//parsing:Lexer",

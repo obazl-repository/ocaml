@@ -20,14 +20,17 @@ load("//test/rules:batch_test.bzl",
 load("//test/rules:compile_fail_test.bzl",
      _compile_fail_test = "compile_fail_test")
 
+load("//test/rules:compile_dump_diff_test.bzl",
+     _compile_dump_diff_test_macro = "compile_dump_diff_test_macro")
+     # _compile_dump_diff_test_sys_macro = "compile_dump_diff_test_sys_macro")
+
+load("//test/rules:ocamlcc_diff_test.bzl",
+     _ocamlcc_diff_tests = "ocamlcc_diff_tests")
+
 # load("//test/rules:inline_expect_test.bzl",
 #      _inline_expect_test = "inline_expect_test")
 load("//test/rules:inline_expect_module.bzl",
      _inline_expect_module  = "inline_expect_module")
-
-load("//test/rules:compile_dump_diff_test.bzl",
-     _compile_dump_diff_test_macro = "compile_dump_diff_test_macro")
-     # _compile_dump_diff_test_sys_macro = "compile_dump_diff_test_sys_macro")
 
 load("//test/rules:test_executable.bzl",
      _test_executable_macro = "test_executable_macro",
@@ -65,6 +68,9 @@ compile_fail_test = _compile_fail_test
 inline_expect_module  = _inline_expect_module
 
 compile_dump_diff_test_macro = _compile_dump_diff_test_macro
+
+ocamlcc_diff_tests = _ocamlcc_diff_tests
+
 # compile_dump_diff_test_sys_macro = _compile_dump_diff_test_sys_macro
 test_executable_macro = _test_executable_macro
 test_executable = _test_executable

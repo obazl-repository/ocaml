@@ -2,6 +2,7 @@ load("//test:rules.bzl",
      "test_module",
      "batch_test_macro"
 )
+load("//config:WARNINGS.bzl", "w")
 
 test_suite(
     name            = "typing-labels",
@@ -27,7 +28,8 @@ test_module(
         "//stdlib:CamlinternalOO",
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
-    ]
+    ],
+    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27]
 )
 
 ##################
@@ -45,7 +47,8 @@ test_module(
         "//stdlib:CamlinternalOO",
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
-    ]
+    ],
+    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27]
 )
 
 ##################
@@ -64,6 +67,7 @@ test_module(
         "//stdlib:CamlinternalOO",
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
-    ]
+    ],
+    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27]
 )
 

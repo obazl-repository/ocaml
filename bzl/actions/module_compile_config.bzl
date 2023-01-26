@@ -76,6 +76,10 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
         "workdir": None,
     }
 
+    if hasattr(ctx.attr, "rc_expected"): # test_module targets
+        if ctx.attr.rc_expected != 0:
+            return (outputs, module_name)
+
     # Two kinds of ModuleInfo outputs:
     # ** action outputs produced by this rule
     # ** provider outputs passed on from deps.
@@ -958,10 +962,10 @@ def construct_args(ctx, tc, _options, cancel_opts,
         compiler = tc.compiler[DefaultInfo].files_to_run.executable
 
     if not ctx.attr._rule in ["compile_module_test", "inline_expect_runner"]:
-        print("TGT: %s" % ctx.label)
-        print("tool compiler: %s" % tc.compiler)
-        print("tool exec: %s" % tc.executable)
-        print("tool arg: %s" % tc.tool_arg)
+        # print("TGT: %s" % ctx.label)
+        # print("tool compiler: %s" % tc.compiler)
+        # print("tool exec: %s" % tc.executable)
+        # print("tool arg: %s" % tc.tool_arg)
         # fail(tc.tool_arg)
         # if tc.tool_arg:
         #     # for vm executors
@@ -1003,17 +1007,21 @@ def construct_args(ctx, tc, _options, cancel_opts,
 
     if ctx.attr._rule == "test_module":
         # if ctx.attr._werrors:
-        args.add("-w", "@A")
-        # else:
-        # args.add("-w", "+A")
+        # args.add("-w", "@A")
+        None
+    #     # else:
+    #     # args.add("-w", "+A")
 
     if ctx.attr._rule not in ["inline_expect_module", "test_module"]:
-        args.add_all(tc.warnings[BuildSettingInfo].value)
+        for w in tc.warnings[BuildSettingInfo].value:
+            args.add_all(["-w", w])
 
     for w in ctx.attr.warnings:
         args.add_all(["-w",
                       w if w.startswith("+")
                       else w if w.startswith("-")
+                      else w if w.startswith("@")
+                      # w.FOO constants are unsigned:
                       else "-" + w])
 
     if not ctx.file.sig:
@@ -1141,7 +1149,7 @@ def gen_compile_script(ctx, executable, args):
     return script
 
 #####################
-def construct_module_compile_action(ctx, module_name):
+def construct_module_compile_config(ctx, module_name):
 # def module_impl(ctx, module_name):
 
     debug = False
@@ -1304,7 +1312,7 @@ def construct_module_compile_action(ctx, module_name):
                           depsets,
                           )
 
-    ## construct_module_compile_action(ctx) return:
+    ## construct_module_compile_config(ctx) return:
     return (inputs,  # => struct, flds: files, depsets
             # action_outputs, # => dictionary 'outputs'
             outputs,

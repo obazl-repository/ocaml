@@ -90,6 +90,12 @@ compiler_module(
     struct = "ast_helper.ml",
     sig    = "Ast_helper_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor"
+    ],
     deps   = [
         "//utils:Misc",
         ":Docstrings",
@@ -117,6 +123,7 @@ compiler_signature(
     name = "Ast_helper_cmi",
     src  = "ast_helper.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         ":Asttypes_cmi",
         ":Docstrings_cmi",
@@ -137,6 +144,10 @@ compiler_module(
     struct = "ast_invariants.ml",
     sig    = "Ast_invariants_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         ":Ast_iterator",
         ":Builtin_attributes",
@@ -172,6 +183,11 @@ compiler_module(
     struct = "ast_iterator.ml",
     sig    = "Ast_iterator_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+    ],
     deps   = [
         ":Location",
     ],
@@ -188,6 +204,7 @@ compiler_signature(
     name = "Ast_iterator_cmi",
     src  = "ast_iterator.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         ":Location_cmi",
         ":Longident_cmi",
@@ -203,6 +220,11 @@ compiler_module(
     struct = "ast_mapper.ml",
     sig    = "Ast_mapper_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier"
+    ],
     deps   = [
         "//config:Config",
         "//utils:Clflags",
@@ -232,6 +254,7 @@ compiler_signature(
     name = "Ast_mapper_cmi",
     src  = "ast_mapper.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         ":Asttypes_cmi",
         ":Location_cmi",
@@ -270,6 +293,9 @@ compiler_module(
     struct = "attr_helper.ml",
     sig    = "Attr_helper_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+    ],
     deps   = [
         ":Location",
     ],
@@ -303,6 +329,10 @@ compiler_module(
     struct = "builtin_attributes.ml",
     sig    = "Builtin_attributes_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-missing-record-field-pattern",
+        "-fragile-match"
+    ],
     deps   = [
         "//utils:Misc",
         "//utils:Warnings",
@@ -344,6 +374,10 @@ compiler_module(
     struct = "depend.ml",
     sig    = "Depend_cmi",
     opts = MODULE_OPTS,
+	warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern"
+    ],
     deps   = [
         "//utils:Clflags",
         "//utils:Misc",
@@ -379,6 +413,10 @@ compiler_module(
     struct = "docstrings.ml",
     sig    = "Docstrings_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern"
+    ],
     deps   = [
         "//utils:Warnings",
         ":Location",
@@ -415,6 +453,7 @@ compiler_module(
     struct = "camlinternalMenhirLib.ml",
     sig    = "CamlinternalMenhirLib_cmi",
     opts = MODULE_OPTS,
+    warnings = ["-fragile-match", "-open-shadow-identifier"],
     stdlib_deps   = [
         "//stdlib:Stdlib.Lazy",
         "//stdlib:Stdlib.Lexing",
@@ -459,6 +498,15 @@ compiler_module(
     struct = "lexer.ml",
     sig    = "Lexer_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        # "-ambiguous-name",
+        # "-disambiguated-name",
+        "-fragile-match",
+        # "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        # "-open-shadow-identifier",
+        # "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//utils:Misc",
         ":Parser"
@@ -497,6 +545,7 @@ compiler_module(
     struct = "location.ml",
     sig    = "Location_cmi",
     opts = MODULE_OPTS,
+    warnings = ["-fragile-match", "-disambiguated-name"],
     deps   = [
         "//utils:Build_path_prefix_map",
         "//utils:Clflags",
@@ -604,6 +653,9 @@ compiler_module(
     struct = "parse.ml",
     sig    = "Parse_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+    ],
     deps   = [
         ":Docstrings",
         ":Lexer",
@@ -645,6 +697,13 @@ compiler_module(
     struct = "parser.ml",
     sig    = "Parser_cmi",
     opts = MODULE_OPTS + ["-w", "-40"],
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+    ],
     deps   = [
         ":Ast_helper",
         ":CamlinternalMenhirLib",
@@ -734,6 +793,11 @@ compiler_module(
     struct = "pprintast.ml",
     sig    = "Pprintast_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        # w.NAME_OUT_OF_SCOPE_40
+    ],
     deps   = [
         ":Ast_helper",
         ":Location",
@@ -773,6 +837,7 @@ compiler_module(
     struct = "printast.ml",
     sig    = "Printast_cmi",
     opts = MODULE_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//utils:Clflags",
         ":Location",

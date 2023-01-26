@@ -22,7 +22,7 @@ load("//bzl/rules/common:impl_ccdeps.bzl", "dump_CcInfo", "ccinfo_to_string")
 load(":test_transitions.bzl",
      "vv_test_in_transition")
 
-load("//bzl/actions:module_compile_action.bzl", "construct_module_compile_action")
+load("//bzl/actions:module_compile_config.bzl", "construct_module_compile_config")
 
 ######################
 def _inline_expect_module_impl(ctx):
@@ -38,7 +38,7 @@ def _inline_expect_module_impl(ctx):
      executor,
      executor_arg,  ## ignore - only used for compile_module_test
      workdir,
-     args) = construct_module_compile_action(ctx, module_name)
+     args) = construct_module_compile_config(ctx, module_name)
 
     if debug:
         print("compiling module: %s" % ctx.label)

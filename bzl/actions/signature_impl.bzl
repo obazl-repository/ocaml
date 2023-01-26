@@ -261,11 +261,15 @@ def signature_impl(ctx, module_name):
         if opt not in cancel_opts:
             args.add(opt)
 
-    args.add_all(tc.warnings[BuildSettingInfo].value)
+    # args.add_all(tc.warnings[BuildSettingInfo].value)
+    for w in tc.warnings[BuildSettingInfo].value:
+        args.add_all(["-w", w])
 
     for w in ctx.attr.warnings:
         args.add_all(["-w",
-                      w if w.startswith("-")
+                      w if w.startswith("+")
+                      else w if w.startswith("-")
+                      else w if w.startswith("@")
                       else "-" + w])
 
     args.add_all(_options)

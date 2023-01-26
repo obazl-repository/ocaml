@@ -166,6 +166,11 @@ compiler_module(
     struct = "btype.ml",
     sig    = "Btype_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier"
+    ],
     deps   = [
         "//utils:Local_store",
         ":Ident",
@@ -195,6 +200,7 @@ compiler_signature(
     name = "Btype_cmi",
     src  = "btype.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         ":Path_cmi",
@@ -209,7 +215,12 @@ compiler_module(
     name   = "Cmt2annot",
     struct = "cmt2annot.ml",
     opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI_70],
+    warnings = [
+        "-ambiguous-name",
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-open-shadow-label-constructor"
+    ],
     deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Location",
@@ -237,7 +248,14 @@ compiler_module(
     struct = "ctype.ml",
     sig    = "Ctype_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-name-out-of-scope",
+        "-open-shadow-identifier"
+    ],
     deps   = [
         "//parsing:Location",
         "//parsing:Longident",
@@ -274,6 +292,7 @@ compiler_signature(
     name = "Ctype_cmi",
     src  = "ctype.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location_cmi",
@@ -296,7 +315,12 @@ compiler_module(
     struct = "datarepr.ml",
     sig    = "Datarepr_cmi",
     opts = MODULE_OPTS,
-	warnings = [w.NAME_OUT_OF_SCOPE_40],
+	warnings = [
+        "-fragile-match",
+        "-disambiguated-name",
+        "-open-shadow-identifier",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//parsing:Location",
         ":Btype",
@@ -318,6 +342,7 @@ compiler_signature(
     name = "Datarepr_cmi",
     src  = "datarepr.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         ":Ident_cmi",
@@ -331,7 +356,15 @@ compiler_module(
     struct = "env.ml",
     sig    = "Env_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//file_formats:Cmi_format",
         "//parsing:Builtin_attributes",
@@ -381,6 +414,7 @@ compiler_signature(
     name = "Env_cmi",
     src  = "env.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//file_formats:Cmi_format_cmi",
         "//parsing:Asttypes_cmi",
@@ -415,7 +449,10 @@ compiler_module(
     struct = "envaux.ml",
     sig    = "Envaux_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-disambiguated-name",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//parsing:Location",
         "//utils:Lazy_backtrack",
@@ -456,6 +493,11 @@ compiler_module(
     struct = "errortrace.ml",
     sig    = "Errortrace_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-ambiguous-name",
+        "-disambiguated-name"
+    ],
     deps   = [
         ":Path",
         ":Types",
@@ -485,6 +527,10 @@ compiler_module(
     struct = "ident.ml",
     sig    = "Ident_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern"
+    ],
     deps   = [
         "//utils:Clflags",
         "//utils:Identifiable",
@@ -571,7 +617,13 @@ compiler_module(
     struct = "includecore.ml",
     sig    = "Includecore_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//parsing:Builtin_attributes",
         "//utils:Diffing_with_keys",
@@ -604,6 +656,7 @@ compiler_signature(
     name = "Includecore_cmi",
     src  = "includecore.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location_cmi",
@@ -628,7 +681,15 @@ compiler_module(
     struct = "includemod.ml",
     sig    = "Includemod_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Builtin_attributes",
@@ -672,6 +733,7 @@ compiler_signature(
     name = "Includemod_cmi",
     src  = "includemod.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Location_cmi",
         "//parsing:Longident_cmi",
@@ -697,7 +759,15 @@ compiler_module(
     struct = "includemod_errorprinter.ml",
     sig    = "Includemod_errorprinter_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        # "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        # "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//parsing:Location",
         "//utils:Clflags",
@@ -750,7 +820,13 @@ compiler_module(
     struct = "mtype.ml",
     sig    = "Mtype_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//parsing:Location",
         "//utils:Clflags",
@@ -787,7 +863,11 @@ compiler_module(
     struct = "oprint.ml",
     sig    = "Oprint_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//parsing:Pprintast",
     ],
@@ -846,7 +926,12 @@ compiler_module(
     struct = "parmatch.ml",
     sig    = "Parmatch_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//parsing:Ast_helper",
         "//parsing:Location",
@@ -912,6 +997,7 @@ compiler_module(
     struct = "path.ml",
     sig    = "Path_cmi",
     opts = MODULE_OPTS,
+    warnings = ["-fragile-match"],
     deps   = [
         ":Ident",
     ],
@@ -960,6 +1046,10 @@ compiler_module(
     struct = "patterns.ml",
     sig    = "Patterns_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//parsing:Location",
         "//parsing:Longident",
@@ -999,6 +1089,7 @@ compiler_module(
     struct = "persistent_env.ml",
     sig    = "Persistent_env_cmi",
     opts = MODULE_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//file_formats:Cmi_format",
         "//parsing:Location",
@@ -1047,7 +1138,10 @@ compiler_module(
     struct = "predef.ml",
     sig    = "Predef_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-disambiguated-name",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//parsing:Ast_helper",
         "//parsing:Location",
@@ -1074,6 +1168,7 @@ compiler_signature(
     name = "Predef_cmi",
     src  = "predef.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         ":Ident_cmi",
         ":Path_cmi",
@@ -1086,6 +1181,7 @@ compiler_module(
     struct = "primitive.ml",
     sig    = "Primitive_cmi",
     opts = MODULE_OPTS,
+    warnings = ["-fragile-match"],
     deps   = [
         "//parsing:Attr_helper",
         "//parsing:Location",
@@ -1127,6 +1223,10 @@ compiler_module(
     struct = "printpat.ml",
     sig    = "Printpat_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         ":Ident",
         ":Typedtree",
@@ -1162,7 +1262,13 @@ compiler_module(
     struct = "printtyp.ml",
     sig    = "Printtyp_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-name-out-of-scope",
+        "-open-shadow-identifier",
+    ],
     deps   = [
         "//parsing:Location",
         "//parsing:Longident",
@@ -1207,6 +1313,7 @@ compiler_signature(
     name = "Printtyp_cmi",
     src  = "printtyp.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location_cmi",
@@ -1229,6 +1336,11 @@ compiler_module(
     struct = "printtyped.ml",
     sig    = "Printtyped_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-disambiguated-name",
+        "-missing-record-field-pattern",
+        "-name-out-of-scope"
+    ],
     deps   = [
         "//parsing:Location",
         "//parsing:Longident",
@@ -1275,6 +1387,10 @@ compiler_module(
     struct = "rec_check.ml",
     sig    = "Rec_check_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         ":Ident",
         ":Path",
@@ -1309,7 +1425,11 @@ compiler_module(
     struct = "shape.ml",
     sig    = "Shape_cmi",
     opts = MODULE_OPTS,
-	warnings = [w.NAME_OUT_OF_SCOPE_40],
+	warnings = [
+        "-fragile-match",
+        "-disambiguated-name",
+        "-name-out-of-scope",
+    ],
     deps   = [
         "//utils:Identifiable",
         "//utils:Misc",
@@ -1342,7 +1462,11 @@ compiler_module(
     struct = "signature_group.ml",
     sig    = "Signature_group_cmi",
     opts = MODULE_OPTS,
-	warnings = [w.NAME_OUT_OF_SCOPE_40],
+	warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+    ],
     deps   = [
         ":Btype",
         ":Ident",
@@ -1371,6 +1495,9 @@ compiler_module(
     struct = "stypes.ml",
     sig    = "Stypes_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//parsing:Location",
         "//utils:Clflags",
@@ -1407,7 +1534,14 @@ compiler_module(
     struct = "subst.ml",
     sig    = "Subst_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-fragile-match",
+        "-disambiguated-name",
+        "-missing-record-field-pattern",
+        "-name-out-of-scope",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//parsing:Ast_mapper",
         "//parsing:Location",
@@ -1435,6 +1569,7 @@ compiler_signature(
     name = "Subst_cmi",
     src  = "subst.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Location_cmi",
         "//parsing:Parsetree_cmi",
@@ -1452,6 +1587,7 @@ compiler_module(
     struct = "tast_iterator.ml",
     sig    = "Tast_iterator_cmi",
     opts = MODULE_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//utils:Lazy_backtrack",
         ":Env",
@@ -1470,6 +1606,7 @@ compiler_signature(
     name = "Tast_iterator_cmi",
     src  = "tast_iterator.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Longident_cmi",
@@ -1485,6 +1622,7 @@ compiler_module(
     struct = "tast_mapper.ml",
     sig    = "Tast_mapper_cmi",
     opts = MODULE_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//utils:Lazy_backtrack",
         ":Env",
@@ -1504,6 +1642,7 @@ compiler_signature(
     name = "Tast_mapper_cmi",
     src  = "tast_mapper.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Longident_cmi",
@@ -1547,7 +1686,15 @@ compiler_module(
     struct = "typeclass.ml",
     sig    = "Typeclass_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        # "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
@@ -1611,7 +1758,16 @@ compiler_module(
     struct = "typecore.ml",
     sig    = "Typecore_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-ambiguous-name",
+        "-disambiguated-name",
+        "-eliminated-optional-arguments",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//file_formats:Cmt_format",
         "//parsing:Ast_helper",
@@ -1689,7 +1845,15 @@ compiler_module(
     struct = "typedecl.ml",
     sig    = "Typedecl_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-name-out-of-scope",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//config:Config",
         "//parsing:Ast_helper",
@@ -1737,6 +1901,7 @@ compiler_signature(
     name = "Typedecl_cmi",
     src  = "typedecl.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location_cmi",
@@ -1763,6 +1928,10 @@ compiler_module(
     struct = "typedecl_immediacy.ml",
     sig    = "Typedecl_immediacy_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+    ],
     deps   = [
         "//parsing:Location",
         ":Ctype",
@@ -1824,7 +1993,13 @@ compiler_module(
     struct = "typedecl_separability.ml",
     sig    = "Typedecl_separability_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//config:Config",
         "//parsing:Location",
@@ -1861,6 +2036,12 @@ compiler_module(
     struct = "typedecl_unboxed.ml",
     sig    = "Typedecl_unboxed_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        # "-ambiguous-name",
+        # "-disambiguated-name",
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//utils:Lazy_backtrack",
         ":Ctype",
@@ -1888,6 +2069,10 @@ compiler_module(
     struct = "typedecl_variance.ml",
     sig    = "Typedecl_variance_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//parsing:Location",
         "//utils:Lazy_backtrack",
@@ -1929,6 +2114,10 @@ compiler_module(
     struct = "typedtree.ml",
     sig    = "Typedtree_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+    ],
     deps   = [
         "//parsing:Location",
         "//parsing:Longident",
@@ -1984,7 +2173,15 @@ compiler_module(
     struct = "typemod.ml",
     sig    = "Typemod_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = [
+        "-ambiguous-name",
+        "-disambiguated-name",
+        "-fragile-match",
+        "-name-out-of-scope",
+        "-missing-record-field-pattern",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//config:Config",
         "//file_formats:Cmi_format",
@@ -2063,6 +2260,10 @@ compiler_module(
     struct = "typeopt.ml",
     sig    = "Typeopt_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//config:Config",
         "//lambda:Lambda",
@@ -2108,6 +2309,10 @@ compiler_module(
     struct = "types.ml",
     sig    = "Types_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern"
+    ],
     deps   = [
         "//config:Config",
         "//parsing:Location",
@@ -2170,6 +2375,10 @@ compiler_module(
     struct = "typetexp.ml",
     sig    = "Typetexp_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-fragile-match",
+        "-missing-record-field-pattern",
+    ],
     deps   = [
         "//parsing:Ast_helper",
         "//parsing:Builtin_attributes",
@@ -2225,6 +2434,14 @@ compiler_module(
     struct = "untypeast.ml",
     sig    = "Untypeast_cmi",
     opts = MODULE_OPTS,
+    warnings = [
+        "-disambiguated-name",
+        "-fragile-match",
+        "-missing-record-field-pattern",
+        "-name-out-of-scope",
+        "-open-shadow-identifier",
+        "-open-shadow-label-constructor",
+    ],
     deps   = [
         "//parsing:Ast_helper",
         "//parsing:Location",
@@ -2254,6 +2471,7 @@ compiler_signature(
     name = "Untypeast_cmi",
     src  = "untypeast.mli",
     opts = SIG_OPTS,
+    warnings = ["-open-shadow-identifier"],
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location_cmi",

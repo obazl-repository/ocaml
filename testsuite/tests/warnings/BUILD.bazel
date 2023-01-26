@@ -1,54 +1,109 @@
-
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
 load("//test:rules.bzl",
+     "inline_expect_module",
+     "test_executable",
      "test_module",
      "test_signature",
 )
 
-MODULE_OPTS = []
-SIG_OPTS = ["-nostdlib"]
+## NB: tests can be configure to make exceptions either warnings or errors.
 
-test_suite(
-    name = "testsuite_tests_warnings_lib",
-    tests  = [
-        ":Deprecated_module",
-        ":Deprecated_module_assigment",
-        ":Deprecated_module_use",
-        ":Deprecated_warning_specs",
-        ":W01",
-        ":W03",
-        ":W04",
-        ":W04_failure",
-        ":W06",
-        ":W32",
-        ":W32b",
-        ":W33",
-        ":W45",
-        ":W47_inline",
-        ":W50",
-        ":W51",
-        ":W51_bis",
-        ":W52",
-        ":W53",
-        ":W54",
-        ":W55",
-        ":W58",
-        ":W59",
-        ":W60",
-        ":W68",
-    ],
-    # signatures  = [
-    #     ":Module_without_cmx_cmi",
-    # ],
-)
+# With warnings, the compile will write warnings to stderr and succeed
+# with return code 0, and will produce the compiled output files (cmi,
+# cmo/x).   Pass `--output_groups=all' to see all outputs.
+
+# The makefiles use warnings, which we do by setting:
+# rc_expected = 0,
+# warnings = ["+A"]
+# See case W03 below for a commented example.
+
+# With errors, the compile will write the same warnings to stderr, but
+# will fail with return code 2, and will not produce compiled output
+# files. Only stdout and stderr files will be output (if specified).
+
+# To run with errors, set rc_expected=2 and omit warnings - the
+# test_module rule will set '-w @A' by default, making all exceptions
+# errors.
+# As a demo, test W01 below is configured with errors.
+
+## NOTE: stderr_actual is required if the compile is expected to write
+## to stderr. It can be any file name (without path); the test_module
+## rule will redirect stderr to the file specified.
+
+## NOTE: compile outputs are written to a workdir, e.g.
+## bazel-bin/testsuite/tests/warnings/_BS_vv/W04.cmo
+
+## But the stderr_actual file (and/or stdout_actual) is not written to
+## the workdir, e.g. bazel-bin/testsuite/tests/warnings/w04.ml.stderr
+
+## NOTE: warning '-w -70' is automatically added if the module has no
+## sigfile.
+
+## WARNING: the documentation in the manual is very misleading. "If a
+## warning is disabled, it isn’t displayed and doesn’t affect
+## compilation in any way (even if it is fatal)." It may not affect
+## compilation but it does affect the behavior of the compiler: the
+## warning gets written to stderr even if it is "disabled". If it is
+## disabled, the compile return code will be 0; if enabled, the rc
+## will be 2.  But in both cases the warning is written to stderr.
+
+## The compiler's default setting is:
+## -w +a-4-6-7-9-27-29-32..42-44-45-48-50-60
+
+## This "disables" these exceptions, which means if raised, warnings
+## will always be written to stderr, but the return code and compiled
+## outputs will not be affected.
+
+## So for example, code with 4 (fragile-match) will emit a warning
+## even if it is not explicitly listed on the command line. But for
+## the sake of clarity the test targets here always list exceptions
+## explicitly.
+
+## ALERT: if you get errors like  "Error: Unbound value +",
+## you probably need to add 'stdlib_deps = ["//stdlib:Stdlib"]'
+
+MODULE_OPTS = []
+SIG_OPTS = []
+
+# test_suite(
+#     name = "testsuite_tests_warnings_lib",
+#     tests  = [
+#         ":Deprecated_module",
+#         ":Deprecated_module_assigment",
+#         ":Deprecated_module_use",
+#         ":Deprecated_warning_specs",
+#         ":W01",
+#         ":W03",
+#         ":W04",
+#         ":W04_failure",
+#         ":W06",
+#         ":W32",
+#         ":W32b",
+#         ":W33",
+#         ":W45",
+#         ":W47_inline",
+#         ":W50",
+#         ":W51",
+#         ":W51_bis",
+#         ":W52",
+#         ":W53",
+#         ":W54",
+#         ":W55",
+#         ":W58",
+#         ":W59",
+#         ":W60",
+#         ":W68",
+#     ],
+#     # signatures  = [
+#     #     ":Module_without_cmx_cmi",
+#     # ],
+# )
 
 test_module(
     name   = "Deprecated_module",
     struct = "deprecated_module.ml",
     sig    = "Deprecated_module_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
 test_signature(
@@ -62,218 +117,270 @@ test_signature(
 test_module(
     name   = "Deprecated_module_assigment",
     struct = "deprecated_module_assigment.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
 test_module(
     name   = "Deprecated_module_use",
     struct = "deprecated_module_use.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
 test_module(
     name   = "Deprecated_warning_specs",
     struct = "deprecated_warning_specs.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
 )
 
-test_signature(
-    name = "Module_without_cmx_cmi",
-    src  = "module_without_cmx.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
-)
-
+# Demo: exceptions as errors
 test_module(
     name   = "W01",
     struct = "w01.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps = ["//stdlib"],
+    opts = ["-no-strict-sequence"],
+    stdout_actual  = "w01.ml.stdout",
+    stderr_actual  = "w01.ml.stderr",
+    rc_expected = 2,
+    warnings = ["@A"]
+    # as warnings:
+    # rc_expected = 0,
+    # warnings = ["2", "5", "8", "10", "11", "27"]
 )
 
 test_module(
     name   = "W03",
     struct = "w03.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stderr_actual  = "w02.ml.stderr",
+    warnings = ["+A"] # overrides @A default, making all exceptions warnings
+    # warning '-70' is added automatically, since we have no .mli
+    # rc_expected defaults to 0
 )
 
 test_module(
     name   = "W04",
     struct = "w04.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stderr_actual  = "w04.ml.stderr",
+    warnings = ["+fragile-match"] # 4
 )
 
 test_module(
     name   = "W04_failure",
     struct = "w04_failure.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stderr_actual  = "w04_failure.ml.stderr",
+    warnings = ["+fragile-match"] # 4
 )
 
 test_module(
     name   = "W06",
     struct = "w06.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps = ["//stdlib:Stdlib"],
+    stderr_actual  = "w06.ml.stderr",
+    warnings = ["+labels-omitted"] # 6
 )
 
 test_module(
     name   = "W32",
     struct = "w32.ml",
     sig    = "W32_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stderr_actual  = "w32.ml.stderr",
+    # warnings = ["@A"],
+    # rc_expected = 2,
+    # warnings = ["+67"]
+    warnings = ["+32", "+39", "+60", "+67"]
 )
 
 test_signature(
     name = "W32_cmi",
     src  = "w32.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
+    # warnings = ["@A"]
+    warnings = ["+unused-functor-parameter"],
 )
 
 test_module(
     name   = "W32b",
     struct = "w32b.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stderr_actual  = "w32b.ml.stderr",
+    warnings = [
+        "+unused-type-declaration", # 34
+        "+unused-module"            # 60
     ]
 )
 
 test_module(
     name   = "W33",
     struct = "w33.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stderr_actual  = "w33.ml.stderr",
+    warnings = [
+        "+unused-open",         # 33
+        "+unused-open-bang",    # 66
     ]
 )
 
 test_module(
     name   = "W45",
     struct = "w45.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stderr_actual  = "w45.ml.stderr",
+    warnings = [
+        "+open-shadow-label-constructor", # 45
+        "+ambiguous-name",                # 41
+        "+unused-open",                   # 33
     ]
 )
 
 test_module(
     name   = "W47_inline",
     struct = "w47_inline.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps = ["//stdlib:Stdlib"],
+    stderr_actual  = "w47_inline.ml.stderr",
+    warnings = [
+        "+unused-var",          # 26
+        "+attribute-payload",   # 47
+        "+inlining-impossible"  # 55
     ]
 )
 
 test_module(
     name   = "W50",
     struct = "w50.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps = ["//stdlib:Stdlib.List"],
+    stderr_actual  = "w50.ml.stderr",
+    warnings = [
+        "+unused-module"            # 60
     ]
 )
 
-test_module(
-    name   = "W51",
+################
+diff_test(
+    name = "W51_test",
+    file1 = "w51.ml",
+    file2 = "W51_expect",
+    timeout = "short",
+    tags = ["inline_expect"]
+)
+
+inline_expect_module(
+    name   = "W51_expect",
     struct = "w51.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps = ["//stdlib:Stdlib"],
+    warnings = ["+fragile-match"]
 )
 
+################
 test_module(
     name   = "W51_bis",
     struct = "w51_bis.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stderr_actual  = "w51_bis.ml.stderr",
+    warnings = [
+        "+wrong-tailcall-expectation" # 51
     ]
 )
 
-test_module(
-    name   = "W52",
+################
+diff_test(
+    name = "W52_test",
+    file1 = "w52.ml",
+    file2 = "W52_expect",
+    timeout = "short",
+    tags = ["inline_expect"]
+)
+inline_expect_module(
+    name   = "W52_expect",
     struct = "w52.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    warnings = [
     ]
 )
+################
 
 test_module(
     name   = "W53",
     struct = "w53.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps = ["//stdlib:Stdlib.Int32",
+                   "//stdlib:Stdlib.Set"],
+    stderr_actual  = "w53.ml.stderr",
+    warnings = [
+        "+unused-value-declaration", # 32
+        "+misplaced-attribute",      # 53
     ]
 )
 
 test_module(
     name   = "W54",
     struct = "w54.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stderr_actual  = "w54.ml.stderr",
+    warnings = [
+        "+duplicated-attribute", # 54
     ]
 )
 
 test_module(
     name   = "W55",
     struct = "w55.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps = ["//stdlib:Stdlib"],
+    stderr_actual  = "w55.ml.stderr",
+    warnings = [
+        "+inlining-impossible", # 55
     ]
 )
 
+################
 test_module(
     name   = "W58",
     struct = "w58.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    sig_deps    = ["Module_without_cmx_cmi"],
+    stdlib_deps = ["//stdlib:Stdlib"],
+    stderr_actual  = "w58.ml.stderr",
+    warnings = [
+        "+no-cmx-file",         # 58
     ]
 )
+test_signature(
+    name = "Module_without_cmx_cmi",
+    src  = "module_without_cmx.mli",
+    opts   = ["-no-opaque"],
+)
+################
 
 test_module(
     name   = "W59",
     struct = "w59.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stdlib_deps = ["//stdlib:Stdlib.Lazy"],
+    stderr_actual  = "w59.ml.stderr",
+
+    # ocamlc.byte
+    # warnings = ["+unused-module"] # 60
+
+    ## ocamlopt.byte:
+    opts   = ["-dflambda-invariants"],
+    warnings = ["+flambda-assignment-to-non-mutable-value"] # 59
 )
 
 test_module(
     name   = "W60",
     struct = "w60.ml",
     sig    = "W60_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+    stderr_actual  = "w60.ml.stderr",
+    warnings = ["+unused-module"] # 60
 )
-
 test_signature(
     name = "W60_cmi",
     src  = "w60.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
+    warnings = ["+unused-functor-parameter"] # 67
+)
+
+################
+## TODO: link and run w68 as a batch test
+
+test_executable(
+    name    = "W68.exe",
+    main    = ":W68",
 )
 
 test_module(
     name   = "W68",
     struct = "w68.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+    stdlib_deps = ["//stdlib:Stdlib", "//stdlib:Stdlib.Gc"],
+    stderr_actual  = "w68.ml.stderr",
+    warnings = [
+        # "@A",
+        "+partial-match",                         # 8
+        "+match-on-mutable-state-prevent-uncurry" # 68
     ]
 )
 
