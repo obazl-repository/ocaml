@@ -1,5 +1,50 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
+################
+def add_dump_args(ctx, ext, args):
+    if hasattr(ctx.attr, "_lambda_expect_test"):
+        for arg in ctx.attr._lambda_expect_test:
+            args.add(arg)
+
+    elif hasattr(ctx.attr, "dump"): # test rules w/explicit dump attr
+        if len(ctx.attr.dump) > 0:
+            args.add("-dump-into-file")
+        for d in ctx.attr.dump:
+            if d == "source":
+                args.add("-dsource")
+            if d == "parsetree":
+                args.add("-dparsetree")
+            if d == "typedtree":
+                args.add("-dtypedtree")
+            if d == "shape":
+                args.add("-dshape")
+            if d == "rawlambda":
+                args.add("-drawlambda")
+            if d == "lambda":
+                args.add("-dlambda")
+            if d == "rawflambda":
+                args.add("-drawflambda")
+            if d == "flambda":
+                args.add("-dflambda")
+            if d == "flambda-let":
+                args.add("-dflambda-let")
+            if d == "flambda-verbose":
+                args.add("-dflambda-verbose")
+
+            if ext == ".cmo":
+                if d == "instr":
+                    args.add("-dinstr")
+
+            if ext == ".cmx":
+                if d == "clambda":
+                    args.add("-dclambda")
+                if d == "rawclambda":
+                    args.add("-drawclambda")
+                if d == "cmm":
+                    args.add("-dcmm")
+                if d == "instruction-selection":
+                    args.add("-dsel")
+
 #######################
 def runtime_preamble(debug=False):
     args = []
