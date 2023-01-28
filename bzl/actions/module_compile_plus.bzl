@@ -53,14 +53,13 @@ def module_compile_plus(ctx, module_name):
     for v in outputs.values():
         if v: outs.append(v)
 
-    print("OUTS: %s" % outs)
+    # print("OUTS: %s" % outs)
     # if ctx.attr._rule == "test_infer_signature":
     #     fail()
 
     cc_toolchain = find_cpp_toolchain(ctx)
 
     ##FIXME: use rule-specific mnemonic, e.g CompileStdlibModule
-
     std_fds = []
     if ctx.outputs.stdout_actual:
         stdout = "1> {}".format(ctx.outputs.stdout_actual.path)
@@ -206,7 +205,7 @@ def module_compile_plus(ctx, module_name):
         # struct_src: compilation input in workdir, symlink
         # call it wstruct_src or wd_struct_src?
         struct_src = outputs["structfile"], # in_structfile
-        structfile = ctx.file.struct.basename,
+        structfile = ctx.file.struct.path,
         cmt = outputs["cmt"], ## out_cmt
 
         ofile  = outputs["ofile"], ## out_o

@@ -64,7 +64,10 @@ def signature_impl(ctx, module_name):
         print("Module name: {src} To: {dst}".format(
             src = from_name, dst = module_name))
 
-    if from_name == module_name:
+    ## module_name derived from ctx.file.src.basename
+    ## from_name derived from ctx.label.name
+
+    if from_name == module_name: # no renaming needed
         ## We need to ensure mli file and cmi file are in the same
         ## place. Since Bazel writes output files into its own dirs
         ## (won't write back into src dir), this means we need to
@@ -89,10 +92,8 @@ def signature_impl(ctx, module_name):
 
             mlifile = sig_src
 
-    else:
-        # namespaced w/o ppx: symlink sig_src to prefixed name, so
-        # that output dir will contain both renamed input mli and
-        # output cmi.
+    else: # src filename != tgt label
+        # name use tgt label name symlink it into workdir
         ns_sig_src = module_name + ".mli"
         if debug:
             print("ns_sig_src: %s" % ns_sig_src)
@@ -134,7 +135,6 @@ def signature_impl(ctx, module_name):
 
     if debug:
         print("out_cmi %s" % out_cmi)
-
 
     ################################################################
     ################  DEPS  ################
@@ -261,9 +261,22 @@ def signature_impl(ctx, module_name):
         if opt not in cancel_opts:
             args.add(opt)
 
-    # args.add_all(tc.warnings[BuildSettingInfo].value)
-    for w in tc.warnings[BuildSettingInfo].value:
-        args.add_all(["-w", w])
+    ## ignore tc warnings for testing
+    if ctx.attr._rule not in ["test_signature"]:
+        for w in tc.warnings[BuildSettingInfo].value:
+            args.add_all(["-w", w])
+
+    if hasattr(ctx.attr, "alerts"):
+        alert_str = ""
+        for a in ctx.attr.alerts:
+            alert_str = alert_str + (a if a.startswith("++")
+                                     else a if a.startswith("+")
+                                     else a if a.startswith("--")
+                                     else a if a.startswith("-")
+                                     else a if a.startswith("@")
+                                     else "+" + a)
+        if len(alert_str) > 0:
+            args.add("-alert", alert_str)
 
     for w in ctx.attr.warnings:
         args.add_all(["-w",
@@ -293,6 +306,7 @@ def signature_impl(ctx, module_name):
     #         direct_inputs.append(ctx.attr._stdlib[ModuleInfo].sig)
     #         direct_inputs.append(ctx.attr._stdlib[ModuleInfo].struct)
 
+    ##FIXME: sigs should not have any cc deps?
     ccInfo_list = []
 
     includes.extend(paths_depset.to_list())
@@ -319,17 +333,19 @@ def signature_impl(ctx, module_name):
 
     args.add("-o", out_cmi)
 
+    ## FIXME: sigfiles should not have any runtime deps?
     if ctx.files.data:
         direct_inputs.extend(ctx.files.data)
 
     inputs_depset = depset(
         order = dsorder,
         direct = []
-        + direct_inputs # + ctx.files._ns_resolver,
+        + direct_inputs # = mlifile, ns resolver, runtime deps (data)
+        # + ctx.files._ns_resolver,
         # + [tc.compiler[DefaultInfo].files_to_run.executable],
         # + ctx.files.data if ctx.files.data else [],
         # + [effective_compiler]
-        + toolarg_input
+        + toolarg_input # compiler
         + resolver
         ,
         transitive = []## indirect_inputs_depsets

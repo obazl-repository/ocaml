@@ -1,7 +1,8 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-load(":BUILD.bzl", "progress_msg", "get_build_executor")
+load(":BUILD.bzl", "progress_msg", "get_build_executor",
+     "add_dump_args")
 
 load("//bzl:providers.bzl",
      "BootInfo",
@@ -72,11 +73,13 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
         "cmt": None,
         "structfile": None,
         "ofile": None,
-        "logfile": None,
+        "logfile": None, # FIXME: mv to test_module
         "workdir": None,
     }
 
-    if hasattr(ctx.attr, "rc_expected"): # test_module targets
+    # test_module targets w/non-zero rc do not return std outputs
+    # (since compile expected to fail).
+    if hasattr(ctx.attr, "rc_expected"):
         if ctx.attr.rc_expected != 0:
             return (outputs, module_name)
 
@@ -138,8 +141,8 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
     # compile action will fail before we can do that, since it's
     # outputs will be in the wrong place.
 
-    mlifile = None
-    cmifile = None
+    # mlifile = None
+    # cmifile = None
     sig_src = None
     # sig_inputs = []
 
@@ -705,24 +708,16 @@ def construct_inputs(ctx, tc, ext, workdir,
 
 # returns struct with flds: files, depsets
 ################
-def merge_deps(ctx,
-               outputs
-               # ext,
-               # provider_output_cmi,
-               # out_cm_,
-               # out_o
-               ):
+def merge_deps(ctx, outputs):
+               # # ext,
+               # # provider_output_cmi,
+               # # out_cm_,
+               # # out_o
+               # ):
 
     depsets = new_deps_aggregator()
 
-    # if ctx.attr._manifest[BuildSettingInfo].value:
-    #     manifest = ctx.attr._manifest[BuildSettingInfo].value
-    # else:
     manifest = []
-
-    # if ctx.label.name == "Stdlib":
-    #     print("Stdlib manifest: %s" % manifest)
-        # fail("X")
 
     #WARNING: always do stdlib_deps first, since others may depend on it
     if hasattr(ctx.attr, "stdlib_deps"):
@@ -867,7 +862,7 @@ def merge_deps(ctx,
     # )
 
     ## FIXME: put merged depsets into new DepsAggregator
-    return (depsets,
+    return depsets
             # sigs_depset,
             # cli_link_deps_depset,
             # afiles_depset,
@@ -875,9 +870,10 @@ def merge_deps(ctx,
             # # archived_cmx_depset,
             # ccInfo_provider,
             # paths_depset)
-            )
+            # )
 
 ################################################################
+## FIXME: remove hardcoded path (linux!)
 def adapt_includes(inc):
     return inc.removeprefix("bazel-out/darwin-fastbuild/bin/")
     # return inc
@@ -887,11 +883,6 @@ def construct_args(ctx, tc, _options, cancel_opts,
                    inputs,
                    outputs,
                    depsets,
-                   # direct_inputs,
-                   # paths_depset,
-                   # sig_src,
-                   # in_structfile,
-                   # out_cm_
                    ):
 
     includes   = []
@@ -1012,17 +1003,32 @@ def construct_args(ctx, tc, _options, cancel_opts,
     #     # else:
     #     # args.add("-w", "+A")
 
+    ## ignore tc warnings for testing
     if ctx.attr._rule not in ["inline_expect_module", "test_module"]:
         for w in tc.warnings[BuildSettingInfo].value:
             args.add_all(["-w", w])
 
+    if hasattr(ctx.attr, "alerts"):
+        alert_str = "@all"
+        for a in ctx.attr.alerts:
+            alert_str = alert_str + (a if a.startswith("++")
+                                     else a if a.startswith("+")
+                                     else a if a.startswith("--")
+                                     else a if a.startswith("-")
+                                     else a if a.startswith("@")
+                                     # default: non-fatal
+                                     else "--" + a)
+        # args.add("-alert", "@all")
+        if len(alert_str) > 0:
+            args.add("-alert", alert_str)
+
+    # args.add("-w", "@A")
     for w in ctx.attr.warnings:
         args.add_all(["-w",
                       w if w.startswith("+")
                       else w if w.startswith("-")
                       else w if w.startswith("@")
-                      # w.FOO constants are unsigned:
-                      else "-" + w])
+                      else "+" + w])
 
     if not ctx.file.sig:
         args.add("-w", "-70")
@@ -1035,52 +1041,11 @@ def construct_args(ctx, tc, _options, cancel_opts,
     # test_module has attr 'dump' for e.g. -dlambda
     #FIXME: rename 'dump' to 'logging'
     #FIXME: make a function for the dump stuff
-    if hasattr(ctx.attr, "_lambda_expect_test"):
-        for arg in ctx.attr._lambda_expect_test:
-            args.add(arg)
-
-    elif hasattr(ctx.attr, "dump"): # test rules w/explicit dump attr
-        if len(ctx.attr.dump) > 0:
-            args.add("-dump-into-file")
-        for d in ctx.attr.dump:
-            if d == "source":
-                args.add("-dsource")
-            if d == "parsetree":
-                args.add("-dparsetree")
-            if d == "typedtree":
-                args.add("-dtypedtree")
-            if d == "shape":
-                args.add("-dshape")
-            if d == "rawlambda":
-                args.add("-drawlambda")
-            if d == "lambda":
-                args.add("-dlambda")
-            if d == "rawflambda":
-                args.add("-drawflambda")
-            if d == "flambda":
-                args.add("-dflambda")
-            if d == "flambda-let":
-                args.add("-dflambda-let")
-            if d == "flambda-verbose":
-                args.add("-dflambda-verbose")
-
-            if ext == ".cmo":
-                if d == "instr":
-                    args.add("-dinstr")
-
-            if ext == ".cmx":
-                if d == "clambda":
-                    args.add("-dclambda")
-                if d == "rawclambda":
-                    args.add("-drawclambda")
-                if d == "cmm":
-                    args.add("-dcmm")
-                if d == "instruction-selection":
-                    args.add("-dsel")
+    add_dump_args(ctx, ".cmi", args)
 
     if ctx.attr._rule == "compile_module_test":
         args.add_all(includes,
-                     map_each = adapt_includes,
+                     map_each = adapt_includes, ##FIXME
                      before_each="-I",
                      uniquify = True)
     else:
@@ -1148,10 +1113,9 @@ def gen_compile_script(ctx, executable, args):
 
     return script
 
-#####################
+################################################################
+## MAIN ENTRY
 def construct_module_compile_config(ctx, module_name):
-# def module_impl(ctx, module_name):
-
     debug = False
     debug_bootstrap = False
     debug_ccdeps = False
@@ -1266,22 +1230,8 @@ def construct_module_compile_config(ctx, module_name):
     #             includes.append(ctx.file._stdlib.dirname)
     #             stdlib_depset.append(ctx.attr._stdlib[ModuleInfo].files)
 
-    (depsets, # > unmerged aggregated deps excluding current action outs
-     ## the rest are the depsets flds merged, with curren outs added
-     # sigs_depset,
-     # cli_link_deps_depset,
-     # afiles_depset,
-     # ofiles_depset,
-     # # archived_cmx_depset,
-     # ccInfo_provider,
-     # paths_depset
-     ) = merge_deps(ctx,
-                    outputs
-                    # ext,
-                    # provider_output_cmi,
-                    # out_cm_,
-                    # out_o
-                    )
+    # > unmerged aggregated deps excluding current action outs
+    depsets = merge_deps(ctx, outputs)
 
     ## now 'depsets.deps' contains aggregated BootInfo deps
 

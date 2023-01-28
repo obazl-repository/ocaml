@@ -6,8 +6,8 @@ load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
 ################################################################
 def _compiler_signature(ctx):
 
-    (this, extension) = paths.split_extension(ctx.file.src.basename)
-    module_name = this[:1].capitalize() + this[1:]
+    (stem, extension) = paths.split_extension(ctx.file.src.basename)
+    module_name = stem[:1].capitalize() + stem[1:]
 
     return signature_impl(ctx, module_name)
 

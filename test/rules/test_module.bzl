@@ -47,8 +47,10 @@ test_module_ = rule(
     attrs = dict(
         module_attrs(),
 
+        alerts = attr.string_list(), #default = ["++all"]),
         warnings = attr.string_list(), #default = ["@A"]),
         rc_expected = attr.int(default = 0),
+
         stdout_actual = attr.output(),
         stderr_actual = attr.output(),
         logfile_actual = attr.output(), # for e.g. -dlambda dumpfile
