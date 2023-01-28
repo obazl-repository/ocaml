@@ -245,7 +245,7 @@ test_module(
     name   = "W04",
     struct = "w04.ml",
     stderr_actual  = "w04.ml.stderr",
-    warnings = ["+fragile-match"] # 4
+    warnings = ["fragile-match"] # 4
 )
 
 #####################
@@ -260,7 +260,7 @@ test_module(
     name   = "W04_failure",
     struct = "w04_failure.ml",
     stderr_actual  = "w04_failure.ml.stderr",
-    warnings = ["+fragile-match"] # 4
+    warnings = ["fragile-match"] # 4
 )
 
 #####################
@@ -276,7 +276,7 @@ test_module(
     struct = "w06.ml",
     stdlib_deps = ["//stdlib:Stdlib"],
     stderr_actual  = "w06.ml.stderr",
-    warnings = ["+labels-omitted"] # 6
+    warnings = ["labels-omitted"] # 6
 )
 
 #####################
@@ -311,7 +311,7 @@ test_signature(
     name = "W32_cmi",
     src  = "w32.mli",
     stderr_actual = "w32.mli.stderr",
-    warnings = ["+unused-functor-parameter"],
+    warnings = ["unused-functor-parameter"],
 )
 
 #####################
@@ -327,8 +327,8 @@ test_module(
     struct = "w32b.ml",
     stderr_actual  = "w32b.ml.stderr",
     warnings = [
-        "+unused-type-declaration", # 34
-        "+unused-module"            # 60
+        "unused-type-declaration", # 34
+        "unused-module"            # 60
     ]
 )
 
@@ -345,8 +345,8 @@ test_module(
     struct = "w33.ml",
     stderr_actual  = "w33.ml.stderr",
     warnings = [
-        "+unused-open",         # 33
-        "+unused-open-bang",    # 66
+        "unused-open",         # 33
+        "unused-open-bang",    # 66
     ]
 )
 
@@ -363,9 +363,9 @@ test_module(
     struct = "w45.ml",
     stderr_actual  = "w45.ml.stderr",
     warnings = [
-        "+open-shadow-label-constructor", # 45
-        "+ambiguous-name",                # 41
-        "+unused-open",                   # 33
+        "open-shadow-label-constructor", # 45
+        "ambiguous-name",                # 41
+        "unused-open",                   # 33
     ]
 )
 
@@ -383,9 +383,9 @@ test_module(
     stdlib_deps = ["//stdlib:Stdlib"],
     stderr_actual  = "w47_inline.ml.stderr",
     warnings = [
-        "+unused-var",          # 26
-        "+attribute-payload",   # 47
-        "+inlining-impossible"  # 55
+        "unused-var",          # 26
+        "attribute-payload",   # 47
+        "inlining-impossible"  # 55
     ]
 )
 
@@ -404,7 +404,7 @@ test_module(
     stdlib_deps = ["//stdlib:Stdlib.List"],
     stderr_actual  = "w50.ml.stderr",
     warnings = [
-        "+unused-module"            # 60
+        "unused-module"            # 60
     ]
 )
 
@@ -421,7 +421,7 @@ inline_expect_module(
     name   = "W51_expect",
     struct = "w51.ml",
     stdlib_deps = ["//stdlib:Stdlib"],
-    warnings = ["+fragile-match"]
+    warnings = ["fragile-match"]
 )
 
 #####################
@@ -437,7 +437,7 @@ test_module(
     struct = "w51_bis.ml",
     stderr_actual  = "w51_bis.ml.stderr",
     warnings = [
-        "+wrong-tailcall-expectation" # 51
+        "wrong-tailcall-expectation" # 51
     ]
 )
 
@@ -474,8 +474,8 @@ test_module(
                    "//stdlib:Stdlib.Set"],
     stderr_actual  = "w53.ml.stderr",
     warnings = [
-        "+unused-value-declaration", # 32
-        "+misplaced-attribute",      # 53
+        "unused-value-declaration", # 32
+        "misplaced-attribute",      # 53
     ]
 )
 
@@ -492,7 +492,7 @@ test_module(
     struct = "w54.ml",
     stderr_actual  = "w54.ml.stderr",
     warnings = [
-        "+duplicated-attribute", # 54
+        "duplicated-attribute", # 54
     ]
 )
 
@@ -530,7 +530,7 @@ test_module(
     stdlib_deps = ["//stdlib:Stdlib"],
     stderr_actual  = "w55.ml.stderr",
     warnings = [
-        "+inlining-impossible", # 55
+        "inlining-impossible", # 55
     ]
 )
 
@@ -550,7 +550,7 @@ test_module(
     stdlib_deps = ["//stdlib:Stdlib"],
     stderr_actual  = "w58.ml.stderr",
     warnings = [
-        "+no-cmx-file",         # 58
+        "no-cmx-file",         # 58
     ]
 )
 
@@ -577,11 +577,11 @@ test_module(
     stderr_actual  = "w59.ml.stderr",
 
     # ocamlc.byte
-    # warnings = ["+unused-module"] # 60
+    # warnings = ["unused-module"] # 60
 
     ## ocamlopt.byte:
     opts   = ["-dflambda-invariants"],
-    warnings = ["+flambda-assignment-to-non-mutable-value"] # 59
+    warnings = ["flambda-assignment-to-non-mutable-value"] # 59
 )
 
 #####################
@@ -598,7 +598,7 @@ test_module(
     struct = "w60.ml",
     sig    = "W60_cmi",
     stderr_actual  = "w60.ml.stderr",
-    warnings = ["+unused-module"] # 60
+    warnings = ["unused-module"] # 60
 )
 
 ocamlcc_diff_tests(
@@ -612,7 +612,7 @@ test_signature(
     name = "W60_cmi",
     src  = "w60.mli",
     stderr_actual  = "w60.mli.stderr",
-    warnings = ["+unused-functor-parameter"] # 67
+    warnings = ["unused-functor-parameter"] # 67
 )
 
 ################
@@ -630,8 +630,8 @@ test_module(
     stderr_actual  = "w68.ml.stderr",
     warnings = [
         # "@A",
-        "+partial-match",                         # 8
-        "+match-on-mutable-state-prevent-uncurry" # 68
+        "partial-match",                         # 8
+        "match-on-mutable-state-prevent-uncurry" # 68
     ]
 )
 

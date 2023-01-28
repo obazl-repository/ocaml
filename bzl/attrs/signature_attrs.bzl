@@ -23,6 +23,9 @@ def signature_attrs():
         warnings = attr.string_list(
             doc = "List of ids, with or without '-' prefix. Do not include '-w'"
         ),
+        report_warnings = attr.label(
+            default = "//config/ocaml/warnings:report"
+        ),
 
         _protocol = attr.label(default = "//config/build/protocol"),
 

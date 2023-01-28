@@ -1022,13 +1022,22 @@ def construct_args(ctx, tc, _options, cancel_opts,
         if len(alert_str) > 0:
             args.add("-alert", alert_str)
 
-    # args.add("-w", "@A")
+    # For compiler and tool builds, we default 'report_warnings' to
+    # False, but the user can set this to True; for test case we want
+    # the to always write messages to stderr so we can diff actuals
+    # and expecteds.
+    if ctx.attr._rule == "test_module":
+        report_warnings = True
+    else:
+        report_warnings = ctx.attr.report_warnings[BuildSettingInfo].value
+
     for w in ctx.attr.warnings:
         args.add_all(["-w",
                       w if w.startswith("+")
                       else w if w.startswith("-")
                       else w if w.startswith("@")
-                      else "+" + w])
+                      else ("+" if report_warnings else "-")
+                      + w])
 
     if not ctx.file.sig:
         args.add("-w", "-70")

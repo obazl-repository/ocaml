@@ -278,12 +278,18 @@ def signature_impl(ctx, module_name):
         if len(alert_str) > 0:
             args.add("-alert", alert_str)
 
+    if ctx.attr._rule == "test_signature":
+        report_warnings = True
+    else:
+        report_warnings = ctx.attr.report_warnings[BuildSettingInfo].value
+
     for w in ctx.attr.warnings:
         args.add_all(["-w",
                       w if w.startswith("+")
                       else w if w.startswith("-")
                       else w if w.startswith("@")
-                      else "-" + w])
+                      else ("+" if report_warnings else "-")
+                      + w])
 
     args.add_all(_options)
 

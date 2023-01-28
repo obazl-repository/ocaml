@@ -208,10 +208,6 @@ config_setting(name = "sig_src?", flag_values = {":sig_src": "True"})
 # label_flag( name = "primitives",
 #             build_setting_default = "//runtime:primitives")
 
-# used by all toolchains:
-string_list_flag(name = "warnings",
-                 build_setting_default = [])
-
 config_setting(
     name = "macos_fastbuild?",
     values = {"compilation_mode": "fastbuild"},

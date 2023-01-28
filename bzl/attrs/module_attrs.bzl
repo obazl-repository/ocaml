@@ -25,6 +25,9 @@ def module_attrs():
         warnings = attr.string_list(
             doc = "List of ids, with or without '-/+' prefix; default is '-'. Do not include '-w'"
         ),
+        report_warnings = attr.label(
+            default = "//config/ocaml/warnings:report"
+        ),
 
         open = attr.label_list(
             # usually //stdlib:Stdlib

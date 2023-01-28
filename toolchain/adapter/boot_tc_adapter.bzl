@@ -274,7 +274,7 @@ boot_toolchain_adapter = rule(
         # ),
         "linkopts" : attr.string_list( ),
         "warnings" : attr.label( ## string list
-            default = "//config:warnings",
+            default = "//config/ocaml/warnings",
         ),
 
         ## https://bazel.build/docs/integrating-with-rules-cc

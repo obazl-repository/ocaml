@@ -15,7 +15,6 @@ load(":BUILD_RULES.bzl",
      "stdlib_signature")
 
 load(":BUILD_STDLIB.bzl", "STDLIB_MANIFEST")
-load("//config:WARNINGS.bzl", "w")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -23,8 +22,6 @@ exports_files(["expand_module_aliases.awk", "weak.ml", "weak.mli"])
 
 MODULE_OPTS = []
 SIG_OPTS    = []
-
-NO_CMI_FILE = "-49"
 
 LABEL_OPTS = ["-nolabels"]
 
@@ -86,7 +83,7 @@ kernel_module(
     sig    = "Stdlib_cmi", # doesn't work with stdlib.mli
     # use_prims = True,
     opts = ["-nopervasives", "-no-alias-deps"],
-    warnings = [NO_CMI_FILE],
+    warnings = ["no-cmi-file"], # 49
     stdlib_deps = [":CamlinternalFormatBasics",],
 )
 
@@ -107,7 +104,7 @@ kernel_signature(
     name = "Stdlib_cmi",
     src  = "stdlib.mli",
     opts = ["-nopervasives", "-no-alias-deps"],
-    warnings = [NO_CMI_FILE],
+    warnings = ["no-cmi-file"], # 49
     stdlib_deps   = [
         ":CamlinternalFormatBasics_cmi",
     ],
@@ -198,7 +195,7 @@ stdlib_internal_module(
     name   = "CamlinternalFormat",
     struct = "camlinternalFormat.ml",
     sig    = "CamlinternalFormat_cmi",
-    warnings = ["-fragile-match"],
+    warnings = ["fragile-match"],
     stdlib_deps   = [
         ":CamlinternalFormatBasics",
         ":Stdlib.Buffer",
@@ -275,7 +272,7 @@ stdlib_internal_module(
     name   = "CamlinternalMod",
     struct = "camlinternalMod.ml",
     sig    = "CamlinternalMod_cmi",
-    warnings = ["-fragile-match"],
+    warnings = ["fragile-match"],
     stdlib_deps   = [
         ":CamlinternalOO", ## (CamlinternalOO)
         ":CamlinternalLazy", ## (CamlinternalOO)
@@ -307,7 +304,7 @@ stdlib_internal_module(
         # ],
         "//conditions:default": []
     }),
-    warnings = ["-ambiguous-name"],
+    warnings = ["ambiguous-name"],
     stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -333,7 +330,7 @@ stdlib_module(
     struct = "arg.ml",
     sig    = "Stdlib.Arg_cmi",
     opts = MODULE_OPTS,
-    warnings = ["-fragile-match"],
+    warnings = ["fragile-match"],
     stdlib_deps   = [
         ":Stdlib.Sys",
         ":Stdlib.String",
@@ -649,7 +646,7 @@ stdlib_module(
     struct = "effect.ml",
     sig    = "Stdlib.Effect_cmi",
     opts = MODULE_OPTS,
-    warnings = ["41"],
+    warnings = ["ambiguous-name"], # 41
     stdlib_deps   = [
         "Stdlib.Callback",
         "Stdlib.Obj",
@@ -756,7 +753,7 @@ stdlib_module(
         "//config/target/executor:vm_executor?": [],
         "//conditions:default": []
     }),
-    warnings = ["-fragile-match"],
+    warnings = ["fragile-match"],
     stdlib_deps   = [
         ":CamlinternalFormat",
         ":CamlinternalFormatBasics",
@@ -858,7 +855,7 @@ stdlib_module(
     struct = "hashtbl.ml",
     sig    = "Stdlib.Hashtbl_cmi",
     opts = MODULE_OPTS,
-    warnings = ["-missing-record-field-pattern"],
+    warnings = ["missing-record-field-pattern"],
     stdlib_deps   = [
         ":Stdlib.Array",
         ":Stdlib.Int",
@@ -1029,8 +1026,8 @@ stdlib_module(
     sig    = "Stdlib.Map_cmi",
     opts = MODULE_OPTS,
     warnings = [
-        "-fragile-match",
-        "-missing-record-field-pattern"
+        "fragile-match",
+        "missing-record-field-pattern"
     ],
     stdlib_deps   = [
         ":Stdlib.List",
@@ -1242,7 +1239,7 @@ stdlib_module(
     struct = "printexc.ml",
     sig    = "Stdlib.Printexc_cmi",
     opts = MODULE_OPTS,
-    warnings = ["-missing-record-field-pattern"],
+    warnings = ["missing-record-field-pattern"],
     stdlib_deps   = [
         ":Stdlib",
         ":Stdlib.Array",
@@ -1298,7 +1295,7 @@ stdlib_module(
     struct = "queue.ml",
     sig    = "Stdlib.Queue_cmi",
     opts = MODULE_OPTS,
-    warnings = ["-missing-record-field-pattern"],
+    warnings = ["missing-record-field-pattern"],
     stdlib_deps   = [
         ":Stdlib",
         ":Stdlib.Seq",
@@ -1317,7 +1314,7 @@ stdlib_module(
     struct = "random.ml",
     sig    = "Stdlib.Random_cmi",
     opts = MODULE_OPTS,
-    warnings = ["-open-shadow-identifier"],
+    warnings = ["open-shadow-identifier"],
     stdlib_deps   = [
         ":Stdlib",
         ":Stdlib.Array",
@@ -1350,7 +1347,7 @@ stdlib_module(
     struct = "result.ml",
     sig    = "Stdlib.Result_cmi",
     opts = MODULE_OPTS,
-    warnings = ["-fragile-match"],
+    warnings = ["fragile-match"],
     stdlib_deps   = [
         ":Stdlib.Seq",
         # ":Stdlib"
@@ -1447,8 +1444,8 @@ stdlib_module(
     sig    = "Stdlib.Set_cmi",
     opts = MODULE_OPTS,
     warnings = [
-        "-fragile-match",
-        "-missing-record-field-pattern"
+        "fragile-match",
+        "missing-record-field-pattern"
     ],
     stdlib_deps   = [
         ":Stdlib.Seq",
