@@ -1,0 +1,4 @@
+File "w60.mli", line 5, characters 20-21:
+5 | module Fold_ordered(P: sig module Id:Comparable end): sig
+                        ^
+Warning 67 [unused-functor-parameter]: unused functor parameter P.

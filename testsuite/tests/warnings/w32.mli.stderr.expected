@@ -1,0 +1,12 @@
+File "w32.mli", line 12, characters 10-11:
+12 | module F (X : sig val x : int end) : sig end
+               ^
+Warning 67 [unused-functor-parameter]: unused functor parameter X.
+File "w32.mli", line 14, characters 10-11:
+14 | module G (X : sig val x : int end) : sig end
+               ^
+Warning 67 [unused-functor-parameter]: unused functor parameter X.
+File "w32.mli", line 16, characters 10-11:
+16 | module H (X : sig val x : int end) : sig val x : int end
+               ^
+Warning 67 [unused-functor-parameter]: unused functor parameter X.
