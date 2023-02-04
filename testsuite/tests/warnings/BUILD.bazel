@@ -1,19 +1,52 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
 load("//test:rules.bzl",
-     "inline_expect_module",
+     "compile_module_tests",
+     "compile_signature_tests",
+     "module_program_tests",
      "ocamlcc_diff_tests",
      "ocamlcc_diff_test",
-     "test_executable",
+     "test_program",
      "test_module",
      "test_signature",
 )
-load("//test/rules:inline_expect_module.bzl",
-     # "inline_expect_module",
-     "inline_expect_test",
+load("//test/rules:inline_expect_module.bzl", "inline_expect_test")
+
+test_suite(
+    name = "warnings",
+    tests  = [
+        ":Deprecated_module_tests",
+        ":Deprecated_module_assigment_tests",
+        ":Deprecated_module_use_tests",
+        ":Deprecated_warning_specs_test",
+        ":W01_tests",
+        ":W03_tests",
+        ":W04_tests",
+        ":W04_failure_tests",
+        ":W06_tests",
+        ":W32_tests",
+        ":W32_sig_tests",
+        ":W32b_tests",
+        ":W33_tests",
+        ":W45_tests",
+        ":W47_inline_tests",
+        ":W50_tests",
+        ":W51_test",
+        ":W51_bis_tests",
+        ":W52_test",
+        ":W53_tests",
+        ":W54_tests",
+        ":W55_tests",
+        ":W55_flambda_tests",
+        # ":W58_tests", # FIXME - "_none_" module name
+        ":W59_tests",
+        ":W60_tests",
+        ":W60_sig_tests",
+        ":W68_tests",  # FIXME
+    ],
 )
 
-## NB: tests can be configure to make exceptions either warnings or errors.
+## NB: tests can be configured to make exceptions either warnings or errors.
 
 # With warnings, the compile will write warnings to stderr and succeed
 # with return code 0, and will produce the compiled output files (cmi,
@@ -69,113 +102,56 @@ load("//test/rules:inline_expect_module.bzl",
 ## ALERT: if you get errors like  "Error: Unbound value +",
 ## you probably need to add 'stdlib_deps = ["//stdlib:Stdlib"]'
 
-MODULE_OPTS = []
-SIG_OPTS = []
-
-test_suite(
-    name = "warnings",
-    tests  = [
-        ":Deprecated_module_tests",
-        ":Deprecated_module_assigment_tests",
-        ":Deprecated_module_use_tests",
-        ":Deprecated_warning_specs_test",
-        ":W01_tests",
-        ":W03_tests",
-        ":W04_tests",
-        ":W04_failure_tests",
-        ":W06_tests",
-        ":W32_tests",
-        ":W32_cmi_tests",
-        ":W32b_tests",
-        ":W33_tests",
-        ":W45_tests",
-        ":W47_inline_tests",
-        ":W50_tests",
-        ":W51_test",  #FIXME: inline expect
-        ":W51_bis_tests",
-        ":W52_test", #FIXME: inline expect
-        ":W53_tests",
-        ":W54_tests",
-        ":W55_tests",
-        ":W55_flambda_tests",
-        # ":W58_tests", # FIXME
-        ":W59_tests",
-        ":W60_tests",
-        ":W60_cmi_tests",
-        # ":W68_tests",  # FIXME
-    ],
-)
-
-
 #####################
-ocamlcc_diff_tests(
-    name = "Deprecated_module_tests",
-    expected = "deprecated_module.compilers.reference",
-    actual   = ":deprecated_module.ml.stderr",
-    tags = ["alerts"],
+compile_module_tests(
+    name            = "Deprecated_module_tests",
+    structfile      = "deprecated_module.ml",
+    cmi             = ":Deprecated_module_cmi",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    alerts          = ["deprecated"],
+    stderr_expected = "deprecated_module.compilers.reference",
+    stderr_actual   = "deprecated_module.ml.stderr",
 )
 
-test_module(
-    name   = "Deprecated_module",
-    struct = "deprecated_module.ml",
-    sig    = "Deprecated_module_cmi",
-    stderr_actual  = "deprecated_module.ml.stderr",
-    alerts = ["deprecated"]
-)
-
-test_signature(
-    name = "Deprecated_module_cmi",
-    src  = "deprecated_module.mli",
-    # WARNING: this will NOT print alerts to stderr, even though the mli file contains deprecations
-    alerts = ["deprecated"]
+compile_signature_tests(
+    name            = "Deprecated_module_sig_tests",
+    sigfile         = "deprecated_module.mli",
+    # WARNING: this will NOT print alerts to stderr, even though the
+    # mli file contains deprecations:
+    alerts = ["+deprecated"],
+    stderr_expected = "deprecated_module.mli.stderr.expected",
+    stderr_actual = "deprecated_module.mli.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
+compile_module_tests(
     ## WARNING: note the misspelling of 'assignment'
-    name = "Deprecated_module_assigment_tests",
-    expected = "deprecated_module_assigment.compilers.reference",
-    actual   = ":deprecated_module_assigment.ml.stderr",
-    tags = ["alerts"],
-)
-
-test_module(
-    name   = "Deprecated_module_assigment",
-    struct = "deprecated_module_assigment.ml",
+    name            = "Deprecated_module_assigment_tests",
+    structfile      = "deprecated_module_assigment.ml",
     stdlib_deps = ["//stdlib:CamlinternalOO"],
-    stderr_actual  = "deprecated_module_assigment.ml.stderr",
-    alerts = ["deprecated"]
+    alerts = ["deprecated"],
+    stderr_expected = ":deprecated_module_assigment.compilers.reference",
+    stderr_actual   = "deprecated_module_assigment.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
-    name          = "Deprecated_module_use_tests",
-    expected      = "deprecated_module_use.compilers.reference",
-    actual        = ":deprecated_module_use.ml.stderr",
-    tags          = ["warnings"],
-)
-
-test_module(
-    name          = "Deprecated_module_use",
-    struct        = "deprecated_module_use.ml",
-    deps          = [":Deprecated_module"],
-    stderr_actual = "deprecated_module_use.ml.stderr",
-    alerts        = ["deprecated"]
+compile_module_tests(
+    name            = "Deprecated_module_use_tests",
+    structfile      = "deprecated_module_use.ml",
+    deps            = [":Deprecated_module"],
+    alerts          = ["deprecated"],
+    stderr_expected = "deprecated_module_use.compilers.reference",
+    stderr_actual   = "deprecated_module_use.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
-    name          = "Deprecated_mutable_tests",
-    expected      = "deprecated_mutable.compilers.reference",
-    actual        = ":deprecated_mutable.ml.stderr",
-    tags          = ["warnings"],
-)
-
-test_module(
-    name          = "Deprecated_mutable",
-    struct        = "deprecated_mutable.ml",
-    stderr_actual = "deprecated_mutable.ml.stderr",
-    alerts        = ["deprecated"]
+compile_module_tests(
+    name            = "Deprecated_mutable_tests",
+    structfile      = "deprecated_mutable.ml",
+    deps            = [":Deprecated_module"],
+    alerts          = ["deprecated"],
+    stderr_expected = "deprecated_mutable.compilers.reference",
+    stderr_actual   = "deprecated_mutable.ml.stderr",
 )
 
 ################
@@ -185,21 +161,12 @@ inline_expect_test(
 )
 
 ################################################################
-
-#####################
-ocamlcc_diff_tests(
-    name = "W01_tests",
-    expected = "w01.compilers.reference",
-    actual   = ":w01.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module( # Demo: exceptions as errors
-    name   = "W01",
-    struct = "w01.ml",
+compile_module_tests(
+    name            = "W01_tests",
+    structfile      = "w01.ml",
     stdlib_deps = ["//stdlib"],
     opts = ["-no-strict-sequence"],
-    stdout_actual  = "w01.ml.stdout",
+    stderr_expected = ":w01.compilers.reference",
     stderr_actual  = "w01.ml.stderr",
     # as warnings:
     # rc_expected = 0,
@@ -217,341 +184,303 @@ test_module( # Demo: exceptions as errors
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W03_tests",
-    expected = "w03.compilers.reference",
-    actual   = ":w03.ml.stderr",
-    tags = ["warnings"],
+compile_module_tests(
+    name            = "W03_tests",
+    structfile      = "w03.ml",
+    alerts          = ["deprecated"], # default: makes the alert a warning
+    stderr_expected = ":w03.compilers.reference",
+    stderr_actual   = "w03.ml.stderr",
+    timeout         = "short"
 )
 
-test_module(
-    name   = "W03",
-    struct = "w03.ml",
-    stderr_actual  = "w03.ml.stderr",
-    alerts = ["deprecated"], # default: makes the alert a warning
-    # warning '-70' is added automatically, since we have no .mli
-    # rc_expected defaults to 0
-)
+# ocamlcc_diff_tests(
+#     name = "W03_tests",
+#     expected = "w03.compilers.reference",
+#     actual   = ":w03.ml.stderr",
+#     tags = ["warnings"],
+# )
 
-#####################
-ocamlcc_diff_tests(
-    name = "W04_tests",
-    expected = "w04.compilers.reference",
-    actual   = ":w04.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W04",
-    struct = "w04.ml",
-    stderr_actual  = "w04.ml.stderr",
-    warnings = ["fragile-match"] # 4
-)
+# test_module(
+#     name   = "W03",
+#     struct = "w03.ml",
+#     stderr_actual  = "w03.ml.stderr",
+#     alerts = ["deprecated"], # default: makes the alert a warning
+#     # warning '-70' is added automatically, since we have no .mli
+#     # rc_expected defaults to 0
+# )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W04_failure_tests",
-    expected = "w04_failure.compilers.reference",
-    actual   = ":w04_failure.ml.stderr",
-    tags = ["warnings"],
+compile_module_tests(
+    name            = "W04_tests",
+    structfile      = "w04.ml",
+    warnings        = ["fragile-match"], # 4
+    stderr_expected = ":w04.compilers.reference",
+    stderr_actual   = "w04.ml.stderr",
+    timeout         = "short"
 )
 
-test_module(
-    name   = "W04_failure",
-    struct = "w04_failure.ml",
-    stderr_actual  = "w04_failure.ml.stderr",
-    warnings = ["fragile-match"] # 4
-)
+# ocamlcc_diff_tests(
+#     name = "W04_tests",
+#     expected = "w04.compilers.reference",
+#     actual   = ":w04.ml.stderr",
+#     tags = ["warnings"],
+# )
 
-#####################
-ocamlcc_diff_tests(
-    name = "W06_tests",
-    expected = "w06.compilers.reference",
-    actual   = ":w06.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W06",
-    struct = "w06.ml",
-    stdlib_deps = ["//stdlib:Stdlib"],
-    stderr_actual  = "w06.ml.stderr",
-    warnings = ["labels-omitted"] # 6
-)
+# test_module(
+#     name   = "W04",
+#     struct = "w04.ml",
+#     stderr_actual  = "w04.ml.stderr",
+#     warnings = ["fragile-match"] # 4
+# )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W32_tests",
-    expected = "w32.ml.stderr.expected",
-    actual   = ":w32.ml.stderr",
-    tags = ["warnings"],
+compile_module_tests(
+    name            = "W04_failure_tests",
+    structfile      = "w04_failure.ml",
+    warnings        = ["fragile-match"], # 4
+    stderr_expected = ":w04_failure.compilers.reference",
+    stderr_actual   = "w04_failure.ml.stderr",
 )
 
-test_module(
-    name   = "W32",
-    struct = "w32.ml",
-    sig    = "W32_cmi",
-    stderr_actual  = "w32.ml.stderr",
-    warnings = [
+# ocamlcc_diff_tests(
+#     name = "W04_failure_tests",
+#     expected = "w04_failure.compilers.reference",
+#     actual   = ":w04_failure.ml.stderr",
+#     tags = ["warnings"],
+# )
+
+# test_module(
+#     name   = "W04_failure",
+#     struct = "w04_failure.ml",
+#     stderr_actual  = "w04_failure.ml.stderr",
+#     warnings = ["fragile-match"] # 4
+# )
+
+#####################
+compile_module_tests(
+    name            = "W06_tests",
+    structfile      = "w06.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    warnings        = ["labels-omitted"], # 6
+    stderr_expected = ":w06.compilers.reference",
+    stderr_actual   = "w06.ml.stderr",
+)
+
+# ocamlcc_diff_tests(
+#     name = "W06_tests",
+#     expected = "w06.compilers.reference",
+#     actual   = ":w06.ml.stderr",
+#     tags = ["warnings"],
+# )
+
+# test_module(
+#     name   = "W06",
+#     struct = "w06.ml",
+#     stdlib_deps = ["//stdlib:Stdlib"],
+#     stderr_actual  = "w06.ml.stderr",
+#     warnings = ["labels-omitted"] # 6
+# )
+
+#####################
+## ALERT: this case conflates .ml and .mli compilation.
+## We split the expected stderr, w32.compilers.reference,
+## into two files, w32.ml.stderr.expected and w32.mli.stderr.expected
+## and test separately.
+compile_module_tests(
+    name            = "W32_tests",
+    structfile      = "w32.ml",
+    cmi             = ":W32_cmi", # generated by compile_signature_tests below
+    warnings        = [
         "unused-functor-parameter", # 67
         "unused-rec-flag",          # 39
         "unused-value-declaration", # 32
         "unused-module"             # 60
-    ]
+    ],
+    ## splitting w32.compilers.reference:
+    stderr_expected = "w32.ml.stderr.expected",
+    stderr_actual   = "w32.ml.stderr",
 )
 
-ocamlcc_diff_tests(
-    name = "W32_cmi_tests",
-    expected = "w32.mli.stderr.expected",
-    actual   = ":w32.mli.stderr",
-    tags = ["warnings"],
-)
-
-test_signature(
-    name = "W32_cmi",
-    src  = "w32.mli",
+compile_signature_tests(
+    name            = "W32_sig_tests",
+    sigfile         = "w32.mli",
+    warnings        = ["unused-functor-parameter"],
+    ## splitting w32.compilers.reference:
+    stderr_expected = ":w32.mli.stderr.expected",
     stderr_actual = "w32.mli.stderr",
-    warnings = ["unused-functor-parameter"],
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W32b_tests",
-    expected = "w32b.compilers.reference",
-    actual   = ":w32b.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W32b",
-    struct = "w32b.ml",
-    stderr_actual  = "w32b.ml.stderr",
-    warnings = [
+compile_module_tests(
+    name            = "W32b_tests",
+    structfile      = "w32b.ml",
+    warnings        = [
         "unused-type-declaration", # 34
         "unused-module"            # 60
-    ]
+    ],
+    stderr_expected = ":w32b.compilers.reference",
+    stderr_actual   = "w32b.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W33_tests",
-    expected = "w33.compilers.reference",
-    actual   = ":w33.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W33",
-    struct = "w33.ml",
-    stderr_actual  = "w33.ml.stderr",
-    warnings = [
+compile_module_tests(
+    name            = "W33_tests",
+    structfile      = "w33.ml",
+    warnings        = [
         "unused-open",         # 33
         "unused-open-bang",    # 66
-    ]
+    ],
+    stderr_expected = ":w33.compilers.reference",
+    stderr_actual   = "w33.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W45_tests",
-    expected = "w45.compilers.reference",
-    actual   = ":w45.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W45",
-    struct = "w45.ml",
-    stderr_actual  = "w45.ml.stderr",
-    warnings = [
+compile_module_tests(
+    name            = "W45_tests",
+    structfile      = "w45.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    warnings        = [
         "open-shadow-label-constructor", # 45
         "ambiguous-name",                # 41
         "unused-open",                   # 33
-    ]
+    ],
+    stderr_expected = ":w45.compilers.reference",
+    stderr_actual   = "w45.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W47_inline_tests",
-    expected = "w47_inline.compilers.reference",
-    actual   = ":w47_inline.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W47_inline",
-    struct = "w47_inline.ml",
-    stdlib_deps = ["//stdlib:Stdlib"],
-    stderr_actual  = "w47_inline.ml.stderr",
-    warnings = [
+compile_module_tests(
+    name            = "W47_inline_tests",
+    structfile      = "w47_inline.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    warnings        = [
         "unused-var",          # 26
         "attribute-payload",   # 47
         "inlining-impossible"  # 55
-    ]
+    ],
+    stderr_expected = ":w47_inline.compilers.reference",
+    stderr_actual   = "w47_inline.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W50_tests",
-    # compilers = ["ocamlc.byte", "ocamlc.opt"],
-    expected = "w50.compilers.reference",
-    actual   = ":w50.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W50",
-    struct = "w50.ml",
-    stdlib_deps = ["//stdlib:Stdlib.List"],
-    stderr_actual  = "w50.ml.stderr",
-    warnings = [
-        "unused-module"            # 60
-    ]
+compile_module_tests(
+    name            = "W50_tests",
+    structfile      = "w50.ml",
+    stdlib_deps     = ["//stdlib:Stdlib.List"],
+    warnings        = ["unused-module"], # 60
+    stderr_expected = ":w50.compilers.reference",
+    stderr_actual   = "w50.ml.stderr",
 )
 
 ################
-diff_test(
-    name = "W51_test",
-    file1 = "w51.ml",
-    file2 = "W51_expect",
-    timeout = "short",
-    tags = ["inline_expect"]
-)
-
-inline_expect_module(
-    name   = "W51_expect",
-    struct = "w51.ml",
+inline_expect_test(
+    name        = "W51_test",
+    struct  = "w51.ml",
     stdlib_deps = ["//stdlib:Stdlib"],
-    warnings = ["fragile-match"]
+    warnings    = ["-A",
+                   "+attribute-payload",         # 47
+                   "+wrong-tailcall-expectation"] # 51
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W51_bis_tests",
-    expected = "w51_bis.compilers.reference",
-    actual   = ":w51_bis.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W51_bis",
-    struct = "w51_bis.ml",
-    stderr_actual  = "w51_bis.ml.stderr",
-    warnings = [
-        "wrong-tailcall-expectation" # 51
-    ]
+compile_module_tests(
+    name            = "W51_bis_tests",
+    structfile      = "w51_bis.ml",
+    warnings        = ["wrong-tailcall-expectation"], # 51
+    stderr_expected = ":w51_bis.compilers.reference",
+    stderr_actual   = "w51_bis.ml.stderr",
 )
 
 ################
-diff_test(
-    name = "W52_test",
-    file1 = "w52.ml",
-    file2 = "W52_expect",
-    timeout = "short",
-    tags = ["inline_expect"]
-)
-
-inline_expect_module(
-    name   = "W52_expect",
-    struct = "w52.ml",
-    warnings = [
-    ]
+inline_expect_test(
+    name        = "W52_test",
+    struct      = "w52.ml",
+    stdlib_deps = ["//stdlib:Stdlib"],
+    warnings    = ["-A", "+fragile-literal-pattern"]
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W53_tests",
-    compilers = ["ocamlc.byte", "ocamlc.opt"],
-    expected = "w53.compilers.reference",
-    actual   = ":w53.ml.stderr",
-    timeout = "short",
-    tags = ["vv", "sv", "warnings"],
-)
-
-test_module(
-    name   = "W53",
-    struct = "w53.ml",
-    stdlib_deps = ["//stdlib:Stdlib.Int32",
-                   "//stdlib:Stdlib.Set"],
-    stderr_actual  = "w53.ml.stderr",
-    warnings = [
+## NOTE: only for vm-emitting compilers
+compile_module_tests(
+    name            = "W53_tests",
+    compilers       = ["ocamlc.byte", "ocamlc.opt"],
+    structfile      = "w53.ml",
+    stdlib_deps     = ["//stdlib:Stdlib.Int32",
+                       "//stdlib:Stdlib.Set"],
+    warnings        = [
         "unused-value-declaration", # 32
         "misplaced-attribute",      # 53
-    ]
+    ],
+    stderr_expected = ":w53.compilers.reference",
+    stderr_actual   = "w53.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W54_tests",
-    expected = "w54.compilers.reference",
-    actual   = ":w54.ml.stderr",
-    tags = ["vv", "sv", "warnings"],
-)
-
-test_module(
-    name   = "W54",
-    struct = "w54.ml",
-    stderr_actual  = "w54.ml.stderr",
-    warnings = [
-        "duplicated-attribute", # 54
-    ]
+compile_module_tests(
+    name            = "W54_tests",
+    structfile      = "w54.ml",
+    warnings = ["duplicated-attribute"], # 54
+    stderr_expected = ":w54.compilers.reference",
+    stderr_actual   = "w54.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
+## NOTE: different compilers expect different stderr, so we need 3 testsuites
+# 1. verify that vm compilers do not report any warnings to stderr:
+# To verify that the test logic works, add the following to w55.ml
+# let foo = ( *\);;
+# this will trigger a comment-not-end warning that will be written to stderr
+test_suite(
     name = "W55_tests",
-    compilers = ["ocamlopt.byte", "ocamlopt.opt"],
-    expected = "w55.native.reference",
-    actual   = ":w55.ml.stderr",
-    tags = ["warnings"],
-    verbose = True
-)
-
-# verify that vm compilers do not report warnings
-# ocamlcc_diff_tests(
-#     name = "W55_vm_tests",
-#     compilers = ["ocamlc.byte"],
-#     # expected = empty ## Not yet supported
-#     actual   = ":w55.ml.stderr",
-#     tags = ["warnings"],
-#     verbose = True
-# )
-
-ocamlcc_diff_tests(
-    name = "W55_flambda_tests",
-    compilers = ["ocamloptx.byte", "ocamloptx.opt",  "ocamloptx.optx"],
-    expected = "w55.flambda.reference",
-    actual   = ":w55.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W55",
-    struct = "w55.ml",
-    stdlib_deps = ["//stdlib:Stdlib"],
-    stderr_actual  = "w55.ml.stderr",
-    warnings = [
-        "inlining-impossible", # 55
+    tests  = [
+        ":W55_vm_tests",
+        ":W55_sys_tests",
+        ":W55_flambda_tests",
     ]
+)
+
+compile_module_tests(
+    name            = "W55_vm_tests",
+    compilers       = ["ocamlc.byte", "ocamlc.opt"],
+    structfile      = "w55.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    stderr_expected = None,
+    stderr_actual   = "w55.ml.vm.stderr",  # expected to be empty
+)
+
+# 2. std native compilers
+compile_module_tests(
+    name            = "W55_sys_tests",
+    compilers       = ["ocamlopt.byte", "ocamlopt.opt"],
+    structfile      = "w55.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    warnings        = ["+A", "inlining-impossible"], # 55
+    stderr_expected = ":w55.native.reference",
+    stderr_actual   = "w55.ml.sys.stderr",
+)
+
+# 3. flambda compilers
+compile_module_tests(
+    name            = "W55_flambda_tests",
+    compilers       = ["ocamloptx.byte", "ocamloptx.opt",  "ocamloptx.optx"],
+    structfile      = "w55.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    warnings        = ["inlining-impossible"], # 55
+    stderr_expected = "w55.flambda.reference",
+    stderr_actual   = "w55.ml.stderr",
 )
 
 #####################
-ocamlcc_diff_tests(
-    name = "W58_tests",
-    compilers = ["ocamlopt.byte", "ocamlopt.opt"],
-    expected = "w58.native.reference",
-    actual   = ":w58.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W58",
-    struct = "w58.ml",
-    sig_deps    = ["Module_without_cmx_cmi"],
-    stdlib_deps = ["//stdlib:Stdlib"],
-    stderr_actual  = "w58.ml.stderr",
-    warnings = [
-        "no-cmx-file",         # 58
-    ]
+## FIXME: module name in warning is "_none_"
+compile_module_tests(
+    name            = "W58_tests",
+    compilers       = ["ocamlc.byte", "ocamlopt.byte"],
+    structfile      = "w58.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    sig_deps        = ["Module_without_cmx_cmi"],
+    warnings        = ["no-cmx-file"],         # 58
+    stderr_expected = ":w58.native.reference",
+    stderr_actual   = "w58.ml.stderr",
 )
 
 test_signature(
@@ -561,77 +490,75 @@ test_signature(
 )
 
 #####################
-ocamlcc_diff_tests(
+test_suite(
     name = "W59_tests",
-    compilers = ["ocamloptx.byte", "ocamloptx.opt", "ocamloptx.optx"],
-    expected = "w59.flambda.reference",
-    actual   = ":w59.ml.stderr",
-    tags = ["warnings"],
-)
-## FIXME: src says ocamlc.byte and ocamlopt.byte
-
-test_module(
-    name   = "W59",
-    struct = "w59.ml",
-    stdlib_deps = ["//stdlib:Stdlib.Lazy"],
-    stderr_actual  = "w59.ml.stderr",
-
-    # ocamlc.byte
-    # warnings = ["unused-module"] # 60
-
-    ## ocamlopt.byte:
-    opts   = ["-dflambda-invariants"],
-    warnings = ["flambda-assignment-to-non-mutable-value"] # 59
-)
-
-#####################
-ocamlcc_diff_tests(
-    name = "W60_tests",
-    # compilers = ["ocamlc.byte", "ocamlc.opt"],
-    expected = "w60.compilers.reference",
-    actual   = ":w60.ml.stderr",
-    tags = ["warnings"],
-)
-
-test_module(
-    name   = "W60",
-    struct = "w60.ml",
-    sig    = "W60_cmi",
-    stderr_actual  = "w60.ml.stderr",
-    warnings = ["unused-module"] # 60
-)
-
-ocamlcc_diff_tests(
-    name = "W60_cmi_tests",
-    expected = "w60.mli.stderr.expected",
-    actual   = ":w60.mli.stderr",
-    tags = ["warnings"],
-)
-
-test_signature(
-    name = "W60_cmi",
-    src  = "w60.mli",
-    stderr_actual  = "w60.mli.stderr",
-    warnings = ["unused-functor-parameter"] # 67
-)
-
-################
-## TODO: link and run w68 as a batch test
-
-test_executable(
-    name    = "W68.exe",
-    main    = ":W68",
-)
-
-test_module(
-    name   = "W68",
-    struct = "w68.ml",
-    stdlib_deps = ["//stdlib:Stdlib", "//stdlib:Stdlib.Gc"],
-    stderr_actual  = "w68.ml.stderr",
-    warnings = [
-        # "@A",
-        "partial-match",                         # 8
-        "match-on-mutable-state-prevent-uncurry" # 68
+    tests  = [
+        ":W59_vm_tests",
+        ":W59_sys_tests",
+        ":W59_flambda_tests",
     ]
 )
 
+compile_module_tests(
+    name            = "W59_vm_tests",
+    compilers       = ["ocamlc.byte", "ocamlc.opt"],
+    structfile      = "w59.ml",
+    stdlib_deps     = ["//stdlib:Stdlib.Lazy"],
+    stderr_expected = None,
+    stderr_actual   = "w59.ml.vm.stderr",
+)
+
+compile_module_tests(
+    name            = "W59_sys_tests",
+    compilers       = ["ocamlopt.byte", "ocamlopt.opt"],
+    structfile      = "w59.ml",
+    stdlib_deps     = ["//stdlib:Stdlib.Lazy"],
+    opts            = ["-dflambda-invariants"],
+    warnings        = ["flambda-assignment-to-non-mutable-value"], # 59
+    stderr_expected = None,
+    stderr_actual   = "w59.ml.sys.stderr",
+)
+
+compile_module_tests(
+    name            = "W59_flambda_tests",
+    compilers       = ["ocamloptx.byte", "ocamloptx.opt", "ocamloptx.optx"],
+    structfile      = "w59.ml",
+    stdlib_deps     = ["//stdlib:Stdlib.Lazy"],
+    opts            = ["-dflambda-invariants"],
+    warnings        = ["flambda-assignment-to-non-mutable-value"], # 59
+    stderr_expected = "w59.flambda.reference",
+    stderr_actual   = "w59.ml.flambda.stderr",
+)
+
+#####################
+compile_module_tests(
+    name            = "W60_tests",
+    structfile      = "w60.ml",
+    cmi             = "W60_cmi",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    warnings = ["unused-module"], # 60
+    stderr_expected = ":w60.compilers.reference",
+    stderr_actual   = "w60.ml.stderr",
+)
+
+compile_signature_tests(
+    name            = "W60_sig_tests",
+    sigfile         = "w60.mli",
+    warnings        = ["unused-functor-parameter"], # 67
+    stderr_expected = "w60.mli.stderr.expected",
+    stderr_actual   = "w60.mli.stderr",
+)
+
+################
+module_program_tests(
+    name            = "W68_tests",
+    compilers       = ["ocamlopt.byte", "ocamlopt.opt", "ocamlopt.optx",
+                 "ocamloptx.optx", "ocamloptx.opt", "ocamloptx.byte"],
+    structfile      = "w68.ml",
+    stdlib_deps     = ["//stdlib:Stdlib", "//stdlib:Stdlib.Gc"],
+    warnings        = [
+        "partial-match",                         # 8
+        "match-on-mutable-state-prevent-uncurry" # 68
+    ],
+    stdout_expected = "w68.reference",
+)
