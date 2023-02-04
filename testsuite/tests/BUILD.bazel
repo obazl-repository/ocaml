@@ -26,6 +26,8 @@ test_suite(
 
         "//testsuite/tests/typing-missing-cmi",
         "//testsuite/tests/typing-missing-cmi-2",
-        "//testsuite/tests/typing-missing-cmi-3"
+        "//testsuite/tests/typing-missing-cmi-3",
+
+        "//testsuite/tests/warnings"
     ],
 )

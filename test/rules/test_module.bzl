@@ -6,6 +6,7 @@ load("//bzl:providers.bzl",
      "SigInfo",
      "StdLibMarker")
 
+load("//bzl:functions.bzl", "validate_outnames")
 load("//bzl/attrs:module_attrs.bzl", "module_attrs")
 load("//bzl/actions:module_impl.bzl", "module_impl")
 load("//bzl/actions:module_compile_plus.bzl",
@@ -17,17 +18,18 @@ load(":test_transitions.bzl",
 ######################
 def _test_module_impl(ctx):
 
+    (stem, extension) = paths.split_extension(ctx.file.struct.basename)
     if ctx.attr.module:
         module_name = ctx.attr.module
     else:
-        (this, extension) = paths.split_extension(ctx.file.struct.basename)
-        module_name = this[:1].capitalize() + this[1:]
+        module_name = stem[:1].capitalize() + stem[1:]
 
     if ctx.attr.rc_expected == 0:
         if (ctx.attr.stderr_actual
             or ctx.attr.stdout_actual
-            or ctx.attr.logfile_actual):
+            or ctx.attr.stdlog_actual):
             # compile succeeds but writes warnings to stderr
+            validate_outnames(ctx, ctx.file.struct.basename)
             return module_compile_plus(ctx, module_name)
             ## return module_impl(ctx, module_name)
         else:
@@ -38,10 +40,12 @@ def _test_module_impl(ctx):
         # at least one of stdout and stderr must be specified
         if not (ctx.attr.stdout_actual or ctx.attr.stderr_actual):
             fail("If expected rc is non-zero, at least one of stdout_actual or stderr_actual must be specified.")
+
+        validate_outnames(ctx, ctx.file.struct.basename)
         return module_compile_plus(ctx, module_name)
 
 ####################
-test_module_ = rule(
+test_module = rule(
     implementation = _test_module_impl,
     doc = "Compiles a module.",
     attrs = dict(
@@ -53,7 +57,7 @@ test_module_ = rule(
 
         stdout_actual = attr.output(),
         stderr_actual = attr.output(),
-        logfile_actual = attr.output(), # for e.g. -dlambda dumpfile
+        stdlog_actual = attr.output(), # for e.g. -dlambda dumpfile
         # stdout_expected = attr.label(allow_single_file = True),
         # stderr_expected = attr.label(allow_single_file = True),
         dump = attr.string_list( #FIXME: rename 'dump' > 'logging'
@@ -107,7 +111,7 @@ test_module_ = rule(
 
 ################################################################
 ##  MACRO: adds tag attribute
-def test_module(name,
+def test_module_(name,
                 visibility = ["//visibility:public"],
                 **kwargs):
 
@@ -115,7 +119,7 @@ def test_module(name,
         fail("test_module target names are automatically suffixed with .cmo and .cmx; do not include in name attribute.")
 
 
-    test_module_(
+    test_module(
         name   = name,
         visibility = visibility,
         tags   = ["test_module"],

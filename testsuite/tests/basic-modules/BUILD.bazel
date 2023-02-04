@@ -1,57 +1,74 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//test:rules.bzl",
-     "test_executable_macro",
      "test_library",
      "test_module",
      "test_signature",
-     "batch_test_macro",
+     "batch_tests",
      "batch_vv_test",
      "inline_expect_module",
-     "compile_dump_diff_test_macro"
+     "ocamlcc_diff_test",
+     "ocamlcc_diff_tests",
+     # "compile_dump_diff_test_macro",
 )
+load("//test/rules:normalizers.bzl", "test_stdlog_normalize")
 
 load("//config:WARNINGS.bzl", "w")
 
+################################################################
 test_suite(
     name = "basic-modules",
     tests = [
-        ":Anonymous_test",
+        ":Anonymous_tests",
         ":Main_expect_test",
         ":Recursive_module_init_expect_test",
         ":Recursive_module_evaluation_errors_test",
     ],
 )
 
-compile_dump_diff_test_macro(
-    name   = "Anonymous_test",
-    test_module = ":Anonymous",
-    logfile_actual = ":anonymous.ml.lambda",
-    vm_expected = "anonymous.ocamlc.reference",
-    sys_expected = "anonymous.ocamlopt.reference",
-    flambda_expected = "anonymous.ocamlopt.flambda.reference",
-    tags = ["lambda"]
+###################
+# diff_test(
+#     name = "Anonymous_diff_test",
+#     file1 = "anonymous.ocamlc.reference.norm",
+#     file2 = ":anonymous.ml.stdlog.norm",
+#     timeout = "short"
+# )
+ocamlcc_diff_test(
+    name = "Anonymous_tests",
+    expected = ":anonymous.ocamlc.reference.norm",
+    actual = ":anonymous.ml.stdlog.norm",
+    timeout = "short"
+)
+# ocamlcc_diff_tests(
+#     name = "Anonymous_tests",
+#     compilers = ["ocamlc.byte", "ocamlc.opt"],
+#     expected = "anonymous.ocamlc.reference.norm",
+#     actual   = ":anonymous.ml.stdlog.norm",
+#     tags = ["warnings"],
+# )
+
+test_stdlog_normalize(
+    name = "Anonymous_norm",
+    expected     = "anonymous.ocamlc.reference",
+    expected_out = ":anonymous.ocamlc.reference.norm",
+    actual     = ":anonymous.ml.stdlog",
+    actual_out = ":anonymous.ml.stdlog.norm",
+    verbose = True
 )
 
 test_module(
     name   = "Anonymous",
     struct   = "anonymous.ml",
-    logfile_actual = "anonymous.ml.lambda",
-    dump = [
-        "lambda",
-        # "rawlambda",
-        # "parsetree",
-        # "instr",
-        # "cmm",         ## native
-        # "clambda",     ## native
-        # "rawclambda",  ## native
-        # "instruction-selection" # native?
-    ],
-    opts   = ["-dno-unique-ids"],
     stdlib_deps = ["//stdlib:CamlinternalMod"],
-    warnings = [w.UNUSED_TYPE_DECLARATION_34, w.UNUSED_VALUE_DECLARATION_32]
+    opts   = ["-dno-unique-ids"],
+    dump = ["lambda"], ##FIXME:  dump => log
+    warnings = [ # do not report (write to stderr)
+        "-unused-type-declaration", # 34
+        "-unused-value-declaration" #_32
+    ],
+    stdlog_actual = "anonymous.ml.stdlog",
 )
 
-batch_test_macro(
+batch_tests(
     name     = "Main_expect_test",
     test_module = ":Main",
     stdout_actual   = "Main.stdout",
@@ -138,7 +155,7 @@ inline_expect_module(
 )
 
 ################################################################
-batch_test_macro(
+batch_tests(
     name     = "Recursive_module_init_expect_test",
     test_module = ":Recursive_module_init",
     stdout_actual   = "Recursive_module_init.stdout",

@@ -10,7 +10,7 @@ load("//bzl/transitions:dev_transitions.bzl",
 
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 
-load("test_executable.bzl", "test_executable")
+load("test_program.bzl", "test_program")
 
 load(":test_transitions.bzl", "test_in_transitions")
 
@@ -133,7 +133,7 @@ def inline_test_macro(name,
         **kwargs
     )
 
-    test_executable(
+    test_program(
         name    = executable,
         main    = test_module,
         opts    = opts,

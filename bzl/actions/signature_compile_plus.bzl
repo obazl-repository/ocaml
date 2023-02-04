@@ -64,14 +64,14 @@ def signature_compile_plus(ctx, module_name):
 
     logfile_output = []
     logfile_cp = ""
-    if ctx.outputs.logfile_actual:
-        logfile_output.append(ctx.outputs.logfile_actual)
+    if ctx.outputs.stdlog_actual:
+        logfile_output.append(ctx.outputs.stdlog_actual)
 
         #NB: ln -s won't work since dumpfile will be removed
         #(since it is not an output), giving us a dangling symlink
         logfile_cp = "cp {dumpfile} {logfile} ;".format(
             dumpfile = outputs["cmstruct"].path + ".dump",
-            logfile = ctx.outputs.logfile_actual.path
+            logfile = ctx.outputs.stdlog_actual.path
         )
 
     ################
@@ -192,8 +192,8 @@ def signature_compile_plus(ctx, module_name):
         all_group.append(ctx.outputs.stdout_actual)
     if ctx.outputs.stderr_actual:
         all_group.append(ctx.outputs.stderr_actual)
-    if ctx.outputs.logfile_actual:
-        all_group.append(ctx.outputs.logfile_actual)
+    if ctx.outputs.stdlog_actual:
+        all_group.append(ctx.outputs.stdlog_actual)
     if outputs["cmti"]:
         all_group.append(outputs["cmti"])
 

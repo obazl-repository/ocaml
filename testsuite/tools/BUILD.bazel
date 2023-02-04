@@ -3,7 +3,7 @@ load("//tools:TOOL_RULES.bzl", "ocaml_tool_vm")
 load("//bzl:rules.bzl", "cc_assemble")
 
 load("//test:rules.bzl",
-     "test_executable",
+     "test_program",
      "test_library",
      "test_module",
      "test_signature",
@@ -63,7 +63,7 @@ ocaml_tool_vm( #FIXME: use compiler rule?
 
 ################
 #FIXME: use ocaml_tool?
-test_executable(
+test_program(
     name = "codegen",
     stem = "codegen",
     main = ":Codegen_main",
@@ -121,6 +121,7 @@ test_module(
     name   = "Expect_test",
     struct = "expect_test.ml",
     opts = MODULE_OPTS + ["-linkall"],
+    alerts = ["-unsynchronized_access"],
     warnings = [
         w.FRAGILE_MATCH_4,
         w.MISSING_RECORD_FIELD_PATTERN_9,

@@ -7,8 +7,8 @@ def add_dump_args(ctx, ext, args):
             args.add(arg)
 
     elif hasattr(ctx.attr, "dump"): # test rules w/explicit dump attr
-        if len(ctx.attr.dump) > 0:
-            args.add("-dump-into-file")
+        # if len(ctx.attr.dump) > 0:
+        #     args.add("-dump-into-file")
         for d in ctx.attr.dump:
             if d == "source":
                 args.add("-dsource")
@@ -111,8 +111,8 @@ def rule_mnemonic(ctx):
     elif rule in ["ocaml_tool_r"]:
         mnemonic = "LinkTool"
 
-    elif rule in ["test_executable"]:
-        ## all [sv][sv]_test_executable rules use this rule name
+    elif rule in ["test_program"]:
+        ## all [sv][sv]_test_program rules use this rule name
         mnemonic = "LinkTestExecutable"
     elif rule in ["test_vv_executable"]:
         mnemonic = "LinkVvTestExecutable"

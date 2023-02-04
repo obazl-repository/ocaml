@@ -254,20 +254,15 @@ def construct_outputs(ctx, _options, tc, workdir, ext,
         out_o = None
 
     out_logfile = None
-    if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
-        or hasattr(ctx.attr, "_lambda_expect_test")):
+    # if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
+    #     or hasattr(ctx.attr, "_lambda_expect_test")):
 
-        out_logfile = declare_output_file(ctx,
-            "", out_cm_.basename, ".dump", ## sfx fixed by compiler
-            sibling = out_cm_
-        )
-        # out_logfile = ctx.actions.declare_file(
-        #     ## Suffix .dump is fixed by compiler
-        #     out_cm_.basename + ".dump",
-        #     sibling = out_cm_,
+        # out_logfile = declare_output_file(ctx,
+        #     "", out_cm_.basename, ".dump", ## sfx fixed by compiler
+        #     sibling = out_cm_
         # )
-        action_outputs.append(out_logfile)
-        outputs["logfile"] = out_logfile
+        # action_outputs.append(out_logfile)
+        # outputs["logfile"] = out_logfile
 
     # construct_outputs:
     return (outputs,
@@ -578,10 +573,10 @@ def construct_inputs(ctx, tc, ext, workdir,
     ## ns rules used by debugger and dynlink with hand-rolled resolvers
     if hasattr(ctx.attr, "ns"):
         if ctx.attr.ns:
-            resolver = ctx.attr.ns[ModuleInfo]
-            resolver_deps.append(resolver.sig)
-            resolver_deps.append(resolver.struct)
-            nsname = resolver.struct.basename[:-4]
+            # resolver = ctx.attr.ns[ModuleInfo]
+            # resolver_deps.append(resolver.sig)
+            # resolver_deps.append(resolver.struct)
+            # nsname = resolver.struct.basename[:-4]
             # args.add_all(["-open", nsname])
 
             # includes.append(ctx.attr.ns[ModuleInfo].sig.dirname)
@@ -757,8 +752,8 @@ def merge_deps(ctx, outputs):
 
     for dep in ctx.attr.deps:
         depsets = aggregate_deps(ctx, dep, depsets, manifest)
-        if ctx.label.name == "Load_path":
-            print(depsets.deps.cli_link_deps)
+        # if ctx.label.name == "Load_path":
+        #     print(depsets.deps.cli_link_deps)
             # fail()
 
     for dep in ctx.attr.cc_deps:
@@ -884,9 +879,7 @@ def construct_args(ctx, tc, _options, cancel_opts,
                    outputs,
                    depsets,
                    ):
-
     includes   = []
-
     open_stdlib = False
     if hasattr(ctx.attr, "stdlib_deps"):
         # if ctx.attr._compilerlibs_archived[BuildSettingInfo].value:
@@ -1046,6 +1039,13 @@ def construct_args(ctx, tc, _options, cancel_opts,
         ##NB: -no-alias-deps is about _link_ deps, not compile deps
         args.add("-no-alias-deps") ##FIXME: control this w/flag?
         args.add("-open", "Stdlib")
+
+    if hasattr(ctx.attr, "ns"):
+        if ctx.attr.ns:
+            resolver = ctx.attr.ns[ModuleInfo]
+            # nsname = resolver.struct.basename[:-4]
+            (nsname, nsext) = paths.split_extension(resolver.struct.basename)
+            args.add("-open", nsname)
 
     # test_module has attr 'dump' for e.g. -dlambda
     #FIXME: rename 'dump' to 'logging'

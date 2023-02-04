@@ -9,14 +9,14 @@ load("//bzl/attrs:executable_attrs.bzl", "exec_common_attrs")
 
 load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
 
-load(":test_executable.bzl", "test_executable")
+load(":test_program.bzl", "test_program")
 load(":test_module.bzl", "test_module")
 
 load(":test_transitions.bzl", "test_in_transitions")
 
 load(":batch_test_impl.bzl", "batch_test_impl")
 
-## batch_test_macro
+## batch_tests
 ## expands to batch_xx_test where xx == vv | vs | ss | sv
 
 ## builds an executable and runs it
@@ -95,7 +95,7 @@ batch_sv_test = batch_rule("sv")
 ###############################################################
 ####  MACRO - generates two test targets plus on test_suite
 ################################################################
-def batch_test_macro(name,
+def batch_tests(name,
                      test_module,
                      # log_actual = None,
                      # log_expected = None,
@@ -128,6 +128,17 @@ def batch_test_macro(name,
         name  = stem + "_test",
         tests = [vv_name, vs_name, ss_name, sv_name]
     )
+
+    # test_run_program(
+    #     name     = vv_name,
+    #     compiler = ...
+    #     test_executable = executable, # + ".vv.byte",
+    #     stdout_actual   = stdout_actual,
+    #     stdout_expected = stdout_expected,
+    #     timeout  = timeout,
+    #     tags     = ["vv"] + tags,
+    #     **kwargs
+    # )
 
     batch_vv_test(
         name     = vv_name,
@@ -166,13 +177,6 @@ def batch_test_macro(name,
         stdout_expected = stdout_expected,
         timeout  = timeout,
         tags     = ["sv"] + tags,
-        **kwargs
-    )
-
-    test_executable(
-        name    = executable,
-        main    = test_module,
-        opts    = OCAML_COMPILER_OPTS + opts,
         **kwargs
     )
 
@@ -232,7 +236,7 @@ def batch_native_tests(name,
         **kwargs
     )
 
-    test_executable(
+    test_program(
         name    = executable,
         main    = ":" + stem,
         opts    = OCAML_COMPILER_OPTS + opts,

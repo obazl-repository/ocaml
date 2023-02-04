@@ -1,208 +1,262 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
-load("//bzl/rules:COMPILER.bzl", "OCAML_COMPILER_OPTS")
+
 load("//bzl:rules.bzl", "cc_preprocess")
-load("//config:WARNINGS.bzl", "w")
 
 load("//test:rules.bzl",
-     "test_executable",
-     "test_vv_executable",
-     "test_vs_executable",
-     "test_ss_executable",
-     "test_sv_executable",
-
-     "test_library",
-     "test_module",
-     "test_signature",
-
      "inline_expect_module",
-     # "inline_expect_test",
-
-     "batch_test_macro",
-     "batch_vv_test",
-     "batch_vs_test",
-     "batch_ss_test",
-     "batch_sv_test",
-
-     "compile_fail_test",
-     # "ocaml_test",
+     "module_program_tests",
+     "ocamlcc_diff_test",
+     "ocamlcc_diff_tests",
+     "test_program",
+     "test_program_outputs",
+     "test_module",
 )
 
+################################################################
 test_suite(
     name = "basic",
     tests = [
-        ":Arrays_test",
-        ":Bigints_test",
-        ":Boxedints_test",
-        ":Constprop_test",
-        ":Divint_test",
-        ":Equality_test",
-        ":Eval_order_1_test",
-        ":Eval_order_2_test",
-        ":Eval_order_3_test",
-        ":Eval_order_4_test",
-        ":Eval_order_6_test",
-        ":Eval_order_7_test",
-        ":Eval_order_pr10283_test",
-        ":Float_test",
-        ":Float_physical_equality_test",
-        ":Includestruct_test",
-        ":Localexn_test",
-        ":Localfunction_test",
-        ":Maps_test",
-        ":Min_int_test",
-        ":Opt_variants_test",
-        ":Patmatch_test",
+        ":Arrays_tests",
+        ":Bigints_tests",
+        ":Boxedints_tests",
+        ":Constprop_tests",
+        ":Divint_tests",
+        ":Equality_tests",
+        ":Eval_order_1_tests",
+        ":Eval_order_2_tests",
+        ":Eval_order_3_tests",
+        ":Eval_order_4_tests",
+        ":Eval_order_6_tests",
+        ":Eval_order_7_tests",
+        ":Eval_order_pr10283_tests",
+        ":Float_tests",
+        # ":Float_physical_equality_tests",  ## FIXME: inline assert test
+        ":Includestruct_tests",
+        ":Localexn_tests",
+        ":Localfunction_tests",
+        ":Maps_tests",
+        ":Min_int_tests",
+        ":Opt_variants_tests",
+        ":Patmatch_tests",
         ":Patmatch_for_multiple_test",
         ":Patmatch_incoherence_test",
         ":Patmatch_split_no_or_test",
-        ":Pr7253_test",
-        ":Pr7533_test",
-        ":Pr7657_test",
-        ":Recvalues_test",
-        ":Sets_test",
-        ":Stringmatch_test",
-        ":Switch_opts_test",
-        ":Tailcalls_test",
-        ":Trigraph_test",
-        ":Tuple_match_test",
-        # ":Unit_naming_test",
-        ":Zero_divided_by_n_test",
+        ":Pr7253_tests",
+        ":Pr7533_tests",
+        ":Pr7657_tests",
+        ":Recvalues_tests",
+        ":Sets_tests",
+        ":Stringmatch_tests",
+        ":Switch_opts_tests",
+        ":Tailcalls_tests",
+        ":Trigraph_tests",
+        ":Tuple_match_tests",
+        # ":Unit_naming_tests",
+        ":Zero_divided_by_n_tests",
     ],
 )
 
 ############
-## batch_test_macro expands to: test_suite,
-## batch_vv_test, batch_vs_test,
-## batch_ss_test, batch_sv_test
-
-# batch_test(
-# )
-# test_batch_runner(
-# )
-# test_batch_executable(
-# )
-# test_batch_module(
-# )
-
-batch_test_macro(
-    name    = "Arrays_test",
-    test_module = ":Arrays",
-    stdout_actual  = "arrays.stdout",
-    stdout_expected = "arrays.reference",
-)
-
-test_module(
-    name   = "Arrays",
-    struct = "arrays.ml",
+module_program_tests(
+    name              = "Arrays_tests",
+    structfile        = "arrays.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Gc",
-    ]
+    ],
+    stdout_expected   = "arrays.reference",
 )
 
-############
-## For demo purposes we include the explicit expansion of macros.
-
-## batch_test_macro expands to:
-## * batch_xx_test targets, where <x> = vv | vs | ss | sv indicates the compiler used to build the code.
-## * one test_executable target, which links the executable run by batch_xx_test
-## * one test_suite target that runs all the batch_xx_test tests
-
-## NB: the arrays test emits nothing to stdout, so we demonstrate the
-## expansion for bigints.ml, which does write to stdout.
-
-# batch_test_macro(
-#     name    = "bigints_test",
-#     test_module = ":Bigints",
-#     stdout_actual  = "bigints.stdout",
-#     stdout_expected = "bigints.reference",
+## NB: no stdout expected for arrays.ml
+# test_program(
+#     name = "Arrays.exe",
+#     main = ":Arrays"
 # )
 
-## to run tests selectively pass --test_tag_filters=...
+# test_module(
+#     name   = "Arrays",
+#     struct = "arrays.ml",
+#     stdlib_deps   = [
+#         "//stdlib:Stdlib.Array",
+#         "//stdlib:Stdlib.Gc",
+#     ]
+# )
 
-## batch_test_macro macro expansion:
-test_suite(
-    name = "Bigints_test",
-    tests = [
-        ":Bigints_vv_test",
-        ":Bigints_vs_test",
-        ":Bigints_ss_test",
-        ":Bigints_sv_test",
-    ]
+############
+## For demo purposes we include the explicit expansion of macros for
+## bigints.ml. To see the expansion for one of the
+## module_program_tests targets below, e.g. Boxedints_tests, run:
+
+# bazel query 'attr(generator_name, Boxedints_tests, testsuite/tests/basic/...)' --output=build
+
+# module_program_tests(
+#     name        = "Bigints_tests",
+#     # compilers   = ["ocamlc.byte", "ocamlc.opt"],
+#     structfile  = "bigints.ml",
+#     warnings = ["@A", "-open-shadow-identifier", "-unused-module"],
+#     stdlib_deps = ["//stdlib:Stdlib.Sys"],
+#     stdout_expected = "bigints.reference",
+# )
+# module_program_tests() expands to:
+## ocamlcc_diff_tests()
+## test_program_outputs()
+## test_program()
+## test_module()
+## test_suite()
+
+# ocamlcc_diff_tests is a macro, expanded from module_program_tests -
+# since this is a macro, it is also expanded, so it will not show up
+# as a query result:
+# ocamlcc_diff_tests(
+#     name          = "Bigints_diff_tests",
+#     expected = "bigints.reference",
+#     actual = "bigints.exe.stdout",
+# )
+
+# ocamlcc_diff_tests expands to one ocamlcc_diff_test per compiler:
+ocamlcc_diff_test(
+    name = "Bigints_ss_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamlopt.opt",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
+)
+ocamlcc_diff_test(
+    name = "Bigints_sv_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamlc.opt",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
+)
+ocamlcc_diff_test(
+    name = "Bigints_sx_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamloptx.opt",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
+)
+ocamlcc_diff_test(
+    name = "Bigints_vs_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamlopt.byte",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
+)
+ocamlcc_diff_test(
+    name = "Bigints_vv_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamlc.byte",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
+)
+ocamlcc_diff_test(
+    name = "Bigints_vx_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamloptx.byte",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
+)
+ocamlcc_diff_test(
+    name = "Bigints_xs_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamlopt.optx",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
+)
+ocamlcc_diff_test(
+    name = "Bigints_xv_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamlc.optx",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
+)
+ocamlcc_diff_test(
+    name = "Bigints_xx_test",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    timeout = "short",
+    compiler = "ocamloptx.optx",
+    expected = "//testsuite/tests/basic:bigints.reference",
+    actual = "//testsuite/tests/basic:Bigints.exe.stdout",
 )
 
-#####################
-batch_vv_test(
-    name    = "Bigints_vv_test",
-    test_executable = ":Bigints.exe",
-    stdout_actual  = "bigints.stdout",
-    stdout_expected = "bigints.reference",
-    # diff_args = ["-w", "-y"],
-    timeout  = "short",
-    tags     = ["vv"],
+## expanded from module_program_tests:
+test_program_outputs(
+    name = "Bigints.exe.outputs",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    test_executable = "//testsuite/tests/basic:Bigints.exe",
+    stdout = "//testsuite/tests/basic:Bigints.exe.stdout",
+    stderr = "//testsuite/tests/basic:Bigints.exe.stderr",
 )
 
-batch_vs_test(
-    name    = "Bigints_vs_test",
-    test_executable = ":Bigints.exe",
-    stdout_actual  = "bigints.stdout",
-    stdout_expected = "bigints.reference",
-    timeout  = "short",
-    tags     = ["vs"],
-    opts  = OCAML_COMPILER_OPTS
+## expanded from module_program_tests:
+test_program(
+    name = "Bigints.exe",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    main = "//testsuite/tests/basic:Bigints",
 )
 
-batch_ss_test(
-    name    = "Bigints_ss_test",
-    test_executable = ":Bigints.exe",
-    stdout_actual  = "bigints.stdout",
-    stdout_expected = "bigints.reference",
-    timeout  = "short",
-    tags     = ["ss"],
-    opts  = OCAML_COMPILER_OPTS
-)
-
-batch_sv_test(
-    name    = "Bigints_sv_test",
-    test_executable = ":Bigints.exe",
-    stdout_actual = "bigints.stdout",
-    stdout_expected = "bigints.reference",
-    timeout  = "short",
-    tags     = ["sv"],
-    opts  = OCAML_COMPILER_OPTS
-)
-
-# run 'bazel run testsuite/tests/basic:Bigints.exe' to see stdout/stderr
-test_executable(
-    name    = "Bigints.exe",
-    main    = ":Bigints",
-)
-
+## expanded from module_program_tests:
 test_module(
-    name   = "Bigints",
-    struct = "bigints.ml",
-    stdlib_deps = [
-        # "//stdlib",
-        "//stdlib:Stdlib.Sys"
-    ]
+    name = "Bigints",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    opts = [],
+    warnings = ["@A", "-open-shadow-identifier", "-unused-module"],
+    struct = "//testsuite/tests/basic:bigints.ml",
+    stdlib_deps = ["//stdlib:Stdlib.Sys"],
+    sig_deps = [],
+    alerts = [],
+    dump = [],
+)
+
+## expanded from ocamlcc_diff_tests; lists all ocamlcc_diff_test targets:
+test_suite(
+    name = "Bigints_tests",
+    generator_name = "Bigints_tests",
+    generator_function = "module_program_tests",
+    generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
+    tests = ["//testsuite/tests/basic:Bigints_ss_test", "//testsuite/tests/basic:Bigints_sv_test", "//testsuite/tests/basic:Bigints_sx_test", "//testsuite/tests/basic:Bigints_vs_test", "//testsuite/tests/basic:Bigints_vv_test", "//testsuite/tests/basic:Bigints_vx_test", "//testsuite/tests/basic:Bigints_xs_test", "//testsuite/tests/basic:Bigints_xv_test", "//testsuite/tests/basic:Bigints_xx_test"],
 )
 
 ################################################################
-#################
-batch_test_macro(
-    name        = "Boxedints_test",
-    test_module = ":Boxedints",
-    stdout_actual   = "boxedints.stdout",
-    stdout_expected = "boxedints.reference",
-    # opts = ["-custom"],
-)
-
-test_module(
-    name   = "Boxedints",
-    struct = "boxedints.ml",
-    # open   = ["//stdlib:Stdlib"],
+module_program_tests(
+    name        = "Boxedints_tests",
+    # compilers   = ["ocamlc.byte", "ocamlc.opt"],
+    structfile  = "boxedints.ml",
+    warnings = ["@A", "-open-shadow-identifier", "-unused-module"],
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
@@ -211,7 +265,8 @@ test_module(
             "//stdlib:Stdlib.Printf"
         ]
     }),
-    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_MODULE_60]
+    stdout_expected = "boxedints.reference",
+    # stderr_expected = None,
 )
 
 ################################################################
@@ -232,16 +287,9 @@ test_module( # not a test, used by unit_naming_test
 # *)
 
 #################
-batch_test_macro(
-    name        = "Constprop_test",
-    test_module = ":Constprop",
-    stdout_actual = "constprop.stdout",
-    stdout_expected    = "constprop.ml.reference",
-)
-
-test_module(
-    name   = "Constprop",
-    struct = "constprop.ml",
+module_program_tests(
+    name              = "Constprop_tests",
+    structfile        = "constprop.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
@@ -249,7 +297,8 @@ test_module(
             "//stdlib:Stdlib.List",
             "//stdlib:Stdlib.Printf",
         ]
-    })
+    }),
+    stdout_expected   = "constprop.ml.reference",
 )
 
 cc_preprocess(
@@ -258,20 +307,31 @@ cc_preprocess(
     out  = "constprop.ml"
 )
 
+# batch_tests(
+#     name        = "Constprop_tests",
+#     test_module = ":Constprop",
+#     stdout_actual = "constprop.stdout",
+#     stdout_expected    = "constprop.ml.reference",
+# )
+
+# test_module(
+#     name   = "Constprop",
+#     struct = "constprop.ml",
+#     stdlib_deps   = select({
+#         "//testsuite/tests:with-stdlib?":["//stdlib"],
+#         "//conditions:default": [
+#             "//stdlib:Stdlib.Int64",
+#             "//stdlib:Stdlib.List",
+#             "//stdlib:Stdlib.Printf",
+#         ]
+#     })
+# )
+
+
 ################################################################
-
-#################
-batch_test_macro(
-    name        = "Divint_test",
-    test_module = ":Divint",
-    stdout_actual = "divint.stdout",
-    stdout_expected    = "divint.reference",
-)
-
-test_module(
-    name        = "Divint",
-    struct      = "divint.ml",
-    open        = ["//stdlib:Stdlib"],
+module_program_tests(
+    name              = "Divint_tests",
+    structfile        = "divint.ml",
     stdlib_deps = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
@@ -279,190 +339,137 @@ test_module(
             "//stdlib:Stdlib.Printf"
         ]
     }),
-    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_FOR_INDEX_35]
+    warnings = ["-open-shadow-identifier", "-unused-for-index"],
+    stdout_expected   = "divint.reference",
 )
 
 #################
-batch_test_macro(
-    name        = "Equality_test",
-    test_module = ":Equality",
-    stdout_actual = "equality.stdout",
-    stdout_expected    = "equality.reference",
-)
-
-test_module(
-    name        = "Equality",
-    struct      = "equality.ml",
-    open        = ["//stdlib:Stdlib"],
+module_program_tests(
+    name              = "Equality_tests",
+    structfile        = "equality.ml",
     stdlib_deps = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Fun"]
-    })
+    }),
+    stdout_expected   = "equality.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Eval_order_1_test",
-    stdout_actual = "eval_order_1.stdout",
-    stdout_expected = "eval_order_1.reference",
-    test_module    = ":Eval_order_1",
-)
-
-test_module(
-    name   = "Eval_order_1",
-    struct = "eval_order_1.ml",
-    stdlib_deps   = select({
-        "//testsuite/tests:with-stdlib?":["//stdlib"],
-        "//conditions:default": ["//stdlib:Stdlib.Printf"]
-    })
-)
-
-#################
-batch_test_macro(
-    name    = "Eval_order_2_test",
-    stdout_actual = "eval_order_2.stdout",
-    stdout_expected = "eval_order_2.reference",
-    test_module    = ":Eval_order_2",
-)
-
-test_module(
-    name   = "Eval_order_2",
-    struct = "eval_order_2.ml",
-    stdlib_deps   = ["//stdlib:Primitives"],
-    warnings = [w.UNUSED_VAR_STRICT_27]
-)
-
-#################
-batch_test_macro(
-    name    = "Eval_order_3_test",
-    stdout_actual = "eval_order_3.stdout",
-    stdout_expected = "eval_order_3.reference",
-    test_module    = ":Eval_order_3",
-)
-
-test_module(
-    name   = "Eval_order_3",
-    struct = "eval_order_3.ml",
-    open   = ["//stdlib:Stdlib"],
+module_program_tests(
+    name              = "Eval_order_1_tests",
+    structfile        = "eval_order_1.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Printf"]
     }),
-    warnings = [w.UNUSED_VAR_STRICT_27]
+    stdout_expected   = "eval_order_1.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Eval_order_4_test",
-    stdout_actual = "eval_order_4.stdout",
-    stdout_expected = "eval_order_4.reference",
-    test_module    = ":Eval_order_4",
-)
-
-test_module(
-    name   = "Eval_order_4",
-    struct = "eval_order_4.ml",
+module_program_tests(
+    name              = "Eval_order_2_tests",
+    structfile        = "eval_order_2.ml",
     stdlib_deps   = ["//stdlib:Primitives"],
-    warnings = [w.UNUSED_VAR_STRICT_27]
+    warnings = ["-unused-var-strict"],
+    stdout_expected   = "eval_order_2.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Eval_order_6_test",
-    stdout_actual = "eval_order_6.stdout",
-    stdout_expected = "eval_order_6.reference",
-    test_module    = ":Eval_order_6",
+module_program_tests(
+    name              = "Eval_order_3_tests",
+    structfile        = "eval_order_3.ml",
+    stdlib_deps   = select({
+        "//testsuite/tests:with-stdlib?":["//stdlib"],
+        "//conditions:default": ["//stdlib:Stdlib.Printf"]
+    }),
+    warnings = ["-unused-var-strict"],
+    stdout_expected   = "eval_order_3.reference",
 )
 
-test_module(
-    name   = "Eval_order_6",
-    struct = "eval_order_6.ml",
-    open   = ["//stdlib:Stdlib"],
+#################
+module_program_tests(
+    name              = "Eval_order_4_tests",
+    structfile        = "eval_order_4.ml",
+    stdlib_deps   = select({
+        "//testsuite/tests:with-stdlib?":["//stdlib"],
+        "//conditions:default": ["//stdlib:Primitives"]
+    }),
+    warnings = ["-unused-var-strict"],
+    stdout_expected   = "eval_order_4.reference",
+)
+
+#################
+module_program_tests(
+    name              = "Eval_order_6_tests",
+    structfile        = "eval_order_6.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Int"]
     }),
     warnings = [
-        w.MISSING_RECORD_FIELD_PATTERN_9,
-        w.MATCH_ON_MUTABLE_STATE_PREVENT_UNCURRY_68
-    ]
+        "-missing-record-field-pattern",
+        "-match-on-mutable-state-prevent-uncurry"
+    ],
+    stdout_expected   = "eval_order_6.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Eval_order_7_test",
-    stdout_actual = "eval_order_7.stdout",
-    stdout_expected = "eval_order_7.reference",
-    test_module    = ":Eval_order_7",
+module_program_tests(
+    name              = "Eval_order_7_tests",
+    structfile        = "eval_order_7.ml",
+    stdlib_deps   = select({
+        "//testsuite/tests:with-stdlib?":["//stdlib"],
+        "//conditions:default": ["//stdlib:Primitives"]
+    }),
+    stdout_expected   = "eval_order_7.reference",
 )
 
-test_module(
-    name   = "Eval_order_7",
-    struct = "eval_order_7.ml",
+#################
+module_program_tests(
+    name              = "Eval_order_pr10283_tests",
+    structfile        = "eval_order_pr10283.ml",
+    stdlib_deps   = select({
+        "//testsuite/tests:with-stdlib?":["//stdlib"],
+        "//conditions:default": ["//stdlib:Stdlib.Printf"]
+    }),
+    stdout_expected   = "eval_order_pr10283.reference",
+)
+
+#################
+module_program_tests(
+    name              = "Float_tests",
+    structfile        = "float.ml",
+    warnings          = [],
+    stdlib_deps       = ["//stdlib:Stdlib.Printf"],
+    stdout_expected   = "float.reference",
+)
+
+#################
+## FIXME: this is an inline test case:
+module_program_tests(
+    name              = "Float_physical_equality_tests",
+    structfile        = "Float_physical_equality.ml",
     stdlib_deps   = ["//stdlib:Primitives"],
-    open   = ["//stdlib:Stdlib"],
+    stdout_expected   = "Float_physical_equality.reference",
 )
+
+# batch_tests(
+#     name    = "Float_physical_equality_test",
+#     stdout_actual = "float_physical_equality.stdout",
+#     stdout_expected = "float_physical_equality.reference",
+#     test_module    = ":Float_physical_equality",
+# )
+
+# test_module(
+#     name   = "Float_physical_equality",
+#     struct = "float_physical_equality.ml",
+#     stdlib_deps   = ["//stdlib:Primitives"]
+# )
 
 #################
-batch_test_macro(
-    name    = "Eval_order_pr10283_test",
-    stdout_actual = "eval_order_pr10283.stdout",
-    stdout_expected = "eval_order_pr10283.reference",
-    test_module    = ":Eval_order_pr10283",
-)
-test_module(
-    name   = "Eval_order_pr10283",
-    struct = "eval_order_pr10283.ml",
-    stdlib_deps   = select({
-        "//testsuite/tests:with-stdlib?":["//stdlib"],
-        "//conditions:default": ["//stdlib:Stdlib.Printf"]
-    })
-)
-
-#################
-batch_test_macro(
-    name    = "Float_test",
-    stdout_actual = "float.stdout",
-    stdout_expected = "float.reference",
-    test_module    = ":Float",
-)
-
-test_module(
-    name   = "Float",
-    struct = "float.ml",
-    open   = ["//stdlib:Stdlib"],
-    stdlib_deps   = select({
-        "//testsuite/tests:with-stdlib?":["//stdlib"],
-        "//conditions:default": ["//stdlib:Stdlib.Printf"]
-    })
-)
-
-#################
-batch_test_macro(
-    name    = "Float_physical_equality_test",
-    stdout_actual = "float_physical_equality.stdout",
-    stdout_expected = "float_physical_equality.reference",
-    test_module    = ":Float_physical_equality",
-)
-
-test_module(
-    name   = "Float_physical_equality",
-    struct = "float_physical_equality.ml",
-    stdlib_deps   = ["//stdlib:Primitives"]
-)
-
-#################
-batch_test_macro(
-    name    = "Includestruct_test",
-    stdout_actual = "includestruct.stdout",
-    stdout_expected = "includestruct.reference",
-    test_module    = ":Includestruct",
-)
-
-test_module(
-    name   = "Includestruct",
-    struct = "includestruct.ml",
-    open   = ["//stdlib:Stdlib"],
+module_program_tests(
+    name              = "Includestruct_tests",
+    structfile        = "includestruct.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
@@ -471,90 +478,61 @@ test_module(
             "//stdlib:Stdlib.Printf",
         ]
     }),
-    warnings = [w.UNUSED_VALUE_DECLARATION_32,
-                w.UNUSED_MODULE_60,
-                w.UNUSED_VAR_STRICT_27]
+    warnings = ["-unused-value-declaration",
+                "-unused-module",
+                "-unused-var-strict"],
+    stdout_expected   = "includestruct.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Localexn_test",
-    stdout_actual = "localexn.stdout",
-    stdout_expected = "localexn.reference",
-    test_module    = ":Localexn",
-)
-
-test_module(
-    name   = "Localexn",
-    struct = "localexn.ml",
-    stdlib_deps   = ["//stdlib:Primitives"]
+module_program_tests(
+    name              = "Localexn_tests",
+    structfile        = "localexn.ml",
+    warnings          = [],
+    stdlib_deps       = ["//stdlib:Primitives"],
+    stdout_expected   = "localexn.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Localfunction_test",
-    stdout_actual = "localfunction.stdout",
-    stdout_expected = "localfunction.reference",
-    test_module    = ":Localfunction",
-)
-
-test_module(
-    name   = "Localfunction",
-    struct = "localfunction.ml",
+module_program_tests(
+    name              = "Localfunction_tests",
+    structfile        = "localfunction.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Gc"]
-    })
+    }),
+    stdout_expected   = "localfunction.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Maps_test",
-    stdout_actual = "maps.stdout",
-    stdout_expected = "maps.reference",
-    test_module    = ":Maps",
-)
-
-test_module(
-    name   = "Maps",
-    struct = "maps.ml",
+module_program_tests(
+    name              = "Maps_tests",
+    structfile        = "maps.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.Map",
             "//stdlib:Stdlib.Printf",
         ]
-    })
+    }),
+    stdout_expected   = "maps.reference",
 )
 
 #################
-batch_test_macro(
-    name        = "Min_int_test",
-    test_module = ":Min_int",
-    stdout_actual = "min_int.stdout",
-    stdout_expected = "min_int.reference",
-)
-
-test_module(
-    name        = "Min_int",
-    struct      = "min_int.ml",
+module_program_tests(
+    name              = "Min_int_tests",
+    structfile        = "min_int.ml",
     stdlib_deps = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Int"]
-    })
+    }),
+    stdout_expected   = "min_int.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Opt_variants_test",
-    stdout_actual = "opt_variants.stdout",
-    stdout_expected = "opt_variants.reference",
-    test_module    = ":Opt_variants",
-)
-
-test_module(
-    name   = "Opt_variants",
-    struct = "opt_variants.ml",
+module_program_tests(
+    name              = "Opt_variants_tests",
+    structfile        = "opt_variants.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Hashtbl",
@@ -566,20 +544,14 @@ test_module(
         "//stdlib:Stdlib.String",
         "//stdlib:Stdlib.Sys",
         "//stdlib:Stdlib.Weak",
-    ]
+    ],
+    stdout_expected   = "opt_variants.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Patmatch_test",
-    stdout_actual = "patmatch.stdout",
-    stdout_expected = "patmatch.reference",
-    test_module    = ":Patmatch",
-)
-
-test_module(
-    name   = "Patmatch",
-    struct = "patmatch.ml",
+module_program_tests(
+    name              = "Patmatch_tests",
+    structfile        = "patmatch.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
@@ -587,16 +559,16 @@ test_module(
             "//stdlib:Stdlib.Printf",
         ]
     }),
-    warnings = [
-        w.AMBIGUOUS_NAME_41,
-        w.DISAMBIGUATED_NAME_42,
-        w.FRAGILE_MATCH_4,
-        w.OPEN_SHADOW_LABEL_CONSTRUCTOR_45,
-        w.UNUSED_VAR_STRICT_27]
+    warnings = ["-ambiguous-name",
+                "-disambiguated-name",
+                "-fragile-match",
+                "-open-shadow-label-constructor",
+                "-unused-var-strict"],
+    stdout_expected   = "patmatch.reference",
 )
 
 ###################
-diff_test(
+diff_test( #FIXME: ocamlcc_diff_test
     name = "Patmatch_for_multiple_test",
     file1 = "patmatch_for_multiple.ml",
     file2 = "Patmatch_for_multiple_expect",
@@ -613,7 +585,7 @@ inline_expect_module(
 )
 
 ###################
-diff_test(
+diff_test( #FIXME: ocamlcc_diff_test
     name = "Patmatch_incoherence_test",
     file1 = "patmatch_incoherence.ml",
     file2 = "Patmatch_incoherence_expect2",
@@ -635,7 +607,7 @@ inline_expect_module(
 )
 
 ###################
-diff_test(
+diff_test( #FIXME: ocamlcc_diff_test
     name = "Patmatch_split_no_or_test",
     file1 = "patmatch_split_no_or.ml",
     file2 = ":Patmatch_split_no_or_expect",
@@ -650,80 +622,50 @@ inline_expect_module(
 )
 
 #################
-batch_test_macro(
-    name    = "Pr7253_test",
-    stdout_actual = "pr7253.stdout",
-    stdout_expected = "pr7253.reference",
-    test_module    = ":Pr7253",
-)
-
-test_module(
-    name   = "Pr7253",
-    struct = "pr7253.ml",
+module_program_tests(
+    name              = "Pr7253_tests",
+    structfile        = "pr7253.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.Printexc",
         ]
     }),
-    warnings = [w.UNUSED_VAR_STRICT_27]
+    warnings = ["-unused-var-strict"],
+    stdout_expected   = "pr7253.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Pr7533_test",
-    stdout_actual = "pr7533.stdout",
-    stdout_expected = "pr7533.reference",
-    test_module    = ":Pr7533",
-)
-
-test_module(
-    name   = "Pr7533",
-    struct = "pr7533.ml",
+module_program_tests(
+    name              = "Pr7533_tests",
+    structfile        = "pr7533.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
             "//stdlib:Stdlib.List",
             "//stdlib:Stdlib.Sys",
         ]
-    })
+    }),
+    stdout_expected   = "pr7533.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Pr7657_test",
-    stdout_actual = "pr7657.stdout",
-    stdout_expected = "pr7657.reference",
-    test_module    = ":Pr7657",
-    opts  = OCAML_COMPILER_OPTS
-)
-
-test_module(
-    name   = "Pr7657",
-    struct = "pr7657.ml",
-    # stdlib_deps    = ["//stdlib:Primitives"]
-    opts   = [
-        "-no-strict-sequence",
-        # "-w", "-21-5"
-    ],
+module_program_tests(
+    name              = "Pr7657_tests",
+    structfile        = "pr7657.ml",
+    opts   = ["-no-strict-sequence"],
     stdlib_deps  =["//stdlib:Primitives"],
     warnings = [
-        w.ELIMINATED_OPTIONAL_ARGUMENTS_48,
-        w.UNUSED_VAR_STRICT_27
-    ]
+        "-eliminated-optional-arguments",
+        "-unused-var-strict"
+    ],
+    stdout_expected   = "pr7657.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Recvalues_test",
-    stdout_actual = "recvalues.stdout",
-    stdout_expected = "recvalues.reference",
-    test_module    = ":Recvalues",
-)
-
-test_module(
-    name   = "Recvalues",
-    struct = "recvalues.ml",
+module_program_tests(
+    name              = "Recvalues_tests",
+    structfile        = "recvalues.ml",
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
@@ -731,111 +673,81 @@ test_module(
             "//stdlib:Stdlib.List",
         ]
     }),
-    warnings = [w.UNUSED_FOR_INDEX_35]
+    warnings = ["-unused-for-index"],
+    stdout_expected   = "recvalues.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Sets_test",
-    stdout_actual = "sets.stdout",
-    stdout_expected = "sets.reference",
-    test_module    = ":Sets",
-)
-
-test_module(
-    name   = "Sets",
-    struct = "sets.ml",
+module_program_tests(
+    name              = "Sets_tests",
+    structfile        = "sets.ml",
     stdlib_deps = [
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Set",
     ],
-    warnings = [w.UNUSED_MODULE_60]
+    warnings = ["-unused-module"],
+    stdout_expected   = "sets.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Stringmatch_test",
-    stdout_actual = "stringmatch.stdout",
-    stdout_expected = "stringmatch.reference",
-    test_module    = ":Stringmatch",
-)
-
-test_module(
-    name   = "Stringmatch",
-    struct = "stringmatch.ml",
-    stdlib_deps   = [
-        "//stdlib:Stdlib.String",
-
-    ],
-    warnings = [w.UNUSED_REC_FLAG_39]
+module_program_tests(
+    name              = "Stringmatch_tests",
+    structfile        = "stringmatch.ml",
+    stdlib_deps       = ["//stdlib:Stdlib.String"],
+    warnings          = ["-unused-rec-flag"],
+    stdout_expected   = "stringmatch.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Switch_opts_test",
-    stdout_actual = "switch_opts.stdout",
-    stdout_expected = "switch_opts.reference",
-    test_module    = ":Switch_opts",
-)
-
-test_module(
-    name   = "Switch_opts",
-    struct = "switch_opts.ml",
+module_program_tests(
+    name              = "Switch_opts_tests",
+    structfile        = "switch_opts.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
     ],
-    warnings = [w.UNUSED_VAR_STRICT_27]
+    warnings = ["-unused-var-strict"],
+    stdout_expected   = "switch_opts.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Tailcalls_test",
-    stdout_actual = "tailcalls.stdout",
-    stdout_expected = "tailcalls.reference",
-    test_module    = ":Tailcalls",
-)
-
-test_module(
-    name   = "Tailcalls",
-    struct = "tailcalls.ml",
-    stdlib_deps   = ["//stdlib:Primitives"]
+module_program_tests(
+    name              = "Tailcalls_tests",
+    structfile        = "tailcalls.ml",
+    stdlib_deps   = ["//stdlib:Primitives"],
+    stdout_expected   = "tailcalls.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Trigraph_test",
-    test_module = ":Trigraph",
-    stdout_actual = "trigraph.stdout",
-    stdout_expected = "trigraph.reference",
-)
-
-test_module(
-    name   = "Trigraph",
-    struct = "trigraph.ml",
-    stdlib_deps = ["//stdlib:Stdlib"]
+module_program_tests(
+    name              = "Trigraph_tests",
+    structfile        = "trigraph.ml",
+    stdlib_deps = ["//stdlib:Stdlib"],
+    stdout_expected   = "trigraph.reference",
 )
 
 #################
-batch_test_macro(
-    name    = "Tuple_match_test",
-    stdout_actual = "tuple_match.stdout",
-    stdout_expected = "tuple_match.reference",
-    test_module    = ":Tuple_match",
-    # prologue = ["//stdlib:Primitives"],
-    opts = ["-open", "Stdlib"]
-)
-
-test_module(
-    name   = "Tuple_match",
-    struct = "tuple_match.ml",
-    opts   = ["-open", "Stdlib"],
+module_program_tests(
+    name              = "Tuple_match_tests",
+    structfile        = "tuple_match.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.Gc",
         "//stdlib:Stdlib.Printf"
-    ]
+    ],
+    stdout_expected   = "tuple_match.reference",
+)
+
+################
+module_program_tests(
+    name            = "Unit_naming_tests",
+    structfile      = "unit_naming.ml",
+    rc_expected     = 2,
+    deps            = [":CamlCase"],
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    stdout_expected = "unit_naming.reference",
+    # stderr_actual = "unit_naming.ml.stderr",
 )
 
 # ocamlcc_diff_test(
@@ -846,27 +758,19 @@ test_module(
 #     tags = ["fail"]
 # )
 
-test_module(
-    name   = "Unit_naming",
-    struct = "unit_naming.ml",
-    rc_expected = 2,
-    stderr_actual = "unit_naming.ml.stderr",
-    deps   = [":CamlCase"],
-    stdlib_deps = ["//stdlib:Stdlib"]
-)
+# test_module(
+#     name   = "Unit_naming",
+#     struct = "unit_naming.ml",
+#     rc_expected = 2,
+#     stderr_actual = "unit_naming.ml.stderr",
+#     deps   = [":CamlCase"],
+#     stdlib_deps = ["//stdlib:Stdlib"]
+# )
 
 #################
-batch_test_macro(
-    name    = "Zero_divided_by_n_test",
-    stdout_actual = "zero_divided_by_n.stdout",
-    stdout_expected = "zero_divided_by_n.reference",
-    test_module    = ":Zero_divided_by_n",
-)
-
-test_module(
-    name   = "Zero_divided_by_n",
-    struct = "zero_divided_by_n.ml",
-    opts   = ["-nopervasives"],
+module_program_tests(
+    name              = "Zero_divided_by_n_tests",
+    structfile        = "zero_divided_by_n.ml",
     stdlib_deps   = ["//stdlib:Stdlib"],
+    stdout_expected   = "zero_divided_by_n.reference",
 )
-

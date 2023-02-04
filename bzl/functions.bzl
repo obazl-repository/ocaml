@@ -20,6 +20,41 @@ load("//bzl:providers.bzl",
 
 WARNING_FLAGS = "@1..3@5..28@30..39@43@46..47@49..57@61..62-40"
 
+#############################
+def validate_outnames(ctx, base):
+    """verify that stdout/stderr/stdlog name matches src name and has correct extention"""
+
+    if hasattr(ctx.attr, "stdout_actual"):
+        if ctx.outputs.stdout_actual:
+            (stdout_stem, stdout_extension) = paths.split_extension(ctx.outputs.stdout_actual.basename)
+            if stdout_extension != ".stdout":
+                fail("stdout_actual filename must use extension .stdout")
+
+    if hasattr(ctx.attr, "stderr_actual"):
+        if ctx.outputs.stderr_actual:
+            (stderr_stem, stderr_extension) = paths.split_extension(
+                ctx.outputs.stderr_actual.basename)
+            if stderr_extension != ".stderr":
+                fail("stderr_actual filename must use extension .stderr; found: {}".format(ctx.outputs.stderr_actual.basename))
+
+            if not stderr_stem.startswith(base):
+                print("tgt: %s" % ctx.label)
+                fail("input filename must be prefix of stderr_actual filename; got: {inf}; found: {outf}".format(
+                    inf = base, outf = stderr_stem))
+
+    if hasattr(ctx.attr, "stdlog_actual"):
+        if ctx.outputs.stdlog_actual:
+            (stdlog_stem, stdlog_extension) = paths.split_extension(ctx.outputs.stdlog_actual.basename)
+            ## for test_module
+            if hasattr(ctx.attr, "struct"):
+                if stdlog_stem != ctx.file.struct.basename:
+                    fail("stdlog_actual stem must equal struct basename; got {a}, {b}".format(a=stdlog_stem, b=ctx.file.struct.basename))
+                    ## for test_signature
+            elif hasattr(ctx.attr, "sig"):
+                if stdlog_stem != ctx.file.src.basename:
+                    fail("stdlog_actual stem must equal src basename; got {a}, {b}".format(a=stdlog_stem, b=ctx.file.src.basename))
+
+###################
 def filestem(File):
     ext = File.extension
     return File.basename[:-(len(ext) + 1)]

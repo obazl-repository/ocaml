@@ -1,4 +1,5 @@
-## ocamlcc_diff_test - diff actuals of test_module v. expected
+## ocamlcc_diff_test - diff actual v. expected
+## like skylib diff_test, w/o windows support and with diff args
 ## macro - generates one test target per compiler
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
@@ -7,7 +8,9 @@ load("//bzl:functions.bzl", "filestem")
 
 load(":test_transitions.bzl", "test_in_transitions")
 
-load("//bzl:providers.bzl", "DumpInfo", "ModuleInfo")
+load(":UTILS.bzl", "std_compilers", "validate_io_files")
+
+load("//bzl:providers.bzl", "DumpInfo", "ModuleInfo", "BootInfo")
 
 ####################
 def runfiles_bash(ctx):
@@ -44,96 +47,77 @@ def runfiles_bash(ctx):
 ##############################
 def _ocamlcc_diff_test_impl(ctx):
 
-    runner = ctx.actions.declare_file(ctx.label.name + "_runner.sh")
-    expected  = ctx.file.expected
-    actual  = ctx.file.actual
-    actual_basename = actual.basename
-    actual_stem     = filestem(actual)
+    # runner = ctx.actions.declare_file(ctx.label.name + "_runner.sh")
+    # expected  = ctx.file.stderr_expected
+    # actual  = ctx.file.stderr_actual
+    # actual_basename = actual.basename
+    # actual_stem     = filestem(actual)
 
-    if not expected:
-        fail("Not yet supported: expected == None")
+    # if not expected:
+    #     fail("Not yet supported: expected == None")
 
-    cmd_prologue = runfiles_bash(ctx)
-    # if True:  ## ctx.attr.verbose:
-    if (ctx.attr.verbose
-        or ctx.attr._sh_verbose[BuildSettingInfo].value):
-        cmd_prologue.append("echo PWD: $(PWD);")
-        cmd_prologue.append("echo EXPECTED: %s" % expected.path)
-        cmd_prologue.append("echo ACTUAL: %s" % actual.path)
-        cmd_prologue.append("echo ACTUAL short: %s" % actual.short_path)
-        cmd_prologue.append("echo ACTUAL stem: %s" % actual_stem)
-        cmd_prologue.append("set -x;")
+    # cmd_prologue = runfiles_bash(ctx)
+    # # if True:  ## ctx.attr.verbose:
+    # if (ctx.attr.verbose
+    #     or ctx.attr._sh_verbose[BuildSettingInfo].value):
+    #     cmd_prologue.append("echo PWD: $(PWD);")
+    #     cmd_prologue.append("echo EXPECTED: %s" % expected.path)
+    #     cmd_prologue.append("echo ACTUAL: %s" % actual.path)
+    #     cmd_prologue.append("echo ACTUAL short: %s" % actual.short_path)
+    #     cmd_prologue.append("echo ACTUAL stem: %s" % actual_stem)
+    #     cmd_prologue.append("set -x;")
 
-    cmd_prologue.append("")
+    # cmd_prologue.append("")
 
-    stripped_expected = expected.basename + ".stripped"
-    normalized_expected = expected.basename + ".normalized"
+    # stripped_expected = expected.basename + ".stripped"
+    # normalized_expected = expected.basename + ".normalized"
 
-    stripped_actual   = actual.basename + ".stripped"
-    normalized_actual   = actual.basename + ".normalized"
+    # stripped_actual   = actual.basename + ".stripped"
+    # normalized_actual   = actual.basename + ".normalized"
+    # awked_actual   = actual.basename + ".awked"
 
-    cmd = "\n".join([
-        ## strip newlines from both files, then sed the actual to
-        ## remove paths, then compare, ignoring spaces
-        ## assumption: whitespace is insignificant
-
-        "cat {expected} | tr -d '\\n' > {nexpected}".format(
-            expected=expected.short_path,
-            nexpected=stripped_expected
-        ),
-        # "echo \"EXPECTED (STRIPPED): `cat {}`\"".format(stripped_expected),
-
-        "cat {actual} | tr -d '\\n' > {nactual}".format(
-            actual=actual.short_path,
-            nactual=stripped_actual
-        ),
-        # "echo \"ACTUAL (STRIPPED): `cat {}`\"".format(stripped_actual),
-
-        ## normalize file name (strip path)
-        # "echo PATH: {};".format(actual.path),
-        # "P=\"$(rlocation ocamlcc/testsuite/tests/warnings/deprecated_module.ml.stderr)\"",
-
-        # "echo P: $P",
-        # "PDIR=$(dirname $P)",
-        # "echo PDIR: $PDIR",
-
-        # "sed -e \"s|$P|{bname}|g;\" {actual} > {fixed};".format(
-
-        "sed -e \"s|File \\\"[^\\\"]*\\\",|File \\\"{bname}\\\",|g;\" {actual} > {fixed};".format(
-            # fpath  = "$P,  # actual.path,
-            bname  = actual_stem, # e.g. "anonymous.ml",
-            actual = stripped_actual,
-            fixed  = normalized_actual
-        ),
-
-        # "echo \"ACTUAL (NORM): `cat {}`\"".format(normalized_actual),
-
-        "diff -wbB {a} {b};".format(
-            a = stripped_expected,
-            b = normalized_actual
-        )
-    ])
+    if ctx.attr.expected == None:
+        ## verify that stderr_actual is empty
+        cmd = "\n".join([
+            "if [ -s {} ]; then".format(ctx.file.actual.short_path),
+            # The file is not-empty.
+            "    echo stderr_actual is non-empty:",
+            "    cat {}".format(ctx.file.actual.short_path),
+            "    exit 1",
+            "else",
+            # The file is empty as expected.
+            "    exit 0",
+            "fi"
+        ])
+    else:
+        cmd = " ".join([
+            "diff ",
+            " ".join(ctx.attr.diff_args),
+            "{a} {b};".format(
+                a = ctx.file.expected.short_path,
+                b = ctx.file.actual.short_path
+            )
+        ])
 
     cmd_epilogue = "\n".join([
         # # skip first line containing src file path - non-portable
         # "diff <(tail -n \\+2 {}) <(tail -n \\+2 compile.stdout)".format(
-        #     ctx.file.expected.short_path
+        #     ctx.file.stderr_expected.short_path
         # )
     ])
 
+    runner = ctx.actions.declare_file(ctx.label.name + "_runner.sh")
     ctx.actions.write(
         output  = runner,
         # content = "\n".join(cmd_prologue),
-        content = "\n".join(cmd_prologue) + cmd + cmd_epilogue,
+        # content = "\n".join(cmd_prologue) + cmd + cmd_epilogue,
+        content = cmd,
         is_executable = True
     )
 
     myrunfiles = ctx.runfiles(
-        files = [
-            # ctx.attr.test_module[DumpInfo].dump,
-            ctx.file.expected,
-            ctx.file.actual
-        ],
+        files = [ctx.file.actual]
+        + ([ctx.file.expected] if ctx.file.expected else []),
         transitive_files =  depset(
             transitive = []
             + [ctx.attr._runfiles_bash[DefaultInfo].files]
@@ -143,7 +127,6 @@ def _ocamlcc_diff_test_impl(ctx):
 
     defaultInfo = DefaultInfo(
         executable=runner,
-        # files = depset([out_exe]),
         runfiles = myrunfiles
     )
 
@@ -158,6 +141,9 @@ def _in_transition_impl(settings, attr):
         print("attr.compiler: %s" % attr.compiler)
         fail()
 
+    if not attr.compiler:
+        return {} # no transition
+
     if attr.compiler == "ocamlc.byte":
         compiler = "@dev//bin:ocamlc.byte"
         runtime  = "@dev//lib:camlrun"
@@ -171,6 +157,12 @@ def _in_transition_impl(settings, attr):
         compiler = "@dev//bin:ocamlopt.byte"
         runtime  = "@dev//lib:asmrun"
 
+    elif attr.compiler == "ocamlc.optx":
+        compiler = "@dev//bin:ocamlc.optx"
+        runtime  = "@dev//lib:camlrun"
+    elif attr.compiler == "ocamlopt.optx":
+        compiler = "@dev//bin:ocamlopt.optx"
+        runtime  = "@dev//lib:asmrun"
     elif attr.compiler == "ocamloptx.byte":
         compiler = "@dev//bin:ocamloptx.byte"
         runtime  = "@dev//lib:asmrun"
@@ -180,6 +172,9 @@ def _in_transition_impl(settings, attr):
     elif attr.compiler == "ocamloptx.optx":
         compiler = "@dev//bin:ocamloptx.optx"
         runtime  = "@dev//lib:asmrun"
+
+    else:
+        fail("Unrecognized compiler: %s" % attr.compiler)
 
     return {
         # "//config/build/protocol" : "test",
@@ -214,8 +209,35 @@ ocamlcc_diff_test = rule(
         compiler = attr.string(
             doc = "ocamlc.byte | ocamlopt.opt | etc."
         ),
-        expected = attr.label(allow_single_file = True),
-        actual = attr.label(allow_single_file = True),
+
+        expected = attr.label(
+            # mandatory = True,
+            allow_single_file = True
+        ),
+        actual = attr.label(
+            # mandatory = True,
+            allow_single_file = True
+        ),
+
+        diff_args = attr.string_list(
+            default = [
+                "--ignore-blank-lines",
+                "--ignore-space-change",
+                "-w", # "--ignore-all-blanks",
+            ]
+        ),
+
+        # for test_run_program outputs:
+        # stdout_expected = attr.label(allow_single_file = True),
+        # stdout_actual = attr.label(allow_single_file = True),
+
+        # # for test_module and test_signature stderr outputs:
+        # stderr_expected = attr.label(allow_single_file = True),
+        # stderr_actual = attr.label(allow_single_file = True),
+
+        # # test_module, test_signature -d logging outputs (e.g. -dlambda):
+        # stdlog_expected = attr.label(allow_single_file = True),
+        # stdlog_actual = attr.label(allow_single_file = True),
 
         verbose = attr.bool(),
         _sh_verbose = attr.label(default = "//testsuite/tests:verbose"),
@@ -225,7 +247,7 @@ ocamlcc_diff_test = rule(
             default = "@bazel_tools//tools/bash/runfiles"
         ),
 
-        _rule = attr.string( default = "compile_dump_diff_test" ),
+        _rule = attr.string( default = "ocamlcc_diff_test" ),
         _allowlist_function_transition = attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
         ),
@@ -238,8 +260,7 @@ ocamlcc_diff_test = rule(
 )
 
 ################################################################
-## MACRO
-################################################################
+## macro helper
 def test_name(name, compiler):
     if compiler == "ocamlc.byte":
         name = name + "_vv_test"
@@ -250,26 +271,45 @@ def test_name(name, compiler):
     elif compiler == "ocamlopt.byte":
         name = name + "_vs_test"
 
+    elif compiler == "ocamlc.optx":
+        name = name + "_xv_test"
+    elif compiler == "ocamlopt.optx":
+        name = name + "_xs_test"
     elif compiler == "ocamloptx.optx":
         name = name + "_xx_test"
     elif compiler == "ocamloptx.opt":
         name = name + "_sx_test"
     elif compiler == "ocamloptx.byte":
         name = name + "_vx_test"
+    else:
+        fail("Unrecognized compiler: %s" % compiler)
+
     return name
 
-std_compilers = ["ocamlc.byte", "ocamlc.opt",
-                 "ocamlopt.byte", "ocamlopt.opt",
-                 "ocamloptx.byte","ocamloptx.opt",
-                 "ocamloptx.optx"]
-
+################################################################
+## MACRO - on ocamlcc_diff_test per compiler
 ################################################################
 def ocamlcc_diff_tests(name,
-                       actual,
+                       actual = None,
                        expected = None,
+
+                       # obsolete:
+                       stdout_actual = None,
+                       stdout_expected = None,
+                       stderr_actual = None,
+                       stderr_expected = None,
+                       stdlog_actual = None,
+                       stdlog_expected = None,
+
                        compilers = std_compilers,
                        timeout = "short",
                        **kwargs):
+
+    # return None
+    # if (stdout_actual == None
+    #     and stderr_actual == None
+    #     and stdlog_actual == None):
+    #     fail("At least one of stdout_actual, stderr_actual, or stdlog_actual must be provided")
 
     if name.endswith("_tests"):
         stem = name[:-6]
@@ -288,8 +328,8 @@ def ocamlcc_diff_tests(name,
         ocamlcc_diff_test(
             name     = tname,
             compiler = compiler,
-            expected = expected,
             actual   = actual,
+            expected = expected,
             timeout  = timeout,
             **kwargs
         )

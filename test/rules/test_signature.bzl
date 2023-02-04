@@ -1,5 +1,7 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
+load("//bzl:functions.bzl", "validate_outnames")
+
 load("//bzl/actions:signature_compile_plus.bzl",
      "signature_compile_plus")
 
@@ -9,6 +11,10 @@ load("//bzl/attrs:signature_attrs.bzl", "signature_attrs")
 ################################################################
 def _test_signature_impl(ctx):
 
+    if not ctx.label.name[0].isupper():
+        print("X: %s" % ctx.label.name[0])
+        fail("test_signature name must begin with upper-case letter")
+
     (this, extension) = paths.split_extension(ctx.file.src.basename)
     module_name = this[:1].capitalize() + this[1:]
 
@@ -17,8 +23,9 @@ def _test_signature_impl(ctx):
     if ctx.attr.rc_expected == 0:
         if (ctx.attr.stderr_actual
             or ctx.attr.stdout_actual
-            or ctx.attr.logfile_actual):
+            or ctx.attr.stdlog_actual):
             # compile succeeds but writes warnings to stderr
+            validate_outnames(ctx, ctx.file.src.basename)
             return signature_compile_plus(ctx, module_name)
             ## return module_impl(ctx, module_name)
         else:
@@ -29,6 +36,8 @@ def _test_signature_impl(ctx):
         # at least one of stdout and stderr must be specified
         if not (ctx.attr.stdout_actual or ctx.attr.stderr_actual):
             fail("If expected rc is non-zero, at least one of stdout_actual or stderr_actual must be specified.")
+
+        validate_outnames(ctx, ctx.file.struct.basename)
         return signature_compile_plus(ctx, module_name)
 
 #######################
@@ -46,7 +55,7 @@ test_signature = rule(
         stderr_actual = attr.output(),
 
         ## not needed?
-        logfile_actual = attr.output(), # for e.g. -dlambda dumpfile
+        stdlog_actual = attr.output(), # for e.g. -dlambda dumpfile
 
         # stdlib_primitives = attr.bool(default = False),
         # _stdlib = attr.label(

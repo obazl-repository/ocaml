@@ -26,7 +26,7 @@ load(":module_compile_config.bzl", "construct_module_compile_config")
 ##################################
 def module_compile_plus(ctx, module_name):
 
-    debug = True
+    debug = False
     debug_ccdeps = False
 
     if debug:
@@ -73,17 +73,23 @@ def module_compile_plus(ctx, module_name):
     else:
         stderr = ""
 
-    logfile_output = []
-    logfile_cp = ""
-    if ctx.outputs.logfile_actual:
-        logfile_output.append(ctx.outputs.logfile_actual)
+    if ctx.outputs.stdlog_actual:
+        # -dlambda etc. write to stderr
+        stdlog = "2> {}".format(ctx.outputs.stdlog_actual.path)
+        std_fds.append(ctx.outputs.stdlog_actual)
+    else:
+        stdlog = ""
+    # logfile_output = []
+    # logfile_cp = ""
+    # if ctx.outputs.stdlog_actual:
+    #     logfile_output.append(ctx.outputs.stdlog_actual)
 
-        #NB: ln -s won't work since dumpfile will be removed
-        #(since it is not an output), giving us a dangling symlink
-        logfile_cp = "cp {dumpfile} {logfile} ;".format(
-            dumpfile = outputs["cmstruct"].path + ".dump",
-            logfile = ctx.outputs.logfile_actual.path
-        )
+    #     #NB: ln -s won't work since dumpfile will be removed
+    #     #(since it is not an output), giving us a dangling symlink
+    #     logfile_cp = "cp {dumpfile} {logfile} ;".format(
+    #         dumpfile = outputs["cmstruct"].path + ".dump",
+    #         logfile = ctx.outputs.stdlog_actual.path
+    #     )
 
     ################
     # run_shell: runs compiler with stdout/stderr redirection
@@ -98,6 +104,7 @@ def module_compile_plus(ctx, module_name):
             "{exe} $@".format(exe=executor.path),
             stdout,
             stderr,
+            stdlog,
             "|| RC=$? || true ; ", # for compiles that fail
             # "echo RC: $? ;",
             "if [ $RC != \"{rc}\" ];".format(rc=ctx.attr.rc_expected),
@@ -106,7 +113,7 @@ def module_compile_plus(ctx, module_name):
             "    exit $RC;",
             # "    exit 0",
             "fi ;",
-            logfile_cp
+            # logfile_cp
         ]),
         arguments = [args],
         # inputs: from deps we get a list of depsets, so:
@@ -121,7 +128,7 @@ def module_compile_plus(ctx, module_name):
             # etc.
             + [cc_toolchain.all_files] ##FIXME: only for sys outputs
         ),
-        outputs   = outs + std_fds + logfile_output,
+        outputs   = outs + std_fds, # + logfile_output,
         mnemonic = "CompileModulePlus",
         progress_message = progress_msg(workdir, ctx)
     )
@@ -133,7 +140,7 @@ def module_compile_plus(ctx, module_name):
         ## no compilation outputs, only stdout/stderr actuals
         default_depset = depset(
             order = dsorder,
-            direct = outs + std_fds + logfile_output
+            direct = outs + std_fds # + logfile_output
         )
         defaultInfo = DefaultInfo(
             files = default_depset
@@ -141,7 +148,7 @@ def module_compile_plus(ctx, module_name):
 
         outputGroupInfo = OutputGroupInfo(
             all    = depset(
-                direct = outs + std_fds + logfile_output
+                direct = outs + std_fds # + logfile_output
             )
         )
         bootInfo   = BootInfo()
@@ -290,20 +297,20 @@ def module_compile_plus(ctx, module_name):
         all_group.append(ctx.outputs.stdout_actual)
     if ctx.outputs.stderr_actual:
         all_group.append(ctx.outputs.stderr_actual)
-    if ctx.outputs.logfile_actual:
-        all_group.append(ctx.outputs.logfile_actual)
+    if ctx.outputs.stdlog_actual:
+        all_group.append(ctx.outputs.stdlog_actual)
 
     if ((hasattr(ctx.attr, "dump") and len(ctx.attr.dump) > 0)
         or hasattr(ctx.attr, "_lambda_expect_test")):
         # if len(ctx.attr.dump) > 0:
-        d = DumpInfo(dump = ctx.outputs.logfile_actual, # outputs["logfile"],
+        d = DumpInfo(dump = ctx.outputs.stdlog_actual, # outputs["logfile"],
                      src = inputs.structfile)
         providers.append(d)
     #     outputGroupInfo = OutputGroupInfo(
     #         cmi        = cmi_depset,
     #         module     = moduleInfo_depset,
     #         log = depset([outputs["logfile"]]),
-    #         all    = depset(direct=[ctx.outputs.logfile_actual],
+    #         all    = depset(direct=[ctx.outputs.stdlog_actual],
     #                         transitive= [moduleInfo_depset]),
     #     )
     # else:

@@ -16,9 +16,20 @@ build:ocamlc.opt --//toolchain:compiler=@dev//bin:ocamlc.opt
 build:ocamlc.opt --//toolchain:runtime=@dev//lib:camlrun
 
 # flamba
+build:ocamlc.optx --//toolchain:compiler=@dev//bin:ocamlc.optx
+build:ocamlc.optx --//toolchain:runtime=@dev//lib:camlrun
+
+build:ocamlopt.optx --//toolchain:compiler=@dev//bin:ocamlopt.optx
+build:ocamlopt.optx --//toolchain:runtime=@dev//lib:asmrun
+
 build:ocamloptx.byte --//toolchain:compiler=@dev//bin:ocamloptx.byte
+build:ocamloptx.byte --//toolchain:runtime=@dev//lib:asmrun
+
 build:ocamloptx.opt  --//toolchain:compiler=@dev//bin:ocamloptx.opt
+build:ocamloptx.opt --//toolchain:runtime=@dev//lib:asmrun
+
 build:ocamloptx.optx --//toolchain:compiler=@dev//bin:ocamloptx.optx
+build:ocamloptx.optx --//toolchain:runtime=@dev//lib:asmrun
 
 build --nokeep_going
 

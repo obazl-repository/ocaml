@@ -1,3 +1,5 @@
+## OBSOLETE
+
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 load("//bzl/actions:executable_impl.bzl", "executable_impl")
