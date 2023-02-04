@@ -38,11 +38,11 @@ test_suite(
         ":W54_tests",
         ":W55_tests",
         ":W55_flambda_tests",
-        # ":W58_tests", # FIXME - "_none_" module name
+        ":W58_tests",
         ":W59_tests",
         ":W60_tests",
         ":W60_sig_tests",
-        ":W68_tests",  # FIXME
+        ":W68_tests",
     ],
 )
 
@@ -471,16 +471,39 @@ compile_module_tests(
 )
 
 #####################
-## FIXME: module name in warning is "_none_"
+test_suite(
+    name = "W58_tests",
+    tests  = [
+        ":W58_vm_tests",
+        ":W58_sys_tests",
+    ]
+)
+
+
+## WARNING: warning only prints for ocamlopt, not ocamlc
 compile_module_tests(
-    name            = "W58_tests",
-    compilers       = ["ocamlc.byte", "ocamlopt.byte"],
+    name            = "W58_sys_tests",
+    compilers       = ["ocamlopt.byte", "ocamlopt.opt",
+                       "ocamloptx.byte", "ocamloptx.opt",
+                       "ocamloptx.optx"],
     structfile      = "w58.ml",
+    opts            = ["-no-opaque"],
     stdlib_deps     = ["//stdlib:Stdlib"],
     sig_deps        = ["Module_without_cmx_cmi"],
-    warnings        = ["no-cmx-file"],         # 58
-    stderr_expected = ":w58.native.reference",
+    warnings        = ["+A"], # "+no-cmx-file"],         # 58
+    stderr_expected = "w58.native.reference",
     stderr_actual   = "w58.ml.stderr",
+)
+
+compile_module_tests(
+    name            = "W58_vm_tests",
+    compilers       = ["ocamlc.byte", "ocamlc.opt"],
+    structfile      = "w58.ml",
+    opts            = ["-no-opaque"],
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    sig_deps        = ["Module_without_cmx_cmi"],
+    warnings        = ["+A"], # "+no-cmx-file"],         # 58
+    stderr_actual   = "w58.ml.vm.stderr",  # should be empty
 )
 
 test_signature(
