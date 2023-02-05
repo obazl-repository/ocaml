@@ -1,11 +1,11 @@
 load("//test/rules:repl_test.bzl", _repl_test = "repl_test")
 
 load("//test/rules:inline_test.bzl",
-     _inline_vv_test = "inline_vv_test",
-     _inline_vs_test = "inline_vs_test",
-     _inline_ss_test = "inline_ss_test",
-     _inline_sv_test = "inline_sv_test",
-     _inline_test_macro = "inline_test_macro")
+     _inline_assertion_vv_test = "inline_assertion_vv_test",
+     _inline_assertion_vs_test = "inline_assertion_vs_test",
+     _inline_assertion_ss_test = "inline_assertion_ss_test",
+     _inline_assertion_sv_test = "inline_assertion_sv_test",
+     _inline_assertion_tests = "inline_assertion_tests")
 
 load("//test/rules:batch_test.bzl",
      _batch_vv_test = "batch_vv_test",
@@ -52,11 +52,11 @@ load("//test/rules:test_signature.bzl", _test_signature = "test_signature")
 
 repl_test = _repl_test
 
-inline_vv_test = _inline_vv_test
-inline_vs_test = _inline_vs_test
-inline_ss_test = _inline_ss_test
-inline_sv_test = _inline_sv_test
-inline_test_macro = _inline_test_macro
+inline_assertion_vv_test = _inline_assertion_vv_test
+inline_assertion_vs_test = _inline_assertion_vs_test
+inline_assertion_ss_test = _inline_assertion_ss_test
+inline_assertion_sv_test = _inline_assertion_sv_test
+inline_assertion_tests = _inline_assertion_tests
 
 batch_vv_test = _batch_vv_test
 batch_vs_test = _batch_vs_test

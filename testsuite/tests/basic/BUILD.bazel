@@ -5,6 +5,7 @@ load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//bzl:rules.bzl", "cc_preprocess")
 
 load("//test:rules.bzl",
+     "compile_module_tests",
      "inline_expect_module",
      "module_program_tests",
      "ocamlcc_diff_test",
@@ -12,7 +13,11 @@ load("//test:rules.bzl",
      "test_program",
      "test_program_outputs",
      "test_module",
+
+     "inline_assertion_vv_test",
+     "inline_assertion_tests"
 )
+load("//test/rules:inline_expect_module.bzl", "inline_expect_test")
 
 ################################################################
 test_suite(
@@ -32,7 +37,7 @@ test_suite(
         ":Eval_order_7_tests",
         ":Eval_order_pr10283_tests",
         ":Float_tests",
-        # ":Float_physical_equality_tests",  ## FIXME: inline assert test
+        ":Float_physical_equality_tests",
         ":Includestruct_tests",
         ":Localexn_tests",
         ":Localfunction_tests",
@@ -53,12 +58,14 @@ test_suite(
         ":Tailcalls_tests",
         ":Trigraph_tests",
         ":Tuple_match_tests",
-        # ":Unit_naming_tests",
+        ":Unit_naming_tests",
         ":Zero_divided_by_n_tests",
     ],
 )
 
 ############
+## WARNING: arrays.ml is kind of fake assertion_test; it writes fail
+## msgs to stdout instead of returning non-zero, so empty std means pass
 module_program_tests(
     name              = "Arrays_tests",
     structfile        = "arrays.ml",
@@ -66,23 +73,8 @@ module_program_tests(
         "//stdlib:Stdlib.Array",
         "//stdlib:Stdlib.Gc",
     ],
-    stdout_expected   = "arrays.reference",
+    stdout_expected   = "arrays.reference", ## empty file for diffing
 )
-
-## NB: no stdout expected for arrays.ml
-# test_program(
-#     name = "Arrays.exe",
-#     main = ":Arrays"
-# )
-
-# test_module(
-#     name   = "Arrays",
-#     struct = "arrays.ml",
-#     stdlib_deps   = [
-#         "//stdlib:Stdlib.Array",
-#         "//stdlib:Stdlib.Gc",
-#     ]
-# )
 
 ############
 ## For demo purposes we include the explicit expansion of macros for
@@ -270,13 +262,6 @@ module_program_tests(
 )
 
 ################################################################
-test_module( # not a test, used by unit_naming_test
-    name   = "CamlCase",
-    struct = "camlCase.ml",
-)
-################################################################
-
-################################################################
 ## with C Preprocessing
 # (* TEST
 #    flags = "-pp '${c_preprocessor}'"
@@ -306,27 +291,6 @@ cc_preprocess(
     src  = "constprop.ml.c",
     out  = "constprop.ml"
 )
-
-# batch_tests(
-#     name        = "Constprop_tests",
-#     test_module = ":Constprop",
-#     stdout_actual = "constprop.stdout",
-#     stdout_expected    = "constprop.ml.reference",
-# )
-
-# test_module(
-#     name   = "Constprop",
-#     struct = "constprop.ml",
-#     stdlib_deps   = select({
-#         "//testsuite/tests:with-stdlib?":["//stdlib"],
-#         "//conditions:default": [
-#             "//stdlib:Stdlib.Int64",
-#             "//stdlib:Stdlib.List",
-#             "//stdlib:Stdlib.Printf",
-#         ]
-#     })
-# )
-
 
 ################################################################
 module_program_tests(
@@ -445,26 +409,14 @@ module_program_tests(
 )
 
 #################
-## FIXME: this is an inline test case:
-module_program_tests(
-    name              = "Float_physical_equality_tests",
-    structfile        = "Float_physical_equality.ml",
+## NB: this case uses assertions so we do not need to diff actual v.
+## expected.
+inline_assertion_tests(
+    name = "Float_physical_equality_tests",
+    structfile = "float_physical_equality.ml",
     stdlib_deps   = ["//stdlib:Primitives"],
-    stdout_expected   = "Float_physical_equality.reference",
+    # stdout_expected   = "Float_physical_equality.reference", ## empty
 )
-
-# batch_tests(
-#     name    = "Float_physical_equality_test",
-#     stdout_actual = "float_physical_equality.stdout",
-#     stdout_expected = "float_physical_equality.reference",
-#     test_module    = ":Float_physical_equality",
-# )
-
-# test_module(
-#     name   = "Float_physical_equality",
-#     struct = "float_physical_equality.ml",
-#     stdlib_deps   = ["//stdlib:Primitives"]
-# )
 
 #################
 module_program_tests(
@@ -567,17 +519,16 @@ module_program_tests(
     stdout_expected   = "patmatch.reference",
 )
 
-###################
-diff_test( #FIXME: ocamlcc_diff_test
-    name = "Patmatch_for_multiple_test",
-    file1 = "patmatch_for_multiple.ml",
-    file2 = "Patmatch_for_multiple_expect",
-    timeout = "short",
-    tags = ["inline_expect"]
-)
+################################################################
+## WARNING WARNING WARNING
 
-inline_expect_module(
-    name = "Patmatch_for_multiple_expect",
+## ocamltest runs the inline expect tool twice for the following three
+## patmatch cases. Output of first run is input to second run,
+# plus second compile uses -principal.  Why?
+
+###################
+inline_expect_test(
+    name = "Patmatch_for_multiple_test",
     struct = "patmatch_for_multiple.ml",
     opts = ["-drawlambda", "-dlambda"],
     # nocopts = True,
@@ -585,10 +536,26 @@ inline_expect_module(
 )
 
 ###################
+## FIXME: ocamltest runs twice, output of first as input of second - why?
+## second compile uses -principal
+# inline_expect_test(
+#     name = "Patmatch_incoherence_test",
+#     struct = "patmatch_incoherence.ml",
+#     opts = ["-no-principal"],
+# )
+
 diff_test( #FIXME: ocamlcc_diff_test
     name = "Patmatch_incoherence_test",
     file1 = "patmatch_incoherence.ml",
-    file2 = "Patmatch_incoherence_expect2",
+    file2 = "Patmatch_incoherence_expect2", # = patmatch_incoherence.corrected.corrected
+    timeout = "short",
+    tags = ["inline_expect"]
+)
+
+diff_test( #FIXME: ocamlcc_diff_test
+    name = "Patmatch_incoherence2_test",
+    file1 = "Patmatch_incoherence_expect", # = .corrected
+    file2 = "Patmatch_incoherence_expect2", # = .corrected.corrected
     timeout = "short",
     tags = ["inline_expect"]
 )
@@ -607,19 +574,25 @@ inline_expect_module(
 )
 
 ###################
-diff_test( #FIXME: ocamlcc_diff_test
+inline_expect_test(
     name = "Patmatch_split_no_or_test",
-    file1 = "patmatch_split_no_or.ml",
-    file2 = ":Patmatch_split_no_or_expect",
-    timeout = "short",
-    tags = ["inline_expect"]
+    struct = "patmatch_split_no_or.ml",
+    opts = ["-principal", "-dlambda"], # "-no-principal",
 )
 
-inline_expect_module(
-    name = "Patmatch_split_no_or_expect",
-    struct = "patmatch_split_no_or.ml",
-    opts   = ["-dlambda"]
-)
+# diff_test( #FIXME: ocamlcc_diff_test
+#     name = "Patmatch_split_no_or_test",
+#     file1 = "patmatch_split_no_or.ml",
+#     file2 = ":Patmatch_split_no_or_expect",
+#     timeout = "short",
+#     tags = ["inline_expect"]
+# )
+
+# inline_expect_module(
+#     name = "Patmatch_split_no_or_expect",
+#     struct = "patmatch_split_no_or.ml",
+#     opts   = ["-dlambda"]
+# )
 
 #################
 module_program_tests(
@@ -740,32 +713,20 @@ module_program_tests(
 )
 
 ################
-module_program_tests(
+compile_module_tests(
     name            = "Unit_naming_tests",
     structfile      = "unit_naming.ml",
-    rc_expected     = 2,
     deps            = [":CamlCase"],
     stdlib_deps     = ["//stdlib:Stdlib"],
-    stdout_expected = "unit_naming.reference",
-    # stderr_actual = "unit_naming.ml.stderr",
+    rc_expected     = 2,
+    stderr_expected = "unit_naming.compilers.reference",
+    stderr_actual   = "unit_naming.ml.stderr",
 )
-
-# ocamlcc_diff_test(
-#     name = "Unit_naming_test",
-#     file1 = "unit_naming.compilers.reference",
-#     file2 = ":unit_naming.ml.stderr",
-#     timeout = "short",
-#     tags = ["fail"]
-# )
-
-# test_module(
-#     name   = "Unit_naming",
-#     struct = "unit_naming.ml",
-#     rc_expected = 2,
-#     stderr_actual = "unit_naming.ml.stderr",
-#     deps   = [":CamlCase"],
-#     stdlib_deps = ["//stdlib:Stdlib"]
-# )
+############
+test_module( # not a test, used by unit_naming_test
+    name   = "CamlCase",
+    struct = "camlCase.ml",
+)
 
 #################
 module_program_tests(

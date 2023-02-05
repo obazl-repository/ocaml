@@ -2,13 +2,12 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
 # load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
-load("//test/rules:test_executable.bzl", "test_executable")
+# load("//test/rules:test_program.bzl", "test_link_program")
 load("//test/rules:test_module.bzl", "test_module")
 
 # load("//test/rules:compile_module_test.bzl", "compile_module_test")
 
 load("//test/rules:inline_expect_module.bzl",
-     # "inline_expect_module",
      "inline_expect_test",
 )
 load("//config:WARNINGS.bzl", "w")
@@ -387,7 +386,7 @@ inline_expect_test(
 #         "$(location typecore_empty_polyvariant_error.ppx.ml)"
 #     ])
 # )
-# test_executable(
+# test_link_program(
 #     name = "ppx.exe",
 #     main = ":Empty_ppx",
 #     # opts = ["-custom"]

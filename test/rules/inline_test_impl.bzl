@@ -13,7 +13,7 @@ load("//bzl:providers.bzl", "HybridExecutableMarker")
 ## then diffs it against expected output.
 
 ##############################
-def inline_test_impl(ctx):
+def inline_assertion_test_impl(ctx):
 
     debug = False
 

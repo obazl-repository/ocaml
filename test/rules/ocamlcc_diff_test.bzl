@@ -8,7 +8,8 @@ load("//bzl:functions.bzl", "filestem")
 
 load(":test_transitions.bzl", "test_in_transitions")
 
-load(":UTILS.bzl", "std_compilers", "validate_io_files")
+load(":UTILS.bzl",
+     "std_compilers", "get_test_name", "validate_io_files")
 
 load("//bzl:providers.bzl", "DumpInfo", "ModuleInfo", "BootInfo")
 
@@ -260,33 +261,6 @@ ocamlcc_diff_test = rule(
 )
 
 ################################################################
-## macro helper
-def test_name(name, compiler):
-    if compiler == "ocamlc.byte":
-        name = name + "_vv_test"
-    elif compiler == "ocamlc.opt":
-        name = name + "_sv_test"
-    elif compiler == "ocamlopt.opt":
-        name = name + "_ss_test"
-    elif compiler == "ocamlopt.byte":
-        name = name + "_vs_test"
-
-    elif compiler == "ocamlc.optx":
-        name = name + "_xv_test"
-    elif compiler == "ocamlopt.optx":
-        name = name + "_xs_test"
-    elif compiler == "ocamloptx.optx":
-        name = name + "_xx_test"
-    elif compiler == "ocamloptx.opt":
-        name = name + "_sx_test"
-    elif compiler == "ocamloptx.byte":
-        name = name + "_vx_test"
-    else:
-        fail("Unrecognized compiler: %s" % compiler)
-
-    return name
-
-################################################################
 ## MACRO - on ocamlcc_diff_test per compiler
 ################################################################
 def ocamlcc_diff_tests(name,
@@ -303,6 +277,7 @@ def ocamlcc_diff_tests(name,
 
                        compilers = std_compilers,
                        timeout = "short",
+                       tags    = [],
                        **kwargs):
 
     # return None
@@ -323,7 +298,7 @@ def ocamlcc_diff_tests(name,
             fail("Unrecognized compiler: {c}. Valid compiler names: {cs}".format(
                 c = compiler, cs=std_compilers
             ))
-        tname = test_name(stem, compiler)
+        tname, ctag = get_test_name(stem, compiler)
         tests.append(tname)
         ocamlcc_diff_test(
             name     = tname,
@@ -331,6 +306,7 @@ def ocamlcc_diff_tests(name,
             actual   = actual,
             expected = expected,
             timeout  = timeout,
+            tags     = [ctag] + tags,
             **kwargs
         )
 

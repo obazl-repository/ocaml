@@ -20,6 +20,7 @@ load("//bzl/transitions:dev_transitions.bzl",
 load(":UTILS.bzl", "std_compilers", "validate_io_files")
 
 load(":test_transitions.bzl",
+     "test_in_transition",
      "vv_test_in_transition",
      "vs_test_in_transition",
      "ss_test_in_transition",
@@ -27,37 +28,6 @@ load(":test_transitions.bzl",
 
 load(":ocamlcc_diff_test.bzl", "ocamlcc_diff_tests")
 load(":test_module.bzl", "test_module")
-
-################################################
-def _in_transition_impl(settings, attr):
-    print("test_link_program _in_transition")
-    print("attr.compiler: %s" % attr.compiler)
-
-    if attr.compiler:
-        if attr.compiler.name in ["ocamlopt.opt", "ocamlopt.byte"]:
-            return {
-                "//toolchain:compiler"    : attr.compiler,
-                "//toolchain:runtime"     : "@dev//lib:asmrun",
-                "//toolchain:ocamlrun"    : "@dev//bin:ocamlrun"
-            }
-        else:
-            fail(attr.compiler)
-    else:
-        return {}
-
-_in_transition = transition(
-    implementation = _in_transition_impl,
-    inputs = [
-        "//toolchain:compiler",
-        "//toolchain:ocamlrun",
-        "//toolchain:runtime",
-    ],
-    outputs = [
-        "//toolchain:compiler",
-        "//toolchain:ocamlrun",
-        "//toolchain:runtime",
-    ]
-)
 
 ##############################
 def _test_program_impl(ctx):
@@ -123,7 +93,7 @@ test_program = rule(
     # cfg = reset_config_transition,
     # cfg = "exec",
     # cfg = dev_tc_compiler_out_transition,
-    cfg = _in_transition,
+    cfg = test_in_transition,
     executable = True,
     fragments = ["cpp"],
     toolchains = ["//toolchain/type:ocaml",
@@ -291,6 +261,7 @@ def module_program_tests(name,
                          deps = [],
                          sig_deps = [],
                          stdlib_deps = [],
+                         suppress_cmi = None,
 
                          stdout_expected = None,
                          # stdout_actual = None,
@@ -347,8 +318,10 @@ def module_program_tests(name,
         name   = m_name,
         struct = structfile,
         sig    = cmi,
+        deps   = deps,
         sig_deps    = sig_deps,
         stdlib_deps = stdlib_deps,
+        suppress_cmi = suppress_cmi,
 
         opts   = opts,
         dump   = dump,

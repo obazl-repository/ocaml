@@ -1,22 +1,16 @@
 load("//test:rules.bzl",
-     "inline_test_macro",
+     "inline_assertion_tests",
      "test_module",
 )
 
 test_suite(
     name = "lib-atomic",
-    tests  = [":Test_atomic_test"]
+    tests  = [":Test_atomic_tests"]
 )
 
-inline_test_macro(
-    name = "Test_atomic_test",
-    test_module = ":Test_atomic",
-    timeout = "short"
-)
-
-test_module(
-    name   = "Test_atomic",
-    struct = "test_atomic.ml",
+inline_assertion_tests(
+    name = "Test_atomic_tests",
+    structfile = "test_atomic.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib",
         "//stdlib:Stdlib.Atomic"

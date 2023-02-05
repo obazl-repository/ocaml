@@ -276,7 +276,9 @@ def _test_stderr_normalize_impl(ctx):
             # "set -x;",
             ## use awk to remove srcfile paths from actual,
             ## then strip newlines from both files
-            "awk '/File / {{ gsub(/File \"[^\"]*\",/, \"File \\\"{fname}\\\",\")}}".format(fname = actual_base),
+            "awk \\",
+            "'/^File .*_none_/ { gsub(/File \"[^\"]*\",/, \"File \\\"_none_\\\",\")} \\",
+            "/^File \"[^_]/ {{ gsub(/File \"[^\"]*\",/, \"File \\\"{fname}\\\",\")}}".format(fname = actual_base),
             "{ print }' \\",
             "{} \\".format(ctx.file.actual.path),
             "1> actual_fixed ;",

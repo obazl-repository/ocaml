@@ -163,8 +163,9 @@ def inline_expect_test(name,
 
     if name.endswith("_test"):
         stem = name[:-5]
+        m_name = stem[:1].capitalize() + stem[1:]
     else:
-        stem = name
+        fail("inline_expect_test name must end in '_test'")
 
     if struct.startswith(":"):
         structfile = struct[1:]

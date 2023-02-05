@@ -1,5 +1,41 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
+################################################
+def _test_in_transition_impl(settings, attr):
+    # print("test_in_transition")
+    # print("attr.compiler: %s" % attr.compiler)
+
+    if attr.compiler:
+        if attr.compiler.name in ["ocamlopt.opt", "ocamlopt.byte"]:
+            return {
+                "//toolchain:compiler"    : attr.compiler,
+                "//toolchain:runtime"     : "@dev//lib:asmrun",
+                "//toolchain:ocamlrun"    : "@dev//bin:ocamlrun"
+            }
+        else:
+            fail(attr.compiler)
+    else:
+        return {}
+
+############################
+test_in_transition = transition(
+    implementation = _test_in_transition_impl,
+    inputs = [
+        "//toolchain:compiler",
+        "//toolchain:ocamlrun",
+        "//toolchain:runtime",
+    ],
+    outputs = [
+        "//toolchain:compiler",
+        "//toolchain:ocamlrun",
+        "//toolchain:runtime",
+    ]
+)
+
+################################################################
+
+################  OBSOLETE
+
 ################################################################
 def _vv_test_in_transition_impl(settings, attr):
     debug = False

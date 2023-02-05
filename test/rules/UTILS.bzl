@@ -1,4 +1,39 @@
 ################################################################
+def get_test_name(name, compiler):
+    if compiler == "ocamlc.byte":
+        name = name + "_vv_test"
+        tag  = "vv"
+    elif compiler == "ocamlc.opt":
+        name = name + "_sv_test"
+        tag  = "sv"
+    elif compiler == "ocamlopt.opt":
+        name = name + "_ss_test"
+        tag  = "ss"
+    elif compiler == "ocamlopt.byte":
+        name = name + "_vs_test"
+        tag  = "vs"
+
+    elif compiler == "ocamlc.optx":
+        name = name + "_xv_test"
+        tag  = "xv"
+    elif compiler == "ocamlopt.optx":
+        name = name + "_xs_test"
+        tag  = "xs"
+    elif compiler == "ocamloptx.optx":
+        name = name + "_xx_test"
+        tag  = "xx"
+    elif compiler == "ocamloptx.opt":
+        name = name + "_sx_test"
+        tag  = "sx"
+    elif compiler == "ocamloptx.byte":
+        name = name + "_vx_test"
+        tag  = "vx"
+    else:
+        fail("Unrecognized compiler: %s" % compiler)
+
+    return name, tag
+
+################################################################
 std_compilers = ["ocamlc.byte", "ocamlc.opt", "ocamlc.optx",
                  "ocamlopt.byte", "ocamlopt.opt", "ocamlopt.optx",
                  "ocamloptx.byte","ocamloptx.opt", "ocamloptx.optx"]

@@ -17,29 +17,31 @@ load("//test/rules:normalizers.bzl", "test_stderr_normalize")
 ####  MACRO
 ################################################################
 def compile_module_tests(name,
-                   structfile = None,
-                   cmi        = None,
-                   sigfile    = None,
-                   compilers = std_compilers,
-                   opts  = [],
-                   dump = [],  # log, e.g. lambda
-                   alerts = [],
-                   warnings = [],
+                         structfile = None,
+                         cmi        = None,
+                         sigfile    = None,
+                         compilers = std_compilers,
+                         opts  = [],
+                         dump = [],  # log, e.g. lambda
+                         alerts = [],
+                         warnings = [],
 
-                   deps = [],
-                   sig_deps = [],
-                   stdlib_deps = [],
+                         deps = [],
+                         sig_deps = [],
+                         stdlib_deps = [],
+                         suppress_cmi = None,
 
-                   stdout_expected = None,
-                   stdout_actual = None,
-                   stderr_expected = None,
-                   stderr_actual = None,
-                   stdlog_expected = None,
-                   stdlog_actual = None,
+                         rc_expected     = 0,
+                         stdout_expected = None,
+                         stdout_actual = None,
+                         stderr_expected = None,
+                         stderr_actual = None,
+                         stdlog_expected = None,
+                         stdlog_actual = None,
 
-                   tags  = [],
-                   timeout = "short",
-                   **kwargs):
+                         tags  = [],
+                         timeout = "short",
+                         **kwargs):
 
     if name.endswith("_tests"):
         stem = name[:-6]
@@ -101,12 +103,14 @@ def compile_module_tests(name,
         deps          = deps,
         sig_deps      = sig_deps,
         stdlib_deps   = stdlib_deps,
+        suppress_cmi  = suppress_cmi,
 
         opts          = opts,
         dump          = dump,
         alerts        = alerts,
         warnings      = warnings,
 
+        rc_expected   = rc_expected,
         stdout_actual = stdout_actual,
         stderr_actual = stderr_actual,
         stdlog_actual = stdlog_actual,
