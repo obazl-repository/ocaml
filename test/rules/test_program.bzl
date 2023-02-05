@@ -29,6 +29,10 @@ load(":test_transitions.bzl",
 load(":ocamlcc_diff_test.bzl", "ocamlcc_diff_tests")
 load(":test_module.bzl", "test_module")
 
+load("//test/rules:normalizers.bzl",
+     "test_stderr_normalize",
+     "test_stdlog_normalize")
+
 ##############################
 def _test_program_impl(ctx):
 
@@ -250,6 +254,7 @@ test_program_outputs = rule(
 
 def module_program_tests(name,
                          structfile,
+                         testlink = False,
                          cmi        = None,
                          sigfile    = None,
                          compilers = std_compilers,
@@ -293,14 +298,31 @@ def module_program_tests(name,
     # print("NAME: %s" % name)
     # print("MSTEM: %s" % mstem)
 
+    if stdout_expected:
+        expectation = stdout_expected + ".norm"
+        actual      = m_name + ".exe.stdout.norm"
+    else:
+        expectation = None
+        actual      = m_name + ".exe.stdout"
+
     ocamlcc_diff_tests(
         ## expands to test_suite and one ocamlcc_diff_test per compiler
         name          = name,
         compilers     = compilers,
-        expected      = stdout_expected,
-        actual        = m_name + ".exe.stdout",
+        expected      = expectation,
+        actual        = actual,
         timeout       = timeout
     )
+
+    if stdout_expected:
+        test_stderr_normalize(
+            name          = m_name + "_norm",
+            src           = structfile,
+            expected      = stdout_expected,
+            expected_out  = stdout_expected + ".norm",
+            actual        = m_name + ".exe.stdout",
+            actual_out    = m_name + ".exe.stdout.norm",
+        )
 
     test_program_outputs(
         name    = m_name + ".exe.outputs",
@@ -317,6 +339,7 @@ def module_program_tests(name,
     test_module(
         name   = m_name,
         struct = structfile,
+        testlink = testlink,
         sig    = cmi,
         deps   = deps,
         sig_deps    = sig_deps,

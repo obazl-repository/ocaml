@@ -51,6 +51,8 @@ test_module = rule(
     attrs = dict(
         module_attrs(),
 
+        testlink = attr.bool(),
+
         alerts = attr.string_list(), #default = ["++all"]),
         warnings = attr.string_list(), #default = ["@A"]),
         rc_expected = attr.int(default = 0),

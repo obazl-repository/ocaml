@@ -1096,11 +1096,22 @@ def construct_args(ctx, tc, _options, cancel_opts,
             args.add("-i")
             # args.add("-o", outputs["mli"])
         else:
-            args.add("-c")
-            if ctx.attr._rule == "compile_module_test":
-                args.add("-o", outputs["cmstruct"])
+            if hasattr(ctx.attr, "testlink"):
+                if ctx.attr.testlink:
+                    # BROKEN due to compiler assumptions about file system locations?
+                    args.add("-o", outputs["cmstruct"].short_path + ".exe")
+                else:
+                    args.add("-c")
+                    if ctx.attr._rule == "compile_module_test":
+                        args.add("-o", outputs["cmstruct"])
+                    else:
+                        args.add("-o", outputs["cmstruct"])
             else:
-                args.add("-o", outputs["cmstruct"])
+                args.add("-c")
+                if ctx.attr._rule == "compile_module_test":
+                    args.add("-o", outputs["cmstruct"])
+                else:
+                    args.add("-o", outputs["cmstruct"])
 
     return args
 

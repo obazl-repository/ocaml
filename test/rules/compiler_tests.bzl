@@ -79,6 +79,14 @@ def compile_module_tests(name,
         else:
             expectation = stderr_expected + ".norm"
             actual      = stderr_actual + ".norm"
+    elif stdout_actual:
+        if stdout_expected == None:
+            ## verify that stderr_actual is null
+            expectation = None
+            actual      = stdout_actual
+        else:
+            expectation = stdout_expected + ".norm"
+            actual      = stdout_actual + ".norm"
     elif stdlog_actual:
         if stdlog_expected == None:
             ## verify that stdlog_actual is null

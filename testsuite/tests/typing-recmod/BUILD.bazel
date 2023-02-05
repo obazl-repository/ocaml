@@ -1,246 +1,245 @@
 load("//test:rules.bzl",
-     "test_executable",
-     "test_library",
+     "compile_module_tests",
+     "module_program_tests",
      "test_module",
      "test_signature",
-
-     "compile_fail_test",
-     "expect_test",
-     "inline_expect_test",
-     "ocaml_test",
 )
+load("//test/rules:inline_expect_module.bzl", "inline_expect_test")
 
-MODULE_OPTS = []
-SIG_OPTS    = []
-
-# test_library(
-#     name = "testsuite_tests_typing-recmod_lib",
-#     tests  = [
-#         ":Gpr1626",
-#         ":Pr9494",
-#         ":T01bad",
-#         ":T02bad",
-#         ":T03ok",
-#         ":T04bad",
-#         ":T05bad",
-#         ":T06ok",
-#         ":T07bad",
-#         ":T08bad",
-#         ":T09bad",
-#         ":T10ok",
-#         ":T11bad",
-#         ":T12bad",
-#         ":T13ok",
-#         ":T14bad",
-#         ":T15bad",
-#         ":T16ok",
-#         ":T17ok",
-#         ":T18ok",
-#         ":T20ok",
-#         ":T21ok",
-#         ":T22ok",
-#     ],
-# )
-
-test_module(
-    name   = "Gpr1626",
-    struct = "gpr1626.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "Pr9494",
-    struct = "pr9494.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-compile_fail_test(
-    name   = "t01bad_test",
-    struct = "t01bad.ml",
-    expected = "t01bad.compilers.reference",
-    deps   = [
-
+test_suite(
+    name = "typing-recmod",
+    tests  = [
+        ":Gpr1626_test",
+        ":Pr6491_test",
+        ":Pr9494_tests",
+        ":T01bad_tests",
+        ":T02bad_tests",
+        ":T03ok_tests",
+        ":T04bad_tests",
+        ":T05bad_tests",
+        ":T06ok_tests",
+        ":T07bad_tests",
+        ":T08bad_tests",
+        ":T09bad_tests",
+        ":T10ok_tests",
+        ":T11bad_tests",
+        ":T12bad_tests",
+        ":T13ok_tests",
+        ":T14bad_tests",
+        ":T15bad_tests",
+        ":T16ok_tests",
+        ":T17ok_tests",
+        ":T18ok_tests",
+        ":T20ok_tests",
+        ":T21ok_tests",
+        ":T22ok_tests",
     ],
 )
 
-test_module(
-    name   = "T01bad",
-    struct = "t01bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+###################
+inline_expect_test(
+    name   = "Gpr1626_test",
+    struct = "gpr1626.ml",
+    # stdlib_deps = [
+    # ],
+)
+
+inline_expect_test(
+    name   = "Pr6491_test",
+    struct = "pr6491.ml",
+)
+
+#####################
+module_program_tests(
+    name              = "Pr9494_tests",
+    structfile        = "pr9494.ml",
+    stdlib_deps       = [
+        "//stdlib:CamlinternalMod",
+        "//stdlib:Stdlib.Printexc",
+        "//stdlib:Stdlib.Set"
+    ],
+    stdout_expected   = "pr9494.reference",
+)
+
+compile_module_tests(
+    name            = "T01bad_tests",
+    structfile      = "t01bad.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    rc_expected     = 2,
+    stderr_expected = ":t01bad.compilers.reference",
+    stderr_actual   = "t01bad.ml.stderr",
+)
+
+compile_module_tests(
+    name            = "T02bad_tests",
+    structfile      = "t02bad.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    rc_expected     = 2,
+    stderr_expected = ":t02bad.compilers.reference",
+    stderr_actual   = "t02bad.ml.stderr",
+)
+
+module_program_tests(
+    name              = "T03ok_tests",
+    structfile        = "t03ok.ml",
+    stdlib_deps       = ["//stdlib:CamlinternalMod"]
+)
+
+compile_module_tests(
+    name            = "T04bad_tests",
+    structfile      = "t04bad.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    rc_expected     = 2,
+    stderr_expected = ":t04bad.compilers.reference",
+    stderr_actual   = "t04bad.ml.stderr",
+)
+
+compile_module_tests(
+    name            = "T05bad_tests",
+    structfile      = "t05bad.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    rc_expected     = 2,
+    stderr_expected = ":t05bad.compilers.reference",
+    stderr_actual   = "t05bad.ml.stderr",
+)
+
+module_program_tests(
+    name              = "T06ok_tests",
+    structfile        = "t06ok.ml",
+    stdlib_deps       = ["//stdlib:CamlinternalMod"]
+)
+
+compile_module_tests(
+    name            = "T07bad_tests",
+    structfile      = "t07bad.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    rc_expected     = 2,
+    stderr_expected = ":t07bad.compilers.reference",
+    stderr_actual   = "t07bad.ml.stderr",
+)
+
+compile_module_tests(
+    name            = "T08bad_tests",
+    structfile      = "t08bad.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    rc_expected     = 2,
+    stderr_expected = ":t08bad.compilers.reference",
+    stderr_actual   = "t08bad.ml.stderr",
+)
+
+compile_module_tests(
+    name            = "T09bad_tests",
+    structfile      = "t09bad.ml",
+    stdlib_deps     = ["//stdlib:Stdlib"],
+    rc_expected     = 2,
+    stderr_expected = ":t09bad.compilers.reference",
+    stderr_actual   = "t09bad.ml.stderr",
+)
+
+module_program_tests(
+    name              = "T10ok_tests",
+    structfile        = "t10ok.ml",
+    stdlib_deps       = ["//stdlib:CamlinternalMod"]
+)
+
+compile_module_tests(
+    name            = "T11bad_tests",
+    structfile      = "t11bad.ml",
+    rc_expected     = 2,
+    stderr_expected = ":t11bad.compilers.reference",
+    stderr_actual   = "t11bad.ml.stderr",
+)
+
+compile_module_tests(
+    name            = "T12bad_tests",
+    structfile      = "t12bad.ml",
+    rc_expected     = 2,
+    stderr_expected = ":t12bad.compilers.reference",
+    stderr_actual   = "t12bad.ml.stderr",
+)
+
+module_program_tests(
+    name              = "T13ok_tests",
+    structfile        = "t13ok.ml",
+    stdlib_deps       = ["//stdlib:CamlinternalOO"]
+)
+
+compile_module_tests(
+    name            = "T14bad_tests",
+    structfile      = "t14bad.ml",
+    rc_expected     = 2,
+    stderr_expected = ":t14bad.compilers.reference",
+    stderr_actual   = "t14bad.ml.stderr",
+)
+
+compile_module_tests(
+    name            = "T15bad_tests",
+    structfile      = "t15bad.ml",
+    rc_expected     = 2,
+    stderr_expected = ":t15bad.compilers.reference",
+    stderr_actual   = "t15bad.ml.stderr",
+)
+
+module_program_tests(
+    name              = "T16ok_tests",
+    structfile        = "t16ok.ml",
+    stdlib_deps       = [
+        "//stdlib:CamlinternalMod",
+        "//stdlib:Stdlib.List"
     ]
 )
 
-test_module(
-    name   = "T02bad",
-    struct = "t02bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+module_program_tests(
+    name              = "T17ok_tests",
+    structfile        = "t17ok.ml",
+    stdlib_deps       = ["//stdlib:CamlinternalMod"]
+)
+
+module_program_tests(
+    name              = "T18ok_tests",
+    structfile        = "t18ok.ml",
+    stdlib_deps       = ["//stdlib:CamlinternalMod"]
+)
+
+module_program_tests(
+    name              = "T20ok_tests",
+    structfile        = "t20ok.ml",
+    # testlink              = True,
+    stdlib_deps       = [
+        "//stdlib:CamlinternalMod",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set"
     ]
 )
 
-test_module(
-    name   = "T03ok",
-    struct = "t03ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
+module_program_tests(
+    name              = "T21ok_tests",
+    structfile        = "t21ok.ml",
+    stdlib_deps       = [
+        "//stdlib:CamlinternalMod",
+        "//stdlib:Stdlib.Map",
+        "//stdlib:Stdlib.Set"
     ]
 )
 
-test_module(
-    name   = "T04bad",
-    struct = "t04bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T05bad",
-    struct = "t05bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T06ok",
-    struct = "t06ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T07bad",
-    struct = "t07bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T08bad",
-    struct = "t08bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T09bad",
-    struct = "t09bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T10ok",
-    struct = "t10ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T11bad",
-    struct = "t11bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T12bad",
-    struct = "t12bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T13ok",
-    struct = "t13ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T14bad",
-    struct = "t14bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T15bad",
-    struct = "t15bad.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T16ok",
-    struct = "t16ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T17ok",
-    struct = "t17ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T18ok",
-    struct = "t18ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T20ok",
-    struct = "t20ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T21ok",
-    struct = "t21ok.ml",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
-)
-
-test_module(
-    name   = "T22ok",
-    struct = "t22ok.ml",
-    sig    = "T22ok_cmi",
-    opts = MODULE_OPTS,
-    deps   = [
-    ]
+module_program_tests(
+    name              = "T22ok_tests",
+    structfile        = "t22ok.ml",
+    cmi               = "T22ok_cmi",
+    stdlib_deps       = [
+        "//stdlib:CamlinternalMod",
+        "//stdlib:Primitives",
+        "//stdlib:Stdlib.Gc",
+        "//stdlib:Stdlib.Printf",
+        "//stdlib:Stdlib.Set"
+    ],
+    stdout_expected = "t22ok.exe.expected.stdout",
+    stdout_actual   = "t22ok.exe.stdout"
 )
 
 test_signature(
     name = "T22ok_cmi",
     src  = "t22ok.mli",
-    opts = SIG_OPTS,
-    deps   = [
-    ]
+    stdlib_deps       = ["//stdlib:Stdlib.Set_cmi"]
 )
 
