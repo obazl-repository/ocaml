@@ -11,7 +11,9 @@ load("//test/rules:test_signature.bzl", "test_signature")
 
 load(":UTILS.bzl", "std_compilers", "validate_io_files")
 
-load("//test/rules:normalizers.bzl", "test_stderr_normalize")
+load("//test/rules:normalizers.bzl",
+     "test_stderr_normalize",
+     "test_stdlog_normalize")
 
 ###############################################################
 ####  MACRO
@@ -66,16 +68,25 @@ def compile_module_tests(name,
                       stdlog_actual)
 
     (mstem, mext) = paths.split_extension(structfile)
-    print("NAME: %s" % name)
-    print("MSTEM: %s" % mstem)
+    # print("NAME: %s" % name)
+    # print("MSTEM: %s" % mstem)
 
-    if stderr_expected == None:
-        ## verify that stderr_actual is null
-        expectation = None
-        actual      = stderr_actual
-    else:
-        expectation = stderr_expected + ".norm"
-        actual      = stderr_actual + ".norm"
+    if stderr_actual:
+        if stderr_expected == None:
+            ## verify that stderr_actual is null
+            expectation = None
+            actual      = stderr_actual
+        else:
+            expectation = stderr_expected + ".norm"
+            actual      = stderr_actual + ".norm"
+    elif stdlog_actual:
+        if stdlog_expected == None:
+            ## verify that stdlog_actual is null
+            expectation = None
+            actual      = stdlog_actual
+        else:
+            expectation = stdlog_expected + ".norm"
+            actual      = stdlog_actual + ".norm"
 
     ocamlcc_diff_tests(
         name          = name,
@@ -94,6 +105,16 @@ def compile_module_tests(name,
             expected_out  = stderr_expected + ".norm",
             actual        = stderr_actual,
             actual_out    = stderr_actual + ".norm",
+        )
+
+    if stdlog_actual and stdlog_expected:
+        test_stdlog_normalize(
+            name          = m_name + "_norm",
+            src           = structfile,
+            expected      = stdlog_expected,
+            expected_out  = stdlog_expected + ".norm",
+            actual        = stdlog_actual,
+            actual_out    = stdlog_actual + ".norm",
         )
 
     test_module(
@@ -150,7 +171,7 @@ def compile_signature_tests(name,
         fail("compile_signature_tests: name must end with '_sig_tests'; actual: {}".format(name))
 
     (sigstem, mext) = paths.split_extension(sigfile)
-    print("SIGSTEM: %s" % sigstem)
+    # print("SIGSTEM: %s" % sigstem)
     sig_mname = sigstem[:1].capitalize() + sigstem[1:]
 
     validate_io_files(stdout_expected,

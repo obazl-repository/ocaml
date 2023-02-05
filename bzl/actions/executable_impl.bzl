@@ -254,9 +254,9 @@ def executable_impl(ctx, tc, exe_name,
     compiler_stem = filestem(compiler)
 
     if ctx.attr._rule == "test_program":
-        print("tc.executable: %s" % tc.executable)
-        print("tc.ocamlrun: %s" % tc.ocamlrun)
-        print("compiler: %s" % compiler)
+        # print("tc.executable: %s" % tc.executable)
+        # print("tc.ocamlrun: %s" % tc.ocamlrun)
+        # print("compiler: %s" % compiler)
 
         if compiler.basename in ["ocamlopt.opt"]:
             ext = ".ss.opt"
@@ -461,7 +461,7 @@ def executable_impl(ctx, tc, exe_name,
     cli_link_deps_list = cli_link_deps_depset.to_list()
     ## HACK alert: this is horribly inefficient but it will do for now:
     already_has_stdlib_module = False
-    print("tgt: %s" % ctx.label)
+    # print("tgt: %s" % ctx.label)
     for dep in cli_link_deps_list:
         # print("cli link: %s" % dep)
         if dep.basename in ["Stdlib.cmo", "Stdlib.cmx",

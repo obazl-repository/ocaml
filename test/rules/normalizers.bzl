@@ -110,7 +110,8 @@ def _test_stdlog_normalize_impl(ctx):
     # expected_normalized=ctx.actions.declare_file(
     #     ctx.file.expected.basename + ctx.attr.ext)
 
-    (actual_base,actual_ext)=paths.split_extension(ctx.file.actual.basename)
+    # (actual_base,actual_ext)=paths.split_extension(ctx.file.actual.basename)
+    actual_base = ctx.file.src.basename
 
     # actual_stripped = ctx.file.actual.basename + ".stripped"
     actual_stripped = ctx.actions.declare_file(ctx.file.actual.basename + ".stripped")
@@ -186,9 +187,13 @@ test_stdlog_normalize = rule(
     implementation = _test_stdlog_normalize_impl,
     doc = "Normalize expected v. actual files, for diffing",
     attrs = dict(
-        # compiler = attr.string(
-        #     doc = "ocamlc.byte | ocamlopt.opt | etc."
-        # ),
+        compiler = attr.string(
+            doc = "ocamlc.byte | ocamlopt.opt | etc."
+        ),
+        src = attr.label( # for extracting original fname
+            #??? mandatory = True,
+            allow_single_file = True
+        ),
 
         expected = attr.label(
             mandatory = True,
@@ -330,7 +335,7 @@ test_stderr_normalize = rule(
         compiler = attr.string(
             doc = "ocamlc.byte | ocamlopt.opt | etc."
         ),
-        src = attr.label(
+        src = attr.label( # for extracting original fname
             #??? mandatory = True,
             allow_single_file = True
         ),

@@ -1,73 +1,54 @@
 load("//test:rules.bzl",
+     "module_program_tests",
      "test_module",
-     "batch_test_macro"
+     "batch_tests"
 )
 load("//config:WARNINGS.bzl", "w")
 
 test_suite(
     name            = "typing-labels",
     tests           = [
-        ":Mixin_test",
-        ":Mixin2_test",
-        ":Mixin3_test",
+        ":Mixin_tests",
+        ":Mixin2_tests",
+        ":Mixin3_tests",
     ],
 )
 
-##################
-batch_test_macro(
-    name            = "Mixin_test",
-    test_module     = ":Mixin",
-    stdout_actual   = "mixin.stdout",
-    stdout_expected = "mixin.reference",
-)
-
-test_module(
-    name            = "Mixin",
-    struct          = "mixin.ml",
+#####################
+module_program_tests(
+    name              = "Mixin_tests",
+    structfile        = "mixin.ml",
     stdlib_deps     = [
         "//stdlib:CamlinternalOO",
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
     ],
-    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27]
+    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27],
+    stdout_expected   = "mixin.reference",
 )
 
-##################
-batch_test_macro(
-    name            = "Mixin2_test",
-    test_module     = ":Mixin2",
-    stdout_actual   = "mixin2.stdout",
-    stdout_expected = "mixin2.reference",
-)
-
-test_module(
-    name            = "Mixin2",
-    struct          = "mixin2.ml",
+#####################
+module_program_tests(
+    name              = "Mixin2_tests",
+    structfile        = "mixin2.ml",
     stdlib_deps     = [
         "//stdlib:CamlinternalOO",
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
     ],
-    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27]
+    warnings = ["open-shadow-identifier", "unused-var-strict"],
+    stdout_expected   = "mixin2.reference",
 )
 
-##################
-batch_test_macro(
-    name            = "Mixin3_test",
-    test_module     = ":Mixin3",
-    stdout_actual   = "mixin3.stdout",
-    stdout_expected = "mixin3.reference",
-)
-
-test_module(
-    name            = "Mixin3",
-    struct          = "mixin3.ml",
+#####################
+module_program_tests(
+    name              = "Mixin3_tests",
+    structfile        = "mixin3.ml",
     stdlib_deps     = [
-        # "//stdlib"
         "//stdlib:CamlinternalOO",
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
     ],
-    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27]
+    warnings = ["open-shadow-identifier", "unused-var-strict"],
+    stdout_expected   = "mixin3.reference",
 )
-

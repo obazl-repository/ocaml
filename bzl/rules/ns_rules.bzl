@@ -55,14 +55,16 @@ ns_signature = rule(
 ################################################################
 def _ns_module(ctx):
 
-    (this, extension) = paths.split_extension(ctx.file.struct.basename)
-    name = this[:1].capitalize() + this[1:]
-    ns_pfx = ctx.file.ns.basename[:-4]
+    (stem, extension) = paths.split_extension(ctx.file.struct.basename)
+    name = stem[:1].capitalize() + stem[1:]
+    (ns_pfx, ns_ext) = paths.split_extension(ctx.file.ns.basename)
+    # ns_pfx = ctx.file.ns.basename[:-4] # drop extension?
     module_name = ns_pfx + "__" + name
 
     return module_impl(ctx, module_name)
 
 #######################
+## FIXME: rename ns_submodule. used in debugger and dynlink
 ns_module = rule(
     implementation = _ns_module,
     doc = "Compiles a module with the bootstrap compiler.",

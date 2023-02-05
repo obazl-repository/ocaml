@@ -1,73 +1,71 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//test:rules.bzl",
+     "module_program_tests",
      "test_module",
-     "batch_test_macro",
+     "batch_tests",
      "inline_expect_module",
      # "inline_expect_test",
 )
+load("//test/rules:inline_expect_module.bzl", "inline_expect_test")
 
 load("//config:WARNINGS.bzl", "w")
 
 test_suite(
     name = "lib-arg",
     tests  = [
-        # ":Test_rest_all_test",
-        ":Testarg_test",
-        ":Testerror_test",
+        ":Test_rest_all_test",
+        ":Testarg_tests",
+        ":Testerror_tests",
     ],
 )
 
-diff_test(
-    name = "Test_rest_all_test",
-    file1 = "test_rest_all.ml",
-    file2 = ":Test_rest_all",
-    timeout = "short",
-    tags = ["inline_expect"]
-)
-
-inline_expect_module(
-    name   = "Test_rest_all",
+inline_expect_test(
+    name   = "Test_rest_all_test",
     struct = "test_rest_all.ml",
     stdlib_deps = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib",
     ],
-    # timeout = "short"
 )
 
-batch_test_macro(
-    name     = "Testarg_test",
-    stdout_actual   = "testarg.stdout",
-    stdout_expected = "testarg.reference",
-    test_module = ":Testarg",
-    timeout  = "short"
-)
+# diff_test(
+#     name = "Test_rest_all_test",
+#     file1 = "test_rest_all.ml",
+#     file2 = ":Test_rest_all",
+#     timeout = "short",
+#     tags = ["inline_expect"]
+# )
 
-test_module(
-    name   = "Testarg",
-    struct = "testarg.ml",
-    warnings = [w.MISSING_MLI_70],
+# inline_expect_module(
+#     name   = "Test_rest_all",
+#     struct = "test_rest_all.ml",
+#     stdlib_deps = [
+#         "//stdlib:Stdlib.Arg",
+#         "//stdlib:Stdlib",
+#     ],
+#     # timeout = "short"
+# )
+
+#####################
+module_program_tests(
+    name              = "Testarg_tests",
+    structfile        = "testarg.ml",
+    warnings = ["-missing-mli"],
     stdlib_deps   = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Printf"
-    ]
+    ],
+    stdout_expected   = "testarg.reference",
 )
 
-batch_test_macro(
-    name     = "Testerror_test",
-    stdout_actual   = "testerror.stdout",
-    stdout_expected = "testerror.reference",
-    test_module = ":Testerror",
-    timeout  = "short"
-)
-
-test_module(
-    name   = "Testerror",
-    struct = "testerror.ml",
-    warnings = [w.UNEXPECTED_DOCSTRING_50, w.MISSING_MLI_70],
+#####################
+module_program_tests(
+    name              = "Testerror_tests",
+    structfile        = "testerror.ml",
+    warnings = ["-unexpected-docstring", "-missing-mli"],
     stdlib_deps   = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Array"
-    ]
+    ],
+    stdout_expected   = "testerror.reference",
 )
-

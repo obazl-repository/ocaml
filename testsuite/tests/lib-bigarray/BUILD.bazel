@@ -1,28 +1,25 @@
-load("//test:rules.bzl", "test_module", "batch_test_macro")
+load("//test:rules.bzl",
+     "test_module",
+     "batch_tests",
+     "module_program_tests")
+
 load("//config:WARNINGS.bzl", "w")
 
 test_suite(
     name = "lib-bigarray",
     tests  = [
-        ":Bigarrays_test",
-        ":Change_layout_test",
-        ":Fftba_test",
-        ":Pr5115_test",
-        ":Weak_bigarray_test",
+        ":Bigarrays_tests",
+        ":Change_layout_tests",
+        ":Fftba_tests",
+        ":Pr5115_tests",
+        ":Weak_bigarray_tests",
     ],
 )
 
-batch_test_macro(
-    name    = "Bigarrays_test",
-    stdout_actual   = "Bigarrays.stdout",
-    stdout_expected = "bigarrays.reference",
-    test_module = ":Bigarrays",
-    timeout = "short"
-)
-
-test_module(
-    name   = "Bigarrays",
-    struct = "bigarrays.ml",
+#####################
+module_program_tests(
+    name              = "Bigarrays_tests",
+    structfile        = "bigarrays.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib.Bigarray",
         "//stdlib:Stdlib.Filename",
@@ -30,73 +27,49 @@ test_module(
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Printf"
     ],
-    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27]
+    warnings = ["open-shadow-identifier", "-unused-var-strict"],
+    stdout_expected   = "bigarrays.reference",
 )
 
-batch_test_macro(
-    name     = "Change_layout_test",
-    stdout_actual   = "change_layout.stdout",
-    stdout_expected = "change_layout.reference",
-    test_module = ":Change_layout",
-    timeout  = "short"
-)
-
-test_module(
-    name   = "Change_layout",
-    struct = "change_layout.ml",
+#####################
+module_program_tests(
+    name              = "Change_layout_tests",
+    structfile        = "change_layout.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib.Bigarray",
         "//stdlib:Stdlib.Format",
-    ]
+    ],
+    stdout_expected   = "change_layout.reference",
 )
 
-batch_test_macro(
-    name     = "Fftba_test",
-    stdout_actual   = "fftba.stdout",
-    stdout_expected = "fftba.reference",
-    test_module = ":Fftba",
-    timeout  = "short"
-)
-
-test_module(
-    name   = "Fftba",
-    struct = "fftba.ml",
+#####################
+module_program_tests(
+    name              = "Fftba_tests",
+    structfile        = "fftba.ml",
     stdlib_deps   = ["//stdlib:Stdlib.Bigarray"],
-    warnings = [w.UNEXPECTED_DOCSTRING_50, w.UNUSED_FOR_INDEX_35]
+    warnings = ["-unexpected-docstring", "-unused-for-index"],
+    stdout_expected   = "fftba.reference",
 )
 
-batch_test_macro(
-    name     = "Pr5115_test",
-    stdout_actual   = "pr5115.stdout",
-    stdout_expected = "pr5115.reference",
-    test_module = ":Pr5115",
-    timeout  = "short"
-)
-
-test_module(
-    name   = "Pr5115",
-    struct = "pr5115.ml",
+#####################
+module_program_tests(
+    name              = "Pr5115_tests",
+    structfile        = "pr5115.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib.Bigarray",
         "//stdlib:Stdlib.Printf"
-    ]
+    ],
+    stdout_expected   = "pr5115.reference",
 )
 
-batch_test_macro(
-    name     = "Weak_bigarray_test",
-    stdout_actual   = "weak_bigarray.stdout",
-    stdout_expected = "weak_bigarray.reference",
-    test_module = ":Weak_bigarray",
-    timeout  = "short"
-)
-
-test_module(
-    name   = "Weak_bigarray",
-    struct = "weak_bigarray.ml",
+#####################
+module_program_tests(
+    name              = "Weak_bigarray_tests",
+    structfile        = "weak_bigarray.ml",
     stdlib_deps   = [
         "//stdlib:Stdlib.Bigarray",
         "//stdlib:Stdlib.Gc",
         "//stdlib:Stdlib.Weak"
-    ]
+    ],
+    stdout_expected   = "weak_bigarray.reference",
 )
-

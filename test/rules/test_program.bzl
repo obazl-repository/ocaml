@@ -290,8 +290,8 @@ def module_program_tests(name,
     #                   stdlog_actual)
 
     (mstem, mext) = paths.split_extension(structfile)
-    print("NAME: %s" % name)
-    print("MSTEM: %s" % mstem)
+    # print("NAME: %s" % name)
+    # print("MSTEM: %s" % mstem)
 
     ocamlcc_diff_tests(
         ## expands to test_suite and one ocamlcc_diff_test per compiler

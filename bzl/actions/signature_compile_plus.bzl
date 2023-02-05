@@ -27,7 +27,7 @@ load("//bzl/rules/common:DEPS.bzl", "aggregate_deps", "merge_depsets")
 ########################
 def signature_compile_plus(ctx, module_name):
 
-    debug = True
+    debug = False
     debug_bootstrap = False
 
     if debug:

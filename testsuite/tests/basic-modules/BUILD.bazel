@@ -1,5 +1,8 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//test:rules.bzl",
+     "compile_module_tests",
+     "module_program_tests",
+
      "test_library",
      "test_module",
      "test_signature",
@@ -10,6 +13,8 @@ load("//test:rules.bzl",
      "ocamlcc_diff_tests",
      # "compile_dump_diff_test_macro",
 )
+load("//test/rules:inline_expect_module.bzl", "inline_expect_test")
+
 load("//test/rules:normalizers.bzl", "test_stdlog_normalize")
 
 load("//config:WARNINGS.bzl", "w")
@@ -19,45 +24,25 @@ test_suite(
     name = "basic-modules",
     tests = [
         ":Anonymous_tests",
-        ":Main_expect_test",
-        ":Recursive_module_init_expect_test",
+        ":Main_tests",
+        ":Recursive_module_init_tests",
         ":Recursive_module_evaluation_errors_test",
     ],
 )
 
-###################
-# diff_test(
-#     name = "Anonymous_diff_test",
-#     file1 = "anonymous.ocamlc.reference.norm",
-#     file2 = ":anonymous.ml.stdlog.norm",
-#     timeout = "short"
-# )
-ocamlcc_diff_test(
+#####################
+test_suite(
     name = "Anonymous_tests",
-    expected = ":anonymous.ocamlc.reference.norm",
-    actual = ":anonymous.ml.stdlog.norm",
-    timeout = "short"
+    tests = [
+        ":Anonymous_vm_tests",
+        ":Anonymous_sys_tests",
+        ":Anonymous_flambda_tests",
+    ]
 )
-# ocamlcc_diff_tests(
-#     name = "Anonymous_tests",
-#     compilers = ["ocamlc.byte", "ocamlc.opt"],
-#     expected = "anonymous.ocamlc.reference.norm",
-#     actual   = ":anonymous.ml.stdlog.norm",
-#     tags = ["warnings"],
-# )
-
-test_stdlog_normalize(
-    name = "Anonymous_norm",
-    expected     = "anonymous.ocamlc.reference",
-    expected_out = ":anonymous.ocamlc.reference.norm",
-    actual     = ":anonymous.ml.stdlog",
-    actual_out = ":anonymous.ml.stdlog.norm",
-    verbose = True
-)
-
-test_module(
-    name   = "Anonymous",
-    struct   = "anonymous.ml",
+compile_module_tests(
+    name              = "Anonymous_vm_tests",
+    compilers = ["ocamlc.byte", "ocamlc.opt", "ocamlc.optx"],
+    structfile        = "anonymous.ml",
     stdlib_deps = ["//stdlib:CamlinternalMod"],
     opts   = ["-dno-unique-ids"],
     dump = ["lambda"], ##FIXME:  dump => log
@@ -65,32 +50,57 @@ test_module(
         "-unused-type-declaration", # 34
         "-unused-value-declaration" #_32
     ],
+    stdlog_expected = "anonymous.ocamlc.reference",
     stdlog_actual = "anonymous.ml.stdlog",
 )
 
-batch_tests(
-    name     = "Main_expect_test",
-    test_module = ":Main",
-    stdout_actual   = "Main.stdout",
-    stdout_expected = "main.reference",
-    timeout = "short"
+compile_module_tests(
+    name              = "Anonymous_sys_tests",
+    compilers = ["ocamlopt.byte", "ocamlopt.opt", "ocamlopt.optx"],
+    structfile        = "anonymous.ml",
+    stdlib_deps = ["//stdlib:CamlinternalMod"],
+    opts   = ["-dno-unique-ids"],
+    dump = ["lambda"], ##FIXME:  dump => log
+    warnings = [ # do not report (write to stderr)
+        "-unused-type-declaration", # 34
+        "-unused-value-declaration" #_32
+    ],
+    stdlog_expected = "anonymous.ocamlopt.reference",
+    stdlog_actual = "anonymous.ml.sys.stdlog",
 )
 
-test_module(
-    name   = "Main",
-    struct = "main.ml",
-    sig    = "Main_cmi",
-    deps   = [
+compile_module_tests(
+    name              = "Anonymous_flambda_tests",
+    compilers = ["ocamloptx.byte", "ocamloptx.opt", "ocamloptx.optx"],
+    structfile        = "anonymous.ml",
+    stdlib_deps = ["//stdlib:CamlinternalMod"],
+    opts   = ["-dno-unique-ids"],
+    dump = ["lambda"], ##FIXME:  dump => log
+    warnings = [ # do not report (write to stderr)
+        "-unused-type-declaration", # 34
+        "-unused-value-declaration" #_32
+    ],
+    stdlog_expected = "anonymous.ocamlopt.flambda.reference",
+    stdlog_actual = "anonymous.ml.flambda.stdlog",
+)
+
+#####################
+module_program_tests(
+    name            = "Main_tests",
+    structfile      = "main.ml",
+    cmi             = "Main_cmi",
+    deps            = [
         ":Offset",
         ":Pr4008",
-        ":Pr7427",
-        ":Pr6726"
+        ":Pr6726",
+        ":Pr7427"
     ],
-    stdlib_deps = [
+    stdlib_deps     = [
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Set",
     ],
-    warnings = [w.UNUSED_MODULE_60, w.UNUSED_VALUE_DECLARATION_32]
+    warnings        = ["-unused-module", "-unused-value-declaration"],
+    stdout_expected = "main.reference",
 )
 
 test_signature(
@@ -109,7 +119,7 @@ test_module(
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.String",
     ],
-    warnings = [w.UNUSED_VALUE_DECLARATION_32, w.UNUSED_VAR_STRICT_27]
+    warnings        = ["-unused-var-strict", "-unused-value-declaration"],
 )
 
 test_module(
@@ -125,7 +135,7 @@ test_module(
     name   = "Pr6726",
     struct = "pr6726.ml",
     stdlib_deps = ["//stdlib:Stdlib"],
-    warnings = [w.UNUSED_VAR_STRICT_27]
+    warnings        = ["-unused-var-strict"]
 )
 
 test_module(
@@ -135,17 +145,9 @@ test_module(
 )
 
 ################################################################
-diff_test(
-    name = "Recursive_module_evaluation_errors_test",
-    file1 = "recursive_module_evaluation_errors.ml",
-    file2 = ":Recursive_module_evaluation_errors",
-    timeout = "short",
-    tags = ["inline_expect"]
-)
-
-inline_expect_module(
-    name = "Recursive_module_evaluation_errors",
-    struct  = "recursive_module_evaluation_errors.ml",
+inline_expect_test(
+    name   = "Recursive_module_evaluation_errors_test",
+    struct = "recursive_module_evaluation_errors.ml",
     stdlib_deps = [
         ## FIXME: deps ordering not working, these must be listed in
         ## this order. This should happen automatically.
@@ -154,25 +156,16 @@ inline_expect_module(
     ],
 )
 
-################################################################
-batch_tests(
-    name     = "Recursive_module_init_expect_test",
-    test_module = ":Recursive_module_init",
-    stdout_actual   = "Recursive_module_init.stdout",
-    stdout_expected = "recursive_module_init.reference",
-    timeout = "short"
-)
-
-test_module(
-    name   = "Recursive_module_init",
-    struct = "recursive_module_init.ml",
-    # dump = ["lambda"],
+#####################
+module_program_tests(
+    name              = "Recursive_module_init_tests",
+    structfile        = "recursive_module_init.ml",
     stdlib_deps = [
         # "//stdlib:Primitives",
         "//stdlib:CamlinternalOO",
         "//stdlib:CamlinternalMod",
         "//stdlib:Stdlib.List",
         "//stdlib:Stdlib.Printf",
-    ]
+    ],
+    stdout_expected   = "recursive_module_init.reference",
 )
-

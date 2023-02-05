@@ -6,7 +6,7 @@ def genbin(name, srcs=[],
            textual_hdrs = [],
            defines=None):
 
-    print("GENBIN deps: %s" % deps)
+    # print("GENBIN deps: %s" % deps)
 
     if defines:
         defs = ["-D" + d for d in defines]

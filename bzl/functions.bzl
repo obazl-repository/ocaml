@@ -47,8 +47,12 @@ def validate_outnames(ctx, base):
             (stdlog_stem, stdlog_extension) = paths.split_extension(ctx.outputs.stdlog_actual.basename)
             ## for test_module
             if hasattr(ctx.attr, "struct"):
-                if stdlog_stem != ctx.file.struct.basename:
-                    fail("stdlog_actual stem must equal struct basename; got {a}, {b}".format(a=stdlog_stem, b=ctx.file.struct.basename))
+                if not stdlog_stem.startswith(base):
+                    print("tgt: %s" % ctx.label)
+                    fail("input filename must be prefix of stdlog_actual filename; got: {inf}; found: {outf}".format(
+                    inf = base, outf = stdlog_stem))
+                # if stdlog_stem != ctx.file.struct.basename:
+                #     fail("stdlog_actual stem must equal struct basename; got {a}, {b}".format(a=stdlog_stem, b=ctx.file.struct.basename))
                     ## for test_signature
             elif hasattr(ctx.attr, "sig"):
                 if stdlog_stem != ctx.file.src.basename:

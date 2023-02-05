@@ -105,7 +105,7 @@ def inline_assertion_tests(name,
         test_name = structfile[1:]
     else:
         test_name = structfile
-    print("test_name: %s" % test_name)
+    # print("test_name: %s" % test_name)
 
     executable = m_name + ".exe"
 
@@ -113,8 +113,6 @@ def inline_assertion_tests(name,
     vs_name = test_name + "_vs_test"
     ss_name = test_name + "_ss_test"
     sv_name = m_name + "_sv_test"
-
-    print("vv_name: %s" % vv_name)
 
     tests = []
 

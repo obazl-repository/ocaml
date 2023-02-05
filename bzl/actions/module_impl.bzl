@@ -238,6 +238,7 @@ def module_impl(ctx, module_name):
             cmi    = cmi_depset,
             cmt    = cmt_depset,
             all    = moduleInfo_depset,
+            ## FIXME: add cc deps to all?
         )
     ## FIXME: output groups should include cmti from sig?
     providers.append(outputGroupInfo)

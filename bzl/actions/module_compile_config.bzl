@@ -56,7 +56,7 @@ def declare_input_file(ctx, workdir, fname, ext, symlink):
 
 ################
 def construct_outputs(ctx, _options, tc, workdir, ext,
-                      # from_name,
+                      # label_mname,
                       module_name ## may be changed
                       ):
     debug = False
@@ -390,7 +390,7 @@ def construct_expect_module_outputs(ctx, _options, tc,
 ################################################################
 def construct_inputs(ctx, tc, ext, workdir,
                      executor, executor_arg,
-                     from_name, module_name,
+                     label_mname, module_name,
                      # direct_inputs,  # in_structfile
                      # stdlib_depset,
                      depsets,
@@ -464,10 +464,12 @@ def construct_inputs(ctx, tc, ext, workdir,
         else:
             in_structfile = ctx.file.struct
 
-    elif from_name == module_name:  ## not namespaced
-        # if ctx.label.name == "CamlinternalFormatBasics":
-            # print("NOT NAMESPACED")
-            # print("cmi is_source? %s" % provider_output_cmi.is_source)
+    elif ctx.attr.ns:
+        # if ctx.label.name == "Anonymous_vm": fail(ctx.label)
+        in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
+
+    else:
+        ## label_mname == module_name:  ## not namespaced
         if ctx.file.struct.is_source:
             # structfile in src dir, make sure in same dir as sig
 
@@ -549,13 +551,6 @@ def construct_inputs(ctx, tc, ext, workdir,
                 in_structfile = declare_input_file(
                     ctx, workdir, module_name, struct_ext, ## ".ml",
                     ctx.file.struct)
-
-    else:  ## we're namespaced
-        in_structfile = declare_input_file(ctx, workdir, module_name, ".ml", ctx.file.struct)
-        # in_structfile = ctx.actions.declare_file(workdir + module_name + ".ml")
-        # ctx.actions.symlink(
-        #     output = in_structfile, target_file = ctx.file.struct
-        # )
 
     # if ctx.label.name == "Patmatch_incoherence_expect2":
     #     print("struct attr: %s" % ctx.file.struct)
@@ -1086,7 +1081,7 @@ def construct_args(ctx, tc, _options, cancel_opts,
 
         elif ctx.attr._rule == "inline_expect_runner":
             None
-        elif ctx.attr._rule == "compile_module_test":
+        elif ctx.attr._rule in ["compile_module_test"]: # , "test_module"]:
             # args.add("-impl", inputs.structfile.short_path)
             # src file not symlinked into workdir:
             # args.add("-I", ctx.file.struct.dirname + "/_BS_vv")
@@ -1130,7 +1125,7 @@ def construct_module_compile_config(ctx, module_name):
     debug_ccdeps = False
 
     basename = ctx.label.name
-    from_name = basename[:1].capitalize() + basename[1:]
+    label_mname = basename[:1].capitalize() + basename[1:]
 
     tc = ctx.toolchains["//toolchain/type:ocaml"]
 
@@ -1252,7 +1247,7 @@ def construct_module_compile_config(ctx, module_name):
     # inputs_depset =
     inputs = construct_inputs(ctx, tc, ext, workdir,
                               executor, executor_arg,
-                              from_name, module_name,
+                              label_mname, module_name,
                               # direct_inputs,
                               # stdlib_depset,
                               depsets,
