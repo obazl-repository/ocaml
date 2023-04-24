@@ -5,6 +5,8 @@
 The OCamlCC rules use several macros to reduce the amount of code in
 BUILD.bazel files.
 
+WARNING: Outdated; macros are still under development ATM
+
 Macros introduce a mismatch between what the developer sees in the
 files and what Bazel sees. In particular it means that you cannot
 determine the build target labels from the BUILD.bazel file alone. A

@@ -76,6 +76,7 @@ def module_impl(ctx, module_name):
             + inputs.bootinfo.structs
             + inputs.bootinfo.cli_link_deps
             # etc.
+            # FIXME: do we need cc_toolchain for modules?
             + [cc_toolchain.all_files] ##FIXME: only for sys outputs
         ),
         outputs   = outs,

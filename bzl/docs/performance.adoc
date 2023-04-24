@@ -2,6 +2,8 @@
 :toc: auto
 :toclevels: 3
 
+link:https://blog.bazel.build/2022/11/15/build-performance-metrics.html[Build performance metrics] (Bazel blog article)
+
 Some informal measurements. Note that Bazel always keeps track of
 "Elapsed time".
 

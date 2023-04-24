@@ -108,3 +108,10 @@ overrides mkexe, but requires that any args be passed with `-ccopt`,
 which will be placed after the `-o` and `-L` args.
 
 
+== misc
+
+link:https://github.com/grailbio/bazel-toolchain[grailbio] llvm Bazel toolchain
+
+link:https://github.com/llvm/llvm-project/tree/main/utils/bazel[Bazel llvm] Google contrib
+
+link:https://github.com/rsms/llvmbox[llvmbox] - portable llvm distrib

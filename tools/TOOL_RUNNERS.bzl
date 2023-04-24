@@ -103,7 +103,7 @@ run_tool = rule(
             default = "//:arg"
         ),
         _verbose = attr.label(
-            default = "//tools:verbose"
+            default = "@ocamlcc//tools:verbose"
         ),
 
         _rule = attr.string( default = "run_tool" ),
@@ -342,7 +342,7 @@ run_ocamlcmt = rule(
             cfg = _cmt_out_transition
         ),
         _verbose = attr.label(
-            default = "//tools:verbose"
+            default = "@ocamlcc//tools:verbose"
         ),
 
         _rule = attr.string( default = "run_ocamlcmt" ),

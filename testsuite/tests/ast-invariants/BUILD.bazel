@@ -1,6 +1,6 @@
 load("//test:rules.bzl",
-     "batch_test_macro",
-     "test_executable",
+     "batch_tests",
+     "test_link_program",
      "test_module",
 )
 
@@ -13,14 +13,14 @@ test_suite(
     ],
 )
 
-batch_test_macro(
+batch_tests(
     name    = "Test_test",
     stdout_actual = "test.stdout",
     stdout_expected = "test.reference",
     test_module    = ":Test",
 )
 
-# test_executable(
+# test_link_program(
 #     name    = "Test.bin",
 #     main    = ":Test",
 # )

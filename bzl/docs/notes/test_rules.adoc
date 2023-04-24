@@ -96,13 +96,13 @@ right ocamlrun. Or emit ocamlrun with the pgm as runfile?
 * `compiler_module`
   ** no transition
   **  `module_impl`
-    *** `constuct_module_compile_action`
+    *** `constuct_module_compile_config`
     *** `ctx.actions.run`
 
 * `test_module`
   ** no transition
   ** `module_impl`
-    *** `constuct_module_compile_action`
+    *** `constuct_module_compile_config`
       **** remove tc.warnings
       **** 'dump' attrib
     *** `ctx.actions.run`
@@ -110,7 +110,7 @@ right ocamlrun. Or emit ocamlrun with the pgm as runfile?
 * `inline_expect_module`
   ** no transition
   ** executable = False
-  ** `constuct_module_compile_action`
+  ** `constuct_module_compile_config`
   ** `ctx.actions.run`
     *** runs expect compiler
     *** emits `.corrected` file
@@ -119,7 +119,7 @@ right ocamlrun. Or emit ocamlrun with the pgm as runfile?
 * `test_infer_signature`
   ** no transition
   ** executable = False
-  ** `constuct_module_compile_action`
+  ** `constuct_module_compile_config`
   ** `ctx.actions.run_shell`
     *** runs compiler with `-i`
     *** redirects stdout to .mli file
@@ -141,7 +141,7 @@ FIXME: replace `inline_expect_test` with `inline_expect_module` plus `diff_test`
 * `inline_expect_test`
   ** `exec` transition on _tool == expect test compiler
   ** test = True
-  ** `constuct_module_compile_action`
+  ** `constuct_module_compile_config`
     *** custom logic for `inline_expect_test`
       **** sets executor to ocamlrun
       **** sets executor_arg to _tool (expect compiler)
@@ -156,7 +156,7 @@ FIXME: replace `inline_expect_test` with `inline_expect_module` plus `diff_test`
 * `compile_module_test`
   ** no transition
   ** test = False
-  ** `constuct_module_compile_action`
+  ** `constuct_module_compile_config`
   ** `ctx.actions.run_shell`
     *** runs compiler
     *** redirects stdout, stderr to user-specified files

@@ -10,13 +10,13 @@ Testing a compiler is a little more complicated than testing an ordinary program
 
 === Standard test protocols
 
-* Classic unit testing: compile and link a module that uses some form
+* Classic (inline) unit testing: compile and link a module that uses some form
   of assertions to test code. When run under test, reports pass/fail.
   No other outputs - no stdout/stderr output.
 +
 The Bazel rule runs the executable directly.
 
-* Batch expect testing: compile and link a module that does some work
+* Batch testing: compile and link a module that does some work
   and writes data to stdout or stderr. The test procedure is to run
   the executable, capture the actual output, and compare it to
   expected output. Expected output file is input to the test. Test
@@ -28,7 +28,7 @@ input, runs it, and redirects its stdout/stderr to user-specified
 files. This is required because Bazel's method for directly running
 executables does not support redirection of stdout/stderr.
 
-* Inline expect testing: uses a modified version of the compiler (the
+* "Inline expect" testing: uses a modified version of the compiler (the
   "expect compiler") to process expect extension code (e.g.
   [nowrap]`[%%expect{|... |}]`) that is embedded in the input source
   file. Output is a copy of the input source file (with extension
@@ -87,9 +87,113 @@ machinery: the "action" normally used to run compilers directly
 redirection of stdout or stderr. So while it works just fine for
 "normal" builds, where printing stdout/stderr to the terminal is
 sufficient, it cannot be used for tests where we need to capture
-stdout/stderr to files. So for those kinds of tests we have a second
-set of rules that construct shell scripts to run the tools, which
-enables us to control all outputs.
+stdout/stderr to files. For that we need to construct a shell script
+that runs the compile and redirects stdout and stderr as required, and
+then use `ctx.actions.run_shell` to run the script. The build rules
+for compilation of test modules and signatures can run either action, and will use the one appropriate for the target.
+
+[TIP]
+====
+Redirection of stdout/stderr is controlled by attributes
+`stdout_actual` and `stderr_actual` on rules `test_module` and
+`test_signature`; logfile output is controlled by `stdlog_actual`.
+**The files named by these attributes can be used as direct build
+targets.** This makes it easy to see how your code is behaving during
+test development.
+
+For example, `//testsuite/tests/warnings/w01.ml` emits multiple
+warnings, which are redirected by `stderr_actual = "w01.ml.stderr"`.
+To see what gets written to that file, you can build the `test_module`
+target, whose name is `W01`, passing `--output_groups=all` to instruct
+Bazel to list everything the target emits, including `w01.ml.stderr`:
+
+    bazel build testsuite/tests/warnings:W01 --output_groups=all
+    Target //testsuite/tests/warnings:W01 up-to-date:
+      bazel-bin/testsuite/tests/warnings/_BS_vv/W01.cmi
+      bazel-bin/testsuite/tests/warnings/_BS_vv/W01.cmo
+      bazel-bin/testsuite/tests/warnings/_BS_vv/w01.ml
+      bazel-bin/testsuite/tests/warnings/w01.ml.stderr
+
+But you can also build the output file directly:
+
+    bazel build //testsuite/tests/warnings:w01.ml.stderr
+    Target //testsuite/tests/warnings:w01.ml.stderr up-to-date:
+      bazel-bin/testsuite/tests/warnings/w01.ml.stderr
+====
+
+==== Warnings
+
+Warnings are explicitly listed, e.g.
+
+.//testsuite/tests/warnings:BUILD.bazel
+----
+test_module(
+    name   = "W04",
+    struct = "w04.ml",
+    stderr_actual  = "w04.ml.stderr",
+    warnings = ["fragile-match"] # 4  <1>
+)
+----
+<1> Either numbers (`4`) or mnemonics (`fragile-match`) may be used,
+with or without a prefix (`+`, `-`, or `@`).
+
+By default, warnings on test targets are "enabled" by prepending `+`
+if no prefix is present (e.g. passed as `+fragile-match`) so that they
+will be written to stderr, captured to a file, and compared with
+expected output. To override this use an explicit `+` or `-` prefix.
+For example, test case
+`//testsuite/tests/basic-modules:Anonymous_tests` compile
+`anonymous.ml`, which triggers some warnings. But they are not used
+for the test case, so to disable reporting we pass
+
+----
+    warnings = [
+        "-unused-type-declaration", # 34
+        "-unused-value-declaration" #_32
+    ]
+----
+
+==== Alerts
+
+Alerts are written to stderr. They are controllable using `-alert`,
+which is similar to `-w` for warnings but not quite the same.
+
+See link:https://v2.ocaml.org/manual/alerts.html[Alerts]
+
+The `test_module` rule sets `-alert @all` by default: all alerts are
+fatal. This is to force the user to make all expected alerts explicit
+by adding them to the `alerts` list attribute. Any alert in the list
+will be added with `--`, which makes it non-fatal but reported. So for
+example, this: `alerts = ["deprecated"]` will translate to
+[nowrap]`-alerts @all--deprecated`. If the target so configured
+triggers a deprecation alert, it will be written to stderr without
+affecting the return code; any other alert will trigger an error
+(written to stderr) and a non-zero return code.
+
+Examples: `//testsuite/tests/warnings:Deprecated_module_tests` etc.
+
+==== Logs
+
+Options like `-dlambda`, `-dparsetree` instruct the compilers to write
+the requested data to `stderr`; the `-dump-into-file` flag (boolean)
+instructs the compilers to write the output to a file (same name as
+input file with suffix `.dump`).
+
+Use the `dump` [TODO: better name] attribute to specify the log you
+want, without a `-d` prefix; for example [nowrap]`dump = ["lambda"]`.  Use
+`stdlog_actual` to specify the file where the log should be written,
+e.g. [nowrap]`stdlog_actual = "anonymous.ml.lambda"`
+
+[TIP]
+====
+As noted above, the "stdlog_actual" file can be used as a direct
+build target on the command line; e.g.
+[nowrap]`bazel build //testsuite/tests/basic-modules:anonymous.ml.lamba`
+====
+
+== Macros
+
+See xref:queries.adoc#macro_expansion[Macro expansion].
 
 == Running tests
 
@@ -112,9 +216,9 @@ this target builds all the compilers, builds all the tests, and runs all the tes
 
 * Run all the tests for `testsuite/tests/basic`:
 
-  ** `$ bazel test testsuite/tests/basic:tests`
+  ** `$ bazel test testsuite/tests/basic`
 
-* Run all the `ocamlc.byte` tests for `testsuite/tests/basic`:
+* Run all the `ocamlc.byte` tests in `testsuite/tests/basic`:
 
   ** `$ bazel test testsuite/tests/basic:tests --test_tag_filters=vv`
 
@@ -249,3 +353,29 @@ is defined in module `Stdlib`. So this error can be corrected by
 adding `//stdlib:Primitives` as a dependency.
 
 
+== Test Maintenance
+
+=== Batch tests (with stderr or logfile output)
+
+First compile the test module.
+
+1. The `stderr_actual` attribute must equal the `struct` name plus suffix `.stderr`.
+2. Build the test_module target with `--output_groups=all`
+3. Inspect the stderr_actual output
+4. Add any missing deps, e.g. `stdlib_deps = ["//stdlib:Stdlib"]`
++ Example: `//testsuite/tests/warnings:Deprecated_module_use`
+
+
+Then add `ocamlcc_diff_tests`; this is a macro that expands to one
+`ocamlcc_diff_??_test` target for each compiler.
+
+1.  The 'name' for `ocamlcc_diff_tests` must end in `_tests`
+2. If the test should only be run for a subset of the compilers, list
+them in `compilers`, e.g. `compilers = ["ocamlc.byte", "ocamlc.opt"]`
+2. The `expected` attribute takes the "reference" file, e.g. `foo.compilers.reference`
+3. The `actual` attribute takes a file specified as the output of a
+test_module target. This is usually the `stderr_actual` file, but it can be any file.
+4.  Add whatever tags you want.
+
+You may need to run the test using `ocamltest`, keeping the log so you
+can see exactly what `ocamltest` does and adjust your Bazel code accordingly.

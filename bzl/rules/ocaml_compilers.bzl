@@ -24,6 +24,9 @@ load(":ocaml_transitions.bzl",
      "std_ocamlc_opt_in_transition")
 
 ################################################################
+
+##FIXME: no need for 'std_' prefix?  Compiler names are always sufficient?
+
 ################################################################
 def _std_ocamlc_byte_in_transition_impl(settings, attr):
     debug = False

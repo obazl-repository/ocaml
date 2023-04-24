@@ -69,6 +69,7 @@ See xref:diagnostics.adoc[Diagnostics] for more information and guidance.
 | `//config/ocaml/archive:verbose`  | False | Inserts `-verbose` for all OCaml archiving actions, telling the compiler to print the commands it uses to drive the C toolchain (archiver).
 | `//config/ocaml/compile:verbose` | False | Inserts `-verbose` to all OCaml compile actions, telling the compiler to print the commands it uses to drive the C toolchain (assembler, compiler).
 | `//config/ocaml/link:verbose` | False | Inserts `-verbose` for all OCaml link actions, telling the compiler to print the commands it uses to drive the C toolchain (linker).
+| `//config/ocaml/warnings:report`  | False | If True, warnings are passed with '+' so the compiler will write warning messages to stderr; otherwise they are passed with '-' (ignored).
 |===
 
 [cols="3,1,5"]

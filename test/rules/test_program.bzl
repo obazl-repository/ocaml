@@ -160,14 +160,21 @@ def _test_program_outputs_impl(ctx):
     else:
         stderr = ""
 
+    args = ctx.actions.args()
+    args.add_all(ctx.attr.args)
+    for plugin in ctx.files.plugins:
+        args.add(plugin.path)
+        ## FIXME: plugin cc deps go in action_inputs
+
     ctx.actions.run_shell(
-        inputs    = depset(),
+        inputs    = ctx.files.plugins, # depset(),
         outputs   = action_outputs,
-        arguments = [], # args],
+        arguments = [args],
         tools = [pgm] + ([ocamlrun] if ocamlrun else []),
         command = " ".join([
             "{}".format(ocamlrun_path),
             "{}".format(pgm.path),
+            "$@",
             stdout,
             stderr
         ]),
@@ -175,8 +182,28 @@ def _test_program_outputs_impl(ctx):
         # progress_message = progress_msg(workdir, ctx)
     )
 
+    # plugins = []
+    # if hasattr(ctx.attr, "plugins"):
+    #     plugins.extend(ctx.files.plugins)
+
+    # myrunfiles = ctx.runfiles(
+    #     files = action_outputs + [
+    #         tc.executable,
+    #         tc.ocamlrun,
+    #         # ctx.outputs.stdout,
+    #         # ctx.outputs.stderr
+    #             ],
+    #     transitive_files =  depset(
+    #         plugins,
+    #         # transitive = []
+    #         # + [ctx.attr._runfiles_bash[DefaultInfo].files]
+    #         # + [ctx.attr._runfiles_bash[DefaultInfo].default_runfiles.files]
+    #     )
+    # )
+
     defaultInfo = DefaultInfo(
         files = depset(action_outputs),
+        # runfiles = myrunfiles
     )
 
     return [defaultInfo]
@@ -188,6 +215,9 @@ test_program_outputs = rule(
     doc = "Run a test executable",
     attrs = dict(
         exec_common_attrs(),
+
+        args = attr.string_list(),
+        plugins = attr.label_list(),
 
         test_executable = attr.label(
             doc = "Label of test executable.",

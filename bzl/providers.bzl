@@ -60,25 +60,29 @@ ModuleInfo, _new_moduleinfo = provider(
 )
 
 ################################################################
-def _SigInfo_init(*,
-                  cmi  = None,
-                  cmti = None,
-                  ##FIXME: rename sig_src, for consistency with ModuleInfo
-                  mli  = None):
+def _OCamlSigInfo_init(*,
+                       cmi  = None,
+                       cmti = None,
+                       ##FIXME: rename sig_src,
+                       ##for consistency with ModuleInfo
+                       mli  = None,
+                       xmo  = False):
     return {
         "cmi"  : cmi,
         "cmti" : cmti,
         "mli"  : mli,
+        "xmo"  : xmo
     }
 
-SigInfo, _new_siginfo = provider(
+OCamlSigInfo, _new_ocamlsiginfo = provider(
     doc = "OCaml signature provider",
     fields = {
-        "cmi"   : "One .cmi file",
-        "cmti"  : "One .cmti file",
+        "cmi"  : "One .cmi file",
+        "cmti" : "One .cmti file",
         "mli"  : "One .mli file",
+        "xmo"  : "Boolean, false if compiled with -opaque"
     },
-    init = _SigInfo_init
+    init = _OCamlSigInfo_init
 )
 
 ################################################################
@@ -211,7 +215,8 @@ OcamlNsResolverProvider = provider(
         "resolver_file": "file",
         "resolver": "Name of resolver module",
         "prefixes": "List of alias prefix segs",
-        "ns_name": "ns name (joined prefixes)"
+        "ns_name": "ns name (joined prefixes)",
+        "archived?" : "Boolean, true if manifest is on archive rule"
     }
 )
 

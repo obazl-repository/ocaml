@@ -200,8 +200,9 @@ def archive_impl(ctx):
                     args.add("-cclib", "-l" + bn)
                     # args.add("-dllpath", dep.dirname)
                     includes.append(dep.dirname)
-                    # sincludes.append("-L" + paths.dirname(dep.short_path))
+                    sincludes.append("-L" + paths.dirname(dep.short_path))
                     sincludes.append("-L" + dep.dirname)
+                    sincludes.append("-L.")
 
                 args.add_all(sincludes, before_each="-ccopt", uniquify=True)
 
@@ -282,13 +283,15 @@ def archive_impl(ctx):
         direct = ctx.files.data if ctx.files.data else []
         + [tc.executable]
         + toolarg_input
+        + static_cc_deps
         ,
         transitive = []
         + [
             sigs_depset,
             afiles_depset,
             ofiles_depset,
-            archived_cmx_depset]
+            archived_cmx_depset,
+        ]
         # cli_link_deps_depset contains this archive, do not add to inputs
         + depsets.deps.cli_link_deps
         # + [libBootInfo.cmi]

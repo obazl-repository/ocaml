@@ -64,6 +64,8 @@ cc_mustache(
     ]
 )
 
+## FIXME: to eliminate the need for a genrule, rename files
+## to linux/s.h, macos/s.h
 genrule(
     name = "s_h",
     outs = ["s.h"],

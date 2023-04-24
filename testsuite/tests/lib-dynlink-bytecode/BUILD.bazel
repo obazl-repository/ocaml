@@ -21,20 +21,23 @@
 ## add it behind the scenes.
 
 load("//test:rules.bzl",
-     "test_executable",
      "test_library",
      "test_module",
+     "test_program",
+     "test_program_outputs",
 
      "test_vv_executable",
      "test_vs_executable",
      "test_ss_executable",
      "test_sv_executable",
 
-     "expect_test",
-     "expect_vv_test",
-     "expect_vs_test",
-     "expect_ss_test",
-     "expect_sv_test",
+     "ocamlcc_diff_tests",
+
+     # "expect_test",
+     # "expect_vv_test",
+     # "expect_vs_test",
+     # "expect_ss_test",
+     # "expect_sv_test",
 )
 
 load("//bzl/rules:COMPILER.bzl",
@@ -68,61 +71,96 @@ load("//bzl/rules:COMPILER.bzl",
 ## Registry case (below), which uses static linking.
 
 ################################################################
-sh_binary(
-    name = "Main.vv.byte.sh",
-    srcs = ["//test/rules:test_executable.sh"],
-    env  = select({
-        "//test:verbose?": {"VERBOSE": "true"},
-        "//conditions:default": {"VERBOSE": "false"}
-    }),
-    args = [
-        "$(rootpath //runtime:ocamlrun)",
-        "$(rootpath :Main.vv.byte)",
-        "$(rootpath :plug1_lib)",
-        "$(rootpath :plug2_lib)",
-    ],
-    data = [
-        "//runtime:ocamlrun",
-        ":Main.vv.byte",
-        ":plug1_lib",
-        ":dllplug1.so",
-        ":plug2_lib",
-        ":dllplug2.so"
-    ],
-    deps = ["@bazel_tools//tools/bash/runfiles"]
-)
+# sh_binary(
+#     name = "Main.vv.byte.sh",
+#     srcs = ["//test/rules:test_executable.sh"],
+#     env  = select({
+#         "//test:verbose?": {"VERBOSE": "true"},
+#         "//conditions:default": {"VERBOSE": "false"}
+#     }),
+#     args = [
+#         "$(rootpath //runtime:ocamlrun)",
+#         "$(rootpath :Main.vv.byte)",
+#         "$(rootpath :libPlug1)",
+#         "$(rootpath :libPlug2)",
+#     ],
+#     data = [
+#         "//runtime:ocamlrun",
+#         ":Main.vv.byte",
+#         ":libPlug1",
+#         ":dllplug1.so",
+#         ":libPlug2",
+#         ":dllplug2.so"
+#     ],
+#     deps = ["@bazel_tools//tools/bash/runfiles"]
+# )
 
 # test_executable macro expansion:
-test_vv_executable(
-    name    = "Main.vv.opt",
+# test_vv_executable(
+#     name    = "Main.vv.opt",
+#     prologue= [
+#         ## FIXME: these all should come from :Main
+#         "//stdlib",
+#         "//otherlibs/dynlink",
+#         ":Registry",
+#     ],
+#     main    = ":Main",
+#     # opts = ["-custom"],
+#     epilogue = [
+#         ":dllplug1.so",
+#         ":dllplug2.so",
+#         # ":libPlug1",
+#         # ":libPlug2",
+#     ],
+# )
+
+# test_vs_executable(
+#     name    = "Main.vs.opt",
+#     prologue= [
+#         "//stdlib",
+#         "//otherlibs/dynlink",
+#         ":Registry",
+#         ":libPlug1",
+#         ":libPlug2",
+#     ],
+#     main    = ":Main",
+#     # args = ["libPlug1", "libPlug2"],
+#     opts  = OCAML_COMPILER_OPTS # + ["-custom"]
+# )
+
+ocamlcc_diff_tests(
+    name     = "Main_diff_tests",
+    expected = "main.reference",
+    actual   = "Main.exe.stdout",
+)
+
+test_program_outputs(
+    name = "Main.exe.outputs",
+    test_executable = ":Main.exe",
+    opts = ["-verbose"],
+    plugins = [":libPlug1", ":libPlug2"],
+    stdout = "Main.exe.stdout",
+    stderr = "Main.exe.stderr",
+)
+
+test_program(
+    name = "Main.exe",
     prologue= [
         ## FIXME: these all should come from :Main
-        "//stdlib",
-        "//otherlibs/dynlink",
-        ":Registry",
+        # "//stdlib",
+        # "//otherlibs/dynlink",
+        # ":Registry",
+        # ":libPlug1",
+        # ":libPlug2",
     ],
     main    = ":Main",
     # opts = ["-custom"],
     epilogue = [
-        ":dllplug1.so",
-        ":dllplug2.so",
-        # ":plug1_lib",
-        # ":plug2_lib",
+        # ":dllplug1.so",
+        # ":dllplug2.so",
+        # ":libPlug1",
+        # ":libPlug2",
     ],
-)
-
-test_vs_executable(
-    name    = "Main.vs.opt",
-    prologue= [
-        "//stdlib",
-        "//otherlibs/dynlink",
-        ":Registry",
-        ":plug1_lib",
-        ":plug2_lib",
-    ],
-    main    = ":Main",
-    # args = ["plug1_lib", "plug2_lib"],
-    opts  = OCAML_COMPILER_OPTS # + ["-custom"]
 )
 
 test_module(
@@ -130,7 +168,7 @@ test_module(
     struct = "main.ml",
     deps   = [
         "//otherlibs/dynlink",
-        ":Registry"
+        ":Registry",
     ],
     stdlib_deps   = ["//stdlib:Stdlib.Marshal"]
 )
@@ -149,14 +187,14 @@ test_module(
 ## of --larch (flag alias in .bazelrc)
 
 ## the test runner:
-expect_vv_test(
-    name    = "Registry_vv_test",
-    test_executable = ":Registry.vv.bin",
-    stdout  = "registry.stdout",
-    expected = "static.reference",
-    timeout  = "short",
-    tags     = ["vv", "dynlink", "ccdeps"],
-)
+# expect_vv_test(
+#     name    = "Registry_vv_test",
+#     test_executable = ":Registry.vv.bin",
+#     stdout  = "registry.stdout",
+#     expected = "static.reference",
+#     timeout  = "short",
+#     tags     = ["vv", "dynlink", "ccdeps"],
+# )
 
 # expect_vv_test(
 #     name    = "Registry_static_test",
@@ -168,12 +206,13 @@ expect_vv_test(
 # )
 
 ## build and run this to see stdout w/o test machinery
-test_vv_executable(
+test_program(
+    name    = "Registry.vv.bin",
+    compiler = "ocamlc.byte",
     ## WARNING: this target uses ocamlc.byte with -custom, so it emits
     ## a hybrid vm/sys executable that can be run directly from the
     ## cmd line, w/o ocamlrun. Hence the "bin" extension -
     ## bytecode-in-native.
-    name    = "Registry.vv.bin",
     prologue= [
         ## FIXME: these are indirect deps of main, they should be
         ## added automatically
@@ -182,8 +221,8 @@ test_vv_executable(
     ],
     main    = ":Registry",
     epilogue = [
-        ":plug1_lib",
-        ":plug2_lib",
+        ":libPlug1",
+        ":libPlug2",
     ],
     opts = ["-linkall", "-verbose"],
     ocamlrun = "//runtime:ocamlrun"
@@ -193,21 +232,29 @@ test_module(
     name   = "Registry",
     struct = "registry.ml",
     stdlib_deps   = ["//stdlib:Primitives"],
+    # cc_deps = [
+    #     ":stub1",
+    #     ":stub2"
+    #     # ":dllplug1.so",
+    #     # ":dllplug2.so",
+    # ],
 )
 
 ################################################################
 ## Plugins
 ################################################################
 test_library(
-    name  = "plug1_lib",
+    name  = "libPlug1",
+    archive = True,
     cmxa_eligible = True,
     ## to build with archive_cc enabled,
     ## either archive=True or --//config/ocaml/compiler/libs:archived
     ## must also be set
-    archive_cc = select({
-        "//testsuite:archive_cc?": True,
-        "//conditions:default": False
-    }),
+    archive_cc = True,
+    # archive_cc = select({
+    #     "//testsuite:archive_cc?": True,
+    #     "//conditions:default": False
+    # }),
     manifest = [
         ":Plug1",
     ]
@@ -293,11 +340,13 @@ cc_binary(
 
 ################################################################
 test_library(
-    name  = "plug2_lib",
-    archive_cc = select({
-        "//testsuite:archive_cc?": True,
-        "//conditions:default": False
-    }),
+    name  = "libPlug2",
+    archive = True,
+    archive_cc = True,
+    # archive_cc = select({
+    #     "//testsuite:archive_cc?": True,
+    #     "//conditions:default": False
+    # }),
     cmxa_eligible = True,
     manifest = [
         ":Plug2",

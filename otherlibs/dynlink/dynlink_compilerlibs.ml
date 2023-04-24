@@ -1,4 +1,4 @@
-
+(* Bazel only. FIXME: use mustache template to generate *)
 module Arg_helper = Dynlink_compilerlibs__Arg_helper
 module Ast_helper = Dynlink_compilerlibs__Ast_helper
 module Ast_mapper = Dynlink_compilerlibs__Ast_mapper

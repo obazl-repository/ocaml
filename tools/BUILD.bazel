@@ -74,7 +74,7 @@ ocaml_tools( # expands to targets ocamldep.byte, ocamldep.opt
     name     = "ocamldep",
     prologue = OCAMLC_PROLOGUE,
     main     = ":Ocamldep",
-    opts     = OCAML_COMPILER_OPTS ##  + ["-verbose", "-ccopt", "-Wl,-v"],
+    opts     = OCAML_COMPILER_OPTS, ##  + ["-verbose", "-ccopt", "-Wl,-v"],
     tags     = ["tool"]
 )
 

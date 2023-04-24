@@ -413,8 +413,8 @@ compiler_library(
     ],
 )
 
-## ns resolver module
-compiler_module(
+## hand-rolled ns resolver module (Bazel only)
+compiler_module( #TODO: rename rule "ns_resolver_module"?
     name   = "Dynlink_compilerlibs",
     struct = "dynlink_compilerlibs.ml",
     opts = MODULE_OPTS + [
@@ -728,7 +728,6 @@ ns_module(
     ns     = ":Dynlink_compilerlibs",
     struct = "//bytecomp:bytesections.ml",
     sig    = ":Dynlink_compilerlibs.Bytesections_cmi",
-    opts = MODULE_OPTS,
     deps   = [
         ":Dynlink_compilerlibs.Config"
     ],

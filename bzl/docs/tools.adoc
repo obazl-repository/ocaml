@@ -292,3 +292,16 @@ CAUTION: the `--//:arg` argument must come before the `--`.
 To see the generated command pass `--//config/tools:verbose` (before `--`):
 
     $ bazel run :ocamlobjinfo --//:arg=//stdlib:Stdlib.Buffer --//config/tools:verbose -- -null-crc
+
+== Utilities
+
+Bazel's query facilities are powerful but cumbersome. For commonly
+used queries a shell script makes sense.
+
+* Macro expansion:
+
+.~/bin/bzlmacro
+----
+#!/bin/sh
+bazel query "attr(generator_name, $1, $2...)" --output=build
+----

@@ -914,7 +914,16 @@ def executable_impl(ctx, tc, exe_name,
     #     ctx.actions.write(output  = ctx.outputs.stderr, content = "test stderr")
 
     if ctx.attr._rule == "test_program":
-        if compiler_stem in ["ocamlc", "ocamlcp"]:
+        if vmruntime_custom:
+                ocamlrun = ""
+                defaultInfo = DefaultInfo(
+                    executable = out_exe,
+                    runfiles = myrunfiles
+                )
+                outputGroupInfo = OutputGroupInfo(
+                    all    = depset([out_exe])
+                )
+        elif compiler_stem in ["ocamlc", "ocamlcp"]:
             runner = ctx.actions.declare_file(workdir + ctx.attr.name + ".sh")
 
             cmd_prologue = runfiles_bash(ctx) + " ".join([
@@ -949,6 +958,10 @@ def executable_impl(ctx, tc, exe_name,
                 is_executable = True
             )
 
+            plugins = []
+            if hasattr(ctx.attr, "plugins"):
+                plugins.extend(ctx.files.plugins)
+
             myrunfiles = ctx.runfiles(
                 files =[
                     tc.executable,
@@ -958,6 +971,7 @@ def executable_impl(ctx, tc, exe_name,
                 ],
                 transitive_files =  depset(
                     transitive = []
+                    + plugins
                     + [ctx.attr._runfiles_bash[DefaultInfo].files]
                     + [ctx.attr._runfiles_bash[DefaultInfo].default_runfiles.files]
                 )
@@ -978,7 +992,7 @@ def executable_impl(ctx, tc, exe_name,
                     # ctx.outputs.stdout, ctx.outputs.stderr
                 ])
             )
-        else:
+        else: # compiler stem != ocamlc, ocamlcp
             defaultInfo = DefaultInfo(
                 executable = out_exe,
                 runfiles = myrunfiles
