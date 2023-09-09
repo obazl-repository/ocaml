@@ -35,7 +35,7 @@ compiler_module(
     name   = "Config",
     struct = "config.ml",
     sig    = "Config_cmi",
-    warnings = ["-unused-value-declaration"],
+    warnings = {"disable": ["unused-value-declaration"]},
     # open   = ["//stdlib:Stdlib"],
     stdlib_deps   = [
         "//stdlib:Stdlib.List",

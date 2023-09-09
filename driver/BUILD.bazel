@@ -7,7 +7,6 @@ load("//bzl:rules.bzl",
 
 load("//config:WARNINGS.bzl", "w")
 
-WARNINGS = [w.NAME_OUT_OF_SCOPE_40] # -40
 MODULE_OPTS = []
 
 SIG_OPTS    = []
@@ -74,10 +73,10 @@ compiler_module(
     struct = "compenv.ml",
     sig    = "Compenv_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-fragile-match",
-        "-missing-record-field-pattern"
-    ],
+    warnings = {"disable": [
+        "fragile-match",
+        "missing-record-field-pattern"
+    ]},
     deps   = [
         "//config:Config",
         "//parsing:Location",
@@ -116,15 +115,15 @@ compiler_module(
     struct = "compile.ml",
     sig    = "Compile_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        # "-ambiguous-name",
-        "-disambiguated-name",
-        "-fragile-match",
-        "-name-out-of-scope",
-        "-missing-record-field-pattern",
-        # "-open-shadow-identifier",
-        # "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        # "ambiguous-name",
+        "disambiguated-name",
+        "fragile-match",
+        "name-out-of-scope",
+        "missing-record-field-pattern",
+        # "open-shadow-identifier",
+        # "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//bytecomp:Bytegen",
         "//bytecomp:Emitcode",
@@ -162,15 +161,15 @@ compiler_module(
     struct = "compile_common.ml",
     sig    = "Compile_common_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        # "-ambiguous-name",
-        "-disambiguated-name",
-        # "-fragile-match",
-        "-name-out-of-scope",
-        # "-missing-record-field-pattern",
-        # "-open-shadow-identifier",
-        # "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        # "ambiguous-name",
+        "disambiguated-name",
+        # "fragile-match",
+        "name-out-of-scope",
+        # "missing-record-field-pattern",
+        # "open-shadow-identifier",
+        # "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//config:Config",
         "//parsing:Builtin_attributes",
@@ -218,15 +217,15 @@ compiler_module(
     struct = "compmisc.ml",
     sig    = "Compmisc_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        # "-ambiguous-name",
-        # "-disambiguated-name",
-        # "-fragile-match",
-        # "-name-out-of-scope",
-        "-missing-record-field-pattern",
-        # "-open-shadow-identifier",
-        # "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        # "ambiguous-name",
+        # "disambiguated-name",
+        # "fragile-match",
+        # "name-out-of-scope",
+        "missing-record-field-pattern",
+        # "open-shadow-identifier",
+        # "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//config:Config",
         "//parsing:Location",
@@ -292,7 +291,7 @@ compiler_module(
     name   = "Main",
     struct = "main.ml",
     opts = MODULE_OPTS,
-	warnings = [w.MISSING_MLI_70],
+	warnings = {"disable": [w.MISSING_MLI_70]},
     deps   = [
         ":Maindriver",
     ],
@@ -314,9 +313,9 @@ compiler_module(
     struct = "main_args.ml",
     sig    = "Main_args_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-disambiguated-name",
-    ],
+    warnings = {"disable": [
+        "disambiguated-name",
+    ]},
     deps   = [
         "//config:Config",
         "//parsing:Location",
@@ -359,15 +358,15 @@ compiler_module(
     struct = "maindriver.ml",
     sig    = "Maindriver_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        # "-ambiguous-name",
-        "-disambiguated-name",
-        # "-fragile-match",
-        "-name-out-of-scope",
-        # "-missing-record-field-pattern",
-        # "-open-shadow-identifier",
-        # "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        # "ambiguous-name",
+        "disambiguated-name",
+        # "fragile-match",
+        "name-out-of-scope",
+        # "missing-record-field-pattern",
+        # "open-shadow-identifier",
+        # "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//bytecomp:Bytelibrarian",
         "//bytecomp:Bytepackager",
@@ -409,12 +408,12 @@ compiler_module(
     struct = "makedepend.ml",
     sig    = "Makedepend_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-fragile-match",
-        "-disambiguated-name",
-        "-name-out-of-scope",
-        "-open-shadow-identifier",
-    ],
+    warnings = {"disable": [
+        "fragile-match",
+        "disambiguated-name",
+        "name-out-of-scope",
+        "open-shadow-identifier",
+    ]},
     deps   = [
         "//config:Config",
         "//parsing:Depend",
@@ -463,7 +462,7 @@ compiler_module(
     struct = "optcompile.ml",
     sig    = "Optcompile_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = {"disable": [w.NAME_OUT_OF_SCOPE_40]},
     deps   = [
         "//asmcomp:Asmgen",
         "//config:Config",
@@ -519,7 +518,7 @@ compiler_module(
     name   = "Optmain",
     struct = "optmain.ml",
     opts = MODULE_OPTS,
-	warnings = [w.MISSING_MLI_70],
+	warnings = {"disable": [w.MISSING_MLI_70]},
     deps   = [
         ":Optmaindriver",
     ],
@@ -541,7 +540,7 @@ compiler_module(
     struct = "optmaindriver.ml",
     sig    = "Optmaindriver_cmi",
     opts = MODULE_OPTS,
-    warnings = [w.NAME_OUT_OF_SCOPE_40],
+    warnings = {"disable": [w.NAME_OUT_OF_SCOPE_40]},
     deps   = [
         "//asmcomp:Asmlibrarian",
         "//asmcomp:Asmpackager",

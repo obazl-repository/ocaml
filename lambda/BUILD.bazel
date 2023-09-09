@@ -72,7 +72,7 @@ compiler_module(
     struct = "debuginfo.ml",
     sig    = "Debuginfo_cmi",
     opts = MODULE_OPTS,
-    warnings = ["-fragile-match"],
+    warnings = {"disable": ["fragile-match"]},
     deps   = [
         "//parsing:Location",
         "//typing:Ident",
@@ -116,12 +116,12 @@ compiler_module(
     struct = "lambda.ml",
     sig    = "Lambda_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-disambiguated-name",
-        "-fragile-match",
-        "-missing-record-field-pattern",
-        "-name-out-of-scope"
-    ],
+    warnings = {"disable": [
+        "disambiguated-name",
+        "fragile-match",
+        "missing-record-field-pattern",
+        "name-out-of-scope"
+    ]},
     deps   = [
         "//parsing:Longident",
         "//typing:Env",
@@ -179,13 +179,13 @@ compiler_module(
     struct = "matching.ml",
     sig    = "Matching_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-ambiguous-name",
-        "-disambiguated-name",
-        "-fragile-match",
-        "-name-out-of-scope",
-        "-missing-record-field-pattern",
-    ],
+    warnings = {"disable": [
+        "ambiguous-name",
+        "disambiguated-name",
+        "fragile-match",
+        "name-out-of-scope",
+        "missing-record-field-pattern",
+    ]},
     deps   = [
         "//parsing:Location",
         "//parsing:Longident",
@@ -241,12 +241,12 @@ compiler_module(
     struct = "printlambda.ml",
     sig    = "Printlambda_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-disambiguated-name",
-        "-fragile-match",
-        "-missing-record-field-pattern",
-        "-name-out-of-scope",
-    ],
+    warnings = {"disable": [
+        "disambiguated-name",
+        "fragile-match",
+        "missing-record-field-pattern",
+        "name-out-of-scope",
+    ]},
     deps   = [
         "//parsing:Location",
         "//typing:Ident",
@@ -354,11 +354,11 @@ compiler_module(
     struct = "simplif.ml",
     sig    = "Simplif_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-fragile-match",
-        "-missing-record-field-pattern",
-        "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        "fragile-match",
+        "missing-record-field-pattern",
+        "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//parsing:Location",
         "//typing:Ident",
@@ -402,7 +402,7 @@ compiler_module(
     struct = "switch.ml",
     sig    = "Switch_cmi",
     opts = MODULE_OPTS,
-    warnings = ["-missing-record-field-pattern"],
+    warnings = {"disable": ["missing-record-field-pattern"]},
     # open   = ["//stdlib:Stdlib"],
     stdlib_deps   = [
         "//stdlib:Stdlib",
@@ -433,14 +433,14 @@ compiler_module(
     struct = "tmc.ml",
     sig    = "Tmc_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-ambiguous-name",
-        "-disambiguated-name",
-        "-fragile-match",
-        "-name-out-of-scope",
-        "-missing-record-field-pattern",
-        "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        "ambiguous-name",
+        "disambiguated-name",
+        "fragile-match",
+        "name-out-of-scope",
+        "missing-record-field-pattern",
+        "open-shadow-label-constructor",
+    ]},
     deps   = [
         ":Lambda"
     ],
@@ -463,12 +463,12 @@ compiler_module(
     struct = "translattribute.ml",
     sig    = "Translattribute_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-disambiguated-name",
-        "-fragile-match",
-        "-missing-record-field-pattern",
-        "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        "disambiguated-name",
+        "fragile-match",
+        "missing-record-field-pattern",
+        "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//config:Config",
         "//parsing:Location",
@@ -506,15 +506,15 @@ compiler_module(
     struct = "translclass.ml",
     sig    = "Translclass_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        # "-ambiguous-name",
-        # "-disambiguated-name",
-        "-fragile-match",
-        # "-name-out-of-scope",
-        "-missing-record-field-pattern",
-        "-open-shadow-identifier",
-        "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        # "ambiguous-name",
+        # "disambiguated-name",
+        "fragile-match",
+        # "name-out-of-scope",
+        "missing-record-field-pattern",
+        "open-shadow-identifier",
+        "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//parsing:Location",
         "//typing:Btype",
@@ -561,14 +561,14 @@ compiler_module(
     struct = "translcore.ml",
     sig    = "Translcore_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-ambiguous-name",
-        "-disambiguated-name",
-        "-fragile-match",
-        "-name-out-of-scope",
-        "-missing-record-field-pattern",
-        "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        "ambiguous-name",
+        "disambiguated-name",
+        "fragile-match",
+        "name-out-of-scope",
+        "missing-record-field-pattern",
+        "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//config:Config",
         "//parsing:Location",
@@ -606,7 +606,7 @@ compiler_signature(
     name = "Translcore_cmi",
     src  = "translcore.mli",
     opts = SIG_OPTS,
-    warnings = ["-open-shadow-identifier"],
+    warnings = {"disable": ["open-shadow-identifier"]},
     deps   = [
         "//parsing:Asttypes_cmi",
         "//parsing:Location_cmi",
@@ -628,15 +628,15 @@ compiler_module(
     struct = "translmod.ml",
     sig    = "Translmod_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-ambiguous-name",
-        "-disambiguated-name",
-        "-fragile-match",
-        # "-name-out-of-scope",
-        "-missing-record-field-pattern",
-        # "-open-shadow-identifier",
-        "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        "ambiguous-name",
+        "disambiguated-name",
+        "fragile-match",
+        # "name-out-of-scope",
+        "missing-record-field-pattern",
+        # "open-shadow-identifier",
+        "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//parsing:Location",
         "//typing:Ctype",
@@ -696,11 +696,11 @@ compiler_module(
     struct = "translobj.ml",
     sig    = "Translobj_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-fragile-match",
-        "-name-out-of-scope",
-        "-disambiguated-name"
-    ],
+    warnings = {"disable": [
+        "fragile-match",
+        "name-out-of-scope",
+        "disambiguated-name"
+    ]},
     deps   = [
         "//config:Config",
         "//typing:Btype",
@@ -739,11 +739,11 @@ compiler_module(
     struct = "translprim.ml",
     sig    = "Translprim_cmi",
     opts = MODULE_OPTS,
-    warnings = [
-        "-fragile-match",
-        "-missing-record-field-pattern",
-        "-open-shadow-label-constructor",
-    ],
+    warnings = {"disable": [
+        "fragile-match",
+        "missing-record-field-pattern",
+        "open-shadow-label-constructor",
+    ]},
     deps   = [
         "//config:Config",
         "//parsing:Location",

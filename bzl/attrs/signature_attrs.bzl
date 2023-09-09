@@ -20,9 +20,14 @@ def signature_attrs():
             doc = "to disable use toolchain's copts"
         ),
 
-        warnings = attr.string_list(
-            doc = "List of ids, with or without '-' prefix. Do not include '-w'"
+        # warnings = attr.string_list(
+        #     doc = "List of ids, with or without '-' prefix. Do not include '-w'"
+        # ),
+
+        warnings = attr.string_list_dict(
+            doc = """Keys: enable, disable, or fatal. Values: list of strings, e.g. "42", "40..42", etc. """
         ),
+
         report_warnings = attr.label(
             default = "//config/ocaml/warnings:report"
         ),

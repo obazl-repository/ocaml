@@ -1019,16 +1019,37 @@ def construct_args(ctx, tc, _options, cancel_opts,
     else:
         report_warnings = ctx.attr.report_warnings[BuildSettingInfo].value
 
-    for w in ctx.attr.warnings:
-        args.add_all(["-w",
-                      w if w.startswith("+")
-                      else w if w.startswith("-")
-                      else w if w.startswith("@")
-                      else ("+" if report_warnings else "-")
-                      + w])
+    # for w in ctx.attr.warnings:
+    #     args.add_all(["-w",
+    #                   w if w.startswith("+")
+    #                   else w if w.startswith("-")
+    #                   else w if w.startswith("@")
+    #                   else ("+" if report_warnings else "-")
+    #                   + w])
 
-    if not ctx.file.sig:
-        args.add("-w", "-70")
+    # if ctx.attr.warn:
+    #     args.add("-w")
+    for k,v in ctx.attr.warnings.items():
+        if k == "disable":
+            for w in v:
+                args.add("-w", "-" + w)
+            # args.add_joined("-w", v,
+            #                 format_each = "-%s",
+            #                 join_with="",
+            #                 uniquify = True)
+        if k == "enable":
+            args.add_joined("-w", v,
+                            format_each = "+%s",
+                            join_with="",
+                            uniquify = True)
+        if k == "fatal":
+            args.add_joined("-w", v,
+                            format_each = "@%s",
+                            join_with="",
+                            uniquify = True)
+
+    # if not ctx.file.sig:
+    #     args.add("-w", "-70")
 
     if open_stdlib:
         ##NB: -no-alias-deps is about _link_ deps, not compile deps
