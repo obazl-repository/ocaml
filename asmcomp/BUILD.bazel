@@ -150,11 +150,13 @@ compiler_library(
     ] + select(
         # $(ARCH_SPECIFIC_ASMCOMP) = INTEL_ASM = x86_[proc,dsl,gas,masm]
         {
-        "//config/arch:x86_64":
-        [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
-        "//config/arch:i386":
-        ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
-    }, no_match_error = "Unsupported arch"),
+            #FIXME: use //platform/build?
+            "//config/arch:x86_64":
+            [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+            "//config/arch:i386":
+            ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+            "//conditions:default": []
+        }, no_match_error = "Unsupported arch"),
 )
 
 compiler_library(
@@ -219,11 +221,12 @@ compiler_library(
     ] + select(
         # $(ARCH_SPECIFIC_ASMCOMP) = INTEL_ASM = x86_[proc,dsl,gas,masm]
         {
-        "//config/arch:x86_64":
-        [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
-        "//config/arch:i386":
-        ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
-    }, no_match_error = "Unsupported arch"),
+            "//config/arch:x86_64":
+            [":X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+            "//config/arch:i386":
+            ["X86_dsl", ":X86_gas", ":X86_masm", ":X86_proc"],
+            "//conditions:default": []
+        }, no_match_error = "Unsupported arch"),
 )
 
 ## compilerlibs/Makefile.compilerlibs:
@@ -275,6 +278,9 @@ compiler_module(
         ":CSEgen",
         ":Mach",
     ],
+    stdlib_deps = [
+        "//stdlib:Stdlib.Bool", # arm
+    ]
 )
 
 compiler_module(
@@ -376,9 +382,10 @@ compiler_signature(
         "//config/arch:riscv64"   : "//asmcomp/riscv:arch.mli",
         "//config/arch:s390x"   : "//asmcomp/s390x:arch.mli",
     }, no_match_error = "unknown arch"),
+    deps = ["//lambda:Debuginfo_cmi"],
     stdlib_deps   = [
         "//stdlib:Stdlib.Arg_cmi",
-        "//stdlib:Stdlib.Format_cmi"
+        "//stdlib:Stdlib.Format_cmi",
     ],
 )
 

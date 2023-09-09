@@ -25,6 +25,7 @@ alias(name = "vm?", actual = "//platform:vm?")
 # alias(name = "sys?", actual = "//platform:sys?")
 
 ################################################################
+alias(name = "linux?", actual = "//platform:linux?")
 alias(name = "linux_amd64?", actual = "//platform:linux_amd64?")
 alias(name = "macos_amd64?", actual = "//platform:macos_amd64?")
 

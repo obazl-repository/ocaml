@@ -60,7 +60,7 @@ ModuleInfo, _new_moduleinfo = provider(
 )
 
 ################################################################
-def _OCamlSigInfo_init(*,
+def _SigInfo_init(*,
                        cmi  = None,
                        cmti = None,
                        ##FIXME: rename sig_src,
@@ -74,7 +74,7 @@ def _OCamlSigInfo_init(*,
         "xmo"  : xmo
     }
 
-OCamlSigInfo, _new_ocamlsiginfo = provider(
+SigInfo, _new_ocamlsiginfo = provider(
     doc = "OCaml signature provider",
     fields = {
         "cmi"  : "One .cmi file",
@@ -82,7 +82,7 @@ OCamlSigInfo, _new_ocamlsiginfo = provider(
         "mli"  : "One .mli file",
         "xmo"  : "Boolean, false if compiled with -opaque"
     },
-    init = _OCamlSigInfo_init
+    init = _SigInfo_init
 )
 
 ################################################################

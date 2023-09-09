@@ -8,7 +8,7 @@ load("//bzl:providers.bzl",
      "BootInfo",
      "DumpInfo",
      "ModuleInfo",
-     "OCamlSigInfo",
+     "SigInfo",
      "NsResolverInfo",
      "DepsAggregator",
      "StdStructMarker",
@@ -447,8 +447,8 @@ def construct_inputs(ctx, tc, ext, workdir,
             ## UPDATE: the new(ish) -cmi-file option addresses this.
             ## With it, no need for the mli file.
 
-            in_files.append(ctx.attr.sig[OCamlSigInfo].cmi)
-            # in_files.append(ctx.attr.sig[OCamlSigInfo].mli)
+            in_files.append(ctx.attr.sig[SigInfo].cmi)
+            # in_files.append(ctx.attr.sig[SigInfo].mli)
 
             in_cmi = ctx.file.sig
 

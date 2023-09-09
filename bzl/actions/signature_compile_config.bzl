@@ -8,7 +8,7 @@ load(":BUILD.bzl", "progress_msg", "add_dump_args")
 load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
-     "SigInfo",
+     # "SigInfo",
      "StdlibSigMarker",
      "StdSigMarker",
      "new_deps_aggregator",
