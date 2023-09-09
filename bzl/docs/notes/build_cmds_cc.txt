@@ -1,4 +1,9 @@
+on macos/m2:
+clang: error: optimization flag '-fexcess-precision=standard' is not supported [-Werror,-Wignored-optimization-argument]
+clang: error: optimization flag '-fno-tree-vrp' is not supported [-Werror,-Wignored-optimization-argument]
 
+================================================================
+linux?
 
 gcc -c -O2 -fno-strict-aliasing -fwrapv -pthread -g -Wall -Werror -fno-common -fexcess-precision=standard -fno-tree-vrp -ffunction-sections  -I./runtime  -D_FILE_OFFSET_BITS=64  -DCAMLDLLIMPORT= -DIN_CAML_RUNTIME  -o runtime/addrmap.b.o runtime/addrmap.c
 

@@ -2,7 +2,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 load("//bzl:providers.bzl",
-     "BootInfo", "ModuleInfo", "SigInfo",
+     "BootInfo", "ModuleInfo", "OCamlSigInfo",
      "OcamlArchiveProvider")
 
 ##############################
@@ -38,16 +38,16 @@ def _run_tool_impl(ctx):
     # if ctx.label.name == "ocamlcmt":
     #     if ModuleInfo in ctx.attr.arg:
     #         arg = ctx.attr.arg[ModuleInfo].cmt.short_path
-    #     elif SigInfo in ctx.attr.arg:
-    #         arg = ctx.attr.arg[SigInfo].cmti.short_path
+    #     elif OCamlSigInfo in ctx.attr.arg:
+    #         arg = ctx.attr.arg[OCamlSigInfo].cmti.short_path
     # else:
     #     arg = ctx.file.arg.short_path
 
     # cmt_files = []
     # if ModuleInfo in ctx.attr.arg:
     #     cmt_files.append(ctx.attr.arg[ModuleInfo].cmt)
-    # if SigInfo in ctx.attr.arg:
-    #     cmt_files.append(ctx.attr.arg[SigInfo].cmti)
+    # if OCamlSigInfo in ctx.attr.arg:
+    #     cmt_files.append(ctx.attr.arg[OCamlSigInfo].cmti)
 
     if ctx.attr._verbose[BuildSettingInfo].value:
         verbose = "set -x; "
@@ -160,8 +160,8 @@ def _run_ocamldep_impl(ctx):
         if ModuleInfo in ctx.attr.arg:
             arg_file = ctx.attr.arg[ModuleInfo].struct_src
             arg      = arg_file.short_path
-        elif SigInfo in ctx.attr.arg:
-            arg_file = ctx.attr.arg[SigInfo].mli
+        elif OCamlSigInfo in ctx.attr.arg:
+            arg_file = ctx.attr.arg[OCamlSigInfo].mli
             arg      = arg_file.short_path
 
     if ctx.attr._verbose[BuildSettingInfo].value:
@@ -217,7 +217,7 @@ run_ocamldep = rule(
             # mandatory = True,
             default = "@ocamlcc//:arg",
             allow_single_file = [".ml", ".mli", ".cmo", ".cmx", ".cmi"],
-            providers = [[ModuleInfo], [SigInfo]]
+            providers = [[ModuleInfo], [OCamlSigInfo]]
         ),
         _verbose = attr.label(
             default = "@ocamlcc//tools:verbose"
@@ -261,8 +261,8 @@ def _run_ocamlcmt_impl(ctx):
     if ModuleInfo in ctx.attr.arg[0]:
         arg_file = ctx.attr.arg[0][ModuleInfo].cmt
         arg      = arg_file.short_path
-    elif SigInfo in ctx.attr.arg[0]:
-        arg_file = ctx.attr.arg[0][SigInfo].cmti
+    elif OCamlSigInfo in ctx.attr.arg[0]:
+        arg_file = ctx.attr.arg[0][OCamlSigInfo].cmti
         arg      = arg_file.short_path
     else:
         print("ctx.attr.arg: %s" % ctx.attr.arg[0][ModuleInfo])
@@ -271,8 +271,8 @@ def _run_ocamlcmt_impl(ctx):
     # cmt_files = []
     # if ModuleInfo in ctx.attr.arg:
     #     cmt_files.append(ctx.attr.arg[ModuleInfo].cmt)
-    # if SigInfo in ctx.attr.arg:
-    #     cmt_files.append(ctx.attr.arg[SigInfo].cmti)
+    # if OCamlSigInfo in ctx.attr.arg:
+    #     cmt_files.append(ctx.attr.arg[OCamlSigInfo].cmti)
 
     if ctx.attr._verbose[BuildSettingInfo].value:
         verbose = "echo \"PWD: $(PWD)\"; set -x; "
@@ -338,7 +338,7 @@ run_ocamlcmt = rule(
             default = "@ocamlcc//:arg",
             # allow_single_file = [".cmt", ".cmti"],
             allow_single_file = True,
-            providers = [[ModuleInfo], [SigInfo]],
+            providers = [[ModuleInfo], [OCamlSigInfo]],
             cfg = _cmt_out_transition
         ),
         _verbose = attr.label(
@@ -465,16 +465,16 @@ run_repl = rule(
 #     if ctx.label.name == "ocamlcmt":
 #         if ModuleInfo in ctx.attr.arg:
 #             arg = ctx.attr.arg[ModuleInfo].cmt.short_path
-#         elif SigInfo in ctx.attr.arg:
-#             arg = ctx.attr.arg[SigInfo].cmti.short_path
+#         elif OCamlSigInfo in ctx.attr.arg:
+#             arg = ctx.attr.arg[OCamlSigInfo].cmti.short_path
 #     else:
 #         arg = ctx.file.arg.short_path
 
 #     cmt_files = []
 #     if ModuleInfo in ctx.attr.arg:
 #         cmt_files.append(ctx.attr.arg[ModuleInfo].cmt)
-#     if SigInfo in ctx.attr.arg:
-#         cmt_files.append(ctx.attr.arg[SigInfo].cmti)
+#     if OCamlSigInfo in ctx.attr.arg:
+#         cmt_files.append(ctx.attr.arg[OCamlSigInfo].cmti)
 
 #     if ctx.attr._verbose[BuildSettingInfo].value:
 #         verbose = "set -x"

@@ -58,6 +58,7 @@ mustache_toolchain_adapter = rule(
     _mustache_toolchain_adapter_impl,
     attrs = {
         "mustach": attr.label(
+            #FIXME: use //vendor/mustach directly?
             default = "//toolchain:mustach",
             allow_single_file = True,
             executable = True,

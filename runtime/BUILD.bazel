@@ -11,6 +11,14 @@ load("//vendor/mustach:cc_mustache.bzl", "cc_mustache")
 
 exports_files(["gen_primitives.sh", "primitives.json", "sync_posix.h"] + glob(["*.c"]))
 
+COPTS_MACOS = ["-std=gnu11"]
+COPTS_LINUX = [
+    "-std=gnu11",
+    "-fexcess-precision=standard",
+    "-fno-tree-vrp"
+]
+COPTS_DEFAULT = ["-std=c11"]
+
 OPTIMIZATION_FLAGS = select({
     ":dbg?": ["-O0", "-g3"], # -Wall -Werror
     "//conditions:default": []
@@ -54,15 +62,17 @@ cc_library(
     ],
     copts = [
         # "-x", "c",  # makes zig barf on mac
+        # "-Wno-deprecated-non-prototype",
+        "-ffunction-sections",
         "-Iruntime/caml",
         "-I$(GENDIR)/runtime",
         "-I$(GENDIR)/runtime/caml",
         "$(OC_CFLAGS)",
         "$(OC_CPPFLAGS)",
     ] + select({
-        "//platform/os:macos?": ["-std=c11"],
-        "//platform/os:linux?": [],
-        "//conditions:default":  [] #"-std=c11"]
+        "//platform/os:macos?": COPTS_MACOS,
+        "//platform/os:linux?": COPTS_LINUX,
+        "//conditions:default": COPTS_DEFAULT
     }) + select({
         # mac zig: ["-Wno-deprecated-non-prototype"]
         "//conditions:default": []
@@ -130,9 +140,9 @@ cc_library(
         # "-Wl,-static",
         # "-Wl,--verbose"
     ] + select({
-        "//platform/os:macos?": [], #"-std=c11"],
-        "//platform/os:linux?": [],
-        "//conditions:default":  [] #"-std=c11"]
+        "//platform/os:macos?": COPTS_MACOS,
+        "//platform/os:linux?": COPTS_LINUX,
+        "//conditions:default": COPTS_DEFAULT
     }) + select({
         "//config/mode:pedantic?": ["-pedantic"],
         "//conditions:default":  []
@@ -245,6 +255,7 @@ mustache(
         # "//platform:windows_x86_32?": ARCH + "nt.asm.mustache",
         # "//platform:windows_x86_64?": ARCH + "nt.asm.mustache",
         "//platform/arch:amd64?": "amd64.S.mustache",
+        "//platform/arch:arm64?": "arm64.S.mustache",
         # "//conditions:default"      : "$(ARCH).S.mustache"
     }),
     toolchains = ["//profile/system/local"],
@@ -613,9 +624,9 @@ cc_binary(
         "$(OC_CPPFLAGS)",
 
     ] + select({
-        "//platform/os:macos?": ["-std=c11"],
-        "//platform/os:linux?": [],
-        "//conditions:default":  ["-std=c11"]
+        "//platform/os:macos?": COPTS_MACOS,
+        "//platform/os:linux?": COPTS_LINUX,
+        "//conditions:default": COPTS_DEFAULT
     }) + select({
         ":fastbuild?": ["-UDEBUG"], # Bazel adds -DDEBUG on macos; why?
         "//conditions:default":  []
@@ -703,9 +714,9 @@ cc_binary(
 #         "$(OC_CFLAGS)",
 #         "$(OC_CPPFLAGS)",
 #     ] + select({
-#         "//platform/os:macos?": ["-std=c11"],
-#         "//platform/os:linux?": [],
-#         "//conditions:default":  [] #"-std=c11"]
+#         "//platform/os:macos?": COPTS_MACOS,
+#         "//platform/os:linux?": COPTS_LINUX,
+#         "//conditions:default": COPTS_DEFAULT
 #     }) + select({
 #         "//config/mode:pedantic?": ["-pedantic"],
 #         "//conditions:default":  []
@@ -839,9 +850,9 @@ cc_binary(
 #         "$(OC_CFLAGS)",
 #         "$(OC_CPPFLAGS)",
 #     ] + select({
-#         "//platform/os:macos?": [], #"-std=c11"],
-#         "//platform/os:linux?": [],
-#         "//conditions:default":  [] #"-std=c11"]
+#         "//platform/os:macos?": COPTS_MACOS,
+#         "//platform/os:linux?": COPTS_LINUX,
+#         "//conditions:default": COPTS_DEFAULT
 #     }) + select({
 #         "//config/mode:pedantic?": ["-pedantic"],
 #         "//conditions:default":  []
@@ -1039,9 +1050,9 @@ string_list_flag(name = "args", build_setting_default = [],
 #         "$(OC_CFLAGS)",
 #         "$(OC_CPPFLAGS)",
 #     ] + select({
-#         "//platform/os:macos?": ["-std=c11"],
-#         "//platform/os:linux?": [],
-#         "//conditions:default":  [] #"-std=c11"]
+#         "//platform/os:macos?": COPTS_MACOS,
+#         "//platform/os:linux?": COPTS_LINUX,
+#         "//conditions:default": COPTS_DEFAULT
 #     }) + select({
 #         "//config/mode:pedantic?": ["-pedantic"],
 #         "//conditions:default":  []

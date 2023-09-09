@@ -6,7 +6,7 @@ load(":BUILD.bzl", "progress_msg")
 load("//bzl:providers.bzl",
      "BootInfo",
      "ModuleInfo",
-     "SigInfo",
+     "OCamlSigInfo",
      "StdlibSigMarker",
      "StdSigMarker",
      "new_deps_aggregator",
@@ -400,7 +400,7 @@ def signature_impl(ctx, module_name):
         cmti = out_cmti
     )
 
-    sigInfo = SigInfo(
+    sigInfo = OCamlSigInfo(
         mli  = mlifile,
         cmi  = out_cmi,
         cmti = out_cmti
