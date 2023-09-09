@@ -1,0 +1,12 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@bazel_skylib//rules:common_settings.bzl",
+     "bool_flag", "string_list_flag")
+
+bool_flag(name = "report", build_setting_default = False)
+config_setting(name = "report?",
+               flag_values = {":report_warnings": "True"})
+
+string_list_flag(name = "warnings",
+                 build_setting_default = [])
+
