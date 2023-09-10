@@ -215,7 +215,6 @@ compile_module_tests(
 compile_module_tests(
     name            = "W04_tests",
     structfile      = "w04.ml",
-    debug = True,
     warnings        = {"enable": ["A"],
                        "disable": ["missing-mli"], # 70
                        ##"fragile-match"], # 4
