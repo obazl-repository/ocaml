@@ -395,16 +395,33 @@ stdlib_signature(
     ],
 )
 
-genrule(
-    name = "array_labels_mli_awk",
-    outs = ["arrayLabels.mli"],
-    srcs = ["arrayLabels.raw.mli", "//stdlib:expand_module_aliases.awk"],
-    cmd_bash  = " ".join([
-        "awk -f $(location //stdlib:expand_module_aliases.awk)",
-        "$(location :arrayLabels.raw.mli)",
-        "> $@"
-    ]),
+mustache(
+    name = "arraymli",
+    out  = "array.mli",
+    json = "empty.json",
+    template = "array.mli.mustache"
 )
+
+mustache(
+    name = "arrayLabelsmli",
+    out  = "arrayLabels.mli",
+    json = "LABELS.json",
+    template = "array.mli.mustache"
+)
+
+## WARNING: the purpose of 'expand_module_aliases.awk' in this
+## context is replace the '@since' decls; e.g.
+## from @since 4.03 (4.05 in ArrayLabels) to @since 4.05
+# genrule(
+#     name = "array_labels_mli_awk",
+#     outs = ["arrayLabels.mli"],
+#     srcs = ["arrayLabels.raw.mli", "//stdlib:expand_module_aliases.awk"],
+#     cmd_bash  = " ".join([
+#         "awk -f $(location //stdlib:expand_module_aliases.awk)",
+#         "$(location :arrayLabels.raw.mli)",
+#         "> $@"
+#     ]),
+# )
 
 stdlib_module(
     struct = "atomic.ml",
@@ -533,6 +550,20 @@ stdlib_signature(
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
+)
+
+mustache(
+    name = "bytesmli",
+    out  = "bytes.mli",
+    json = "empty.json",
+    template = "bytes.mli.mustache"
+)
+
+mustache(
+    name = "bytesLabelsmli",
+    out  = "bytesLabels.mli",
+    json = "LABELS.json",
+    template = "bytes.mli.mustache"
 )
 
 stdlib_module(
@@ -874,6 +905,13 @@ stdlib_signature(
     src  = "hashtbl.mli",
     opts = SIG_OPTS,
     stdlib_deps   = [":Stdlib.Seq_cmi"]
+)
+
+mustache(
+    name = "hashtbl_mli",
+    out  = "hashtbl.mli",
+    json = "empty.json",
+    template = "hashtbl.mli.mustache"
 )
 
 stdlib_module(
@@ -1772,4 +1810,19 @@ kernel_module_cmx(
     struct = "std_exit.ml",
     sig    = ":Std_exit_cmi",
     stdlib_deps = [":Stdlib"]
+)
+
+################
+mustache(
+    name = "listmli",
+    out  = "list.mli",
+    json = "empty.json",
+    template = "list.mli.mustache"
+)
+
+mustache(
+    name = "listLabelsmli",
+    out  = "listLabels.mli",
+    json = "LABELS.json",
+    template = "list.mli.mustache"
 )

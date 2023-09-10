@@ -1,0 +1,23 @@
+{
+    "~": "~",
+    "cmp": "cmp:",
+    "dimx": "dimx:",
+    "dimy": "dimy:",
+    "dst": "dst:",
+    "dst_pos": "dst_pos:",
+    "eq": "eq:",
+    "f": "f:",
+    "init": "init:",
+    "key": "key:",
+    "left": "left:",
+    "len": "len:",
+    "map": "map:",
+    "pos": "pos:",
+    "prefix": "prefix:",
+    "right": "right:",
+    "sep": "sep:",
+    "set": "set:",
+    "src": "src:",
+    "src_pos": "src_pos:",
+    "suffix": "suffix:"
+}
