@@ -413,23 +413,19 @@ def construct_args(ctx, tc, _options, cancel_opts,
     #                   else "+" + w])
 
     for k,v in ctx.attr.warnings.items():
-        if k == "disable":
+        if k in ["disable", "disabled"]:
             for w in v:
                 args.add("-w", "-" + w)
             # args.add_joined("-w", v,
             #                 format_each = "-%s",
             #                 join_with="",
             #                 uniquify = True)
-        if k == "enable":
-            args.add_joined("-w", v,
-                            format_each = "+%s",
-                            join_with="",
-                            uniquify = True)
+        if k in ["enable", "enabled"]:
+            for w in v:
+                args.add("-w", "+" + w)
         if k == "fatal":
-            args.add_joined("-w", v,
-                            format_each = "@%s",
-                            join_with="",
-                            uniquify = True)
+            for w in v:
+                args.add("-w", "@" + w)
 
     # if no_alias_deps:
     #     args.add("-no-alias-deps") ##FIXME: control this w/flag?

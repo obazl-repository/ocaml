@@ -929,7 +929,6 @@ def construct_args(ctx, tc, _options, cancel_opts,
         includes.append(outputs["sigfile"].dirname)
 
     # includes.append(tc.runtime.dirname)
-
     args = ctx.actions.args()
 
     # if ctx.attr._rule == "compile_module_test":
@@ -1029,24 +1028,21 @@ def construct_args(ctx, tc, _options, cancel_opts,
 
     # if ctx.attr.warn:
     #     args.add("-w")
+
     for k,v in ctx.attr.warnings.items():
-        if k == "disable":
+        if k in ["disable", "disabled"]:
             for w in v:
                 args.add("-w", "-" + w)
             # args.add_joined("-w", v,
             #                 format_each = "-%s",
             #                 join_with="",
             #                 uniquify = True)
-        if k == "enable":
-            args.add_joined("-w", v,
-                            format_each = "+%s",
-                            join_with="",
-                            uniquify = True)
+        if k in ["enable", "enabled"]:
+            for w in v:
+                args.add("-w", "+" + w)
         if k == "fatal":
-            args.add_joined("-w", v,
-                            format_each = "@%s",
-                            join_with="",
-                            uniquify = True)
+            for w in v:
+                args.add("-w", "@" + w)
 
     # if not ctx.file.sig:
     #     args.add("-w", "-70")

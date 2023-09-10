@@ -283,13 +283,36 @@ def signature_impl(ctx, module_name):
     else:
         report_warnings = ctx.attr.report_warnings[BuildSettingInfo].value
 
-    for w in ctx.attr.warnings:
-        args.add_all(["-w",
-                      w if w.startswith("+")
-                      else w if w.startswith("-")
-                      else w if w.startswith("@")
-                      else ("+" if report_warnings else "-")
-                      + w])
+    # for w in ctx.attr.warnings:
+    #     args.add_all(["-w",
+    #                   w if w.startswith("+")
+    #                   else w if w.startswith("-")
+    #                   else w if w.startswith("@")
+    #                   else ("+" if report_warnings else "-")
+    #                   + w])
+
+    for k,v in ctx.attr.warnings.items():
+        if k in ["disable", "disabled"]:
+            for w in v:
+                args.add("-w", "-" + w)
+            # args.add_joined("-w", v,
+            #                 format_each = "-%s",
+            #                 join_with="",
+            #                 uniquify = True)
+        if k in ["enable", "enabled"]:
+            for w in v:
+                args.add("-w", "+" + w)
+            # args.add_joined("-w", v,
+            #                 format_each = "+%s",
+            #                 join_with="",
+            #                 uniquify = True)
+        if k == "fatal":
+            for w in v:
+                args.add("-w", "@" + w)
+            # args.add_joined("-w", v,
+            #                 format_each = "@%s",
+            #                 join_with="",
+            #                 uniquify = True)
 
     args.add_all(_options)
 

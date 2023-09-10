@@ -1,6 +1,9 @@
 load("//bzl:rules.bzl", "cc_assemble")
 
 #######################
+## generates:
+##   cc_library(name = "<name>")
+##   cc_binary(name = "<name>.exe")
 def genbin(name, srcs=[],
            deps=[], c_opts=[],
            textual_hdrs = [],
@@ -14,7 +17,7 @@ def genbin(name, srcs=[],
         defs = []
 
     native.cc_binary(
-        name = name + ".out",
+        name = name + ".exe",
         srcs = [":" + name]
     )
 
@@ -22,11 +25,17 @@ def genbin(name, srcs=[],
         name = name,
         srcs = [
             # "//runtime:archasm", # won't do, need entire libasmrun
-            "//testsuite/tools:asmgen_amd64",
             "//runtime/caml:config.h",
             "//runtime/caml:m.h",
             "//runtime/caml:s.h",
-        ] + srcs + deps,
+        ] + srcs + deps + select({
+            "//platform/build:macos_arm64?": [
+                "//testsuite/tools:asmgen_arm64"],
+            # "//platform/build:macos_amd64?": [
+            #     "//testsuite/tools:asmgen_amd64"],
+            "//platform/build:macos_x86_64?": [
+                "//testsuite/tools:asmgen_amd64"],
+        }, no_match_error = "Unsupported arch"),
         textual_hdrs = textual_hdrs,
         copts = [
             "-x", "c",
@@ -35,15 +44,21 @@ def genbin(name, srcs=[],
         ] + c_opts + defs,
         # ],
         # linkopts = ["-lpthread"],
-        deps = deps + [
-            "//testsuite/tools:asmgen_amd64",
-            ##FIXME: adding asmrun dep causes bazel to add '[S]' to link
-            ##cmd, which breaks it, no idea why
-            # "//runtime:asmrun",
-        ],
+        deps = deps + select({
+            # "//platform/build:macos_amd64?": [
+            #     "//testsuite/tools:asmgen_amd64"],
+            "//platform/build:macos_arm64?": [
+                "//testsuite/tools:asmgen_arm64"],
+        }, no_match_error = "Unsupported arch"),
+        ##FIXME: adding asmrun dep causes bazel to add
+        ## '[S]' to link cmd, which breaks it, no idea why
+        # "//runtime:asmrun",
     )
 
 ######################
+## generates:
+##   genrule(name = "<name>", outs = "<stem>.s" ...)
+## FIXME: rename to genasm
 def codegen(name, cmm, opts=[]):
     if not cmm.endswith(".cmm"):
         fail("cmm attr value must end in .cmm")
@@ -80,6 +95,24 @@ ASM_DEFINES = [
 ]
 
 ##################################
+## asmgen_test: generate .s from .cmm, assemble it,
+## link it with
+#    hdrs + "//runtime/caml:s.h",
+##   c_srs attrib: main.c, mainarith.c, or mainimmed.c
+##   "//testsuite/tools:asmgen_[arm,amd]64"
+##  and emit the result as test binary
+
+## does NOT emit a cc_test target - only for build_test
+
+## expands to:
+##   genrule(name = "<name>",
+##           tool: //testsuite/tools:codegen
+##           srcs="<stem>.cmm", outs = "<stem>.s" ...)
+##   cc_assemble(name = "<stem>_s", src = "<stem>.s" ...)
+##        provides <stem>.o
+##   genbin(name = "<stem>" ...)
+##     => cc_library(name = "<stem>")
+##     => cc_binary(name = "<stem>.out", srcs = ["<stem>"]...)
 def asmgen_test(name, cmm,
                 c_srcs = [],
                 main = None,

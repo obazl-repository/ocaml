@@ -26,7 +26,8 @@ def compile_module_tests(name,
                          opts  = [],
                          dump = [],  # log, e.g. lambda
                          alerts = [],
-                         warnings = [],
+                         warnings = {},
+                         debug = False,
 
                          deps = [],
                          sig_deps = [],
@@ -138,6 +139,7 @@ def compile_module_tests(name,
         dump          = dump,
         alerts        = alerts,
         warnings      = warnings,
+        debug         = debug,
 
         rc_expected   = rc_expected,
         stdout_actual = stdout_actual,
@@ -155,7 +157,8 @@ def compile_signature_tests(name,
                         ## FIXME: do we need to support -dlambda for sigs?
                             dump = [],  # log, e.g. lambda
                             alerts = [],
-                            warnings = [],
+                            warnings = {},
+                            debug = False,
 
                             deps = [],
                             sig_deps = [],
@@ -216,6 +219,7 @@ def compile_signature_tests(name,
         # dump   = dump,
         alerts = alerts,
         warnings = warnings,
+        debug = debug,
 
         stdout_actual = stdout_actual,
         stderr_actual = stderr_actual,

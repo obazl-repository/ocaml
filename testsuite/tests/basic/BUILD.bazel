@@ -226,7 +226,10 @@ test_module(
     generator_function = "module_program_tests",
     generator_location = "testsuite/tests/basic/BUILD.bazel:108:21",
     opts = [],
-    warnings = ["@A", "-open-shadow-identifier", "-unused-module"],
+    warnings = {
+        "fatal": ["A"],
+        "disable": ["open-shadow-identifier", "unused-module", "missing-mli"]
+    },
     struct = "//testsuite/tests/basic:bigints.ml",
     stdlib_deps = ["//stdlib:Stdlib.Sys"],
     sig_deps = [],
@@ -248,7 +251,10 @@ module_program_tests(
     name        = "Boxedints_tests",
     # compilers   = ["ocamlc.byte", "ocamlc.opt"],
     structfile  = "boxedints.ml",
-    warnings = ["@A", "-open-shadow-identifier", "-unused-module"],
+    warnings = {
+        "fatal": ["A"],
+        "disable": ["open-shadow-identifier", "unused-module", "missing-mli"]
+    },
     stdlib_deps   = select({
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": [
@@ -303,7 +309,10 @@ module_program_tests(
             "//stdlib:Stdlib.Printf"
         ]
     }),
-    warnings = ["-open-shadow-identifier", "-unused-for-index"],
+    warnings = {
+        "fatal": ["A"],
+        "disable": ["open-shadow-identifier", "unused-for-index", "missing-mli"]
+    },
     stdout_expected   = "divint.reference",
 )
 
@@ -334,7 +343,7 @@ module_program_tests(
     name              = "Eval_order_2_tests",
     structfile        = "eval_order_2.ml",
     stdlib_deps   = ["//stdlib:Primitives"],
-    warnings = ["-unused-var-strict"],
+    warnings = {"disable": ["unused-var-strict"]},
     stdout_expected   = "eval_order_2.reference",
 )
 
@@ -346,7 +355,7 @@ module_program_tests(
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Printf"]
     }),
-    warnings = ["-unused-var-strict"],
+    warnings = {"disable": ["unused-var-strict"]},
     stdout_expected   = "eval_order_3.reference",
 )
 
@@ -358,7 +367,7 @@ module_program_tests(
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Primitives"]
     }),
-    warnings = ["-unused-var-strict"],
+    warnings = {"disable": ["unused-var-strict"]},
     stdout_expected   = "eval_order_4.reference",
 )
 
@@ -370,10 +379,12 @@ module_program_tests(
         "//testsuite/tests:with-stdlib?":["//stdlib"],
         "//conditions:default": ["//stdlib:Stdlib.Int"]
     }),
-    warnings = [
-        "-missing-record-field-pattern",
-        "-match-on-mutable-state-prevent-uncurry"
-    ],
+    warnings = {
+        "disable": [
+            "missing-record-field-pattern",
+            "match-on-mutable-state-prevent-uncurry"
+        ]
+    },
     stdout_expected   = "eval_order_6.reference",
 )
 
@@ -403,7 +414,7 @@ module_program_tests(
 module_program_tests(
     name              = "Float_tests",
     structfile        = "float.ml",
-    warnings          = [],
+    warnings          = {},
     stdlib_deps       = ["//stdlib:Stdlib.Printf"],
     stdout_expected   = "float.reference",
 )
@@ -430,9 +441,13 @@ module_program_tests(
             "//stdlib:Stdlib.Printf",
         ]
     }),
-    warnings = ["-unused-value-declaration",
-                "-unused-module",
-                "-unused-var-strict"],
+    warnings = {
+        "disable": [
+            "unused-value-declaration",
+            "unused-module",
+            "unused-var-strict"
+        ]
+    },
     stdout_expected   = "includestruct.reference",
 )
 
@@ -440,7 +455,7 @@ module_program_tests(
 module_program_tests(
     name              = "Localexn_tests",
     structfile        = "localexn.ml",
-    warnings          = [],
+    warnings          = {},
     stdlib_deps       = ["//stdlib:Primitives"],
     stdout_expected   = "localexn.reference",
 )
@@ -511,11 +526,15 @@ module_program_tests(
             "//stdlib:Stdlib.Printf",
         ]
     }),
-    warnings = ["-ambiguous-name",
-                "-disambiguated-name",
-                "-fragile-match",
-                "-open-shadow-label-constructor",
-                "-unused-var-strict"],
+    warnings = {
+        "disable": [
+            "ambiguous-name",
+            "disambiguated-name",
+            "fragile-match",
+            "open-shadow-label-constructor",
+            "unused-var-strict"
+        ]
+    },
     stdout_expected   = "patmatch.reference",
 )
 
@@ -604,7 +623,7 @@ module_program_tests(
             "//stdlib:Stdlib.Printexc",
         ]
     }),
-    warnings = ["-unused-var-strict"],
+    warnings = {"disable": ["unused-var-strict"]},
     stdout_expected   = "pr7253.reference",
 )
 
@@ -628,10 +647,12 @@ module_program_tests(
     structfile        = "pr7657.ml",
     opts   = ["-no-strict-sequence"],
     stdlib_deps  =["//stdlib:Primitives"],
-    warnings = [
-        "-eliminated-optional-arguments",
-        "-unused-var-strict"
-    ],
+    warnings = {
+        "disable": [
+            "eliminated-optional-arguments",
+            "unused-var-strict"
+        ]
+    },
     stdout_expected   = "pr7657.reference",
 )
 
@@ -646,7 +667,7 @@ module_program_tests(
             "//stdlib:Stdlib.List",
         ]
     }),
-    warnings = ["-unused-for-index"],
+    warnings = {"disable": ["unused-for-index"]},
     stdout_expected   = "recvalues.reference",
 )
 
@@ -659,7 +680,7 @@ module_program_tests(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Set",
     ],
-    warnings = ["-unused-module"],
+    warnings = {"disable": ["unused-module"]},
     stdout_expected   = "sets.reference",
 )
 
@@ -668,7 +689,7 @@ module_program_tests(
     name              = "Stringmatch_tests",
     structfile        = "stringmatch.ml",
     stdlib_deps       = ["//stdlib:Stdlib.String"],
-    warnings          = ["-unused-rec-flag"],
+    warnings = {"disable": ["unused-rec-flag"]},
     stdout_expected   = "stringmatch.reference",
 )
 
@@ -680,7 +701,7 @@ module_program_tests(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.List",
     ],
-    warnings = ["-unused-var-strict"],
+    warnings = {"disable": ["unused-var-strict"]},
     stdout_expected   = "switch_opts.reference",
 )
 

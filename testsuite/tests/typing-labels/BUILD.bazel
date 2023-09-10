@@ -23,7 +23,7 @@ module_program_tests(
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
     ],
-    warnings = [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27],
+    warnings = {"disable": [w.OPEN_SHADOW_IDENTIFIER_44, w.UNUSED_VAR_STRICT_27]},
     stdout_expected   = "mixin.reference",
 )
 
@@ -36,7 +36,7 @@ module_program_tests(
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
     ],
-    warnings = ["open-shadow-identifier", "unused-var-strict"],
+    warnings = {"disable": ["open-shadow-identifier", "unused-var-strict"]},
     stdout_expected   = "mixin2.reference",
 )
 
@@ -49,6 +49,6 @@ module_program_tests(
         "//stdlib:Stdlib.MoreLabels",
         "//stdlib:Stdlib.StdLabels"
     ],
-    warnings = ["open-shadow-identifier", "unused-var-strict"],
+    warnings = {"disable": ["open-shadow-identifier", "unused-var-strict"]},
     stdout_expected   = "mixin3.reference",
 )

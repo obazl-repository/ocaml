@@ -45,10 +45,10 @@ compile_module_tests(
     stdlib_deps = ["//stdlib:CamlinternalMod"],
     opts   = ["-dno-unique-ids"],
     dump = ["lambda"], ##FIXME:  dump => log
-    warnings = [ # do not report (write to stderr)
-        "-unused-type-declaration", # 34
-        "-unused-value-declaration" #_32
-    ],
+    warnings = {"disable": [ # do not report (write to stderr)
+        "unused-type-declaration", # 34
+        "unused-value-declaration" #_32
+    ]},
     stdlog_expected = "anonymous.ocamlc.reference",
     stdlog_actual = "anonymous.ml.stdlog",
 )
@@ -60,10 +60,10 @@ compile_module_tests(
     stdlib_deps = ["//stdlib:CamlinternalMod"],
     opts   = ["-dno-unique-ids"],
     dump = ["lambda"], ##FIXME:  dump => log
-    warnings = [ # do not report (write to stderr)
-        "-unused-type-declaration", # 34
-        "-unused-value-declaration" #_32
-    ],
+    warnings = {"disable": [ # do not report (write to stderr)
+        "unused-type-declaration", # 34
+        "unused-value-declaration" #_32
+    ]},
     stdlog_expected = "anonymous.ocamlopt.reference",
     stdlog_actual = "anonymous.ml.sys.stdlog",
 )
@@ -75,10 +75,10 @@ compile_module_tests(
     stdlib_deps = ["//stdlib:CamlinternalMod"],
     opts   = ["-dno-unique-ids"],
     dump = ["lambda"], ##FIXME:  dump => log
-    warnings = [ # do not report (write to stderr)
-        "-unused-type-declaration", # 34
-        "-unused-value-declaration" #_32
-    ],
+    warnings = {"disable": [ # do not report (write to stderr)
+        "unused-type-declaration", # 34
+        "unused-value-declaration" #_32
+    ]},
     stdlog_expected = "anonymous.ocamlopt.flambda.reference",
     stdlog_actual = "anonymous.ml.flambda.stdlog",
 )
@@ -98,7 +98,7 @@ module_program_tests(
         "//stdlib:Stdlib.Printf",
         "//stdlib:Stdlib.Set",
     ],
-    warnings        = ["-unused-module", "-unused-value-declaration"],
+    warnings = {"disable": ["unused-module", "unused-value-declaration"]},
     stdout_expected = "main.reference",
 )
 
@@ -118,7 +118,7 @@ test_module(
         "//stdlib:Stdlib.Set",
         "//stdlib:Stdlib.String",
     ],
-    warnings        = ["-unused-var-strict", "-unused-value-declaration"],
+    warnings = {"disable": ["unused-var-strict", "unused-value-declaration"]},
 )
 
 test_module(
@@ -134,7 +134,7 @@ test_module(
     name   = "Pr6726",
     struct = "pr6726.ml",
     stdlib_deps = ["//stdlib:Stdlib"],
-    warnings        = ["-unused-var-strict"]
+    warnings = {"disable": ["unused-var-strict"]}
 )
 
 test_module(

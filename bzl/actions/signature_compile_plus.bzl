@@ -81,7 +81,7 @@ def signature_compile_plus(ctx, module_name):
         command = " ".join([
             # "set -uo pipefail;",
             "set +e;",
-            "set -x;",
+            "set -x;" if ctx.attr.debug else "",
             "RC=0;", # need this for compiles that succeed
             "{exe} $@".format(exe=executor.path),
             stdout,

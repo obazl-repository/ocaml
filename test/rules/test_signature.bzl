@@ -46,9 +46,11 @@ test_signature = rule(
     doc = "Sig rule for testing",
     attrs = dict(
         signature_attrs(),
-
+        debug = attr.bool(
+            doc = "Adds 'set -x' to shell cmd used to run compiler"
+        ),
         alerts = attr.string_list(), #default = ["++all"]),
-        warnings = attr.string_list(), #default = ["@A"]),
+        warnings = attr.string_list_dict(),
         rc_expected = attr.int(default = 0),
 
         stdout_actual = attr.output(),

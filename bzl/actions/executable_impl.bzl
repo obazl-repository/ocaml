@@ -341,14 +341,30 @@ def executable_impl(ctx, tc, exe_name,
 
     args.add_all(_options)
 
-    for w in ctx.attr.warnings:
-        args.add_all(["-w",
-                      w if w.startswith("-")
-                      else "-" + w])
+    # for w in ctx.attr.warnings:
+    #     args.add_all(["-w",
+    #                   w if w.startswith("-")
+    #                   else "-" + w])
     # if ctx.attr.warnings == [  ]:
     #     args.add_all(ctx.attr.warnings)
     # else:
     #     args.add_all(tc.warnings[BuildSettingInfo].value)
+
+    for k,v in ctx.attr.warnings.items():
+        if k == "disable":
+            for w in v:
+                args.add("-w", "-" + w)
+            # args.add_joined("-w", v,
+            #                 format_each = "-%s",
+            #                 join_with="",
+            #                 uniquify = True)
+        if k == "enable":
+            for w in v:
+                args.add("-w", "+" + w)
+        if k == "fatal":
+            for w in v:
+                args.add("-w", "@" + w)
+
 
     data_inputs = []
     # if ctx.attr.data:

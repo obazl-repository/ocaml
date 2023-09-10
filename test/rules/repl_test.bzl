@@ -158,9 +158,13 @@ repl_test = rule(
             doc = "to disable use toolchain's copts"
         ),
         _verbose = attr.label(default = "//config/ocaml/link:verbose"),
-        warnings         = attr.string_list(
-            doc          = "List of OCaml warning options. Will override configurable default options."
+        # warnings         = attr.string_list(
+        #     doc          = "List of OCaml warning options. Will override configurable default options."
+        # ),
+        warnings = attr.string_list_dict(
+            doc = """Keys: enable, disable, or fatal. Values: list of strings, e.g. "42", "40..42", etc. """
         ),
+
 
         _runtime = attr.label(
             allow_single_file = True,

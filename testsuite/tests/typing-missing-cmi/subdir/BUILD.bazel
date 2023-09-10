@@ -5,7 +5,7 @@ filegroup(name = "Mstruct", srcs = [":M"],
           visibility = ["//testsuite/tests/typing-missing-cmi:__pkg__"])
 
 test_module(name   = "M", struct = "m.ml",
-            warnings = [w.MISSING_MLI_70, w.UNUSED_MODULE_60],
+            warnings = {"disable": [w.MISSING_MLI_70, w.UNUSED_MODULE_60]},
             visibility = ["//testsuite/tests/typing-missing-cmi:__pkg__"])
 
 

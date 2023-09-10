@@ -27,7 +27,7 @@ module_program_tests(
         "//stdlib:Stdlib.Int64",
         "//stdlib:Stdlib.Printf"
     ],
-    warnings = ["open-shadow-identifier", "-unused-var-strict"],
+    warnings = {"disable": ["open-shadow-identifier", "unused-var-strict"]},
     stdout_expected   = "bigarrays.reference",
 )
 
@@ -47,7 +47,7 @@ module_program_tests(
     name              = "Fftba_tests",
     structfile        = "fftba.ml",
     stdlib_deps   = ["//stdlib:Stdlib.Bigarray"],
-    warnings = ["-unexpected-docstring", "-unused-for-index"],
+    warnings = {"disable": ["unexpected-docstring", "unused-for-index"]},
     stdout_expected   = "fftba.reference",
 )
 

@@ -86,7 +86,7 @@ test_module(
     name   = "Codegen_main",
     struct = "codegen_main.ml",
     opts = MODULE_OPTS,
-    warnings = [w.MISSING_MLI_70],
+    warnings = {"disable": [w.MISSING_MLI_70]},
     deps   = [
         "//utils:ocamlcommon",
         # "//utils:Clflags",
@@ -122,13 +122,13 @@ test_module(
     struct = "expect_test.ml",
     opts = MODULE_OPTS + ["-linkall"],
     alerts = ["-unsynchronized_access"],
-    warnings = [
+    warnings = {"disable": [
         w.FRAGILE_MATCH_4,
         w.MISSING_RECORD_FIELD_PATTERN_9,
         w.DISAMBIGUATED_NAME_42,
         w.OPEN_SHADOW_IDENTIFIER_44,
         w.MISSING_MLI_70
-    ],
+    ]},
     deps   = [
         "//toplevel:Toploop",
     ],
@@ -181,7 +181,7 @@ test_module(
         ":Parsecmmaux"
     ],
     stdlib_deps = ["//stdlib:Stdlib.Parsing"],
-    warnings = [w.FRAGILE_MATCH_4, w.UNUSED_VAR_STRICT_27]
+    warnings = {"disable": [w.FRAGILE_MATCH_4, w.UNUSED_VAR_STRICT_27]}
 )
 
 genrule(
@@ -234,6 +234,14 @@ test_signature(
 cc_assemble(
     name = "asmgen_amd64",
     src = "asmgen_amd64.S",
+    defines = ASM_DEFINES,
+    ## This tc provides custom MAKE vars
+    toolchains = ["//profile/system/local"],
+)
+
+cc_assemble(
+    name = "asmgen_arm64",
+    src = "asmgen_arm64.S",
     defines = ASM_DEFINES,
     ## This tc provides custom MAKE vars
     toolchains = ["//profile/system/local"],

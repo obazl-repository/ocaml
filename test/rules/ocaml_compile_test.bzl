@@ -64,8 +64,11 @@ ocaml_compile_test = rule(
         # -nostdlib -nopervasives -dlambda -dno-unique-ids
         opts             = attr.string_list( ),
         _verbose = attr.label(default = "//config/ocaml/link:verbose"),
-        warnings         = attr.string_list(
-            doc          = "List of OCaml warning options. Will override configurable default options."
+        # warnings         = attr.string_list(
+        #     doc          = "List of OCaml warning options. Will override configurable default options."
+        # ),
+        warnings = attr.string_list_dict(
+            doc = """Keys: enable, disable, or fatal. Values: list of strings, e.g. "42", "40..42", etc. """
         ),
 
         _tool    = attr.label(

@@ -17,6 +17,12 @@ Bazel rules:
   `testsuite/tools/expect_test` (Bazel build target:
   `//testsuite/tools:inline_expect`)
 
+=== macros
+
+Some of the build rules are macros.  To see their expansion:
+
+    bazel query --output=build //path/to:target
+
 === meta-testing
 
 With Bazel a build target can directly depend on submodules in a

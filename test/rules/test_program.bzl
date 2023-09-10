@@ -291,7 +291,7 @@ def module_program_tests(name,
                          opts  = [],
                          dump = [],  # log, e.g. lambda
                          alerts = [],
-                         warnings = [],
+                         warnings = {},
 
                          deps = [],
                          sig_deps = [],

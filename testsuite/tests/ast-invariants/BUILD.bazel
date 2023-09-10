@@ -28,11 +28,11 @@ batch_tests(
 test_module(
     name   = "Test",
     struct = "test.ml",
-    warnings = [
+    warnings = {"disable": [
         w.FRAGILE_MATCH_4,
         w.MISSING_RECORD_FIELD_PATTERN_9,
         w.MISSING_MLI_70
-    ],
+    ]},
     deps = ["//otherlibs/unix:libUnix"],
     sig_deps = ["//parsing:Parsetree_cmi"],
     libOCaml_deps = [

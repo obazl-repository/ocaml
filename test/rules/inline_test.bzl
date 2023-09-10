@@ -86,7 +86,7 @@ def inline_assertion_tests(name,
                            compilers = std_compilers,
                            opts  = [],
                            alerts = [],
-                           warnings = [],
+                           warnings = {},
 
                            deps = [],
                            sig_deps = [],

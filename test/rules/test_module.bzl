@@ -50,11 +50,13 @@ test_module = rule(
     doc = "Compiles a module.",
     attrs = dict(
         module_attrs(),
-
+        debug = attr.bool(
+            doc = "Adds 'set -x' to shell cmd used to run compiler"
+        ),
         testlink = attr.bool(),
 
         alerts = attr.string_list(), #default = ["++all"]),
-        warnings = attr.string_list(), #default = ["@A"]),
+        warnings = attr.string_list_dict(),
         rc_expected = attr.int(default = 0),
 
         stdout_actual = attr.output(),

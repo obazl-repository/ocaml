@@ -453,7 +453,9 @@ compiler_module(
     struct = "camlinternalMenhirLib.ml",
     sig    = "CamlinternalMenhirLib_cmi",
     opts = MODULE_OPTS,
-    warnings = {"disable": ["fragile-match", "open-shadow-identifier"]},
+    warnings = {"disable": [
+        "fragile-match", "open-shadow-identifier"
+    ]},
     stdlib_deps   = [
         "//stdlib:Stdlib.Lazy",
         "//stdlib:Stdlib.Lexing",
@@ -488,7 +490,7 @@ genrule(
     outs = ["camlinternalMenhirLib.mli"],
     srcs = ["//boot/menhir:menhirLib.mli"],
     cmd  = "\n".join([
-        "echo '[@@@ocaml.warning \"67\"]' > $@;",
+        "echo '[@@@ocaml.warning \"-67\"]' > $@;",
 	    "cat $(location //boot/menhir:menhirLib.mli) >> $@"
     ])
 )

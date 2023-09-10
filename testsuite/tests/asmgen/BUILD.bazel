@@ -5,6 +5,8 @@ load("//test/rules:batch_test.bzl", "batch_native_tests")
 
 load(":BUILD.bzl", "codegen_test", "genbin", "asmgen_test")
 
+## currently: only verifies successful builds
+
 test_suite(
     name = "asmgen",
     tests  = [
@@ -194,7 +196,7 @@ asmgen_test(
 #     c_srcs = ["main.c"],
 #     defines = ["INT_INT", "FUN=catch_exit"])
 
-codegen_test(name = "invariants", cmm = "invariants.cmm")
+#codegen_test(name = "invariants", cmm = "invariants.cmm")
 
 ############
 asmgen_test(

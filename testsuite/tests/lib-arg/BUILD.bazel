@@ -50,7 +50,7 @@ inline_expect_test(
 module_program_tests(
     name              = "Testarg_tests",
     structfile        = "testarg.ml",
-    warnings = ["-missing-mli"],
+    warnings = {"disable": ["missing-mli"]},
     stdlib_deps   = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Printf"
@@ -62,7 +62,7 @@ module_program_tests(
 module_program_tests(
     name              = "Testerror_tests",
     structfile        = "testerror.ml",
-    warnings = ["-unexpected-docstring", "-missing-mli"],
+    warnings = {"disable": ["unexpected-docstring", "missing-mli"]},
     stdlib_deps   = [
         "//stdlib:Stdlib.Arg",
         "//stdlib:Stdlib.Array"
