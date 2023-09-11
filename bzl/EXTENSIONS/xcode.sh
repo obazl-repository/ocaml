@@ -1,7 +1,12 @@
 #!/bin/sh
 
 DEVELOPER_DIR="$(xcode-select -p)"
+
+## FIXME: also support iphoneos sdk?
 SDKROOT="$(xcrun --show-sdk-path)"
+## outputs path to MacOSX.sdk, which is the current sdk
+## with  MacOSX13.3.sdk -> MacOSX.sdk,  MacOSX13.sdk -> MacOSX.sdk
+# $(xcrun --sdk macosx --show-sdk-path) emits path to MacOSX13.3.sdk
 
 echo "DD: $DEVELOPER_DIR"
 echo "SDK: $SDKROOT"

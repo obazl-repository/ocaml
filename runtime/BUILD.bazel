@@ -260,8 +260,8 @@ mustache(
     template = select({
         # "//platform:windows_x86_32?": ARCH + "nt.asm.mustache",
         # "//platform:windows_x86_64?": ARCH + "nt.asm.mustache",
-        "//platform/arch:amd64?": "amd64.S.mustache",
-        "//platform/arch:arm64?": "arm64.S.mustache",
+        "//platform/arch:amd64?": "amd64.mustache.S",
+        "//platform/arch:arm64?": "arm64.mustache.S",
         # "//conditions:default"      : "$(ARCH).S.mustache"
     }),
     toolchains = ["//profile/system/local"],

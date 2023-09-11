@@ -84,10 +84,22 @@
 
 
         .set    domain_curr_field, 0
+#if defined(SYS_macosx)
+#define DOMAIN_STATE(c_type, name) DOMAIN_STATE c_type, name
+        .macro DOMAIN_STATE c_type, name
+        .equ    domain_field_caml_\name, domain_curr_field
+        .set    domain_curr_field, domain_curr_field + 1
+        .endm
+{{#domain_states}}
+        DOMAIN_STATE {{type}}, {{name}}
+{{/domain_states}}
+#undef DOMAIN_STATE
+#else
 {{#domain_states}}
         .equ    domain_field_caml_{{name}}, domain_curr_field ; \
         .set    domain_curr_field, domain_curr_field + 1
 {{/domain_states}}
+#endif
 
 #define Caml_state(var) [DOMAIN_STATE_PTR, 8*domain_field_caml_##var]
 

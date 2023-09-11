@@ -115,3 +115,6 @@ link:https://github.com/grailbio/bazel-toolchain[grailbio] llvm Bazel toolchain
 link:https://github.com/llvm/llvm-project/tree/main/utils/bazel[Bazel llvm] Google contrib
 
 link:https://github.com/rsms/llvmbox[llvmbox] - portable llvm distrib
+
+PIC feature: link:https://stackoverflow.com/questions/73326906/how-do-i-disable-pic-for-a-toolchain[How do I disable PIC for a toolchain?] (so)
+

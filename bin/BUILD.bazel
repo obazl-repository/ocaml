@@ -31,6 +31,7 @@ bool_flag(name = "verbose", build_setting_default = False,
 config_setting(name = "verbose?", flag_values = {":verbose": "True"})
 
 ################################################################
+## expands to targets :ocamlc.byte, ocamlopt.byte, etc.
 std_compilers(                  # macro
     name = "std_ocamlcc",
     visibility = ["//visibility:public"]

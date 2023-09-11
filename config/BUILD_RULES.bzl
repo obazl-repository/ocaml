@@ -368,7 +368,7 @@ config_mkexe = rule(
 
 ################################################################
 def _ocaml_cc_config_impl(ctx):
-
+    # print("OCAML_CC_CONFIG")
     cc_config_map = cc_tc_config_map(ctx)
     # print("cc_config_map: %s" % cc_config_map)
 
@@ -440,7 +440,6 @@ def _ocaml_cc_config_impl(ctx):
         output  = user_json,
         content = json.encode(json_map)
     )
-
     ################################################################
     args = ctx.actions.args()
     args.add_all(["-a", ctx.file.json.path])
@@ -471,6 +470,7 @@ def _ocaml_cc_config_impl(ctx):
         output  = user_json,
         content = json.encode(json_map)
     )
+    # print("USER_JSON: %s" % user_json.path)
 
     ################################################################
     args = ctx.actions.args()

@@ -4,6 +4,8 @@ On the mac Bazel needs DEVELOPER_DIR and SDKROOT.
 
 Some useful cmds:
 
+* `xcodebuild -showsdks`
+
 * `xcodebuild -sdk -version`
 
 * `xcrun --show-sdk-path`
@@ -11,6 +13,7 @@ Some useful cmds:
 => /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 
 * `xcrun --sdk macosx --show-sdk-path`
+* `xcrun --sdk iphoneos --show-sdk-path`
 
 => /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
 

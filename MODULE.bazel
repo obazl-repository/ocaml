@@ -1,0 +1,27 @@
+module(
+    name = "ocamlcc",
+    version = "5.1.0",
+    compatibility_level = 5
+)
+
+bazel_dep(name = "platforms",    version = "0.0.7")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")
+bazel_dep(name = "rules_cc",     version = "0.0.8")
+
+cc_config = use_extension("//bzl/EXTENSIONS:cc_config.bzl",
+                      "cc_config")
+# cc_config.xcode(version = "13.3.0")
+use_repo(cc_config, "ocaml_xcode")
+
+# this will have no effect if this module is a bazel_dep.
+# but: what if we want to do dev on ocamlcc by
+# using it in a different local repo?
+bazel_dep(name = "dev", version = "0.0.0")
+local_path_override(module_name = "dev",
+                    path = ".baseline")
+
+register_toolchains("//toolchain/selector/local:all")
+register_toolchains("//toolchain/profile/selector/cc/local:all")
+register_toolchains("//toolchain/profile/selector/cc/linux")
+register_toolchains("//toolchain/profile/selector/cc/macos:all")
+

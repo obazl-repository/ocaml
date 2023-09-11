@@ -1,4 +1,0 @@
-= cc toolchain integration
-
-PIC feature: link:https://stackoverflow.com/questions/73326906/how-do-i-disable-pic-for-a-toolchain[How do I disable PIC for a toolchain?] (so)
-

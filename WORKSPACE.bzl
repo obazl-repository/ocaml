@@ -11,7 +11,7 @@ _ocaml_xcode = repository_rule(
     attrs = {
         "_script" : attr.label(
             allow_single_file = True,
-            default = "//bzl/bin:xcode.sh"
+            default = "//bzl/EXTENSIONS:xcode.sh"
         )
     }
 )

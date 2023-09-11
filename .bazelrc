@@ -1,3 +1,8 @@
+common --experimental_cc_shared_library
+common --enable_bzlmod
+# try-import .config/registries.bazelrc
+#common --registry=https://bcr.bazel.build
+
 ## in dev mode, just pass //config/target/executor=<> to set output
 build --flag_alias=tgt=//config/target/executor
 build --flag_alias=stdlib=//testsuite/tests:with-stdlib
@@ -180,5 +185,5 @@ build:ocamlc.opt --//config/target/emitter=vm
 # build:vs_sv --//config/target/emitter=vm
 
 
-try-import .config/dev.bazelrc
+# try-import .config/dev.bazelrc
 try-import .config/user.bazelrc

@@ -36,9 +36,9 @@ echo "Making .baseline directories"
 mkdir -p $BASELINEDIR/bin
 mkdir -p $BASELINEDIR/lib
 
-echo "Installing WORKSPACE and BUILD files"
+#echo "Installing WORKSPACE and BUILD files"
 
-# echo "workspace(name = \"baseline\")" > $BASELINEDIR/WORKSPACE.bazel
+#echo "workspace(name = \"baseline\")" > $BASELINEDIR/WORKSPACE.bazel
 # echo "exports_files(glob([\"**\"]))"  > $BASELINEDIR/BUILD.bazel
 # echo "exports_files(glob([\"**\"]))"  > $BASELINEDIR/bin/BUILD.bazel
 # echo "exports_files(glob([\"**\"]))"  > $BASELINEDIR/lib/BUILD.bazel
@@ -111,12 +111,13 @@ done
 
 # cp -vf $(rlocation ocamlcc/vendor/mustach/mustach) $BASELINEDIR/bin
 
-echo "Setting permissions"
+echo "Setting Permissions"
 
-chmod -f ${VERBOSE} ug=+rx-w,o=-rwx $BASELINEDIR/bin/*
-chmod -f ${VERBOSE} ug=+r-xw,o=-rwx $BASELINEDIR/bin/*.bazel
-chmod -f ${VERBOSE} ug=+r-xw,o=-rwx $BASELINEDIR/bin/*.byte
+cd $BASELINEDIR/lib && chmod -f ${VERBOSE} ugo=+r-xw *
 
-chmod -f ${VERBOSE} ugo=+r-xw $BASELINEDIR/lib/*
+chmod -f ${VERBOSE} u=+rwx,go=+rx-w $BASELINEDIR/bin/*
+chmod -f ${VERBOSE} u=+rw-x,go=+r-wx $BASELINEDIR/bin/*.byte
+chmod -f ${VERBOSE} u=+rw,go=+r-xw $BASELINEDIR/bin/*.bazel 2>/dev/null
+
 
 echo "Checkpoint completed."

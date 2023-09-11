@@ -189,7 +189,12 @@ val iter2 : {{f}}('a -> 'b -> unit) -> 'a array -> 'b array -> unit
 (** [iter2 {{~}}f a b] applies function [f] to all the elements of [a]
    and [b].
    @raise Invalid_argument if the arrays are not the same size.
+{{^labels}}
    @since 4.03 (4.05 in ArrayLabels)
+{{/labels}}
+{{#labels}}
+   @since 4.05
+{{/labels}}
    *)
 
 val map2 : {{f}}('a -> 'b -> 'c) -> 'a array -> 'b array -> 'c array
