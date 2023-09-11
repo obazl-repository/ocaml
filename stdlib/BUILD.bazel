@@ -96,7 +96,7 @@ mustache(
     name = "stdlib_ml",
     out  = "stdlib.ml",
     json = "stdlib.json",
-    template = "stdlib.ml.mustache"
+    template = "stdlib.mustache.ml"
 )
 
 alias(name = "Primitives_cmi", actual = ":Stdlib_cmi")
@@ -114,7 +114,7 @@ mustache(
     name = "stdlib_mli",
     out  = "stdlib.mli",
     json = "stdlib.json",
-    template = "stdlib.mli.mustache"
+    template = "stdlib.mustache.mli"
 )
 
 # genrule(
@@ -399,14 +399,14 @@ mustache(
     name = "arraymli",
     out  = "array.mli",
     json = "empty.json",
-    template = "array.mli.mustache"
+    template = "array.mustache.mli"
 )
 
 mustache(
     name = "arrayLabelsmli",
     out  = "arrayLabels.mli",
     json = "LABELS.json",
-    template = "array.mli.mustache"
+    template = "array.mustache.mli"
 )
 
 ## WARNING: the purpose of 'expand_module_aliases.awk' in this
@@ -556,14 +556,14 @@ mustache(
     name = "bytesmli",
     out  = "bytes.mli",
     json = "empty.json",
-    template = "bytes.mli.mustache"
+    template = "bytes.mustache.mli"
 )
 
 mustache(
     name = "bytesLabelsmli",
     out  = "bytesLabels.mli",
     json = "LABELS.json",
-    template = "bytes.mli.mustache"
+    template = "bytes.mustache.mli"
 )
 
 stdlib_module(
@@ -907,11 +907,12 @@ stdlib_signature(
     stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
+# FIXME: use template moreLabels.mustache.mli?
 mustache(
     name = "hashtbl_mli",
     out  = "hashtbl.mli",
     json = "empty.json",
-    template = "hashtbl.mli.mustache"
+    template = "hashtbl.mustache.mli"
 )
 
 stdlib_module(
@@ -1083,6 +1084,13 @@ stdlib_signature(
     stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
+mustache(
+    name = "mapmli",
+    out  = "map.mli",
+    json = "empty.json",
+    template = "map.mustache.mli",
+)
+
 stdlib_module(
     name   = "Stdlib.Marshal",
     struct = "marshal.ml",
@@ -1122,6 +1130,18 @@ stdlib_signature(
         ":Stdlib.Map_cmi",
         ":Stdlib.Hashtbl_cmi"
     ],
+)
+
+mustache(
+    name = "moreLabelsmli",
+    out  = "moreLabels.mli",
+    json = "LABELS.json",
+    template = "moreLabels.mustache.mli",
+    partials = [
+        "hashtbl.mustache.mli",
+        "map.mustache.mli",
+        "set.mustache.mli",
+    ]
 )
 
 stdlib_module(
@@ -1504,6 +1524,13 @@ stdlib_signature(
     stdlib_deps   = [":Stdlib.Seq_cmi"]
 )
 
+mustache(
+    name = "setmli",
+    out  = "set.mli",
+    json = "empty.json",
+    template = "set.mustache.mli",
+)
+
 stdlib_module(
     name   = "Stdlib.Stack",
     struct = "stack.ml",
@@ -1606,6 +1633,20 @@ stdlib_signature(
         ":Stdlib.Seq_cmi",
         ":Stdlib.Uchar_cmi"
     ],
+)
+
+mustache(
+    name = "stringmli",
+    out  = "string.mli",
+    json = "empty.json",
+    template = "string.mustache.mli"
+)
+
+mustache(
+    name = "stringLabelsmli",
+    out  = "stringLabels.mli",
+    json = "LABELS.json",
+    template = "string.mustache.mli"
 )
 
 stdlib_module(
@@ -1817,12 +1858,12 @@ mustache(
     name = "listmli",
     out  = "list.mli",
     json = "empty.json",
-    template = "list.mli.mustache"
+    template = "list.mustache.mli"
 )
 
 mustache(
     name = "listLabelsmli",
     out  = "listLabels.mli",
     json = "LABELS.json",
-    template = "list.mli.mustache"
+    template = "list.mustache.mli"
 )

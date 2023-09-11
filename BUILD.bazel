@@ -8,7 +8,10 @@ load("//tools:TOOL_RUNNERS.bzl",
      "run_tool",
      "run_repl")
 
-exports_files(["Makefile.config", "VERSION", "BUILD.bazel"])
+exports_files([
+    "Makefile.config", "VERSION", "BUILD.bazel",
+    "partial.test.mustache"
+])
 
 label_flag(name = "arg",
            build_setting_default = "BUILD.bazel",

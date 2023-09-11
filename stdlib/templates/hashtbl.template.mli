@@ -111,8 +111,8 @@ val reset : ('a, 'b) t -> unit
 val copy : ('a, 'b) t -> ('a, 'b) t
 (** Return a copy of the given hashtable. *)
 
-val add : ('a, 'b) t -> key:'a -> data:'b -> unit
-(** [Hashtbl.add tbl ~key ~data] adds a binding of [key] to [data]
+val add : ('a, 'b) t -> {{key}}'a -> {{data}}'b -> unit
+(** [Hashtbl.add tbl {{~}}key {{~}}data] adds a binding of [key] to [data]
    in table [tbl].
 
    {b Warning}: Previous bindings for [key] are not removed, but simply
@@ -146,15 +146,15 @@ val remove : ('a, 'b) t -> 'a -> unit
    restoring the previous binding if it exists.
    It does nothing if [x] is not bound in [tbl]. *)
 
-val replace : ('a, 'b) t -> key:'a -> data:'b -> unit
-(** [Hashtbl.replace tbl ~key ~data] replaces the current binding of [key]
+val replace : ('a, 'b) t -> {{key}}'a -> {{data}}'b -> unit
+(** [Hashtbl.replace tbl {{~}}key {{~}}data] replaces the current binding of [key]
    in [tbl] by a binding of [key] to [data].  If [key] is unbound in [tbl],
    a binding of [key] to [data] is added to [tbl].
    This is functionally equivalent to {!remove}[ tbl key]
    followed by {!add}[ tbl key data]. *)
 
-val iter : f:(key:'a -> data:'b -> unit) -> ('a, 'b) t -> unit
-(** [Hashtbl.iter ~f tbl] applies [f] to all bindings in table [tbl].
+val iter : {{f}}({{key}}'a -> {{data}}'b -> unit) -> ('a, 'b) t -> unit
+(** [Hashtbl.iter {{~}}f tbl] applies [f] to all bindings in table [tbl].
    [f] receives the key as first argument, and the associated value
    as second argument. Each binding is presented exactly once to [f].
 
@@ -173,9 +173,9 @@ val iter : f:(key:'a -> data:'b -> unit) -> ('a, 'b) t -> unit
    by [f] during the iteration.
 *)
 
-val filter_map_inplace: f:(key:'a -> data:'b -> 'b option) -> ('a, 'b) t ->
+val filter_map_inplace: {{f}}({{key}}'a -> {{data}}'b -> 'b option) -> ('a, 'b) t ->
     unit
-(** [Hashtbl.filter_map_inplace ~f tbl] applies [f] to all bindings in
+(** [Hashtbl.filter_map_inplace {{~}}f tbl] applies [f] to all bindings in
     table [tbl] and update each binding depending on the result of
     [f].  If [f] returns [None], the binding is discarded.  If it
     returns [Some new_val], the binding is update to associate the key
@@ -184,8 +184,8 @@ val filter_map_inplace: f:(key:'a -> data:'b -> 'b option) -> ('a, 'b) t ->
     Other comments for {!iter} apply as well.
     @since 4.03 *)
 
-val fold : f:(key:'a -> data:'b -> 'c -> 'c) -> ('a, 'b) t -> init:'c -> 'c
-(** [Hashtbl.fold ~f tbl ~init] computes
+val fold : {{f}}({{key}}'a -> {{data}}'b -> 'c -> 'c) -> ('a, 'b) t -> {{init}}'c -> 'c
+(** [Hashtbl.fold {{~}}f tbl {{~}}init] computes
    [(f kN dN ... (f k1 d1 init)...)],
    where [k1 ... kN] are the keys of all bindings in [tbl],
    and [d1 ... dN] are the associated values.
@@ -374,21 +374,21 @@ module type S =
     val reset : 'a t -> unit (** @since 4.00 *)
 
     val copy : 'a t -> 'a t
-    val add : 'a t -> key:key -> data:'a -> unit
+    val add : 'a t -> {{key}}key -> {{data}}'a -> unit
     val remove : 'a t -> key -> unit
     val find : 'a t -> key -> 'a
     val find_opt : 'a t -> key -> 'a option
     (** @since 4.05 *)
 
     val find_all : 'a t -> key -> 'a list
-    val replace : 'a t -> key:key -> data:'a -> unit
+    val replace : 'a t -> {{key}}key -> {{data}}'a -> unit
     val mem : 'a t -> key -> bool
-    val iter : f:(key:key -> data:'a -> unit) -> 'a t -> unit
-    val filter_map_inplace: f:(key:key -> data:'a -> 'a option) -> 'a t ->
+    val iter : {{f}}({{key}}key -> {{data}}'a -> unit) -> 'a t -> unit
+    val filter_map_inplace: {{f}}({{key}}key -> {{data}}'a -> 'a option) -> 'a t ->
       unit
     (** @since 4.03 *)
 
-    val fold : f:(key:key -> data:'a -> 'b -> 'b) -> 'a t -> init:'b -> 'b
+    val fold : {{f}}({{key}}key -> {{data}}'a -> 'b -> 'b) -> 'a t -> {{init}}'b -> 'b
     val length : 'a t -> int
     val stats: 'a t -> statistics (** @since 4.00 *)
 
@@ -451,20 +451,20 @@ module type SeededS =
     val clear : 'a t -> unit
     val reset : 'a t -> unit
     val copy : 'a t -> 'a t
-    val add : 'a t -> key:key -> data:'a -> unit
+    val add : 'a t -> {{key}}key -> {{data}}'a -> unit
     val remove : 'a t -> key -> unit
     val find : 'a t -> key -> 'a
     val find_opt : 'a t -> key -> 'a option (** @since 4.05 *)
 
     val find_all : 'a t -> key -> 'a list
-    val replace : 'a t -> key:key -> data:'a -> unit
+    val replace : 'a t -> {{key}}key -> {{data}}'a -> unit
     val mem : 'a t -> key -> bool
-    val iter : f:(key:key -> data:'a -> unit) -> 'a t -> unit
-    val filter_map_inplace: f:(key:key -> data:'a -> 'a option) -> 'a t ->
+    val iter : {{f}}({{key}}key -> {{data}}'a -> unit) -> 'a t -> unit
+    val filter_map_inplace: {{f}}({{key}}key -> {{data}}'a -> 'a option) -> 'a t ->
       unit
     (** @since 4.03 *)
 
-    val fold : f:(key:key -> data:'a -> 'b -> 'b) -> 'a t -> init:'b -> 'b
+    val fold : {{f}}({{key}}key -> {{data}}'a -> 'b -> 'b) -> 'a t -> {{init}}'b -> 'b
     val length : 'a t -> int
     val stats: 'a t -> statistics
 

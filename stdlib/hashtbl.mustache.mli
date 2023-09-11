@@ -1,3 +1,4 @@
+{{^labels}}
 (**************************************************************************)
 (*                                                                        *)
 (*                                 OCaml                                  *)
@@ -16,6 +17,8 @@
 (* NOTE: If this file is hashtbl.mli, do not edit it directly! Instead,
    edit templates/hashtbl.template.mli and run tools/sync_stdlib_docs *)
 
+{{/labels}}
+{{=<% %>=}}
 (** Hash tables and hash functions.
 
    Hash tables are hashed association tables, with in-place modification.
@@ -37,10 +40,10 @@
    in interactive environments. It uses the polymorphic {!hash} function
    defined in the OCaml runtime (at the time of writing, it's SipHash),
    as well as the polymorphic equality [(=)].
-{{=<% %>=}}<% change of template tag delims so we can output '{{!' %>
+
    See {{!examples} the examples section}.
-<%={{ }}=%>
 *)
+<%={{ }}=%>
 
 (** {b Unsynchronized accesses} *)
 
@@ -58,7 +61,12 @@
 (** {1 Generic interface} *)
 
 
+{{^labels}}
 type (!'a, !'b) t
+{{/labels}}
+{{#labels}}
+type (!'a, !'b) t = ('a, 'b) Hashtbl.t
+{{/labels}}
 (** The type of hash tables from type ['a] to type ['b]. *)
 
 val create : ?random: (* thwart tools/sync_stdlib_docs *) bool ->
@@ -255,7 +263,12 @@ val rebuild : ?random (* thwart tools/sync_stdlib_docs *) :bool ->
     @since 4.12 *)
 
 (** @since 4.00 *)
+{{^labels}}
 type statistics = {
+{{/labels}}
+{{#labels}}
+type statistics = Hashtbl.statistics = {
+{{/labels}}
   num_bindings: int;
     (** Number of bindings present in the table.
         Same value as returned by {!length}. *)
@@ -413,7 +426,14 @@ module type S =
   end
 (** The output signature of the functor {!Make}. *)
 
+{{^labels}}
 module Make (H : HashedType) : S with type key = H.t
+{{/labels}}
+{{#labels}}
+module Make : functor (H : HashedType) -> S
+  with type key = H.t
+   and type 'a t = 'a Hashtbl.Make(H).t
+{{/labels}}
 (** Functor building an implementation of the hashtable structure.
     The functor [Hashtbl.Make] returns a structure containing
     a type [key] of keys and a type ['a t] of hash tables
@@ -490,7 +510,14 @@ module type SeededS =
 (** The output signature of the functor {!MakeSeeded}.
     @since 4.00 *)
 
+{{^labels}}
 module MakeSeeded (H : SeededHashedType) : SeededS with type key = H.t
+{{/labels}}
+{{#labels}}
+    module MakeSeeded (H : SeededHashedType) : SeededS
+    with type key = H.t
+     and type 'a t = 'a Hashtbl.MakeSeeded(H).t
+{{/labels}}
 (** Functor building an implementation of the hashtable structure.
     The functor [Hashtbl.MakeSeeded] returns a structure containing
     a type [key] of keys and a type ['a t] of hash tables
@@ -637,3 +664,4 @@ val seeded_hash_param : int -> int -> int -> 'a -> int
   ]}
 
 *)
+

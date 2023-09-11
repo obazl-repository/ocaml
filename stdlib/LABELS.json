@@ -1,6 +1,9 @@
 {
+    "labels": true,
+    "indent": "    ",
     "~": "~",
     "cmp": "cmp:",
+    "data": "data:",
     "dimx": "dimx:",
     "dimy": "dimy:",
     "dst": "dst:",
@@ -16,6 +19,7 @@
     "prefix": "prefix:",
     "right": "right:",
     "sep": "sep:",
+    "seq": "seq:",
     "set": "set:",
     "src": "src:",
     "src_pos": "src_pos:",

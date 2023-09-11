@@ -138,6 +138,14 @@ static void close_json();
 
 int main(int argc, char **argv)
 {
+    /* printf("CWD: %s\n", getcwd(NULL,0)); */
+    /* printf("BUILD_WORKSPACE_DIRECTORY: %s\n", */
+    /*        getenv("BUILD_WORKSPACE_DIRECTORY")); */
+
+    /* printf("RUNFILES_DIR: %s\n", getenv("RUNFILES_DIR")); */
+    /* printf("RUNFILES_MANIFEST_FILE: %s\n", */
+    /*        getenv("RUNFILES_MANIFEST_FILE")); */
+    /* printf("BAZEL_CURRENT_REPOSITORY: %s\n", BAZEL_CURRENT_REPOSITORY); */
     char *json_infile = NULL;
     char *template_infile = NULL;
     char *outfile = NULL;
@@ -196,6 +204,8 @@ int main(int argc, char **argv)
         fprintf(stdout, "Missing -t <template>\n");
         exit(EXIT_FAILURE);
     }
+
+    
 
     errno = 0;
     output = fopen(outfile, "w");

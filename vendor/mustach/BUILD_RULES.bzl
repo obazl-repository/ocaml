@@ -25,14 +25,13 @@ def _mustache_impl(ctx):
         executable = tc.mustache, ## ctx.file._tool,
         arguments = [args],
         inputs = depset(
-            [ctx.file.template, ctx.file.json],
+            [ctx.file.template, ctx.file.json] + ctx.files.partials,
         ),
         outputs = [ctx.outputs.out],
     )
 
     ########
     return [
-        # DefaultInfo(files = depset([outfile]))
         DefaultInfo(files = depset([ctx.outputs.out]))
     ]
 
@@ -51,6 +50,9 @@ mustache = rule(
             mandatory = True,
             allow_single_file = True,
             cfg = "exec",
+        ),
+        "partials": attr.label_list(
+            allow_files = True
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
