@@ -9,7 +9,7 @@ load("//bzl:rules.bzl", "cc_assemble")
 load("//vendor/mustach:BUILD_RULES.bzl", "mustache")
 load("//vendor/mustach:cc_mustache.bzl", "cc_mustache")
 
-exports_files(["gen_primitives.sh", "primitives.json", "sync_posix.h"] + glob(["*.c"]))
+exports_files(["gen_primitives.sh", "primitives.json", "sync_posix.h"] + glob(["*.c"], exclude = ["*.mustache.c", "*.out.c"]))
 
 COPTS_PLATFORM = select({
     "//platform/build:macos_arm64?": [
@@ -355,7 +355,11 @@ filegroup(
             "startup_byt.c",
             "startup_nat.c",
             "unix.c",
-            "win32.c"
+            "win32.c",
+
+            "ints.mustache.c",
+            "prims.mustache.c",
+            "prims.out.c"
         ]
     ) + select({
     ## $(UNIX_OR_WIN32) = 'unix' or 'win32', from configure script
@@ -474,7 +478,7 @@ filegroup(
 mustache(
     name = "ints_c",
     out  = "ints.c",
-    template = "ints.c.mustache",
+    template = "ints.mustache.c",
     json     = "primitives.json",
     visibility = ["//boot:__pkg__"]
 )
@@ -482,7 +486,7 @@ mustache(
 mustache(
     name = "primitives_dat",
     out  = "primitives.dat",
-    template = "primitives.dat.mustache",
+    template = "primitives.mustache.dat",
     json     = "primitives.json",
     visibility = ["//visibility:public"]
     #     "//bytecomp:__pkg__",
@@ -518,7 +522,7 @@ cc_mustache(
 mustache(
     name = "prims_c",
     out  = "prims.c",
-    template = "prims.c.mustache",
+    template = "prims.mustache.c",
     json     = "primitives.json",
     visibility = ["//boot:__pkg__"]
 )
