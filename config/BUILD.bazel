@@ -18,6 +18,11 @@ load(":BUILD_RULES.bzl",
      "ocaml_cc_config",
      "config_mkexe", "OCamlCcToolchainInfo", "config_cc_toolchain")
 
+load("@ocaml_config//:BUILD.bzl", "OS", "OSREV", "HWARCH")
+# print("OS: %s" % OS)
+# print("OSREV: %s" % OSREV)
+# print("ARCH: %s" % HWARCH)
+
 package(default_visibility = ["//visibility:public"])
 
 compiler_signature(
@@ -81,7 +86,7 @@ compiler_module(
 mustache(
     name = "config_ml",
     out      = "config.ml",
-    template = "config.ml.mustache",
+    template = "config.mustache.ml",
     json     = "config.json", # "config.ml.json",
     # stdlib = "//stdlib"
 )
@@ -164,9 +169,15 @@ mustache(
     template = "config_cc_toolchain.ml.mustache"
 )
 
+## config_cc_toolchain inspects the toolchain selected by bazel,
+# and writes its description out to a json file, so that
+# it can be transferred to OCaml's Config module fields.
 config_cc_toolchain(
     name = "config.cc_toolchain",
-    out  = "config_cc_toolchain.json"
+    out  = "config_cc_toolchain.json",
+    copts = ["-foo"],
+    defines = ["BAR"],
+    linkopts = ["-Wfoobar"]
 )
 
 config_sys(

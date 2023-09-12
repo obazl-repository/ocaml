@@ -7,6 +7,12 @@ load("//bzl/transitions:cc_transitions.bzl", "reset_cc_config_transition")
 
 load(":BUILD_CC_LINK.bzl", "link_config")
 
+# these are written by the config module extension:
+load("@ocaml_config//:BUILD.bzl", "OS", "OSREV", "HWARCH")
+# print("X OS: %s" % OS)
+# print("X OSREV: %s" % OSREV)
+# print("X ARCH: %s" % HWARCH)
+
 ## exports rules: config_cc_toolchain, config_mkexe
 
 DISABLED_FEATURES = [
@@ -30,7 +36,7 @@ def cc_tc_config_map(ctx):
 
     # print("VAR: %s" % ctx.var)
     for k,v in ctx.var.items():
-        # print("VAR: {k} : {v}".format(k=k, v=v))
+        print("VAR: {k} : {v}".format(k=k, v=v))
         config_map[k] = v
 
     # config_map["AR"] = ctx.var["AR"]
@@ -137,6 +143,7 @@ def cc_tc_config_map(ctx):
         cc_toolchain = tc,
         # source_file = source_file.path,
         # output_file = output_file.path,
+        # user_compile_flags = ...
         # preprocessor_defines = depset(defines)
     )
 
@@ -237,6 +244,11 @@ def _config_cc_toolchain_impl(ctx):
     #     outputs = [output_file],
     # )
 
+    config_map["host"] = "{arch}-{vendor}-{os}{osrev}".format(
+        arch = HWARCH, vendor = "apple", os = OS, osrev = OSREV
+    )
+    config_map["target"] = "acme"
+
     config_map_json = json.encode_indent(config_map)
     ctx.actions.write(
         output = ctx.outputs.out,
@@ -312,6 +324,10 @@ def _config_cc_toolchain_impl(ctx):
     ]
 
 ####################
+## config_cc_toolchain inspects the toolchain selected by bazel,
+# and writes its description out to a json file, so that
+# it can be transferred to OCaml's Config module fields.
+## see https://bazel.build/configure/integrate-cpp
 config_cc_toolchain = rule(
     implementation = _config_cc_toolchain_impl,
     attrs = {
@@ -372,11 +388,22 @@ def _ocaml_cc_config_impl(ctx):
     cc_config_map = cc_tc_config_map(ctx)
     # print("cc_config_map: %s" % cc_config_map)
 
+    cc_config_map["host"] = "{arch}-{vendor}-{os}{osrev}".format(
+        arch = HWARCH, vendor = "apple", os = OS.lower(),
+        osrev = OSREV
+    )
+    cc_config_map["target"] = cc_config_map["host"]
+
     ## generate user_config.json, from attrs,
     ## then merge with main json
     user_json = ctx.actions.declare_file("user_config.json")
 
     json_map = {}
+
+    #TODO: host strips expected by ocaml for host/target,
+    # e.g.  "aarch64-apple-darwin22.9.0"
+    json_map["host"] = cc_config_map["host"]
+    json_map["target"] = cc_config_map["target"]
 
     json_map["system"] = cc_config_map["system"]
     json_map["model"] = cc_config_map["model"]
@@ -472,7 +499,8 @@ def _ocaml_cc_config_impl(ctx):
     )
     # print("USER_JSON: %s" % user_json.path)
 
-    ################################################################
+    ######################################################
+    # merge info on selected tc w/user-specified json file
     args = ctx.actions.args()
     args.add_all(["-a", ctx.file.json.path])
     args.add_all(["-b", user_json.path])
@@ -551,10 +579,10 @@ ocaml_cc_config = rule(
         # ),
 
         "_xcode_sdkroot": attr.label(
-            default = "@ocaml_xcode//env:sdkroot"
+            default = "@ocaml_config//xcode:sdkroot"
         ),
         "_xcode_developer_dir": attr.label(
-            default = "@ocaml_xcode//env:developer_dir"
+            default = "@ocaml_config//xcode:developer_dir"
         ),
 
         "_allowlist_function_transition": attr.label(

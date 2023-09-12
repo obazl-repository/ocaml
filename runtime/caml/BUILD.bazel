@@ -7,7 +7,7 @@ cc_mustache(
     name = "domain_state_h",
     out  = "domain_state.h",
     json = "domain_state.json",
-    template = "domain_state.h.mustache",
+    template = "domain_state.mustache.h",
     visibility = [
         "//boot:__pkg__",
         "//runtime:__subpackages__",
@@ -21,7 +21,7 @@ cc_mustache(
     name = "instruct_h",
     out  = "instruct.h",
     json = "//bytecomp:opcodes.json",
-    template = "instruct.h.mustache",
+    template = "instruct.mustache.h",
     visibility = [
         "//boot:__pkg__",
         "//runtime:__subpackages__",
@@ -33,7 +33,7 @@ cc_mustache(
     name = "fail_h",
     out  = "fail.h",
     json = "//runtime:primitives.json",
-    template = "fail.h.mustache",
+    template = "fail.mustache.h",
     visibility = [
         "//boot:__pkg__",
         "//lambda:__pkg__",
@@ -46,7 +46,7 @@ cc_mustache(
     name = "jumptbl_h",
     out  = "jumptbl.h",
     json = "//bytecomp:opcodes.json",
-    template = "jumptbl.h.mustache",
+    template = "jumptbl.mustache.h",
     visibility = [
         "//boot:__pkg__",
         "//runtime:__pkg__",
@@ -57,7 +57,7 @@ cc_mustache(
     name = "opnames_h",
     out  = "opnames.h",
     json = "//bytecomp:opcodes.json",
-    template = "opnames.h.mustache",
+    template = "opnames.mustache.h",
     visibility = [
         "//boot:__pkg__",
         "//runtime:__pkg__",

@@ -26,6 +26,12 @@
             "docstring": "End of the minor heap. always(young_start <= young_ptr <= young_end)"
         },
         {
+            "type": "value*",
+            "name": "young_trigger",
+            "offset": 24,
+            "docstring": "Input for setting the young_limit"
+        },
+        {
             "type": "struct stack_info*",
             "name": "current_stack",
             "offset": 32,

@@ -558,14 +558,14 @@ mustache(
     name = "opcodes_ml",
     out  = "opcodes.ml",
     json = "opcodes.json",
-    template = "opcodes.ml.mustache",
+    template = "opcodes.mustache.ml",
 )
 
 mustache(
     name = "opnames_ml",
     out  = "opnames.ml",
     json = "opcodes.json",
-    template = "opnames.ml.mustache",
+    template = "opnames.mustache.ml",
     visibility = ["//tools:__pkg__"]
 )
 

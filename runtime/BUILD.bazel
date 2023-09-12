@@ -514,7 +514,7 @@ cc_library(
 cc_mustache(
     name = "primitives_h",
     out  = "primitives.h",
-    template = "primitives.h.mustache",
+    template = "primitives.mustache.h",
     json     = "primitives.json",
     visibility = ["//boot:__pkg__"]
 )

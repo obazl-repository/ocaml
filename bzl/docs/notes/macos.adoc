@@ -13,9 +13,12 @@ Some useful cmds:
 => /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 
 * `xcrun --sdk macosx --show-sdk-path`
-* `xcrun --sdk iphoneos --show-sdk-path`
 
 => /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
+
+* `xcrun --sdk iphoneos --show-sdk-path`
+
+* `xcrun --show-sdk-version`
 
 
 * `xcode-select -p` - prints path of selected DEVELOPER_DIR

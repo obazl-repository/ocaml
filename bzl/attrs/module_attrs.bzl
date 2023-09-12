@@ -152,10 +152,10 @@ def module_attrs():
         ),
 
         _xcode_sdkroot = attr.label(
-            default = "@ocaml_xcode//env:sdkroot"
+            default = "@ocaml_config//xcode:sdkroot"
         ),
         _xcode_developer_dir = attr.label(
-            default = "@ocaml_xcode//env:developer_dir"
+            default = "@ocaml_config//xcode:developer_dir"
         )
 
         # _sdkpath = attr.label(
