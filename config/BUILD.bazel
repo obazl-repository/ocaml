@@ -166,7 +166,7 @@ mustache(
     name = "__config_cc_ml__",
     out  = "config_cc_toolchain.ml",
     json = "config_cc_toolchain.json",
-    template = "config_cc_toolchain.ml.mustache"
+    template = "config_cc_toolchain.mustache.ml"
 )
 
 ## config_cc_toolchain inspects the toolchain selected by bazel,

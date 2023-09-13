@@ -579,7 +579,7 @@ mustache(
     name = "domainstate_ml",
     out  = "domainstate.ml",
     json = "//runtime/caml:domain_state.json",
-    template = "domainstate.ml.mustache"
+    template = "domainstate.mustache.ml"
 )
 
 # genrule(
@@ -615,7 +615,7 @@ mustache(
     name = "domainstate_mli",
     out  = "domainstate.mli",
     json = "//runtime/caml:domain_state.json",
-    template = "domainstate.mli.mustache"
+    template = "domainstate.mustache.mli"
 )
 
 # genrule(

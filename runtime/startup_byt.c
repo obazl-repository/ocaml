@@ -61,7 +61,7 @@
 #include "caml/startup_aux.h"
 #include "caml/version.h"
 
-/* #include "build_config.h" */
+#include "build_config.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -380,13 +380,13 @@ static void do_print_config(void)
   /* Print the runtime configuration */
   printf("version: %s\n", OCAML_VERSION_STRING);
   printf("standard_library_default: %s\n",
-         caml_stat_strdup_of_os("OCAML_STDLIB_DIR"));
+         caml_stat_strdup_of_os(OCAML_STDLIB_DIR));
   printf("standard_library: %s\n",
          caml_stat_strdup_of_os(caml_get_stdlib_location()));
   printf("int_size: %d\n", 8 * (int)sizeof(value));
   printf("word_size: %d\n", 8 * (int)sizeof(value) - 1);
   printf("os_type: %s\n", OCAML_OS_TYPE);
-  printf("host: %s\n", "HOST");
+  printf("host: %s\n", HOST);
   printf("flat_float_array: %s\n",
 #ifdef FLAT_FLOAT_ARRAY
          "true");

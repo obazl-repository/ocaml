@@ -80,7 +80,7 @@ mustache(
     name = "ocamldebug_ml",
     out  = "ocamldebug.ml",
     json = "ocamldebug.json",
-    template = "ocamldebug.ml.mustache",
+    template = "ocamldebug.mustache.ml",
 )
 
 compiler_library(

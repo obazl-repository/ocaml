@@ -22,40 +22,89 @@ DISABLED_FEATURES = [
 OCamlCcToolchainInfo = provider()
 
 ################################################################
-def cc_tc_config_map(ctx):
-    config_map = {}
+## cc_flags does what a configure script would normally do.
+# FIXME: this logic could go into a mustache template.
+# e.g. json would have an object for each compiler,
+# so instead of "if clang, set common_cflags to x"
+# we just have a data structure associating config settings
+# to compilers
+# then the template can handle the logic.
+# i.e. here we're constructing that json file at build time
+# we can instead write it as a fixed input file.
+################
+def cc_cflags(ctx, tc, config_map):
+    compiler = config_map["compiler"]
+    print("COMPILER: %s" % compiler)
 
-    config_map["target_host_platform"] = str(ctx.fragments.platform.host_platform)
-    config_map["target_platform"] = str(ctx.fragments.platform.platform)
+    if compiler in ["clang", "gcc"]:
+        config_map["cc_has_debug_prefix_map"] = True
+    else:
+        config_map["cc_has_debug_prefix_map"] = False
 
-    config_map["host_host_platform"] = str(ctx.host_fragments.platform.host_platform)
-    config_map["host_platform"] = str(ctx.host_fragments.platform.platform)
+    # if config_map["host"] == "mingw32":
+    if config_map["TARGET_CPU"] == "mingw32": #FIXME
+        if compiler == "gcc":
+            config_map["internal_cflags"] = [
+                "-Wno-unused",
+                # $cc_warnings
+                "-fexcess-precision=standard"
+            ]
+            config_map["common_cflags"] = [
+                "-O2 -fno-strict-aliasing -fwrapv -mms-bitfields"
+            ]
+            config_map["internal_cppflags"] = [
+                "-D__USE_MINGW_ANSI_STDIO=0",
+                "-DUNICODE",
+                "-D_UNICODE",
+                "-DWINDOWS_UNICODE=$(WINDOWS_UNICODE)"
+            ]
+        else:
+            fail("Unsupported compiler: %s" % compiler)
+    else: # not mingw32
+        if compiler == "clang":
+            config_map["common_cflags"] = [
+                "-O2", "-fno-strict-aliasing", "-fwrapv"]
+            config_map["internal_cflags"] = [
+                "$cc_warnings", "-fno-common"]
+        elif compiler == "gcc":
+            ## version < 4.9: unsupported
+            config_map["common_cflags"] = [
+                "-O2", "-fno-strict-aliasing", "-fwrapv"]
+            config_map["internal_cflags"] = [
+                "$cc_warnings",
+                "-fno-common", "-fexcess-precision=standard"]
+        elif compiler == "msvc":
+            config_map["outputobj"] = "-Fo"
+            config_map["warn_error_flag"] = "-WX"
+            config_map["cc_warnings"] = ""
+            config_map["common_cflags"] = [
+                "-nologo", "-O2", "-Gy-",
+                "-MD", "$cc_warnings"]
+            config_map["common_cppflags"] = [
+                "-D_CRT_SECURE_NO_DEPRECATE"]
+            # config_map["internal_cppflags"] = [
+            #     "'-DUNICODE -D_UNICODE'
+            #     OCAML_CL_HAS_VOLATILE_METADATA
+            #     AS_IF([test "x$cl_has_volatile_metadata" = "xtrue"],
+            #     [internal_cflags='-d2VolatileMetadata-'])
+            #     internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
+            #     internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
 
-    tc = find_cpp_toolchain(ctx)
-    # tc is a CcToolchainInfo
+        elif compiler == "xlc":
+            None
+        elif compiler == "sunc":
+            None
+        else:
+            config_map["common_cflags"] = "-O"
+            config_map["outputobj"] = "-o"
+            config_map["warn_error_flag"] = "-Werror"
+            config_map["cc_warnings"] = "-Wall"
 
-    # print("VAR: %s" % ctx.var)
-    for k,v in ctx.var.items():
-        print("VAR: {k} : {v}".format(k=k, v=v))
-        config_map[k] = v
+    return config_map
 
-    # config_map["AR"] = ctx.var["AR"]
-    # config_map["ABI"] = ctx.var["ABI"]
-    # config_map["ABI_GLIBC_VERSION"] = ctx.var["ABI_GLIBC_VERSION"]
-    # config_map["GLIBC_VERSION"] = ctx.var["GLIBC_VERSION"]
-    # config_map["CC"] = ctx.var["CC"]
-    # config_map["C_COMPILER"] = ctx.var["C_COMPILER"]
-    # config_map["LD"] = ctx.var["LD"]
-    # config_map["NM"] = ctx.var["NM"]
-    # if ctx.var.get("OBJCOPY"):
-    #     config_map["OBJCOPY"] = ctx.var["OBJCOPY"]
-    # else:
-    #     config_map["OBJCOPY"] = None
-    # config_map["STRIP"] = ctx.var["STRIP"]
-    # config_map["TARGET_CPU"] = ctx.var["TARGET_CPU"]
-
-    # print("VERSION FILE: %s" % ctx.version_file)
-
+########################
+def cc_common_extract(ctx, tc, config_map):
+    print("CC_COMMON_EXTRACT")
     feature_config = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = tc,
@@ -63,66 +112,9 @@ def cc_tc_config_map(ctx):
         unsupported_features = DISABLED_FEATURES + ctx.disabled_features,
     )
 
-# AS_CASE([$host],
-#   [*-pc-windows],
-#     [CC=cl
-#     ccomptype=msvc
-#     S=asm
-#     SO=dll
-#     outputexe=-Fe
-#     syslib='$(1).lib'],
-#   [ccomptype=cc
-#   S=s
-#   SO=so
-#   outputexe='-o '
-#   syslib='-l$(1)'])
-
-    config_map["all_files"] = [f.path for f in tc.all_files.to_list()]
-    config_map["cpu"] = tc.cpu
-    #TODO: parse tc.target_gnu_system_name to get arch, system
-    # or use cpu ( == darwin_x86_64)
-    if tc.cpu.endswith("x86_64"):
-        config_map["arch"] = "amd64"
-    elif  tc.cpu == "k8":
-        config_map["arch"] = "amd64"
-    else:
-        config_map["arch"] = "unknown"
-
-    if tc.cpu.startswith("darwin"):
-        config_map["model"] = "default"
-        config_map["system"] = "macosx"
-    else:
-        config_map["model"] = "default"
-        config_map["system"] = "linux" ## FIXME
-
-    config_map["ccomptype"] = "msvc" if tc.compiler == "msvc" else "cc"
-    config_map["compiler"] = tc.compiler
-    if tc.compiler == "msvc":
-        config_map["outputobj"] = "-Fo"
-        config_map["warn_error_flag"] = "-WX"
-        config_map["cc_warnings"] = ""
-    else:
-        config_map["outputobj"] = "-o"
-        config_map["warn_error_flag"] = "-Werror"
-        config_map["cc_warnings"] = "-Wall"
-    config_map["compiler_executable"] = tc.compiler_executable
-    config_map["preprocessor_executable"] = tc.preprocessor_executable
-    config_map["ar_executable"] = tc.ar_executable
-    config_map["gcov_executable"] = tc.gcov_executable
-    config_map["ld_executable"] = tc.ld_executable
-    config_map["nm_executable"] = tc.nm_executable
-    config_map["objcopy_executable"] = tc.objcopy_executable
-    config_map["objdump_executable"] = tc.objdump_executable
-    config_map["strip_executable"] = tc.strip_executable
-
-    config_map["libc"] = tc.libc
-    config_map["sysroot"] = tc.sysroot
-    config_map["target_gnu_system_name"] = tc.target_gnu_system_name
-    config_map["built_in_include_directories"] = tc.built_in_include_directories
     config_map["dynamic_runtime_lib"] = tc.dynamic_runtime_lib(feature_configuration = feature_config).to_list()
     config_map["static_runtime_lib"] = tc.static_runtime_lib(feature_configuration = feature_config).to_list()
     config_map["for_dynamic_libs_needs_pic"] = tc.needs_pic_for_dynamic_libraries(feature_configuration = feature_config)
-
 
     c_compiler_path = cc_common.get_tool_for_action(
         feature_configuration = feature_config,
@@ -201,6 +193,159 @@ def cc_tc_config_map(ctx):
 
     # merged_contexts = cc_common.merge_compilation_contexts(
     #     compilation_contexts = cc_ccontexts)
+    return config_map
+
+################
+def cc_tc_test(ctx):
+    config_map = {}
+
+    config_map["target_host_platform"] = str(ctx.fragments.platform.host_platform)
+    config_map["target_platform"] = str(ctx.fragments.platform.platform)
+
+    config_map["host_host_platform"] = str(ctx.host_fragments.platform.host_platform)
+    config_map["host_platform"] = str(ctx.host_fragments.platform.platform)
+
+    for k,v in ctx.var.items():
+        print("VAR: {k} : {v}".format(k=k, v=v))
+        config_map[k] = v
+
+    tc = find_cpp_toolchain(ctx)
+
+    for k in dir(tc):
+        v = getattr(tc, k)
+        # print("Type {}: {}".format(k, type(v)))
+        if type(v) == "depset":
+            config_map[k] = [f.path for f in v.to_list()]
+        elif type(v) == "builtin_function_or_method":
+            ## ar_files, as_files, compiler_files,
+            ## coverage_files, etc.
+            # if k == "runtime_sysroot":
+            #     print("{}: {}".format(k, v()))
+            # Error in runtime_sysroot: Rule in 'config' cannot use private API
+            continue
+        else:
+            print("{} : {}".format(k, v))
+            config_map[k] = v
+            if k == "cpu":
+                if v.endswith("x86_64"):
+                    config_map["arch"] = "amd64"
+                elif  v == "k8":
+                    config_map["arch"] = "amd64"
+                else:
+                    config_map["arch"] = "unknown"
+                if v.startswith("darwin"):
+                    config_map["model"] = "default"
+                    config_map["system"] = "macosx"
+                else:
+                    config_map["model"] = "default"
+                    config_map["system"] = "linux" ## FIXME
+
+            # print("TC k: %{}, v: %{}".format(k, config_map[k]))
+
+    config_map = cc_common_extract(ctx, tc, config_map)
+
+    config_map = cc_cflags(ctx, tc, config_map)
+
+    return config_map
+
+################################################################
+## cc_tc_config_map used by
+##    config_cc_toolchain
+##    ocaml_cc_config
+def cc_tc_config_map(ctx):
+    config_map = {}
+
+    config_map["target_host_platform"] = str(ctx.fragments.platform.host_platform)
+    config_map["target_platform"] = str(ctx.fragments.platform.platform)
+
+    config_map["host_host_platform"] = str(ctx.host_fragments.platform.host_platform)
+    config_map["host_platform"] = str(ctx.host_fragments.platform.platform)
+
+    tc = find_cpp_toolchain(ctx)
+    # tc is a CcToolchainInfo
+    for item in dir(tc):
+        print("TC key: %s" % item)
+
+    # print("VAR: %s" % ctx.var)
+    for k,v in ctx.var.items():
+        print("VAR: {k} : {v}".format(k=k, v=v))
+        config_map[k] = v
+
+    # config_map["AR"] = ctx.var["AR"]
+    # config_map["ABI"] = ctx.var["ABI"]
+    # config_map["ABI_GLIBC_VERSION"] = ctx.var["ABI_GLIBC_VERSION"]
+    # config_map["GLIBC_VERSION"] = ctx.var["GLIBC_VERSION"]
+    # config_map["CC"] = ctx.var["CC"]
+    # config_map["C_COMPILER"] = ctx.var["C_COMPILER"]
+    # config_map["LD"] = ctx.var["LD"]
+    # config_map["NM"] = ctx.var["NM"]
+    # if ctx.var.get("OBJCOPY"):
+    #     config_map["OBJCOPY"] = ctx.var["OBJCOPY"]
+    # else:
+    #     config_map["OBJCOPY"] = None
+    # config_map["STRIP"] = ctx.var["STRIP"]
+    # config_map["TARGET_CPU"] = ctx.var["TARGET_CPU"]
+
+    # print("VERSION FILE: %s" % ctx.version_file)
+
+# AS_CASE([$host],
+#   [*-pc-windows],
+#     [CC=cl
+#     ccomptype=msvc
+#     S=asm
+#     SO=dll
+#     outputexe=-Fe
+#     syslib='$(1).lib'],
+#   [ccomptype=cc
+#   S=s
+#   SO=so
+#   outputexe='-o '
+#   syslib='-l$(1)'])
+
+    config_map["all_files"] = [f.path for f in tc.all_files.to_list()]
+    config_map["cpu"] = tc.cpu
+    #TODO: parse tc.target_gnu_system_name to get arch, system
+    # or use cpu ( == darwin_x86_64)
+    if tc.cpu.endswith("x86_64"):
+        config_map["arch"] = "amd64"
+    elif  tc.cpu == "k8":
+        config_map["arch"] = "amd64"
+    else:
+        config_map["arch"] = "unknown"
+
+    if tc.cpu.startswith("darwin"):
+        config_map["model"] = "default"
+        config_map["system"] = "macosx"
+    else:
+        config_map["model"] = "default"
+        config_map["system"] = "linux" ## FIXME
+
+    config_map["ccomptype"] = "msvc" if tc.compiler == "msvc" else "cc"
+    config_map["compiler"] = tc.compiler
+    if tc.compiler == "msvc":
+        config_map["outputobj"] = "-Fo"
+        config_map["warn_error_flag"] = "-WX"
+        config_map["cc_warnings"] = ""
+    else:
+        config_map["outputobj"] = "-o"
+        config_map["warn_error_flag"] = "-Werror"
+        config_map["cc_warnings"] = "-Wall"
+    config_map["compiler_executable"] = tc.compiler_executable
+    config_map["preprocessor_executable"] = tc.preprocessor_executable
+    config_map["ar_executable"] = tc.ar_executable
+    config_map["gcov_executable"] = tc.gcov_executable
+    config_map["ld_executable"] = tc.ld_executable
+    config_map["nm_executable"] = tc.nm_executable
+    config_map["objcopy_executable"] = tc.objcopy_executable
+    config_map["objdump_executable"] = tc.objdump_executable
+    config_map["strip_executable"] = tc.strip_executable
+
+    config_map["libc"] = tc.libc
+    config_map["sysroot"] = tc.sysroot
+    config_map["target_gnu_system_name"] = tc.target_gnu_system_name
+    config_map["built_in_include_directories"] = tc.built_in_include_directories
+
+    config_map = cc_common_extract(ctx, tc, config_map)
 
     config_map["copts"]    = ctx.fragments.cpp.copts
     copts = []
@@ -228,9 +373,14 @@ def cc_tc_config_map(ctx):
     return config_map
 
 ###################################
+## config_cc_toolchain inspects the toolchain selected by bazel,
+# and writes its description out to a json file, so that
+# it can be transferred to OCaml's Config module fields.
+## see https://bazel.build/configure/integrate-cpp
 def _config_cc_toolchain_impl(ctx):
 
-    config_map = cc_tc_config_map(ctx)
+    # config_map = cc_tc_config_map(ctx)
+    config_map = cc_tc_test(ctx)
     # print("config_map: %s" % config_map)
 
     # ctx.actions.run(
@@ -245,9 +395,10 @@ def _config_cc_toolchain_impl(ctx):
     # )
 
     config_map["host"] = "{arch}-{vendor}-{os}{osrev}".format(
-        arch = HWARCH, vendor = "apple", os = OS, osrev = OSREV
+        arch = HWARCH, vendor = "apple",
+        os = OS.lower(), osrev = OSREV
     )
-    config_map["target"] = "acme"
+    config_map["target"] = config_map["host"]
 
     config_map_json = json.encode_indent(config_map)
     ctx.actions.write(
@@ -276,11 +427,11 @@ def _config_cc_toolchain_impl(ctx):
         c_compiler_path = config_map["c_compiler_path"],
         cc_flags_make_variable = config_map["cc_flags_make_variable"],
         cc_has_debug_prefix_map = config_map["cc_has_debug_prefix_map"],
-        cc_warnings = config_map["cc_warnings"],
-        ccomptype = config_map["ccomptype"],
+        # cc_warnings = config_map["cc_warnings"],
+        # ccomptype = config_map["ccomptype"],
         compiler = config_map["compiler"],
         compiler_executable = config_map["compiler_executable"],
-        copts = config_map["copts"],
+        # copts = config_map["copts"],
 
         # cpp_link_dso_cmd_line = config_map["cpp_link_dso_cmd_line"],
         cpp_link_exe_cmd_line = config_map["cpp_link_exe_cmd_line"],
@@ -296,12 +447,12 @@ def _config_cc_toolchain_impl(ctx):
         host_platform = config_map["host_platform"],
         ld_executable = config_map["ld_executable"],
         libc = config_map["libc"],
-        linkopts = config_map["linkopts"],
+        # linkopts = config_map["linkopts"],
         model = config_map["model"],
         nm_executable = config_map["nm_executable"],
         objcopy_executable = config_map["objcopy_executable"],
         objdump_executable = config_map["objdump_executable"],
-        outputobj = config_map["outputobj"],
+        # outputobj = config_map["outputobj"],
         preprocess_assemble_cmd_line = config_map["preprocess_assemble_cmd_line"],
         preprocessor_executable = config_map["preprocessor_executable"],
         static_runtime_lib = config_map["static_runtime_lib"],
@@ -314,7 +465,7 @@ def _config_cc_toolchain_impl(ctx):
         # user_copts = config_map["user_copts"],
         # user_defines = config_map["user_defines"],
         # user_linkopts = config_map["user_linkopts"],
-        warn_error_flag = config_map["warn_error_flag"],
+        # warn_error_flag = config_map["warn_error_flag"],
     )
 
     ########
@@ -323,11 +474,7 @@ def _config_cc_toolchain_impl(ctx):
         ocamlCcToolchainInfo
     ]
 
-####################
-## config_cc_toolchain inspects the toolchain selected by bazel,
-# and writes its description out to a json file, so that
-# it can be transferred to OCaml's Config module fields.
-## see https://bazel.build/configure/integrate-cpp
+###########################
 config_cc_toolchain = rule(
     implementation = _config_cc_toolchain_impl,
     attrs = {

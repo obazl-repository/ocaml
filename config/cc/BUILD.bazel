@@ -7,6 +7,12 @@ bool_flag(
     visibility = ["//visibility:public"]
 )
 
+bool_flag(
+    name = "debug-prefix-map",
+    build_setting_default = False,
+    visibility = ["//visibility:public"]
+)
+
 bool_flag(name = "verbose", build_setting_default = False,
           tags = ["diagnostics", "verbosity"],
           visibility = ["//visibility:public"])

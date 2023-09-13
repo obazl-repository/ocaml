@@ -1,0 +1,13 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+string_flag(
+    name = "vmruntime",
+    build_setting_default = "std",
+    values = ["std", "custom", "dynamic"],
+    visibility = ["//visibility:public"]
+)
+
+config_setting(name = "std?", flag_values = {":vmruntime": "std"})
+config_setting(name = "custom?", flag_values = {":vmruntime": "custom"})
+config_setting(name = "dynamic?", flag_values = {":vmruntime": "dynamic"})
+

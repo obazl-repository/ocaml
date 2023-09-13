@@ -9,7 +9,7 @@ Categories:
 * D: deployment configuration
 * B: build config
 * TC: toolchain config
-* SYS: system config
+* SYS: system config (hw, os)
 * X:  sw config, e.g. version numbers
 
 An asterisk '*' marks items that are not needed for Bazel builds. All
@@ -75,7 +75,7 @@ derive the item or not, e.g. ENDIANNESS.
 | *SYS | ARCH | .configure | Makefile.config | detected by Bazel
 | *SYS | ARCH64 | .configure | Makefile.config | boolean;  detected by Bazel
 | ?SYS | ENDIANNESS | .configure | Makefile.config | boolean;  inferrable by Bazel?
-| ?SYS | MODEL | .configure | Makefile.config | only for ARCH=power
+| ?SYS | MODEL | .configure | Makefile.config | set to MODEL_default except when ARCH=power
 | *SYS | SYSTEM | .configure | Makefile.config | OS; detected by bazel
 | *TC | ASM | .configure | Makefile.config | cmd and flags for running assembler; derivable from Bazel tc
 | *TC | SAPP | .configure | Makefile.config | cmd and flags for running preprocessor  and assembler; derivable from Bazel tc

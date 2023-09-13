@@ -177,7 +177,7 @@ kernel_module(
     name   = "CamlinternalFormatBasics",
     struct = "camlinternalFormatBasics.ml",
     sig    = "CamlinternalFormatBasics_cmi",
-    opts   = ["-nopervasives", "-verbose"]
+    opts   = ["-nopervasives"], # "-verbose"]
     # sig    = select({
     #     "//config:sig_src?": "camlinternalFormatBasics.mli",
     #     "//conditions:default": "CamlinternalFormatBasics_cmi",

@@ -1,0 +1,102 @@
+bindir : deploy
+
+standard_library_default: build
+
+ccomp_type: cc_toolchain
+c_compiler: cc_toolchain
+c_output_obj: cc_toolchain
+c_has_debug_prefix_map: cc_toolchain
+as_has_debug_prefix_map: cc_toolchain
+ocamlc_cflags: cc_toolchain
+ocamlc_cppflags: cc_toolchain
+ocamlopt_cflags: cc_toolchain
+ocamlopt_cppflags: cc_toolchain
+bytecomp_c_libraries: cc_toolchain? build?
+bytecomp_c_compiler:  build?
+native_c_compiler:    build?
+native_c_libraries:   cc_toolchain? build?
+native_pack_linker:   cc_toolchain {|ld -r -arch x86_64 -o |}
+
+let default_rpath = {||}
+let mksharedlibrpath = {||}
+
+ar:  cc_toolchain
+
+supports_shared_libraries: cc_toolchain? sys?
+
+## mk* : embedded in compilers to drive cc compile/link
+## NB: may involve cross-compilation
+mkdll: build
+mkexe: build
+mkmaindll: build
+
+flambda: build, or not a config parameter? platform?
+    configure:  --enable-flambda
+
+with_flambda_invariants: flambda config
+    configure:   --enable-flambda-invariants
+
+with_cmm_invariants: build (native only)
+    configure:   --enable-cmm-invariants
+
+windows_unicode: build?
+
+force_instrumented_runtime: build
+    configure:  --enable-instrumented-runtime: build the instrumented runtime [default=auto]
+
+flat_float_array: build
+    configure:  --disable-flat-float-array
+                          do not use flat float arrays
+
+function_sections: cc_toolchain: feature, build
+    configure  --disable-function-sections
+                          do not emit each function in a separate section
+
+afl_instrument: build
+    config:  --with-afl              use the AFL fuzzer
+    but asmcomp is always built with Afl_instrument
+    ditto for runtime, always includes afl.c?
+    i.e. always available, controlled by compile flag -afl_instrument
+    default is off; passing --with-afl at build time sets default to true
+
+architecture: sysfeature
+model: sysfeature
+system: sysfeature
+
+asm: cc_toolchain
+asm_cfi_supported: sysfeature? cc_toolchain; configure opt: --disable-cfi
+
+with_frame_pointers: build
+    NB: not feature detection, so not cc_toolchain config
+    configure opt: --enable-frame-pointers use frame pointers in runtime and generated code
+    https://people.cs.rutgers.edu/~pxk/419/notes/frames.html#:~:text=Understanding%20Frame%20Pointers
+
+profinfo: build (runtime only; spacetime profiling)
+profinfo_width: build
+
+ext_exe:  cc_toolchain? or build?
+ext_obj: same
+ext_asm: same
+ext_lib: same
+ext_dll: same
+
+host: sys
+target: sys
+
+let systhread_supported = true
+    configure: --disable-systhreads: disable the Win32/POSIX threads library
+    NB: "systhreads": custom wrapper around posix/win thread libs, in otherlibs/systhreads
+
+let flexdll_dirs = []
+
+################
+other stuff from ./configure options:
+
+  --enable-imprecise-c99-float-ops
+                           enables potentially imprecise replacement
+                           implementations of C99 float ops if unavailable on
+                           this platform
+
+  --enable-mmap-map-stack use mmap to allocate stacks instead of malloc
+
+  --enable-warn-error     treat C compiler warnings as errors

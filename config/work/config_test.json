@@ -1,0 +1,7 @@
+{
+    "mkexe_cmd": "-a -b -foo",
+    "flambda": true,
+    "with_flambda_invariants":	true,
+    "with_cmm_invariants":	true,
+    "xxxx": "foobar"
+}

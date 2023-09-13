@@ -1,0 +1,178 @@
+[linux.x86_64]
+# AC_DEFINE([HAS_ARCH_CODE32], [1]),
+
+[linux.powerpc.gcc]
+oc_ldflags = ["-mbss-plt"]
+
+[clang]
+warn_error_flag = "-Werror"
+cc_warnings = "-Wall"
+cc_has_debug_prefix_map = true
+common_cflags = ["-O2", "-fno-strict-aliasing", "-fwrapv"]
+internal_cflags = ["$cc_warnings", "-fno-common"]
+
+[macos.x86_64] ## == darwin
+endianness = "le"
+bits = 64
+arch64 = true
+oc_ldflags = ["-Wl,-no_compact_unwind"]
+ocaml_os_type = "Unix"
+defines = ["HAS_FULL_THREAD_VARIABLES"]
+
+mkdll_flags = [
+    "-shared", "-undefined", "dynamic_lookup",
+    "-Wl,-no_compact_unwind", "-Wl,-w"
+]
+supports_shared_libraries = true
+
+[macos.aarch64]
+endianness = "le"
+bits = 64
+arch64 = true
+defines = ["ARCH_SIXTYFOUR"]
+SIZEOF_INT = 4
+SIZEOF_LONG = 8
+SIZEOF_LONG_P = 8
+SIZEOF_SHORT = 2
+SIZEOF_LONG_LONG = 8
+ARCH_SIXTYFOUR = 1
+SIZEOF_PTR = 8
+SIZEOF_LONGLONG = 8
+ALIGNOF_DOUBLE = 8
+ALIGNOF_LONG = 8
+ALIGNOF_LONG_LONG = 8
+ocaml_os_type = "Unix"
+
+mkdll_flags = [
+    "-shared", "-undefined", "dynamic_lookup", "-Wl,-w"
+]
+supports_shared_libraries = true
+
+[gcc]
+warn_error_flag = "-Werror"
+cc_warnings = "-Wall"
+common_cflags = ["-O2", "-fno-strict-aliasing", "-fwrapv"]
+internal_cflags = [
+    "$cc_warnings",
+    "-fno-common", "-fexcess-precision=standard"
+]
+# 32bit arch: cclibs="$cclibs -latomic"
+
+[cygwin]
+ostype = "Cygwin"
+
+# AS_IF([$supports_shared_libraries],
+      [mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain} ${flexlink_flags}"
+      mkexe_cflags=''
+      mkexe_ldflags_prefix='-link '],
+      [mkexe_extra_flags=''
+      oc_ldflags='-Wl,--stack,16777216']
+
+
+[cygwin.gcc]
+common_cppflags = "$common_cppflags -U_WIN32"
+
+[cygwin.i686]
+flexdll_chain = "cygwin"
+flexlink_stack = 16777216
+flexlink_merge-manifest = true
+
+[cygwin.x86_64]
+flexdll_chain = "cygwin64"
+flexlink_stack = 16777216
+flexlink_merge-manifest = true
+
+[mingw32]
+ostype = "Win32"
+toolchain = "mingw"
+defines = ["HAS_FULL_THREAD_VARIABLES"]
+
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cflags=''
+    mkexe_ldflags_prefix='-link '
+    oc_exe_ldflags='-municode'
+    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
+    SO="dll"],
+
+[mingw32.gcc]
+warn_error_flag = "-Werror"
+cc_warnings = "-Wall"
+common_cflags = ["-O2", "-fno-strict-aliasing", "-fwrapv"]
+internal_cflags = [
+    "$cc_warnings",
+    "-fno-common", "-fexcess-precision=standard"
+]
+
+[mingw32.i686-w64]
+oc_dll_ldflags = ["-static-libgcc"]
+flexdll_chain = "mingw"
+flexlink_stack = 16777216
+
+[mingw32.x86_64-w64]
+flexdll_chain = "mingw64"
+flexlink_stack = 33554432
+
+[windows]
+    [toolchain=msvc
+    ostype="Win32"
+    mkexe_cmd_exp="flexlink -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cmd="${flexlink_cmd} -exe -chain ${flexdll_chain} ${flexlink_flags}"
+    mkexe_cflags=''
+    mkexe_ldflags_prefix='-link '
+    mkexe_via_cc_ldflags_prefix='/link '
+    oc_exe_ldflags='/ENTRY:wmainCRTStartup'
+    mkexe_extra_flags="$mkexe_ldflags_prefix$oc_exe_ldflags"
+    mkexedebugflag=''],
+
+
+[windows.i686]
+flexdll_chain = "msvc"
+flexlink_stack = 16777216
+flexlink_merge-manifest = true
+
+[windows.x86_64]
+flexdll_chain = "msvc64"
+flexlink_stack = 33554432
+flexlink_merge-manifest = true
+
+[msvc]
+outputobj = "-Fo"
+warn_error_flag = "-WX"
+cc_warnings = []
+outputobj = ["-Fo"]
+warn_error_flag = ["-WX"]
+common_cflags = [
+    "-nologo", "-O2", "-Gy-",
+    "-MD", "$cc_warnings"
+]
+internal_cppflags = [
+    "'-DUNICODE -D_UNICODE'"
+    "-DWINDOWS_UNICODE=$(WINDOWS_UNICODE)",
+    ## IF OCAML_CL_HAS_VOLATILE_METADATA:
+    "-d2VolatileMetadata-"
+]
+
+[xlc]
+outputobj = "-o"
+warn_error_flag = ""
+cc_warnings = ["-qflag=i:i"] # all warnings enabled
+common_cflags = [
+    "-O5", "-qtune=balanced", "-qnoipa", "-qinline"]
+internal_cflags = ["$cc_warnings"]
+
+[xlc.powerpc.ibm-aix],
+oc_ldflags = ["-brtl", "-bexpfull"]
+# AC_DEFINE([HAS_ARCH_CODE32], [1])],
+
+[sunc]
+outputobj = "-o"
+cc_warnings = [""]
+# Optimization should be >= O4 to inline functions
+# and prevent unresolved externals
+common_cflags = ["-O4", "-xc99=all", "-D_XPG6", "$CFLAGS"]
+internal_cflags = ["$cc_warnings"]
+
+[other]
+common_cflags = ["-O"]

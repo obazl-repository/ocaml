@@ -1,0 +1,30 @@
+{
+    "clang": {
+        "cc_has_debug_prefix_map": true,
+        "common_cflags": [
+            "-O2", "-fno-strict-aliasing", "-fwrapv"],
+        "internal_cflags": ["$cc_warnings", "-fno-common"]
+    },
+    "gcc": {
+        "common_cflags": [
+            "-O2", "-fno-strict-aliasing", "-fwrapv"
+        ],
+        "internal_cflags": = [
+            "$cc_warnings",
+            "-fno-common", "-fexcess-precision=standard"
+        ]
+    }
+    "msvc": {
+        "outputobj": ["-Fo"],
+        "warn_error_flag": ["-WX"],
+        "cc_warnings": [""],
+        "common_cflags": = [
+            "-nologo", "-O2", "-Gy-",
+            "-MD", "$cc_warnings"],
+        "internal_cppflags": = [
+            "'-DUNICODE -D_UNICODE'"
+            "-DWINDOWS_UNICODE=$(WINDOWS_UNICODE)",
+            "IF OCAML_CL_HAS_VOLATILE_METADATA:",
+            "-d2VolatileMetadata-"
+    }
+}

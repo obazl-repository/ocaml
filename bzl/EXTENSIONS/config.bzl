@@ -26,10 +26,10 @@ HWARCH = "{hw}"
         """.format(os = os, rev = revision, hw = hwarch)
     )
 
-    # print("repo_ctx.os.arch: %s" % repo_ctx.os.arch)
+    print("repo_ctx.os.arch: %s" % repo_ctx.os.arch)
     # for k,v in repo_ctx.os.environ.items():
     #     print("ENV {k} : {v}".format(k=k,v=v))
-    # print("repo_ctx.os.name: %s" % repo_ctx.os.name)
+    print("repo_ctx.os.name: %s" % repo_ctx.os.name)
 
     xcrun = repo_ctx.which("xcrun")
     # print("XCRUN: %s" % xcrun)

@@ -320,7 +320,7 @@ mustache(
     name = "runtimedef_ml",
     out  = "runtimedef.ml",
     json = "//runtime:primitives.json",
-    template = "runtimedef.ml.mustache",
+    template = "runtimedef.mustache.ml",
 )
 
 # genrule(
