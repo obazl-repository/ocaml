@@ -335,7 +335,7 @@ mustache(
 ## WARNING: on windows the build for asm files is different, see //Makefile
 filegroup(
     name = "common_c_sources",
-    srcs = ["sync_posix.h"] + glob(
+    srcs = ["sync_posix.h", "build_config.h"] + glob(
         include = ["*.c"],
         exclude = [
             "alloc.original.c",
@@ -1085,3 +1085,57 @@ string_list_flag(name = "args", build_setting_default = [],
 #     visibility = ["//visibility:public"]
 # )
 
+################################################################
+genrule(
+    name = "makeprims",
+    outs = ["primitives.txt"],
+    srcs = [
+        "afl.c",
+        "alloc.c",
+        "array.c",
+        "backtrace.c",
+        "backtrace_byt.c",
+        "bigarray.c",
+        "callback.c",
+        "compare.c",
+        "domain.c",
+        "dynlink.c",
+        "extern.c",
+        "fiber.c",
+        "finalise.c",
+        "floats.c",
+        "gc_ctrl.c",
+        "hash.c",
+        "intern.c",
+        "interp.c",
+        "ints.original.c",
+        "io.c",
+        "lexing.c",
+        "md5.c",
+        "memory.c",
+        "memprof.c",
+        "meta.c",
+        "obj.c",
+        "parsing.c",
+        "platform.c",
+        "prng.c",
+        "runtime_events.c",
+        "signals.c",
+        "startup_aux.c",
+        "str.c",
+        "sync.c",
+        "sys.c",
+        "weak.c",
+    ],
+    cmd  = " ".join([
+        "$(execpath :extract_prims);",
+        "cp primitives.dat $@;"
+    ]),
+    tools = [":extract_prims"]
+)
+
+cc_binary(
+    name = "extract_prims",
+    srcs = ["extract_primitives.c"],
+    data = ["ints.c"]
+)
